@@ -3,7 +3,7 @@
 
 javac -classpath "junit-4.10.jar" hello/*.java
 java -classpath ".:./junit-4.10.jar" hello/Runner
-java -classpath ".:./junit-4.10.jar" -javaagent:appmap-0.5.0-java11.jar hello/Runner
+APPMAP=true java -classpath ".:./junit-4.10.jar" -javaagent:appmap-0.5.0-java11.jar hello/Runner
 
 # APPMAP=true java -classpath ".:./junit-4.10.jar" -javaagent:appmap-0.5.0-java11.jar hello/Runner
 
