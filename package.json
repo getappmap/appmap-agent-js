@@ -1,0 +1,15 @@
+{
+  "name": "@appland/appmap-agent-js",
+  "version": "0.0.0",
+  "scripts": {},
+  "files": [],
+  "dependencies": {},
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/applandinc/appmap-agent-js.git"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
