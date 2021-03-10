@@ -4,12 +4,9 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 
 public class HelloTest {
+  Hello hello = new Hello();
   @Test
-  public void testYolo () {
-    assertEquals(Hello.yolo(), "Yolo");
-  }
-  @Test
-  public void testSwag () {
-    assertEquals(Hello.swag(), "Swag");
+  public void testFoo () {
+    assertEquals(hello.foo(), "bar");
   }
 }

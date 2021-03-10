@@ -1,10 +1,11 @@
 package hello;
 
 public class Hello {
-  public static String yolo () {
-    return "Yolo";
+  public String foo () {
+    System.out.println("foo");
+    return this.bar();
   }
-  public static String swag () {
-    return "Swag";
+  public String bar () {
+    return "bar";
   }
 }
