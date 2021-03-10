@@ -3,7 +3,9 @@
   "version": "0.0.0",
   "scripts": {},
   "files": [],
-  "dependencies": {},
+  "dependencies": {
+    "yaml": "^1.10.0"
+  },
   "devDependencies": {},
   "repository": {
     "type": "git",
