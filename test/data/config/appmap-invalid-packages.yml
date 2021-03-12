@@ -1,0 +1,7 @@
+# comment
+name: appname
+packages: foo
+exclude:
+- Class
+- Class#instanceMethod
+- Class.classMethod

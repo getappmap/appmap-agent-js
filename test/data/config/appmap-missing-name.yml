@@ -1,0 +1,8 @@
+# comment
+packages:
+- path: package1
+- path: package2
+exclude:
+- Class
+- Class#instanceMethod
+- Class.classMethod

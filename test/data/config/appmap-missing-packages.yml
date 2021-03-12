@@ -1,0 +1,6 @@
+# comment
+name: appname
+exclude:
+- Class
+- Class#instanceMethod
+- Class.classMethod

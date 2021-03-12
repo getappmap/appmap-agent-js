@@ -1,0 +1,11 @@
+# comment
+name:
+  - foo
+  - bar
+packages:
+- path: package1
+- path: package2
+exclude:
+- Class
+- Class#instanceMethod
+- Class.classMethod

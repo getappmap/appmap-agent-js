@@ -20,9 +20,17 @@ const spawnSync = (command) => {
   }
 };
 
-const prettify = (path) => spawnSync(`npx prettier --write ${path}`);
+const prettify = (path) => {
+  if (!argv.raw) {
+    spawnSync(`npx prettier --write ${path}`);
+  }
+}
 
-const lint = (path) => spawnSync(`npx eslint ${path}`);
+const lint = (path) => {
+  if (!argv.raw) {
+    spawnSync(`npx eslint ${path}`);
+  }
+}
 
 const test = (path) => spawnSync(`node ${path}`);
 
@@ -35,14 +43,19 @@ const testGraphicalCoverage = (path1, path2) => {
 
 const testTextualCoverage = (check, path1, path2) => {
   spawnSync(
-    `npx c8 --reporter=text-summary${check ? ' --check-coverage --branches 100 --functions 100 --lines 100 --statements 100 ' : ' '}--include ${path1}.js node ${path2}.js`,
+    `npx c8 --reporter=text-summary${check ? ' --check-coverage --branches 100 --functions 100 --lines 100 --statements 100 ' : ' '}--include ${path1} node ${path2}`,
   );
 };
 
-const argv = Object.assign({target:null, check:false}, minimist(process.argv.slice(2)));
+const argv = {
+  target: null,
+  check: false,
+  raw: false,
+  ...minimist(process.argv.slice(2))
+};
 
-if (argv.target === null) {
-  const path1 = process.argv[2];
+if (argv.target !== null) {
+  const path1 = argv.target;
   console.log(Chalk.bgMagenta(path1));
   prettify(path1);
   lint(path1);
@@ -55,8 +68,8 @@ if (argv.target === null) {
   }
 } else {
   [
-    'instrumenter/loggr.mjs',
-    'instrumenter/env.mjs',
+    'instrumenter/logger.mjs',
+    'instrumenter/settings.mjs',
     'instrumenter/git.mjs',
     'instrumenter/appmap.mjs',
   ].forEach((path) => {

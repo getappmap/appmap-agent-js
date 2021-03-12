@@ -2,6 +2,7 @@
   "root": true,
   "extends": ["airbnb-base", "prettier"],
   "rules": {
-    "lines-between-class-members": "off"
+    "lines-between-class-members": "off",
+    "spaced-comment": "off"
   }
 }
