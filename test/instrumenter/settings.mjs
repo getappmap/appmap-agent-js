@@ -4,7 +4,7 @@ import Yaml from 'yaml';
 import * as Logger from '../../lib/instrumenter/logger.mjs';
 import Settings from '../../lib/instrumenter/settings.mjs';
 
-Logger.reloadGlobalLevel('DEBUG');
+Logger.reloadGlobalLevel('CRITICAL');
 
 const AssertStrict = Assert.strict;
 
