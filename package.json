@@ -4,6 +4,7 @@
   "scripts": {},
   "files": [],
   "dependencies": {
+    "acorn": "^7.4.1",
     "yaml": "^1.10.0"
   },
   "devDependencies": {
