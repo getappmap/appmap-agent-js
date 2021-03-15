@@ -2,3 +2,5 @@
 /node_modules/
 /coverage/
 /.nyc_output/
+/test/data/config/
+/test/data/hellogitworld/

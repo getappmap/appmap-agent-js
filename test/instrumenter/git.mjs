@@ -5,6 +5,10 @@ import * as Logger from '../../lib/instrumenter/logger.mjs';
 const AssertStrict = Assert.strict;
 Logger.reloadGlobalLevel('CRITICAL');
 
+if (!Fs.readdirSync("test/data/").includes("hellogitworld")) {
+  require("child_process").execSync("git clone https://github.com/githubtraining/hellogitworld.git test/data");
+}
+
 const git = new Git();
 
 AssertStrict.equal(git.isRepository(), true);

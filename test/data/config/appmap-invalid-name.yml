@@ -1,11 +1,16 @@
-# comment
-name:
-  - foo
-  - bar
+name: null
 packages:
-- path: package1
-- path: package2
+  - path: package1
+  - path: package2
+    shallow: true
+  - path: package3
+    shallow: false
+  - path: package4
+    shallow: null
+  - ? path
+  - null
 exclude:
-- Class
-- Class#instanceMethod
-- Class.classMethod
+  - Class
+  - Class#instanceMethod
+  - Class.classMethod
+  - null
