@@ -1,0 +1,16 @@
+packages:
+  - null
+  - foo: bar
+  - ? path
+  - path: package1
+  - path: package2
+    shallow: true
+  - path: package3
+    shallow: false
+  - path: package4
+    shallow: null
+exclude:
+  - Class
+  - Class#instanceMethod
+  - Class.classMethod
+  - null

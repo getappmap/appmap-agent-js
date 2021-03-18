@@ -2,5 +2,4 @@
 /node_modules/
 /coverage/
 /.nyc_output/
-/test/data/config/
-/test/data/git/
+/test/unit/env/git/
