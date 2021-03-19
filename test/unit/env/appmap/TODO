@@ -1,0 +1,39 @@
+{
+  "version": "1.4",
+  "metadata": {
+    "name": "TODO",
+    "labels": [
+      "TODO"
+    ],
+    "app": "myapp",
+    "feature": "TODO",
+    "feature_group": "TODO",
+    "language": {
+      "name": "javascript",
+      "engine": null,
+      "version": "ECMAScript2020"
+    },
+    "client": {},
+    "recorder": {
+      "name": "default"
+    },
+    "recording": {
+      "defined_class": "TODO",
+      "method_id": "TODO"
+    },
+    "git": {
+      "repository": "https://github.com/lachrist/sample.git",
+      "branch": "main",
+      "commit": "d15a7e72b7d0710a5f589ae1e5152492d8bb1eff",
+      "status": [
+        ""
+      ],
+      "tag": "v0.0.1",
+      "annotated_tag": "v0.0.0",
+      "commits_since_tag": 1,
+      "commits_since_annotated_tag": 2
+    }
+  },
+  "classMap": [],
+  "events": []
+}
