@@ -72,7 +72,8 @@ const main = (argv) => {
     'lib/logger.mjs',
     'lib/settings.mjs',
     'lib/git.mjs',
-    // 'lib/appmap.mjs',
+    'lib/appmap.mjs',
+    'lib/namespace.mjs',
   ].forEach((path) => {
     run(path, argv.raw, true);
   });
