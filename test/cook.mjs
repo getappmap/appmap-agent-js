@@ -61,17 +61,17 @@ const main = (argv) => {
     return run(argv.target, argv.raw, false);
   }
   [
-    'src/es2015/empty-marker.js',
-    'src/es2015/event-counter.js',
-    'src/es2015/get-now.js',
-    'src/es2015/serialize.js',
-    'src/es2015/get-identity.js',
-    'src/es2015/node/send/local.js',
-    'src/es2015/node/setup-engine.js',
-    'src/es2015/node/setup-archive.js',
-    // 'lib/logger.mjs',
-    // 'lib/settings.mjs',
-    // 'lib/git.mjs',
+    // 'src/es2015/empty-marker.js',
+    // 'src/es2015/event-counter.js',
+    // 'src/es2015/get-now.js',
+    // 'src/es2015/serialize.js',
+    // 'src/es2015/get-identity.js',
+    // 'src/es2015/node/send/local.js',
+    // 'src/es2015/node/setup-engine.js',
+    // 'src/es2015/node/setup-archive.js',
+    'lib/logger.mjs',
+    'lib/settings.mjs',
+    'lib/git.mjs',
     // 'lib/appmap.mjs',
   ].forEach((path) => {
     run(path, argv.raw, true);

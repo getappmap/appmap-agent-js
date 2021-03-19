@@ -1,16 +1,16 @@
 import * as Fs from 'fs';
 import * as ChildProcess from 'child_process';
-import * as Assert from 'assert';
-import * as Logger from '../../lib/instrumenter/logger.mjs';
-import Git from '../../lib/instrumenter/git.mjs';
+import { strict as Assert } from 'assert';
+import * as Logger from '../../../lib/logger.mjs';
+import Git from '../../../lib/git.mjs';
 
 const AssertStrict = Assert.strict;
 Logger.reloadGlobalLevel('DEBUG');
 
 const url = 'https://github.com/lachrist/sample.git';
-const path = 'test/data/git/';
+const path = 'test/unit/env/git/';
 
-if (!Fs.readdirSync('test/data/').includes('git')) {
+if (!Fs.readdirSync('test/unit/env/').includes('git')) {
   ChildProcess.execSync(`git clone ${url} ${path}`);
 }
 
@@ -31,7 +31,7 @@ if (!Fs.readdirSync('test/data/').includes('git')) {
 }
 
 {
-  const git = new Git("/");
+  const git = new Git('/');
   AssertStrict.equal(git.isRepository(), false);
   AssertStrict.equal(git.getRepositoryURL(), null);
   AssertStrict.equal(git.getBranchName(), null);

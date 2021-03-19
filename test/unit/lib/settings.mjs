@@ -1,12 +1,10 @@
 import * as Fs from 'fs';
-import * as Assert from 'assert';
+import { strict as Assert } from 'assert';
 import Yaml from 'yaml';
-import * as Logger from '../../lib/instrumenter/logger.mjs';
-import Settings from '../../lib/instrumenter/settings.mjs';
+import * as Logger from '../../../lib/logger.mjs';
+import Settings from '../../../lib/settings.mjs';
 
 Logger.reloadGlobalLevel('CRITICAL');
-
-const AssertStrict = Assert.strict;
 
 const inputString = `#comment
 name: appname
@@ -44,7 +42,7 @@ const makeMissing = (path, key) => {
   return { APPMAP_CONFIG: path };
 };
 
-Fs.writeFileSync('test/data/config/appmap.yml', inputString, 'utf8');
+Fs.writeFileSync('test/unit/env/config/appmap.yml', inputString, 'utf8');
 
 const prototype = {
   enabled: false,
@@ -68,22 +66,22 @@ const makeFresh = (array, element) => {
 };
 
 const checkSettings = (settings, expected) => {
-  AssertStrict.equal(settings.getOutputDir(), expected.outdir);
-  AssertStrict.equal(settings.getAppName(), expected.appname);
+  Assert.equal(settings.getOutputDir(), expected.outdir);
+  Assert.equal(settings.getAppName(), expected.appname);
   expected.exclusions.forEach((exclusion) => {
-    AssertStrict.equal(settings.isExcluded('package', exclusion), true);
+    Assert.equal(settings.isExcluded('package', exclusion), true);
   });
-  AssertStrict.equal(
+  Assert.equal(
     settings.isExcluded('package', makeFresh(expected.exclusions, 'Class')),
     false,
   );
   expected.packages.forEach(({ path, depth }) => {
-    AssertStrict.equal(
+    Assert.equal(
       settings.getInstrumentationDepth(path),
       expected.enabled ? depth : 0,
     );
   });
-  AssertStrict.equal(
+  Assert.equal(
     settings.getInstrumentationDepth(makeFresh(expected.packages, 'package')),
     0,
   );
@@ -93,7 +91,7 @@ const checkSettings = (settings, expected) => {
   checkSettings(
     new Settings({
       ...env,
-      APPMAP_CONFIG: 'test/data/config/appmap.yml',
+      APPMAP_CONFIG: 'test/unit/env/config/appmap.yml',
       APPMAP_OUTPUT_DIR: 'appmap/output/dir/',
     }),
     {
@@ -104,27 +102,27 @@ const checkSettings = (settings, expected) => {
   );
 });
 
-process.chdir('test/data/config/');
+process.chdir('test/unit/env/config/');
 [{ APPMAP: 'false' }, { APPMAP: 'FALSE' }, { APPMAP: 'foobar' }, {}].forEach(
   (env) => {
     checkSettings(new Settings(env), prototype);
   },
 );
-process.chdir('../../../');
+process.chdir('../../../../');
 
 [
   {
-    APPMAP_CONFIG: 'test/data/config/missing.yml',
+    APPMAP_CONFIG: 'test/unit/env/config/missing.yml',
   },
   {
     APPMAP_CONFIG:
-      (Fs.writeFileSync('test/data/config/unparsable.yml', '- * -', 'utf8'),
-      'test/data/config/unparsable.yml'),
+      (Fs.writeFileSync('test/unit/env/config/unparsable.yml', '- * -', 'utf8'),
+      'test/unit/env/config/unparsable.yml'),
   },
   {
     APPMAP_CONFIG:
-      (Fs.writeFileSync('test/data/config/invalid.yml', 'null', 'utf8'),
-      'test/data/config/invalid.yml'),
+      (Fs.writeFileSync('test/unit/env/config/invalid.yml', 'null', 'utf8'),
+      'test/unit/env/config/invalid.yml'),
   },
 ].forEach((env) => {
   checkSettings(new Settings(env), {
@@ -136,8 +134,8 @@ process.chdir('../../../');
 });
 
 [
-  makeInvalid('test/data/config/invalid-name.yml', 'name'),
-  makeMissing('test/data/config/missing-name.yml', 'name'),
+  makeInvalid('test/unit/env/config/invalid-name.yml', 'name'),
+  makeMissing('test/unit/env/config/missing-name.yml', 'name'),
 ].forEach((env) => {
   checkSettings(new Settings(env), {
     __proto__: prototype,
@@ -146,8 +144,8 @@ process.chdir('../../../');
 });
 
 [
-  makeInvalid('test/data/config/invalid-packages.yml', 'packages'),
-  makeMissing('test/data/config/missing-packages.yml', 'packages'),
+  makeInvalid('test/unit/env/config/invalid-packages.yml', 'packages'),
+  makeMissing('test/unit/env/config/missing-packages.yml', 'packages'),
 ].forEach((env) => {
   checkSettings(new Settings(env), {
     __proto__: prototype,
@@ -156,8 +154,8 @@ process.chdir('../../../');
 });
 
 [
-  makeInvalid('test/data/config/invalid-exclude.yml', 'exclude'),
-  makeMissing('test/data/config/missing-exclude.yml', 'exclude'),
+  makeInvalid('test/unit/env/config/invalid-exclude.yml', 'exclude'),
+  makeMissing('test/unit/env/config/missing-exclude.yml', 'exclude'),
 ].forEach((env) => {
   checkSettings(new Settings(env), {
     __proto__: prototype,
