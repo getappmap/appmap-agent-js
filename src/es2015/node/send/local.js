@@ -1,13 +1,13 @@
-/* global APPMAP */
+/* global APPMAP_GLOBAL_APPMAP_OBJECT */
 
 const APPMAP_GLOBAL_SEND = (message) => {
-  if (message.type === "engine") {
-    APPMAP.setEngine(message.name, message.version);
+  if (message.type === 'engine') {
+    APPMAP_GLOBAL_APPMAP_OBJECT.setEngine(message.name, message.version);
   }
-  if (message.type === "event") {
-    APPMAP.registerEvent(message.data);
+  if (message.type === 'event') {
+    APPMAP_GLOBAL_APPMAP_OBJECT.addEvent(message.data);
   }
-  if (message.type === "exit") {
-    APPMAP.archive();
+  if (message.type === 'archive') {
+    APPMAP_GLOBAL_APPMAP_OBJECT.archive(message.data);
   }
 };

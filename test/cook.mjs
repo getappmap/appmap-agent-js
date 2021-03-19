@@ -20,75 +20,62 @@ const spawnSync = (command) => {
   }
 };
 
-const prettify = (path) => {
-  spawnSync(`npx prettier --write ${path}`);
-};
-
-const lint = (path) => {
-  spawnSync(`npx eslint ${path}`);
-};
-
-const test = (path) => spawnSync(`node ${path}`);
-
-const testGraphicalCoverage = (path1, path2) => {
-  spawnSync(
-    `npx c8 --reporter=html --report-dir=coverage --include ${path1} node ${path2}`,
-  );
-  spawnSync(`open coverage/index.html`);
-};
-
-const testTextualCoverage = (check, path1, path2) => {
-  spawnSync(
-    `npx c8 --reporter=text-summary${
-      check
-        ? ' --check-coverage --branches 100 --functions 100 --lines 100 --statements 100 '
-        : ' '
-    }--include ${path1} node ${path2}`,
-  );
-};
-
-const run = (argv) => {
-  if (argv.target !== null) {
-    const path1 = argv.target;
-    process.stdout.write(`${Chalk.bgMagenta(path1)}${'\n'}`);
-    if (!argv.raw) {
-      prettify(path1);
-      lint(path1);
-    }
-    if (path1.startsWith('lib/')) {
-      const path2 = `test/${path1.substring(4)}`;
-      if (!argv.raw) {
-        prettify(path2);
-        lint(path2);
-      }
-      test(path2);
-      testGraphicalCoverage(path1, path2);
-    }
-  } else {
-    [
-      'instrumenter/logger.mjs',
-      'instrumenter/settings.mjs',
-      'instrumenter/git.mjs',
-      'instrumenter/appmap.mjs',
-    ].forEach((path) => {
-      const path1 = `lib/${path}`;
-      const path2 = `test/${path}`;
-      process.stdout.write(`${Chalk.bgMagenta(path1)}${'\n'}`);
-      if (!argv.raw) {
-        prettify(path1);
-        lint(path1);
-        prettify(path2);
-        lint(path2);
-      }
-      test(path2);
-      testTextualCoverage(argv.check, path1, path2);
-    });
+const cook = (path, raw) => {
+  if (!raw) {
+    spawnSync(`npx prettier --write ${path}`);
+    spawnSync(`npx eslint ${path}`);
   }
 };
 
-run({
+const test = (instrumenter, batch, target, unit) => {
+  spawnSync(`node ${unit}`);
+  if (batch) {
+    spawnSync(
+      `npx ${instrumenter} --reporter=text-summary --check-coverage --branches 100 --functions 100 --lines 100 --statements 100 --include ${target} node ${unit}`,
+    );
+  } else {
+    spawnSync(
+      `npx ${instrumenter} --reporter=html --report-dir=coverage --include ${target} node ${unit}`,
+    );
+    spawnSync(`open coverage/index.html`);
+  }
+};
+
+const run = (target, raw, batch) => {
+  process.stdout.write(`${Chalk.bgMagenta(target)}${'\n'}`);
+  cook(target, raw);
+  if (target.startsWith('lib/') && target.endsWith(".mjs")) {
+    const unit = `test/unit/${target}`;
+    cook(unit, raw);
+    test('c8', batch, target, unit);
+  }
+  if (target.startsWith('src/') && target.endsWith('.js')) {
+    const unit = `test/unit/${target.substring(0, target.length - 3)}.mjs`;
+    cook(unit, raw);
+    test('nyc --hook-run-in-this-context', batch, target, unit);
+  }
+}
+
+const main = (argv) => {
+  if (argv.target !== null) {
+    return run(argv.target, argv.raw, false);
+  }
+  [
+    'src/es2015/empty-marker.js',
+    'src/es2015/event-counter.js',
+    'src/es2015/get-now.js',
+    'src/es2015/serialize.js',
+    // 'lib/logger.mjs',
+    // 'lib/settings.mjs',
+    // 'lib/git.mjs',
+    // 'lib/appmap.mjs',
+  ].forEach((path) => {
+    run(path, argv.raw, true);
+  });
+}
+
+main({
   target: null,
-  check: false,
   raw: false,
   ...minimist(process.argv.slice(2)),
 });

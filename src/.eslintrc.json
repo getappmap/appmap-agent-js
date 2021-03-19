@@ -5,6 +5,7 @@
     "es6": false
   },
   "rules": {
-    "no-unused-vars": "off"
+    "no-unused-vars": "off",
+    "camelcase": ["error", {"allow": ["^global_"]}]
   }
 }
