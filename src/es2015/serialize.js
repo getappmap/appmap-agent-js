@@ -1,5 +1,7 @@
+/* global APPMAP_GLOBAL_EMPTY_MARKER */
 
 const APPMAP_GLOBAL_SERIALIZE = ((() => {
+  const globalUndefined = undefined;
   const globalString = String;
   const globalJSONStringify = JSON.stringify;
   const globalReflectApply = Reflect.apply;
@@ -17,7 +19,7 @@ const APPMAP_GLOBAL_SERIALIZE = ((() => {
     if (value === false) {
       return "false";
     }
-    if (value === void 0) {
+    if (value === globalUndefined) {
       return "undefined";
     }
     if (typeof value === "number") {
