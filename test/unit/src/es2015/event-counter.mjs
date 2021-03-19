@@ -5,4 +5,4 @@ import load from '../fixture-load.mjs';
 
 load('src/es2015/event-counter.js');
 
-Assert.ok(typeof APPMAP_GLOBAL_EVENT_COUNTER === 'number');
+Assert.equal(typeof APPMAP_GLOBAL_EVENT_COUNTER, 'number');

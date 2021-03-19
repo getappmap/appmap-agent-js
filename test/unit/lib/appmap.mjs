@@ -1,4 +1,3 @@
-// import { strict as Assert } from 'assert';
 
 import { strict as Assert } from 'assert';
 import * as Fs from 'fs';

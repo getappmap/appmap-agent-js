@@ -5,4 +5,4 @@ import load from '../fixture-load.mjs';
 
 load('src/es2015/get-now.js');
 
-Assert.ok(typeof APPMAP_GLOBAL_GET_NOW() === 'number');
+Assert.equal(typeof APPMAP_GLOBAL_GET_NOW(), 'number');

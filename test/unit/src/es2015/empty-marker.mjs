@@ -5,4 +5,4 @@ import load from '../fixture-load.mjs';
 
 load('src/es2015/empty-marker.js');
 
-Assert.ok(typeof APPMAP_GLOBAL_EMPTY_MARKER === 'symbol');
+Assert.equal(typeof APPMAP_GLOBAL_EMPTY_MARKER, 'symbol');
