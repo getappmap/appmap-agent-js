@@ -10,9 +10,13 @@ global.APPMAP_GLOBAL_APPMAP_OBJECT = {
 };
 
 load('src/es2015/node/send/local.js');
+load('src/es2015/empty-marker.js');
+load('src/es2015/serialize.js');
 load('src/es2015/node/setup-archive.js');
 
 process.kill(process.pid, 'SIGINT');
 process.kill(process.pid, 'SIGTERM');
 
-Assert.deepEqual(trace, [{ type: 'SIGINT' }]);
+setTimeout(() => {
+  Assert.deepEqual(trace, [{ type: 'SIGINT' }]);
+}, 500);

@@ -23,12 +23,14 @@
     });
   });
 
+  /* istanbul ignore next */
   process.on('uncaughtException', (error, origin) => {
     archive({
       type: 'exception',
       error: APPMAP_GLOBAL_SERIALIZE(error),
       origin,
     });
+    throw error;
   });
 
   process.on('SIGINT', () => {
