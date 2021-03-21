@@ -19,20 +19,23 @@ const node = file.parse();
 const location1 = new Location(file, node, Context.getVoidContext(), []);
 Assert.equal(location1.getFile(), file);
 Assert.equal(location1.shouldBeInstrumented(), true);
-Assert.deepEqual(location1.makeEntity([{type:"class", name:"foo", childeren:[]}]), {
-  type: "package",
-  name: file.getPath(),
-  childeren: [{type:"class", name:"foo", childeren:[]}]
-});
+Assert.deepEqual(
+  location1.makeEntity([{ type: 'class', name: 'foo', childeren: [] }]),
+  {
+    type: 'package',
+    name: file.getPath(),
+    childeren: [{ type: 'class', name: 'foo', childeren: [] }],
+  },
+);
 
 const location2 = location1.makeDeeperLocation(
   node.body[0].expression.right,
   new Context.VariableContext(node.body[0].expression.left, 'assignment'),
 );
 Assert.deepEqual(location2.makeEntity([]), {
-  type: "class",
-  name: "@o|assignment",
-  childeren: []
+  type: 'class',
+  name: '@o|assignment',
+  childeren: [],
 });
 
 const location3 = location1.makeDeeperLocation(
@@ -40,17 +43,19 @@ const location3 = location1.makeDeeperLocation(
   new Context.VariableContext(node.body[1].expression.left, 'assignment'),
 );
 Assert.deepEqual(location3.makeEntity([]), {
-  type: "class",
-  name: "@f|assignment",
-  childeren: [{
-    type: "function",
-    name: "()",
-    source: "() => {}",
-    location: `${file.getPath()}:3`,
-    labels: [],
-    comment: null,
-    static: false 
-  }]
+  type: 'class',
+  name: '@f|assignment',
+  childeren: [
+    {
+      type: 'function',
+      name: '()',
+      source: '() => {}',
+      location: `${file.getPath()}:3`,
+      labels: [],
+      comment: null,
+      static: false,
+    },
+  ],
 });
 
 const location4 = location1.makeDeeperLocation(
@@ -58,7 +63,7 @@ const location4 = location1.makeDeeperLocation(
   Context.getVoidContext(),
 );
 Assert.deepEqual(location4.makeEntity([]), {
-  type: "__ERROR__",
+  type: '__ERROR__',
   name: Context.getVoidContext().getName(),
-  childeren: []
+  childeren: [],
 });
