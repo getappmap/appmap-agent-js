@@ -3,6 +3,8 @@
   "extends": ["airbnb-base", "prettier"],
   "rules": {
     "lines-between-class-members": "off",
-    "spaced-comment": "off"
+    "spaced-comment": "off",
+    "max-classes-per-file": "off",
+    "class-methods-use-this": "off"
   }
 }
