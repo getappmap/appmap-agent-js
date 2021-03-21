@@ -8,14 +8,11 @@ const APPMAP_GLOBAL_SERIALIZE_PARAMETER = ((() => {
     if (value instanceof global_Error) {
       // const stack = value.stack;
       // const lines = global_Reflect_apply(global_Array_prototype_split, stack, ["\n"]);
-      // if (lines.length > 1 && lines[]) {
-      // 
-      // }
       return {
         class: "TODO",
         message: error.message,
         object_id: APPMAP_GLOBAL_GET_IDENTITY(value),
-        path: error.stack
+        path: error.stack,
         lineno: null
       };
     }
