@@ -1,6 +1,7 @@
 import * as FileSystem from 'fs';
 import { strict as Assert } from 'assert';
 import File from '../../../../lib/file.mjs';
+import * as Dummy from '../../../../lib/instrumenter/dummy.mjs';
 import * as Context from '../../../../lib/instrumenter/context.mjs';
 import Location from '../../../../lib/instrumenter/location.mjs';
 
@@ -63,8 +64,5 @@ const location4 = location1.makeDeeperLocation(
   node.body[2].expression,
   Context.getVoidContext(),
 );
-Assert.deepEqual(location4.makeEntity([]), {
-  type: '__APPMAP_ERROR__',
-  name: Context.getVoidContext().getName(),
-  childeren: [],
-});
+Assert.deepEqual(location4.makeEntity([]), Dummy.getClassEntity());
+
