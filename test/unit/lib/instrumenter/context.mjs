@@ -20,7 +20,7 @@ import * as Context from '../../../../lib/instrumenter/context.mjs';
     type: 'Literal',
     value: 123,
   }, "assignment");
-  Assert.equal(context.getName(), `@__ERROR__|assignment`);
+  Assert.equal(context.getName(), `@__APPMAP_ERROR__|assignment`);
 }
 
 {
@@ -40,7 +40,7 @@ import * as Context from '../../../../lib/instrumenter/context.mjs';
     type: 'Literal',
     value: 123,
   });
-  Assert.equal(context.getName(), `.__ERROR__|object-value`);
+  Assert.equal(context.getName(), `.__APPMAP_ERROR__|object-value`);
 }
 
 {
@@ -117,7 +117,7 @@ import * as Context from '../../../../lib/instrumenter/context.mjs';
     value: 123,
   });
   Assert.equal(context.isStatic(), false);
-  Assert.equal(context.getName(), `.__ERROR__|prototype-method`);
+  Assert.equal(context.getName(), `.__APPMAP_ERROR__|prototype-method`);
 }
 
 {

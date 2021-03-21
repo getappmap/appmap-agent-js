@@ -16,8 +16,9 @@ FileSystem.writeFileSync(
 const file = new File('test/unit/env/target/location.js', 2015, 'script');
 const node = file.parse();
 
-const location1 = new Location(file, node, Context.getVoidContext(), []);
+const location1 = new Location(file, "namespace", node, Context.getVoidContext(), []);
 Assert.equal(location1.getFile(), file);
+Assert.equal(location1.getNamespace(), "namespace");
 Assert.equal(location1.shouldBeInstrumented(), true);
 Assert.deepEqual(
   location1.makeEntity([{ type: 'class', name: 'foo', childeren: [] }]),
@@ -63,7 +64,7 @@ const location4 = location1.makeDeeperLocation(
   Context.getVoidContext(),
 );
 Assert.deepEqual(location4.makeEntity([]), {
-  type: '__ERROR__',
+  type: '__APPMAP_ERROR__',
   name: Context.getVoidContext().getName(),
   childeren: [],
 });
