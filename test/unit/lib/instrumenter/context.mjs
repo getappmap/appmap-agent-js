@@ -1,5 +1,5 @@
 import { strict as Assert } from 'assert';
-import * as Context from '../../../../lib/instrumenter/context.mjs';
+import {getVoidContext, IdentifierContext, MethodDefinitionContext, PropertyContext} as Context from '../../../../lib/instrumenter/context.mjs';
 
 /////////////////
 // VoidContext //
