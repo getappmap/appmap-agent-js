@@ -5,6 +5,7 @@
   "files": [],
   "dependencies": {
     "acorn": "^7.4.1",
+    "escodegen": "^2.0.0",
     "yaml": "^1.10.0"
   },
   "devDependencies": {
