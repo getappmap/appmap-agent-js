@@ -5,10 +5,6 @@
     "lines-between-class-members": "off",
     "spaced-comment": "off",
     "max-classes-per-file": "off",
-    "class-methods-use-this": "off",
-    "import/prefer-default-export": "off",
-    "no-unused-vars": ["error", { "vars": "all", "args": "none", "ignoreRestSiblings": false }],
-    "import/no-cycle" : "off",
-    "no-use-before-define" : "off"
+    "no-unused-vars": ["error", { "vars": "all", "args": "none", "ignoreRestSiblings": false }]
   }
 }
