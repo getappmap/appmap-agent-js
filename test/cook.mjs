@@ -69,11 +69,12 @@ const main = (argv) => {
     // 'src/es2015/node/send/local.js',
     // 'src/es2015/node/setup-engine.js',
     // 'src/es2015/node/setup-archive.js',
-    'lib/logger.mjs',
-    'lib/settings.mjs',
-    'lib/git.mjs',
-    'lib/appmap.mjs',
-    'lib/namespace.mjs',
+    // 'lib/logger.mjs',
+    // 'lib/settings.mjs',
+    // 'lib/git.mjs',
+    // 'lib/appmap.mjs',
+    // 'lib/namespace.mjs',
+    'lib/file.mjs',
   ].forEach((path) => {
     run(path, argv.raw, true);
   });
