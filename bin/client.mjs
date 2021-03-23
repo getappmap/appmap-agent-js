@@ -1,5 +1,4 @@
+import minimist from 'minimist';
+import main from '../lib/main.mjs';
 
-import minimist from "minimist";
-import main from "../lib/main.mjs";
-
-console.log(main(Minimist(process.argv.slice(2))));
+process.stdout.write(main(minimist(process.argv.slice(2))));
