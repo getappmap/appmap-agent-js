@@ -4,8 +4,10 @@ import File from '../../../../lib/file.mjs';
 import Namespace from '../../../../lib/namespace.mjs';
 import { RootLocation } from '../../../../lib/instrument/location.mjs';
 
+const path = 'test/unit/env/target/location.js';
+
 FileSystem.writeFileSync(
-  'test/unit/env/target/location.js',
+  path,
   `
     123;
     function f () {}
@@ -28,7 +30,7 @@ FileSystem.writeFileSync(
   'utf8',
 );
 
-const file = new File('test/unit/env/target/location.js', 2015, 'script');
+const file = new File(path, 2015, 'script');
 // console.log(
 //   file
 //     .getContent()
@@ -86,7 +88,7 @@ Assert.deepEqual(location1.makeEntity(['child']), {
         type: 'function',
         name: '()',
         source: 'function f () {}',
-        location: 'test/unit/env/target/location.js:3',
+        location: `${path}:3`,
         labels: [],
         comment: null,
         static: false,
@@ -125,7 +127,7 @@ Assert.deepEqual(location1.makeEntity(['child']), {
               type: 'function',
               name: '()',
               source: '() { "constructor"; }',
-              location: 'test/unit/env/target/location.js:5',
+              location: `${path}:5`,
               labels: [],
               comment: null,
               static: false,
@@ -150,7 +152,7 @@ Assert.deepEqual(location1.makeEntity(['child']), {
               type: 'function',
               name: '()',
               source: '() { "m1"; }',
-              location: 'test/unit/env/target/location.js:6',
+              location: `${path}:6`,
               labels: [],
               comment: null,
               static: false,
@@ -175,7 +177,7 @@ Assert.deepEqual(location1.makeEntity(['child']), {
               type: 'function',
               name: '()',
               source: '() { "m2"; }',
-              location: 'test/unit/env/target/location.js:7',
+              location: `${path}:7`,
               labels: [],
               comment: null,
               static: true,
@@ -273,7 +275,7 @@ Assert.deepEqual(location1.makeEntity(['child']), {
               type: 'function',
               name: '()',
               source: '() { "k5"; }',
-              location: 'test/unit/env/target/location.js:14',
+              location: `${path}:14`,
               labels: [],
               comment: null,
               static: false,
@@ -298,7 +300,7 @@ Assert.deepEqual(location1.makeEntity(['child']), {
               type: 'function',
               name: '()',
               source: '() { "k6"; }',
-              location: 'test/unit/env/target/location.js:15',
+              location: `${path}:15`,
               labels: [],
               comment: null,
               static: false,

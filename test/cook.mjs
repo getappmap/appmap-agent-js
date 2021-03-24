@@ -74,7 +74,10 @@ const main = (argv) => {
     // 'lib/git.mjs',
     // 'lib/appmap.mjs',
     // 'lib/namespace.mjs',
-    'lib/file.mjs',
+    // 'lib/file.mjs',
+    // 'lib/instrument/location.mjs',
+    // 'lib/instrument/result.mjs',
+    // 'lib/instrument/visit.mjs',
   ].forEach((path) => {
     run(path, argv.raw, true);
   });
