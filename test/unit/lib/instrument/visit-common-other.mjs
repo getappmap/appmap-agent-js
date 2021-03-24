@@ -1,4 +1,14 @@
 import { strict as Assert } from 'assert';
+import {
+  parseExpression,
+  parseSpreadableExpression,
+  generate,
+  mockRootLocation,
+} from './fixture.mjs';
+import {
+  getResultNode,
+  getResultEntities,
+} from '../../../../lib/instrument/result.mjs';
 import * as Visit from '../../../../lib/instrument/visit.mjs';
 import '../../../../lib/instrument/visit-common-other.mjs';
 
@@ -12,65 +22,30 @@ const namespace = {
   },
 };
 
-const location = {
-  extend(node, kind) {
-    return this;
-  },
-  shouldBeInstrumented() {
-    return true;
-  },
-  getNamespace() {
-    Assert.deepEqual(this, location);
-    return namespace;
-  },
-};
+const location = mockRootLocation(namespace);
 
 const test = (kind, node) => {
-  Assert.deepEqual(Visit[`visit${kind}`](node, location), {
-    node,
-    entities: [],
-  });
+  const result = Visit[`visit${kind}`](node, location);
+  Assert.equal(generate(getResultNode(result)), generate(node));
+  Assert.deepEqual(getResultEntities(result), []);
 };
 
 /////////////
 // Literal //
 /////////////
 
-{
-  const node = {
-    type: 'Literal',
-    value: 123,
-  };
-  ['Literal', 'NonComputedKey', 'Expression'].forEach((kind) => {
-    test(kind, node);
-  });
-}
-
-test('Literal', {
-  type: 'Literal',
-  bigint: '123n',
-  value: 123n,
-});
-
-test('Literal', {
-  type: 'Literal',
-  regex: {
-    pattern: 'abc',
-    flags: 'g',
-  },
-  value: /abc/g,
+['Literal', 'NonComputedKey', 'Expression'].forEach((kind) => {
+  test(kind, parseExpression(`123`));
+  test(kind, parseExpression(`123n`));
+  test(kind, parseExpression(`/abc/g`));
 });
 
 ///////////////////
 // SpreadElement //
 ///////////////////
 
-test('SpreadableExpression', {
-  type: 'SpreadElement',
-  argument: {
-    type: 'Literal',
-    value: 123,
-  },
+['SpreadableExpression', 'Property'].forEach((kind) => {
+  test(kind, parseSpreadableExpression(`...123`));
 });
 
 ////////////////
@@ -86,11 +61,6 @@ Assert.equal(counter, 0);
   ['Expression', 'scoping'],
   ['Pattern', 'scoping'],
   ['RestablePattern', 'scoping'],
-].forEach(([kind, name]) =>
-  test(kind, {
-    type: 'Identifier',
-    name,
-  }),
-);
+].forEach(([kind, name]) => test(kind, parseExpression(name)));
 
 Assert.equal(counter, 4);
