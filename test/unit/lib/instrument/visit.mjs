@@ -38,7 +38,7 @@ import * as Visit from '../../../../lib/instrument/visit.mjs';
     ['NonScopingIdentifier', 'Identifier'],
     ['ImportSpecifier', 'NamedImportSpecifier'],
     ['ExportSpecifier', 'ExportSpecifier'],
-    ['StringLiteral', 'Literal'],
+    ['Literal', 'Literal'],
     ['Statement', 'ExpressionStatement'],
   ].forEach(([kind, type]) => {
     const location1 = {
@@ -123,7 +123,7 @@ import * as Visit from '../../../../lib/instrument/visit.mjs';
     },
   };
   Visit.assignVisitorObject('Program', {
-    Program: () => Assert.fail()
+    Program: () => Assert.fail(),
   });
   const result = Visit.visitProgram(node1, location1);
   Assert.equal(getResultNode(result), node1);
