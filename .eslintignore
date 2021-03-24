@@ -1,3 +1,5 @@
 /node_modules/
 /sample/
+/coverage/
+/test/unit/env/target/
 *.json

@@ -44,7 +44,7 @@ const test = (instrumenter, batch, target, unit) => {
 const run = (target, raw, batch) => {
   process.stdout.write(`${Chalk.bgMagenta(target)}${'\n'}`);
   cook(target, raw);
-  if (target.startsWith('lib/') && target.endsWith(".mjs")) {
+  if (target.startsWith('lib/') && target.endsWith('.mjs')) {
     const unit = `test/unit/${target}`;
     cook(unit, raw);
     test('c8', batch, target, unit);
@@ -54,7 +54,7 @@ const run = (target, raw, batch) => {
     cook(unit, raw);
     test('nyc --hook-run-in-this-context', batch, target, unit);
   }
-}
+};
 
 const main = (argv) => {
   if (argv.target !== null) {
@@ -81,7 +81,7 @@ const main = (argv) => {
   ].forEach((path) => {
     run(path, argv.raw, true);
   });
-}
+};
 
 main({
   target: null,

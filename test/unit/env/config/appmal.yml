@@ -1,17 +1,16 @@
-
 name: appname
 packages:
-- path: package1
-- path: package2
-  shallow: true
-- path: package3
-  shallow: false
-- path: package4
-  shallow: null
-- path: null
-- null
+  - path: package1
+  - path: package2
+    shallow: true
+  - path: package3
+    shallow: false
+  - path: package4
+    shallow: null
+  - path: null
+  - null
 exclude:
-- Class
-- Class#instanceMethod
-- Class.classMethod
-- null
+  - Class
+  - Class#instanceMethod
+  - Class.classMethod
+  - null

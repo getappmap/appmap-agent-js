@@ -7,7 +7,7 @@ packages:
     shallow: false
   - path: package4
     shallow: null
-  - ? path
+  - path:
   - null
 exclude:
   - Class

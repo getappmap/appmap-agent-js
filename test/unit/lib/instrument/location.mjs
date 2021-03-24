@@ -4,7 +4,6 @@ import File from '../../../../lib/file.mjs';
 import Namespace from '../../../../lib/namespace.mjs';
 import { RootLocation } from '../../../../lib/instrument/location.mjs';
 
-
 const path = 'test/unit/env/target/location.js';
 
 FileSystem.writeFileSync(

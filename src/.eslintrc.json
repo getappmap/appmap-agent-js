@@ -6,6 +6,6 @@
   },
   "rules": {
     "no-unused-vars": "off",
-    "camelcase": ["error", {"allow": ["^global_"]}]
+    "camelcase": ["error", { "allow": ["^global_"] }]
   }
 }

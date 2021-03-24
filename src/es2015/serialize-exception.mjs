@@ -1,6 +1,7 @@
 /* global APPMAP_GLOBAL_GET_IDENTITY, APPMAP_GLOBAL_SERIALIZE */
+/* eslint camelcase: ["error", {allow: ["object_id"]}] */
 
-const APPMAP_GLOBAL_SERIALIZE_PARAMETER = ((() => {
+const APPMAP_GLOBAL_SERIALIZE_PARAMETER = (() => {
   const global_Error = Error;
   // const global_Reflect_apply = Reflect.apply;
   // const global_Array_prototype_split = Array.prototype.split;
@@ -9,19 +10,19 @@ const APPMAP_GLOBAL_SERIALIZE_PARAMETER = ((() => {
       // const stack = value.stack;
       // const lines = global_Reflect_apply(global_Array_prototype_split, stack, ["\n"]);
       return {
-        class: "TODO",
+        class: 'TODO',
         message: error.message,
         object_id: APPMAP_GLOBAL_GET_IDENTITY(value),
         path: error.stack,
-        lineno: null
+        lineno: null,
       };
     }
     return {
-      class: "TODO",
+      class: 'TODO',
       message: null,
       object_id: APPMAP_GLOBAL_GET_IDENTITY(value),
       path: null,
-      lineno: null
+      lineno: null,
     };
   };
-}) ());
+})();
