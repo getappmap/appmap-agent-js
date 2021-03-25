@@ -1,15 +1,9 @@
-import { strict as Assert } from 'assert';
 import {
-  mockResult,
-  mockRootLocation,
   parseExpression,
-  generate,
-} from './fixture.mjs';
-import Namespace from '../../../../lib/namespace.mjs';
-import {
-  getResultEntities,
-  getResultNode,
-} from '../../../../lib/instrument/result.mjs';
+  mockResult,
+  compareResult,
+  mockRootLocation,
+} from './__fixture__.mjs';
 import {
   assignVisitorObject,
   visitExpression,
@@ -20,13 +14,7 @@ Error.stackTraceLimit = Infinity;
 
 {
   const makeVisitor = (kind) => (node, location) =>
-    mockResult(
-      {
-        type: 'Literal',
-        value: `${kind}|${node.value}`,
-      },
-      [],
-    );
+    mockResult(parseExpression(JSON.stringify(`${kind}|${node.value}`)), []);
   assignVisitorObject('Expression', {
     Literal: makeVisitor('Expression'),
   });
@@ -37,53 +25,32 @@ Error.stackTraceLimit = Infinity;
 
 assignVisitorObject('Method', {
   FunctionExpression: (node, location) =>
-    mockResult(
-      {
-        type: 'FunctionExpression',
-        id: null,
-        async: false,
-        generator: false,
-        params: [],
-        body: {
-          type: 'BlockStatement',
-          body: [],
-        },
-      },
-      [],
-    ),
+    mockResult(parseExpression(`function (visited) {}`), []),
 });
 
-const location = mockRootLocation(new Namespace('PREFIX'));
+const namespace = null;
+const location = mockRootLocation(namespace);
 
-{
-  const node1 = parseExpression(`{["foo"]:"bar"}`);
-  const code1 = generate(node1);
-  const node2 = parseExpression(`{["Expression|foo"]:"Expression|bar"}`);
-  const code2 = generate(node2);
-  const result = visitExpression(node1, location);
-  Assert.deepEqual(generate(getResultNode(result)), code2);
-  Assert.deepEqual(getResultEntities(result), [
+compareResult(
+  visitExpression(parseExpression(`{["foo"]:"bar"}`), location),
+  mockResult(parseExpression(`{["Expression|foo"]:"Expression|bar"}`), [
     {
       kind: 'Expression',
-      code: code1,
+      type: 'ObjectExpression',
+      line: 1,
       childeren: [],
     },
-  ]);
-}
+  ]),
+);
 
-{
-  const node1 = parseExpression(`{"foo" (bar) { qux; }}`);
-  const code1 = generate(node1);
-  const node2 = parseExpression(`{"NonComputedKey|foo" () {} }`);
-  const code2 = generate(node2);
-  const result = visitExpression(node1, location);
-  console.log(getResultNode(result).properties);
-  Assert.deepEqual(generate(getResultNode(result)), code2);
-  Assert.deepEqual(getResultEntities(result), [
+compareResult(
+  visitExpression(parseExpression(`{"foo" (bar) {}}`), location),
+  mockResult(parseExpression(`{"NonComputedKey|foo" (visited) {} }`), [
     {
       kind: 'Expression',
-      code: code1,
+      type: 'ObjectExpression',
+      line: 1,
       childeren: [],
     },
-  ]);
-}
+  ]),
+);

@@ -2,19 +2,17 @@ import { strict as Assert } from 'assert';
 import {
   parseExpression,
   parseSpreadableExpression,
-  generate,
+  compareResult,
+  mockResult,
   mockRootLocation,
-} from './fixture.mjs';
-import {
-  getResultNode,
-  getResultEntities,
-} from '../../../../lib/instrument/result.mjs';
+} from './__fixture__.mjs';
 import * as Visit from '../../../../lib/instrument/visit.mjs';
 import '../../../../lib/instrument/visit-common-other.mjs';
 
 let counter = 0;
 
 const namespace = {
+  __proto__: null,
   checkCollision(...args) {
     counter += 1;
     Assert.deepEqual(this, namespace);
@@ -24,11 +22,13 @@ const namespace = {
 
 const location = mockRootLocation(namespace);
 
-const test = (kind, node) => {
-  const result = Visit[`visit${kind}`](node, location);
-  Assert.equal(generate(getResultNode(result)), generate(node));
-  Assert.deepEqual(getResultEntities(result), []);
-};
+const test = (kind, node) => compareResult(
+  Visit[`visit${kind}`](
+    node,
+    location),
+  mockResult(
+    node,
+    []));
 
 /////////////
 // Literal //

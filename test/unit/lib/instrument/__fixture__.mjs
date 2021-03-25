@@ -1,12 +1,11 @@
-// import {strict as Assert} from "assert";
+import { strict as Assert } from 'assert';
 import { parse as acorn } from 'acorn';
 import { generate as escodegen } from 'escodegen';
-
-export const generate = (node) => escodegen(node);
 
 const options = {
   ecmaVersion: 2020,
   sourceType: 'script',
+  locations: true,
 };
 
 export const parseProgram = (code) => acorn(`${code}`, options);
@@ -23,10 +22,10 @@ export const parseRestablePattern = (code) =>
 
 export const mockResult = (node, entities) => ({ node, entities });
 
-// export const compareResult = (result1, result2) => {
-//   Assert.equal(generate(result1.node), generate(result2.node));
-//   Assert.deepEqual(result1.entities, result2.entities);
-// };
+export const compareResult = (result1, result2) => {
+  Assert.equal(escodegen(result1.node), escodegen(result2.node));
+  Assert.deepEqual(result1.entities, result2.entities);
+};
 
 export class MockLocation {
   constructor(namespace, data) {
@@ -48,7 +47,8 @@ export class MockLocation {
     }
     return {
       kind: this.data.kind,
-      code: escodegen(this.data.node),
+      type: this.data.node.type,
+      line: this.data.node.loc.start.line,
       childeren,
     };
   }
