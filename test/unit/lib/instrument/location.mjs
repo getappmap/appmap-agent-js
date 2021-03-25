@@ -26,11 +26,11 @@ FileSystem.writeFileSync(
     });
     var o1 = {}, {o2, o3} = {};
     o4 = {};
-    `,
+    export default class {}`,
   'utf8',
 );
 
-const file = new File(path, 2015, 'script');
+const file = new File(path, 2015, 'module');
 // console.log(
 //   file
 //     .getContent()
@@ -45,14 +45,14 @@ const location0 = new RootLocation(file, namespace);
 Assert.equal(location0.getFile(), file);
 Assert.equal(location0.getNamespace(), namespace);
 Assert.equal(location0.shouldBeInstrumented(), true);
-Assert.equal(typeof location0.makeEntity([]), "object");
-Assert.equal(typeof location0.isStaticMethod([]), "boolean");
-Assert.equal(typeof location0.isChildStaticMethod([]), "boolean");
-Assert.equal(typeof location0.getStartLine([]), "number");
-Assert.equal(typeof location0.getName([]), "string");
-Assert.equal(typeof location0.getChildName([]), "string");
-Assert.equal(typeof location0.getKind([]), "string");
-Assert.equal(typeof location0.getContainerName([]), "string");
+Assert.ok(location0.makeEntity([]).type.startsWith('__APPMAP_AGENT_ERROR_'));
+Assert.equal(location0.isStaticMethod([]), false);
+Assert.equal(location0.isChildStaticMethod([]), false);
+Assert.equal(location0.getStartLine([]), 0);
+Assert.ok(location0.getName([]).startsWith('__APPMAP_AGENT_ERROR_'));
+Assert.ok(location0.getChildName([]).startsWith('__APPMAP_AGENT_ERROR_'));
+Assert.ok(location0.getKind([]).startsWith('__APPMAP_AGENT_ERROR_'));
+Assert.ok(location0.getContainerName([]).startsWith('__APPMAP_AGENT_ERROR_'));
 
 const node1 = node;
 const location1 = location0.extend('Program', node);
@@ -71,7 +71,12 @@ Assert.deepEqual(location1.makeEntity(['child']), {
 {
   const node2 = node1.body[0];
   const location2 = location1.extend('Statement', node2);
-  Assert.ok(location2.makeEntity(['child']).type.startsWith("__APPMAP_AGENT_ERROR_"));
+  Assert.ok(
+    location2.makeEntity(['child']).type.startsWith('__APPMAP_AGENT_ERROR_'),
+  );
+  Assert.equal(location2.getContainerName(), path);
+  Assert.ok(location2.getKind().startsWith('__APPMAP_AGENT_ERROR_'));
+  Assert.ok(typeof location2.getStartLine(), 'number');
 }
 
 /////////////////////////
@@ -367,5 +372,18 @@ Assert.deepEqual(location1.makeEntity(['child']), {
         childeren: ['child'],
       });
     }
+  }
+}
+
+//////////////////////////
+// AssignmentExpression //
+//////////////////////////
+{
+  const node2 = node1.body[6];
+  const location2 = location1.extend('Statement', node2);
+  {
+    const node3 = node2.declaration;
+    const location3 = location2.extend('Statement', node3);
+    Assert.deepEqual(location3.getName(), '@#default|class');
   }
 }
