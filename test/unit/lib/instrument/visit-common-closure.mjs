@@ -1,7 +1,7 @@
 import { parse, mockResult, compareResult } from './__fixture__.mjs';
-import { RootLocation } from '../../../../lib/instrument/location.mjs';
 import File from '../../../../lib/file.mjs';
 import Namespace from '../../../../lib/namespace.mjs';
+import { RootLocation } from '../../../../lib/instrument/location.mjs';
 import {
   assignVisitorObject,
   visit,

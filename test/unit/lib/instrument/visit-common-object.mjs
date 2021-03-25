@@ -1,9 +1,7 @@
-import {
-  parse,
-  mockResult,
-  compareResult,
-  mockRootLocation,
-} from './__fixture__.mjs';
+import { parse, mockResult, compareResult } from './__fixture__.mjs';
+import File from '../../../../lib/file.mjs';
+import Namespace from '../../../../lib/namespace.mjs';
+import { RootLocation } from '../../../../lib/instrument/location.mjs';
 import {
   assignVisitorObject,
   visit,
@@ -31,29 +29,42 @@ assignVisitorObject('Method', {
     mockResult(parse('Expression', `function (visited) {}`), []),
 });
 
-const namespace = null;
-const location = mockRootLocation(namespace);
+const namespace = new Namespace('$');
 
-compareResult(
-  visit('Expression', parse('Expression', `{["foo"]:"bar"}`), location),
-  mockResult(parse('Expression', `{["Expression|foo"]:"Expression|bar"}`), [
-    {
-      kind: 'Expression',
-      type: 'ObjectExpression',
-      line: 1,
-      childeren: [],
-    },
-  ]),
-);
+{
+  const file = new File('filename.js', 2020, 'script', `({["foo"]:"bar"});`);
+  const location0 = new RootLocation(file, namespace);
+  const node1 = file.parse();
+  const location1 = location0.extend('Program', node1);
+  const node2 = node1.body[0];
+  const location2 = location1.extend('Statement', node1);
+  compareResult(
+    visit('Expression', node2.expression, location2),
+    mockResult(parse('Expression', `{["Expression|foo"]:"Expression|bar"}`), [
+      {
+        type: 'class',
+        name: '§none',
+        childeren: [],
+      },
+    ]),
+  );
+}
 
-compareResult(
-  visit('Expression', parse('Expression', `{"foo" (bar) {}}`), location),
-  mockResult(parse('Expression', `{"NonComputedKey|foo" (visited) {} }`), [
-    {
-      kind: 'Expression',
-      type: 'ObjectExpression',
-      line: 1,
-      childeren: [],
-    },
-  ]),
-);
+{
+  const file = new File('filename.js', 2020, 'script', `({"foo" (bar) {}});`);
+  const location0 = new RootLocation(file, namespace);
+  const node1 = file.parse();
+  const location1 = location0.extend('Program', node1);
+  const node2 = node1.body[0];
+  const location2 = location1.extend('Statement', node1);
+  compareResult(
+    visit('Expression', node2.expression, location2),
+    mockResult(parse('Expression', `{"NonComputedKey|foo" (visited) {} }`), [
+      {
+        type: 'class',
+        name: '§none',
+        childeren: [],
+      },
+    ]),
+  );
+}

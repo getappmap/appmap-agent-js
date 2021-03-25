@@ -1,10 +1,5 @@
 import { strict as Assert } from 'assert';
-import {
-  parse,
-  compareResult,
-  mockResult,
-  mockRootLocation,
-} from './__fixture__.mjs';
+import { parse, compareResult, mockResult } from './__fixture__.mjs';
 import { visit } from '../../../../lib/instrument/visit.mjs';
 import '../../../../lib/instrument/visit-common-other.mjs';
 
@@ -19,7 +14,13 @@ const namespace = {
   },
 };
 
-const location = mockRootLocation(namespace);
+const location = {
+  __proto__: null,
+  extend: (kind, node) => location,
+  getName: () => 'yo',
+  getNamespace: () => namespace,
+  shouldBeInstrumented: () => true,
+};
 
 const test = (kind, node) =>
   compareResult(visit(kind, node, location), mockResult(node, []));
