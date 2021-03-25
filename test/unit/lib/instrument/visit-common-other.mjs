@@ -17,7 +17,6 @@ const namespace = {
 const location = {
   __proto__: null,
   extend: (kind, node) => location,
-  getName: () => 'yo',
   getNamespace: () => namespace,
   shouldBeInstrumented: () => true,
 };
