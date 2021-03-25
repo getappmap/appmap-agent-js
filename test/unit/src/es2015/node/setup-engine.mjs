@@ -1,5 +1,5 @@
 import { strict as Assert } from 'assert';
-import load from '../../fixture-load.mjs';
+import { load } from '../../__fixture__.mjs';
 
 const trace = [];
 

@@ -1,7 +1,7 @@
 /* global APPMAP_GLOBAL_SERIALIZE, APPMAP_GLOBAL_EMPTY_MARKER */
 
 import { strict as Assert } from 'assert';
-import load from '../fixture-load.mjs';
+import { load } from '../__fixture__.mjs';
 
 load('src/es2015/empty-marker.js');
 load('src/es2015/serialize.js');

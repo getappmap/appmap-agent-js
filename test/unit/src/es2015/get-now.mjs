@@ -1,7 +1,7 @@
 /* global APPMAP_GLOBAL_GET_NOW */
 
 import { strict as Assert } from 'assert';
-import load from '../fixture-load.mjs';
+import { load } from '../__fixture__.mjs';
 
 load('src/es2015/get-now.js');
 
