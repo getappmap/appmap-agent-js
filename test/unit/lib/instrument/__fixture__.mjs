@@ -28,8 +28,8 @@ export const parse = (kind, code) => {
 export const mockResult = (node, entities) => ({ node, entities });
 
 export const compareResult = (result1, result2) => {
-  // console.log("1", result1.node);
-  // console.log("1", escodegen(result1.node));
+  // console.log("1", result1.node.body.body);
+  console.log("1", escodegen(result1.node));
   // console.log("2", result2.node);
   // console.log("2", escodegen(result2.node));
   Assert.equal(escodegen(result1.node), escodegen(result2.node));
