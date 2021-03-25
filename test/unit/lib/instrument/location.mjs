@@ -45,10 +45,14 @@ const location0 = new RootLocation(file, namespace);
 Assert.equal(location0.getFile(), file);
 Assert.equal(location0.getNamespace(), namespace);
 Assert.equal(location0.shouldBeInstrumented(), true);
-Assert.throws(
-  () => location0.makeEntity([]),
-  new Error(`RootLocation cannot create entity`),
-);
+Assert.equal(typeof location0.makeEntity([]), "object");
+Assert.equal(typeof location0.isStaticMethod([]), "boolean");
+Assert.equal(typeof location0.isChildStaticMethod([]), "boolean");
+Assert.equal(typeof location0.getStartLine([]), "number");
+Assert.equal(typeof location0.getName([]), "string");
+Assert.equal(typeof location0.getChildName([]), "string");
+Assert.equal(typeof location0.getKind([]), "string");
+Assert.equal(typeof location0.getContainerName([]), "string");
 
 const node1 = node;
 const location1 = location0.extend('Program', node);
@@ -67,11 +71,7 @@ Assert.deepEqual(location1.makeEntity(['child']), {
 {
   const node2 = node1.body[0];
   const location2 = location1.extend('Statement', node2);
-  Assert.deepEqual(location2.makeEntity(['child']), {
-    type: '__APPMAP_AGENT_ERROR__',
-    name: 'ExpressionStatement',
-    childeren: ['child'],
-  });
+  Assert.ok(location2.makeEntity(['child']).type.startsWith("__APPMAP_AGENT_ERROR_"));
 }
 
 /////////////////////////
@@ -171,7 +171,7 @@ Assert.deepEqual(location1.makeEntity(['child']), {
         const location5 = location4.extend('Method', node5);
         Assert.deepEqual(location5.makeEntity(['child']), {
           type: 'class',
-          name: `constructor.m2|getter`,
+          name: `constructor.m2|get`,
           childeren: [
             {
               type: 'function',
@@ -201,7 +201,7 @@ Assert.deepEqual(location1.makeEntity(['child']), {
     const location3 = location2.extend('Expression', node3);
     Assert.deepEqual(location3.makeEntity(['child']), {
       type: 'class',
-      name: `<empty>|empty`,
+      name: `§none`,
       childeren: ['child'],
     });
     // non-computed identifier key //
@@ -213,7 +213,7 @@ Assert.deepEqual(location1.makeEntity(['child']), {
         const location5 = location4.extend('Expression', node5);
         Assert.deepEqual(location5.makeEntity(['child']), {
           type: 'class',
-          name: `singleton.k1|value`,
+          name: `singleton.k1|init`,
           childeren: ['child'],
         });
       }
@@ -227,7 +227,7 @@ Assert.deepEqual(location1.makeEntity(['child']), {
         const location5 = location4.extend('Expression', node5);
         Assert.deepEqual(location5.makeEntity(['child']), {
           type: 'class',
-          name: `singleton["k2"]|value`,
+          name: `singleton["k2"]|init`,
           childeren: ['child'],
         });
       }
@@ -241,7 +241,7 @@ Assert.deepEqual(location1.makeEntity(['child']), {
         const location5 = location4.extend('Expression', node5);
         Assert.deepEqual(location5.makeEntity(['child']), {
           type: 'class',
-          name: `singleton["k3"]|value`,
+          name: `singleton["k3"]|init`,
           childeren: ['child'],
         });
       }
@@ -255,7 +255,7 @@ Assert.deepEqual(location1.makeEntity(['child']), {
         const location5 = location4.extend('Expression', node5);
         Assert.deepEqual(location5.makeEntity(['child']), {
           type: 'class',
-          name: `singleton[#dynamic]|value`,
+          name: `singleton[#dynamic]|init`,
           childeren: ['child'],
         });
       }
@@ -294,7 +294,7 @@ Assert.deepEqual(location1.makeEntity(['child']), {
         const location5 = location4.extend('Expression', node5);
         Assert.deepEqual(location5.makeEntity(['child']), {
           type: 'class',
-          name: `singleton.k6|getter`,
+          name: `singleton.k6|get`,
           childeren: [
             {
               type: 'function',
