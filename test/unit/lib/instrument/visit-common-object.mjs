@@ -1,12 +1,12 @@
 import {
-  parseExpression,
+  parse,
   mockResult,
   compareResult,
   mockRootLocation,
 } from './__fixture__.mjs';
 import {
   assignVisitorObject,
-  visitExpression,
+  visit,
 } from '../../../../lib/instrument/visit.mjs';
 import '../../../../lib/instrument/visit-common-object.mjs';
 
@@ -14,7 +14,10 @@ Error.stackTraceLimit = Infinity;
 
 {
   const makeVisitor = (kind) => (node, location) =>
-    mockResult(parseExpression(JSON.stringify(`${kind}|${node.value}`)), []);
+    mockResult(
+      parse('Expression', JSON.stringify(`${kind}|${node.value}`)),
+      [],
+    );
   assignVisitorObject('Expression', {
     Literal: makeVisitor('Expression'),
   });
@@ -25,15 +28,15 @@ Error.stackTraceLimit = Infinity;
 
 assignVisitorObject('Method', {
   FunctionExpression: (node, location) =>
-    mockResult(parseExpression(`function (visited) {}`), []),
+    mockResult(parse('Expression', `function (visited) {}`), []),
 });
 
 const namespace = null;
 const location = mockRootLocation(namespace);
 
 compareResult(
-  visitExpression(parseExpression(`{["foo"]:"bar"}`), location),
-  mockResult(parseExpression(`{["Expression|foo"]:"Expression|bar"}`), [
+  visit('Expression', parse('Expression', `{["foo"]:"bar"}`), location),
+  mockResult(parse('Expression', `{["Expression|foo"]:"Expression|bar"}`), [
     {
       kind: 'Expression',
       type: 'ObjectExpression',
@@ -44,8 +47,8 @@ compareResult(
 );
 
 compareResult(
-  visitExpression(parseExpression(`{"foo" (bar) {}}`), location),
-  mockResult(parseExpression(`{"NonComputedKey|foo" (visited) {} }`), [
+  visit('Expression', parse('Expression', `{"foo" (bar) {}}`), location),
+  mockResult(parse('Expression', `{"NonComputedKey|foo" (visited) {} }`), [
     {
       kind: 'Expression',
       type: 'ObjectExpression',

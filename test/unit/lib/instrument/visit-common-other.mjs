@@ -1,12 +1,11 @@
 import { strict as Assert } from 'assert';
 import {
-  parseExpression,
-  parseSpreadableExpression,
+  parse,
   compareResult,
   mockResult,
   mockRootLocation,
 } from './__fixture__.mjs';
-import * as Visit from '../../../../lib/instrument/visit.mjs';
+import { visit } from '../../../../lib/instrument/visit.mjs';
 import '../../../../lib/instrument/visit-common-other.mjs';
 
 let counter = 0;
@@ -22,22 +21,17 @@ const namespace = {
 
 const location = mockRootLocation(namespace);
 
-const test = (kind, node) => compareResult(
-  Visit[`visit${kind}`](
-    node,
-    location),
-  mockResult(
-    node,
-    []));
+const test = (kind, node) =>
+  compareResult(visit(kind, node, location), mockResult(node, []));
 
 /////////////
 // Literal //
 /////////////
 
 ['Literal', 'NonComputedKey', 'Expression'].forEach((kind) => {
-  test(kind, parseExpression(`123`));
-  test(kind, parseExpression(`123n`));
-  test(kind, parseExpression(`/abc/g`));
+  test(kind, parse('Expression', `123`));
+  test(kind, parse('Expression', `123n`));
+  test(kind, parse('Expression', `/abc/g`));
 });
 
 ///////////////////
@@ -45,7 +39,7 @@ const test = (kind, node) => compareResult(
 ///////////////////
 
 ['SpreadableExpression', 'Property'].forEach((kind) => {
-  test(kind, parseSpreadableExpression(`...123`));
+  test(kind, parse('SpreadableExpression', `...123`));
 });
 
 ////////////////
@@ -61,6 +55,6 @@ Assert.equal(counter, 0);
   ['Expression', 'scoping'],
   ['Pattern', 'scoping'],
   ['RestablePattern', 'scoping'],
-].forEach(([kind, name]) => test(kind, parseExpression(name)));
+].forEach(([kind, name]) => test(kind, parse('Expression', name)));
 
 Assert.equal(counter, 4);

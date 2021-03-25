@@ -4,7 +4,10 @@ import {
   getResultEntities,
   combineResult,
 } from '../../../../lib/instrument/result.mjs';
-import * as Visit from '../../../../lib/instrument/visit.mjs';
+import {
+  visit,
+  assignVisitorObject,
+} from '../../../../lib/instrument/visit.mjs';
 
 /////////////
 // Dummies //
@@ -48,7 +51,7 @@ import * as Visit from '../../../../lib/instrument/visit.mjs';
         return location2;
       },
     };
-    const result = Visit[`visit${kind}`](node, location1);
+    const result = visit(kind, node, location1);
     Assert.equal(getResultNode(result).type, type, kind);
     Assert.deepEqual(getResultEntities(result), [], kind);
   });
@@ -85,13 +88,13 @@ import * as Visit from '../../../../lib/instrument/visit.mjs';
       return location2;
     },
   };
-  Visit.assignVisitorObject('Program', {
+  assignVisitorObject('Program', {
     Program: (...args) => {
       Assert.deepEqual(args, [node1, location2]);
       return combineResult((node, location) => node2, args[0], args[1]);
     },
   });
-  const result = Visit.visitProgram(node1, location1);
+  const result = visit('Program', node1, location1);
   Assert.equal(getResultNode(result), node2);
   Assert.deepEqual(getResultEntities(result), []);
 }
@@ -122,10 +125,10 @@ import * as Visit from '../../../../lib/instrument/visit.mjs';
       return location2;
     },
   };
-  Visit.assignVisitorObject('Program', {
+  assignVisitorObject('Program', {
     Program: () => Assert.fail(),
   });
-  const result = Visit.visitProgram(node1, location1);
+  const result = visit('Program', node1, location1);
   Assert.equal(getResultNode(result), node1);
   Assert.deepEqual(getResultEntities(result), []);
 }

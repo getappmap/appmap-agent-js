@@ -1,30 +1,21 @@
-import { strict as Assert } from 'assert';
 import {
+  parse,
   mockResult,
+  compareResult,
   mockRootLocation,
-  parseExpression,
-  generate,
 } from './__fixture__.mjs';
-import Namespace from '../../../../lib/namespace.mjs';
-import {
-  getResultEntities,
-  getResultNode,
-} from '../../../../lib/instrument/result.mjs';
 import {
   assignVisitorObject,
-  visitExpression,
+  visit,
 } from '../../../../lib/instrument/visit.mjs';
-import '../../../../lib/instrument/visit-common-object.mjs';
+import '../../../../lib/instrument/visit-common-class.mjs';
 
 Error.stackTraceLimit = Infinity;
 
 {
   const makeVisitor = (kind) => (node, location) =>
     mockResult(
-      {
-        type: 'Literal',
-        value: `${kind}|${node.value}`,
-      },
+      parse('Expression', JSON.stringify(`${kind}|${node.value}`)),
       [],
     );
   assignVisitorObject('Expression', {
@@ -35,54 +26,50 @@ Error.stackTraceLimit = Infinity;
   });
 }
 
-assignVisitorObject('Method', {
-  FunctionExpression: (node, location) =>
-    mockResult(
-      {
-        type: 'FunctionExpression',
-        id: null,
-        async: false,
-        generator: false,
-        params: [],
-        body: {
-          type: 'BlockStatement',
-          body: [],
-        },
-      },
-      [],
-    ),
+assignVisitorObject('ScopingIdentifier', {
+  Identifier: (node, location) => mockResult(
+    parse('Expression', `ScopingIdentifier_${node.name}`),
+    [])
 });
 
-const location = mockRootLocation(new Namespace('PREFIX'));
+assignVisitorObject('Method', {
+  FunctionExpression: (node, location) =>
+    mockResult(parse('Expression', `function () { "Method"; }`), []),
+});
 
-{
-  const node1 = parseExpression(`class c { }`);
-  const code1 = generate(node1);
-  const node2 = parseExpression(`{["Expression|foo"]:"Expression|bar"}`);
-  const code2 = generate(node2);
-  const result = visitExpression(node1, location);
-  Assert.deepEqual(generate(getResultNode(result)), code2);
-  Assert.deepEqual(getResultEntities(result), [
+const namespace = null;
+const location = mockRootLocation(namespace);
+
+compareResult(
+  visit('Expression', parse('Expression', `class { ["m"] () {} }`), location),
+  mockResult(parse('Expression', `class { ["Expression|m"] () { "Method"; } }`), [
     {
       kind: 'Expression',
-      code: code1,
+      type: 'ClassExpression',
+      line: 1,
       childeren: [],
     },
-  ]);
-}
+  ]),
+);
 
-{
-  const node1 = parseExpression(`{"foo" (bar) { qux; }}`);
-  const code1 = generate(node1);
-  const node2 = parseExpression(`{"NonComputedKey|foo" () {} }`);
-  const code2 = generate(node2);
-  const result = visitExpression(node1, location);
-  Assert.deepEqual(generate(getResultNode(result)), code2);
-  Assert.deepEqual(getResultEntities(result), [
-    {
-      kind: 'Expression',
-      code: code1,
-      childeren: [],
-    },
-  ]);
-}
+compareResult(
+  visit(
+    'Statement',
+    parse('Statement', `class c extends "super" { static get "m" () {} }`),
+    location,
+  ),
+  mockResult(
+    parse(
+      'Statement',
+      `class ScopingIdentifier_c extends "Expression|super" { static get "NonComputedKey|m" () { "Method"; } }`,
+    ),
+    [
+      {
+        kind: 'Statement',
+        type: 'ClassDeclaration',
+        line: 1,
+        childeren: [],
+      },
+    ],
+  ),
+);
