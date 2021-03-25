@@ -10,19 +10,6 @@ import '../../../../lib/instrument/visit-expression.mjs';
 
 Error.stackTraceLimit = Infinity;
 
-// const buildExpressionStatement = (node) => ({
-//   type: 'ExpressionStatement',
-//   expression: node,
-// });
-// 
-// assignVisitorObject('Statement', {
-//   ExpressionStatement: (node, location) =>
-//     mapResult(
-//       buildExpressionStatement,
-//       visit('Expression', node.expression, location),
-//     ),
-// });
-
 ["Expression", "SpreadableExpression", "SuperableExpression", "Pattern", "NonScopingIdentifier"].forEach((kind) => {
   assignVisitorObject(kind, {
     Identifier: (node, location) => mockResult({
@@ -38,7 +25,6 @@ assignVisitorObject("SpreadableExpression", {
     name: "SpreadElement"
   }, [])
 });
-
 
 const namespace = new Namespace('PREFIX');
 
