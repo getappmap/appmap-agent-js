@@ -41,7 +41,7 @@ const settings = {
   appmap.addEvent('event3');
   appmap.archive('termination2');
   const json = JSON.parse(
-    Fs.readFileSync(`${outdir}/${appmap.json.metadata.name}.json`, 'utf8'),
+    Fs.readFileSync(`${outdir}/${appmap.json.metadata.name}.appmap.json`, 'utf8'),
   );
   Assert.deepEqual(json.classMap, ['entity1']);
   Assert.equal(json.metadata.language.engine, 'engine-name-2@engine-version-2');

@@ -1,3 +1,3 @@
-let APPMAP_GLOBAL_EVENT_COUNTER = 0;
+/* eslint prefer-const: "off" */
 
-APPMAP_GLOBAL_EVENT_COUNTER += 1;
+let APPMAP_GLOBAL_EVENT_COUNTER = 0;
