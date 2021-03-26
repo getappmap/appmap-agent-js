@@ -32,11 +32,11 @@ const namespace = new Namespace('$');
   );
   const location0 = new RootLocation(file, namespace);
   const node1 = file.parse();
-  const location1 = location0.extend('Program', node1);
+  const location1 = location0.extend(node1);
   const node2 = node1.body[0];
-  const location2 = location1.extend('Statement', node2);
+  const location2 = location1.extend(node2);
   const node3 = node2.declarations[0];
-  const location3 = location2.extend('VariableDeclarator', node3);
+  const location3 = location2.extend(node3);
   compareResult(
     visit('Expression', node3.init, location3),
     mockResult(
@@ -115,7 +115,7 @@ const namespace = new Namespace('$');
   );
   const location0 = new RootLocation(file, namespace);
   const node1 = file.parse();
-  const location1 = location0.extend('Program', node1);
+  const location1 = location0.extend(node1);
   compareResult(
     visit('Statement', node1.body[0], location1),
     mockResult(

@@ -35,9 +35,9 @@ const namespace = new Namespace('$');
   const file = new File('filename.js', 2020, 'script', `({["foo"]:"bar"});`);
   const location0 = new RootLocation(file, namespace);
   const node1 = file.parse();
-  const location1 = location0.extend('Program', node1);
+  const location1 = location0.extend(node1);
   const node2 = node1.body[0];
-  const location2 = location1.extend('Statement', node1);
+  const location2 = location1.extend(node1);
   compareResult(
     visit('Expression', node2.expression, location2),
     mockResult(parse('Expression', `{["Expression|foo"]:"Expression|bar"}`), [
@@ -54,9 +54,9 @@ const namespace = new Namespace('$');
   const file = new File('filename.js', 2020, 'script', `({"foo" (bar) {}});`);
   const location0 = new RootLocation(file, namespace);
   const node1 = file.parse();
-  const location1 = location0.extend('Program', node1);
+  const location1 = location0.extend(node1);
   const node2 = node1.body[0];
-  const location2 = location1.extend('Statement', node1);
+  const location2 = location1.extend(node1);
   compareResult(
     visit('Expression', node2.expression, location2),
     mockResult(parse('Expression', `{"NonComputedKey|foo" (visited) {} }`), [
