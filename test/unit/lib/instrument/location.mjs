@@ -1,7 +1,6 @@
 import * as FileSystem from 'fs';
 import { strict as Assert } from 'assert';
 import File from '../../../../lib/file.mjs';
-import Namespace from '../../../../lib/namespace.mjs';
 import { RootLocation } from '../../../../lib/instrument/location.mjs';
 
 const path = 'test/unit/env/target/location.js';
@@ -31,19 +30,10 @@ FileSystem.writeFileSync(
 );
 
 const file = new File(path, 2015, 'module');
-// console.log(
-//   file
-//     .getContent()
-//     .split('\n')
-//     .map((line, index) => `${index}|${line}`)
-//     .join('\n'),
-// );
 const node = file.parse();
-const namespace = new Namespace('FOO');
 
-const location0 = new RootLocation(file, namespace);
+const location0 = new RootLocation(file);
 Assert.equal(location0.getFile(), file);
-Assert.equal(location0.getNamespace(), namespace);
 Assert.equal(location0.shouldBeInstrumented(), true);
 Assert.ok(location0.makeEntity([]).type.startsWith('__APPMAP_AGENT_ERROR_'));
 Assert.equal(location0.isStaticMethod([]), false);
@@ -57,7 +47,6 @@ Assert.ok(location0.getContainerName([]).startsWith('__APPMAP_AGENT_ERROR_'));
 const node1 = node;
 const location1 = location0.extend('Program', node);
 Assert.equal(location1.getFile(), file);
-Assert.equal(location1.getNamespace(), namespace);
 Assert.equal(location1.shouldBeInstrumented(), true);
 Assert.deepEqual(location1.makeEntity(['child']), {
   type: 'package',
