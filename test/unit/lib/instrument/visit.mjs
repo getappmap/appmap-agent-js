@@ -97,72 +97,17 @@ const output = {
   );
 });
 
-//
-//
-//
-// ////////////////////////////////
-// // shouldBeInstrumented: true //
-// ////////////////////////////////
-//
-// {
-//   input = {
-//     type: 'Identifier',
-//     name: "x"
-//   };
-//   const node2 = {
-//     type: 'Identifier',
-//     name: "y"
-//   };
-//   setVisitor("Program", (...args) => {
-//     Assert.deeEqual(args, [node1, {location2, }]);
-//     return [];
-//   }, (...args) => {
-//
-//   });
-//
-//
-//
-//   assignVisitorObject('Program', {
-//     Program: (...args) => {
-//       Assert.deepEqual(args, [node1, location2]);
-//       return combineResult((node, location) => node2, args[0], args[1]);
-//     },
-//   });
-//   const result = visit('Program', node1, location1);
-//   Assert.equal(getResultNode(result), node2);
-//   Assert.deepEqual(getResultEntities(result), []);
-// }
-//
-// /////////////////////////////////
-// // shouldBeInstrumented: false //
-// /////////////////////////////////
-//
-// {
-//   const node1 = {
-//     type: 'Program',
-//     body: [],
-//     sourceType: 'script',
-//   };
-//   const location2 = {
-//     __proto__: null,
-//     shouldBeInstrumented(...args) {
-//       Assert.equal(this, location2);
-//       Assert.deepEqual(args, []);
-//       return false;
-//     },
-//   };
-//   const location1 = {
-//     __proto__: null,
-//     extend(...args) {
-//       Assert.equal(this, location1);
-//       Assert.deepEqual(args, ['Program', node1]);
-//       return location2;
-//     },
-//   };
-//   assignVisitorObject('Program', {
-//     Program: () => Assert.fail(),
-//   });
-//   const result = visit('Program', node1, location1);
-//   Assert.equal(getResultNode(result), node1);
-//   Assert.deepEqual(getResultEntities(result), []);
-// }
+{
+  const location = {
+    __proto__: null,
+    extend: () => location,
+    shouldBeInstrumented: () => true,
+    makeEntity: () => null,
+  };
+  Assert.deepEqual(visit({ type: 'Foo' }, { location, namespace, file }), {
+    node: {
+      type: 'Foo',
+    },
+    entities: [],
+  });
+}
