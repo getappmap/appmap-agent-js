@@ -1,57 +1,97 @@
-import { parse, mockResult, compareResult, mapResult } from './__fixture__.mjs';
-import File from '../../../../lib/file.mjs';
-import Namespace from '../../../../lib/namespace.mjs';
-import { RootLocation } from '../../../../lib/instrument/location.mjs';
-import {
-  assignVisitorObject,
-  visit,
-} from '../../../../lib/instrument/visit.mjs';
-import '../../../../lib/instrument/visit-expression.mjs';
+import { test } from './__fixture__.mjs';
+import '../../../../lib/instrument/visit-statement.mjs';
 
 Error.stackTraceLimit = Infinity;
 
-["Expression", "Pattern"].forEach((kind) => {
-  assignVisitorObject(kind, {
-    Identifier: (node, location) => mockResult({
-      type: "Identifier",
-      name: `${kind}_${node.name}`
-    }, [])
+const testStatement = (code, source = 'script') =>
+  test({
+    input: code,
+    source,
+    keys: [['body', 0]],
   });
+
+////////////
+// Atomic //
+////////////
+
+testStatement(`throw x;`);
+
+testStatement(`123;`);
+
+testStatement(`debugger;`);
+
+test({
+  input: `l: break l;`,
+  keys: [['body', 0], 'body'],
+});
+test({
+  input: `while (123) break;`,
+  keys: [['body', 0], 'body'],
 });
 
-const namespace = new Namespace('PREFIX');
+test({
+  input: `l: while (123) continue l;`,
+  keys: [['body', 0], 'body', 'body'],
+});
+test({
+  input: `while (123) continue;`,
+  keys: [['body', 0], 'body'],
+});
 
-const test = (code1, code2) => {
-  const file = new File(`filename.js`, 2020, 'script', `${code1}`);
-  const location0 = new RootLocation(file, namespace);
-  const node1 = file.parse();
-  const location1 = location0.extend(node1);
-  compareResult(
-    visit('Statement', node1.body[0], location1),
-    mockResult(parse('Statement', code2), []),
-  );
-};
+/////////////////
+// Declaration //
+/////////////////
 
-// const testSpecial = (code1, code2) => {
-//   const file = new File(`filename.js`, 2020, 'script', `({ async * m () { (${code1}); }});`);
-//   const location0 = new RootLocation(file, namespace);
-//   const node1 = file.parse();
-//   const location1 = location0.extend(node1);
-//   const node2 = node1.body[0];
-//   const location2 = location1.extend(node2);
-//   const node3 = node2.expression;
-//   const location3 = location2.extend(node3);
-//   const node4 = node3.properties[0];
-//   const location4 = location3.extend(node4);
-//   const node5 = node4.value;
-//   const location5 = location4.extend(node5);
-//   const node6 = node5.body;
-//   const location6 = location5.extend(node6);
-//   const node7 = node6.body[0];
-//   const location7 = location6.extend(node7);
-//   compareResult(
-//     visit('Expression', node7.expression, location7),
-//     mockResult(parse('Program', `({ async * m () { (${code2}); }});`).body[0].expression.properties[0].value.body.body[0].expression, []),
-//   );
-// }
+testStatement(`let x = 123, y;`);
 
+testStatement(`import {x as y, z} from "source";`, 'module');
+testStatement(`import * as x from "source";`, 'module');
+testStatement(`import x from "source";`, 'module');
+
+test({
+  source: 'module',
+  input: `
+    let x, z;
+    export {x as y, z};`,
+  keys: [['body', 1]],
+});
+testStatement(`export {x as y} from "source";`, 'module');
+testStatement(`export let x;`, 'module');
+testStatement(`export * from "source";`, 'module');
+testStatement(`export default 123;`, 'module');
+
+//////////////
+// Compound //
+//////////////
+
+testStatement(`{ 123; }`);
+
+testStatement(`with (123) 456;`);
+
+testStatement(`l: { 123; }`);
+
+testStatement(`if (123) 456; else 789;`);
+testStatement(`if (123) 456;`);
+
+testStatement(`try { 123; } catch { 456; } finally { 789; }`);
+testStatement(`try { 123; } catch (x) { 456; }`);
+testStatement(`try { 123; } finally { 456; }`);
+
+testStatement(`while (123) 456;`);
+testStatement(`do 456; while (123)`);
+
+testStatement(`for (123; 456; 789) 0;`);
+testStatement(`for (;;) 123;`);
+
+testStatement(`for (x of 123) 456;`);
+test({
+  input: `(async () => { for (x of await 123) 456; });`,
+  keys: [['body', 0], 'expression', 'body', ['body', 0]],
+});
+
+testStatement(`for (x in 123) 456;`);
+
+testStatement(`switch (123) {
+  case 456: 789;
+  default: 0;
+}`);

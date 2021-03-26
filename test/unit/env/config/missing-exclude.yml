@@ -2,7 +2,7 @@ name: appname
 packages:
   - null
   - foo: bar
-  - path:
+  - ? path
   - path: package1
   - path: package2
     shallow: true

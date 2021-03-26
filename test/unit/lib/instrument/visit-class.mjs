@@ -1,8 +1,14 @@
-import { testExpression } from './__fixture__.mjs';
-import '../../../../lib/instrument/visit-common-class.mjs';
+import { test } from './__fixture__.mjs';
+import '../../../../lib/instrument/visit-class.mjs';
 
 Error.stackTraceLimit = Infinity;
 
-testExpression(`class { m () { } } `);
+test({
+  input: `(class { m () { } });`,
+  keys: [['body', 0], 'expression'],
+});
 
-testExpression(`class f extends null { static get [m] () { } } `);
+test({
+  input: `class f extends null { static get [m] () { } } `,
+  keys: [['body', 0]],
+});

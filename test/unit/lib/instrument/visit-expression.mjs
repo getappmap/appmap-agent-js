@@ -1,7 +1,27 @@
-import { testExpression, testSpecialExpression } from './__fixture__.mjs';
+import { test } from './__fixture__.mjs';
 import '../../../../lib/instrument/visit-expression.mjs';
 
 Error.stackTraceLimit = Infinity;
+
+const testExpression = (code) =>
+  test({
+    input: `(${code});`,
+    keys: [['body', 0], 'expression'],
+  });
+
+const testSpecialExpression = (code) =>
+  test({
+    input: `({ async * m () { (${code}); } })`,
+    keys: [
+      ['body', 0],
+      'expression',
+      ['properties', 0],
+      'value',
+      'body',
+      ['body', 0],
+      'expression',
+    ],
+  });
 
 /////////////
 // Literal //

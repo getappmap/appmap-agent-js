@@ -61,18 +61,30 @@ const main = (argv) => {
     return run(argv.target, argv.raw, false);
   }
   [
+    /////////
+    // src //
+    /////////
+    // indep //
+    // 'src/es2015/node/process-id.js',
     // 'src/es2015/empty-marker.js',
+    // 'src/es2015/undefined.js',
     // 'src/es2015/event-counter.js',
     // 'src/es2015/get-now.js',
+    // // serialize //
     // 'src/es2015/get-identity.js',
     // 'src/es2015/get-class-name.js',
-    // 'src/es2015/serialize.js',
-    // 'src/es2015/serialize-parameter.js',
-    'src/es2015/serialize-exception.js',
-    'src/es2015/node/send/local.js',
-    'src/es2015/node/setup-engine.js',
-    'src/es2015/node/setup-archive.js',
-    'lib/logger.mjs',
+    // 'src/es2015/serialize.js', // empty-marker
+    // 'src/es2015/serialize-parameter.js', // serialize, get-class-name, get-identity
+    // 'src/es2015/serialize-exception.js', // empty-marker, serialize, get-class-name, get-identity
+    // // send //
+    // 'src/es2015/node/send/local.js',
+    // 'src/es2015/node/setup-engine.js', // send
+    // 'src/es2015/node/setup-archive.js', // send, serialize
+    // /////////
+    // // lib //
+    // /////////
+    // 'lib/logger.mjs',
+    'lib/bundle.mjs',
     'lib/settings.mjs',
     'lib/git.mjs',
     'lib/appmap.mjs',
@@ -80,7 +92,16 @@ const main = (argv) => {
     'lib/file.mjs',
     'lib/instrument/location.mjs',
     'lib/instrument/result.mjs',
+    'lib/instrument/location.mjs',
     'lib/instrument/visit.mjs',
+    'lib/instrument/visit-class.mjs',
+    'lib/instrument/visit-closure.mjs',
+    'lib/instrument/visit-expression.mjs',
+    'lib/instrument/visit-identifier.mjs',
+    'lib/instrument/visit-pattern.mjs',
+    'lib/instrument/visit-program.mjs',
+    'lib/instrument/visit-statement.mjs',
+    'lib/instrument/index.mjs',
   ].forEach((path) => {
     run(path, argv.raw, true);
   });
