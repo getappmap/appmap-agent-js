@@ -1,13 +1,17 @@
 /* global APPMAP_GLOBAL_APPMAP_OBJECT */
 
-const APPMAP_GLOBAL_SEND = (message) => {
-  if (message.type === 'engine') {
-    APPMAP_GLOBAL_APPMAP_OBJECT.setEngine(message.name, message.version);
+const APPMAP_GLOBAL_SEND = (type, data) => {
+  if (type === 'engine') {
+    APPMAP_GLOBAL_APPMAP_OBJECT.setEngine(data.name, data.version);
+    return true;
   }
-  if (message.type === 'event') {
-    APPMAP_GLOBAL_APPMAP_OBJECT.addEvent(message.data);
+  if (type === 'event') {
+    APPMAP_GLOBAL_APPMAP_OBJECT.addEvent(data);
+    return true;
   }
-  if (message.type === 'archive') {
-    APPMAP_GLOBAL_APPMAP_OBJECT.archive(message.data);
+  if (type === 'archive') {
+    APPMAP_GLOBAL_APPMAP_OBJECT.archive(data);
+    return true;
   }
+  return false;
 };

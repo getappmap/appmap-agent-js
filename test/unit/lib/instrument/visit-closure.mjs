@@ -29,7 +29,7 @@ test({
       $_LOCAL_EVENT_IDENTITY = $_GLOBAL_EVENT_COUNTER += 1,
       $_LOCAL_SUCCESS = $_GLOBAL_EMPTY_MARKER,
       $_LOCAL_FAILURE = $_GLOBAL_EMPTY_MARKER;
-    $_GLOBAL_ADD_EVENT({
+    $_GLOBAL_SEND('event', {
       id: $_LOCAL_EVENT_IDENTITY,
       event: 'call',
       thread_id: $_GLOBAL_PROCESS_ID,
@@ -54,11 +54,11 @@ test({
     } catch ($_LOCAL_ERROR) {
       throw $_LOCAL_FAILURE = $_LOCAL_ERROR;
     } finally {
-      $_GLOBAL_ADD_EVENT({
+      $_GLOBAL_SEND('event', {
         id: $_GLOBAL_EVENT_COUNTER += 1,
         event: 'return',
         thread_id: $_GLOBAL_PROCESS_ID,
-        parent_id: $_GLOBAL_EVENT_IDENTITY,
+        parent_id: $_LOCAL_EVENT_IDENTITY,
         ellapsed: $_GLOBAL_GET_NOW() - $_LOCAL_TIMER,
         return_value: $_GLOBAL_SERIALIZE_PARAMETER($_LOCAL_SUCCESS, 'return'),
         exceptions: $_GLOBAL_SERIALIZE_EXCEPTION($_LOCAL_FAILURE)
@@ -78,7 +78,7 @@ test({
       $_LOCAL_EVENT_IDENTITY = $_GLOBAL_EVENT_COUNTER += 1,
       $_LOCAL_SUCCESS = $_GLOBAL_EMPTY_MARKER,
       $_LOCAL_FAILURE = $_GLOBAL_EMPTY_MARKER;
-    $_GLOBAL_ADD_EVENT({
+    $_GLOBAL_SEND('event', {
       id: $_LOCAL_EVENT_IDENTITY,
       event: 'call',
       thread_id: $_GLOBAL_PROCESS_ID,
@@ -95,11 +95,11 @@ test({
     } catch ($_LOCAL_ERROR) {
       throw $_LOCAL_FAILURE = $_LOCAL_ERROR;
     } finally {
-      $_GLOBAL_ADD_EVENT({
+      $_GLOBAL_SEND('event', {
         id: $_GLOBAL_EVENT_COUNTER += 1,
         event: 'return',
         thread_id: $_GLOBAL_PROCESS_ID,
-        parent_id: $_GLOBAL_EVENT_IDENTITY,
+        parent_id: $_LOCAL_EVENT_IDENTITY,
         ellapsed: $_GLOBAL_GET_NOW() - $_LOCAL_TIMER,
         return_value: $_GLOBAL_SERIALIZE_PARAMETER($_LOCAL_SUCCESS, 'return'),
         exceptions: $_GLOBAL_SERIALIZE_EXCEPTION($_LOCAL_FAILURE)

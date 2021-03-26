@@ -14,6 +14,8 @@ const testStatement = (code, source = 'script') =>
 // Atomic //
 ////////////
 
+testStatement(`;`);
+
 testStatement(`throw x;`);
 
 testStatement(`123;`);

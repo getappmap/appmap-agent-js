@@ -22,21 +22,19 @@ global.APPMAP_GLOBAL_APPMAP_OBJECT = {
   },
 };
 
-APPMAP_GLOBAL_SEND({
-  type: 'engine',
-  name: 'engine-name',
-  version: 'engine-version',
-});
+Assert.equal(
+  APPMAP_GLOBAL_SEND('engine', {
+    name: 'engine-name',
+    version: 'engine-version',
+  }),
+  true,
+);
 
-APPMAP_GLOBAL_SEND({
-  type: 'event',
-  data: 'event-data',
-});
+Assert.equal(APPMAP_GLOBAL_SEND('event', 'event-data'), true);
 
-APPMAP_GLOBAL_SEND({
-  type: 'archive',
-  data: 'archive-data',
-});
+Assert.equal(APPMAP_GLOBAL_SEND('archive', 'archive-data'), true);
+
+Assert.equal(APPMAP_GLOBAL_SEND('foo', 'bar'), false);
 
 Assert.deepEqual(trace, [
   ['engine', 'engine-name', 'engine-version'],

@@ -8,10 +8,7 @@
   const archive = (data) => {
     if (!archived) {
       archived = true;
-      APPMAP_GLOBAL_SEND({
-        type: 'archive',
-        data,
-      });
+      APPMAP_GLOBAL_SEND('archive', data);
     }
   };
 
