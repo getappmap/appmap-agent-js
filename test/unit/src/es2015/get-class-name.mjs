@@ -5,9 +5,9 @@ import { load } from '../__fixture__.mjs';
 
 load('src/es2015/get-class-name.js');
 
-Assert.equal(APPMAP_GLOBAL_GET_CLASS_NAME(null), 'null-class');
+Assert.equal(APPMAP_GLOBAL_GET_CLASS_NAME(null), 'null');
 
-Assert.equal(APPMAP_GLOBAL_GET_CLASS_NAME(123), 'number-class');
+Assert.equal(APPMAP_GLOBAL_GET_CLASS_NAME(123), 'number');
 
 Assert.equal(APPMAP_GLOBAL_GET_CLASS_NAME(new Date()), 'Date');
 
@@ -17,7 +17,7 @@ Assert.equal(
       return 'foo';
     },
   }),
-  'unknown',
+  'Unknown',
 );
 
 Assert.equal(
@@ -26,14 +26,14 @@ Assert.equal(
       name: 123,
     },
   }),
-  'unknown',
+  'Unknown',
 );
 
 Assert.equal(
   APPMAP_GLOBAL_GET_CLASS_NAME({
     constructor: {},
   }),
-  'unknown',
+  'Unknown',
 );
 
 Assert.equal(
@@ -44,5 +44,5 @@ Assert.equal(
       },
     },
   }),
-  'unknown',
+  'Unknown',
 );

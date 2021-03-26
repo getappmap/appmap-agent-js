@@ -19,12 +19,12 @@ const APPMAP_GLOBAL_GET_CLASS_NAME = (() => {
               }
             }
           }
-          return "unknown";
+          return "Unknown";
         }
         object = global_Reflect_getPrototypeOf(object);
       }
-      return "null-class";
+      return "null";
     }
-    return `${typeof value}-class`;
+    return typeof value;
   };
 })();

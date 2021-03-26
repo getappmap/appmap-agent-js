@@ -1,8 +1,19 @@
+// node bin/client.mjs -- sandbox.js
 
-const o = {
-  m (x) {
-    return x * x;
+
+class Counter {
+  constructor () {
+    this.state = 0;
   }
-};
+  incrementBy (amount) {
+    const plus = (left, right) => left + right;
+    this.state = plus(this.state, amount);
+  }
+  increment () {
+    this.incrementBy(1);
+    return this.state;
+  }
+}
 
-o.m(3);
+const counter = new Counter();
+counter.increment();
