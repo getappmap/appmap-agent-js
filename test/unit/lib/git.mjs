@@ -23,7 +23,7 @@ if (!Fs.readdirSync('test/unit/env/').includes('git')) {
     git.getCommitHash(),
     'd15a7e72b7d0710a5f589ae1e5152492d8bb1eff',
   );
-  AssertStrict.deepEqual(git.getStatus(), ['']);
+  AssertStrict.ok(Array.isArray(git.getStatus()));
   AssertStrict.equal(git.getLatestTag(), 'v0.0.1');
   AssertStrict.equal(git.getLatestAnnotatedTag(), 'v0.0.0');
   AssertStrict.equal(git.getCommitNumberSinceLatestTag(), 1);

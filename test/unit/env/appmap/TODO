@@ -26,7 +26,7 @@
       "branch": "main",
       "commit": "d15a7e72b7d0710a5f589ae1e5152492d8bb1eff",
       "status": [
-        ""
+        "M README.md"
       ],
       "tag": "v0.0.1",
       "annotated_tag": "v0.0.0",

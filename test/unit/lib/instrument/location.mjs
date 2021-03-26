@@ -50,27 +50,27 @@ Assert.ok(
 ///////////////////////
 
 [
-  ["BreakStatement", "label"],
-  ["ContinueStatement", "label"],
-  ["LabeledStatement", "label"],
-  ["ExportSpecifier", "exported"],
-  ["ImportSpecifier", "imported"],
-  ["MemberExpression", "property"],
-  ["Property", "key"],
-  ["MethodDefinition", "key"]].forEach(([type, name]) => {
-    const node1 = {
-      type,
-      computed: false,
-      [name]: {
-        type: "Identifier",
-        name: "x"
-      },
-    };
-    const location1 = location0.extend(node1);
-    const node2 = node1.label;
-    const location2 = location1.extend(node1[name]);
-    Assert.equal(location2.isNonScopingIdentifier(), true);
-  });
+  ['BreakStatement', 'label'],
+  ['ContinueStatement', 'label'],
+  ['LabeledStatement', 'label'],
+  ['ExportSpecifier', 'exported'],
+  ['ImportSpecifier', 'imported'],
+  ['MemberExpression', 'property'],
+  ['Property', 'key'],
+  ['MethodDefinition', 'key'],
+].forEach(([type, name]) => {
+  const node1 = {
+    type,
+    computed: false,
+    [name]: {
+      type: 'Identifier',
+      name: 'x',
+    },
+  };
+  const location1 = location0.extend(node1);
+  const location2 = location1.extend(node1[name]);
+  Assert.equal(location2.isNonScopingIdentifier(), true);
+});
 
 /////////////
 // Program //
@@ -100,8 +100,8 @@ Assert.deepEqual(location1.makeEntity(['child'], file), {
   Assert.equal(location3.isStaticMethod(), false);
   Assert.equal(location3.isNonScopingIdentifier(), false);
   Assert.equal(location3.getStartLine(), 2);
-  Assert.ok(location3.getName(file), "§none");
-  Assert.ok(location3.getChildName(null), "§none");
+  Assert.ok(location3.getName(file), '§none');
+  Assert.ok(location3.getChildName(null), '§none');
   Assert.ok(location3.getKind().startsWith('__APPMAP_AGENT_ERROR_'));
   Assert.equal(location3.getParentContainerName(file), path);
 }

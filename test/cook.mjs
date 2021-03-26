@@ -65,33 +65,31 @@ const main = (argv) => {
     // src //
     /////////
     // indep //
-    // 'src/es2015/node/process-id.js',
-    // 'src/es2015/empty-marker.js',
-    // 'src/es2015/undefined.js',
-    // 'src/es2015/event-counter.js',
-    // 'src/es2015/get-now.js',
-    // // serialize //
-    // 'src/es2015/get-identity.js',
-    // 'src/es2015/get-class-name.js',
-    // 'src/es2015/serialize.js', // empty-marker
-    // 'src/es2015/serialize-parameter.js', // serialize, get-class-name, get-identity
-    // 'src/es2015/serialize-exception.js', // empty-marker, serialize, get-class-name, get-identity
-    // // send //
-    // 'src/es2015/node/send/local.js',
-    // 'src/es2015/node/setup-engine.js', // send
-    // 'src/es2015/node/setup-archive.js', // send, serialize
-    // /////////
-    // // lib //
-    // /////////
-    // 'lib/logger.mjs',
+    'src/es2015/node/process-id.js',
+    'src/es2015/empty-marker.js',
+    'src/es2015/undefined.js',
+    'src/es2015/event-counter.js',
+    'src/es2015/get-now.js',
+    // serialize //
+    'src/es2015/get-identity.js',
+    'src/es2015/get-class-name.js',
+    'src/es2015/serialize.js', // empty-marker
+    'src/es2015/serialize-parameter.js', // serialize, get-class-name, get-identity
+    'src/es2015/serialize-exception.js', // empty-marker, serialize, get-class-name, get-identity
+    // send //
+    'src/es2015/node/send/local.js',
+    'src/es2015/node/setup-engine.js', // send
+    'src/es2015/node/setup-archive.js', // send, serialize
+    /////////
+    // lib //
+    /////////
+    'lib/logger.mjs',
     'lib/bundle.mjs',
     'lib/settings.mjs',
     'lib/git.mjs',
     'lib/appmap.mjs',
     'lib/namespace.mjs',
     'lib/file.mjs',
-    'lib/instrument/location.mjs',
-    'lib/instrument/result.mjs',
     'lib/instrument/location.mjs',
     'lib/instrument/visit.mjs',
     'lib/instrument/visit-class.mjs',
@@ -102,6 +100,7 @@ const main = (argv) => {
     'lib/instrument/visit-program.mjs',
     'lib/instrument/visit-statement.mjs',
     'lib/instrument/index.mjs',
+    'lib/main.mjs',
   ].forEach((path) => {
     run(path, argv.raw, true);
   });

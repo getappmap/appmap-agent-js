@@ -3,25 +3,25 @@ import '../../../../lib/instrument/visit-closure.mjs';
 
 Error.stackTraceLimit = Infinity;
 
-const prefix = "$"
+const prefix = '$';
 
 test({
   prefix,
   input: `function f () { return x; }`,
   output: `function f () { return $_LOCAL_SUCCESS = x; }`,
-  keys: [["body", 0], "body", ["body", 0]]
+  keys: [['body', 0], 'body', ['body', 0]],
 });
 
 test({
   prefix,
   input: `function f () { return; }`,
   output: `function f () { return $_LOCAL_SUCCESS = $_GLOBAL_UNDEFINED; }`,
-  keys: [["body", 0], "body", ["body", 0]]
+  keys: [['body', 0], 'body', ['body', 0]],
 });
 
 test({
   prefix,
-  path: "filename.js",
+  path: 'filename.js',
   input: `const f = (x, y, ...z) => t;`,
   output: `const f = ($_LOCAL_ARGUMENT_0, $_LOCAL_ARGUMENT_1, ...$_LOCAL_ARGUMENT_2) => {
     var
@@ -65,13 +65,12 @@ test({
       });
     }
   };`,
-  keys: [["body", 0], ["declarations", 0], "init"]
+  keys: [['body', 0], ['declarations', 0], 'init'],
 });
-
 
 test({
   prefix,
-  path: "filename.js",
+  path: 'filename.js',
   input: `async function * f () { 123; }`,
   output: `async function * f () {
     var
@@ -107,5 +106,5 @@ test({
       });
     }
   };`,
-  keys: [["body", 0]]
+  keys: [['body', 0]],
 });

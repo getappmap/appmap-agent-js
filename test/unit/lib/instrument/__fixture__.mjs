@@ -45,10 +45,10 @@ export const test = (options) => {
     location,
     file,
   });
-  console.log("1", getResultNode(result));
-  console.log("2", escodegen(getResultNode(result)));
-  console.log("3", node2);
-  console.log("4", escodegen(node2));
+  // console.log("1", getResultNode(result));
+  // console.log("2", escodegen(getResultNode(result)));
+  // console.log("3", node2);
+  // console.log("4", escodegen(node2));
   Assert.equal(escodegen(getResultNode(result)), escodegen(node2));
 };
 
