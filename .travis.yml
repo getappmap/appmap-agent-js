@@ -8,4 +8,6 @@ install:
   - npm install
 
 script:
-  - npm test
+  - npm run prettier
+  - npm run eslint
+  - npm run test
