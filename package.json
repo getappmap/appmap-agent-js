@@ -4,7 +4,7 @@
   "scripts": {
     "prettier": "npx prettier --write lib/**/*.mjs src/**/*.js test/**/*.mjs",
     "eslint": "npx eslint lib/**/*.mjs src/**/*.js test/**/*.mjs",
-    "test": "node node test/unit/run.mjs"
+    "test": "node test/unit/run.mjs"
   },
   "files": [],
   "dependencies": {
