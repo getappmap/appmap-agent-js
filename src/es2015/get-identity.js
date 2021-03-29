@@ -7,7 +7,7 @@ const APPMAP_GLOBAL_GET_IDENTITY = (() => {
   const registery1 = { __proto__: null };
   const registery2 = new WeakMap();
   return (value) => {
-    if (typeof value === 'symbol') {
+    if (typeof value === "symbol") {
       if (!(value in registery1)) {
         counter += 1;
         registery1[value] = counter;
@@ -15,8 +15,8 @@ const APPMAP_GLOBAL_GET_IDENTITY = (() => {
       return registery1[value];
     }
     if (
-      (typeof value === 'object' && value !== null) ||
-      typeof value === 'function'
+      (typeof value === "object" && value !== null) ||
+      typeof value === "function"
     ) {
       if (
         !global_Reflect_apply(global_WeakMap_prototype_has, registery2, [value])

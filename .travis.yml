@@ -1,0 +1,11 @@
+arch: amd64
+os: linux
+dist: xenial
+language: node_js
+node_js: [lts/*]
+
+install:
+  - npm install
+
+script:
+  - npm test

@@ -10,7 +10,7 @@ load('src/es2015/get-class-name.js');
 load('src/es2015/get-identity.js');
 
 Assert.deepEqual(APPMAP_GLOBAL_SERIALIZE_PARAMETER(Symbol('foo'), 'pattern'), {
-  class: 'TODO',
+  class: 'symbol',
   name: 'pattern',
   object_id: 1,
   value: '[object Symbol]',

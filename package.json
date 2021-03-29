@@ -1,7 +1,9 @@
 {
   "name": "@appland/appmap-agent-js",
   "version": "0.0.0",
-  "scripts": {},
+  "scripts": {
+    "test": "npx prettier --write ./ && npx eslint ./ && node test/unit/run.mjs"
+  },
   "files": [],
   "dependencies": {
     "acorn": "^7.4.1",

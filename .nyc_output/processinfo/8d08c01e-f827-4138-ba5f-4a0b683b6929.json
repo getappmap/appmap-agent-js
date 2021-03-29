@@ -1,0 +1,18 @@
+{
+  "parent": null,
+  "pid": 29585,
+  "argv": [
+    "/usr/local/bin/node",
+    "/Users/soft/Desktop/workspace/appmap-agent-js/test/unit/src/es2015/node/setup-archive.mjs"
+  ],
+  "execArgv": [],
+  "cwd": "/Users/soft/Desktop/workspace/appmap-agent-js",
+  "time": 1617025909726,
+  "ppid": 29584,
+  "coverageFilename": "/Users/soft/Desktop/workspace/appmap-agent-js/.nyc_output/8d08c01e-f827-4138-ba5f-4a0b683b6929.json",
+  "externalId": "",
+  "uuid": "8d08c01e-f827-4138-ba5f-4a0b683b6929",
+  "files": [
+    "/Users/soft/Desktop/workspace/appmap-agent-js/src/es2015/node/setup-archive.js"
+  ]
+}

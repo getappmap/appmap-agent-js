@@ -7,8 +7,6 @@ import File from '../../../../lib/file.mjs';
 import Namespace from '../../../../lib/namespace.mjs';
 import { visit, getResultNode } from '../../../../lib/instrument/visit.mjs';
 
-
-
 export const test = (options) => {
   const { path, ecma, source, input, output, prefix, keys } = {
     path: 'filname.js',
@@ -37,7 +35,7 @@ export const test = (options) => {
     if (Array.isArray(key)) {
       key.forEach(step);
     } else {
-      step(key)
+      step(key);
     }
   });
   const result = visit(node1, {

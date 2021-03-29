@@ -8,37 +8,37 @@
   const archive = (data) => {
     if (!archived) {
       archived = true;
-      APPMAP_GLOBAL_SEND('archive', data);
+      APPMAP_GLOBAL_SEND("archive", data);
     }
   };
 
-  process.on('exit', (code, origin) => {
+  process.on("exit", (code, origin) => {
     archive({
-      type: 'exit',
+      type: "exit",
       code,
       origin,
     });
   });
 
   /* istanbul ignore next */
-  process.on('uncaughtException', (error, origin) => {
+  process.on("uncaughtException", (error, origin) => {
     archive({
-      type: 'exception',
+      type: "exception",
       error: APPMAP_GLOBAL_SERIALIZE(error),
       origin,
     });
     throw error;
   });
 
-  process.on('SIGINT', () => {
+  process.on("SIGINT", () => {
     archive({
-      type: 'SIGINT',
+      type: "SIGINT",
     });
   });
 
-  process.on('SIGTERM', () => {
+  process.on("SIGTERM", () => {
     archive({
-      type: 'SIGTERM',
+      type: "SIGTERM",
     });
   });
 }

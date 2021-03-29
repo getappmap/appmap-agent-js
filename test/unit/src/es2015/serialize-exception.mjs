@@ -16,7 +16,7 @@ Assert.deepEqual(
 
 Assert.deepEqual(APPMAP_GLOBAL_SERIALIZE_EXCEPTION(null), [
   {
-    class: 'TODO',
+    class: 'null',
     message: null,
     object_id: null,
     path: null,
@@ -28,7 +28,7 @@ const error = new Error('foo');
 
 Assert.deepEqual(APPMAP_GLOBAL_SERIALIZE_EXCEPTION(error), [
   {
-    class: 'TODO',
+    class: 'Error',
     message: error.message,
     object_id: 1,
     path: error.stack,
