@@ -4,14 +4,15 @@
   "scripts": {
     "prettier": "npx prettier --write lib/**/*.mjs src/**/*.js test/**/*.mjs",
     "eslint": "npx eslint lib/**/*.mjs src/**/*.js test/**/*.mjs",
-    "test": "node test/unit/run.mjs"
+    "test": "node test/unit/run.mjs",
+    "release": "npx semantic-release"
   },
   "files": [],
   "dependencies": {
     "acorn": "^7.4.1",
     "escodegen": "^2.0.0",
-    "yaml": "^1.10.0",
-    "minimist": "^1.2.5"
+    "minimist": "^1.2.5",
+    "yaml": "^1.10.0"
   },
   "devDependencies": {
     "c8": "^7.6.0",
@@ -21,7 +22,8 @@
     "eslint-config-prettier": "^8.1.0",
     "eslint-plugin-import": "^2.22.1",
     "nyc": "^15.1.0",
-    "prettier": "^2.2.1"
+    "prettier": "^2.2.1",
+    "semantic-release": "^17.4.2"
   },
   "repository": {
     "type": "git",

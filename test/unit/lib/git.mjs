@@ -1,4 +1,4 @@
-import * as Fs from 'fs';
+import * as FileSystem from 'fs';
 import * as ChildProcess from 'child_process';
 import { strict as Assert } from 'assert';
 import * as Logger from '../../../lib/logger.mjs';
@@ -7,27 +7,40 @@ import Git from '../../../lib/git.mjs';
 const AssertStrict = Assert.strict;
 Logger.reloadGlobalLevel('DEBUG');
 
-const url = 'https://github.com/lachrist/sample.git';
-const path = 'test/unit/env/git/';
+// const url = 'https://github.com/lachrist/sample.git';
+// const path = 'test/unit/env/git/';
+//
+// if (!FileSystem.readdirSync('test/unit/env/').includes('git')) {
+//   ChildProcess.execSync(`git clone ${url} ${path}`);
+// }
 
-if (!Fs.readdirSync('test/unit/env/').includes('git')) {
-  ChildProcess.execSync(`git clone ${url} ${path}`);
-}
+// {
+//   const git = new Git(path);
+//   AssertStrict.equal(git.isRepository(), true);
+//   AssertStrict.equal(git.getRepositoryURL(), url);
+//   AssertStrict.equal(git.getBranchName(), 'main');
+//   AssertStrict.equal(
+//     git.getCommitHash(),
+//     'd15a7e72b7d0710a5f589ae1e5152492d8bb1eff',
+//   );
+//   AssertStrict.ok(Array.isArray(git.getStatus()));
+//   AssertStrict.equal(git.getLatestTag(), 'v0.0.1');
+//   AssertStrict.equal(git.getLatestAnnotatedTag(), 'v0.0.0');
+//   AssertStrict.equal(git.getCommitNumberSinceLatestTag(), 1);
+//   AssertStrict.equal(git.getCommitNumberSinceLatestAnnotatedTag(), 2);
+// }
 
 {
-  const git = new Git(path);
+  const git = new Git(".");
   AssertStrict.equal(git.isRepository(), true);
-  AssertStrict.equal(git.getRepositoryURL(), url);
-  AssertStrict.equal(git.getBranchName(), 'main');
-  AssertStrict.equal(
-    git.getCommitHash(),
-    'd15a7e72b7d0710a5f589ae1e5152492d8bb1eff',
-  );
+  AssertStrict.equal(git.getRepositoryURL(), "https://github.com/applandinc/appmap-agent-js");
+  AssertStrict.equal(typeof git.getBranchName(), 'string');
+  AssertStrict.equal(typeof git.getCommitHash(), 'string');
   AssertStrict.ok(Array.isArray(git.getStatus()));
-  AssertStrict.equal(git.getLatestTag(), 'v0.0.1');
-  AssertStrict.equal(git.getLatestAnnotatedTag(), 'v0.0.0');
-  AssertStrict.equal(git.getCommitNumberSinceLatestTag(), 1);
-  AssertStrict.equal(git.getCommitNumberSinceLatestAnnotatedTag(), 2);
+  AssertStrict.equal(typeof git.getLatestTag(), 'string');
+  AssertStrict.equal(typeof git.getLatestAnnotatedTag(), 'string');
+  AssertStrict.equal(typeof git.getCommitNumberSinceLatestTag(), 'number');
+  AssertStrict.equal(typeof git.getCommitNumberSinceLatestAnnotatedTag(), 'number');
 }
 
 {
