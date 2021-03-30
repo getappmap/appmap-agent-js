@@ -42,7 +42,7 @@ const makeMissing = (path, key) => {
   return { APPMAP_CONFIG: path };
 };
 
-Fs.writeFileSync('test/unit/env/config/appmap.yml', inputString, 'utf8');
+Fs.writeFileSync('tmp/test/appmap.yml', inputString, 'utf8');
 
 const prototype = {
   enabled: false,
@@ -91,7 +91,7 @@ const checkSettings = (settings, expected) => {
   checkSettings(
     new Settings({
       ...env,
-      APPMAP_CONFIG: 'test/unit/env/config/appmap.yml',
+      APPMAP_CONFIG: 'tmp/test/appmap.yml',
       APPMAP_OUTPUT_DIR: 'appmap/output/dir/',
     }),
     {
@@ -102,27 +102,27 @@ const checkSettings = (settings, expected) => {
   );
 });
 
-process.chdir('test/unit/env/config/');
+process.chdir('tmp/test/');
 [{ APPMAP: 'false' }, { APPMAP: 'FALSE' }, { APPMAP: 'foobar' }, {}].forEach(
   (env) => {
     checkSettings(new Settings(env), prototype);
   },
 );
-process.chdir('../../../../');
+process.chdir('../../');
 
 [
   {
-    APPMAP_CONFIG: 'test/unit/env/config/missing.yml',
+    APPMAP_CONFIG: 'tmp/test/missing.yml',
   },
   {
     APPMAP_CONFIG:
-      (Fs.writeFileSync('test/unit/env/config/unparsable.yml', '- * -', 'utf8'),
-      'test/unit/env/config/unparsable.yml'),
+      (Fs.writeFileSync('tmp/test/unparsable.yml', '- * -', 'utf8'),
+      'tmp/test/unparsable.yml'),
   },
   {
     APPMAP_CONFIG:
-      (Fs.writeFileSync('test/unit/env/config/invalid.yml', 'null', 'utf8'),
-      'test/unit/env/config/invalid.yml'),
+      (Fs.writeFileSync('tmp/test/invalid.yml', 'null', 'utf8'),
+      'tmp/test/invalid.yml'),
   },
 ].forEach((env) => {
   checkSettings(new Settings(env), {
@@ -134,8 +134,8 @@ process.chdir('../../../../');
 });
 
 [
-  makeInvalid('test/unit/env/config/invalid-name.yml', 'name'),
-  makeMissing('test/unit/env/config/missing-name.yml', 'name'),
+  makeInvalid('tmp/test/invalid-name.yml', 'name'),
+  makeMissing('tmp/test/missing-name.yml', 'name'),
 ].forEach((env) => {
   checkSettings(new Settings(env), {
     __proto__: prototype,
@@ -144,8 +144,8 @@ process.chdir('../../../../');
 });
 
 [
-  makeInvalid('test/unit/env/config/invalid-packages.yml', 'packages'),
-  makeMissing('test/unit/env/config/missing-packages.yml', 'packages'),
+  makeInvalid('tmp/test/invalid-packages.yml', 'packages'),
+  makeMissing('tmp/test/missing-packages.yml', 'packages'),
 ].forEach((env) => {
   checkSettings(new Settings(env), {
     __proto__: prototype,
@@ -154,8 +154,8 @@ process.chdir('../../../../');
 });
 
 [
-  makeInvalid('test/unit/env/config/invalid-exclude.yml', 'exclude'),
-  makeMissing('test/unit/env/config/missing-exclude.yml', 'exclude'),
+  makeInvalid('tmp/test/invalid-exclude.yml', 'exclude'),
+  makeMissing('tmp/test/missing-exclude.yml', 'exclude'),
 ].forEach((env) => {
   checkSettings(new Settings(env), {
     __proto__: prototype,

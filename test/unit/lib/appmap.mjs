@@ -1,10 +1,10 @@
 import { strict as Assert } from 'assert';
-import * as Fs from 'fs';
+import * as FileSystem from 'fs';
 import * as ChildProcess from 'child_process';
 import Git from '../../../lib/git.mjs';
 import AppMap from '../../../lib/appmap.mjs';
 
-const outdir = 'test/unit/env/appmap';
+const outdir = 'tmp/appmap';
 
 const settings = {
   __proto__: null,
@@ -41,7 +41,7 @@ const settings = {
   appmap.addEvent('event3');
   appmap.archive('termination2');
   const json = JSON.parse(
-    Fs.readFileSync(
+    FileSystem.readFileSync(
       `${outdir}/${appmap.json.metadata.name}.appmap.json`,
       'utf8',
     ),
@@ -53,13 +53,18 @@ const settings = {
 
 {
   const url = 'https://github.com/lachrist/sample.git';
-  const path = 'test/unit/env/git/';
-  if (!Fs.readdirSync('test/unit/env/').includes('git')) {
-    ChildProcess.execSync(`git clone ${url} test/unit/env/git/`);
+  const path = 'tmp/test/sample-git/';
+  if (!FileSystem.existsSync(path)) {
+    ChildProcess.execSync(`git clone ${url} ${path}`);
   }
   const git = new Git(path);
   const appmap = new AppMap(git, settings);
   appmap.archive('termination1');
-  const json = JSON.parse(Fs.readFileSync('test/unit/env/appmap/TODO', 'utf8'));
+  const json = JSON.parse(
+    FileSystem.readFileSync(
+      `${outdir}/${appmap.json.metadata.name}.appmap.json`,
+      'utf8',
+    ),
+  );
   Assert.equal(json.metadata.git.repository, url);
 }

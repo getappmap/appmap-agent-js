@@ -1,8 +1,9 @@
-arch: amd64
+arch: arm64
 os: linux
 dist: xenial
 language: node_js
 node_js: [lts/*]
+cache: npm
 
 install:
   - npm install
@@ -11,3 +12,8 @@ script:
   - npm run prettier
   - npm run eslint
   - npm run test
+
+deploy:
+  - provider: script
+    skip_cleanup: false
+    script: npm run deploy

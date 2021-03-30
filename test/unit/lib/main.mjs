@@ -2,7 +2,7 @@ import { strict as Assert } from 'assert';
 import * as FileSystem from 'fs';
 import main from '../../../lib/main.mjs';
 
-const path = 'test/unit/env/target/target.js';
+const path = 'tmp/test/target.js';
 
 FileSystem.writeFileSync(path, `process.argv.concat(["qux"]);`, 'utf8');
 

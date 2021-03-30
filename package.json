@@ -2,11 +2,16 @@
   "name": "@appland/appmap-agent-js",
   "version": "0.0.0",
   "scripts": {
-    "prettier": "npx prettier --write lib/**/*.mjs src/**/*.js test/**/*.mjs",
-    "eslint": "npx eslint lib/**/*.mjs src/**/*.js test/**/*.mjs",
-    "test": "node test/unit/run.mjs"
+    "prettier": "npx prettier --write 'lib/**/*.mjs' 'src/**/*.js' 'test/**/*.mjs' 'bin/*.mjs'",
+    "eslint": "npx eslint 'lib/**/*.mjs' 'src/**/*.js' 'test/**/*.mjs' 'bin/*.mjs'",
+    "test": "node test/unit/run.mjs",
+    "deploy": "npx semantic-release"
   },
-  "files": [],
+  "files": [
+    "src/**/*.js",
+    "lib/**/*.mjs",
+    "bin/*.mjs"
+  ],
   "dependencies": {
     "acorn": "^7.4.1",
     "escodegen": "^2.0.0",
