@@ -13,7 +13,7 @@
     "bin/*.mjs"
   ],
   "bin": {
-    "appmap": "bin/client.mjs"
+    "appmap": "bin/agent.mjs"
   },
   "dependencies": {
     "acorn": "^7.4.1",
