@@ -1,10 +1,7 @@
-repositoryUrl: https://github.com/applandinc/appmap-agent-js.git
-tagFormat: v${version}
 dryRun: true
 ci: true
 branches:
   - name: alpha
-    channel: next
 plugins:
   - '@semantic-release/commit-analyzer'
   - '@semantic-release/release-notes-generator'
