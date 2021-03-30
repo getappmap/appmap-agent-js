@@ -1,3 +1,5 @@
+repositoryUrl: https://github.com/applandinc/appmap-agent-js.git
+tagFormat: v${version}
 dryRun: true
 ci: true
 branches:
