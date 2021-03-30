@@ -1,3 +1,10 @@
+## [1.0.2](https://github.com/applandinc/appmap-agent-js/compare/v1.0.1...v1.0.2) (2021-03-30)
+
+
+### Bug Fixes
+
+* add hashbang to bin ([0219d9e](https://github.com/applandinc/appmap-agent-js/commit/0219d9e7de3825c92af3f4a1f9c86d7d3e0bddf1))
+
 ## [1.0.1](https://github.com/applandinc/appmap-agent-js/compare/v1.0.0...v1.0.1) (2021-03-30)
 
 
