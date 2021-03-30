@@ -20,6 +20,16 @@ const settings = {
   },
 };
 
+const name = "foobar";
+
+const file = {
+  getPath(...args) {
+    Assert.equal(this, file);
+    Assert.deepEqual(args, []);
+    return `/${name}.js`;
+  }
+};
+
 {
   const git = {
     __proto__: null,
@@ -29,7 +39,7 @@ const settings = {
       return false;
     },
   };
-  const appmap = new AppMap(git, settings);
+  const appmap = new AppMap(git, settings, file);
   appmap.addEntity('entity1');
   appmap.setEngine('engine-name-1', 'engine-version-1');
   appmap.setEngine('engine-name-2', 'engine-version-2');
@@ -42,7 +52,7 @@ const settings = {
   appmap.archive('termination2');
   const json = JSON.parse(
     FileSystem.readFileSync(
-      `${outdir}/${appmap.json.metadata.name}.appmap.json`,
+      `${outdir}/${name}.appmap.json`,
       'utf8',
     ),
   );
@@ -58,11 +68,11 @@ const settings = {
     ChildProcess.execSync(`git clone ${url} ${path}`);
   }
   const git = new Git(path);
-  const appmap = new AppMap(git, settings);
+  const appmap = new AppMap(git, settings, file);
   appmap.archive('termination1');
   const json = JSON.parse(
     FileSystem.readFileSync(
-      `${outdir}/${appmap.json.metadata.name}.appmap.json`,
+      `${outdir}/${name}.appmap.json`,
       'utf8',
     ),
   );
