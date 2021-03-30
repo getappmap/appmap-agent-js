@@ -1,6 +1,6 @@
 {
   "name": "@appland/appmap-agent-js",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "scripts": {
     "commit": "npx prettier --write 'lib/**/*.mjs' 'src/**/*.js' 'test/**/*.mjs' 'bin/*.mjs' && npx cz",
     "lint": "npx eslint 'lib/**/*.mjs' 'src/**/*.js' 'test/**/*.mjs' 'bin/*.mjs'",
