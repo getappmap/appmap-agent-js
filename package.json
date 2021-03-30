@@ -2,8 +2,8 @@
   "name": "@appland/appmap-agent-js",
   "version": "0.0.0",
   "scripts": {
-    "prettier": "npx prettier --write 'lib/**/*.mjs' 'src/**/*.js' 'test/**/*.mjs' 'bin/*.mjs'",
-    "eslint": "npx eslint 'lib/**/*.mjs' 'src/**/*.js' 'test/**/*.mjs' 'bin/*.mjs'",
+    "commit": "npx prettier --write 'lib/**/*.mjs' 'src/**/*.js' 'test/**/*.mjs' 'bin/*.mjs' && npx cz",
+    "lint": "npx eslint 'lib/**/*.mjs' 'src/**/*.js' 'test/**/*.mjs' 'bin/*.mjs'",
     "test": "node test/unit/run.mjs",
     "deploy": "npx semantic-release"
   },
@@ -16,6 +16,7 @@
     "acorn": "^7.4.1",
     "escodegen": "^2.0.0",
     "minimist": "^1.2.5",
+    "npm": "^6.14.12",
     "yaml": "^1.10.0"
   },
   "devDependencies": {
@@ -23,6 +24,7 @@
     "@semantic-release/git": "^9.0.0",
     "c8": "^7.6.0",
     "chalk": "^4.1.0",
+    "commitizen": "^4.2.3",
     "eslint": "^7.21.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-config-prettier": "^8.1.0",
@@ -35,6 +37,7 @@
     "url": "https://github.com/applandinc/appmap-agent-js.git"
   },
   "publishConfig": {
+    "cache": "~/.npm",
     "access": "public"
   }
 }
