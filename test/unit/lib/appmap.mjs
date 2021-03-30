@@ -20,14 +20,14 @@ const settings = {
   },
 };
 
-const name = "foobar";
+const name = 'foobar';
 
 const file = {
   getPath(...args) {
     Assert.equal(this, file);
     Assert.deepEqual(args, []);
     return `/${name}.js`;
-  }
+  },
 };
 
 {
@@ -51,10 +51,7 @@ const file = {
   appmap.addEvent('event3');
   appmap.archive('termination2');
   const json = JSON.parse(
-    FileSystem.readFileSync(
-      `${outdir}/${name}.appmap.json`,
-      'utf8',
-    ),
+    FileSystem.readFileSync(`${outdir}/${name}.appmap.json`, 'utf8'),
   );
   Assert.deepEqual(json.classMap, ['entity1']);
   Assert.equal(json.metadata.language.engine, 'engine-name-2@engine-version-2');
@@ -71,10 +68,7 @@ const file = {
   const appmap = new AppMap(git, settings, file);
   appmap.archive('termination1');
   const json = JSON.parse(
-    FileSystem.readFileSync(
-      `${outdir}/${name}.appmap.json`,
-      'utf8',
-    ),
+    FileSystem.readFileSync(`${outdir}/${name}.appmap.json`, 'utf8'),
   );
   Assert.equal(json.metadata.git.repository, url);
 }

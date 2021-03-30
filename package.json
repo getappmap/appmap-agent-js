@@ -12,6 +12,9 @@
     "lib/**/*.mjs",
     "bin/*.mjs"
   ],
+  "bin": {
+    "appmap": "bin/bin.mjs"
+  },
   "dependencies": {
     "acorn": "^7.4.1",
     "escodegen": "^2.0.0",
