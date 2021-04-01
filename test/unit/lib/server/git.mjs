@@ -1,8 +1,8 @@
 import * as FileSystem from 'fs';
 import * as ChildProcess from 'child_process';
 import { strict as Assert } from 'assert';
-import * as Logger from '../../../lib/logger.mjs';
-import Git from '../../../lib/git.mjs';
+import * as Logger from '../../../../lib/server/logger.mjs';
+import Git from '../../../../lib/server/git.mjs';
 
 const AssertStrict = Assert.strict;
 Logger.reloadGlobalLevel('DEBUG');

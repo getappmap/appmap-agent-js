@@ -1,8 +1,8 @@
 import { strict as Assert } from 'assert';
 import * as FileSystem from 'fs';
 import * as ChildProcess from 'child_process';
-import Git from '../../../lib/git.mjs';
-import AppMap from '../../../lib/appmap.mjs';
+import Git from '../../../../lib/server/git.mjs';
+import AppMap from '../../../../lib/server/appmap.mjs';
 
 const outdir = 'tmp/appmap';
 

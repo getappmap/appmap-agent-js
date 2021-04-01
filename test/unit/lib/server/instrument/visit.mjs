@@ -4,7 +4,7 @@ import {
   setVisitor,
   getEmptyArray,
   getEmptyResult,
-} from '../../../../lib/instrument/visit.mjs';
+} from '../../../../../lib/server/instrument/visit.mjs';
 
 Assert.deepEqual(getEmptyArray(), []);
 

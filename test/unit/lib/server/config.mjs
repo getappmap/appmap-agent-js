@@ -1,8 +1,8 @@
 import * as Fs from 'fs';
 import { strict as Assert } from 'assert';
 import Yaml from 'yaml';
-import * as Logger from '../../../lib/logger.mjs';
-import Settings from '../../../lib/settings.mjs';
+import * as Logger from '../../../../lib/server/logger.mjs';
+import Config from '../../../../lib/server/config.mjs';
 
 Logger.reloadGlobalLevel('CRITICAL');
 

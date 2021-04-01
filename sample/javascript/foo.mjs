@@ -13,8 +13,9 @@
 
 // require("main.js");
 
-// import * as bar from "./bar.js";
-console.log(global.process._linkedBinding);
+import * as bar from "./bar.mjs";
+// console.log(global.process._linkedBinding);
+
 
 
 

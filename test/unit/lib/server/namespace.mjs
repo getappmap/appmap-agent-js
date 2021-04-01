@@ -1,5 +1,5 @@
 import { strict as Assert } from 'assert';
-import Namespace from '../../../lib/namespace.mjs';
+import Namespace from '../../../../lib/server/namespace.mjs';
 
 const namespace = new Namespace('PREFIX');
 

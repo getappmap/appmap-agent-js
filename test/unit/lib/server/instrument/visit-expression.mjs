@@ -1,5 +1,5 @@
 import { test } from './__fixture__.mjs';
-import '../../../../lib/instrument/visit-expression.mjs';
+import '../../../../../lib/server/instrument/visit-expression.mjs';
 
 Error.stackTraceLimit = Infinity;
 

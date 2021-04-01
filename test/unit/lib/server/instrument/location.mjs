@@ -1,6 +1,6 @@
 import { strict as Assert } from 'assert';
 import File from '../../../../lib/file.mjs';
-import { RootLocation } from '../../../../lib/instrument/location.mjs';
+import { RootLocation } from '../../../../../lib/server/instrument/location.mjs';
 
 const path = 'test/unit/env/target/location.js';
 

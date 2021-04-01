@@ -1,6 +1,6 @@
 import * as FileSystem from 'fs';
 import { strict as Assert } from 'assert';
-import File from '../../../lib/file.mjs';
+import File from '../../../../lib/server/file.mjs';
 
 FileSystem.writeFileSync('tmp/test/script-es5.js', `var x = 123;`, 'utf8');
 FileSystem.writeFileSync('tmp/test/script-es2015.js', `let x = 123;`, 'utf8');

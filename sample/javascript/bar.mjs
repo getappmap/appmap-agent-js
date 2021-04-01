@@ -33,3 +33,5 @@
 // throw "boum";
 
 console.log("bar");
+
+console.log(global);

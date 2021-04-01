@@ -22,18 +22,18 @@ const defaultTransformSource = (...args) => {
   Assert.deepEqual(args[1], {format:"foobar", url:PATH});
   Assert.deepEqual(args[2], defaultTransformSource);
   return new Promise((resolve, reject) => {
-    resolve(CONTENT3);
+    resolve({source:CONTENT3});
   });
 };
 
-transformSource(CONTENT1, {format:"module", url:PATH}, () => Assert.fail()).then((content) => {
-  Assert.equal(content, CONTENT2);
+transformSource(CONTENT1, {format:"module", url:PATH}, () => Assert.fail()).then((result) => {
+  Assert.deepEqual(result, {source:CONTENT2});
 });
 
-transformSource((new TextEncoder()).encode(CONTENT1), {format:"module", url:PATH}, () => Assert.fail()).then((content) => {
-  Assert.equal(content, CONTENT2);
+transformSource((new TextEncoder()).encode(CONTENT1), {format:"module", url:PATH}, () => Assert.fail()).then((result) => {
+  Assert.deepEqual(result, {source:CONTENT2});
 });
 
-transformSource(CONTENT1, {format:"foobar", url:PATH}, defaultTransformSource).then((content) => {
-  Assert.equal(content, CONTENT3);
+transformSource(CONTENT1, {format:"foobar", url:PATH}, defaultTransformSource).then((result) => {
+Assert.deepEqual(result, {source:CONTENT3});
 });

@@ -1,5 +1,5 @@
 import { strict as Assert } from 'assert';
-import * as Logger from '../../../lib/logger.mjs';
+import * as Logger from '../../../../lib/server/logger.mjs';
 
 const LoggerDefault = Logger.default;
 

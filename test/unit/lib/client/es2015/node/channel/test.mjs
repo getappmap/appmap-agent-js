@@ -4,10 +4,6 @@ import {strict as Assert} from "assert";
 
 const IDENTIFIER = "__TRACE__";
 
-const trace = [];
-
-global[IDENTIFIER] = trace;
-
 const channel = makeChannel({APPMAP_TRACE_IDENTIFIER:IDENTIFIER});
 
 channel.initialize("data");
@@ -17,7 +13,7 @@ channel.emit("event");
 channel.terminate("reason");
 
 Assert.deepEqual(
-  trace,
+  global[IDENTIFIER],
   [
     ["initialize", "data"],
     ["instrument-script", "filename.js"],

@@ -1,6 +1,6 @@
 import { strict as Assert } from 'assert';
 import * as FileSystem from 'fs';
-import main from '../../../lib/main.mjs';
+import inline from '../../../../lib/server/inline.mjs';
 
 const path = 'tmp/test/target.js';
 
