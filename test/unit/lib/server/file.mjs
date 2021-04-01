@@ -11,7 +11,7 @@ FileSystem.writeFileSync(
 );
 
 {
-  const file = new File('tmp/test/script-es5.js', 5, 'script');
+  const file = new File(5, 'script', 'tmp/test/script-es5.js');
   Assert.equal(file.getPath(), 'tmp/test/script-es5.js');
   Assert.equal(file.getLanguageVersion(), 5);
   Assert.equal(file.getSourceType(), 'script');
@@ -22,28 +22,28 @@ FileSystem.writeFileSync(
 }
 
 {
-  const file = new File('tmp/test/script-es2015.js', 2015, 'script');
+  const file = new File(2015, 'script', 'tmp/test/script-es2015.js');
   Assert.doesNotThrow(() => {
     file.parse();
   });
 }
 
 {
-  const file = new File('tmp/test/module-es2015.js', 2015, 'module');
+  const file = new File(2015, 'module', 'tmp/test/module-es2015.js');
   Assert.doesNotThrow(() => {
     file.parse();
   });
 }
 
 {
-  const file = new File('tmp/test/script-es2015.js', 5, 'script');
+  const file = new File(5, 'script', 'tmp/test/script-es2015.js');
   Assert.throws(() => {
     file.parse();
   }, SyntaxError);
 }
 
 {
-  const file = new File('tmp/test/module-es2015.js', 2015, 'script');
+  const file = new File(2015, 'script', 'tmp/test/module-es2015.js');
   Assert.throws(() => {
     file.parse();
   }, SyntaxError);

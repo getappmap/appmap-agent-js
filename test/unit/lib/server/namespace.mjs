@@ -7,13 +7,6 @@ Assert.equal(namespace.checkCollision('foo'), undefined);
 Assert.equal(namespace.checkCollision('PREFIXfoo'), undefined);
 
 Assert.equal(
-  namespace.compileGlobal('APPMAP_GLOBAL_EVENT_COUNTER'),
-  'PREFIX_GLOBAL_EVENT_COUNTER',
-);
-Assert.equal(namespace.compileGlobal('APPMAP_GLOBAL_foo'), 'PREFIX_GLOBAL_foo');
-Assert.equal(namespace.compileGlobal('foo'), 'foo');
-
-Assert.equal(
   namespace.getGlobal('EVENT_COUNTER'),
   'PREFIX_GLOBAL_EVENT_COUNTER',
 );

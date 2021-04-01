@@ -1,74 +1,25 @@
 import { strict as Assert } from 'assert';
 import * as FileSystem from 'fs';
-import * as ChildProcess from 'child_process';
-import Git from '../../../../lib/server/git.mjs';
-import AppMap from '../../../../lib/server/appmap.mjs';
+import Appmap from '../../../../lib/server/appmap.mjs';
 
-const outdir = 'tmp/appmap';
+const OUTDIR = 'tmp/appmap';
+const NAME = "metadata-name";
+const LANGUAGE_VERSION = 123;
 
-const settings = {
-  __proto__: null,
-  getAppName(...args) {
-    Assert.equal(this, settings);
-    Assert.deepEqual(args, []);
-    return 'myapp';
-  },
-  getOutputDir(...args) {
-    Assert.equal(this, settings);
-    Assert.deepEqual(args, []);
-    return outdir;
-  },
-};
+const namespace = {};
+const appmap = new Appmap({name:NAME, language:{version:LANGUAGE_VERSION}}, namespace);
 
-const name = 'foobar';
-
-const file = {
-  getPath(...args) {
-    Assert.equal(this, file);
-    Assert.deepEqual(args, []);
-    return `/${name}.js`;
-  },
-};
-
-{
-  const git = {
-    __proto__: null,
-    isRepository(...args) {
-      Assert.equal(this, git);
-      Assert.deepEqual(args, []);
-      return false;
-    },
-  };
-  const appmap = new AppMap(git, settings, file);
-  appmap.addEntity('entity1');
-  appmap.setEngine('engine-name-1', 'engine-version-1');
-  appmap.setEngine('engine-name-2', 'engine-version-2');
-  appmap.addEvent('event1');
-  appmap.addEvent('event2');
-  appmap.archive('termination1');
-  appmap.addEntity('entity2');
-  appmap.setEngine('engine-name-3', 'engine-version-1');
-  appmap.addEvent('event3');
-  appmap.archive('termination2');
-  const json = JSON.parse(
-    FileSystem.readFileSync(`${outdir}/${name}.appmap.json`, 'utf8'),
-  );
-  Assert.deepEqual(json.classMap, ['entity1']);
-  Assert.equal(json.metadata.language.engine, 'engine-name-2@engine-version-2');
-  Assert.deepEqual(json.events, ['event1', 'event2']);
-}
-
-{
-  const url = 'https://github.com/lachrist/sample.git';
-  const path = 'tmp/test/sample-git/';
-  if (!FileSystem.existsSync(path)) {
-    ChildProcess.execSync(`git clone ${url} ${path}`);
-  }
-  const git = new Git(path);
-  const appmap = new AppMap(git, settings, file);
-  appmap.archive('termination1');
-  const json = JSON.parse(
-    FileSystem.readFileSync(`${outdir}/${name}.appmap.json`, 'utf8'),
-  );
-  Assert.equal(json.metadata.git.repository, url);
-}
+Assert.equal(appmap.getNamespace(), namespace);
+Assert.equal(appmap.getLanguageVersion(), LANGUAGE_VERSION);
+appmap.addEntity('entity1');
+appmap.addEvent('event1');
+appmap.addEvent('event2');
+appmap.archive(OUTDIR, 'termination1');
+appmap.addEntity('entity2');
+appmap.addEvent('event3');
+appmap.archive(OUTDIR, 'termination2');
+const json = JSON.parse(
+  FileSystem.readFileSync(`${OUTDIR}/${NAME}.appmap.json`, 'utf8'),
+);
+Assert.deepEqual(json.classMap, ['entity1']);
+Assert.deepEqual(json.events, ['event1', 'event2']);
