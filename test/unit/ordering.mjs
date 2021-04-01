@@ -1,23 +1,5 @@
-export const src = [
-  // indep //
-  'es2015/node/process-id',
-  'es2015/empty-marker',
-  'es2015/undefined',
-  'es2015/event-counter',
-  'es2015/get-now',
-  // serialize //
-  'es2015/get-identity',
-  'es2015/get-class-name',
-  'es2015/serialize', // empty-marker
-  'es2015/serialize-parameter', // serialize, get-class-name, get-identity
-  'es2015/serialize-exception', // empty-marker, serialize, get-class-name, get-identity
-  // send //
-  'es2015/node/send/local',
-  'es2015/node/setup-engine', // send
-  'es2015/node/setup-archive', // send, serialize
-];
 
-export const lib = [
+export const server = [
   'logger',
   'bundle',
   'settings',
@@ -35,5 +17,17 @@ export const lib = [
   'instrument/visit-program',
   'instrument/visit-statement',
   'instrument/index',
-  'main',
+  'inline',
+];
+
+export const client = [
+  'es2015/script',
+  'es2015/node/channel/test',
+  'es2015/node/setup',
+  'es2015/node/hook-cjs',
+  'es2015/node/hook-esm',
+  'es2015/node/main-cjs',
+  'es2015/node/main-esm',
+  'es2015/node/main-both',
+  'es2015/node/inline',
 ];

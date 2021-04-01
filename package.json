@@ -2,6 +2,7 @@
   "name": "@appland/appmap-agent-js",
   "version": "1.0.2",
   "scripts": {
+    "coverage": "npx c8 --reporter=html --require $TARGET node test/unit/$TARGET",
     "build": "npx rollup lib/server/inline.mjs --file dist/inline.js --format cjs",
     "prettify": "npx prettier --write 'lib/**/*.{js,mjs}' 'test/**/*.mjs' 'bin/*.mjs'",
     "commit": "npx cz",
