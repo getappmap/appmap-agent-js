@@ -1,5 +1,5 @@
 /* global APPMAP_GLOBAL_EMPTY_MARKER, APPMAP_GLOBAL_GET_IDENTITY, APPMAP_GLOBAL_SERIALIZE, APPMAP_GLOBAL_GET_CLASS_NAME */
-/* eslint camelcase: ["error", {allow: ["object_id", "^global_"]}] */
+/* eslint camelcase: ["error", {allow: ["object_id"]}] */
 
 const APPMAP_GLOBAL_SERIALIZE_EXCEPTION = (() => {
   const global_Error = Error;

@@ -1,0 +1,11 @@
+env:
+  node: false
+  browser: false
+  es6: false
+rules:
+  eslint-disable prefer-object-spread: off
+  prefer-object-spread: off
+  new-cap: off
+  camelcase:
+    - error
+    - allow: ["^global_"]
