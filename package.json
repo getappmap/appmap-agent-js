@@ -10,8 +10,8 @@
     "deploy": "npx semantic-release"
   },
   "files": [
-    "src/**/*.js",
-    "lib/**/*.mjs",
+    "dist/*.js",
+    "lib/**/*.{js,mjs}",
     "bin/*.mjs"
   ],
   "bin": {
