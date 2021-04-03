@@ -1,7 +1,5 @@
 import { writeFileSync } from 'fs';
 import { strict as Assert } from 'assert';
-import Yaml from 'yaml';
-import * as Logger from '../../../../lib/server/logger.mjs';
 import { getDefaultConfig } from '../../../../lib/server/config.mjs';
 
 const config = getDefaultConfig();

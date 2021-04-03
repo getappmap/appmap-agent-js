@@ -8,8 +8,8 @@ const CONTENT3 = `export default 789;`;
 
 const transformSource = hookESM((...args) => {
   Assert.equal(args.length, 3);
-  Assert.equal(args[0], CONTENT1);
-  Assert.equal(args[1], '/foo/bar.mjs');
+  Assert.equal(args[0], '/foo/bar.mjs');
+  Assert.equal(args[1], CONTENT1);
   Assert.equal(typeof args[2], 'object');
   Assert.equal(typeof args[2].resolve, 'function');
   Assert.equal(typeof args[2].reject, 'function');

@@ -18,30 +18,29 @@ FileSystem.writeFileSync(
   "utf8"
 );
 
-// FileSystem.writeFileSync(
-//   "tmp/test/native.mjs",
-//   "({});"
-// );
+FileSystem.writeFileSync(
+  "tmp/test/native.mjs",
+  "({});"
+);
 
 main({
-  "output-dir": "tmp/appmap/",
-  "app-name": "foo",
-  "map-name": "bar",
   _: [path]
 });
 
 main({
   cjs: true,
+  channel: "APPMAP_CHANNEL",
   _: [path],
 });
 
-main({
-  mjs: true,
-  _: [path],
-});
 
 main({
-  cjs: true,
-  mjs: true,
+  esm: true,
   _: [path],
 });
+//
+// main({
+//   cjs: true,
+//   esm: true,
+//   _: [path],
+// });

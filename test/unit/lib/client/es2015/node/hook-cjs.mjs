@@ -9,7 +9,7 @@ const content = 'module.exports = 123;';
 FileSystem.writeFileSync(path, content, 'utf8');
 
 hookCJS((...args) => {
-  Assert.deepEqual(args, [content, path]);
+  Assert.deepEqual(args, [path, content]);
   return `module.exports = 456;`;
 });
 

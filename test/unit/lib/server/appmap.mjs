@@ -49,7 +49,7 @@ Assert.deepEqual(json, {
     client: {
       name: '@appland/appmap-agent-js',
       url: 'https://github.com/applandinc/appmap-agent-js.git',
-      version: '1.0.2',
+      version: '???',
     },
     recorder: { name: 'recorder1' },
     recording: 'recording',
