@@ -1,2 +1,1 @@
-
-import "../../../../../../lib/client/es2015/node/main-both.js";
+import '../../../../../../lib/client/es2015/node/main-both.js';

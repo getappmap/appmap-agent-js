@@ -12,12 +12,12 @@
 
 import * as VirtualMachine from 'vm';
 import * as FileSystem from 'fs';
-import {strict as Assert} from 'assert';
+import { strict as Assert } from 'assert';
 
 const filename = 'lib/client/es2015/script.js';
 
 VirtualMachine.runInThisContext(FileSystem.readFileSync(filename, 'utf8'), {
-  filename
+  filename,
 });
 
 Assert.equal(typeof APPMAP_GLOBAL_EMPTY_MARKER, 'symbol');

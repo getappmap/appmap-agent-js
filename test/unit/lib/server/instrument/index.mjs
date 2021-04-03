@@ -15,5 +15,5 @@ Assert.deepEqual(entities, [
     type: 'package',
     name: 'filename.js',
     childeren: [],
-  }
+  },
 ]);

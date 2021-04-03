@@ -3,11 +3,14 @@ import * as FileSystem from 'fs';
 import Appmap from '../../../../lib/server/appmap.mjs';
 
 const OUTDIR = 'tmp/appmap';
-const NAME = "metadata-name";
+const NAME = 'metadata-name';
 const LANGUAGE_VERSION = 123;
 
 const namespace = {};
-const appmap = new Appmap({name:NAME, language:{version:LANGUAGE_VERSION}}, namespace);
+const appmap = new Appmap(
+  { name: NAME, language: { version: LANGUAGE_VERSION } },
+  namespace,
+);
 
 Assert.equal(appmap.getNamespace(), namespace);
 Assert.equal(appmap.getLanguageVersion(), LANGUAGE_VERSION);

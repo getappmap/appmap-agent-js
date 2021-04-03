@@ -5,7 +5,10 @@ import { generate as escodegen } from 'escodegen';
 import { RootLocation } from '../../../../../lib/server/instrument/location.mjs';
 import File from '../../../../../lib/server/file.mjs';
 import Namespace from '../../../../../lib/server/namespace.mjs';
-import { visit, getResultNode } from '../../../../../lib/server/instrument/visit.mjs';
+import {
+  visit,
+  getResultNode,
+} from '../../../../../lib/server/instrument/visit.mjs';
 
 export const test = (options) => {
   const { path, ecma, source, input, output, prefix, keys } = {
