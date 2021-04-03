@@ -33,10 +33,17 @@ Assert.deepEqual(global[TRACE_IDENTIFIER], [
   [
     'initialize',
     {
-      pid: PID,
-      engine: `node@${ENGINE_VERSION}`,
-      prefix: ESCAPE_PREFIX,
-      ecmascript: ECMASCRIPT_VERSION,
+      env: emitter.env,
+      pid: emitter.pid,
+      engine: `node@${emitter.version}`,
+      feature: "TODO",
+      feature_group: "TODO",
+      labels: ["TODO"],
+      frameworks: ["TODO"],
+      recording: {
+        defined_class: "TODO",
+        method_id: "TODO",
+      },
     },
   ],
   ['terminate', { type: 'exception', error: 'BOUM', origin: 'origin' }],

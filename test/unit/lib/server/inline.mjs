@@ -5,24 +5,18 @@ import makeChannel from '../../../../lib/server/inline.mjs';
 const channel = makeChannel();
 
 channel.initialize({
-  pid: 123,
   env: {
     APPMAP_OUTPUT_DIR: 'tmp/appmap',
-    APPMAP_GIT_DIR: '.',
-    APPMAP: 'true',
-    APPMAP_CONFIG: 'tmp/test/appmap.yml',
-  },
-  engine: 'foo@bar',
-  name: 'main',
-  prefix: 'qux',
+    APPMAP_MAP_NAME: 'foo',
+  }
 });
 
 Assert.equal(
-  channel.instrumentScript(`const  o1  =  {};`, `filename.js`),
+  channel.instrumentScript(`filename.js`, `const  o1  =  {};`),
   `const o1 = {};`,
 );
 
-channel.instrumentModule(`const  o2  =  {};`, `filename.mjs`, {
+channel.instrumentModule(`filename.mjs`, `const  o2  =  {};`, {
   resolve: (...args) => {
     Assert.deepEqual(args, [`const o2 = {};`]);
   },
@@ -31,15 +25,25 @@ channel.instrumentModule(`const  o2  =  {};`, `filename.mjs`, {
   },
 });
 
+channel.instrumentModule(`filename.mjs`, `@INVALID_JS@`, {
+  resolve: (...args) => {
+    Assert.fail();
+  },
+  reject: (...args) => {
+    Assert.equal(args.length, 1);
+    Assert.ok(args[0] instanceof Error);
+  },
+});
+
 channel.emit('event');
 
 channel.terminate('reason');
 
 const json = JSON.parse(
-  FileSystem.readFileSync(`tmp/appmap/main.appmap.json`, 'utf8'),
+  FileSystem.readFileSync(`tmp/appmap/foo.appmap.json`, 'utf8'),
 );
 
-Assert.deepEqual(json, {});
+Assert.deepEqual(json.events, ["event"]);
 
 // Assert.deepEqual(
 //   main({

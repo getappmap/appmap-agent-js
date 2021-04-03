@@ -1,448 +1,468 @@
 'use strict';
 
-var Path = require('path');
-var Url = require('url');
 var FileSystem = require('fs');
 var Yaml = require('yaml');
+var Util = require('util');
+var Path = require('path');
 var ChildProcess = require('child_process');
 var acorn = require('acorn');
 var escodegen = require('escodegen');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
-var Yaml__default = /*#__PURE__*/_interopDefaultLegacy(Yaml);
-
-const DEBUG = 1;
-const INFO = 2;
-const WARNING = 3;
-const ERROR = 4;
-const CRITICAL = 5;
-
-let globalLevel = WARNING;
-
-class Logger {
-  constructor(
-    name,
-    level = null,
-    writable = process.stderr,
-    relative = process.cwd(),
-  ) {
-    this.name = name.startsWith('file:///')
-      ? Path.relative(relative, new Url.URL(name).pathname)
-      : name;
-    this.level = level;
-    this.writable = writable;
+function _interopNamespace(e) {
+  if (e && e.__esModule) return e;
+  var n = Object.create(null);
+  if (e) {
+    Object.keys(e).forEach(function (k) {
+      if (k !== 'default') {
+        var d = Object.getOwnPropertyDescriptor(e, k);
+        Object.defineProperty(n, k, d.get ? d : {
+          enumerable: true,
+          get: function () {
+            return e[k];
+          }
+        });
+      }
+    });
   }
-  debug(message) {
-    if ((this.level === null ? globalLevel : this.level) <= DEBUG) {
-      this.writable.write(`DEBUG ${this.name} >> ${message}${'\n'}`, 'utf8');
-    }
-  }
-  info(message) {
-    if ((this.level === null ? globalLevel : this.level) <= INFO) {
-      this.writable.write(`INFO ${this.name} >> ${message}${'\n'}`, 'utf8');
-    }
-  }
-  warning(message) {
-    if ((this.level === null ? globalLevel : this.level) <= WARNING) {
-      this.writable.write(`WARNING ${this.name} >> ${message}${'\n'}`, 'utf8');
-    }
-  }
-  error(message) {
-    if ((this.level === null ? globalLevel : this.level) <= ERROR) {
-      this.writable.write(`ERROR ${this.name} >> ${message}${'\n'}`, 'utf8');
-    }
-  }
-  critical(message) {
-    if ((this.level === null ? globalLevel : this.level) <= CRITICAL) {
-      this.writable.write(`CRITICAL ${this.name} >> ${message}${'\n'}`, 'utf8');
-    }
-  }
-  getLevel() {
-    return this.level === null ? globalLevel : this.level;
-  }
+  n['default'] = e;
+  return Object.freeze(n);
 }
 
-const logger = new Logger((typeof document === 'undefined' ? new (require('u' + 'rl').URL)('file:' + __filename).href : (document.currentScript && document.currentScript.src || new URL('inline.js', document.baseURI).href)));
+var FileSystem__namespace = /*#__PURE__*/_interopNamespace(FileSystem);
+var Yaml__default = /*#__PURE__*/_interopDefaultLegacy(Yaml);
+var Util__namespace = /*#__PURE__*/_interopNamespace(Util);
+var Path__namespace = /*#__PURE__*/_interopNamespace(Path);
+var ChildProcess__namespace = /*#__PURE__*/_interopNamespace(ChildProcess);
 
-const reloadGlobalLevel = (level) => {
-  const mapping = {
-    __proto__: null,
-    DEBUG,
-    INFO,
-    WARNING,
-    ERROR,
-    CRITICAL,
-  };
-  if (level.toUpperCase() in mapping) {
-    globalLevel = mapping[level.toUpperCase()];
-  } else {
-    logger.warning(`Invalid APPMAP_LOG_LEVEL environment variable`);
-  }
+// I'm not about the debuglog api because modifying process.env.NODE_DEBUG has no effect.
+// Why not directly provide the optimize logging function then?
+// https://github.com/nodejs/node/blob/master/lib/internal/util/debuglog.js
+
+const logger = {
+  error: Util__namespace.debuglog('appmap-error', (log) => {
+    logger.error = log;
+  }),
+  warning: Util__namespace.debuglog('appmap-warning', (log) => {
+    logger.warning = log;
+  }),
+  info: Util__namespace.debuglog('appmap-info', (log) => {
+    logger.info = log;
+  })
 };
 
-/* c8 ignore start */
-if (
-  Reflect.getOwnPropertyDescriptor(process.env, 'APPMAP_LOG_LEVEL') !==
-  undefined
-) {
-  reloadGlobalLevel(process.env.APPMAP_LOG_LEVEL);
-} else {
-  logger.info(`No APPMAP_LOG_LEVEL environment variable provided`);
-}
-/* c8 ignore end */
+const DEFAULT_ENABLED = false;
+const DEFAULT_OUTPUT_DIR = 'tmp/appmap';
+const DEFAULT_GIT_DIR = '.';
+const DEFAULT_LANGUAGE_VERSION = '2015';
+const DEFAULT_ESCAPE_PREFIX = 'APPMAP';
+const DEFAULT_APP_NAME = 'unknown-app-name';
+const DEFAULT_MAP_NAME = 'unknown-map-name';
 
-const logger$1 = new Logger((typeof document === 'undefined' ? new (require('u' + 'rl').URL)('file:' + __filename).href : (document.currentScript && document.currentScript.src || new URL('inline.js', document.baseURI).href)));
+const wrapName = (name) => ({ name });
+
+const combine = (closure1, closure2) => (any) => closure2(closure1(any));
 
 const isNotNull = (any) => any !== null;
 
-//////////////////////
-// enabled (APPMAP) //
-//////////////////////
+const trim$1 = (string) => string.trim();
 
-const isEnabled = (env) => {
-  if (Reflect.getOwnPropertyDescriptor(env, 'APPMAP') !== undefined) {
-    const mapping = {
-      __proto__: null,
-      TRUE: true,
-      FALSE: false,
-    };
-    if (env.APPMAP.toUpperCase() in mapping) {
-      return mapping[env.APPMAP.toUpperCase()];
+const toLowerCase = (string) => string.toLowerCase();
+
+const identity = (any) => any;
+
+const isAppmapEnvKey = (key) => key === "APPMAP" || key.startsWith("APPMAP_");
+
+//////////////
+// Sanitize //
+//////////////
+
+const makeEscapePrefixSanitizer = (location) => (string) => {
+  if (!/^[a-zA-Z_$][a-zA-Z_$0-9]+$/.test(string)) {
+    logger.warning(
+      'Invalid %s, defaulting to %s >> expected matching /^[a-zA-Z_$][a-zA-Z_$0-9]+$/ and got: %s',
+      location,
+      DEFAULT_ESCAPE_PREFIX,
+      string,
+    );
+    return DEFAULT_ESCAPE_PREFIX;
+  }
+  return string;
+};
+
+const ecmas = [
+  '5',
+  '5.1',
+  '2015',
+  '2016',
+  '2017',
+  '2018',
+  '2019',
+  '2020',
+  '2021',
+];
+
+const makeLanguageVersionSanitizer = (location) => (string) => {
+  if (!ecmas.includes(string)) {
+    logger.warning(
+      'Invalid %s env argument, defaulting to %s >> expected one of %j and got: %s',
+      ecmas,
+      DEFAULT_LANGUAGE_VERSION,
+      string,
+    );
+    return DEFAULT_LANGUAGE_VERSION;
+  }
+  return string;
+};
+
+const makeTypeSanitizer = (type, location, json1) => (json2) => {
+  /* eslint-disable valid-typeof */
+  if (typeof json2 !== type) {
+    logger.warning(
+      'Invalid %s, defaulting to %j >> expected a %s and got: %j',
+      location,
+      json1,
+      type,
+      json2,
+    );
+    return json1;
+  }
+  /* eslint-enable valid-typeof */
+  return json2;
+};
+
+const makeBooleanStringSanitizer = (location, boolean) => (string) => {
+  string = string.toLowerCase();
+  if (string !== 'true' && string !== 'false') {
+    logger.warning(
+      "Invalid %s, defaulting to %b >> expected 'true' or 'false' (case insensitive) and got: %s",
+      location,
+      boolean,
+      string,
+    );
+    return boolean;
+  }
+  return string === 'true';
+};
+
+const makeArraySanitizer = (location, sanitizer) => (json) => {
+  if (!Array.isArray(json)) {
+    logger.warning(
+      'Invalid %s, defaulting to [] >> expected an array and got: %j',
+      location,
+      json,
+    );
+    return [];
+  }
+  return json.map(sanitizer).filter(isNotNull);
+};
+
+const mappings = {
+  env: {
+    __proto__: null,
+    APPMAP: {
+      name: 'enabled',
+      sanitize: combine(
+        toLowerCase,
+        makeBooleanStringSanitizer('APPMAP env argument', false),
+      ),
+    },
+    APPMAP_MAP_NAME: {
+      name: 'map_name',
+      sanitize: identity,
+    },
+    APPMAP_APP_NAME: {
+      name: 'app_name',
+      sanitize: identity,
+    },
+    APPMAP_LANGUAGE_VERSION: {
+      name: 'language_version',
+      sanitize: makeLanguageVersionSanitizer(),
+    },
+    APPMAP_ESCAPE_PREFIX: {
+      name: 'escape_prefix',
+      sanitize: makeEscapePrefixSanitizer('APPMAP_ESCAPE_PREFIX env argument'),
+    },
+    APPMAP_OUTPUT_DIR: {
+      name: 'output_dir',
+      sanitize: identity,
+    },
+    APPMAP_GIT_DIR: {
+      name: 'git_dir',
+      sanitize: identity,
+    },
+    APPMAP_EXCLUDE: {
+      name: 'exclusions',
+      sanitize: (string) => string.split(',').map(trim$1),
+    },
+    APPMAP_PACKAGES: {
+      name: 'packages',
+      sanitize: (string) => string.split(',').map(trim$1).map(wrapName),
+    },
+  },
+  json: {
+    __proto__: null,
+    enabled: {
+      name: 'enabled',
+      sanitize: makeTypeSanitizer('boolean', 'enabled value', false),
+    },
+    name: {
+      name: 'app_name',
+      sanitize: makeTypeSanitizer('string', 'name value', DEFAULT_APP_NAME),
+    },
+    'map-name': {
+      name: 'map_name',
+      sanitize: makeTypeSanitizer('string', 'map-name value', DEFAULT_MAP_NAME),
+    },
+    'language-version': {
+      name: 'language_version',
+      sanitize: combine(
+        makeTypeSanitizer(
+          'string',
+          'language-version value',
+          DEFAULT_LANGUAGE_VERSION,
+        ),
+        makeLanguageVersionSanitizer()
+      )
+    },
+    'escape-prefix': {
+      name: 'escape_prefix',
+      sanitize: combine(
+        makeTypeSanitizer(
+          'string',
+          'escape-prefix value',
+          DEFAULT_ESCAPE_PREFIX,
+        ),
+        makeEscapePrefixSanitizer('escape-prefix value'),
+      ),
+    },
+    'output-dir': {
+      name: 'output_dir',
+      sanitize: makeTypeSanitizer(
+        'string',
+        'output-dir value',
+        DEFAULT_OUTPUT_DIR,
+      ),
+    },
+    'git-dir': {
+      name: 'git_dir',
+      sanitize: makeTypeSanitizer(
+        'string',
+        'git-dir value',
+        DEFAULT_GIT_DIR,
+      ),
+    },
+    packages: {
+      name: 'packages',
+      sanitize: makeArraySanitizer('output_dir conf value', (json, index) => {
+          if (typeof json === 'string') {
+            return { name: json };
+          }
+          if (typeof json === 'object' && json !== null) {
+            if (Reflect.getOwnPropertyDescriptor(json, 'name') === undefined) {
+              logger.warning(
+                'Invalid packages[%i] value >> missing name field and got %s',
+                index,
+                json,
+              );
+              return null;
+            }
+            if (typeof json.name !== 'string') {
+              logger.warning(
+                'Invalid packages[%i].name value >> expected a string and got %s',
+                index,
+                json.name,
+              );
+              return null;
+            }
+            return {
+              name: json.name,
+            };
+          }
+          logger.warning(
+            'Invalid packages[%i] value >> expected either a string or an object and got %s',
+            index,
+            json,
+          );
+          return null;
+        }),
+    },
+    exclude: {
+      name: 'exclusions',
+      sanitize: makeArraySanitizer('exclude conf value', (json, index) => {
+        if (typeof json !== 'string') {
+          logger.warning(
+            'Invalid exclude[%i] conf value >> expected a string and got %j',
+            index,
+            json,
+          );
+          return null;
+        }
+        return json;
+      }),
+    },
+  },
+};
+
+///////////
+// Merge //
+///////////
+
+const overwrite = (scalar1, scalar2) => scalar2;
+
+const concat = (array1, array2) => [...array1, ...array2];
+
+const mergers = {
+  enabled: overwrite,
+  app_name: overwrite,
+  map_name: overwrite,
+  language_version: overwrite,
+  escape_prefix: overwrite,
+  output_dir: overwrite,
+  git_dir: overwrite,
+  packages: concat,
+  exclusions: concat,
+};
+
+////////////
+// Extend //
+////////////
+
+const extend = (mapping, conf, object) => {
+  conf = { ...conf };
+  Reflect.ownKeys(object).forEach((key) => {
+    if (key in mapping) {
+      const { name, sanitize } = mapping[key];
+      conf[name] = mergers[name](conf[name], sanitize(object[key]));
+    } else {
+      logger.warning("Unrecognized conf key %s", key);
     }
-    logger$1.warning(`Invalid APPMAP environment variable, defaulting to FALSE.`);
-    return false;
-  }
-  logger$1.info(`No APPMAP environment variable provided, defaulting to FALSE.`);
-  return false;
+  });
+  return conf;
 };
 
-////////////
-// output //
-////////////
-
-const getOutputDir = (env) => {
-  if (
-    Reflect.getOwnPropertyDescriptor(env, 'APPMAP_OUTPUT_DIR') !== undefined
-  ) {
-    return env.APPMAP_OUTPUT_DIR;
-  }
-  logger$1.info(
-    `No APPMAP_OUTPUT_DIR environment variable provided, defaulting to tmp/appmap.`,
-  );
-  return 'tmp/appmap/';
-};
-
-////////////
-// Prefix //
-////////////
-
-const getEscapePrefix = (env) => {
-  if (
-    Reflect.getOwnPropertyDescriptor(env, 'APPMAP_ESCAPE_PREFIX') !== undefined
-  ) {
-    return env.APPMAP_ESCAPE_PREFIX;
-  }
-  logger$1.info(
-    `No APPMAP_ESCAPE_PREFIX environment variable provided, defaulting to APPMAP.`,
-  );
-  return 'APPMAP';
-};
-
-////////////////////////////
-// config (APPMAP_CONFIG) //
-////////////////////////////
-
-const defaultConfig = {
-  name: 'unknown',
-  packages: [],
-  exclude: [],
-};
-
-const loadYAMLConfig = (env) => {
-  let configPath = 'appmap.yml';
-  if (Reflect.getOwnPropertyDescriptor(env, 'APPMAP_CONFIG') !== undefined) {
-    configPath = env.APPMAP_CONFIG;
+const extendWithPath = (conf, path) => {
+  let parse;
+  if (path.endsWith('.json')) {
+    parse = JSON.parse;
+  } else if (path.endsWith('.yml')) {
+    parse = Yaml__default['default'].parse;
   } else {
-    logger$1.info(
-      `No APPMAP_CONFIG environment variable provided, defaulting to appmap.yml`,
+    logger.warning(
+      "Invalid conf file extension >> expected '.yml' or '.json', got: %s",
+      conf,
     );
+    return undefined;
   }
-
-  let configContent = null;
+  let content;
   try {
-    configContent = FileSystem.readFileSync(configPath, 'utf8');
+    content = FileSystem__namespace.readFileSync(path, 'utf8');
   } catch (error) {
-    logger$1.warning(`Could not open configuration file: ${error.message}`);
-    return { ...defaultConfig };
+    logger.warning('Failed to read conf file at %s >> %s', path, error.message);
+    return undefined;
   }
-
+  let json;
   try {
-    return Yaml__default['default'].parse(configContent);
+    json = parse(content);
   } catch (error) {
-    logger$1.warning(`Could not parse configuration file: ${error.message}`);
-    return { ...defaultConfig };
+    logger.warning('Failed to parse conf file >> %s', error.message);
   }
+  /* eslint-disable no-use-before-define */
+  return extendWithJson(conf, json);
+  /* eslint-enable no-use-before-define */
 };
 
-const validatePackage = (package1, index1) => {
-  if (typeof package1 !== 'object' || package1 === null) {
-    logger$1.warning(
-      `Invalid config.packages[${String(
-        index1,
-      )}] field in configuration file, expected a proper object.`,
+const extendWithJson = (conf, json) => {
+  if (json === null || typeof json !== 'object') {
+    logger.warning(
+      'Invalid top-level format >> expected an object and got: %j',
+      json,
     );
-    return null;
+    return conf;
   }
-  if (Reflect.getOwnPropertyDescriptor(package1, 'path') === undefined) {
-    logger$1.warning(
-      `Missing config.packages[${String(
-        index1,
-      )}].path field in configuration file.`,
-    );
-    return null;
+  if (Reflect.getOwnPropertyDescriptor(json, 'extend') !== undefined) {
+    if (typeof json.extend !== 'string') {
+      logger.warning(
+        'Invalid extend value >> expected a string and got: %j',
+        json.extend,
+      );
+    } else {
+      conf = extendWithPath(conf, json.extend);
+    }
   }
-  if (typeof package1.path !== 'string') {
-    logger$1.warning(
-      `Invalid config.packages[${String(index1)}].path, expected a string.`,
-    );
-    return null;
-  }
-  // {
-  //   const index2 = array.findIndex((package2) =>
-  //     typeof package2 === 'object' && package2 !== null
-  //       ? package1.path === package2.path
-  //       : false,
-  //   );
-  //   if (index1 !== index2) {
-  //     logger.warning(
-  //       `Duplicate config.packages[${String(index1)},${String(index2)}].path.`,
-  //     );
-  //     return null;
-  //   }
-  // }
-  if (Reflect.getOwnPropertyDescriptor(package1, 'shallow') === undefined) {
-    logger$1.info(`Missing config.packages[${String(index1)}].shallow.`);
-    return {
-      path: package1.path,
-      shallow: false,
-    };
-  }
-  if (typeof package1.shallow !== 'boolean') {
-    logger$1.warning(
-      `Invalid config.packages[${String(index1)}].shallow, expected a boolean.`,
-    );
-    return {
-      path: package1.path,
-      shallow: false,
-    };
-  }
-  return {
-    path: package1.path,
-    shallow: package1.shallow,
-  };
+  return extend(mappings.json, conf, json);
 };
 
-const validateExclude = (exclude, index) => {
-  if (typeof exclude !== 'string') {
-    logger$1.warning(
-      `Invalid config.exclude[${String(
-        index,
-      )}] field in configuration file, expected a string.`,
-    );
-    return null;
+const extendWithEnv = (conf, env) => {
+  if (Reflect.getOwnPropertyDescriptor(env, 'APPMAP_CONFIG') !== undefined) {
+    conf = extendWithPath(conf, env.APPMAP_CONFIG);
   }
-  return exclude;
-};
-
-const validateString = (config, name) => {
-  if (Reflect.getOwnPropertyDescriptor(config, name) === undefined) {
-    logger$1.warning(`Missing config.${name} field in configuration file.`);
-    return defaultConfig[name];
-  }
-  if (typeof config[name] !== 'string') {
-    logger$1.warning(
-      `Invalid config.${name} field in configuration file, expected a string.`,
-    );
-    return defaultConfig[name];
-  }
-  return config[name];
-};
-
-const validateArray = (config, name, validator) => {
-  if (Reflect.getOwnPropertyDescriptor(config, name) === undefined) {
-    logger$1.info(`Missing config.${name} field in configuration file.`);
-    return defaultConfig[name];
-  }
-  if (!Array.isArray(config[name])) {
-    logger$1.warning(
-      `Invalid config.${name} field in configuration file, expected an array.`,
-    );
-    return defaultConfig[name];
-  }
-  return config[name].map(validator).filter(isNotNull);
-};
-
-const validateConfig = (config) => {
-  if (typeof config !== 'object' || config === null || Array.isArray(config)) {
-    logger$1.warning(`Expected configuration file to return an object.`);
-    return { ...defaultConfig };
-  }
-  return {
-    name: validateString(config, 'name'),
-    packages: validateArray(config, 'packages', validatePackage),
-    exclude: validateArray(config, 'exclude', validateExclude),
-  };
+  return extend(mappings.env, conf, Reflect.ownKeys(env).filter(isAppmapEnvKey).reduce((acc, key) => {
+    acc[key] = env[key];
+    return acc;
+  }, {__proto__:null}));
 };
 
 ////////////
-// Export //
+// Config //
 ////////////
 
-class Setting {
-  constructor(env) {
-    // console.log("foo", loadYAMLConfig(env));
-    this.prefix = getEscapePrefix(env);
-    this.config = validateConfig(loadYAMLConfig(env));
-    this.enabled = isEnabled(env);
-    this.outputDir = getOutputDir(env);
+class Config {
+  constructor(conf) {
+    this.conf = conf;
   }
-  getOutputDir() {
-    return this.outputDir;
+  extendWithJson (json) {
+    return new Config(extendWithJson(this.conf, json));
   }
-  getAppName() {
-    return this.config.name;
+  extendWithPath (path) {
+    return new Config(extendWithPath(this.conf, path));
+  }
+  extendWithEnv(env) {
+    return new Config(extendWithEnv(this.conf, env));
   }
   getEscapePrefix() {
-    return this.prefix;
+    return this.conf.escape_prefix;
   }
-  getInstrumentationDepth(path) {
-    if (!this.enabled) {
-      return 0;
-    }
-    const package1 = this.config.packages.find(
-      (package2) => package2.path === path,
-    );
-    if (package1 === undefined) {
-      return 0;
-    }
-    return package1.shallow ? 1 : Infinity;
+  getOutputDir() {
+    return this.conf.output_dir;
   }
-  isExcluded(path, name) {
-    // TODO support for per-package exclusion
-    return this.config.exclude.includes(name);
+  getGitDir() {
+    return this.conf.git_dir;
+  }
+  getAppName() {
+    return this.conf.app_name;
+  }
+  getLanguageVersion() {
+    return this.conf.language_version;
+  }
+  getMapName() {
+    return this.conf.map_name;
+  }
+  isEnabled() {
+    return this.conf.enabled;
+  }
+  getPackages() {
+    return this.conf.packages;
+  }
+  getExclusions() {
+    return this.conf.exclusions;
   }
 }
 
-const logger$2 = new Logger((typeof document === 'undefined' ? new (require('u' + 'rl').URL)('file:' + __filename).href : (document.currentScript && document.currentScript.src || new URL('inline.js', document.baseURI).href)));
+const config = new Config({
+  enabled: DEFAULT_ENABLED,
+  app_name: DEFAULT_APP_NAME,
+  map_name: DEFAULT_MAP_NAME,
+  git_dir: DEFAULT_GIT_DIR,
+  language_version: DEFAULT_LANGUAGE_VERSION,
+  escape_prefix: DEFAULT_ESCAPE_PREFIX,
+  output_dir: DEFAULT_OUTPUT_DIR,
+  packages: [],
+  exclusions: [],
+});
 
-const trim = (string) => string.trim();
-
-const format = (command, path, reason, detail, stderr) =>
-  `Command failure cwd=${path}: ${command} >> ${reason} ${detail}${
-    stderr === '' ? '' : `${'\n'}${stderr}`
-  }`;
-
-const spawnSync = (command, path) => {
-  const result = ChildProcess.spawnSync(
-    command.split(' ')[0],
-    command.split(' ').slice(1),
-    {
-      cwd: path,
-      encoding: 'utf8',
-      timeout: 1000,
-      stdio: ['ignore', 'pipe', 'pipe'],
-    },
-  );
-  /* c8 ignore start */
-  if (Reflect.getOwnPropertyDescriptor(result, 'error') !== undefined) {
-    logger$2.warning(
-      format(command, path, 'failed with', result.error.message, result.stderr),
-    );
-    return null;
-  }
-  if (result.signal !== null) {
-    logger$2.warning(
-      format(
-        command,
-        path,
-        'killed with',
-        String(result.signal),
-        result.stderr,
-      ),
-    );
-    return null;
-  }
-  /* c8 ignore stop */
-  return result;
-};
-
-const parseStatus = (status) => {
-  if (status === null) {
-    return null;
-  }
-  return status.split('\n').map(trim);
-};
-
-const parseDescription = (description) => {
-  if (description === null) {
-    return null;
-  }
-  const parts = /^([^-]*)-([0-9]+)-/.exec(description);
-  /* c8 ignore start */
-  if (parts === null) {
-    logger$2.warning(`Failed to parse git description, got: ${description}`);
-    return null;
-  }
-  /* c8 ignore stop */
-  return parseInt(parts[2], 10);
-};
-
-const run = (command, path) => {
-  const result = spawnSync(command, path);
-  /* c8 ignore start */
-  if (result === null) {
-    return null;
-  }
-  /* c8 ignore stop */
-  if (result.status !== 0) {
-    logger$2.warning(
-      format(
-        command,
-        path,
-        'exit with status',
-        String(result.status),
-        result.stderr,
-      ),
-    );
-    return null;
-  }
-  return result.stdout.trim();
-};
-
-var git = (path) => {
-  const result = spawnSync(`git rev-parse --git-dir`, undefined.path);
-  if (result === null || result.status !== 0) {
-    logger$2.warning(`Not a git repository`);
-    return null;
-  }
-  return {
-    repository: run(`git config --get remote.origin.url`, undefined.path),
-    branch: run(`git rev-parse --abbrev-ref HEAD`, undefined.path),
-    commit: run(`git rev-parse HEAD`, undefined.path),
-    status: parseStatus(run(`git status --porcelain`, undefined.path)),
-    tag: run(`git describe --abbrev=0 --tags`, undefined.path),
-    annotated_tag: run(`git describe --abbrev=0`, undefined.path),
-    commits_since_tag: parseDescription(
-      run(`git describe --long --tag`, undefined.path),
-    ),
-    commits_since_annotated_tag: parseDescription(
-      run(`git describe --long`, undefined.path),
-    ),
-  };
-};
-
-const logger$3 = new Logger((typeof document === 'undefined' ? new (require('u' + 'rl').URL)('file:' + __filename).href : (document.currentScript && document.currentScript.src || new URL('inline.js', document.baseURI).href)));
+const getDefaultConfig = () => config;
 
 const globals = {
   __proto__: null,
@@ -475,8 +495,10 @@ var Namespace = (class Namespace {
   }
   checkCollision(identifier) {
     if (identifier.startsWith(this.prefix)) {
-      logger$3.error(
-        `Base-level identifier should never start with ${this.prefix}, got: ${identifier}`,
+      logger.error(
+        `Base-level identifier should never start with %s, got: %`,
+        this.prefix,
+        identifier,
       );
     }
   }
@@ -497,127 +519,129 @@ var Namespace = (class Namespace {
   // }
   getGlobal(name) {
     if (!(name in globals)) {
-      logger$3.error(
-        `getGlobal >> Unrecognized global appmap name, got: ${name}`,
-      );
+      logger.error('Unrecognized global identifier name, got: %s', name);
     }
     return `${this.prefix}_GLOBAL_${name}`;
   }
   getLocal(name) {
     if (!(name in locals)) {
-      logger$3.error(`getLocal >> Unrecognized local appmap name, got: ${name}`);
+      logger.error('Unrecognized local identifier name, got: %s', name);
     }
     return `${this.prefix}_LOCAL_${name}`;
   }
 });
 
-const logger$4 = new Logger((typeof document === 'undefined' ? new (require('u' + 'rl').URL)('file:' + __filename).href : (document.currentScript && document.currentScript.src || new URL('inline.js', document.baseURI).href)));
+const trim = (string) => string.trim();
 
-const APPMAP_VERSION = '1.4';
+const format = (command, path, reason, detail, stderr) =>
+  `Command failure cwd=${path}: ${command} >> ${reason} ${detail} ${stderr}`;
 
-const client = FileSystem.readFileSync(
-  Path.join(
-    Path.dirname(new Url.URL((typeof document === 'undefined' ? new (require('u' + 'rl').URL)('file:' + __filename).href : (document.currentScript && document.currentScript.src || new URL('inline.js', document.baseURI).href))).pathname),
-    '..',
-    '..',
-    'package.json',
-  ),
-  'utf8',
-);
+const spawnSync = (command, path) => {
+  const result = ChildProcess__namespace.spawnSync(
+    command.split(' ')[0],
+    command.split(' ').slice(1),
+    {
+      cwd: path,
+      encoding: 'utf8',
+      timeout: 1000,
+      stdio: ['ignore', 'pipe', 'pipe'],
+    },
+  );
+  /* c8 ignore start */
+  if (Reflect.getOwnPropertyDescriptor(result, 'error') !== undefined) {
+    logger.warning(
+      format(command, path, 'failed with', result.error.message, result.stderr),
+    );
+    return null;
+  }
+  if (result.signal !== null) {
+    logger.warning(
+      format(
+        command,
+        path,
+        'killed with',
+        String(result.signal),
+        result.stderr,
+      ),
+    );
+    return null;
+  }
+  /* c8 ignore stop */
+  return result;
+};
 
-var Appmap = (class AppMap {
-  constructor(metadata, namespace) {
-    this.namespace = namespace;
-    this.archived = false;
-    this.entities = [];
-    this.events = [];
-    this.metadata = {
-      name: '???',
-      labels: [],
-      app: '???',
-      feature: '???',
-      feature_group: '???',
-      language: {
-        name: 'javascript',
-        version: '???',
-        engine: '???',
-      },
-      frameworks: [],
-      client: {
-        name: client.name,
-        url: client.url,
-        version: client.version,
-      },
-      recorder: {
-        name: '???',
-      },
-      recording: null,
-      git: null,
-      ...metadata,
-    };
+const parseStatus = (status) => {
+  /* c8 ignore start */
+  if (status === null) {
+    return null;
   }
-  getLanguageVersion() {
-    return this.metadata.language.version;
+  /* c8 ignore stop */
+  return status.split('\n').map(trim);
+};
+
+const parseDescription = (description) => {
+  /* c8 ignore start */
+  if (description === null) {
+    return null;
   }
-  getNamespace() {
-    return this.namespace;
+  /* c8 ignore stop */
+  const parts = /^([^-]*)-([0-9]+)-/.exec(description);
+  /* c8 ignore start */
+  if (parts === null) {
+    logger.warning(`Failed to parse git description, got: ${description}`);
+    return null;
   }
-  addEntity(entity) {
-    if (this.archived) {
-      logger$4.error(
-        `Trying to add a code entity on an archived appmap, got: ${JSON.stringify(
-          entity,
-        )}`,
-      );
-    } else {
-      this.entities.push(entity);
-    }
+  /* c8 ignore stop */
+  return parseInt(parts[2], 10);
+};
+
+const run = (command, path) => {
+  const result = spawnSync(command, path);
+  /* c8 ignore start */
+  if (result === null) {
+    return null;
   }
-  addEvent(event) {
-    if (this.archived) {
-      logger$4.error(
-        `Trying to add an event on an archived appmap, got: ${JSON.stringify(
-          event,
-        )}`,
-      );
-    } else {
-      this.events.push(event);
-    }
+  if (result.status !== 0) {
+    logger.warning(
+      format(
+        command,
+        path,
+        'exit with status',
+        String(result.status),
+        result.stderr,
+      ),
+    );
+    return null;
   }
-  archive(dirname, termination) {
-    logger$4.info(`Termination: ${JSON.stringify(termination)}`);
-    if (this.archived) {
-      logger$4.error(
-        `Trying to archive an already archived appmap, got: ${JSON.stringify(
-          termination,
-        )}`,
-      );
-    } else {
-      this.archived = true;
-      FileSystem.writeFileSync(
-        Path.join(dirname, `${this.metadata.name}.appmap.json`),
-        JSON.stringify(
-          {
-            version: APPMAP_VERSION,
-            metadata: this.metadata,
-            classMap: this.entities,
-            events: this.events,
-          },
-          null,
-          2,
-        ),
-        'utf8',
-      );
-    }
+  /* c8 ignore stop */
+  return result.stdout.trim();
+};
+
+var git = (path) => {
+  if (run(`git rev-parse --git-dir`, path) === null) {
+    logger.warning(`Not a git repository`);
+    return null;
   }
-});
+  return {
+    repository: run(`git config --get remote.origin.url`, path),
+    branch: run(`git rev-parse --abbrev-ref HEAD`, path),
+    commit: run(`git rev-parse HEAD`, path),
+    status: parseStatus(run(`git status --porcelain`, path)),
+    tag: run(`git describe --abbrev=0 --tags`, path),
+    annotated_tag: run(`git describe --abbrev=0`, path),
+    commits_since_tag: parseDescription(run(`git describe --long --tag`, path)),
+    commits_since_annotated_tag: parseDescription(
+      run(`git describe --long`, path),
+    ),
+  };
+};
 
 class File {
   constructor(
     version,
     source,
     path,
-    content = FileSystem.readFileSync(path, 'utf8'),
+    content = FileSystem__namespace.readFileSync(path, 'utf8'),
   ) {
     this.path = path;
     this.version = version;
@@ -644,8 +668,6 @@ class File {
     });
   }
 }
-
-const logger$5 = new Logger((typeof document === 'undefined' ? new (require('u' + 'rl').URL)('file:' + __filename).href : (document.currentScript && document.currentScript.src || new URL('inline.js', document.baseURI).href)));
 
 const getPatternName = (node) => {
   if (node === null) {
@@ -682,7 +704,7 @@ class Location {
     if (this.node.type === 'VariableDeclaration') {
       return this.node.kind;
     }
-    logger$5.error(`Invalid node for getKind()`);
+    logger.error(`Invalid node for getKind()`);
     return '__APPMAP_AGENT_ERROR_LOCATION_GET_KIND__';
   }
   getChildName(node) {
@@ -756,7 +778,7 @@ class Location {
   }
   isChildNonScopingIdentifier(node) {
     if (node.type !== 'Identifier') {
-      logger$5.warning(
+      logger.warning(
         `isChildScopingIdentifier should only be called on Identifier node, got: ${node.type}`,
       );
       return false;
@@ -839,52 +861,50 @@ class RootLocation {
     return true;
   }
   makeEntity(childeren, file) {
-    logger$5.error(`RootLocation.makeEntity()`);
+    logger.error(`RootLocation.makeEntity()`);
     return null;
   }
   isStaticMethod() {
-    logger$5.error(`RootLocation.isStaticMethod()`);
+    logger.error(`RootLocation.isStaticMethod()`);
     return false;
   }
   isChildStaticMethod() {
-    logger$5.error(`RootLocation.isChildStaticMethod()`);
+    logger.error(`RootLocation.isChildStaticMethod()`);
     return false;
   }
   isChildNonScopingIdentifier() {
-    logger$5.error(`RootLocation.isChildScopingIdentifier()`);
+    logger.error(`RootLocation.isChildScopingIdentifier()`);
     return false;
   }
   isNonScopingIdentifier() {
-    logger$5.error(`RootLocation.isScopingIdentifier()`);
+    logger.error(`RootLocation.isScopingIdentifier()`);
     return false;
   }
   getStartLine() {
-    logger$5.error(`RootLocation.getStartLine()`);
+    logger.error(`RootLocation.getStartLine()`);
     return 0;
   }
   getName(file) {
-    logger$5.error(`RootLocation.getName()`);
+    logger.error(`RootLocation.getName()`);
     return '__APPMAP_AGENT_ERROR_ROOT_LOCATION_GET_NAME__';
   }
   getChildName() {
-    logger$5.error(`RootLocation.getChildName()`);
+    logger.error(`RootLocation.getChildName()`);
     return '__APPMAP_AGENT_ERROR_ROOT_LOCATION_GET_CHILD_NAME__';
   }
   getKind() {
-    logger$5.error(`RootLocation.getKind()`);
+    logger.error(`RootLocation.getKind()`);
     return '__APPMAP_AGENT_ERROR_ROOT_LOCATION_GET_KIND__';
   }
   getContainerName(file) {
-    logger$5.error(`RootLocation.getContainerName()`);
+    logger.error(`RootLocation.getContainerName()`);
     return '__APPMAP_AGENT_ERROR_ROOT_LOCATION_GET_CONTAINER_NAME__';
   }
   getParentContainerName() {
-    logger$5.error(`RootLocation.getParentContainerName()`);
+    logger.error(`RootLocation.getParentContainerName()`);
     return '__APPMAP_AGENT_ERROR_ROOT_LOCATION_GET_PARENT_CONTAINER_NAME__';
   }
 }
-
-const logger$6 = new Logger((typeof document === 'undefined' ? new (require('u' + 'rl').URL)('file:' + __filename).href : (document.currentScript && document.currentScript.src || new URL('inline.js', document.baseURI).href)));
 
 const visitors = { __proto__: null };
 
@@ -932,7 +952,7 @@ const visit = (target, { location, namespace, file }) => {
       }
       node = join(node, context, ...fields);
     } else {
-      logger$6.error(`Cannot visit node, got: ${node.type}`);
+      logger.error(`Cannot visit node, got: ${node.type}`);
     }
     const entity = extended.makeEntity(entities, file);
     if (entity !== null) {
@@ -2081,74 +2101,135 @@ var instrument = (file, namespace, callback) => {
   return escodegen.generate(getResultNode(result));
 };
 
-const logger$7 = new Logger((typeof document === 'undefined' ? new (require('u' + 'rl').URL)('file:' + __filename).href : (document.currentScript && document.currentScript.src || new URL('inline.js', document.baseURI).href)));
+var dirname_1 = __dirname;
 
-var inline = (env) => {
-  const config = new Setting(env);
-  let appmap = null;
-  const addEntity = (entity) => appmap.addEntity(entity);
-  return {
-    initialize: (data) => {
-      if (appmap === null) {
-        appmap = new Appmap(
-          {
-            name: data.name,
-            labels: [],
+const APPMAP_VERSION = '1.4';
+
+const client = JSON.parse(FileSystem__namespace.readFileSync(
+  Path__namespace.join(
+    dirname_1,
+    '..',
+    'package.json',
+  ),
+  'utf8',
+));
+
+var Appmap = (class Appmap {
+  constructor() {
+    this.state = null;
+  }
+  initialize(recorder, config, init) {
+    if (this.state !== null) {
+      logger.error('Appmap cannot be initialized because it is not idle');
+    } else {
+      this.state = {
+        config: config.extendWithEnv(init.env),
+        namespace: new Namespace(config.getEscapePrefix()),
+        appmap: {
+          version: APPMAP_VERSION,
+          metadata: {
+            name: config.getMapName(),
+            labels: init.labels,
             app: config.getAppName(),
-            feature: null,
-            feature_group: null,
+            feature: init.feature,
+            feature_group: init.feature_group,
             language: {
               name: 'javascript',
-              engine: data.engine,
-              version: data.ecmascript,
+              engine: init.engine,
+              version: config.getLanguageVersion(),
             },
-            frameworks: [],
-            recorder: 'inline',
-            recording: null,
-            git: git(config.getGitDirectory()),
+            frameworks: init.frameworks,
+            client: {
+              name: client.name,
+              url: client.repository.url,
+              version: client.version,
+            },
+            recorder: {
+              name: recorder,
+            },
+            recording: init.recording,
+            git: git(config.getGitDir()),
           },
-          new Namespace(data.prefix),
+          classMap: [],
+          events: [],
+        },
+      };
+    }
+  }
+  instrument(source, path, content) {
+    if (this.state === null) {
+      logger.error('Appmap cannot instrument code because it is idle');
+      return content;
+    }
+    logger.info('Appmap instrument %s at %s', source, path);
+    return instrument(
+      new File(this.state.config.getLanguageVersion(), source, path, content),
+      this.state.namespace,
+      (entity) => {
+        logger.info('Appmap register code entity: %j', entity);
+        this.state.appmap.classMap.push(entity);
+      },
+    );
+  }
+  emit(event) {
+    if (this.state === null) {
+      logger.error(
+        'Appmap cannot register event because it is idle; ignoring the event',
+      );
+    } else {
+      logger.info('Appmap save event: %j', event);
+      this.state.appmap.events.push(event);
+    }
+  }
+  terminate(reason) {
+    if (this.state === null) {
+      logger.error('Appmap cannot be terminated because it is idle');
+    } else {
+      logger.info('Appmap terminate with: %j', reason);
+      const path = Path__namespace.join(
+        this.state.config.getOutputDir(),
+        `${this.state.config.getMapName()}.appmap.json`,
+      );
+      const content = JSON.stringify(this.state.appmap);
+      try {
+        FileSystem__namespace.writeFileSync(path, content, 'utf8');
+      } catch (error) {
+        logger.error(
+          'Appmap cannot be saved at %s because %s; outputing to stdout instead',
+          path,
+          error.message,
         );
-      } else {
-        logger$7.error(`duplicate initalization`);
+        process.stdout.write(content, 'utf8');
+        process.stdout.write('\n', 'utf8');
+      } finally {
+        this.state = null;
       }
+    }
+  }
+});
+
+const RECORDER_NAME = 'node-inline';
+
+var inline = (env) => {
+  const appmap = new Appmap();
+  return {
+    initialize: (init) => {
+      appmap.initialize(RECORDER_NAME, getDefaultConfig(), init);
     },
     terminate: (reason) => {
-      if (appmap === null) {
-        logger$7.error(`terminate before initalization`);
-      } else {
-        appmap.archive(config.getOutputDir(), reason);
-      }
+      appmap.terminate(reason);
     },
-    instrumentScript: (content, path) => {
-      if (appmap === null) {
-        logger$7.error(`instrumentScript before initalization`);
-        return content;
-      }
-      return instrument(
-        new File(appmap.getLanguageVersion(), 'script', path, content),
-        appmap.getNamespace(),
-        addEntity,
-      );
-    },
-    instrumentModule: (content, path, pending) => {
-      if (appmap === null) {
-        logger$7.error(`instrumentModule before initalization`);
-        pending.resolve(content);
-      } else {
-        pending.resolve(
-          new File(appmap.getLanguageVersion(), 'script', path, content),
-          appmap.getNamespace(),
-          addEntity,
-        );
+    instrumentScript: (path, content) =>
+      appmap.instrument('script', path, content),
+    instrumentModule: (path, content, { resolve, reject }) => {
+      try {
+        resolve(appmap.instrument('module', path, content));
+      } catch (error) {
+        reject(error);
       }
     },
     emit: (event) => {
-      if (appmap === null) {
-        logger$7.error(`emit before initalization`);
-      } else {
-        appmap.addEvent(event);
-      }
+      appmap.emit(event);
     },
   };
 };
