@@ -1,226 +1,124 @@
-import * as Fs from 'fs';
+import { writeFileSync } from 'fs';
 import { strict as Assert } from 'assert';
 import Yaml from 'yaml';
 import * as Logger from '../../../../lib/server/logger.mjs';
 import { getDefaultConfig } from '../../../../lib/server/config.mjs';
 
+const config = getDefaultConfig();
 
-// enabled: DEFAULT_ENABLED,
-// app_name: DEFAULT_APP_NAME,
-// map_name: DEFAULT_MAP_NAME,
-// git_dir: DEFAULT_GIT_DIR,
-// language_version: DEFAULT_LANGUAGE_VERSION,
-// escape_prefix: DEFAULT_ESCAPE_PREFIX,
-// output_dir: DEFAULT_OUTPUT_DIR,
-// packages: [],
-// exclude: [],
+config.extendWithPath("/foo");
+config.extendWithPath("/foo.json");
+config.extendWithPath("/foo.yml");
+config.extendWithJson(123);
+config.extendWithJson({extend:123});
+config.extendWithJson({extend:"/foo"});
+config.extendWithEnv({APPMAP_CONFIG:"/foo"});
+
+writeFileSync("tmp/test/conf.yml", "name: foo", "utf8");
+Assert.equal(config.extendWithPath("tmp/test/conf.yml").getAppName(), "foo");
+
+writeFileSync("tmp/test/conf.json", "@foo", "utf8");
+config.extendWithPath("tmp/test/conf.json");
+
+const makeMakeTest = (method) => (kind, key) => (value) => config[`extendWith${kind}`]({[key]: value})[method]();
+
+// simple strings //
+[
+  ["getGitDir", "APPMAP_GIT_DIR", "git-dir", "."],
+  ["getOutputDir", "APPMAP_OUTPUT_DIR", "output-dir", "tmp/appmap"],
+  ["getAppName", "APPMAP_APP_NAME", "name", "unknown-app-name"],
+  ["getMapName", "APPMAP_MAP_NAME", "map-name", "unknown-map-name"],
+].forEach(([method, key1, key2, def]) => {
+  const makeTest = makeMakeTest(method);
+  {
+    const test = makeTest("Env", key1);
+    Assert.equal(test("foo"), "foo");
+  }
+  {
+    const test = makeTest("Json", key2);
+    Assert.equal(test("foo"), "foo");
+    Assert.equal(test(123), def);
+  }
+});
 
 // isEnabled //
 {
-  const config1 = getDefaultConfig();
-  const config2 = config1.extendWithEnv({APPMAP: "TruE"});
-  Assert.deepEqual(config1.isEnabled(), false);
-  Assert.deepEqual(config2.isEnabled(), true);
-  Assert.deepEqual(config2.extendWithEnv({APPMAP: "FalsE"}).isEnabled(), false);
-  Assert.deepEqual(config2.extendWithEnv({APPMAP: "foo"}).isEnabled(), false);
-  Assert.deepEqual(config1.extendWithJson({enabled: true}).isEnabled(), true);
-  Assert.deepEqual(config2.extendWithJson({enabled: false}).isEnabled(), false);
-  Assert.deepEqual(config2.extendWithJson({enabled: "foo"}).isEnabled(), false);
-}
-
-// getAppName //
-{
-  const def = "unknown-app-name";
-  const config1 = getDefaultConfig();
-  const config2 = config1.extendWithEnv({APPMAP_APP_NAME: "foo"});
-  Assert.deepEqual(config1.getAppName(), def);
-  Assert.deepEqual(config2.getAppName(), "foo");
-  Assert.deepEqual(config2.extendWithJson({name: "foo"}).getAppName(), "foo");
-  Assert.deepEqual(config2.extendWithJson({name: 123}).getAppName(), def);
+  const def = false;
+  const makeTest = makeMakeTest("isEnabled");
+  {
+    const test = makeTest("Env", "APPMAP");
+    Assert.equal(test("TruE"), true);
+    Assert.equal(test("FalsE"), false);
+    Assert.equal(test("foo"), def);
+  }
+  {
+    const test = makeTest("Json", "enabled");
+    Assert.equal(test(true), true);
+    Assert.equal(test(false), false);
+    Assert.equal(test("foo"), def);
+  }
 }
 
 // getEscapePrefix //
 {
   const def = "APPMAP";
-  const config1 = getDefaultConfig();
-  const config2 = config1.extendWithEnv({APPMAP_ESCAPE_PREFIX: "foo"});
-  Assert.deepEqual(config1.getEscapePrefix(), def);
-  Assert.deepEqual(config2.getEscapePrefix(), "foo");
-  Assert.deepEqual(config2.extendWithEnv({APPMAP_ESCAPE_PREFIX: "@bar"}).getEscapePrefix(), def);
-  Assert.deepEqual(config1.extendWithJson({"escape-prefix": "qux"}).getEscapePrefix(), "qux");
-  Assert.deepEqual(config2.extendWithJson({"escape-prefix": 123}).getEscapePrefix(), def);
+  const makeTest = makeMakeTest("getEscapePrefix");
+  {
+    const test = makeTest("Env", "APPMAP_ESCAPE_PREFIX");
+    Assert.equal(test("foo"), "foo");
+    Assert.equal(test("@bar"), def);
+  }
+  {
+    const test = makeTest("Json", "escape-prefix");
+    Assert.equal(test("foo"), "foo");
+    Assert.equal(test("@bar"), def);
+    Assert.equal(test(123), def);
+  }
 }
 
-// language_version
+// language_version //
 {
   const def = "2015";
-  const config1 = getDefaultConfig();
-  const config2 = config1.extendWithEnv({APPMAP_LANGUAGE_VERSION: "5"});
-  Assert.deepEqual(config1.getLanguageVersion(), def);
-  Assert.deepEqual(config2.getLanguageVersion(), "5");
-  Assert.deepEqual(config2.extendWithEnv({APPMAP_LANGUAGE_VERSION: "foo"}).getLanguageVersion(), def);
-  Assert.deepEqual(config1.extendWithJson({"language-version": "5"}).getLanguageVersion(), "5");
-  Assert.deepEqual(config2.extendWithJson({"language-version": "bar"}).getLanguageVersion(), def);
+  const makeTest = makeMakeTest("getLanguageVersion");
+  {
+    const test = makeTest("Env", "APPMAP_LANGUAGE_VERSION");
+    Assert.equal(test("5"), "5");
+    Assert.equal(test("foo"), def);
+  }
+  {
+    const test = makeTest("Json", "language-version");
+    Assert.equal(test("5"), "5");
+    Assert.equal(test("foo"), def);
+    Assert.equal(test(5), def);
+  }
 }
 
-// Logger.reloadGlobalLevel('CRITICAL');
+// getPackages //
+{
+  const makeTest = makeMakeTest("getPackages");
+  {
+    const test = makeTest("Env", "APPMAP_PACKAGES");
+    Assert.deepEqual(test(" foo , bar "), [{name:"foo"}, {name:"bar"}]);
+  }
+  {
+    const test = makeTest("Json", "packages");
+    Assert.deepEqual(test([{name:"foo"}, "bar"]), [{name:"foo"}, {name:"bar"}]);
+    Assert.deepEqual(test(123), []);
+    Assert.deepEqual(test([456, {}, {name:789}, "qux"]), [{name:"qux"}]);
+  }
+}
 
-// const inputString = `
-// #comment
-// name: appname
-// packages:
-//   - null
-//   - foo: bar
-//   - path: null
-//   - path: package1
-//   - path: package2
-//     shallow: true
-//   - path: package3
-//     shallow: false
-//   - path: package4
-//     shallow: null
-// exclude:
-//   - Class
-//   - Class#instanceMethod
-//   - Class.classMethod
-//   - null
-// `;
-
-
-
-// const inputObject = Yaml.parse(inputString);
-//
-// const makeInvalid = (path, key) => {
-//   const object = { ...inputObject };
-//   object[key] = null;
-//   Fs.writeFileSync(path, Yaml.stringify(object), 'utf8');
-//   return { APPMAP_CONFIG: path };
-// };
-//
-// const makeMissing = (path, key) => {
-//   const object = { ...inputObject };
-//   delete object[key];
-//   Fs.writeFileSync(path, Yaml.stringify(object), 'utf8');
-//   return { APPMAP_CONFIG: path };
-// };
-//
-// Fs.writeFileSync('tmp/test/appmap.yml', inputString, 'utf8');
-//
-// const prototype = {
-//   enabled: false,
-//   outdir: 'tmp/appmap/',
-//   appname: 'appname',
-//   exclusions: ['Class', 'Class#instanceMethod', 'Class.classMethod'],
-//   packages: [
-//     { path: 'package1', depth: Infinity },
-//     { path: 'package2', depth: 1 },
-//     { path: 'package3', depth: Infinity },
-//     { path: 'package4', depth: Infinity },
-//   ],
-// };
-//
-// const makeFresh = (array, element) => {
-//   let index = 0;
-//   while (array.includes(`${element}${String(index)}`)) {
-//     index += 1;
-//   }
-//   return `${element}${String(index)}`;
-// };
-//
-// const checkConfig = (config, expected) => {
-//   Assert.equal(config.getOutputDir(), expected.outdir);
-//   Assert.equal(config.getAppName(), expected.appname);
-//   expected.exclusions.forEach((exclusion) => {
-//     Assert.equal(config.isExcluded('package', exclusion), true);
-//   });
-//   Assert.equal(
-//     config.isExcluded('package', makeFresh(expected.exclusions, 'Class')),
-//     false,
-//   );
-//   expected.packages.forEach(({ path, depth }) => {
-//     Assert.equal(
-//       config.getInstrumentationDepth(path),
-//       expected.enabled ? depth : 0,
-//     );
-//   });
-//   Assert.equal(
-//     config.getInstrumentationDepth(makeFresh(expected.packages, 'package')),
-//     0,
-//   );
-// };
-//
-// [{ APPMAP: 'true' }, { APPMAP: 'TRUE' }].forEach((env) => {
-//   checkConfig(
-//     new Config({
-//       ...env,
-//       APPMAP_CONFIG: 'tmp/test/appmap.yml',
-//       APPMAP_OUTPUT_DIR: 'appmap/output/dir/',
-//     }),
-//     {
-//       __proto__: prototype,
-//       outdir: 'appmap/output/dir/',
-//       enabled: true,
-//     },
-//   );
-// });
-//
-// process.chdir('tmp/test/');
-// [{ APPMAP: 'false' }, { APPMAP: 'FALSE' }, { APPMAP: 'foobar' }, {}].forEach(
-//   (env) => {
-//     checkConfig(new Config(env), prototype);
-//   },
-// );
-// process.chdir('../../');
-//
-// [
-//   {
-//     APPMAP_CONFIG: 'tmp/test/missing.yml',
-//   },
-//   {
-//     APPMAP_CONFIG:
-//       (Fs.writeFileSync('tmp/test/unparsable.yml', '- * -', 'utf8'),
-//       'tmp/test/unparsable.yml'),
-//   },
-//   {
-//     APPMAP_CONFIG:
-//       (Fs.writeFileSync('tmp/test/invalid.yml', 'null', 'utf8'),
-//       'tmp/test/invalid.yml'),
-//   },
-// ].forEach((env) => {
-//   checkConfig(new Config(env), {
-//     __proto__: prototype,
-//     appname: 'unknown',
-//     packages: [],
-//     exclusions: [],
-//   });
-// });
-//
-// [
-//   makeInvalid('tmp/test/invalid-name.yml', 'name'),
-//   makeMissing('tmp/test/missing-name.yml', 'name'),
-// ].forEach((env) => {
-//   checkConfig(new Config(env), {
-//     __proto__: prototype,
-//     appname: 'unknown',
-//   });
-// });
-//
-// [
-//   makeInvalid('tmp/test/invalid-packages.yml', 'packages'),
-//   makeMissing('tmp/test/missing-packages.yml', 'packages'),
-// ].forEach((env) => {
-//   checkConfig(new Config(env), {
-//     __proto__: prototype,
-//     packages: [],
-//   });
-// });
-//
-// [
-//   makeInvalid('tmp/test/invalid-exclude.yml', 'exclude'),
-//   makeMissing('tmp/test/missing-exclude.yml', 'exclude'),
-// ].forEach((env) => {
-//   checkConfig(new Config(env), {
-//     __proto__: prototype,
-//     exclusions: [],
-//   });
-// });
+// getExclusions //
+{
+  const makeTest = makeMakeTest("getExclusions");
+  {
+    const test = makeTest("Env", "APPMAP_EXCLUDE");
+    Assert.deepEqual(test(" foo , bar "), ["foo", "bar"]);
+  }
+  {
+    const test = makeTest("Json", "exclude");
+    Assert.deepEqual(test(["foo", "bar"]), ["foo", "bar"]);
+    Assert.deepEqual(test(123), []);
+    Assert.deepEqual(test([456, "qux"]), ["qux"]);
+  }
+}
