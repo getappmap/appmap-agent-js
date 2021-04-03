@@ -4,7 +4,6 @@ import Yaml from 'yaml';
 import * as Logger from '../../../../lib/server/logger.mjs';
 import { getDefaultConfig } from '../../../../lib/server/config.mjs';
 
-const config = getDefaultConfig();
 
 // enabled: DEFAULT_ENABLED,
 // app_name: DEFAULT_APP_NAME,
@@ -16,14 +15,53 @@ const config = getDefaultConfig();
 // packages: [],
 // exclude: [],
 
-Assert.deepEqual(config.extendWithEnv({APPMAP: "TruE"}).isEnabled(), true);
-Assert.deepEqual(config.extendWithEnv({APPMAP: "FalsE"}).isEnabled(), false);
-Assert.deepEqual(config.extendWithEnv({APPMAP: "foo"}).isEnabled(), false);
+// isEnabled //
+{
+  const config1 = getDefaultConfig();
+  const config2 = config1.extendWithEnv({APPMAP: "TruE"});
+  Assert.deepEqual(config1.isEnabled(), false);
+  Assert.deepEqual(config2.isEnabled(), true);
+  Assert.deepEqual(config2.extendWithEnv({APPMAP: "FalsE"}).isEnabled(), false);
+  Assert.deepEqual(config2.extendWithEnv({APPMAP: "foo"}).isEnabled(), false);
+  Assert.deepEqual(config1.extendWithJson({enabled: true}).isEnabled(), true);
+  Assert.deepEqual(config2.extendWithJson({enabled: false}).isEnabled(), false);
+  Assert.deepEqual(config2.extendWithJson({enabled: "foo"}).isEnabled(), false);
+}
 
-Assert.deepEqual(config.extendWithJson({enabled: true}).isEnabled(), true);
-Assert.deepEqual(config.extendWithJson({enabled: false}).isEnabled(), true);
-Assert.deepEqual(config.extendWithJson({enabled: "foo"}).isEnabled(), true);
+// getAppName //
+{
+  const def = "unknown-app-name";
+  const config1 = getDefaultConfig();
+  const config2 = config1.extendWithEnv({APPMAP_APP_NAME: "foo"});
+  Assert.deepEqual(config1.getAppName(), def);
+  Assert.deepEqual(config2.getAppName(), "foo");
+  Assert.deepEqual(config2.extendWithJson({name: "foo"}).getAppName(), "foo");
+  Assert.deepEqual(config2.extendWithJson({name: 123}).getAppName(), def);
+}
 
+// getEscapePrefix //
+{
+  const def = "APPMAP";
+  const config1 = getDefaultConfig();
+  const config2 = config1.extendWithEnv({APPMAP_ESCAPE_PREFIX: "foo"});
+  Assert.deepEqual(config1.getEscapePrefix(), def);
+  Assert.deepEqual(config2.getEscapePrefix(), "foo");
+  Assert.deepEqual(config2.extendWithEnv({APPMAP_ESCAPE_PREFIX: "@bar"}).getEscapePrefix(), def);
+  Assert.deepEqual(config1.extendWithJson({"escape-prefix": "qux"}).getEscapePrefix(), "qux");
+  Assert.deepEqual(config2.extendWithJson({"escape-prefix": 123}).getEscapePrefix(), def);
+}
+
+// language_version
+{
+  const def = "2015";
+  const config1 = getDefaultConfig();
+  const config2 = config1.extendWithEnv({APPMAP_LANGUAGE_VERSION: "5"});
+  Assert.deepEqual(config1.getLanguageVersion(), def);
+  Assert.deepEqual(config2.getLanguageVersion(), "5");
+  Assert.deepEqual(config2.extendWithEnv({APPMAP_LANGUAGE_VERSION: "foo"}).getLanguageVersion(), def);
+  Assert.deepEqual(config1.extendWithJson({"language-version": "5"}).getLanguageVersion(), "5");
+  Assert.deepEqual(config2.extendWithJson({"language-version": "bar"}).getLanguageVersion(), def);
+}
 
 // Logger.reloadGlobalLevel('CRITICAL');
 
