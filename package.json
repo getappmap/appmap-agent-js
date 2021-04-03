@@ -3,7 +3,7 @@
   "version": "1.0.2",
   "scripts": {
     "coverage": "npx c8 --reporter=html --require $TARGET node test/unit/$TARGET",
-    "build": "npx rollup --plugin commonjs lib/server/inline.mjs --file dist/inline.js --format cjs",
+    "build": "npx rollup lib/server/inline-channel.mjs --file dist/inline-channel.js --format cjs",
     "prettify": "npx prettier --write 'lib/server/**/*.mjs' 'lib/client/**/*.js' 'test/**/*.mjs' 'bin/*.mjs'",
     "commit": "npx cz",
     "lint": "npx eslint 'lib/client/**/*.js' 'lib/server/**/*.mjs' 'test/**/*.mjs' 'bin/*.mjs'",
@@ -11,9 +11,10 @@
     "deploy": "npx semantic-release"
   },
   "files": [
-    "dist/*.js",
-    "lib/**/*.{js,mjs}",
-    "bin/*.mjs"
+    "/home.js",
+    "/dist/*.js",
+    "/lib/**/*.{js,mjs}",
+    "/bin/*.mjs"
   ],
   "bin": {
     "appmap": "bin/agent.mjs"
@@ -26,7 +27,6 @@
     "yaml": "^1.10.0"
   },
   "devDependencies": {
-    "@rollup/plugin-commonjs": "^18.0.0",
     "@semantic-release/changelog": "^5.0.1",
     "@semantic-release/git": "^9.0.0",
     "c8": "^7.6.0",

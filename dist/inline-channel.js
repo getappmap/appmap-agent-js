@@ -10,46 +10,22 @@ var escodegen = require('escodegen');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
-function _interopNamespace(e) {
-  if (e && e.__esModule) return e;
-  var n = Object.create(null);
-  if (e) {
-    Object.keys(e).forEach(function (k) {
-      if (k !== 'default') {
-        var d = Object.getOwnPropertyDescriptor(e, k);
-        Object.defineProperty(n, k, d.get ? d : {
-          enumerable: true,
-          get: function () {
-            return e[k];
-          }
-        });
-      }
-    });
-  }
-  n['default'] = e;
-  return Object.freeze(n);
-}
-
-var FileSystem__namespace = /*#__PURE__*/_interopNamespace(FileSystem);
 var Yaml__default = /*#__PURE__*/_interopDefaultLegacy(Yaml);
-var Util__namespace = /*#__PURE__*/_interopNamespace(Util);
-var Path__namespace = /*#__PURE__*/_interopNamespace(Path);
-var ChildProcess__namespace = /*#__PURE__*/_interopNamespace(ChildProcess);
 
 // I'm not about the debuglog api because modifying process.env.NODE_DEBUG has no effect.
 // Why not directly provide the optimize logging function then?
 // https://github.com/nodejs/node/blob/master/lib/internal/util/debuglog.js
 
 const logger = {
-  error: Util__namespace.debuglog('appmap-error', (log) => {
+  error: Util.debuglog('appmap-error', (log) => {
     logger.error = log;
   }),
-  warning: Util__namespace.debuglog('appmap-warning', (log) => {
+  warning: Util.debuglog('appmap-warning', (log) => {
     logger.warning = log;
   }),
-  info: Util__namespace.debuglog('appmap-info', (log) => {
+  info: Util.debuglog('appmap-info', (log) => {
     logger.info = log;
-  })
+  }),
 };
 
 const DEFAULT_ENABLED = false;
@@ -66,13 +42,13 @@ const combine = (closure1, closure2) => (any) => closure2(closure1(any));
 
 const isNotNull = (any) => any !== null;
 
-const trim$1 = (string) => string.trim();
+const trim = (string) => string.trim();
 
 const toLowerCase = (string) => string.toLowerCase();
 
 const identity = (any) => any;
 
-const isAppmapEnvKey = (key) => key === "APPMAP" || key.startsWith("APPMAP_");
+const isAppmapEnvKey = (key) => key === 'APPMAP' || key.startsWith('APPMAP_');
 
 //////////////
 // Sanitize //
@@ -194,11 +170,11 @@ const mappings = {
     },
     APPMAP_EXCLUDE: {
       name: 'exclusions',
-      sanitize: (string) => string.split(',').map(trim$1),
+      sanitize: (string) => string.split(',').map(trim),
     },
     APPMAP_PACKAGES: {
       name: 'packages',
-      sanitize: (string) => string.split(',').map(trim$1).map(wrapName),
+      sanitize: (string) => string.split(',').map(trim).map(wrapName),
     },
   },
   json: {
@@ -223,8 +199,8 @@ const mappings = {
           'language-version value',
           DEFAULT_LANGUAGE_VERSION,
         ),
-        makeLanguageVersionSanitizer()
-      )
+        makeLanguageVersionSanitizer(),
+      ),
     },
     'escape-prefix': {
       name: 'escape_prefix',
@@ -247,46 +223,42 @@ const mappings = {
     },
     'git-dir': {
       name: 'git_dir',
-      sanitize: makeTypeSanitizer(
-        'string',
-        'git-dir value',
-        DEFAULT_GIT_DIR,
-      ),
+      sanitize: makeTypeSanitizer('string', 'git-dir value', DEFAULT_GIT_DIR),
     },
     packages: {
       name: 'packages',
       sanitize: makeArraySanitizer('output_dir conf value', (json, index) => {
-          if (typeof json === 'string') {
-            return { name: json };
+        if (typeof json === 'string') {
+          return { name: json };
+        }
+        if (typeof json === 'object' && json !== null) {
+          if (Reflect.getOwnPropertyDescriptor(json, 'name') === undefined) {
+            logger.warning(
+              'Invalid packages[%i] value >> missing name field and got %s',
+              index,
+              json,
+            );
+            return null;
           }
-          if (typeof json === 'object' && json !== null) {
-            if (Reflect.getOwnPropertyDescriptor(json, 'name') === undefined) {
-              logger.warning(
-                'Invalid packages[%i] value >> missing name field and got %s',
-                index,
-                json,
-              );
-              return null;
-            }
-            if (typeof json.name !== 'string') {
-              logger.warning(
-                'Invalid packages[%i].name value >> expected a string and got %s',
-                index,
-                json.name,
-              );
-              return null;
-            }
-            return {
-              name: json.name,
-            };
+          if (typeof json.name !== 'string') {
+            logger.warning(
+              'Invalid packages[%i].name value >> expected a string and got %s',
+              index,
+              json.name,
+            );
+            return null;
           }
-          logger.warning(
-            'Invalid packages[%i] value >> expected either a string or an object and got %s',
-            index,
-            json,
-          );
-          return null;
-        }),
+          return {
+            name: json.name,
+          };
+        }
+        logger.warning(
+          'Invalid packages[%i] value >> expected either a string or an object and got %s',
+          index,
+          json,
+        );
+        return null;
+      }),
     },
     exclude: {
       name: 'exclusions',
@@ -336,7 +308,7 @@ const extend = (mapping, conf, object) => {
       const { name, sanitize } = mapping[key];
       conf[name] = mergers[name](conf[name], sanitize(object[key]));
     } else {
-      logger.warning("Unrecognized conf key %s", key);
+      logger.warning('Unrecognized conf key %s', key);
     }
   });
   return conf;
@@ -357,7 +329,7 @@ const extendWithPath = (conf, path) => {
   }
   let content;
   try {
-    content = FileSystem__namespace.readFileSync(path, 'utf8');
+    content = FileSystem.readFileSync(path, 'utf8');
   } catch (error) {
     logger.warning('Failed to read conf file at %s >> %s', path, error.message);
     return undefined;
@@ -398,10 +370,19 @@ const extendWithEnv = (conf, env) => {
   if (Reflect.getOwnPropertyDescriptor(env, 'APPMAP_CONFIG') !== undefined) {
     conf = extendWithPath(conf, env.APPMAP_CONFIG);
   }
-  return extend(mappings.env, conf, Reflect.ownKeys(env).filter(isAppmapEnvKey).reduce((acc, key) => {
-    acc[key] = env[key];
-    return acc;
-  }, {__proto__:null}));
+  return extend(
+    mappings.env,
+    conf,
+    Reflect.ownKeys(env)
+      .filter(isAppmapEnvKey)
+      .reduce(
+        (acc, key) => {
+          acc[key] = env[key];
+          return acc;
+        },
+        { __proto__: null },
+      ),
+  );
 };
 
 ////////////
@@ -412,10 +393,10 @@ class Config {
   constructor(conf) {
     this.conf = conf;
   }
-  extendWithJson (json) {
+  extendWithJson(json) {
     return new Config(extendWithJson(this.conf, json));
   }
-  extendWithPath (path) {
+  extendWithPath(path) {
     return new Config(extendWithPath(this.conf, path));
   }
   extendWithEnv(env) {
@@ -531,13 +512,13 @@ var Namespace = (class Namespace {
   }
 });
 
-const trim = (string) => string.trim();
+const trim$1 = (string) => string.trim();
 
 const format = (command, path, reason, detail, stderr) =>
   `Command failure cwd=${path}: ${command} >> ${reason} ${detail} ${stderr}`;
 
 const spawnSync = (command, path) => {
-  const result = ChildProcess__namespace.spawnSync(
+  const result = ChildProcess.spawnSync(
     command.split(' ')[0],
     command.split(' ').slice(1),
     {
@@ -576,7 +557,7 @@ const parseStatus = (status) => {
     return null;
   }
   /* c8 ignore stop */
-  return status.split('\n').map(trim);
+  return status.split('\n').map(trim$1);
 };
 
 const parseDescription = (description) => {
@@ -641,7 +622,7 @@ class File {
     version,
     source,
     path,
-    content = FileSystem__namespace.readFileSync(path, 'utf8'),
+    content = FileSystem.readFileSync(path, 'utf8'),
   ) {
     this.path = path;
     this.version = version;
@@ -2101,18 +2082,22 @@ var instrument = (file, namespace, callback) => {
   return escodegen.generate(getResultNode(result));
 };
 
-var dirname_1 = __dirname;
+// import { home } from '../../home.js';
 
 const APPMAP_VERSION = '1.4';
 
-const client = JSON.parse(FileSystem__namespace.readFileSync(
-  Path__namespace.join(
-    dirname_1,
-    '..',
-    'package.json',
-  ),
-  'utf8',
-));
+const client = {
+  name: "@appland/appmap-agent-js",
+  repository: {
+    type: "git",
+    url: "https://github.com/applandinc/appmap-agent-js.git"
+  },
+  version: "???",
+};
+
+// const client = JSON.parse(
+//   FileSystem.readFileSync(Path.join(home, 'package.json'), 'utf8'),
+// );
 
 var Appmap = (class Appmap {
   constructor() {
@@ -2186,13 +2171,13 @@ var Appmap = (class Appmap {
       logger.error('Appmap cannot be terminated because it is idle');
     } else {
       logger.info('Appmap terminate with: %j', reason);
-      const path = Path__namespace.join(
+      const path = Path.join(
         this.state.config.getOutputDir(),
         `${this.state.config.getMapName()}.appmap.json`,
       );
       const content = JSON.stringify(this.state.appmap);
       try {
-        FileSystem__namespace.writeFileSync(path, content, 'utf8');
+        FileSystem.writeFileSync(path, content, 'utf8');
       } catch (error) {
         logger.error(
           'Appmap cannot be saved at %s because %s; outputing to stdout instead',
@@ -2210,7 +2195,7 @@ var Appmap = (class Appmap {
 
 const RECORDER_NAME = 'node-inline';
 
-var inline = (env) => {
+var inlineChannel = (env) => {
   const appmap = new Appmap();
   return {
     initialize: (init) => {
@@ -2234,4 +2219,4 @@ var inline = (env) => {
   };
 };
 
-module.exports = inline;
+module.exports = inlineChannel;

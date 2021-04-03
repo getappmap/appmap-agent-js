@@ -4,11 +4,13 @@ JavaScript client agent for the AppMap framework
 
 To install:
 ```sh
-npm install @appland/appmap-agent-js  
+npm install @appland/appmap-agent-js
 ```
 
 To run:
 ```sh
+npx appmap 
+
 APPMAP_OUTPUT_DIR=. npx appmap -- standalone-file.js argv0 argv1
 ```
 
