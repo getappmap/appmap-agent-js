@@ -1,11 +1,9 @@
 import * as FileSystem from 'fs';
 import * as ChildProcess from 'child_process';
 import { strict as Assert } from 'assert';
-import * as Logger from '../../../../lib/server/logger.mjs';
 import git from '../../../../lib/server/git.mjs';
 
 const AssertStrict = Assert.strict;
-Logger.reloadGlobalLevel('DEBUG');
 
 const url = 'https://github.com/lachrist/sample.git';
 const path = 'tmp/test/sample-git/';
