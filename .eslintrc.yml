@@ -2,6 +2,9 @@ root: true
 extends: [airbnb-base, prettier]
 rules:
   lines-between-class-members: off
+  camelcase:
+    - error
+    - properties: never
   no-param-reassign: off
   spaced-comment: off
   max-classes-per-file: off

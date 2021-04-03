@@ -9,3 +9,4 @@ rules:
   camelcase:
     - error
     - allow: ["^global_"]
+      properties: never

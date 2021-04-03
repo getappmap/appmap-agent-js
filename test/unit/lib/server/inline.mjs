@@ -1,24 +1,17 @@
 import { strict as Assert } from 'assert';
-import * as FileSystem from 'fs';
+import * as FileSystem from "fs";
 import makeChannel from '../../../../lib/server/inline.mjs';
 
-const path = 'tmp/test/target.js';
-
-// FileSystem.writeFileSync(path, `process.argv.concat(["qux"]);`, 'utf8');
-
-const channel = makeChannel({
-  APPMAP_OUTPUT_DIR: "tmp/appmap",
-  APPMAP_GIT_DIR:
-  APPMAP: "true",
-  APPMAP_CONFIG: "tmp/test/appmap.yml"
-});
-
-// Assert.equal(
-//   channel.instrumentScript(`123;`, `filename.js`),
-
+const channel = makeChannel();
 
 channel.initialize({
   pid: 123,
+  env: {
+    APPMAP_OUTPUT_DIR: "tmp/appmap",
+    APPMAP_GIT_DIR: ".",
+    APPMAP: "true",
+    APPMAP_CONFIG: "tmp/test/appmap.yml"
+  },
   engine: "foo@bar",
   name: "main",
   prefix: "qux"
@@ -37,9 +30,11 @@ channel.instrumentModule(`const  o2  =  {};`, `filename.mjs`, {
 
 channel.emit("event");
 
-chanel.terminate("reason");
+channel.terminate("reason");
 
-const json = JSON.parse(Fs.readFileSync(`tmp/appmap/main.appmap.json`, 'utf8'));
+const json = JSON.parse(FileSystem.readFileSync(`tmp/appmap/main.appmap.json`, 'utf8'));
+
+Assert.deepEqual(json, {});
 
 // Assert.deepEqual(
 //   main({

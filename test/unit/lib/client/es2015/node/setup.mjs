@@ -1,6 +1,7 @@
 import { strict as Assert } from 'assert';
-import setup from "../../../../../../lib/client/es2015/node/setup.js";
 import { EventEmitter } from "events";
+import setup from "../../../../../../lib/client/es2015/node/setup.js";
+
 
 const ESCAPE_PREFIX = "escape_prefix";
 const TRACE_IDENTIFIER = "__TRACE__";

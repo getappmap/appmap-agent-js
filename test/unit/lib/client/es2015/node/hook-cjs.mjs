@@ -1,7 +1,8 @@
 import { strict as Assert } from 'assert';
 import * as FileSystem from  "fs";
+import * as Path from "path";
 import hookCJS from "../../../../../../lib/client/es2015/node/hook-cjs.js";
-import * as Path from "path"
+
 
 const path = Path.resolve("tmp/test/hook-cjs.js");
 const content = "module.exports = 123;";
