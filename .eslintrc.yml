@@ -1,7 +1,8 @@
 root: true
 extends: [airbnb-base, prettier]
 rules:
-  lines-between-class-members: "off"
+  lines-between-class-members: off
+  no-param-reassign: off
   spaced-comment: off
   max-classes-per-file: off
   no-unused-vars:
