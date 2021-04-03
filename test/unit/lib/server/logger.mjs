@@ -1,4 +1,3 @@
-
 import logger from '../../../../lib/server/logger.mjs';
 
 logger.error('error');

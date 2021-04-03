@@ -1,5 +1,4 @@
-
-import * as FileSystem from "fs";
+import * as FileSystem from 'fs';
 import { strict as Assert } from 'assert';
 import main from '../../../../lib/server/inline-main.mjs';
 
@@ -10,29 +9,21 @@ import main from '../../../../lib/server/inline-main.mjs';
 //   // counter += 1;
 // };
 
-const path = "tmp/test/foo.js";
+const path = 'tmp/test/foo.js';
 
-FileSystem.writeFileSync(
-  path,
-  "({});",
-  "utf8"
-);
+FileSystem.writeFileSync(path, '({});', 'utf8');
 
-FileSystem.writeFileSync(
-  "tmp/test/native.mjs",
-  "({});"
-);
+FileSystem.writeFileSync('tmp/test/native.mjs', '({});');
 
 main({
-  _: [path]
+  _: [path],
 });
 
 main({
   cjs: true,
-  channel: "APPMAP_CHANNEL",
+  channel: 'APPMAP_CHANNEL',
   _: [path],
 });
-
 
 main({
   esm: true,
