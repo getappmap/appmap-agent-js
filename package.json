@@ -1,6 +1,6 @@
 {
   "name": "@appland/appmap-agent-js",
-  "version": "1.0.2",
+  "version": "2.0.0",
   "scripts": {
     "coverage": "npx c8 --reporter=html --require $TARGET node test/unit/$TARGET",
     "build": "npx rollup lib/server/inline-channel.mjs --file dist/inline-channel.js --format cjs",
