@@ -7,7 +7,6 @@ cache: npm
 
 install:
   - npm install
-  - npm run build
 
 script:
   - npm run lint

@@ -2082,22 +2082,24 @@ var instrument = (file, namespace, callback) => {
   return escodegen.generate(getResultNode(result));
 };
 
-// import { home } from '../../home.js';
-
 const APPMAP_VERSION = '1.4';
 
-const client = {
-  name: "@appland/appmap-agent-js",
-  repository: {
-    type: "git",
-    url: "https://github.com/applandinc/appmap-agent-js.git"
-  },
-  version: "???",
-};
-
+// Getting the right version:
+//
+// import { home } from '../../home.js';
+// npx rollup --plugin commonjs
 // const client = JSON.parse(
 //   FileSystem.readFileSync(Path.join(home, 'package.json'), 'utf8'),
 // );
+
+const client = {
+  name: '@appland/appmap-agent-js',
+  repository: {
+    type: 'git',
+    url: 'https://github.com/applandinc/appmap-agent-js.git',
+  },
+  version: '???',
+};
 
 var Appmap = (class Appmap {
   constructor() {

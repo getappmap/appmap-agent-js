@@ -11,7 +11,7 @@ const ECMASCRIPT_VERSION = 123;
 global[TRACE_IDENTIFIER] = [];
 const emitter = new EventEmitter();
 emitter.env = {
-  APPMAP_CHANNEL: 'test',
+  APPMAP_CHANNEL: 'foo',
   APPMAP_TRACE_IDENTIFIER: TRACE_IDENTIFIER,
   APPMAP_ESCAPE_PREFIX: ESCAPE_PREFIX,
   APPMAP_ECMASCRIPT_VERSION: ECMASCRIPT_VERSION,
@@ -19,6 +19,10 @@ emitter.env = {
 emitter.pid = PID;
 emitter.version = ENGINE_VERSION;
 const MESSAGE = 'BOUM';
+
+Assert.throws(() => setup(emitter), /^Error: Invalid APPMAP_CHANNEL/);
+
+emitter.env.APPMAP_CHANNEL = 'test';
 
 setup(emitter);
 Assert.throws(

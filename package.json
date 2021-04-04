@@ -17,7 +17,7 @@
     "/bin/*.mjs"
   ],
   "bin": {
-    "appmap": "bin/agent.mjs"
+    "appmap-agent": "bin/bin.mjs"
   },
   "dependencies": {
     "acorn": "^7.4.1",
