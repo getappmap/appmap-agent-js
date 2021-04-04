@@ -1,3 +1,10 @@
+## [2.0.1](https://github.com/applandinc/appmap-agent-js/compare/v2.0.0...v2.0.1) (2021-04-04)
+
+
+### Bug Fixes
+
+* correct outdated global variable (PROCESS_ID and SEND) ([a784eaa](https://github.com/applandinc/appmap-agent-js/commit/a784eaa4f158c3a76e18728a0a5d279a17c4316d))
+
 # [2.0.0](https://github.com/applandinc/appmap-agent-js/compare/v1.0.2...v2.0.0) (2021-04-04)
 
 
