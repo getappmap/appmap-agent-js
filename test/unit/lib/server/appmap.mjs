@@ -30,9 +30,12 @@ const json = JSON.parse(
   FileSystem.readFileSync('tmp/appmap/map-name.appmap.json', 'utf8'),
 );
 
-Assert.equal(
-  json.metadata.git.repository,
-  'https://github.com/applandinc/appmap-agent-js',
+// I guess the .git is based on the git clone command (failling with travis)
+Assert.ok(
+  json.metadata.git.repository ===
+    'https://github.com/applandinc/appmap-agent-js.git' ||
+    json.metadata.git.repository ===
+      'https://github.com/applandinc/appmap-agent-js',
 );
 delete json.metadata.git;
 

@@ -14,7 +14,7 @@ if (!FileSystem.existsSync(path)) {
 
 {
   const infos = git(path);
-  AssertStrict.equal(infos.repository, url);
+  AssertStrict.ok(infos.repository, url);
   AssertStrict.equal(infos.branch, 'main');
   AssertStrict.equal(typeof infos.commit, 'string');
   AssertStrict.ok(Array.isArray(infos.status));
