@@ -1151,9 +1151,8 @@ setVisitor(
   const makeEnterStatement = (node, context) =>
     buildExpressionStatement(
       buildCallExpression(
-        buildIdentifier(context.namespace.getGlobal('SEND')),
+        buildIdentifier(context.namespace.getGlobal('EMIT')),
         [
-          buildLiteral('event'),
           buildObjectExpression([
             buildRegularProperty(
               'id',
@@ -1162,7 +1161,7 @@ setVisitor(
             buildRegularProperty('event', buildLiteral('call')),
             buildRegularProperty(
               'thread_id',
-              buildIdentifier(context.namespace.getGlobal('PROCESS_ID')),
+              buildIdentifier(context.namespace.getGlobal('PID')),
             ),
             buildRegularProperty(
               'defined_class',
@@ -1231,9 +1230,8 @@ setVisitor(
   const makeLeaveStatement = (node, context) =>
     buildExpressionStatement(
       buildCallExpression(
-        buildIdentifier(context.namespace.getGlobal('SEND')),
+        buildIdentifier(context.namespace.getGlobal('EMIT')),
         [
-          buildLiteral('event'),
           buildObjectExpression([
             buildRegularProperty(
               'id',
@@ -1246,7 +1244,7 @@ setVisitor(
             buildRegularProperty('event', buildLiteral('return')),
             buildRegularProperty(
               'thread_id',
-              buildIdentifier(context.namespace.getGlobal('PROCESS_ID')),
+              buildIdentifier(context.namespace.getGlobal('PID')),
             ),
             buildRegularProperty(
               'parent_id',

@@ -29,10 +29,10 @@ test({
       $_LOCAL_EVENT_IDENTITY = $_GLOBAL_EVENT_COUNTER += 1,
       $_LOCAL_SUCCESS = $_GLOBAL_EMPTY_MARKER,
       $_LOCAL_FAILURE = $_GLOBAL_EMPTY_MARKER;
-    $_GLOBAL_SEND('event', {
+    $_GLOBAL_EMIT({
       id: $_LOCAL_EVENT_IDENTITY,
       event: 'call',
-      thread_id: $_GLOBAL_PROCESS_ID,
+      thread_id: $_GLOBAL_PID,
       defined_class: 'filename.js',
       method_id: '@f|const',
       path: 'filename.js',
@@ -54,10 +54,10 @@ test({
     } catch ($_LOCAL_ERROR) {
       throw $_LOCAL_FAILURE = $_LOCAL_ERROR;
     } finally {
-      $_GLOBAL_SEND('event', {
+      $_GLOBAL_EMIT({
         id: $_GLOBAL_EVENT_COUNTER += 1,
         event: 'return',
-        thread_id: $_GLOBAL_PROCESS_ID,
+        thread_id: $_GLOBAL_PID,
         parent_id: $_LOCAL_EVENT_IDENTITY,
         ellapsed: $_GLOBAL_GET_NOW() - $_LOCAL_TIMER,
         return_value: $_GLOBAL_SERIALIZE_PARAMETER($_LOCAL_SUCCESS, 'return'),
@@ -78,10 +78,10 @@ test({
       $_LOCAL_EVENT_IDENTITY = $_GLOBAL_EVENT_COUNTER += 1,
       $_LOCAL_SUCCESS = $_GLOBAL_EMPTY_MARKER,
       $_LOCAL_FAILURE = $_GLOBAL_EMPTY_MARKER;
-    $_GLOBAL_SEND('event', {
+    $_GLOBAL_EMIT({
       id: $_LOCAL_EVENT_IDENTITY,
       event: 'call',
-      thread_id: $_GLOBAL_PROCESS_ID,
+      thread_id: $_GLOBAL_PID,
       defined_class: 'filename.js',
       method_id: '@f|function',
       path: 'filename.js',
@@ -95,10 +95,10 @@ test({
     } catch ($_LOCAL_ERROR) {
       throw $_LOCAL_FAILURE = $_LOCAL_ERROR;
     } finally {
-      $_GLOBAL_SEND('event', {
+      $_GLOBAL_EMIT({
         id: $_GLOBAL_EVENT_COUNTER += 1,
         event: 'return',
-        thread_id: $_GLOBAL_PROCESS_ID,
+        thread_id: $_GLOBAL_PID,
         parent_id: $_LOCAL_EVENT_IDENTITY,
         ellapsed: $_GLOBAL_GET_NOW() - $_LOCAL_TIMER,
         return_value: $_GLOBAL_SERIALIZE_PARAMETER($_LOCAL_SUCCESS, 'return'),

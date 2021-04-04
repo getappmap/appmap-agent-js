@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import minimist from 'minimist';
 import main from '../lib/server/inline-main.mjs';
 
