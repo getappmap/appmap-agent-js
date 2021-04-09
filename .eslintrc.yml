@@ -6,6 +6,7 @@ rules:
     - error
     - properties: never
   no-param-reassign: off
+  valid-typeof: off
   spaced-comment: off
   max-classes-per-file: off
   no-unused-vars:
