@@ -26,13 +26,13 @@ test({
   output: `const f = ($_LOCAL_ARGUMENT_0, $_LOCAL_ARGUMENT_1, ...$_LOCAL_ARGUMENT_2) => {
     var
       $_LOCAL_TIMER = $_GLOBAL_GET_NOW(),
-      $_LOCAL_EVENT_IDENTITY = $_GLOBAL_EVENT_COUNTER += 1,
+      $_LOCAL_EVENT_ID = $_GLOBAL_EVENT_COUNTER += 1,
       $_LOCAL_SUCCESS = $_GLOBAL_EMPTY_MARKER,
       $_LOCAL_FAILURE = $_GLOBAL_EMPTY_MARKER;
     $_GLOBAL_EMIT({
-      id: $_LOCAL_EVENT_IDENTITY,
+      id: $_LOCAL_EVENT_ID,
       event: 'call',
-      thread_id: $_GLOBAL_PID,
+      thread_id: $_GLOBAL_PROCESS_ID,
       defined_class: 'filename.js',
       method_id: '@f|const',
       path: 'filename.js',
@@ -57,8 +57,8 @@ test({
       $_GLOBAL_EMIT({
         id: $_GLOBAL_EVENT_COUNTER += 1,
         event: 'return',
-        thread_id: $_GLOBAL_PID,
-        parent_id: $_LOCAL_EVENT_IDENTITY,
+        thread_id: $_GLOBAL_PROCESS_ID,
+        parent_id: $_LOCAL_EVENT_ID,
         ellapsed: $_GLOBAL_GET_NOW() - $_LOCAL_TIMER,
         return_value: $_GLOBAL_SERIALIZE_PARAMETER($_LOCAL_SUCCESS, 'return'),
         exceptions: $_GLOBAL_SERIALIZE_EXCEPTION($_LOCAL_FAILURE)
@@ -75,13 +75,13 @@ test({
   output: `async function * f () {
     var
       $_LOCAL_TIMER = $_GLOBAL_GET_NOW(),
-      $_LOCAL_EVENT_IDENTITY = $_GLOBAL_EVENT_COUNTER += 1,
+      $_LOCAL_EVENT_ID = $_GLOBAL_EVENT_COUNTER += 1,
       $_LOCAL_SUCCESS = $_GLOBAL_EMPTY_MARKER,
       $_LOCAL_FAILURE = $_GLOBAL_EMPTY_MARKER;
     $_GLOBAL_EMIT({
-      id: $_LOCAL_EVENT_IDENTITY,
+      id: $_LOCAL_EVENT_ID,
       event: 'call',
-      thread_id: $_GLOBAL_PID,
+      thread_id: $_GLOBAL_PROCESS_ID,
       defined_class: 'filename.js',
       method_id: '@f|function',
       path: 'filename.js',
@@ -98,8 +98,8 @@ test({
       $_GLOBAL_EMIT({
         id: $_GLOBAL_EVENT_COUNTER += 1,
         event: 'return',
-        thread_id: $_GLOBAL_PID,
-        parent_id: $_LOCAL_EVENT_IDENTITY,
+        thread_id: $_GLOBAL_PROCESS_ID,
+        parent_id: $_LOCAL_EVENT_ID,
         ellapsed: $_GLOBAL_GET_NOW() - $_LOCAL_TIMER,
         return_value: $_GLOBAL_SERIALIZE_PARAMETER($_LOCAL_SUCCESS, 'return'),
         exceptions: $_GLOBAL_SERIALIZE_EXCEPTION($_LOCAL_FAILURE)

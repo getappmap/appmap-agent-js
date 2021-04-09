@@ -31,19 +31,17 @@ const file = new File(
 
 const location0 = new RootLocation();
 Assert.equal(location0.shouldBeInstrumented(), true);
-Assert.equal(location0.makeEntity([], file), null);
-Assert.equal(location0.isNonScopingIdentifier(), false);
-Assert.equal(location0.isChildNonScopingIdentifier(null), false);
-Assert.equal(location0.isStaticMethod(), false);
-Assert.equal(location0.isChildStaticMethod(null), false);
-Assert.equal(location0.getStartLine(), 0);
-Assert.ok(location0.getName(file).startsWith('__APPMAP_AGENT_ERROR_'));
-Assert.ok(location0.getChildName(null).startsWith('__APPMAP_AGENT_ERROR_'));
-Assert.ok(location0.getKind().startsWith('__APPMAP_AGENT_ERROR_'));
-Assert.ok(location0.getContainerName(file).startsWith('__APPMAP_AGENT_ERROR_'));
-Assert.ok(
-  location0.getParentContainerName(file).startsWith('__APPMAP_AGENT_ERROR_'),
-);
+Assert.throws(() => location0.makeEntity([], file));
+Assert.throws(() => location0.isNonScopingIdentifier());
+Assert.throws(() => location0.isChildNonScopingIdentifier(null));
+Assert.throws(() => location0.isStaticMethod());
+Assert.throws(() => location0.isChildStaticMethod(null));
+Assert.throws(() => location0.getStartLine());
+Assert.throws(() => location0.getName(file));
+Assert.throws(() => location0.getChildName(null));
+Assert.throws(() => location0.getKind());
+Assert.throws(() => location0.getContainerName(file));
+Assert.throws(() => location0.getParentContainerName(file));
 
 ///////////////////////
 // ScopingIdentifier //
@@ -78,7 +76,6 @@ Assert.ok(
 
 const node1 = file.parse();
 const location1 = location0.extend(node1);
-Assert.equal(location1.isNonScopingIdentifier(), false);
 Assert.equal(location1.shouldBeInstrumented(), true);
 Assert.deepEqual(location1.makeEntity(['child'], file), {
   type: 'package',
@@ -92,7 +89,7 @@ Assert.deepEqual(location1.makeEntity(['child'], file), {
 {
   const node2 = node1.body[0];
   const location2 = location1.extend(node2);
-  Assert.equal(location2.isNonScopingIdentifier(), false);
+  Assert.throws(() => location2.isNonScopingIdentifier());
   const node3 = node2.expression;
   const location3 = location2.extend(node3);
   Assert.equal(location3.shouldBeInstrumented(), true);
@@ -102,7 +99,7 @@ Assert.deepEqual(location1.makeEntity(['child'], file), {
   Assert.equal(location3.getStartLine(), 2);
   Assert.ok(location3.getName(file), '§none');
   Assert.ok(location3.getChildName(null), '§none');
-  Assert.ok(location3.getKind().startsWith('__APPMAP_AGENT_ERROR_'));
+  Assert.throws(() => location3.getKind());
   Assert.equal(location3.getParentContainerName(file), path);
 }
 

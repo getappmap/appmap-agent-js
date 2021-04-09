@@ -1,6 +1,8 @@
 import { strict as Assert } from 'assert';
 import Namespace from '../../../../lib/server/namespace.mjs';
 
+Assert.throws(() => new Namespace("FOO BAR"));
+
 const namespace = new Namespace('PREFIX');
 
 Assert.equal(namespace.checkCollision('foo'), undefined);

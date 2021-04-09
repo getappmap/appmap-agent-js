@@ -3,17 +3,13 @@ import * as FileSystem from 'fs';
 import { getDefaultConfig } from '../../../../lib/server/config.mjs';
 import Appmap from '../../../../lib/server/appmap.mjs';
 
-const appmap = new Appmap();
-
-appmap.instrument('source', 'path1', 'content');
-appmap.emit('event1');
-appmap.terminate('reason1');
-
-appmap.initialize('recorder1', getDefaultConfig(), {
+const appmap = new Appmap(getDefaultConfig(), {
   env: {
     APPMAP_OUTPUT_DIR: 'tmp/appmap',
     APPMAP_MAP_NAME: 'map-name',
   },
+  engine: "engine",
+  recorder: "recorder",
   feature: 'feature',
   labels: ['label'],
   frameworks: ['framework'],
@@ -21,10 +17,13 @@ appmap.initialize('recorder1', getDefaultConfig(), {
   recording: 'recording',
 });
 
-appmap.initialize('recorder2', getDefaultConfig(), { env: {} });
-appmap.instrument('script', 'path2', '({});');
-appmap.emit('event2');
-appmap.terminate('reason2');
+appmap.instrument('source', 'path1', '({});');
+appmap.emit('event1');
+appmap.terminate('reason1');
+
+Assert.throws(() => appmap.instrument('script', 'path2', 'content'));
+Assert.throws(() => appmap.emit('event2'));
+Assert.throws(() => appmap.terminate('reason2'));
 
 const json = JSON.parse(
   FileSystem.readFileSync('tmp/appmap/map-name.appmap.json', 'utf8'),
@@ -47,29 +46,22 @@ Assert.deepEqual(json, {
     app: 'unknown-app-name',
     feature: 'feature',
     feature_group: 'feature-group',
-    language: { name: 'javascript', version: '2015' },
+    language: { name: 'javascript', engine: "engine", version: '2015' },
     frameworks: ['framework'],
     client: {
       name: '@appland/appmap-agent-js',
       url: 'https://github.com/applandinc/appmap-agent-js.git',
       version: '???',
     },
-    recorder: { name: 'recorder1' },
+    recorder: "recorder",
     recording: 'recording',
   },
   classMap: [
     {
       type: 'package',
-      name: 'path2',
+      name: 'path1',
       childeren: [{ type: 'class', name: '§none', childeren: [] }],
     },
   ],
-  events: ['event2'],
+  events: ['event1'],
 });
-
-appmap.initialize('recorder3', getDefaultConfig(), {
-  env: {
-    APPMAP_OUTPUT_DIR: 'foo/bar/qux',
-  },
-});
-appmap.terminate('reason3');
