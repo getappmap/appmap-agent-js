@@ -1,5 +1,5 @@
 import * as FileSystem from 'fs';
-import main from '../../../../lib/server/inline-main.mjs';
+import main from '../../../../../lib/server/inline/main.mjs';
 
 const path = 'tmp/test/foo.js';
 
