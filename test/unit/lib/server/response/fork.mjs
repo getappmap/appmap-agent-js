@@ -1,0 +1,62 @@
+import { strict as Assert } from 'assert';
+import {registerChild} from '../../../../../lib/server/response/fork.mjs';
+import EventEmitter from "events";
+
+const trace = [];
+
+const dispatcher = {
+  __proto__: null
+};
+
+const child = {
+  __proto__: new EventEmitter(),
+  send (...args) {
+    Assert.equal(this, child);
+    trace.push(args);
+  }
+};
+
+registerChild(child, dispatcher);
+
+dispatcher.dispatch = function (...args) {
+  Assert.equal(this, dispatcher);
+  trace.push(args);
+  return "qux";
+};
+
+child.emit("error", new Error("foo"));
+
+child.emit("message", {
+  query: null
+});
+
+child.emit("message", {
+  index: null
+});
+
+child.emit("message", {
+  index: null,
+  query: "foo"
+});
+
+child.emit("message", {
+  index: 123,
+  query: "bar"
+});
+
+dispatcher.dispatch = () => { throw new Error("BOUM") };
+
+child.emit("message", {
+  index: 456,
+  query: "buz"
+});
+
+Assert.deepEqual(trace, [["foo"], ["bar"], [{
+  index: 123,
+  success: "qux",
+  failure: null
+}], [{
+  index: 456,
+  success: null,
+  failure: "BOUM"
+}]]);

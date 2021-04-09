@@ -15,8 +15,7 @@ export const server = [
   // 'instrument/visit-statement',
   // 'instrument/index',
   // 'appmap',
-
-  'dispatcher',
+  // 'dispatcher',
   'response/http1',
   'response/http2',
   'response/fork',
