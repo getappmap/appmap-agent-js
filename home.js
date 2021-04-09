@@ -1,2 +1,2 @@
 
-exports.home = __dirname;
+module.exports = __dirname;
