@@ -11,6 +11,8 @@ const {session, prefix} = dispatcher.dispatch({
   init: {}
 });
 
+Assert.equal(typeof prefix, "string");
+
 Assert.throws(() => dispatcher.dispatch({
   name: "foo",
   session

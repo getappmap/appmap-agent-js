@@ -1,6 +1,7 @@
+
 import { strict as Assert } from 'assert';
-import {registerChild} from '../../../../../lib/server/response/fork.mjs';
 import EventEmitter from "events";
+import {registerChild} from '../../../../../lib/server/response/messaging.mjs';
 
 const trace = [];
 
@@ -18,7 +19,7 @@ const child = {
 
 registerChild(child, dispatcher);
 
-dispatcher.dispatch = function (...args) {
+dispatcher.dispatch = function dispatch (...args) {
   Assert.equal(this, dispatcher);
   trace.push(args);
   return "qux";

@@ -1,6 +1,6 @@
 import { strict as Assert } from 'assert';
 import * as FileSystem from 'fs';
-import makeChannel from '../../../../../lib/server/inline/channel.mjs';
+import makeChannel from '../../../../lib/server/inline.mjs';
 
 const channel = makeChannel();
 

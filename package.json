@@ -23,8 +23,10 @@
     "acorn": "^7.4.1",
     "escodegen": "^2.0.0",
     "minimist": "^1.2.5",
+    "net-socket-messaging": "^0.1.1",
     "npm": "^6.14.12",
     "posix-socket": "^0.0.11",
+    "posix-socket-messaging": "*",
     "yaml": "^1.10.0"
   },
   "devDependencies": {

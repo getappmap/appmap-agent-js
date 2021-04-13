@@ -11,7 +11,7 @@ const argv = {
   ... minimist(process.argv.slice(2)),
 };
 
-const env = process.env;
+const {env} = process;
 
 if (argv.protocol === "inline") {
   ChildProcess.spawn("node", argv._, hookSpawnOptions({

@@ -1,6 +1,6 @@
 import { strict as Assert } from 'assert';
-import {makeServer} from '../../../../../lib/server/response/http2.mjs';
 import {request} from "http2";
+import {makeServer} from '../../../../../lib/server/response/http2.mjs';
 
 const dispatcher = {
   __proto__: null,
@@ -9,7 +9,7 @@ const dispatcher = {
 const server = makeServer(dispatcher);
 
 const test1 = (callback) => {
-  dispatcher.dispatch = function (...args) {
+  dispatcher.dispatch = function dispatch (...args) {
     Assert.equal(this, dispatcher);
     Assert.deepEqual(args, [123]);
     return 456;
