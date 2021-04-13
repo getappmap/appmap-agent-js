@@ -1,73 +1,137 @@
 import { strict as Assert } from 'assert';
 import EventEmitter from 'events';
-import { registerChild } from '../../../../../lib/server/response/messaging.mjs';
-
-const trace = [];
+import { connect } from "net";
+import { patch } from "net-socket-messaging";
+import { makeServer } from '../../../../../lib/server/response/messaging.mjs';
 
 const dispatcher = {
   __proto__: null,
 };
 
-const child = {
-  __proto__: new EventEmitter(),
-  send(...args) {
-    Assert.equal(this, child);
-    trace.push(args);
+const server = makeServer(dispatcher, null);
+
+server.on("connection", (socket) => {
+  socket.emit("error", new Error("FooBar"));
+});
+
+const noop = () => {};
+
+const iterator = [
+  {
+    dispatch (...args) {
+      Assert.equal(this, dispatcher);
+      Assert.deepEqual(args, [123]);
+      return 456;
+    },
+    input: JSON.stringify({
+      index: 789,
+      query: 123
+    }),
+    output: {
+      index: 789,
+      success: 456,
+      failure: null
+    }
   },
-};
-
-registerChild(child, dispatcher);
-
-dispatcher.dispatch = function dispatch(...args) {
-  Assert.equal(this, dispatcher);
-  trace.push(args);
-  return 'qux';
-};
-
-child.emit('error', new Error('foo'));
-
-child.emit('message', {
-  query: null,
-});
-
-child.emit('message', {
-  index: null,
-});
-
-child.emit('message', {
-  index: null,
-  query: 'foo',
-});
-
-child.emit('message', {
-  index: 123,
-  query: 'bar',
-});
-
-dispatcher.dispatch = () => {
-  throw new Error('BOUM');
-};
-
-child.emit('message', {
-  index: 456,
-  query: 'buz',
-});
-
-Assert.deepEqual(trace, [
-  ['foo'],
-  ['bar'],
-  [
-    {
-      index: 123,
-      success: 'qux',
-      failure: null,
+  {
+    dispatch (...args) {
+      Assert.equal(this, dispatcher);
+      Assert.deepEqual(args, [123]);
+      throw new Error('BOUM');
     },
-  ],
-  [
-    {
-      index: 456,
+    input: JSON.stringify({
+      index: 789,
+      query: 123
+    }),
+    output: {
+      index: 789,
       success: null,
-      failure: 'BOUM',
-    },
-  ],
-]);
+      failure: "BOUM"
+    }
+  },
+  {
+    dispatch: noop,
+    input: "@invalid-json",
+    output: {
+      index: null,
+      success: null,
+      failure: "Unexpected token @ in JSON at position 0"
+    }
+  },
+  {
+    dispatch: noop,
+    input: JSON.stringify({
+      query: 123
+    }),
+    output: {
+      index: null,
+      success: null,
+      failure: "Missing index field"
+    }
+  },
+  {
+    dispatch: noop,
+    input: JSON.stringify({
+      index: 789
+    }),
+    output: {
+      index: 789,
+      success: null,
+      failure: "Missing query field"
+    }
+  },
+  {
+    dispatch: noop,
+    input: JSON.stringify({
+      index: 789
+    }),
+    output: {
+      index: 789,
+      success: null,
+      failure: "Missing query field"
+    }
+  },
+  {
+    dispatch: () => 456,
+    input: JSON.stringify({
+      index: null,
+      query: 123
+    }),
+    output: {
+      index: null,
+      success: null,
+      failure: "Query expected null as a response"
+    }
+  },
+  {
+    dispatch: () => null,
+    input: JSON.stringify({
+      index: null,
+      query: 123
+    }),
+    output: null
+  },
+][Symbol.iterator]();
+
+const step = () => {
+  const {done, value} = iterator.next();
+  if (done) {
+    server.close();
+  } else {
+    dispatcher.dispatch = value.dispatch;
+    const socket = connect(server.address().port);
+    patch(socket);
+    socket.send(value.input);
+    if (value.output === null) {
+      socket.end();
+    } else {
+      socket.on("message", (message) => {
+        Assert.deepEqual(JSON.parse(message), value.output);
+        socket.end();
+      });
+    }
+    socket.on("close", step);
+  }
+};
+
+server.listen(0, step);

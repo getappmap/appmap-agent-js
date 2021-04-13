@@ -27,7 +27,7 @@ if (argv.protocol === 'inline') {
     ),
   );
 } else {
-  const server = createServer(argv.protocol, env, {});
+  const server = createServer(argv.protocol, env, null);
   server.listen(argv.port);
   server.on('listening', () => {
     ChildProcess.spawn(
