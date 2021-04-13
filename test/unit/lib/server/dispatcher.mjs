@@ -1,61 +1,68 @@
-
 import { strict as Assert } from 'assert';
-import { getDefaultConfig } from  '../../../../lib/server/config.mjs';
+import { getDefaultConfig } from '../../../../lib/server/config.mjs';
 import Dispatcher from '../../../../lib/server/dispatcher.mjs';
 
 const dispatcher = new Dispatcher(getDefaultConfig());
 
-const {session, prefix} = dispatcher.dispatch({
-  name: "initialize",
+const { session, prefix } = dispatcher.dispatch({
+  name: 'initialize',
   env: {},
-  init: {}
+  init: {},
 });
 
-Assert.equal(typeof prefix, "string");
+Assert.equal(typeof prefix, 'string');
 
-Assert.throws(() => dispatcher.dispatch({
-  name: "foo",
-  session
-}));
+Assert.throws(() =>
+  dispatcher.dispatch({
+    name: 'foo',
+    session,
+  }),
+);
 
 dispatcher.dispatch({
-  name: "instrument",
+  name: 'instrument',
   session,
-  source: "script",
-  path: "filename.js",
-  content: "({})"
+  source: 'script',
+  path: 'filename.js',
+  content: '({})',
 });
 
-Assert.throws(() => dispatcher.dispatch({
-  name: "instrument",
-  session,
-  source: "foo",
-  path: "filename.js",
-  content: "({})"
-}));
+Assert.throws(() =>
+  dispatcher.dispatch({
+    name: 'instrument',
+    session,
+    source: 'foo',
+    path: 'filename.js',
+    content: '({})',
+  }),
+);
 
 dispatcher.dispatch({
-  name: "emit",
+  name: 'emit',
   session,
-  event: "event"
+  event: 'event',
 });
 
 dispatcher.dispatch({
-  name: "terminate",
+  name: 'terminate',
   session,
-  reason: "reason"
+  reason: 'reason',
 });
 
 Assert.throws(() => dispatcher.dispatch(null));
 
-Assert.throws(() => dispatcher.dispatch({
-  name: "terminate",
-  session: 123,
-  reason: "reason"
-}));
+Assert.throws(() =>
+  dispatcher.dispatch({
+    name: 'terminate',
+    session: 123,
+    reason: 'reason',
+  }),
+);
 
-Assert.throws(() => dispatcher.dispatch({
-  name: "terminate",
-  session,
-  reason: "reason"
-}));
+Assert.throws(() =>
+  dispatcher.dispatch({
+    name: 'terminate',
+    session,
+    reason: 'reason',
+  }),
+);
