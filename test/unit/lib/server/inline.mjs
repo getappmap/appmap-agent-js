@@ -2,45 +2,57 @@ import { strict as Assert } from 'assert';
 import * as FileSystem from 'fs';
 import makeChannel from '../../../../lib/server/inline.mjs';
 
-const channel = makeChannel();
+const { requestSync, requestAsync } = makeChannel();
 
-channel.initialize({
-  env: {
-    APPMAP_OUTPUT_DIR: 'tmp/appmap',
-    APPMAP_MAP_NAME: 'foo',
-  },
+const {session, prefix} = requestSync({
+  name: "initialize",
+  env: {},
+  init: {}
 });
 
-Assert.equal(
-  channel.instrumentScript(`filename.js`, `const  o1  =  {};`),
-  `const o1 = {};`,
-);
+Assert.equal(typeof prefix, "string");
 
-channel.instrumentModule(`filename.mjs`, `const  o2  =  {};`, {
-  resolve: (...args) => {
-    Assert.deepEqual(args, [`const o2 = {};`]);
-  },
-  reject: () => {
-    Assert.fail();
-  },
-});
+requestAsync({
+  name: "emit",
+  session,
+  event: "foo"
+}, null);
 
-channel.instrumentModule(`filename.mjs`, `@INVALID_JS@`, {
-  resolve: (...args) => {
-    Assert.fail();
-  },
-  reject: (...args) => {
-    Assert.equal(args.length, 1);
-    Assert.ok(args[0] instanceof Error);
-  },
-});
+requestAsync({
+  name: "initialize",
+  env: {},
+  init: {}
+}, null);
 
-channel.emit('event');
+requestAsync({
+  name: "foo",
+}, null);
 
-channel.terminate('reason');
+{
+  const trace = [];
+  requestAsync({
+    name: "emit",
+    event: "foo"
+  }, {
+    reject: (...args) => {
+      Assert.equal(args.length, 1);
+      Assert.ok(args[0] instanceof Error);
+      trace.push(args[0].message);
+    },
+    resolve: () => Assert.fail()
+  });
+  Assert.deepEqual(trace, ["Missing property: session"]);
+}
 
-const json = JSON.parse(
-  FileSystem.readFileSync(`tmp/appmap/foo.appmap.json`, 'utf8'),
-);
-
-Assert.deepEqual(json.events, ['event']);
+{
+  const trace = [];
+  requestAsync({
+    name: "emit",
+    session,
+    event: "foo"
+  }, {
+    reject: () => Assert.fail,
+    resolve: (...args) => trace.push(args)
+  });
+  Assert.deepEqual(trace, [[null]]);
+}
