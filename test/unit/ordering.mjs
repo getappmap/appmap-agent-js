@@ -16,11 +16,11 @@ export const server = [
   // 'instrument/index',
   // 'appmap',
   // 'dispatcher',
-  'response/messaging',
-  'response/http1',
-  'response/http2',
-  'response/http3',
-  'response/index',
+  // 'response/messaging',
+  // 'response/http1',
+  // 'response/http2',
+  // 'response/http3',
+  // 'response/index',
   'index',
   'inline'
 ];

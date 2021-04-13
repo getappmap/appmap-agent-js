@@ -8,7 +8,7 @@ const dispatcher = {
   __proto__: null,
 };
 
-const server = makeServer(dispatcher, null);
+const server = makeServer(dispatcher, {});
 
 server.on("connection", (socket) => {
   socket.emit("error", new Error("FooBar"));
