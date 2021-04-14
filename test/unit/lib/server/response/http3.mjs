@@ -1,6 +1,6 @@
 
 import { strict as Assert } from 'assert';
-import { makeServer } from '../../../../../lib/server/response/http1.mjs';
+import { makeServer } from '../../../../../lib/server/response/http3.mjs';
 
 Assert.throws(
   () => makeServer(),

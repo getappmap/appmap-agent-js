@@ -26,9 +26,9 @@ export const server = [
 ];
 
 export const client = [
-  // 'es2015/script',
-  'es2015/node/request/sync/messaging',
-  'es2015/node/request/sync/curl',
+  'es2015/script',
+  // 'es2015/node/request/sync/messaging',
+  // 'es2015/node/request/sync/curl',
   'es2015/node/request/async/messaging',
   'es2015/node/request/async/http1',
   'es2015/node/request/async/http2',
