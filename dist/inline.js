@@ -1,8 +1,8 @@
 'use strict';
 
+var Util = require('util');
 var FileSystem = require('fs');
 var Yaml = require('yaml');
-var Util = require('util');
 var Path = require('path');
 var ChildProcess = require('child_process');
 var acorn = require('acorn');
@@ -445,68 +445,45 @@ const config = new Config({
 
 const getDefaultConfig = () => config;
 
-const globals = {
-  __proto__: null,
-  UNDEFINED: null,
-  EVENT_COUNTER: null,
-  EMPTY_MARKER: null,
-  GET_NOW: null,
-  PROCESS_ID: null,
-  SERIALIZE: null,
-  SERIALIZE_PARAMETER: null,
-  SERIALIZE_EXCEPTION: null,
-  GET_CLASS_NAME: null,
-  EMIT: null,
-  GET_IDENTITY: null,
-};
+var globals = [
+  "EMPTY_MARKER",
+  "UNDEFINED",
+  "GET_NOW",
+  "EMIT",
+  "PROCESS_ID",
+  "EVENT_COUNTER",
+  "GET_CLASS_NAME",
+  "GET_IDENTITY",
+  "SERIALIZE",
+  "SERIALIZE_EXCEPTION",
+  "SERIALIZE_PARAMETER"
+];
 
-const locals = {
-  __proto__: null,
-  EVENT_IDENTITY: null,
-  ARGUMENT: null,
-  ERROR: null,
-  SUCCESS: null,
-  FAILURE: null,
-  TIMER: null,
-};
+const locals = ['EVENT_ID', 'ARGUMENT', 'ERROR', 'SUCCESS', 'FAILURE', 'TIMER'];
 
 var Namespace = (class Namespace {
   constructor(prefix) {
+    if (!/^[A-Za-z_$][0-9A-Za-z_$]*$/u.test(prefix)) {
+      throw new Error(`Invalid prefix: ${prefix}`);
+    }
     this.prefix = prefix;
   }
   checkCollision(identifier) {
     if (identifier.startsWith(this.prefix)) {
-      logger.error(
-        `Base-level identifier should never start with %s, got: %`,
-        this.prefix,
-        identifier,
+      throw new Error(
+        `Base-level identifier should never start with the escape prefix ${this.prefix}, got: ${identifier}`,
       );
     }
   }
-  // compileGlobal(identifier) {
-  //   if (!identifier.startsWith('APPMAP_GLOBAL_')) {
-  //     logger.error(
-  //       `Global appmap identifiers should start with "APPMAP_GLOBAL_", got: ${identifier}`,
-  //     );
-  //     return identifier;
-  //   }
-  //   const name = identifier.substring('APPMAP_GLOBAL_'.length);
-  //   if (!(name in globals)) {
-  //     logger.error(
-  //       `compileGlobal >> Unrecognized global appmap name, got: ${identifier}`,
-  //     );
-  //   }
-  //   return `${this.prefix}_GLOBAL_${name}`;
-  // }
   getGlobal(name) {
-    if (!(name in globals)) {
-      logger.error('Unrecognized global identifier name, got: %s', name);
+    if (!globals.includes(name)) {
+      throw new Error(`Invalid global identifier name: ${name}`);
     }
     return `${this.prefix}_GLOBAL_${name}`;
   }
   getLocal(name) {
-    if (!(name in locals)) {
-      logger.error('Unrecognized local identifier name, got: %s', name);
+    if (!locals.includes(name)) {
+      throw new Error(`Invalid local identifier name: ${name}`);
     }
     return `${this.prefix}_LOCAL_${name}`;
   }
@@ -682,11 +659,12 @@ class Location {
     return new Location(node, this);
   }
   getKind() {
-    if (this.node.type === 'VariableDeclaration') {
-      return this.node.kind;
+    if (this.node.type !== 'VariableDeclaration') {
+      throw new Error(
+        `Expected node to be of type VariableDeclaration and got: ${this.node.type}`,
+      );
     }
-    logger.error(`Invalid node for getKind()`);
-    return '__APPMAP_AGENT_ERROR_LOCATION_GET_KIND__';
+    return this.node.kind;
   }
   getChildName(node) {
     if (this.node.type === 'VariableDeclarator' && this.node.init === node) {
@@ -759,10 +737,9 @@ class Location {
   }
   isChildNonScopingIdentifier(node) {
     if (node.type !== 'Identifier') {
-      logger.warning(
+      throw new Error(
         `isChildScopingIdentifier should only be called on Identifier node, got: ${node.type}`,
       );
-      return false;
     }
     if (
       this.node.type === 'BreakStatement' ||
@@ -842,48 +819,37 @@ class RootLocation {
     return true;
   }
   makeEntity(childeren, file) {
-    logger.error(`RootLocation.makeEntity()`);
-    return null;
+    throw new Error(`RootLocation.makeEntity()`);
   }
   isStaticMethod() {
-    logger.error(`RootLocation.isStaticMethod()`);
-    return false;
+    throw new Error(`RootLocation.isStaticMethod()`);
   }
   isChildStaticMethod() {
-    logger.error(`RootLocation.isChildStaticMethod()`);
-    return false;
+    throw new Error(`RootLocation.isChildStaticMethod()`);
   }
   isChildNonScopingIdentifier() {
-    logger.error(`RootLocation.isChildScopingIdentifier()`);
-    return false;
+    throw new Error(`RootLocation.isChildScopingIdentifier()`);
   }
   isNonScopingIdentifier() {
-    logger.error(`RootLocation.isScopingIdentifier()`);
-    return false;
+    throw new Error(`RootLocation.isScopingIdentifier()`);
   }
   getStartLine() {
-    logger.error(`RootLocation.getStartLine()`);
-    return 0;
+    throw new Error(`RootLocation.getStartLine()`);
   }
   getName(file) {
-    logger.error(`RootLocation.getName()`);
-    return '__APPMAP_AGENT_ERROR_ROOT_LOCATION_GET_NAME__';
+    throw new Error(`RootLocation.getName()`);
   }
   getChildName() {
-    logger.error(`RootLocation.getChildName()`);
-    return '__APPMAP_AGENT_ERROR_ROOT_LOCATION_GET_CHILD_NAME__';
+    throw new Error(`RootLocation.getChildName()`);
   }
   getKind() {
-    logger.error(`RootLocation.getKind()`);
-    return '__APPMAP_AGENT_ERROR_ROOT_LOCATION_GET_KIND__';
+    throw new Error(`RootLocation.getKind()`);
   }
   getContainerName(file) {
-    logger.error(`RootLocation.getContainerName()`);
-    return '__APPMAP_AGENT_ERROR_ROOT_LOCATION_GET_CONTAINER_NAME__';
+    throw new Error(`RootLocation.getContainerName()`);
   }
   getParentContainerName() {
-    logger.error(`RootLocation.getParentContainerName()`);
-    return '__APPMAP_AGENT_ERROR_ROOT_LOCATION_GET_PARENT_CONTAINER_NAME__';
+    throw new Error(`RootLocation.getParentContainerName()`);
   }
 }
 
@@ -908,8 +874,7 @@ const getResultEntities = ({ entities }) => entities;
 
 const getResultNode = ({ node }) => node;
 
-const visit = (target, { location, namespace, file }) => {
-  let node = target; // eslint no-param-reassign
+const visit = (node, { location, namespace, file }) => {
   let entities = [];
   const extended = location.extend(node);
   if (extended.shouldBeInstrumented(file)) {
@@ -932,12 +897,12 @@ const visit = (target, { location, namespace, file }) => {
         }
       }
       node = join(node, context, ...fields);
+      const entity = extended.makeEntity(entities, file);
+      if (entity !== null) {
+        entities = [entity];
+      }
     } else {
-      logger.error(`Cannot visit node, got: ${node.type}`);
-    }
-    const entity = extended.makeEntity(entities, file);
-    if (entity !== null) {
-      entities = [entity];
+      logger.error('Cannot visit node of type %s', node.type);
     }
   }
   return {
@@ -1131,7 +1096,7 @@ setVisitor(
         ),
       ),
       buildVariableDeclarator(
-        buildIdentifier(context.namespace.getLocal('EVENT_IDENTITY')),
+        buildIdentifier(context.namespace.getLocal('EVENT_ID')),
         buildAssignmentExpression(
           '+=',
           buildIdentifier(context.namespace.getGlobal('EVENT_COUNTER')),
@@ -1156,12 +1121,12 @@ setVisitor(
           buildObjectExpression([
             buildRegularProperty(
               'id',
-              buildIdentifier(context.namespace.getLocal('EVENT_IDENTITY')),
+              buildIdentifier(context.namespace.getLocal('EVENT_ID')),
             ),
             buildRegularProperty('event', buildLiteral('call')),
             buildRegularProperty(
               'thread_id',
-              buildIdentifier(context.namespace.getGlobal('PID')),
+              buildIdentifier(context.namespace.getGlobal('PROCESS_ID')),
             ),
             buildRegularProperty(
               'defined_class',
@@ -1244,11 +1209,11 @@ setVisitor(
             buildRegularProperty('event', buildLiteral('return')),
             buildRegularProperty(
               'thread_id',
-              buildIdentifier(context.namespace.getGlobal('PID')),
+              buildIdentifier(context.namespace.getGlobal('PROCESS_ID')),
             ),
             buildRegularProperty(
               'parent_id',
-              buildIdentifier(context.namespace.getLocal('EVENT_IDENTITY')),
+              buildIdentifier(context.namespace.getLocal('EVENT_ID')),
             ),
             buildRegularProperty(
               'ellapsed',
@@ -2080,7 +2045,7 @@ var instrument = (file, namespace, callback) => {
   return escodegen.generate(getResultNode(result));
 };
 
-const APPMAP_VERSION = '1.4';
+const VERSION = '1.4';
 
 // Getting the right version:
 //
@@ -2100,123 +2065,203 @@ const client = {
 };
 
 var Appmap = (class Appmap {
-  constructor() {
-    this.state = null;
-  }
-  initialize(recorder, config, init) {
-    if (this.state !== null) {
-      logger.error('Appmap cannot be initialized because it is not idle');
-    } else {
-      this.state = {
-        config: config.extendWithEnv(init.env),
-        namespace: new Namespace(config.getEscapePrefix()),
-        appmap: {
-          version: APPMAP_VERSION,
-          metadata: {
-            name: config.getMapName(),
-            labels: init.labels,
-            app: config.getAppName(),
-            feature: init.feature,
-            feature_group: init.feature_group,
-            language: {
-              name: 'javascript',
-              engine: init.engine,
-              version: config.getLanguageVersion(),
-            },
-            frameworks: init.frameworks,
-            client: {
-              name: client.name,
-              url: client.repository.url,
-              version: client.version,
-            },
-            recorder: {
-              name: recorder,
-            },
-            recording: init.recording,
-            git: git(config.getGitDir()),
-          },
-          classMap: [],
-          events: [],
+  constructor(config, json) {
+    const init = {
+      feature: null,
+      feature_group: null,
+      labels: [],
+      frameworks: [],
+      recorder: null,
+      recording: null,
+      engine: null,
+      ...json,
+    };
+    this.config = config;
+    this.namespace = new Namespace(config.getEscapePrefix());
+    this.terminated = false;
+    this.appmap = {
+      version: VERSION,
+      metadata: {
+        name: config.getMapName(),
+        labels: init.labels,
+        app: config.getAppName(),
+        feature: init.feature,
+        feature_group: init.feature_group,
+        language: {
+          name: 'javascript',
+          engine: init.engine,
+          version: config.getLanguageVersion(),
         },
-      };
-    }
+        frameworks: init.frameworks,
+        client: {
+          name: client.name,
+          url: client.repository.url,
+          version: client.version,
+        },
+        recorder: init.recorder,
+        recording: init.recording,
+        git: git(config.getGitDir()),
+      },
+      classMap: [],
+      events: [],
+    };
   }
   instrument(source, path, content) {
-    if (this.state === null) {
-      logger.error('Appmap cannot instrument code because it is idle');
-      return content;
+    if (this.terminated) {
+      throw new Error(`Terminated appmap can no longer instrument code`);
     }
-    logger.info('Appmap instrument %s at %s', source, path);
     return instrument(
-      new File(this.state.config.getLanguageVersion(), source, path, content),
-      this.state.namespace,
+      new File(this.config.getLanguageVersion(), source, path, content),
+      this.namespace,
       (entity) => {
         logger.info('Appmap register code entity: %j', entity);
-        this.state.appmap.classMap.push(entity);
+        this.appmap.classMap.push(entity);
       },
     );
   }
   emit(event) {
-    if (this.state === null) {
-      logger.error(
-        'Appmap cannot register event because it is idle; ignoring the event',
-      );
-    } else {
-      logger.info('Appmap save event: %j', event);
-      this.state.appmap.events.push(event);
+    if (this.terminated) {
+      throw new Error('Terminated appmap can no longer receive events');
     }
+    this.appmap.events.push(event);
   }
   terminate(reason) {
-    if (this.state === null) {
-      logger.error('Appmap cannot be terminated because it is idle');
-    } else {
-      logger.info('Appmap terminate with: %j', reason);
-      const path = Path.join(
-        this.state.config.getOutputDir(),
-        `${this.state.config.getMapName()}.appmap.json`,
-      );
-      const content = JSON.stringify(this.state.appmap);
-      try {
-        FileSystem.writeFileSync(path, content, 'utf8');
-      } catch (error) {
-        logger.error(
-          'Appmap cannot be saved at %s because %s; outputing to stdout instead',
-          path,
-          error.message,
-        );
-        process.stdout.write(content, 'utf8');
-        process.stdout.write('\n', 'utf8');
-      } finally {
-        this.state = null;
-      }
+    if (this.terminated) {
+      throw new Error('Terminated appmap can no longer be terminated');
     }
+    this.terminated = true;
+    FileSystem.writeFileSync(
+      Path.join(
+        this.config.getOutputDir(),
+        `${this.config.getMapName()}.appmap.json`,
+      ),
+      JSON.stringify(this.appmap),
+      'utf8',
+    );
   }
 });
 
-const RECORDER_NAME = 'node-inline';
+const checkHas = (object, key) => {
+  if (Reflect.getOwnPropertyDescriptor(object, key) === undefined) {
+    throw new Error(`Missing property: ${String(key)}`);
+  }
+};
 
-var inlineChannel = (env) => {
-  const appmap = new Appmap();
+const checkNotNull = (any) => {
+  if (any === null) {
+    throw new Error('Unexpected null');
+  }
+};
+
+const checkTypeof = (value, type) => {
+  if (typeof value !== type) {
+    throw new Error(
+      `Invalid value type: expected a ${type} and got a ${typeof value}`,
+    );
+  }
+};
+
+const checkAnyof = (value, values) => {
+  if (!values.includes(value)) {
+    throw new Error('Invalid enumeration-based value');
+  }
+};
+
+const sources = ['script', 'module'];
+
+var Dispatcher = (class Dispatcher {
+  constructor(config) {
+    this.config = config;
+    this.appmaps = { __proto__: null };
+  }
+  dispatch(json) {
+    checkTypeof(json, 'object');
+    checkNotNull(json);
+    checkHas(json, 'name');
+    if (json.name === 'initialize') {
+      checkHas(json, 'init');
+      checkTypeof(json.init, 'object');
+      checkNotNull(json);
+      checkHas(json, 'env');
+      checkTypeof(json.init, 'object');
+      checkNotNull(json);
+      let session;
+      do {
+        session = Math.random().toString(36).substring(2);
+      } while (session in this.appmaps);
+      const config = this.config.extendWithEnv(json.env);
+      const appmap = new Appmap(config, json.init);
+      this.appmaps[session] = appmap;
+      return {
+        session,
+        prefix: config.getEscapePrefix(),
+      };
+    }
+    checkHas(json, 'session');
+    checkTypeof(json.session, 'string');
+    checkHas(this.appmaps, json.session);
+    const appmap = this.appmaps[json.session];
+    if (json.name === 'terminate') {
+      checkHas(json, 'reason');
+      appmap.terminate(json.reason);
+      delete this.appmaps[json.session];
+      return null;
+    }
+    if (json.name === 'instrument') {
+      checkHas(json, 'source');
+      checkHas(json, 'path');
+      checkHas(json, 'content');
+      checkAnyof(json.source, sources);
+      checkTypeof(json.path, 'string');
+      checkTypeof(json.content, 'string');
+      return appmap.instrument(json.source, json.path, json.content);
+    }
+    if (json.name === 'emit') {
+      checkHas(json, 'event');
+      appmap.emit(json.event);
+      return null;
+    }
+    throw new Error('Unrecognized name');
+  }
+});
+
+var inline = () => {
+  const dispatcher = new Dispatcher(getDefaultConfig());
   return {
-    initialize: (init) => {
-      appmap.initialize(RECORDER_NAME, getDefaultConfig(), init);
+    requestSync: (json1) => {
+      logger.info('inline sync request: %j', json1);
+      const json2 = dispatcher.dispatch(json1);
+      logger.info('inline sync response: %j', json2);
+      return json2;
     },
-    terminate: (reason) => {
-      appmap.terminate(reason);
-    },
-    instrumentScript: (path, content) =>
-      appmap.instrument('script', path, content),
-    instrumentModule: (path, content, { resolve, reject }) => {
+    requestAsync: (json1, pending) => {
+      logger.info('inline async request: %j', json1);
+      let json2;
       try {
-        resolve(appmap.instrument('module', path, content));
+        json2 = dispatcher.dispatch(json1);
       } catch (error) {
-        reject(error);
+        logger.error('inline async failure response: %s', error.stack);
+        if (pending !== null) {
+          pending.reject(error);
+        }
+        return null;
       }
-    },
-    emit: (event) => {
-      appmap.emit(event);
+      if (pending !== null) {
+        logger.info('inline async success response: %j', json2);
+        pending.resolve(json2);
+        return null;
+      }
+      if (json2 !== null) {
+        logger.error(
+          'inline async request expected a null result and got: %j',
+          json2,
+        );
+        return null;
+      }
+      logger.info('inline async success response (not transmitted): null');
+      return null;
     },
   };
 };
 
-module.exports = inlineChannel;
+module.exports = inline;

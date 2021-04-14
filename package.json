@@ -3,10 +3,10 @@
   "version": "2.0.1",
   "scripts": {
     "coverage": "npx c8 --reporter=html --require $TARGET node test/unit/$TARGET",
-    "build": "npx rollup lib/server/inline-channel.mjs --file dist/inline-channel.js --format cjs",
-    "prettify": "npx prettier --write 'lib/server/**/*.mjs' 'lib/client/**/*.js' 'test/**/*.mjs' 'bin/*.mjs'",
+    "build": "node build/make-globals.mjs && npx rollup lib/server/inline.mjs --file dist/inline.js --format cjs",
+    "prettify": "npx prettier --write 'lib/server/**/*.mjs' 'lib/client/**/*.js' 'test/**/*.mjs' 'bin/*.mjs' 'build/*.mjs'",
     "commit": "npx cz",
-    "lint": "npx eslint 'lib/client/**/*.js' 'lib/server/**/*.mjs' 'test/**/*.mjs' 'bin/*.mjs'",
+    "lint": "npx eslint 'lib/client/**/*.js' 'lib/server/**/*.mjs' 'test/**/*.mjs' 'bin/*.mjs' 'build/*.mjs'",
     "test": "node test/unit/run.mjs",
     "deploy": "npx semantic-release"
   },
