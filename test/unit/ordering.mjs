@@ -21,12 +21,12 @@ export const server = [
   // 'response/http2',
   // 'response/http3',
   // 'response/index',
-  'index',
-  'inline'
+  // 'index',
+  // 'inline'
 ];
 
 export const client = [
-  'es2015/script',
+  // 'es2015/script',
   'es2015/node/request/sync/messaging',
   'es2015/node/request/sync/curl',
   'es2015/node/request/async/messaging',
