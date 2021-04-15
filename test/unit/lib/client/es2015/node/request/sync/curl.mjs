@@ -31,6 +31,13 @@ child.on('message', (port) => {
     }),
     123,
   );
+  Assert.equal(
+    requestSync({
+      status: 200,
+      body: '',
+    }),
+    null,
+  );
   Assert.throws(
     () =>
       requestSync({

@@ -21,6 +21,16 @@ const iterator = [
     dispatch(...args) {
       Assert.equal(this, dispatcher);
       Assert.deepEqual(args, [123]);
+      return null;
+    },
+    input: JSON.stringify(123),
+    status: 200,
+    body: "",
+  },
+  {
+    dispatch(...args) {
+      Assert.equal(this, dispatcher);
+      Assert.deepEqual(args, [123]);
       throw new Error('BOUM');
     },
     input: JSON.stringify(123),
