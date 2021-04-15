@@ -12,7 +12,7 @@ Assert.equal(
   typeof makeChannel({
     APPMAP_PROTOCOL: 'http1',
     APPMAP_HOST: 'localhost',
-    APPMAP_PORT: 0,
+    APPMAP_PORT: '0',
   }),
   'object',
 );

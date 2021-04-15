@@ -3,7 +3,12 @@ import { Server } from 'net';
 import * as FileSystem from 'fs';
 import * as Agent from '../../../../lib/server/index.mjs';
 
-Assert.ok(Agent.createServer('messaging', {}, {}) instanceof Server);
+const env = {
+  APPMAP_FOO: 'BAR',
+  QUX: 'BUZ',
+};
+Assert.ok(Agent.createServer('messaging', env, {}) instanceof Server);
+Assert.deepEqual(env, { QUX: 'BUZ' });
 
 Assert.deepEqual(
   Agent.hookForkOptions(
@@ -24,6 +29,7 @@ Assert.deepEqual(
   {
     env: {
       FOO: 'BAR',
+      APPMAP_FOO: 'APPMAP_BAR',
       APPMAP_PROTOCOL: 'http3',
       APPMAP_HOST: 'localhost',
       APPMAP_PORT: '1234',
