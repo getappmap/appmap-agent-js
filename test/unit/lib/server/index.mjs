@@ -1,6 +1,6 @@
 import { strict as Assert } from 'assert';
 import { Server } from 'net';
-import * as FileSystem from "fs";
+import * as FileSystem from 'fs';
 import * as Agent from '../../../../lib/server/index.mjs';
 
 Assert.ok(Agent.createServer('messaging', {}, {}) instanceof Server);
@@ -62,14 +62,14 @@ Assert.deepEqual(
 });
 
 {
-  const path = "tmp/test/main.js";
+  const path = 'tmp/test/main.js';
   const options = {
-    protocol: "inline",
+    protocol: 'inline',
     esm: false,
-    cjs: false
+    cjs: false,
   };
-  FileSystem.writeFileSync(path, `123;`, "utf8");
+  FileSystem.writeFileSync(path, `123;`, 'utf8');
   Agent.fork(path, [], {}, options);
-  Agent.spawn("node", [path], {}, options);
-  Agent.spawnSync("node", [path], {}, options);
+  Agent.spawn('node', [path], {}, options);
+  Agent.spawnSync('node', [path], {}, options);
 }

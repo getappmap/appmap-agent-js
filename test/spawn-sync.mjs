@@ -1,15 +1,11 @@
 import * as ChildProcess from 'child_process';
 
 export default (cmd, argv, options) => {
-  const result = ChildProcess.spawnSync(
-    cmd,
-    argv,
-    {
-      ...options,
-      stdio: "inherit"
-    }
-  );
-  if (Reflect.getOwnPropertyDescriptor(result, "error") !== undefined) {
+  const result = ChildProcess.spawnSync(cmd, argv, {
+    ...options,
+    stdio: 'inherit',
+  });
+  if (Reflect.getOwnPropertyDescriptor(result, 'error') !== undefined) {
     throw result.error;
   }
   if (result.signal !== null) {

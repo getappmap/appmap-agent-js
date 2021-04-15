@@ -61,7 +61,7 @@ Assert.deepEqual(trace, [
     'sync',
     {
       name: 'initialize',
-      env: emitter.env,
+      env: {},
       init: {
         pid: emitter.pid,
         engine: `node@${emitter.version}`,
@@ -109,6 +109,7 @@ Assert.deepEqual(trace, [
     {
       name: 'terminate',
       session: 'session',
+      sync: false,
       reason: {
         type: 'exit',
         code: 'code',

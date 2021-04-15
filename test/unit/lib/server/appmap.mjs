@@ -3,27 +3,37 @@ import * as FileSystem from 'fs';
 import { getDefaultConfig } from '../../../../lib/server/config.mjs';
 import Appmap from '../../../../lib/server/appmap.mjs';
 
-const appmap = new Appmap(getDefaultConfig(), {
-  env: {
+try {
+  FileSystem.unlinkSync('tmp/appmap/map-name.appmap.json');
+} catch (error) {
+  if (error !== null) {
+    Assert.equal(error.code, 'ENOENT');
+  }
+}
+
+const appmap = new Appmap(
+  getDefaultConfig().extendWithEnv({
     APPMAP_OUTPUT_DIR: 'tmp/appmap',
     APPMAP_MAP_NAME: 'map-name',
+  }),
+  {
+    engine: 'engine',
+    recorder: 'recorder',
+    feature: 'feature',
+    labels: ['label'],
+    frameworks: ['framework'],
+    feature_group: 'feature-group',
+    recording: 'recording',
   },
-  engine: 'engine',
-  recorder: 'recorder',
-  feature: 'feature',
-  labels: ['label'],
-  frameworks: ['framework'],
-  feature_group: 'feature-group',
-  recording: 'recording',
-});
+);
 
 appmap.instrument('source', 'path1', '({});');
 appmap.emit('event1');
-appmap.terminate('reason1');
+appmap.terminate(true, 'reason1');
 
 Assert.throws(() => appmap.instrument('script', 'path2', 'content'));
 Assert.throws(() => appmap.emit('event2'));
-Assert.throws(() => appmap.terminate('reason2'));
+Assert.throws(() => appmap.terminate(true, 'reason2'));
 
 const json = JSON.parse(
   FileSystem.readFileSync('tmp/appmap/map-name.appmap.json', 'utf8'),
@@ -41,7 +51,7 @@ delete json.metadata.git;
 Assert.deepEqual(json, {
   version: '1.4',
   metadata: {
-    name: 'unknown-map-name',
+    name: 'map-name',
     labels: ['label'],
     app: 'unknown-app-name',
     feature: 'feature',
@@ -65,3 +75,12 @@ Assert.deepEqual(json, {
   ],
   events: ['event1'],
 });
+
+new Appmap(getDefaultConfig(), {}).terminate(false, 'reason');
+
+new Appmap(
+  getDefaultConfig().extendWithEnv({
+    APPMAP_OUTPUT_DIR: 'tmp/missing/',
+  }),
+  {},
+).terminate(false, 'reason');

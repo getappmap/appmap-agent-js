@@ -1,17 +1,19 @@
+import * as FileSystem from 'fs';
+import * as ChildProcess from 'child_process';
+import * as Agent from '../../lib/server/index.mjs';
 
-import * as FileSystem from "fs";
-import * as Agent from "../../lib/server/index.mjs";
+ChildProcess.spawnSync('npm', ['run', 'build'], { stdio: 'inherit' });
 
 FileSystem.writeFileSync(
-  "tmp/test/dependency.js",
+  'tmp/test/dependency.js',
   `module.exports = function dependency () {};`,
-  "utf8"
+  'utf8',
 );
 
 FileSystem.writeFileSync(
-  "tmp/test/main.mjs",
+  'tmp/test/main.mjs',
   `import dependency from "./dependency.js"; dependency();`,
-  "utf8"
+  'utf8',
 );
 
 // console.log(hookSpawnOptions(
@@ -25,17 +27,23 @@ FileSystem.writeFileSync(
 //   },
 // ));
 
-Agent.fork("tmp/test/main.mjs", [], {
-  stdio: 'inherit',
-  env: {
-    NODE_DEBUG: "appmap*",
-    ...process.env
-  }
-}, {
-  protocol: "inline",
-  cjs: true,
-  esm: true
-});
+Agent.fork(
+  'tmp/test/main.mjs',
+  [],
+  {
+    stdio: 'inherit',
+    env: {
+      NODE_DEBUG: 'appmap*',
+      APPMAP_MAP_NAME: 'inline',
+      ...process.env,
+    },
+  },
+  {
+    protocol: 'inline',
+    cjs: true,
+    esm: true,
+  },
+);
 
 //
 // ChildProcess.forkSync(

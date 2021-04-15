@@ -314,7 +314,8 @@ const extend = (mapping, conf, object) => {
   return conf;
 };
 
-const extendWithPath = (conf, path) => {
+const extendWithFile = (conf, path) => {
+  logger.info("configuration extended with file: %s", path);
   let parse;
   if (path.endsWith('.json')) {
     parse = JSON.parse;
@@ -346,6 +347,7 @@ const extendWithPath = (conf, path) => {
 };
 
 const extendWithJson = (conf, json) => {
+  logger.info("configuration extended with json: %j", json);
   if (json === null || typeof json !== 'object') {
     logger.warning(
       'Invalid top-level format >> expected an object and got: %j',
@@ -360,15 +362,16 @@ const extendWithJson = (conf, json) => {
         json.extend,
       );
     } else {
-      conf = extendWithPath(conf, json.extend);
+      conf = extendWithFile(conf, json.extend);
     }
   }
   return extend(mappings.json, conf, json);
 };
 
 const extendWithEnv = (conf, env) => {
+  logger.info("configuration extended with environment: %j", env);
   if (Reflect.getOwnPropertyDescriptor(env, 'APPMAP_CONFIG') !== undefined) {
-    conf = extendWithPath(conf, env.APPMAP_CONFIG);
+    conf = extendWithFile(conf, env.APPMAP_CONFIG);
   }
   return extend(
     mappings.env,
@@ -396,8 +399,8 @@ class Config {
   extendWithJson(json) {
     return new Config(extendWithJson(this.conf, json));
   }
-  extendWithPath(path) {
-    return new Config(extendWithPath(this.conf, path));
+  extendWithFile(path) {
+    return new Config(extendWithFile(this.conf, path));
   }
   extendWithEnv(env) {
     return new Config(extendWithEnv(this.conf, env));
@@ -2114,7 +2117,7 @@ var Appmap = (class Appmap {
       new File(this.config.getLanguageVersion(), source, path, content),
       this.namespace,
       (entity) => {
-        logger.info('Appmap register code entity: %j', entity);
+        logger.info('Appmap receive code entity: %j', entity);
         this.appmap.classMap.push(entity);
       },
     );
@@ -2123,21 +2126,39 @@ var Appmap = (class Appmap {
     if (this.terminated) {
       throw new Error('Terminated appmap can no longer receive events');
     }
+    logger.info('Appmap receive event: %j', event);
     this.appmap.events.push(event);
   }
-  terminate(reason) {
+  terminate(json) {
     if (this.terminated) {
       throw new Error('Terminated appmap can no longer be terminated');
     }
     this.terminated = true;
-    FileSystem.writeFileSync(
-      Path.join(
-        this.config.getOutputDir(),
-        `${this.config.getMapName()}.appmap.json`,
-      ),
-      JSON.stringify(this.appmap),
-      'utf8',
+    const path = Path.join(
+      this.config.getOutputDir(),
+      `${this.config.getMapName()}.appmap.json`,
     );
+    logger.info('Appmap terminate with %j', path, json);
+    if (json.sync) {
+      FileSystem.writeFileSync(
+        path,
+        JSON.stringify(this.appmap),
+        'utf8'
+      );
+    } else {
+      FileSystem.writeFileSync(
+        path,
+        JSON.stringify(this.appmap),
+        'utf8',
+        (error) => {
+          if (error !== null) {
+            logger.error(`Could not write appmap to %s >> $s`, path, error.message);
+          } else {
+            logger.info("Appmap written to %", path);
+          }
+        }
+      );
+    }
   }
 });
 
@@ -2202,8 +2223,8 @@ var Dispatcher = (class Dispatcher {
     checkHas(this.appmaps, json.session);
     const appmap = this.appmaps[json.session];
     if (json.name === 'terminate') {
-      checkHas(json, 'reason');
-      appmap.terminate(json.reason);
+      checkHas(json, 'term');
+      appmap.terminate(json.term);
       delete this.appmaps[json.session];
       return null;
     }

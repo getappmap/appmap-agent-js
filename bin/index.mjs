@@ -1,8 +1,7 @@
 #!/usr/bin/env node
 
-import ChildProcess from 'child_process';
 import minimist from 'minimist';
-import { hookSpawnOptions, createServer } from '../lib/server/index.mjs';
+import * as Agent from '../lib/server/index.mjs';
 
 const argv = {
   protocol: 'messaging',
@@ -15,36 +14,25 @@ const argv = {
 
 const { env } = process;
 
+const fork = (port) =>
+  Agent.fork(
+    argv._[0],
+    argv._.slice(1),
+    {
+      stdio: 'inherit',
+    },
+    {
+      ...argv,
+      port: null,
+    },
+  );
+
 if (argv.protocol === 'inline') {
-  ChildProcess.spawn(
-    'node',
-    argv._,
-    hookSpawnOptions(
-      {
-        stdio: 'inherit',
-      },
-      {
-        ...argv,
-        port: null
-      },
-    ),
-  ));
+  fork(null);
 } else {
-  const server = createServer(argv.protocol, env, null);
+  const server = Agent.createServer(argv.protocol, env, null);
   server.listen(argv.port);
   server.on('listening', () => {
-    ChildProcess.spawn(
-      'node',
-      argv._,
-      hookSpawnOptions(
-        {
-          stdio: 'inherit',
-        },
-        {
-          ...argv,
-          port: server.address().port,
-        },
-      ),
-    );
+    fork(server.address().port);
   });
 }

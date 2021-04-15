@@ -1,22 +1,22 @@
-import { writeFileSync } from 'fs';
+import * as FileSystem from 'fs';
 import { strict as Assert } from 'assert';
 import { getDefaultConfig } from '../../../../lib/server/config.mjs';
 
 const config = getDefaultConfig();
 
-config.extendWithPath('/foo');
-config.extendWithPath('/foo.json');
-config.extendWithPath('/foo.yml');
+config.extendWithFile('/foo');
+config.extendWithFile('/foo.json');
+config.extendWithFile('/foo.yml');
 config.extendWithJson(123);
 config.extendWithJson({ extend: 123 });
 config.extendWithJson({ extend: '/foo' });
 config.extendWithEnv({ APPMAP_CONFIG: '/foo' });
 
-writeFileSync('tmp/test/conf.yml', 'name: foo', 'utf8');
-Assert.equal(config.extendWithPath('tmp/test/conf.yml').getAppName(), 'foo');
+FileSystem.writeFileSync('tmp/test/conf.yml', 'name: foo', 'utf8');
+Assert.equal(config.extendWithFile('tmp/test/conf.yml').getAppName(), 'foo');
 
-writeFileSync('tmp/test/conf.json', '@foo', 'utf8');
-config.extendWithPath('tmp/test/conf.json');
+FileSystem.writeFileSync('tmp/test/conf.json', '@foo', 'utf8');
+config.extendWithFile('tmp/test/conf.json');
 
 const makeMakeTest = (method) => (kind, key) => (value) =>
   config[`extendWith${kind}`]({ [key]: value })[method]();

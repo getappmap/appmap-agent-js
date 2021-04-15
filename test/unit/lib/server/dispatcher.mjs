@@ -46,6 +46,7 @@ dispatcher.dispatch({
 dispatcher.dispatch({
   name: 'terminate',
   session,
+  sync: true,
   reason: 'reason',
 });
 
@@ -55,6 +56,7 @@ Assert.throws(() =>
   dispatcher.dispatch({
     name: 'terminate',
     session: 123,
+    sync: true,
     reason: 'reason',
   }),
 );
@@ -63,6 +65,5 @@ Assert.throws(() =>
   dispatcher.dispatch({
     name: 'terminate',
     session,
-    reason: 'reason',
   }),
 );

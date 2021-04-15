@@ -21,13 +21,14 @@ Assert.deepEqual(
   makeChannel({
     APPMAP_PROTOCOL: {
       requestSync: 123,
-      requestAsync: 456
+      requestAsync: 456,
     },
   }),
   {
+    inline: false,
     env: {},
     requestSync: 123,
-    requestAsync: 456
+    requestAsync: 456,
   },
 );
 
