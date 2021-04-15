@@ -1,3 +1,10 @@
+## [2.1.1](https://github.com/applandinc/appmap-agent-js/compare/v2.1.0...v2.1.1) (2021-04-15)
+
+
+### Bug Fixes
+
+* path to bin ([e537164](https://github.com/applandinc/appmap-agent-js/commit/e537164321d48ef27174eeb002f42f8ea435d3d7))
+
 # [2.1.0](https://github.com/applandinc/appmap-agent-js/compare/v2.0.1...v2.1.0) (2021-04-15)
 
 
