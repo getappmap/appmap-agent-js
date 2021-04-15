@@ -1,3 +1,24 @@
+# [2.1.0](https://github.com/applandinc/appmap-agent-js/compare/v2.0.1...v2.1.0) (2021-04-15)
+
+
+### Bug Fixes
+
+* eslint ([b44cf23](https://github.com/applandinc/appmap-agent-js/commit/b44cf23d1b1bc94d8efdd2e768d3396e94c49e74))
+* rely on more comptible curl options ([b501a8d](https://github.com/applandinc/appmap-agent-js/commit/b501a8da315130f767fea11d7158beb4910b62de))
+* run eslint and prettier ([93b34f8](https://github.com/applandinc/appmap-agent-js/commit/93b34f81a4d8fae285db36c919a0aea5fc516875))
+* run eslint and prettier ([266fe27](https://github.com/applandinc/appmap-agent-js/commit/266fe271bf56d99a8a8bca3a93a82f792472b84d))
+
+
+### Features
+
+* added new communication channel between server and client ([35a7ff0](https://github.com/applandinc/appmap-agent-js/commit/35a7ff046a1da43f604ea59548c7b049cdf19cd3))
+* replace fork channel by messaging channel ([31e85c2](https://github.com/applandinc/appmap-agent-js/commit/31e85c29c18323f98535518bac0218ab077f06dc))
+
+
+### Performance Improvements
+
+* http optimized empty body when null return ([d3be7ec](https://github.com/applandinc/appmap-agent-js/commit/d3be7ecbe62293a9817f5d4f4868fea05df6336e))
+
 ## [2.0.1](https://github.com/applandinc/appmap-agent-js/compare/v2.0.0...v2.0.1) (2021-04-04)
 
 
