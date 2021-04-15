@@ -5,6 +5,11 @@ language: node_js
 node_js: [lts/*]
 cache: npm
 
+# # https://unix.stackexchange.com/questions/342952/curl-write-http-code-to-stderr-or-to-file
+# # 7.63
+# before_install:
+#   - sudo apt-get -y install libxml2-dev
+
 install:
   - npm install
 
