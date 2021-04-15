@@ -7,7 +7,7 @@
     "prettify": "npx prettier --write 'lib/server/**/*.mjs' 'lib/client/**/*.js' 'test/**/*.mjs' 'bin/*.mjs' 'build/*.mjs'",
     "commit": "npx cz",
     "lint": "npx eslint 'lib/client/**/*.js' 'lib/server/**/*.mjs' 'test/**/*.mjs' 'bin/*.mjs' 'build/*.mjs'",
-    "test": "node test/unit/run.mjs",
+    "test": "node test/unit/run.mjs && node test/integration/run.mjs",
     "deploy": "npx semantic-release"
   },
   "files": [

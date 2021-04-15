@@ -8,31 +8,37 @@ const argv = {
   port: 0,
   esm: true,
   cjs: true,
-  _: null,
+  ecma: 'es2015',
+  _: [],
   ...minimist(process.argv.slice(2)),
 };
 
-const { env } = process;
-
-const fork = (port) =>
-  Agent.fork(
-    argv._[0],
-    argv._.slice(1),
-    {
-      stdio: 'inherit',
-    },
-    {
-      ...argv,
-      port: null,
-    },
-  );
-
-if (argv.protocol === 'inline') {
-  fork(null);
+if (argv._.length === 0) {
+  process.stderr.write('Missing entry point\n');
 } else {
-  const server = Agent.createServer(argv.protocol, env, null);
-  server.listen(argv.port);
-  server.on('listening', () => {
-    fork(server.address().port);
-  });
+  const env = { ...process.env };
+  const fork = (port) =>
+    Agent.fork(
+      argv._[0],
+      argv._.slice(1),
+      {
+        stdio: 'inherit',
+        env,
+      },
+      {
+        ...argv,
+        port,
+      },
+    );
+  if (argv.protocol === 'inline') {
+    fork(null);
+  } else {
+    const server = Agent.createServer(argv.protocol, env, null);
+    server.listen(argv.port);
+    server.on('listening', () => {
+      fork(server.address().port).on('exit', (code, signal) => {
+        server.close();
+      });
+    });
+  }
 }

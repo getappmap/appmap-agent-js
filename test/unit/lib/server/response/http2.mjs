@@ -31,7 +31,7 @@ const iterator = [
     },
     input: JSON.stringify(123),
     status: 200,
-    body: "",
+    body: '',
   },
   {
     dispatch(...args) {

@@ -55,7 +55,7 @@ if (process.argv.length === 2) {
     process.stdout.write(Chalk.red(`Missing:${'\n'}${miss.join('\n')}${'\n'}`));
     status = 1;
   } else {
-    process.stdout.write(Chalk.green('Vicoly, acheived 100% coverage!'));
+    process.stdout.write(Chalk.green('Victoly >> 100% coverage!\n'));
   }
 } else if (process.argv.length === 3) {
   const path1 = process.argv[2];
