@@ -12,12 +12,12 @@
   },
   "files": [
     "/home.js",
-    "/dist/*.js",
+    "/dist/*.{js,mjs}",
     "/lib/**/*.{js,mjs}",
-    "/bin/*.mjs"
+    "/bin/*.{js,mjs}"
   ],
   "bin": {
-    "appmap-agent": "bin/bin.mjs"
+    "appmap-agent": "bin/index.mjs"
   },
   "dependencies": {
     "acorn": "^7.4.1",
