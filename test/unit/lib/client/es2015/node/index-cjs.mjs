@@ -1,6 +1,8 @@
+import protocol from './__fixture_protocol__.mjs';
 
-import { strict as Assert } from "assert";
+process.env = {
+  ...process.env,
+  APPMAP_PROTOCOL: protocol,
+};
 
-import('../../../../../../lib/client/es2015/node/index-cjs.js').catch((error) => {
-  console.log(error.message);
-});
+import('../../../../../../lib/client/es2015/node/index-cjs.js');

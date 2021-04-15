@@ -1,11 +1,15 @@
 import { strict as Assert } from 'assert';
 import * as ChildProcess from 'child_process';
 import * as Path from 'path';
-import dirname from '../__fixture_dirname__.js';
+import { fileURLToPath } from 'url';
 
 export default (protocol, makeRequestAsync) => {
   const child = ChildProcess.fork(
-    Path.join(dirname, '__fixture_http_server__.mjs'),
+    Path.join(
+      Path.dirname(fileURLToPath(import.meta.url)),
+      '..',
+      '__fixture_http_server__.mjs',
+    ),
     [protocol, '0'],
     {
       stdio: ['inherit', 'inherit', 'inherit', 'ipc'],

@@ -1,11 +1,15 @@
 import * as Path from 'path';
 import * as ChildProcess from 'child_process';
 import { strict as Assert } from 'assert';
+import { fileURLToPath } from 'url';
 import makeRequestSync from '../../../../../../../../lib/client/es2015/node/request/sync/messaging.js';
-import dirname from '../__fixture_dirname__.js';
 
 const child = ChildProcess.fork(
-  Path.join(dirname, '__fixture_net_server__.mjs'),
+  Path.join(
+    Path.dirname(fileURLToPath(import.meta.url)),
+    '..',
+    '__fixture_net_server__.mjs',
+  ),
   ['0'],
   {
     stdio: ['inherit', 'inherit', 'inherit', 'ipc'],
