@@ -1,14 +1,12 @@
 import { strict as Assert } from 'assert';
 import { Server } from 'net';
-import {
-  createServer,
-  hookSpawnOptions,
-} from '../../../../lib/server/index.mjs';
+import * as FileSystem from "fs";
+import * as Agent from '../../../../lib/server/index.mjs';
 
-Assert.ok(createServer('messaging', {}, {}) instanceof Server);
+Assert.ok(Agent.createServer('messaging', {}, {}) instanceof Server);
 
 Assert.deepEqual(
-  hookSpawnOptions(
+  Agent.hookForkOptions(
     {
       env: {
         FOO: 'BAR',
@@ -35,7 +33,7 @@ Assert.deepEqual(
 );
 
 Assert.deepEqual(
-  hookSpawnOptions(
+  Agent.hookForkOptions(
     {
       env: {},
       execArgv: [],
@@ -59,6 +57,19 @@ Assert.deepEqual(
 
 [true, false].forEach((esm) => {
   [true, false].forEach((cjs) => {
-    hookSpawnOptions({}, { esm, cjs });
+    Agent.hookForkOptions({}, { esm, cjs });
   });
 });
+
+{
+  const path = "tmp/test/main.js";
+  const options = {
+    protocol: "inline",
+    esm: false,
+    cjs: false
+  };
+  FileSystem.writeFileSync(path, `123;`, "utf8");
+  Agent.fork(path, [], {}, options);
+  Agent.spawn("node", [path], {}, options);
+  Agent.spawnSync("node", [path], {}, options);
+}

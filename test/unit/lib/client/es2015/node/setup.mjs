@@ -61,8 +61,8 @@ Assert.deepEqual(trace, [
     'sync',
     {
       name: 'initialize',
+      env: emitter.env,
       init: {
-        env: emitter.env,
         pid: emitter.pid,
         engine: `node@${emitter.version}`,
         feature: 'TODO',

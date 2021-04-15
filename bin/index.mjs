@@ -5,9 +5,11 @@ import minimist from 'minimist';
 import { hookSpawnOptions, createServer } from '../lib/server/index.mjs';
 
 const argv = {
-  __proto__: null,
   protocol: 'messaging',
   port: 0,
+  esm: true,
+  cjs: true,
+  _: null,
   ...minimist(process.argv.slice(2)),
 };
 
@@ -22,10 +24,11 @@ if (argv.protocol === 'inline') {
         stdio: 'inherit',
       },
       {
-        protocol: 'inline',
+        ...argv,
+        port: null
       },
     ),
-  );
+  ));
 } else {
   const server = createServer(argv.protocol, env, null);
   server.listen(argv.port);
@@ -38,7 +41,7 @@ if (argv.protocol === 'inline') {
           stdio: 'inherit',
         },
         {
-          protocol: argv.protocol,
+          ...argv,
           port: server.address().port,
         },
       ),

@@ -17,11 +17,18 @@ Assert.equal(
   'object',
 );
 
-Assert.equal(
+Assert.deepEqual(
   makeChannel({
-    APPMAP_PROTOCOL: 123,
+    APPMAP_PROTOCOL: {
+      requestSync: 123,
+      requestAsync: 456
+    },
   }),
-  123,
+  {
+    env: {},
+    requestSync: 123,
+    requestAsync: 456
+  },
 );
 
 Assert.throws(() => {
