@@ -23,6 +23,7 @@ if (argv._.length === 0) {
       argv._.slice(1),
       {
         stdio: 'inherit',
+        // execArgv: ["--inspect-brk"],
         env,
       },
       {

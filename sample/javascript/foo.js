@@ -1,0 +1,2 @@
+require("acorn");
+require("assert");

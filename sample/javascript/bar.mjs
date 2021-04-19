@@ -31,7 +31,4 @@
 
 // console.log(process.argv);
 // throw "boum";
-
-console.log("bar");
-
-console.log(global);
+export default "bar";
