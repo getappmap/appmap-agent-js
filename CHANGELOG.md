@@ -1,3 +1,15 @@
+# [2.2.0](https://github.com/applandinc/appmap-agent-js/compare/v2.1.2...v2.2.0) (2021-04-20)
+
+
+### Bug Fixes
+
+* update remaining of the application to new configuration feature ([6fed62b](https://github.com/applandinc/appmap-agent-js/commit/6fed62bae809114e828dd49a978f71f655bb3360))
+
+
+### Features
+
+* add support for package listing and exclusions and use json schema validator ([ffa3c3f](https://github.com/applandinc/appmap-agent-js/commit/ffa3c3f06d92dc1ce461312f4151b058cbb198e3))
+
 ## [2.1.2](https://github.com/applandinc/appmap-agent-js/compare/v2.1.1...v2.1.2) (2021-04-19)
 
 
