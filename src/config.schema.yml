@@ -1,0 +1,47 @@
+type: object
+additionalProperties: false
+properties:
+  extends: {type: string}
+  enabled: {type: boolean}
+  name: {type: string}
+  map-name: {type: string}
+  escape-prefix:
+    type: string
+    pattern: "^[a-zA-Z_$][a-zA-Z_$-9]*$"
+  output-dir: {type: string}
+  git-dir: {type: string}
+  language-version:
+    enum:
+      - es5
+      - es5.1
+      - es6
+      - es2015
+      - es7
+      - es2016
+      - es8
+      - es2017
+      - es9
+      - es2018
+      - es10
+      - es2019
+      - es11
+      - es2020
+      - es12
+      - es2021
+  packages:
+    type: array
+    items:
+      anyOf:
+        - {type: string}
+        - type: object
+          additionalProperties: false
+          properties:
+            dist: {type: string}
+            path: {type: string}
+            shallow: {type: boolean}
+            exclude:
+              type: array
+              items: {type: string}
+  exclude:
+    type: array
+    items: {type: string}
