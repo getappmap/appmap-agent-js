@@ -3,7 +3,7 @@
   "version": "2.1.1",
   "scripts": {
     "coverage": "npx c8 --reporter=html --require $TARGET node test/unit/$TARGET",
-    "build": "node build/make-globals.mjs && npx rollup lib/server/inline.mjs --file dist/inline.js --format cjs",
+    "build": "node build/index.mjs",
     "prettify": "npx prettier --write 'lib/server/**/*.mjs' 'lib/client/**/*.js' 'test/**/*.mjs' 'bin/*.mjs' 'build/*.mjs'",
     "commit": "npx cz",
     "lint": "npx eslint 'lib/client/**/*.js' 'lib/server/**/*.mjs' 'test/**/*.mjs' 'bin/*.mjs' 'build/*.mjs'",
@@ -20,7 +20,8 @@
     "appmap-agent": "bin/index.mjs"
   },
   "dependencies": {
-    "acorn": "^7.4.1",
+    "acorn": "^8.1.1",
+    "ajv": "^8.1.0",
     "escodegen": "^2.0.0",
     "minimist": "^1.2.5",
     "net-socket-messaging": "^0.1.5",
@@ -30,6 +31,7 @@
     "yaml": "^1.10.0"
   },
   "devDependencies": {
+    "@rollup/plugin-commonjs": "^18.0.0",
     "@semantic-release/changelog": "^5.0.1",
     "@semantic-release/git": "^9.0.0",
     "c8": "^7.6.0",
@@ -43,7 +45,8 @@
     "jasmine": "^3.7.0",
     "mocha": "^8.3.2",
     "nyc": "^15.1.0",
-    "prettier": "^2.2.1"
+    "prettier": "^2.2.1",
+    "rollup": "^2.45.2"
   },
   "repository": {
     "type": "git",
