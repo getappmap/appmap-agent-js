@@ -4,9 +4,10 @@ import Namespace from '../../../../../lib/server/namespace.mjs';
 import instrument from '../../../../../lib/server/instrument/index.mjs';
 
 const file = new File(2020, 'script', 'filename.js', `123;`);
+const isNameExcluded = () => false;
 const namespace = new Namespace('PREFIX');
 const entities = [];
-const content = instrument(file, namespace, (entity) => {
+const content = instrument(file, namespace, isNameExcluded, (entity) => {
   entities.push(entity);
 });
 Assert.equal(content, `123;`);

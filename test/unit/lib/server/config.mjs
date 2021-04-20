@@ -4,123 +4,249 @@ import { getDefaultConfig } from '../../../../lib/server/config.mjs';
 
 const config = getDefaultConfig();
 
-config.extendWithFile('/foo');
-config.extendWithFile('/foo.json');
-config.extendWithFile('/foo.yml');
-config.extendWithJson(123);
-config.extendWithJson({ extend: 123 });
-config.extendWithJson({ extend: '/foo' });
-config.extendWithEnv({ APPMAP_CONFIG: '/foo' });
+////////////////////
+// extendWithFile //
+////////////////////
 
-FileSystem.writeFileSync('tmp/test/conf.yml', 'name: foo', 'utf8');
-Assert.equal(config.extendWithFile('tmp/test/conf.yml').getAppName(), 'foo');
-
-FileSystem.writeFileSync('tmp/test/conf.json', '@foo', 'utf8');
-config.extendWithFile('tmp/test/conf.json');
-
-const makeMakeTest = (method) => (kind, key) => (value) =>
-  config[`extendWith${kind}`]({ [key]: value })[method]();
-
-// simple strings //
-[
-  ['getGitDir', 'APPMAP_GIT_DIR', 'git-dir', '.'],
-  ['getOutputDir', 'APPMAP_OUTPUT_DIR', 'output-dir', 'tmp/appmap'],
-  ['getAppName', 'APPMAP_APP_NAME', 'name', 'unknown-app-name'],
-  ['getMapName', 'APPMAP_MAP_NAME', 'map-name', 'unknown-map-name'],
-].forEach(([method, key1, key2, def]) => {
-  const makeTest = makeMakeTest(method);
-  {
-    const test = makeTest('Env', key1);
-    Assert.equal(test('foo'), 'foo');
-  }
-  {
-    const test = makeTest('Json', key2);
-    Assert.equal(test('foo'), 'foo');
-    Assert.equal(test(123), def);
-  }
-});
-
-// isEnabled //
-{
-  const def = false;
-  const makeTest = makeMakeTest('isEnabled');
-  {
-    const test = makeTest('Env', 'APPMAP');
-    Assert.equal(test('TruE'), true);
-    Assert.equal(test('FalsE'), false);
-    Assert.equal(test('foo'), def);
-  }
-  {
-    const test = makeTest('Json', 'enabled');
-    Assert.equal(test(true), true);
-    Assert.equal(test(false), false);
-    Assert.equal(test('foo'), def);
+try {
+  FileSystem.unlinkSync('tmp/test/foo');
+} catch (error) {
+  if (error.code !== 'ENOENT') {
+    throw error;
   }
 }
+Assert.ok(
+  config
+    .extendWithFile('tmp/test/foo', process.cwd())
+    .startsWith('failed to read conf file'),
+);
 
-// getEscapePrefix //
-{
-  const def = 'APPMAP';
-  const makeTest = makeMakeTest('getEscapePrefix');
-  {
-    const test = makeTest('Env', 'APPMAP_ESCAPE_PREFIX');
-    Assert.equal(test('foo'), 'foo');
-    Assert.equal(test('@bar'), def);
-  }
-  {
-    const test = makeTest('Json', 'escape-prefix');
-    Assert.equal(test('foo'), 'foo');
-    Assert.equal(test('@bar'), def);
-    Assert.equal(test(123), def);
+FileSystem.writeFileSync('tmp/test/foo', '123', 'utf8');
+Assert.ok(
+  config.extendWithFile('tmp/test/foo').startsWith('failed to parse conf file'),
+);
+
+FileSystem.writeFileSync(
+  'tmp/test/foo.json',
+  JSON.stringify({ enabled: 'foo' }),
+  'utf8',
+);
+Assert.ok(
+  config
+    .extendWithFile('tmp/test/foo.json')
+    .startsWith('invalid configuration'),
+);
+
+FileSystem.writeFileSync(
+  'tmp/test/foo.json',
+  JSON.stringify({ enabled: true }),
+  'utf8',
+);
+Assert.ok(config.extendWithFile('tmp/test/foo.json').conf.enabled, true);
+
+FileSystem.writeFileSync('tmp/test/foo.yml', 'enabled: true', 'utf8');
+Assert.ok(config.extendWithFile('tmp/test/foo.yml').conf.enabled, true);
+
+/////////////////////
+// extendsWithJson //
+/////////////////////
+
+try {
+  FileSystem.unlinkSync('tmp/test/foo');
+} catch (error) {
+  if (error.code !== 'ENOENT') {
+    throw error;
   }
 }
+Assert.ok(
+  config
+    .extendWithJson({ extends: 'tmp/test/foo' }, process.cwd())
+    .startsWith('failed to read conf file'),
+);
 
-// language_version //
-{
-  const def = '2015';
-  const makeTest = makeMakeTest('getLanguageVersion');
-  {
-    const test = makeTest('Env', 'APPMAP_LANGUAGE_VERSION');
-    Assert.equal(test('5'), '5');
-    Assert.equal(test('foo'), def);
-  }
-  {
-    const test = makeTest('Json', 'language-version');
-    Assert.equal(test('5'), '5');
-    Assert.equal(test('foo'), def);
-    Assert.equal(test(5), def);
-  }
-}
+Assert.equal(
+  config.extendWithJson({ 'git-dir': 'bar' }, '/foo').conf['git-dir'],
+  '/foo/bar',
+);
 
-// getPackages //
-{
-  const makeTest = makeMakeTest('getPackages');
-  {
-    const test = makeTest('Env', 'APPMAP_PACKAGES');
-    Assert.deepEqual(test(' foo , bar '), [{ name: 'foo' }, { name: 'bar' }]);
-  }
-  {
-    const test = makeTest('Json', 'packages');
-    Assert.deepEqual(test([{ name: 'foo' }, 'bar']), [
-      { name: 'foo' },
-      { name: 'bar' },
-    ]);
-    Assert.deepEqual(test(123), []);
-    Assert.deepEqual(test([456, {}, { name: 789 }, 'qux']), [{ name: 'qux' }]);
-  }
-}
+Assert.deepEqual(
+  config.extendWithJson({ exclude: ['foo', 'bar'] }, process.cwd()).conf
+    .exclude,
+  ['foo', 'bar'],
+);
 
-// getExclusions //
-{
-  const makeTest = makeMakeTest('getExclusions');
-  {
-    const test = makeTest('Env', 'APPMAP_EXCLUDE');
-    Assert.deepEqual(test(' foo , bar '), ['foo', 'bar']);
-  }
-  {
-    const test = makeTest('Json', 'exclude');
-    Assert.deepEqual(test(['foo', 'bar']), ['foo', 'bar']);
-    Assert.deepEqual(test(123), []);
-    Assert.deepEqual(test([456, 'qux']), ['qux']);
-  }
-}
+Assert.deepEqual(
+  config.extendWithJson(
+    {
+      packages: [
+        'dist-or-path',
+        {
+          dist: 'dist',
+        },
+        {
+          path: 'shallow-path',
+          shallow: true,
+        },
+        {
+          path: 'deep-path',
+        },
+      ],
+    },
+    '/foo',
+  ).conf.packages,
+  [
+    {
+      shallow: false,
+      path: '/foo/node_modules/dist-or-path',
+      dist: 'dist-or-path',
+      exclude: [],
+    },
+    {
+      shallow: false,
+      path: '/foo/node_modules/dist',
+      dist: 'dist',
+      exclude: [],
+    },
+    {
+      shallow: false,
+      path: '/foo/dist-or-path',
+      dist: 'dist-or-path',
+      exclude: [],
+    },
+    {
+      shallow: true,
+      path: '/foo/shallow-path',
+      dist: null,
+      exclude: [],
+    },
+    { shallow: false, path: '/foo/deep-path', dist: null, exclude: [] },
+  ],
+);
+
+///////////////////
+// extendWithEnv //
+///////////////////
+
+Assert.equal(
+  config.extendWithEnv(
+    {
+      APPMAP: 'TruE',
+      APPMAP_BAR: 'qux',
+    },
+    '/foo',
+  ).conf.enabled,
+  true,
+);
+
+Assert.deepEqual(
+  config.extendWithEnv(
+    {
+      APPMAP_PACKAGES: ' bar , qux ',
+    },
+    '/foo',
+  ).conf.packages,
+  config.extendWithJson(
+    {
+      packages: ['bar', 'qux'],
+    },
+    '/foo',
+  ).conf.packages,
+);
+
+/////////////
+// Getters //
+/////////////
+
+Assert.equal(config.getEscapePrefix(), 'APPMAP');
+
+Assert.equal(config.getGitDir(), '.');
+
+Assert.equal(config.getOutputDir(), 'tmp/appmap');
+
+Assert.equal(config.getAppName(), 'unknown-app-name');
+
+Assert.equal(config.getMapName(), 'unknown-map-name');
+
+Assert.equal(config.getLanguageVersion(), 'es2015');
+
+////////////////////////////
+// getFileInstrumentation //
+////////////////////////////
+
+Assert.equal(
+  config
+    .extendWithJson({ packages: ['bar'] }, '/foo')
+    .getFileInstrumentation('/foo/bar'),
+  null,
+);
+
+Assert.equal(
+  config
+    .extendWithJson({ enabled: true }, '/foo')
+    .getFileInstrumentation('/foo/bar'),
+  null,
+);
+
+Assert.equal(
+  config
+    .extendWithJson({ enabled: true, packages: ['bar'] }, '/foo')
+    .getFileInstrumentation('bar'),
+  null,
+);
+
+Assert.equal(
+  config
+    .extendWithJson({ enabled: true, packages: ['bar'] }, '/foo')
+    .getFileInstrumentation('/foo/bar'),
+  'deep',
+);
+
+Assert.equal(
+  config
+    .extendWithJson(
+      { enabled: true, packages: [{ path: 'bar', shallow: true }] },
+      '/foo',
+    )
+    .getFileInstrumentation('/foo/bar'),
+  'shallow',
+);
+
+//////////////////////
+// isNameExcluded //
+//////////////////////
+
+Assert.equal(config.isNameExcluded('/foo/bar', 'name'), true);
+
+Assert.equal(
+  config
+    .extendWithJson({ enabled: true }, '/foo')
+    .isNameExcluded('/foo/bar', 'name'),
+  true,
+);
+
+Assert.equal(
+  config
+    .extendWithJson(
+      { enabled: true, packages: ['bar'], exclude: ['name'] },
+      '/foo',
+    )
+    .isNameExcluded('/foo/bar', 'name'),
+  true,
+);
+
+Assert.equal(
+  config
+    .extendWithJson(
+      { enabled: true, packages: [{ path: 'bar', exclude: ['name'] }] },
+      '/foo',
+    )
+    .isNameExcluded('/foo/bar', 'name'),
+  true,
+);
+
+Assert.equal(
+  config
+    .extendWithJson({ enabled: true, packages: ['bar'] }, '/foo')
+    .isNameExcluded('/foo/bar', 'name'),
+  false,
+);

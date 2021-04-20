@@ -1,4 +1,5 @@
 import { strict as Assert } from 'assert';
+import * as Path from 'path';
 import * as FileSystem from 'fs';
 import { getDefaultConfig } from '../../../../lib/server/config.mjs';
 import Appmap from '../../../../lib/server/appmap.mjs';
@@ -11,11 +12,25 @@ try {
   }
 }
 
+Assert.equal(
+  new Appmap(getDefaultConfig()).instrument(
+    'script',
+    Path.resolve(process.cwd(), 'foo.js'),
+    '(function f () {} ())',
+  ),
+  '(function f () {} ())',
+);
+
 const appmap = new Appmap(
-  getDefaultConfig().extendWithEnv({
-    APPMAP_OUTPUT_DIR: 'tmp/appmap',
-    APPMAP_MAP_NAME: 'map-name',
-  }),
+  getDefaultConfig().extendWithEnv(
+    {
+      APPMAP: 'true',
+      APPMAP_PACKAGES: 'path1',
+      APPMAP_OUTPUT_DIR: 'tmp/appmap',
+      APPMAP_MAP_NAME: 'map-name',
+    },
+    process.cwd(),
+  ),
   {
     engine: 'engine',
     recorder: 'recorder',
@@ -27,7 +42,7 @@ const appmap = new Appmap(
   },
 );
 
-appmap.instrument('source', 'path1', '({});');
+appmap.instrument('script', Path.resolve(process.cwd(), 'path1'), '({});');
 appmap.emit('event1');
 appmap.terminate(true, 'reason1');
 
@@ -56,7 +71,7 @@ Assert.deepEqual(json, {
     app: 'unknown-app-name',
     feature: 'feature',
     feature_group: 'feature-group',
-    language: { name: 'javascript', engine: 'engine', version: '2015' },
+    language: { name: 'javascript', engine: 'engine', version: 'es2015' },
     frameworks: ['framework'],
     client: {
       name: '@appland/appmap-agent-js',
@@ -69,7 +84,7 @@ Assert.deepEqual(json, {
   classMap: [
     {
       type: 'package',
-      name: 'path1',
+      name: Path.resolve(process.cwd(), 'path1'),
       childeren: [{ type: 'class', name: '§none', childeren: [] }],
     },
   ],
@@ -79,8 +94,11 @@ Assert.deepEqual(json, {
 new Appmap(getDefaultConfig(), {}).terminate(false, 'reason');
 
 new Appmap(
-  getDefaultConfig().extendWithEnv({
-    APPMAP_OUTPUT_DIR: 'tmp/missing/',
-  }),
+  getDefaultConfig().extendWithEnv(
+    {
+      APPMAP_OUTPUT_DIR: 'tmp/missing/',
+    },
+    process.cwd(),
+  ),
   {},
 ).terminate(false, 'reason');

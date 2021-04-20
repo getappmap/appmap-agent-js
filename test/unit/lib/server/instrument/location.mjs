@@ -30,7 +30,6 @@ const file = new File(
 );
 
 const location0 = new RootLocation();
-Assert.equal(location0.shouldBeInstrumented(), true);
 Assert.throws(() => location0.makeEntity([], file));
 Assert.throws(() => location0.isNonScopingIdentifier());
 Assert.throws(() => location0.isChildNonScopingIdentifier(null));
@@ -76,7 +75,6 @@ Assert.throws(() => location0.getParentContainerName(file));
 
 const node1 = file.parse();
 const location1 = location0.extend(node1);
-Assert.equal(location1.shouldBeInstrumented(), true);
 Assert.deepEqual(location1.makeEntity(['child'], file), {
   type: 'package',
   name: file.getPath(),
@@ -92,7 +90,6 @@ Assert.deepEqual(location1.makeEntity(['child'], file), {
   Assert.throws(() => location2.isNonScopingIdentifier());
   const node3 = node2.expression;
   const location3 = location2.extend(node3);
-  Assert.equal(location3.shouldBeInstrumented(), true);
   Assert.equal(location3.makeEntity([], file), null);
   Assert.equal(location3.isStaticMethod(), false);
   Assert.equal(location3.isNonScopingIdentifier(), false);

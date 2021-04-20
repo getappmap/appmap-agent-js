@@ -2,503 +2,328 @@
 
 var Util = require('util');
 var FileSystem = require('fs');
-var Yaml = require('yaml');
 var Path = require('path');
+var YAML = require('yaml');
+var require$$0 = require('ajv/dist/runtime/equal');
 var ChildProcess = require('child_process');
 var acorn = require('acorn');
 var escodegen = require('escodegen');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
-var Yaml__default = /*#__PURE__*/_interopDefaultLegacy(Yaml);
+function _interopNamespace(e) {
+  if (e && e.__esModule) return e;
+  var n = Object.create(null);
+  if (e) {
+    Object.keys(e).forEach(function (k) {
+      if (k !== 'default') {
+        var d = Object.getOwnPropertyDescriptor(e, k);
+        Object.defineProperty(n, k, d.get ? d : {
+          enumerable: true,
+          get: function () {
+            return e[k];
+          }
+        });
+      }
+    });
+  }
+  n['default'] = e;
+  return Object.freeze(n);
+}
+
+var Util__namespace = /*#__PURE__*/_interopNamespace(Util);
+var FileSystem__namespace = /*#__PURE__*/_interopNamespace(FileSystem);
+var Path__namespace = /*#__PURE__*/_interopNamespace(Path);
+var YAML__default = /*#__PURE__*/_interopDefaultLegacy(YAML);
+var require$$0__default = /*#__PURE__*/_interopDefaultLegacy(require$$0);
+var ChildProcess__namespace = /*#__PURE__*/_interopNamespace(ChildProcess);
 
 // I'm not about the debuglog api because modifying process.env.NODE_DEBUG has no effect.
 // Why not directly provide the optimize logging function then?
 // https://github.com/nodejs/node/blob/master/lib/internal/util/debuglog.js
 
 const logger = {
-  error: Util.debuglog('appmap-error', (log) => {
+  error: Util__namespace.debuglog('appmap-error', (log) => {
     logger.error = log;
   }),
-  warning: Util.debuglog('appmap-warning', (log) => {
+  warning: Util__namespace.debuglog('appmap-warning', (log) => {
     logger.warning = log;
   }),
-  info: Util.debuglog('appmap-info', (log) => {
+  info: Util__namespace.debuglog('appmap-info', (log) => {
     logger.info = log;
   }),
 };
 
-const DEFAULT_ENABLED = false;
-const DEFAULT_OUTPUT_DIR = 'tmp/appmap';
-const DEFAULT_GIT_DIR = '.';
-const DEFAULT_LANGUAGE_VERSION = '2015';
-const DEFAULT_ESCAPE_PREFIX = 'APPMAP';
-const DEFAULT_APP_NAME = 'unknown-app-name';
-const DEFAULT_MAP_NAME = 'unknown-map-name';
+var config$1 = validate10;const schema11 = {"type":"object","additionalProperties":false,"properties":{"extends":{"type":"string"},"enabled":{"type":"boolean"},"name":{"type":"string"},"map-name":{"type":"string"},"escape-prefix":{"type":"string","pattern":"^[a-zA-Z_$][a-zA-Z_$-9]*$"},"output-dir":{"type":"string"},"git-dir":{"type":"string"},"language-version":{"enum":["es5","es5.1","es6","es2015","es7","es2016","es8","es2017","es9","es2018","es10","es2019","es11","es2020","es12","es2021"]},"packages":{"type":"array","items":{"anyOf":[{"type":"string"},{"type":"object","additionalProperties":false,"properties":{"dist":{"type":"string"},"path":{"type":"string"},"shallow":{"type":"boolean"},"exclude":{"type":"array","items":{"type":"string"}}}}]}},"exclude":{"type":"array","items":{"type":"string"}}}};const func4 = Object.prototype.hasOwnProperty;require$$0__default['default'].default;const pattern0 = new RegExp("^[a-zA-Z_$][a-zA-Z_$-9]*$", "u");function validate10(data, {instancePath="", parentData, parentDataProperty, rootData=data}={}){let vErrors = null;let errors = 0;if(errors === 0){if(data && typeof data == "object" && !Array.isArray(data)){const _errs1 = errors;for(const key0 in data){if(!(func4.call(schema11.properties, key0))){validate10.errors = [{instancePath,schemaPath:"#/additionalProperties",keyword:"additionalProperties",params:{additionalProperty: key0},message:"must NOT have additional properties"}];return false;}}if(_errs1 === errors){if(data.extends !== undefined){const _errs2 = errors;if(typeof data.extends !== "string"){validate10.errors = [{instancePath:instancePath+"/extends",schemaPath:"#/properties/extends/type",keyword:"type",params:{type: "string"},message:"must be string"}];return false;}var valid0 = _errs2 === errors;}else {var valid0 = true;}if(valid0){if(data.enabled !== undefined){const _errs4 = errors;if(typeof data.enabled !== "boolean"){validate10.errors = [{instancePath:instancePath+"/enabled",schemaPath:"#/properties/enabled/type",keyword:"type",params:{type: "boolean"},message:"must be boolean"}];return false;}var valid0 = _errs4 === errors;}else {var valid0 = true;}if(valid0){if(data.name !== undefined){const _errs6 = errors;if(typeof data.name !== "string"){validate10.errors = [{instancePath:instancePath+"/name",schemaPath:"#/properties/name/type",keyword:"type",params:{type: "string"},message:"must be string"}];return false;}var valid0 = _errs6 === errors;}else {var valid0 = true;}if(valid0){if(data["map-name"] !== undefined){const _errs8 = errors;if(typeof data["map-name"] !== "string"){validate10.errors = [{instancePath:instancePath+"/map-name",schemaPath:"#/properties/map-name/type",keyword:"type",params:{type: "string"},message:"must be string"}];return false;}var valid0 = _errs8 === errors;}else {var valid0 = true;}if(valid0){if(data["escape-prefix"] !== undefined){let data4 = data["escape-prefix"];const _errs10 = errors;if(errors === _errs10){if(typeof data4 === "string"){if(!pattern0.test(data4)){validate10.errors = [{instancePath:instancePath+"/escape-prefix",schemaPath:"#/properties/escape-prefix/pattern",keyword:"pattern",params:{pattern: "^[a-zA-Z_$][a-zA-Z_$-9]*$"},message:"must match pattern \""+"^[a-zA-Z_$][a-zA-Z_$-9]*$"+"\""}];return false;}}else {validate10.errors = [{instancePath:instancePath+"/escape-prefix",schemaPath:"#/properties/escape-prefix/type",keyword:"type",params:{type: "string"},message:"must be string"}];return false;}}var valid0 = _errs10 === errors;}else {var valid0 = true;}if(valid0){if(data["output-dir"] !== undefined){const _errs12 = errors;if(typeof data["output-dir"] !== "string"){validate10.errors = [{instancePath:instancePath+"/output-dir",schemaPath:"#/properties/output-dir/type",keyword:"type",params:{type: "string"},message:"must be string"}];return false;}var valid0 = _errs12 === errors;}else {var valid0 = true;}if(valid0){if(data["git-dir"] !== undefined){const _errs14 = errors;if(typeof data["git-dir"] !== "string"){validate10.errors = [{instancePath:instancePath+"/git-dir",schemaPath:"#/properties/git-dir/type",keyword:"type",params:{type: "string"},message:"must be string"}];return false;}var valid0 = _errs14 === errors;}else {var valid0 = true;}if(valid0){if(data["language-version"] !== undefined){let data7 = data["language-version"];const _errs16 = errors;if(!((((((((((((((((data7 === "es5") || (data7 === "es5.1")) || (data7 === "es6")) || (data7 === "es2015")) || (data7 === "es7")) || (data7 === "es2016")) || (data7 === "es8")) || (data7 === "es2017")) || (data7 === "es9")) || (data7 === "es2018")) || (data7 === "es10")) || (data7 === "es2019")) || (data7 === "es11")) || (data7 === "es2020")) || (data7 === "es12")) || (data7 === "es2021"))){validate10.errors = [{instancePath:instancePath+"/language-version",schemaPath:"#/properties/language-version/enum",keyword:"enum",params:{allowedValues: schema11.properties["language-version"].enum},message:"must be equal to one of the allowed values"}];return false;}var valid0 = _errs16 === errors;}else {var valid0 = true;}if(valid0){if(data.packages !== undefined){let data8 = data.packages;const _errs17 = errors;if(errors === _errs17){if(Array.isArray(data8)){var valid1 = true;const len0 = data8.length;for(let i0=0; i0<len0; i0++){let data9 = data8[i0];const _errs19 = errors;const _errs20 = errors;let valid2 = false;const _errs21 = errors;if(typeof data9 !== "string"){const err0 = {instancePath:instancePath+"/packages/" + i0,schemaPath:"#/properties/packages/items/anyOf/0/type",keyword:"type",params:{type: "string"},message:"must be string"};if(vErrors === null){vErrors = [err0];}else {vErrors.push(err0);}errors++;}var _valid0 = _errs21 === errors;valid2 = valid2 || _valid0;if(!valid2){const _errs23 = errors;if(errors === _errs23){if(data9 && typeof data9 == "object" && !Array.isArray(data9)){const _errs25 = errors;for(const key1 in data9){if(!((((key1 === "dist") || (key1 === "path")) || (key1 === "shallow")) || (key1 === "exclude"))){const err1 = {instancePath:instancePath+"/packages/" + i0,schemaPath:"#/properties/packages/items/anyOf/1/additionalProperties",keyword:"additionalProperties",params:{additionalProperty: key1},message:"must NOT have additional properties"};if(vErrors === null){vErrors = [err1];}else {vErrors.push(err1);}errors++;break;}}if(_errs25 === errors){if(data9.dist !== undefined){const _errs26 = errors;if(typeof data9.dist !== "string"){const err2 = {instancePath:instancePath+"/packages/" + i0+"/dist",schemaPath:"#/properties/packages/items/anyOf/1/properties/dist/type",keyword:"type",params:{type: "string"},message:"must be string"};if(vErrors === null){vErrors = [err2];}else {vErrors.push(err2);}errors++;}var valid3 = _errs26 === errors;}else {var valid3 = true;}if(valid3){if(data9.path !== undefined){const _errs28 = errors;if(typeof data9.path !== "string"){const err3 = {instancePath:instancePath+"/packages/" + i0+"/path",schemaPath:"#/properties/packages/items/anyOf/1/properties/path/type",keyword:"type",params:{type: "string"},message:"must be string"};if(vErrors === null){vErrors = [err3];}else {vErrors.push(err3);}errors++;}var valid3 = _errs28 === errors;}else {var valid3 = true;}if(valid3){if(data9.shallow !== undefined){const _errs30 = errors;if(typeof data9.shallow !== "boolean"){const err4 = {instancePath:instancePath+"/packages/" + i0+"/shallow",schemaPath:"#/properties/packages/items/anyOf/1/properties/shallow/type",keyword:"type",params:{type: "boolean"},message:"must be boolean"};if(vErrors === null){vErrors = [err4];}else {vErrors.push(err4);}errors++;}var valid3 = _errs30 === errors;}else {var valid3 = true;}if(valid3){if(data9.exclude !== undefined){let data13 = data9.exclude;const _errs32 = errors;if(errors === _errs32){if(Array.isArray(data13)){var valid4 = true;const len1 = data13.length;for(let i1=0; i1<len1; i1++){const _errs34 = errors;if(typeof data13[i1] !== "string"){const err5 = {instancePath:instancePath+"/packages/" + i0+"/exclude/" + i1,schemaPath:"#/properties/packages/items/anyOf/1/properties/exclude/items/type",keyword:"type",params:{type: "string"},message:"must be string"};if(vErrors === null){vErrors = [err5];}else {vErrors.push(err5);}errors++;}var valid4 = _errs34 === errors;if(!valid4){break;}}}else {const err6 = {instancePath:instancePath+"/packages/" + i0+"/exclude",schemaPath:"#/properties/packages/items/anyOf/1/properties/exclude/type",keyword:"type",params:{type: "array"},message:"must be array"};if(vErrors === null){vErrors = [err6];}else {vErrors.push(err6);}errors++;}}var valid3 = _errs32 === errors;}else {var valid3 = true;}}}}}}else {const err7 = {instancePath:instancePath+"/packages/" + i0,schemaPath:"#/properties/packages/items/anyOf/1/type",keyword:"type",params:{type: "object"},message:"must be object"};if(vErrors === null){vErrors = [err7];}else {vErrors.push(err7);}errors++;}}var _valid0 = _errs23 === errors;valid2 = valid2 || _valid0;}if(!valid2){const err8 = {instancePath:instancePath+"/packages/" + i0,schemaPath:"#/properties/packages/items/anyOf",keyword:"anyOf",params:{},message:"must match a schema in anyOf"};if(vErrors === null){vErrors = [err8];}else {vErrors.push(err8);}errors++;validate10.errors = vErrors;return false;}else {errors = _errs20;if(vErrors !== null){if(_errs20){vErrors.length = _errs20;}else {vErrors = null;}}}var valid1 = _errs19 === errors;if(!valid1){break;}}}else {validate10.errors = [{instancePath:instancePath+"/packages",schemaPath:"#/properties/packages/type",keyword:"type",params:{type: "array"},message:"must be array"}];return false;}}var valid0 = _errs17 === errors;}else {var valid0 = true;}if(valid0){if(data.exclude !== undefined){let data15 = data.exclude;const _errs36 = errors;if(errors === _errs36){if(Array.isArray(data15)){var valid5 = true;const len2 = data15.length;for(let i2=0; i2<len2; i2++){const _errs38 = errors;if(typeof data15[i2] !== "string"){validate10.errors = [{instancePath:instancePath+"/exclude/" + i2,schemaPath:"#/properties/exclude/items/type",keyword:"type",params:{type: "string"},message:"must be string"}];return false;}var valid5 = _errs38 === errors;if(!valid5){break;}}}else {validate10.errors = [{instancePath:instancePath+"/exclude",schemaPath:"#/properties/exclude/type",keyword:"type",params:{type: "array"},message:"must be array"}];return false;}}var valid0 = _errs36 === errors;}else {var valid0 = true;}}}}}}}}}}}}else {validate10.errors = [{instancePath,schemaPath:"#/type",keyword:"type",params:{type: "object"},message:"must be object"}];return false;}}validate10.errors = vErrors;return errors === 0;}
 
-const wrapName = (name) => ({ name });
-
-const combine = (closure1, closure2) => (any) => closure2(closure1(any));
-
-const isNotNull = (any) => any !== null;
-
-const trim = (string) => string.trim();
-
-const toLowerCase = (string) => string.toLowerCase();
+const trim$1 = (string) => string.trim();
 
 const identity = (any) => any;
 
-const isAppmapEnvKey = (key) => key === 'APPMAP' || key.startsWith('APPMAP_');
+const isNotNull = (any) => any !== null;
 
-//////////////
-// Sanitize //
-//////////////
+////////////////////
+// extendWithJson //
+////////////////////
 
-const makeEscapePrefixSanitizer = (location) => (string) => {
-  if (!/^[a-zA-Z_$][a-zA-Z_$0-9]+$/.test(string)) {
-    logger.warning(
-      'Invalid %s, defaulting to %s >> expected matching /^[a-zA-Z_$][a-zA-Z_$0-9]+$/ and got: %s',
-      location,
-      DEFAULT_ESCAPE_PREFIX,
-      string,
-    );
-    return DEFAULT_ESCAPE_PREFIX;
-  }
-  return string;
+const resolve = (path, base) => Path__namespace.resolve(base, path);
+
+const makeOverwrite = (key, transform) => (value, object, context) => {
+  object[key] = transform(value, context);
+  return null;
 };
 
-const ecmas = [
-  '5',
-  '5.1',
-  '2015',
-  '2016',
-  '2017',
-  '2018',
-  '2019',
-  '2020',
-  '2021',
-];
-
-const makeLanguageVersionSanitizer = (location) => (string) => {
-  if (!ecmas.includes(string)) {
-    logger.warning(
-      'Invalid %s env argument, defaulting to %s >> expected one of %j and got: %s',
-      ecmas,
-      DEFAULT_LANGUAGE_VERSION,
-      string,
-    );
-    return DEFAULT_LANGUAGE_VERSION;
-  }
-  return string;
-};
-
-const makeTypeSanitizer = (type, location, json1) => (json2) => {
-  /* eslint-disable valid-typeof */
-  if (typeof json2 !== type) {
-    logger.warning(
-      'Invalid %s, defaulting to %j >> expected a %s and got: %j',
-      location,
-      json1,
-      type,
-      json2,
-    );
-    return json1;
-  }
-  /* eslint-enable valid-typeof */
-  return json2;
-};
-
-const makeBooleanStringSanitizer = (location, boolean) => (string) => {
-  string = string.toLowerCase();
-  if (string !== 'true' && string !== 'false') {
-    logger.warning(
-      "Invalid %s, defaulting to %b >> expected 'true' or 'false' (case insensitive) and got: %s",
-      location,
-      boolean,
-      string,
-    );
-    return boolean;
-  }
-  return string === 'true';
-};
-
-const makeArraySanitizer = (location, sanitizer) => (json) => {
-  if (!Array.isArray(json)) {
-    logger.warning(
-      'Invalid %s, defaulting to [] >> expected an array and got: %j',
-      location,
-      json,
-    );
-    return [];
-  }
-  return json.map(sanitizer).filter(isNotNull);
-};
-
-const mappings = {
-  env: {
-    __proto__: null,
-    APPMAP: {
-      name: 'enabled',
-      sanitize: combine(
-        toLowerCase,
-        makeBooleanStringSanitizer('APPMAP env argument', false),
-      ),
-    },
-    APPMAP_MAP_NAME: {
-      name: 'map_name',
-      sanitize: identity,
-    },
-    APPMAP_APP_NAME: {
-      name: 'app_name',
-      sanitize: identity,
-    },
-    APPMAP_LANGUAGE_VERSION: {
-      name: 'language_version',
-      sanitize: makeLanguageVersionSanitizer(),
-    },
-    APPMAP_ESCAPE_PREFIX: {
-      name: 'escape_prefix',
-      sanitize: makeEscapePrefixSanitizer('APPMAP_ESCAPE_PREFIX env argument'),
-    },
-    APPMAP_OUTPUT_DIR: {
-      name: 'output_dir',
-      sanitize: identity,
-    },
-    APPMAP_GIT_DIR: {
-      name: 'git_dir',
-      sanitize: identity,
-    },
-    APPMAP_EXCLUDE: {
-      name: 'exclusions',
-      sanitize: (string) => string.split(',').map(trim),
-    },
-    APPMAP_PACKAGES: {
-      name: 'packages',
-      sanitize: (string) => string.split(',').map(trim).map(wrapName),
-    },
-  },
-  json: {
-    __proto__: null,
-    enabled: {
-      name: 'enabled',
-      sanitize: makeTypeSanitizer('boolean', 'enabled value', false),
-    },
-    name: {
-      name: 'app_name',
-      sanitize: makeTypeSanitizer('string', 'name value', DEFAULT_APP_NAME),
-    },
-    'map-name': {
-      name: 'map_name',
-      sanitize: makeTypeSanitizer('string', 'map-name value', DEFAULT_MAP_NAME),
-    },
-    'language-version': {
-      name: 'language_version',
-      sanitize: combine(
-        makeTypeSanitizer(
-          'string',
-          'language-version value',
-          DEFAULT_LANGUAGE_VERSION,
-        ),
-        makeLanguageVersionSanitizer(),
-      ),
-    },
-    'escape-prefix': {
-      name: 'escape_prefix',
-      sanitize: combine(
-        makeTypeSanitizer(
-          'string',
-          'escape-prefix value',
-          DEFAULT_ESCAPE_PREFIX,
-        ),
-        makeEscapePrefixSanitizer('escape-prefix value'),
-      ),
-    },
-    'output-dir': {
-      name: 'output_dir',
-      sanitize: makeTypeSanitizer(
-        'string',
-        'output-dir value',
-        DEFAULT_OUTPUT_DIR,
-      ),
-    },
-    'git-dir': {
-      name: 'git_dir',
-      sanitize: makeTypeSanitizer('string', 'git-dir value', DEFAULT_GIT_DIR),
-    },
-    packages: {
-      name: 'packages',
-      sanitize: makeArraySanitizer('output_dir conf value', (json, index) => {
-        if (typeof json === 'string') {
-          return { name: json };
-        }
-        if (typeof json === 'object' && json !== null) {
-          if (Reflect.getOwnPropertyDescriptor(json, 'name') === undefined) {
-            logger.warning(
-              'Invalid packages[%i] value >> missing name field and got %s',
-              index,
-              json,
-            );
-            return null;
-          }
-          if (typeof json.name !== 'string') {
-            logger.warning(
-              'Invalid packages[%i].name value >> expected a string and got %s',
-              index,
-              json.name,
-            );
-            return null;
-          }
-          return {
-            name: json.name,
-          };
-        }
-        logger.warning(
-          'Invalid packages[%i] value >> expected either a string or an object and got %s',
-          index,
-          json,
-        );
-        return null;
-      }),
-    },
-    exclude: {
-      name: 'exclusions',
-      sanitize: makeArraySanitizer('exclude conf value', (json, index) => {
-        if (typeof json !== 'string') {
-          logger.warning(
-            'Invalid exclude[%i] conf value >> expected a string and got %j',
-            index,
-            json,
-          );
-          return null;
-        }
-        return json;
-      }),
-    },
-  },
-};
-
-///////////
-// Merge //
-///////////
-
-const overwrite = (scalar1, scalar2) => scalar2;
-
-const concat = (array1, array2) => [...array1, ...array2];
+const sortPackage = (specifier1, specifier2) =>
+  specifier2.path.length - specifier1.path.length;
 
 const mergers = {
-  enabled: overwrite,
-  app_name: overwrite,
-  map_name: overwrite,
-  language_version: overwrite,
-  escape_prefix: overwrite,
-  output_dir: overwrite,
-  git_dir: overwrite,
-  packages: concat,
-  exclusions: concat,
+  __proto__: null,
+  extends: (path, conf, base) =>
+    /* eslint-disable no-use-before-define */
+    extendWithFile(conf, Path__namespace.resolve(base, path)),
+    /* eslint-enable no-use-before-define */
+  packages: (specifiers, conf, base) => {
+    conf.packages = [
+      ...specifiers.flatMap((specifier) => {
+        if (typeof specifier === 'string') {
+          specifier = { path: specifier, dist: specifier };
+        }
+        specifier = {
+          shallow: false,
+          path: null,
+          dist: null,
+          exclude: [],
+          ...specifier,
+        };
+        const specifiers = [];
+        if (specifier.dist !== null) {
+          specifiers.push({
+            ...specifier,
+            path: Path__namespace.resolve(base, 'node_modules', specifier.dist),
+          });
+        }
+        if (specifier.path !== null) {
+          specifiers.push({
+            ...specifier,
+            path: Path__namespace.resolve(base, specifier.path),
+          });
+        }
+        return specifiers;
+      }),
+      ...conf.packages,
+    ];
+    conf.packages.sort(sortPackage);
+    return null;
+  },
+  exclude: (exclusions, conf, base) => {
+    conf.exclude = [...exclusions, ...conf.exclude];
+    return null;
+  },
+  enabled: makeOverwrite('enabled', identity),
+  name: makeOverwrite('map-name', identity),
+  'app-name': makeOverwrite('app-name', identity),
+  'map-name': makeOverwrite('map-name', identity),
+  'language-version': makeOverwrite('language-version', identity),
+  'escape-prefix': makeOverwrite('escape-prefix', identity),
+  'output-dir': makeOverwrite('output-dir', resolve),
+  'git-dir': makeOverwrite('git-dir', resolve),
 };
 
-////////////
-// Extend //
-////////////
+const extendWithJson = (conf, json, base) => {
+  logger.info('Configuration extended with json: %j', json);
+  base = Path__namespace.resolve(process.cwd(), base);
+  if (!config$1(json)) {
+    // console.asset(validateConfig.errors.length > 0)
+    logger.warning(`Invalid configuration: %j`, config$1.errors);
+    return `invalid configuration at ${config$1.errors[0].schemaPath}, it ${config$1.errors[0].message}`;
+  }
+  const messages = Reflect.ownKeys(json)
+    .map((key) => mergers[key](json[key], conf, base))
+    .filter(isNotNull);
+  if (messages.length > 0) {
+    return messages[0];
+  }
+  return null;
+};
 
-const extend = (mapping, conf, object) => {
-  conf = { ...conf };
-  Reflect.ownKeys(object).forEach((key) => {
-    if (key in mapping) {
-      const { name, sanitize } = mapping[key];
-      conf[name] = mergers[name](conf[name], sanitize(object[key]));
-    } else {
-      logger.warning('Unrecognized conf key %s', key);
+///////////////////
+// extendWithEnv //
+///////////////////
+
+const mapping = {
+  __proto__: null,
+  APPMAP: ['enabled', (string) => string.toLowerCase() === 'true'],
+  APPMAP_CONFIG: ['extends', identity],
+  APPMAP_NAME: ['name', identity],
+  APPMAP_APP_NAME: ['app-name', identity],
+  APPMAP_MAP_NAME: ['map-name', identity],
+  APPMAP_OUTPUT_DIR: ['output-dir', identity],
+  APPMAP_GIT_DIR: ['git-dir', identity],
+  APPMAP_LANGUAGE_VERSION: ['language-version', identity],
+  APPMAP_PACKAGES: ['packages', (string) => string.split(',').map(trim$1)],
+};
+
+const extendWithEnv = (conf, env, base) => {
+  logger.info('Configuration extended with environment: %j', env);
+  env = { __proto__: null, ...env };
+  const json = { __proto__: null };
+  Reflect.ownKeys(env).forEach((key1) => {
+    if (key1.startsWith('APPMAP')) {
+      if (key1 in mapping) {
+        const [key2, transform] = mapping[key1];
+        json[key2] = transform(env[key1]);
+      } else {
+        logger.warning('Unrecognized appmap env key: %s', key1);
+      }
     }
   });
-  return conf;
+  return extendWithJson(conf, json, base);
+};
+
+////////////////////
+// extendWithFile //
+////////////////////
+
+const parseDefault = () => {
+  throw new Error(
+    "invalid file extension, expected one of: '.yml', '.yaml', or '.json'",
+  );
 };
 
 const extendWithFile = (conf, path) => {
-  logger.info('configuration extended with file: %s', path);
+  logger.info('Configuration extended with file: %s', path);
+  let content;
+  try {
+    content = FileSystem__namespace.readFileSync(path, 'utf8');
+  } catch (error) {
+    logger.warning('Cannot read conf file %s >> %s', path, error.message);
+    return `failed to read conf file ${path} because ${error.message}`;
+  }
   let parse;
   if (path.endsWith('.json')) {
     parse = JSON.parse;
-  } else if (path.endsWith('.yml')) {
-    parse = Yaml__default['default'].parse;
+  } else if (path.endsWith('.yml') || path.endsWith('.yaml')) {
+    parse = YAML__default['default'].parse;
   } else {
-    logger.warning(
-      "Invalid conf file extension >> expected '.yml' or '.json', got: %s",
-      conf,
-    );
-    return undefined;
-  }
-  let content;
-  try {
-    content = FileSystem.readFileSync(path, 'utf8');
-  } catch (error) {
-    logger.warning('Failed to read conf file at %s >> %s', path, error.message);
-    return undefined;
+    parse = parseDefault;
   }
   let json;
   try {
     json = parse(content);
   } catch (error) {
-    logger.warning('Failed to parse conf file >> %s', error.message);
+    logger.warning('Cannot parse conf file %s >> %s', path, error.message);
+    return `failed to parse conf file ${path} because ${error.message}`;
   }
-  /* eslint-disable no-use-before-define */
-  return extendWithJson(conf, json);
-  /* eslint-enable no-use-before-define */
-};
-
-const extendWithJson = (conf, json) => {
-  logger.info('configuration extended with json: %j', json);
-  if (json === null || typeof json !== 'object') {
-    logger.warning(
-      'Invalid top-level format >> expected an object and got: %j',
-      json,
-    );
-    return conf;
-  }
-  if (Reflect.getOwnPropertyDescriptor(json, 'extend') !== undefined) {
-    if (typeof json.extend !== 'string') {
-      logger.warning(
-        'Invalid extend value >> expected a string and got: %j',
-        json.extend,
-      );
-    } else {
-      conf = extendWithFile(conf, json.extend);
-    }
-  }
-  return extend(mappings.json, conf, json);
-};
-
-const extendWithEnv = (conf, env) => {
-  logger.info('configuration extended with environment: %j', env);
-  if (Reflect.getOwnPropertyDescriptor(env, 'APPMAP_CONFIG') !== undefined) {
-    conf = extendWithFile(conf, env.APPMAP_CONFIG);
-  }
-  return extend(
-    mappings.env,
-    conf,
-    Reflect.ownKeys(env)
-      .filter(isAppmapEnvKey)
-      .reduce(
-        (acc, key) => {
-          acc[key] = env[key];
-          return acc;
-        },
-        { __proto__: null },
-      ),
-  );
+  return extendWithJson(conf, json, Path__namespace.dirname(path));
 };
 
 ////////////
 // Config //
 ////////////
 
+const runExtend = (extend, conf, ...args) => {
+  conf = { ...conf };
+  const failure = extend(conf, ...args);
+  if (failure !== null) {
+    return failure;
+  }
+  /* eslint-disable no-use-before-define */
+  return new Config(conf);
+  /* eslint-enable no-use-before-define */
+};
+
+const getSpecifier = (specifiers, path) => {
+  if (!Path__namespace.isAbsolute(path)) {
+    logger.error('Expected an absolute path and got: %s', path);
+    return undefined;
+  }
+  path = Path__namespace.resolve(path); // absolute path may not be normalized and contain [".", ".."]
+  return specifiers.find((specifier) => path.startsWith(specifier.path));
+};
+
 class Config {
   constructor(conf) {
     this.conf = conf;
   }
-  extendWithJson(json) {
-    return new Config(extendWithJson(this.conf, json));
+  extendWithJson(json, base) {
+    return runExtend(extendWithJson, this.conf, json, base);
   }
   extendWithFile(path) {
-    return new Config(extendWithFile(this.conf, path));
+    return runExtend(extendWithFile, this.conf, path);
   }
-  extendWithEnv(env) {
-    return new Config(extendWithEnv(this.conf, env));
+  extendWithEnv(env, base) {
+    return runExtend(extendWithEnv, this.conf, env, base);
   }
   getEscapePrefix() {
-    return this.conf.escape_prefix;
+    return this.conf['escape-prefix'];
   }
   getOutputDir() {
-    return this.conf.output_dir;
+    return this.conf['output-dir'];
   }
   getGitDir() {
-    return this.conf.git_dir;
+    return this.conf['git-dir'];
   }
   getAppName() {
-    return this.conf.app_name;
+    return this.conf['app-name'];
   }
   getLanguageVersion() {
-    return this.conf.language_version;
+    return this.conf['language-version'];
   }
   getMapName() {
-    return this.conf.map_name;
+    return this.conf['map-name'];
   }
-  isEnabled() {
-    return this.conf.enabled;
+  getFileInstrumentation(path) {
+    if (!this.conf.enabled) {
+      return null;
+    }
+    const specifier = getSpecifier(this.conf.packages, path);
+    if (specifier === undefined) {
+      return null;
+    }
+    return specifier.shallow ? 'shallow' : 'deep';
   }
-  getPackages() {
-    return this.conf.packages;
-  }
-  getExclusions() {
-    return this.conf.exclusions;
+  isNameExcluded(path, name) {
+    if (!this.conf.enabled) {
+      logger.error('Call isNameExcluded(%) on disabled appmap', path);
+      return true;
+    }
+    if (this.conf.exclude.includes(name)) {
+      return true;
+    }
+    const specifier = getSpecifier(this.conf.packages, path);
+    if (specifier === undefined) {
+      logger.error('Missing package for %', path);
+      return true;
+    }
+    return specifier.exclude.includes(name);
   }
 }
 
+////////////////////
+// Default Config //
+////////////////////
+
 const config = new Config({
-  enabled: DEFAULT_ENABLED,
-  app_name: DEFAULT_APP_NAME,
-  map_name: DEFAULT_MAP_NAME,
-  git_dir: DEFAULT_GIT_DIR,
-  language_version: DEFAULT_LANGUAGE_VERSION,
-  escape_prefix: DEFAULT_ESCAPE_PREFIX,
-  output_dir: DEFAULT_OUTPUT_DIR,
+  enabled: false,
+  'app-name': 'unknown-app-name',
+  'map-name': 'unknown-map-name',
+  'git-dir': '.',
+  'language-version': 'es2015',
+  'escape-prefix': 'APPMAP',
+  'output-dir': 'tmp/appmap',
   packages: [],
-  exclusions: [],
+  exclude: [],
 });
 
 const getDefaultConfig = () => config;
 
-var globals = [
-  "EMPTY_MARKER",
-  "UNDEFINED",
-  "GET_NOW",
-  "EMIT",
-  "PROCESS_ID",
-  "EVENT_COUNTER",
-  "GET_CLASS_NAME",
-  "GET_IDENTITY",
-  "SERIALIZE",
-  "SERIALIZE_EXCEPTION",
-  "SERIALIZE_PARAMETER"
-];
-
-const locals = ['EVENT_ID', 'ARGUMENT', 'ERROR', 'SUCCESS', 'FAILURE', 'TIMER'];
-
-var Namespace = (class Namespace {
-  constructor(prefix) {
-    if (!/^[A-Za-z_$][0-9A-Za-z_$]*$/u.test(prefix)) {
-      throw new Error(`Invalid prefix: ${prefix}`);
-    }
-    this.prefix = prefix;
-  }
-  checkCollision(identifier) {
-    if (identifier.startsWith(this.prefix)) {
-      throw new Error(
-        `Base-level identifier should never start with the escape prefix ${this.prefix}, got: ${identifier}`,
-      );
-    }
-  }
-  getGlobal(name) {
-    if (!globals.includes(name)) {
-      throw new Error(`Invalid global identifier name: ${name}`);
-    }
-    return `${this.prefix}_GLOBAL_${name}`;
-  }
-  getLocal(name) {
-    if (!locals.includes(name)) {
-      throw new Error(`Invalid local identifier name: ${name}`);
-    }
-    return `${this.prefix}_LOCAL_${name}`;
-  }
-});
-
-const trim$1 = (string) => string.trim();
+const trim = (string) => string.trim();
 
 const format = (command, path, reason, detail, stderr) =>
   `Command failure cwd=${path}: ${command} >> ${reason} ${detail} ${stderr}`;
 
 const spawnSync = (command, path) => {
-  const result = ChildProcess.spawnSync(
+  const result = ChildProcess__namespace.spawnSync(
     command.split(' ')[0],
     command.split(' ').slice(1),
     {
@@ -537,7 +362,7 @@ const parseStatus = (status) => {
     return null;
   }
   /* c8 ignore stop */
-  return status.split('\n').map(trim$1);
+  return status.split('\n').map(trim);
 };
 
 const parseDescription = (description) => {
@@ -602,7 +427,7 @@ class File {
     version,
     source,
     path,
-    content = FileSystem.readFileSync(path, 'utf8'),
+    content = FileSystem__namespace.readFileSync(path, 'utf8'),
   ) {
     this.path = path;
     this.version = version;
@@ -734,10 +559,6 @@ class Location {
   getStartLine() {
     return this.node.loc.start.line;
   }
-  shouldBeInstrumented(file) {
-    // TODO add some logic here
-    return true;
-  }
   isChildNonScopingIdentifier(node) {
     if (node.type !== 'Identifier') {
       throw new Error(
@@ -818,9 +639,6 @@ class RootLocation {
   extend(node) {
     return new Location(node, this);
   }
-  shouldBeInstrumented() {
-    return true;
-  }
   makeEntity(childeren, file) {
     throw new Error(`RootLocation.makeEntity()`);
   }
@@ -877,14 +695,15 @@ const getResultEntities = ({ entities }) => entities;
 
 const getResultNode = ({ node }) => node;
 
-const visit = (node, { location, namespace, file }) => {
+const visit = (node, { location, isNameExcluded, namespace, file }) => {
+  location = location.extend(node);
   let entities = [];
-  const extended = location.extend(node);
-  if (extended.shouldBeInstrumented(file)) {
+  if (!isNameExcluded(location.getName(file))) {
     if (node.type in visitors) {
       const context = {
-        location: extended,
+        location,
         file,
+        isNameExcluded,
         namespace,
       };
       const { split, join } = visitors[node.type];
@@ -900,7 +719,7 @@ const visit = (node, { location, namespace, file }) => {
         }
       }
       node = join(node, context, ...fields);
-      const entity = extended.makeEntity(entities, file);
+      const entity = location.makeEntity(entities, file);
       if (entity !== null) {
         entities = [entity];
       }
@@ -2036,17 +1855,61 @@ setVisitor(
   }),
 );
 
-var instrument = (file, namespace, callback) => {
+var instrument = (file, namespace, isNameExcluded, callback) => {
   const location = new RootLocation();
-  /* c8 ignore start */
-  if (!location.shouldBeInstrumented(file)) {
-    return file.content;
-  }
-  /* c8 ignore stop */
-  const result = visit(file.parse(), { location, file, namespace });
+  const result = visit(file.parse(), {
+    location,
+    file,
+    namespace,
+    isNameExcluded,
+  });
   getResultEntities(result).forEach(callback);
   return escodegen.generate(getResultNode(result));
 };
+
+var globals = [
+  "EMPTY_MARKER",
+  "UNDEFINED",
+  "GET_NOW",
+  "EMIT",
+  "PROCESS_ID",
+  "EVENT_COUNTER",
+  "GET_CLASS_NAME",
+  "GET_IDENTITY",
+  "SERIALIZE",
+  "SERIALIZE_EXCEPTION",
+  "SERIALIZE_PARAMETER"
+];
+
+const locals = ['EVENT_ID', 'ARGUMENT', 'ERROR', 'SUCCESS', 'FAILURE', 'TIMER'];
+
+var Namespace = (class Namespace {
+  constructor(prefix) {
+    if (!/^[A-Za-z_$][0-9A-Za-z_$]*$/u.test(prefix)) {
+      throw new Error(`Invalid prefix: ${prefix}`);
+    }
+    this.prefix = prefix;
+  }
+  checkCollision(identifier) {
+    if (identifier.startsWith(this.prefix)) {
+      throw new Error(
+        `Base-level identifier should never start with the escape prefix ${this.prefix}, got: ${identifier}`,
+      );
+    }
+  }
+  getGlobal(name) {
+    if (!globals.includes(name)) {
+      throw new Error(`Invalid global identifier name: ${name}`);
+    }
+    return `${this.prefix}_GLOBAL_${name}`;
+  }
+  getLocal(name) {
+    if (!locals.includes(name)) {
+      throw new Error(`Invalid local identifier name: ${name}`);
+    }
+    return `${this.prefix}_LOCAL_${name}`;
+  }
+});
 
 const VERSION = '1.4';
 
@@ -2113,9 +1976,14 @@ var Appmap = (class Appmap {
     if (this.terminated) {
       throw new Error(`Terminated appmap can no longer instrument code`);
     }
+    const instrumentation = this.config.getFileInstrumentation(path);
+    if (instrumentation === null) {
+      return content;
+    }
     return instrument(
       new File(this.config.getLanguageVersion(), source, path, content),
       this.namespace,
+      (name) => this.config.isNameExcluded(path, name),
       (entity) => {
         logger.info('Appmap receive code entity: %j', entity);
         this.appmap.classMap.push(entity);
@@ -2134,7 +2002,7 @@ var Appmap = (class Appmap {
       throw new Error('Terminated appmap can no longer be terminated');
     }
     this.terminated = true;
-    const path = Path.join(
+    const path = Path__namespace.join(
       this.config.getOutputDir(),
       `${this.config.getMapName()}.appmap.json`,
     );
@@ -2145,9 +2013,9 @@ var Appmap = (class Appmap {
       json,
     );
     if (sync) {
-      FileSystem.writeFileSync(path, JSON.stringify(this.appmap), 'utf8');
+      FileSystem__namespace.writeFileSync(path, JSON.stringify(this.appmap), 'utf8');
     } else {
-      FileSystem.writeFile(
+      FileSystem__namespace.writeFile(
         path,
         JSON.stringify(this.appmap),
         'utf8',
@@ -2215,7 +2083,7 @@ var Dispatcher = (class Dispatcher {
       do {
         session = Math.random().toString(36).substring(2);
       } while (session in this.appmaps);
-      const config = this.config.extendWithEnv(json.env);
+      const config = this.config.extendWithEnv(json.env, process.cwd());
       const appmap = new Appmap(config, json.init);
       this.appmaps[session] = appmap;
       return {

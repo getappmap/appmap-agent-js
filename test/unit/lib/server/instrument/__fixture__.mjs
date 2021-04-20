@@ -21,6 +21,7 @@ export const test = (options) => {
     keys: null,
     ...options,
   };
+  const isNameExcluded = (name) => false;
   let location = new RootLocation();
   const namespace = new Namespace(prefix);
   const file = new File(ecma, source, path, input);
@@ -45,10 +46,7 @@ export const test = (options) => {
     namespace,
     location,
     file,
+    isNameExcluded,
   });
-  // console.log("1", getResultNode(result));
-  // console.log("2", escodegen(getResultNode(result)));
-  // console.log("3", node2);
-  // console.log("4", escodegen(node2));
   Assert.equal(escodegen(getResultNode(result)), escodegen(node2));
 };

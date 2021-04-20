@@ -8,6 +8,7 @@ rules:
   no-param-reassign: off
   valid-typeof: off
   spaced-comment: off
+  no-shadow: off
   max-classes-per-file: off
   no-unused-vars:
     - error

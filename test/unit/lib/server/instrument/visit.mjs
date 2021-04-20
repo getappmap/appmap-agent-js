@@ -28,15 +28,19 @@ const output = {
 };
 
 [
-  [true, 'entity0'],
-  [false, null],
-].forEach(([instrumentable, entity], index) => {
+  [false, 'entity0'],
+  [true, null],
+].forEach(([excluded, entity], index) => {
+  const isNameExcluded = (...args) => {
+    Assert.deepEqual(args, ['???']);
+    return excluded;
+  };
   const extended = {
     __proto__: null,
-    shouldBeInstrumented(...args) {
+    getName(...args) {
       Assert.equal(this, extended);
       Assert.deepEqual(args, [file]);
-      return instrumentable;
+      return '???';
     },
     makeEntity(...args) {
       Assert.equal(this, extended);
@@ -55,8 +59,11 @@ const output = {
   setVisitor(
     'Identifier',
     (...args) => {
-      Assert.equal(instrumentable, true);
-      Assert.deepEqual(args, [input, { location: extended, namespace, file }]);
+      Assert.equal(excluded, false);
+      Assert.deepEqual(args, [
+        input,
+        { location: extended, namespace, file, isNameExcluded },
+      ]);
       return [
         {
           node: 'child1',
@@ -71,10 +78,10 @@ const output = {
       ];
     },
     (...args) => {
-      Assert.equal(instrumentable, true);
+      Assert.equal(excluded, false);
       Assert.deepEqual(args, [
         input,
-        { location: extended, namespace, file },
+        { location: extended, namespace, file, isNameExcluded },
         'child1',
         ['child2'],
       ]);
@@ -83,31 +90,35 @@ const output = {
   );
 
   Assert.deepEqual(
-    visit(input, { location, namespace, file }),
-    instrumentable
+    visit(input, { location, namespace, file, isNameExcluded }),
+    excluded
       ? {
+          node: input,
+          entities: [],
+        }
+      : {
           node: output,
           entities:
             entity === null ? ['entity1', 'entity2', 'entite3'] : [entity],
-        }
-      : {
-          node: input,
-          entities: [],
         },
   );
 });
 
 {
+  const isNameExcluded = () => false;
   const location = {
     __proto__: null,
     extend: () => location,
-    shouldBeInstrumented: () => true,
+    getName: () => '???',
     makeEntity: () => null,
   };
-  Assert.deepEqual(visit({ type: 'Foo' }, { location, namespace, file }), {
-    node: {
-      type: 'Foo',
+  Assert.deepEqual(
+    visit({ type: 'Foo' }, { location, namespace, file, isNameExcluded }),
+    {
+      node: {
+        type: 'Foo',
+      },
+      entities: [],
     },
-    entities: [],
-  });
+  );
 }
