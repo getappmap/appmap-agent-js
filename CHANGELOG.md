@@ -1,3 +1,10 @@
+## [2.1.2](https://github.com/applandinc/appmap-agent-js/compare/v2.1.1...v2.1.2) (2021-04-19)
+
+
+### Bug Fixes
+
+* update posix-socket-messaging ([625fd8c](https://github.com/applandinc/appmap-agent-js/commit/625fd8c9649a71e005fbb9f3f53a04231e28b616))
+
 ## [2.1.1](https://github.com/applandinc/appmap-agent-js/compare/v2.1.0...v2.1.1) (2021-04-15)
 
 
