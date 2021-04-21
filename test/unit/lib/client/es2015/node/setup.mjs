@@ -28,7 +28,7 @@ emitter.pid = 123;
 
 emitter.version = '1.2.3';
 
-const { instrumentScript, instrumentModule } = setup(emitter);
+const { instrumentScript, instrumentModule } = setup('origin', emitter);
 
 Assert.equal(prefix_GLOBAL_PROCESS_ID, 123);
 
