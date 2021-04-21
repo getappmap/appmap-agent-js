@@ -1,3 +1,10 @@
+# [2.3.0](https://github.com/applandinc/appmap-agent-js/compare/v2.2.0...v2.3.0) (2021-04-21)
+
+
+### Features
+
+* child_process methods can now be hooked so that their spawn processes are also instrumented ([f34132b](https://github.com/applandinc/appmap-agent-js/commit/f34132b3511f2352e84e4ed03c82f4a7a689aa55))
+
 # [2.2.0](https://github.com/applandinc/appmap-agent-js/compare/v2.1.2...v2.2.0) (2021-04-20)
 
 
