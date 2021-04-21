@@ -1,3 +1,10 @@
+# [2.4.0](https://github.com/applandinc/appmap-agent-js/compare/v2.3.0...v2.4.0) (2021-04-21)
+
+
+### Features
+
+* propagate hook-child-process cli argument to forked processes ([ea6af3b](https://github.com/applandinc/appmap-agent-js/commit/ea6af3bb80ebd1e1322f224090154773e4f667e2))
+
 # [2.3.0](https://github.com/applandinc/appmap-agent-js/compare/v2.2.0...v2.3.0) (2021-04-21)
 
 
