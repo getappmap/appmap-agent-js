@@ -6,9 +6,6 @@ import * as Agent from '../lib/server/index.mjs';
 const argv = {
   protocol: 'messaging',
   port: 0,
-  esm: true,
-  cjs: true,
-  ecma: 'es2015',
   _: [],
   ...minimist(process.argv.slice(2)),
 };
@@ -23,7 +20,6 @@ if (argv._.length === 0) {
       argv._.slice(1),
       {
         stdio: 'inherit',
-        // execArgv: ["--inspect-brk"],
         env,
       },
       {
