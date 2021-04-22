@@ -26,3 +26,4 @@ npx appmap-agent -- main.mjs argv0 argv1
   * `http2`
 * `--port <port>`: Specify the TCP port to perform the inter-process communication. Default is `0` which assign a random port. Path to unix domain sockets are also accepted. No effect if the protocol is `inline`.
 * `--` Everything after the standalone double dash will be used to launch the program under test.
+
