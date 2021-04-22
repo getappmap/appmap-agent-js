@@ -6,31 +6,47 @@ import setup from '../../../../../../lib/client/es2015/node/setup.js';
 
 const emitter = new EventEmitter();
 const trace = [];
-emitter.env = {
-  APPMAP_PROTOCOL: {
-    requestSync: (json) => {
-      trace.push(['sync', json]);
-      if (json.name === 'initialize') {
-        return { session: 'session', prefix: 'prefix' };
-      }
-      return 'qux';
-    },
-    requestAsync: (json, pending) => {
-      trace.push(['async', json]);
-      if (pending !== null) {
-        pending.resolve('qux');
-      }
-    },
+
+const data = {
+  env: {},
+  execPath: 'exec-path',
+  pid: 'pid',
+  ppid: 'ppid',
+  execArgv: ['exec-arg0'],
+  argv: ['node', 'main.js', 'arg0'],
+  platform: 'platform',
+  arch: 'arch',
+  version: 'version',
+};
+
+const protocol = {
+  requestSync: (json) => {
+    trace.push(['sync', json]);
+    if (json.name === 'initialize') {
+      return { session: 'session', prefix: 'prefix' };
+    }
+    return 'qux';
+  },
+  requestAsync: (json, pending) => {
+    trace.push(['async', json]);
+    if (pending !== null) {
+      pending.resolve('qux');
+    }
   },
 };
 
-emitter.pid = 123;
+Object.assign(emitter, data, {
+  env: {
+    APPMAP_PROTOCOL: protocol,
+  },
+});
 
-emitter.version = '1.2.3';
+const { instrumentScript, instrumentModule } = setup(
+  { argv: ['hook'] },
+  emitter,
+);
 
-const { instrumentScript, instrumentModule } = setup('origin', emitter);
-
-Assert.equal(prefix_GLOBAL_PROCESS_ID, 123);
+Assert.equal(prefix_GLOBAL_PROCESS_ID, 'pid');
 
 Assert.equal(instrumentScript('script.js', 'script;'), 'qux');
 
@@ -61,18 +77,24 @@ Assert.deepEqual(trace, [
     'sync',
     {
       name: 'initialize',
-      env: {},
-      init: {
-        pid: emitter.pid,
-        engine: `node@${emitter.version}`,
+      options: {
+        __proto__: null,
+        'hook-child-process': false,
+        host: 'localhost',
+        port: 0,
+        protocol,
+      },
+      hook: { argv: ['hook'] },
+      process: data,
+      config: {
+        'map-name': 'main.js',
+        'recorder-name': 'TODO',
         feature: 'TODO',
-        feature_group: 'TODO',
-        labels: ['TODO'],
-        frameworks: ['TODO'],
-        recording: {
-          defined_class: 'TODO',
-          method_id: 'TODO',
-        },
+        'feature-group': 'TODO',
+        labels: [],
+        frameworks: [],
+        'recording-defined-class': 'TODO',
+        'recording-method-id': 'TODO',
       },
     },
   ],

@@ -31,15 +31,6 @@ const appmap = new Appmap(
     },
     process.cwd(),
   ),
-  {
-    engine: 'engine',
-    recorder: 'recorder',
-    feature: 'feature',
-    labels: ['label'],
-    frameworks: ['framework'],
-    feature_group: 'feature-group',
-    recording: 'recording',
-  },
 );
 
 appmap.instrument('script', Path.resolve(process.cwd(), 'path1'), '({});');
@@ -54,7 +45,7 @@ const json = JSON.parse(
   FileSystem.readFileSync('tmp/appmap/map-name.appmap.json', 'utf8'),
 );
 
-// I guess the .git is based on the git clone command (failling with travis)
+// Failing with travis: I guess that whether .git is included or not depends on the original git clone command
 Assert.ok(
   json.metadata.git.repository ===
     'https://github.com/applandinc/appmap-agent-js.git' ||
@@ -62,24 +53,29 @@ Assert.ok(
       'https://github.com/applandinc/appmap-agent-js',
 );
 delete json.metadata.git;
+delete json.metadata.client.version;
 
 Assert.deepEqual(json, {
   version: '1.4',
   metadata: {
     name: 'map-name',
-    labels: ['label'],
-    app: 'unknown-app-name',
-    feature: 'feature',
-    feature_group: 'feature-group',
-    language: { name: 'javascript', engine: 'engine', version: 'es2015' },
-    frameworks: ['framework'],
+    labels: [],
+    app: null,
+    feature: null,
+    feature_group: null,
+    language: { name: 'javascript', engine: null, version: 'es2015' },
+    frameworks: [],
     client: {
       name: '@appland/appmap-agent-js',
       url: 'https://github.com/applandinc/appmap-agent-js.git',
-      version: '???',
     },
-    recorder: 'recorder',
-    recording: 'recording',
+    recorder: {
+      name: null,
+    },
+    recording: {
+      defined_class: null,
+      method_id: null,
+    },
   },
   classMap: [
     {

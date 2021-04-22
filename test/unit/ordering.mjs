@@ -37,6 +37,7 @@ export const client = [
   'es2015/node/request/async/http2',
   'es2015/node/request/async/http3',
   'es2015/node/env',
+  'es2015/node/argv',
   'es2015/node/channel',
   'es2015/node/hook-child-process',
   'es2015/node/hook-cjs',

@@ -8,7 +8,6 @@ rollup({
   bundle
     .write({
       file: 'dist/inline.js',
-      external: './dist/schema.js',
       format: 'cjs',
     })
     .then(() => {

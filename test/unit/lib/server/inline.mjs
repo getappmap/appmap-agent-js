@@ -1,12 +1,14 @@
 import { strict as Assert } from 'assert';
-import makeChannel from '../../../../lib/server/inline.mjs';
+import { makeChannel } from '../../../../lib/server/inline.mjs';
 
 const { requestSync, requestAsync } = makeChannel();
 
 const { session, prefix } = requestSync({
   name: 'initialize',
-  env: {},
-  init: {},
+  process: {
+    env: {},
+  },
+  config: {},
 });
 
 Assert.equal(typeof prefix, 'string');
@@ -23,8 +25,10 @@ requestAsync(
 requestAsync(
   {
     name: 'initialize',
-    env: {},
-    init: {},
+    process: {
+      env: {},
+    },
+    config: {},
   },
   null,
 );

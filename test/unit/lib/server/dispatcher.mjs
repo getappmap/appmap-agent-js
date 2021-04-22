@@ -6,8 +6,10 @@ const dispatcher = new Dispatcher(getDefaultConfig());
 
 const { session, prefix } = dispatcher.dispatch({
   name: 'initialize',
-  env: {},
-  init: {},
+  process: {
+    env: {},
+  },
+  config: {},
 });
 
 Assert.equal(typeof prefix, 'string');

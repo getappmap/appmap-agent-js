@@ -3,7 +3,7 @@ import * as FileSystem from 'fs';
 import * as Env from '../../../../../../lib/client/es2015/node/env.js';
 import hookChildProcess from '../../../../../../lib/client/es2015/node/hook-child-process.js';
 
-hookChildProcess('--require=./tmp/test/hook.js', {});
+hookChildProcess({ argv: ['--require=./tmp/test/hook.js'] }, {});
 
 FileSystem.writeFileSync(
   'tmp/test/hook.js',
@@ -30,9 +30,9 @@ const options = Env.extractOptions({
   APPMAP_HOOK_CHILD_PROCESS: 'true',
 });
 
-const origin = '--require=./tmp/test/hook.js';
+const hook = { argv: ['--require', './tmp/test/hook.js'] };
 
-hookChildProcess(origin, options);
+hookChildProcess(hook, options);
 
 import('child_process').then((ChildProcess) => {
   {
@@ -61,7 +61,7 @@ import('child_process').then((ChildProcess) => {
     Assert.equal(child.signal, null);
     Assert.equal(child.status, 0);
     Assert.equal(child.stderr, '');
-    Assert.equal(child.stdout, makeStdout('bar', [origin], ['arg0', 'arg1']));
+    Assert.equal(child.stdout, makeStdout('bar', hook.argv, ['arg0', 'arg1']));
   }
 
   {
@@ -86,7 +86,7 @@ import('child_process').then((ChildProcess) => {
     child.on('exit', (status, signal) => {
       Assert.equal(signal, null);
       Assert.equal(status, 0);
-      Assert.equal(stdout, makeStdout('bar', [origin], ['arg0', 'arg1']));
+      Assert.equal(stdout, makeStdout('bar', hook.argv, ['arg0', 'arg1']));
     });
   }
 
@@ -110,7 +110,10 @@ import('child_process').then((ChildProcess) => {
     child.on('exit', (status, signal) => {
       Assert.equal(signal, null);
       Assert.equal(status, 0);
-      Assert.equal(stdout, makeStdout('bar', [origin, '--no-warnings'], []));
+      Assert.equal(
+        stdout,
+        makeStdout('bar', [...hook.argv, '--no-warnings'], []),
+      );
     });
   }
 

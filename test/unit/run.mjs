@@ -26,6 +26,7 @@ if (process.argv.length === 2) {
     cover(path1, path2, packOptions(path1, null));
     process.stdout.write('\n\n');
   };
+  step('lib/home.js', 'test/unit/lib/home.mjs');
   server.forEach((target) => {
     step(`lib/server/${target}.mjs`, `test/unit/lib/server/${target}.mjs`);
   });

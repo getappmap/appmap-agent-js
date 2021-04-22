@@ -15,15 +15,15 @@ try {
     throw error;
   }
 }
-Assert.ok(
-  config
-    .extendWithFile('tmp/test/foo', process.cwd())
-    .startsWith('failed to read conf file'),
+Assert.throws(
+  () => config.extendWithFile('tmp/test/foo', process.cwd()),
+  /^Error: ENOENT/,
 );
 
 FileSystem.writeFileSync('tmp/test/foo', '123', 'utf8');
-Assert.ok(
-  config.extendWithFile('tmp/test/foo').startsWith('failed to parse conf file'),
+Assert.throws(
+  () => config.extendWithFile('tmp/test/foo'),
+  /^Error: invalid file extension/,
 );
 
 FileSystem.writeFileSync(
@@ -31,10 +31,9 @@ FileSystem.writeFileSync(
   JSON.stringify({ enabled: 'foo' }),
   'utf8',
 );
-Assert.ok(
-  config
-    .extendWithFile('tmp/test/foo.json')
-    .startsWith('invalid configuration'),
+Assert.throws(
+  () => config.extendWithFile('tmp/test/foo.json'),
+  /^Error: invalid configuration/,
 );
 
 FileSystem.writeFileSync(
@@ -51,17 +50,9 @@ Assert.ok(config.extendWithFile('tmp/test/foo.yml').conf.enabled, true);
 // extendsWithJson //
 /////////////////////
 
-try {
-  FileSystem.unlinkSync('tmp/test/foo');
-} catch (error) {
-  if (error.code !== 'ENOENT') {
-    throw error;
-  }
-}
-Assert.ok(
-  config
-    .extendWithJson({ extends: 'tmp/test/foo' }, process.cwd())
-    .startsWith('failed to read conf file'),
+Assert.throws(
+  () => config.extendWithJson({ extends: 'tmp/test/foo' }, null),
+  /^Error: Missing base directory path/,
 );
 
 Assert.equal(
@@ -157,17 +148,96 @@ Assert.deepEqual(
 // Getters //
 /////////////
 
-Assert.equal(config.getEscapePrefix(), 'APPMAP');
+Assert.equal(
+  config
+    .extendWithJson({ 'escape-prefix': 'ESCAPE_PREFIX' }, null)
+    .getEscapePrefix(),
+  'ESCAPE_PREFIX',
+);
 
-Assert.equal(config.getGitDir(), '.');
+Assert.equal(
+  config.extendWithJson({ 'app-name': 'APP_NAME' }, null).getAppName(),
+  'APP_NAME',
+);
 
-Assert.equal(config.getOutputDir(), 'tmp/appmap');
+Assert.equal(
+  config.extendWithJson({ 'map-name': 'MAP_NAME' }, null).getMapName(),
+  'MAP_NAME',
+);
 
-Assert.equal(config.getAppName(), 'unknown-app-name');
+Assert.equal(
+  config.extendWithJson({ 'output-dir': '/OUTPUT_DIR' }, null).getOutputDir(),
+  '/OUTPUT_DIR',
+);
 
-Assert.equal(config.getMapName(), 'unknown-map-name');
+Assert.equal(
+  config
+    .extendWithJson({ 'language-version': '5.1' }, null)
+    .getLanguageVersion(),
+  '5.1',
+);
 
-Assert.equal(config.getLanguageVersion(), 'es2015');
+{
+  const metadata = config
+    .extendWithJson(
+      {
+        'map-name': 'MAP_NAME',
+        labels: ['LABEL0', 'LABEL1'],
+        'app-name': 'APP_NAME',
+        feature: 'FEATURE',
+        'feature-group': 'FEATURE_GROUP',
+        'language-engine': 'LANGUAGE_ENGINE',
+        'language-version': '5.1',
+        frameworks: [
+          {
+            name: 'FRAMEWORKS-0-NAME',
+            version: 'FRAMEWORKS-0-version',
+          },
+        ],
+        'recorder-name': 'RECORDER_NAME',
+        'recording-defined-class': 'RECORDING_DEFINED_CLASS',
+        'recording-method-id': 'RECORDING_METHOD_ID',
+      },
+      null,
+    )
+    .getMetaData();
+  Assert.ok(Reflect.getOwnPropertyDescriptor(metadata, 'git') !== undefined);
+  delete metadata.git;
+  Assert.ok(Reflect.getOwnPropertyDescriptor(metadata, 'client') !== undefined);
+  Assert.ok(
+    Reflect.getOwnPropertyDescriptor(metadata.client, 'version') !== undefined,
+  );
+  delete metadata.client.version;
+  Assert.deepEqual(metadata, {
+    name: 'MAP_NAME',
+    labels: ['LABEL0', 'LABEL1'],
+    app: 'APP_NAME',
+    feature: 'FEATURE',
+    feature_group: 'FEATURE_GROUP',
+    language: {
+      name: 'javascript',
+      engine: 'LANGUAGE_ENGINE',
+      version: '5.1',
+    },
+    frameworks: [
+      {
+        name: 'FRAMEWORKS-0-NAME',
+        version: 'FRAMEWORKS-0-version',
+      },
+    ],
+    client: {
+      name: '@appland/appmap-agent-js',
+      url: 'https://github.com/applandinc/appmap-agent-js.git',
+    },
+    recorder: {
+      name: 'RECORDER_NAME',
+    },
+    recording: {
+      defined_class: 'RECORDING_DEFINED_CLASS',
+      method_id: 'RECORDING_METHOD_ID',
+    },
+  });
+}
 
 ////////////////////////////
 // getFileInstrumentation //
