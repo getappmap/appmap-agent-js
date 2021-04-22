@@ -1,3 +1,15 @@
+# [2.5.0](https://github.com/applandinc/appmap-agent-js/compare/v2.4.0...v2.5.0) (2021-04-22)
+
+
+### Bug Fixes
+
+* pull from alpha ([a8b4d11](https://github.com/applandinc/appmap-agent-js/commit/a8b4d116a80aa92df6d10eb981f8cb624db17938))
+
+
+### Features
+
+* all metadata are now included in config and initialization query provides more info ([cc4640f](https://github.com/applandinc/appmap-agent-js/commit/cc4640fe855f7e44dda38d7b595f5b9eceec17b8))
+
 # [2.4.0](https://github.com/applandinc/appmap-agent-js/compare/v2.3.0...v2.4.0) (2021-04-21)
 
 
