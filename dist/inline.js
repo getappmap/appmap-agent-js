@@ -6,7 +6,7 @@ var Util = require('util');
 var FileSystem = require('fs');
 var Path = require('path');
 var YAML = require('yaml');
-var require$$0 = require('ajv/dist/runtime/equal');
+var Ajv = require('ajv');
 var ChildProcess = require('child_process');
 var acorn = require('acorn');
 var escodegen = require('escodegen');
@@ -38,7 +38,7 @@ var FileSystem__namespace = /*#__PURE__*/_interopNamespace(FileSystem);
 var Path__default = /*#__PURE__*/_interopDefaultLegacy(Path);
 var Path__namespace = /*#__PURE__*/_interopNamespace(Path);
 var YAML__default = /*#__PURE__*/_interopDefaultLegacy(YAML);
-var require$$0__default = /*#__PURE__*/_interopDefaultLegacy(require$$0);
+var Ajv__default = /*#__PURE__*/_interopDefaultLegacy(Ajv);
 var ChildProcess__namespace = /*#__PURE__*/_interopNamespace(ChildProcess);
 
 // I'm not about the debuglog api because modifying process.env.NODE_DEBUG has no effect.
@@ -57,13 +57,40 @@ const logger = {
   }),
 };
 
-var config$1 = validate10;const schema11 = {"type":"object","additionalProperties":false,"properties":{"extends":{"type":"string"},"enabled":{"type":"boolean"},"escape-prefix":{"type":"string","pattern":"^[a-zA-Z_$][a-zA-Z_$-9]*$"},"output-dir":{"type":"string"},"app-name":{"type":"string"},"name":{"type":"string"},"map-name":{"type":"string"},"git-dir":{"type":"string"},"feature":{"type":"string"},"feature-group":{"type":"string"},"labels":{"type":"array","items":{"type":"string"}},"recorder-name":{"type":"string"},"recording-defined-class":{"type":"string"},"recording-method-id":{"type":"string"},"frameworks":{"type":"array","items":{"type":"object","additionalProperties":false,"required":["name","version"],"properties":{"name":{"type":"string"},"version":{"type":"string"}}}},"language-engine":{"type":"string"},"language-version":{"enum":["5","5.1","6","2015","7","2016","8","2017","9","2018","10","2019","11","2020","12","2021"]},"packages":{"type":"array","items":{"anyOf":[{"type":"string"},{"type":"object","additionalProperties":false,"properties":{"dist":{"type":"string"},"path":{"type":"string"},"shallow":{"type":"boolean"},"exclude":{"type":"array","items":{"type":"string"}}}}]}},"exclude":{"type":"array","items":{"type":"string"}}}};const func4 = Object.prototype.hasOwnProperty;require$$0__default['default'].default;const pattern0 = new RegExp("^[a-zA-Z_$][a-zA-Z_$-9]*$", "u");function validate10(data, {instancePath="", parentData, parentDataProperty, rootData=data}={}){let vErrors = null;let errors = 0;if(errors === 0){if(data && typeof data == "object" && !Array.isArray(data)){const _errs1 = errors;for(const key0 in data){if(!(func4.call(schema11.properties, key0))){validate10.errors = [{instancePath,schemaPath:"#/additionalProperties",keyword:"additionalProperties",params:{additionalProperty: key0},message:"must NOT have additional properties"}];return false;}}if(_errs1 === errors){if(data.extends !== undefined){const _errs2 = errors;if(typeof data.extends !== "string"){validate10.errors = [{instancePath:instancePath+"/extends",schemaPath:"#/properties/extends/type",keyword:"type",params:{type: "string"},message:"must be string"}];return false;}var valid0 = _errs2 === errors;}else {var valid0 = true;}if(valid0){if(data.enabled !== undefined){const _errs4 = errors;if(typeof data.enabled !== "boolean"){validate10.errors = [{instancePath:instancePath+"/enabled",schemaPath:"#/properties/enabled/type",keyword:"type",params:{type: "boolean"},message:"must be boolean"}];return false;}var valid0 = _errs4 === errors;}else {var valid0 = true;}if(valid0){if(data["escape-prefix"] !== undefined){let data2 = data["escape-prefix"];const _errs6 = errors;if(errors === _errs6){if(typeof data2 === "string"){if(!pattern0.test(data2)){validate10.errors = [{instancePath:instancePath+"/escape-prefix",schemaPath:"#/properties/escape-prefix/pattern",keyword:"pattern",params:{pattern: "^[a-zA-Z_$][a-zA-Z_$-9]*$"},message:"must match pattern \""+"^[a-zA-Z_$][a-zA-Z_$-9]*$"+"\""}];return false;}}else {validate10.errors = [{instancePath:instancePath+"/escape-prefix",schemaPath:"#/properties/escape-prefix/type",keyword:"type",params:{type: "string"},message:"must be string"}];return false;}}var valid0 = _errs6 === errors;}else {var valid0 = true;}if(valid0){if(data["output-dir"] !== undefined){const _errs8 = errors;if(typeof data["output-dir"] !== "string"){validate10.errors = [{instancePath:instancePath+"/output-dir",schemaPath:"#/properties/output-dir/type",keyword:"type",params:{type: "string"},message:"must be string"}];return false;}var valid0 = _errs8 === errors;}else {var valid0 = true;}if(valid0){if(data["app-name"] !== undefined){const _errs10 = errors;if(typeof data["app-name"] !== "string"){validate10.errors = [{instancePath:instancePath+"/app-name",schemaPath:"#/properties/app-name/type",keyword:"type",params:{type: "string"},message:"must be string"}];return false;}var valid0 = _errs10 === errors;}else {var valid0 = true;}if(valid0){if(data.name !== undefined){const _errs12 = errors;if(typeof data.name !== "string"){validate10.errors = [{instancePath:instancePath+"/name",schemaPath:"#/properties/name/type",keyword:"type",params:{type: "string"},message:"must be string"}];return false;}var valid0 = _errs12 === errors;}else {var valid0 = true;}if(valid0){if(data["map-name"] !== undefined){const _errs14 = errors;if(typeof data["map-name"] !== "string"){validate10.errors = [{instancePath:instancePath+"/map-name",schemaPath:"#/properties/map-name/type",keyword:"type",params:{type: "string"},message:"must be string"}];return false;}var valid0 = _errs14 === errors;}else {var valid0 = true;}if(valid0){if(data["git-dir"] !== undefined){const _errs16 = errors;if(typeof data["git-dir"] !== "string"){validate10.errors = [{instancePath:instancePath+"/git-dir",schemaPath:"#/properties/git-dir/type",keyword:"type",params:{type: "string"},message:"must be string"}];return false;}var valid0 = _errs16 === errors;}else {var valid0 = true;}if(valid0){if(data.feature !== undefined){const _errs18 = errors;if(typeof data.feature !== "string"){validate10.errors = [{instancePath:instancePath+"/feature",schemaPath:"#/properties/feature/type",keyword:"type",params:{type: "string"},message:"must be string"}];return false;}var valid0 = _errs18 === errors;}else {var valid0 = true;}if(valid0){if(data["feature-group"] !== undefined){const _errs20 = errors;if(typeof data["feature-group"] !== "string"){validate10.errors = [{instancePath:instancePath+"/feature-group",schemaPath:"#/properties/feature-group/type",keyword:"type",params:{type: "string"},message:"must be string"}];return false;}var valid0 = _errs20 === errors;}else {var valid0 = true;}if(valid0){if(data.labels !== undefined){let data10 = data.labels;const _errs22 = errors;if(errors === _errs22){if(Array.isArray(data10)){var valid1 = true;const len0 = data10.length;for(let i0=0; i0<len0; i0++){const _errs24 = errors;if(typeof data10[i0] !== "string"){validate10.errors = [{instancePath:instancePath+"/labels/" + i0,schemaPath:"#/properties/labels/items/type",keyword:"type",params:{type: "string"},message:"must be string"}];return false;}var valid1 = _errs24 === errors;if(!valid1){break;}}}else {validate10.errors = [{instancePath:instancePath+"/labels",schemaPath:"#/properties/labels/type",keyword:"type",params:{type: "array"},message:"must be array"}];return false;}}var valid0 = _errs22 === errors;}else {var valid0 = true;}if(valid0){if(data["recorder-name"] !== undefined){const _errs26 = errors;if(typeof data["recorder-name"] !== "string"){validate10.errors = [{instancePath:instancePath+"/recorder-name",schemaPath:"#/properties/recorder-name/type",keyword:"type",params:{type: "string"},message:"must be string"}];return false;}var valid0 = _errs26 === errors;}else {var valid0 = true;}if(valid0){if(data["recording-defined-class"] !== undefined){const _errs28 = errors;if(typeof data["recording-defined-class"] !== "string"){validate10.errors = [{instancePath:instancePath+"/recording-defined-class",schemaPath:"#/properties/recording-defined-class/type",keyword:"type",params:{type: "string"},message:"must be string"}];return false;}var valid0 = _errs28 === errors;}else {var valid0 = true;}if(valid0){if(data["recording-method-id"] !== undefined){const _errs30 = errors;if(typeof data["recording-method-id"] !== "string"){validate10.errors = [{instancePath:instancePath+"/recording-method-id",schemaPath:"#/properties/recording-method-id/type",keyword:"type",params:{type: "string"},message:"must be string"}];return false;}var valid0 = _errs30 === errors;}else {var valid0 = true;}if(valid0){if(data.frameworks !== undefined){let data15 = data.frameworks;const _errs32 = errors;if(errors === _errs32){if(Array.isArray(data15)){var valid2 = true;const len1 = data15.length;for(let i1=0; i1<len1; i1++){let data16 = data15[i1];const _errs34 = errors;if(errors === _errs34){if(data16 && typeof data16 == "object" && !Array.isArray(data16)){let missing0;if(((data16.name === undefined) && (missing0 = "name")) || ((data16.version === undefined) && (missing0 = "version"))){validate10.errors = [{instancePath:instancePath+"/frameworks/" + i1,schemaPath:"#/properties/frameworks/items/required",keyword:"required",params:{missingProperty: missing0},message:"must have required property '"+missing0+"'"}];return false;}else {const _errs36 = errors;for(const key1 in data16){if(!((key1 === "name") || (key1 === "version"))){validate10.errors = [{instancePath:instancePath+"/frameworks/" + i1,schemaPath:"#/properties/frameworks/items/additionalProperties",keyword:"additionalProperties",params:{additionalProperty: key1},message:"must NOT have additional properties"}];return false;}}if(_errs36 === errors){if(data16.name !== undefined){const _errs37 = errors;if(typeof data16.name !== "string"){validate10.errors = [{instancePath:instancePath+"/frameworks/" + i1+"/name",schemaPath:"#/properties/frameworks/items/properties/name/type",keyword:"type",params:{type: "string"},message:"must be string"}];return false;}var valid3 = _errs37 === errors;}else {var valid3 = true;}if(valid3){if(data16.version !== undefined){const _errs39 = errors;if(typeof data16.version !== "string"){validate10.errors = [{instancePath:instancePath+"/frameworks/" + i1+"/version",schemaPath:"#/properties/frameworks/items/properties/version/type",keyword:"type",params:{type: "string"},message:"must be string"}];return false;}var valid3 = _errs39 === errors;}else {var valid3 = true;}}}}}else {validate10.errors = [{instancePath:instancePath+"/frameworks/" + i1,schemaPath:"#/properties/frameworks/items/type",keyword:"type",params:{type: "object"},message:"must be object"}];return false;}}var valid2 = _errs34 === errors;if(!valid2){break;}}}else {validate10.errors = [{instancePath:instancePath+"/frameworks",schemaPath:"#/properties/frameworks/type",keyword:"type",params:{type: "array"},message:"must be array"}];return false;}}var valid0 = _errs32 === errors;}else {var valid0 = true;}if(valid0){if(data["language-engine"] !== undefined){const _errs41 = errors;if(typeof data["language-engine"] !== "string"){validate10.errors = [{instancePath:instancePath+"/language-engine",schemaPath:"#/properties/language-engine/type",keyword:"type",params:{type: "string"},message:"must be string"}];return false;}var valid0 = _errs41 === errors;}else {var valid0 = true;}if(valid0){if(data["language-version"] !== undefined){let data20 = data["language-version"];const _errs43 = errors;if(!((((((((((((((((data20 === "5") || (data20 === "5.1")) || (data20 === "6")) || (data20 === "2015")) || (data20 === "7")) || (data20 === "2016")) || (data20 === "8")) || (data20 === "2017")) || (data20 === "9")) || (data20 === "2018")) || (data20 === "10")) || (data20 === "2019")) || (data20 === "11")) || (data20 === "2020")) || (data20 === "12")) || (data20 === "2021"))){validate10.errors = [{instancePath:instancePath+"/language-version",schemaPath:"#/properties/language-version/enum",keyword:"enum",params:{allowedValues: schema11.properties["language-version"].enum},message:"must be equal to one of the allowed values"}];return false;}var valid0 = _errs43 === errors;}else {var valid0 = true;}if(valid0){if(data.packages !== undefined){let data21 = data.packages;const _errs44 = errors;if(errors === _errs44){if(Array.isArray(data21)){var valid4 = true;const len2 = data21.length;for(let i2=0; i2<len2; i2++){let data22 = data21[i2];const _errs46 = errors;const _errs47 = errors;let valid5 = false;const _errs48 = errors;if(typeof data22 !== "string"){const err0 = {instancePath:instancePath+"/packages/" + i2,schemaPath:"#/properties/packages/items/anyOf/0/type",keyword:"type",params:{type: "string"},message:"must be string"};if(vErrors === null){vErrors = [err0];}else {vErrors.push(err0);}errors++;}var _valid0 = _errs48 === errors;valid5 = valid5 || _valid0;if(!valid5){const _errs50 = errors;if(errors === _errs50){if(data22 && typeof data22 == "object" && !Array.isArray(data22)){const _errs52 = errors;for(const key2 in data22){if(!((((key2 === "dist") || (key2 === "path")) || (key2 === "shallow")) || (key2 === "exclude"))){const err1 = {instancePath:instancePath+"/packages/" + i2,schemaPath:"#/properties/packages/items/anyOf/1/additionalProperties",keyword:"additionalProperties",params:{additionalProperty: key2},message:"must NOT have additional properties"};if(vErrors === null){vErrors = [err1];}else {vErrors.push(err1);}errors++;break;}}if(_errs52 === errors){if(data22.dist !== undefined){const _errs53 = errors;if(typeof data22.dist !== "string"){const err2 = {instancePath:instancePath+"/packages/" + i2+"/dist",schemaPath:"#/properties/packages/items/anyOf/1/properties/dist/type",keyword:"type",params:{type: "string"},message:"must be string"};if(vErrors === null){vErrors = [err2];}else {vErrors.push(err2);}errors++;}var valid6 = _errs53 === errors;}else {var valid6 = true;}if(valid6){if(data22.path !== undefined){const _errs55 = errors;if(typeof data22.path !== "string"){const err3 = {instancePath:instancePath+"/packages/" + i2+"/path",schemaPath:"#/properties/packages/items/anyOf/1/properties/path/type",keyword:"type",params:{type: "string"},message:"must be string"};if(vErrors === null){vErrors = [err3];}else {vErrors.push(err3);}errors++;}var valid6 = _errs55 === errors;}else {var valid6 = true;}if(valid6){if(data22.shallow !== undefined){const _errs57 = errors;if(typeof data22.shallow !== "boolean"){const err4 = {instancePath:instancePath+"/packages/" + i2+"/shallow",schemaPath:"#/properties/packages/items/anyOf/1/properties/shallow/type",keyword:"type",params:{type: "boolean"},message:"must be boolean"};if(vErrors === null){vErrors = [err4];}else {vErrors.push(err4);}errors++;}var valid6 = _errs57 === errors;}else {var valid6 = true;}if(valid6){if(data22.exclude !== undefined){let data26 = data22.exclude;const _errs59 = errors;if(errors === _errs59){if(Array.isArray(data26)){var valid7 = true;const len3 = data26.length;for(let i3=0; i3<len3; i3++){const _errs61 = errors;if(typeof data26[i3] !== "string"){const err5 = {instancePath:instancePath+"/packages/" + i2+"/exclude/" + i3,schemaPath:"#/properties/packages/items/anyOf/1/properties/exclude/items/type",keyword:"type",params:{type: "string"},message:"must be string"};if(vErrors === null){vErrors = [err5];}else {vErrors.push(err5);}errors++;}var valid7 = _errs61 === errors;if(!valid7){break;}}}else {const err6 = {instancePath:instancePath+"/packages/" + i2+"/exclude",schemaPath:"#/properties/packages/items/anyOf/1/properties/exclude/type",keyword:"type",params:{type: "array"},message:"must be array"};if(vErrors === null){vErrors = [err6];}else {vErrors.push(err6);}errors++;}}var valid6 = _errs59 === errors;}else {var valid6 = true;}}}}}}else {const err7 = {instancePath:instancePath+"/packages/" + i2,schemaPath:"#/properties/packages/items/anyOf/1/type",keyword:"type",params:{type: "object"},message:"must be object"};if(vErrors === null){vErrors = [err7];}else {vErrors.push(err7);}errors++;}}var _valid0 = _errs50 === errors;valid5 = valid5 || _valid0;}if(!valid5){const err8 = {instancePath:instancePath+"/packages/" + i2,schemaPath:"#/properties/packages/items/anyOf",keyword:"anyOf",params:{},message:"must match a schema in anyOf"};if(vErrors === null){vErrors = [err8];}else {vErrors.push(err8);}errors++;validate10.errors = vErrors;return false;}else {errors = _errs47;if(vErrors !== null){if(_errs47){vErrors.length = _errs47;}else {vErrors = null;}}}var valid4 = _errs46 === errors;if(!valid4){break;}}}else {validate10.errors = [{instancePath:instancePath+"/packages",schemaPath:"#/properties/packages/type",keyword:"type",params:{type: "array"},message:"must be array"}];return false;}}var valid0 = _errs44 === errors;}else {var valid0 = true;}if(valid0){if(data.exclude !== undefined){let data28 = data.exclude;const _errs63 = errors;if(errors === _errs63){if(Array.isArray(data28)){var valid8 = true;const len4 = data28.length;for(let i4=0; i4<len4; i4++){const _errs65 = errors;if(typeof data28[i4] !== "string"){validate10.errors = [{instancePath:instancePath+"/exclude/" + i4,schemaPath:"#/properties/exclude/items/type",keyword:"type",params:{type: "string"},message:"must be string"}];return false;}var valid8 = _errs65 === errors;if(!valid8){break;}}}else {validate10.errors = [{instancePath:instancePath+"/exclude",schemaPath:"#/properties/exclude/type",keyword:"type",params:{type: "array"},message:"must be array"}];return false;}}var valid0 = _errs63 === errors;}else {var valid0 = true;}}}}}}}}}}}}}}}}}}}}}else {validate10.errors = [{instancePath,schemaPath:"#/type",keyword:"type",params:{type: "object"},message:"must be object"}];return false;}}validate10.errors = vErrors;return errors === 0;}
-
 // This file must be placed at lib/home.js because it also bundled into dist/inline.js and __dirname is not modified.
 
 
 
 var home_1 = Path__default['default'].resolve(__dirname, "..");
+
+const ajv = new Ajv__default['default']();
+ajv.addSchema(
+  YAML__default['default'].parse(
+    FileSystem__namespace.readFileSync(Path__namespace.resolve(home_1, 'src', 'schema.yml'), 'utf8'),
+  ),
+);
+const validateRequestSchema = ajv.getSchema('request');
+const validateConfigurationSchema = ajv.getSchema('configuration');
+
+const makeValidate = (name, callback) => (json) => {
+  if (!callback(json)) {
+    logger.warning(`Invalid json for schema %s: %j`, name, callback.errors);
+    // console.asset(validateConfiguration.errors.length > 0)
+    const error = callback.errors[0];
+    throw new Error(
+      `invalid ${name} at ${error.schemaPath}, it ${
+        error.message
+      } (${JSON.stringify(error.params)})`,
+    );
+  }
+};
+
+const validateRequest = makeValidate('request', validateRequestSchema);
+
+const validateConfiguration = makeValidate(
+  'configuration',
+  validateConfigurationSchema,
+);
 
 const trim$1 = (string) => string.trim();
 
@@ -181,7 +208,9 @@ const resolve = (base, path) => {
     return path;
   }
   if (base === null) {
-    throw new Error(`Missing base directory path to resolve relative path: ${path}`);
+    throw new Error(
+      `Missing base directory path to resolve relative path: ${path}`,
+    );
   }
   return Path__namespace.resolve(base, path);
 };
@@ -195,7 +224,7 @@ const npm = JSON.parse(
 );
 
 ////////////////////
-// extendWithJson //
+// extendWithData //
 ////////////////////
 
 const makeOverwrite = (key, transform) => (value, object, context) => {
@@ -211,12 +240,12 @@ const sortPackage = (specifier1, specifier2) =>
 
 const mergers = {
   __proto__: null,
-  extends: (path, conf, base) =>
+  extends: (path, data, base) =>
     /* eslint-disable no-use-before-define */
-    extendWithFile(conf, resolve(base, path)),
+    extendWithFile(data, resolve(base, path)),
   /* eslint-enable no-use-before-define */
-  packages: (specifiers, conf, base) => {
-    conf.packages = [
+  packages: (specifiers, data, base) => {
+    data.packages = [
       ...specifiers.flatMap((specifier) => {
         if (typeof specifier === 'string') {
           specifier = { path: specifier, dist: specifier };
@@ -243,13 +272,13 @@ const mergers = {
         }
         return specifiers;
       }),
-      ...conf.packages,
+      ...data.packages,
     ];
-    conf.packages.sort(sortPackage);
+    data.packages.sort(sortPackage);
   },
-  "exclude": makeConcat("exclude"),
-  "enabled": makeOverwrite('enabled', identity),
-  "name": makeOverwrite('map-name', identity),
+  exclude: makeConcat('exclude'),
+  enabled: makeOverwrite('enabled', identity),
+  name: makeOverwrite('map-name', identity),
   'app-name': makeOverwrite('app-name', identity),
   'map-name': makeOverwrite('map-name', identity),
   'language-version': makeOverwrite('language-version', identity),
@@ -257,29 +286,25 @@ const mergers = {
   'escape-prefix': makeOverwrite('escape-prefix', identity),
   'output-dir': makeOverwrite('output-dir', flip(resolve)),
   'git-dir': makeOverwrite('git-dir', flip(resolve)),
-  'labels': makeConcat("labels"),
-  'frameworks': makeConcat("frameworks"),
-  'feature': makeOverwrite("feature", identity),
-  'feature-group': makeOverwrite("feature-group", identity),
-  'recorder-name': makeOverwrite("recorder-name", identity),
-  'recording-defined-class': makeOverwrite("recording-defined-class", identity),
-  'recording-method-id': makeOverwrite("recording-method-id", identity),
+  labels: makeConcat('labels'),
+  frameworks: makeConcat('frameworks'),
+  feature: makeOverwrite('feature', identity),
+  'feature-group': makeOverwrite('feature-group', identity),
+  'recorder-name': makeOverwrite('recorder-name', identity),
+  'recording-defined-class': makeOverwrite('recording-defined-class', identity),
+  'recording-method-id': makeOverwrite('recording-method-id', identity),
 };
 
-const extendWithJson = (conf, json, base) => {
-  conf = { ... conf};
-  logger.info('Configuration extended with json: %j', json);
+const extendWithData = (data1, data2, base) => {
+  data1 = { ...data1 };
+  logger.info('Configuration extended with data: %j', data2);
   if (base !== null) {
     base = resolve(process.cwd(), base);
   }
-  if (!config$1(json)) {
-    logger.warning(`Invalid configuration: %j`, config$1.errors);
-    // console.asset(validateConfig.errors.length > 0)
-    const error = config$1.errors[0];
-    throw new Error(`invalid configuration at ${error.schemaPath}, it ${error.message} (${JSON.stringify(error.params)})`);
-  }
-  Reflect.ownKeys(json).forEach((key) => { mergers[key](json[key], conf, base); });
-  return conf;
+  Reflect.ownKeys(data2).forEach((key) => {
+    mergers[key](data2[key], data1, base);
+  });
+  return data1;
 };
 
 ///////////////////
@@ -299,21 +324,22 @@ const mapping = {
   APPMAP_PACKAGES: ['packages', (string) => string.split(',').map(trim)],
 };
 
-const extendWithEnv = (conf, env, base) => {
+const extendWithEnv = (data1, env, base) => {
   logger.info('Configuration extended with environment: %j', env);
   env = { __proto__: null, ...env };
-  const json = { __proto__: null };
+  const data2 = { __proto__: null };
   Reflect.ownKeys(env).forEach((key1) => {
     if (key1.startsWith('APPMAP')) {
       if (key1 in mapping) {
         const [key2, transform] = mapping[key1];
-        json[key2] = transform(env[key1]);
+        data2[key2] = transform(env[key1]);
       } else {
         logger.warning('Unrecognized appmap env key: %s', key1);
       }
     }
   });
-  return extendWithJson(conf, json, base);
+  validateConfiguration(data2);
+  return extendWithData(data1, data2, base);
 };
 
 ////////////////////
@@ -326,13 +352,9 @@ const parseDefault = () => {
   );
 };
 
-const extendWithFile = (conf, path) => {
+const extendWithFile = (data1, path) => {
   logger.info('Configuration extended with file: %s', path);
-  let content = FileSystem__namespace.readFileSync(path, 'utf8');
-  // } catch (error) {
-  //   logger.warning('Cannot read conf file %s >> %s', path, error.message);
-  //   return `failed to read conf file ${path} because ${error.message}`;
-  // }
+  const content = FileSystem__namespace.readFileSync(path, 'utf8');
   let parse;
   if (path.endsWith('.json')) {
     parse = JSON.parse;
@@ -341,12 +363,9 @@ const extendWithFile = (conf, path) => {
   } else {
     parse = parseDefault;
   }
-  let json = parse(content);
-  // } catch (error) {
-  //   logger.warning('Cannot parse conf file %s >> %s', path, error.message);
-  //   return `failed to parse conf file ${path} because ${error.message}`;
-  // }
-  return extendWithJson(conf, json, Path__namespace.dirname(path));
+  const data2 = parse(content);
+  validateConfiguration(data2);
+  return extendWithData(data1, data2, Path__namespace.dirname(path));
 };
 
 ////////////
@@ -363,49 +382,46 @@ const getSpecifier = (specifiers, path) => {
 };
 
 class Config {
-  constructor(conf) {
-    this.conf = conf;
+  constructor(data) {
+    this.data = data;
   }
-  extendWithJson(json, base) {
-    return new Config(extendWithJson({... this.conf}, json, base));
-    // return runExtend(extendWithJson, this.conf, json, base);
+  extendWithData(data, base) {
+    return new Config(extendWithData({ ...this.data }, data, base));
   }
   extendWithFile(path) {
-    return new Config(extendWithFile({ ... this.conf} , path));
-    // return runExtend(extendWithFile, this.conf, path);
+    return new Config(extendWithFile({ ...this.data }, path));
   }
   extendWithEnv(env, base) {
-    return new Config(extendWithEnv({...this.conf}, env, base));
-    // return runExtend(extendWithEnv, this.conf, env, base);
+    return new Config(extendWithEnv({ ...this.data }, env, base));
   }
   getEscapePrefix() {
-    return this.conf['escape-prefix'];
+    return this.data['escape-prefix'];
   }
   getOutputDir() {
-    return this.conf['output-dir'];
+    return this.data['output-dir'];
   }
   getLanguageVersion() {
-    return this.conf['language-version'];
+    return this.data['language-version'];
   }
   getFileInstrumentation(path) {
-    if (!this.conf.enabled) {
+    if (!this.data.enabled) {
       return null;
     }
-    const specifier = getSpecifier(this.conf.packages, path);
+    const specifier = getSpecifier(this.data.packages, path);
     if (specifier === undefined) {
       return null;
     }
     return specifier.shallow ? 'shallow' : 'deep';
   }
   isNameExcluded(path, name) {
-    if (!this.conf.enabled) {
+    if (!this.data.enabled) {
       logger.error('Call isNameExcluded(%) on disabled appmap', path);
       return true;
     }
-    if (this.conf.exclude.includes(name)) {
+    if (this.data.exclude.includes(name)) {
       return true;
     }
-    const specifier = getSpecifier(this.conf.packages, path);
+    const specifier = getSpecifier(this.data.packages, path);
     if (specifier === undefined) {
       logger.error('Missing package for %', path);
       return true;
@@ -413,37 +429,37 @@ class Config {
     return specifier.exclude.includes(name);
   }
   getAppName() {
-    return this.conf["app-name"];
+    return this.data['app-name'];
   }
   getMapName() {
-    return this.conf["map-name"];
+    return this.data['map-name'];
   }
-  getMetaData () {
+  getMetaData() {
     return {
-      name: this.conf["map-name"],
-      labels: this.conf["labels"],
-      app: this.conf["app-name"],
-      feature: this.conf["feature"],
-      feature_group: this.conf["feature-group"],
+      name: this.data['map-name'],
+      labels: this.data.labels,
+      app: this.data['app-name'],
+      feature: this.data.feature,
+      feature_group: this.data['feature-group'],
       language: {
         name: 'javascript',
-        engine: this.conf["language-engine"],
-        version: this.conf["language-version"]
+        engine: this.data['language-engine'],
+        version: this.data['language-version'],
       },
-      frameworks: this.conf["frameworks"],
+      frameworks: this.data.frameworks,
       client: {
         name: npm.name,
         url: npm.repository.url,
         version: npm.version,
       },
       recorder: {
-        name: this.conf["recorder-name"]
+        name: this.data['recorder-name'],
       },
       recording: {
-        defined_class: this.conf["recording-defined-class"],
-        method_id: this.conf["recording-method-id"]
+        defined_class: this.data['recording-defined-class'],
+        method_id: this.data['recording-method-id'],
       },
-      git: git(this.conf["git-dir"]),
+      git: git(this.data['git-dir']),
     };
   }
 }
@@ -460,18 +476,18 @@ const config = new Config({
   packages: [],
   exclude: [],
   // MetaData //
-  "map-name": null,
-  "labels": [],
-  "app-name": null,
-  "feature": null,
-  "feature-group": null,
-  "language-engine": null,
-  "language-version": 'es2015',
-  "frameworks": [],
-  "recorder-name": null,
-  "recording-defined-class": null,
-  "recording-method-id": null,
-  "git-dir": ".",
+  'map-name': null,
+  labels: [],
+  'app-name': null,
+  feature: null,
+  'feature-group': null,
+  'language-engine': null,
+  'language-version': 'es2015',
+  frameworks: [],
+  'recorder-name': null,
+  'recording-defined-class': null,
+  'recording-method-id': null,
+  'git-dir': '.',
 });
 
 const getDefaultConfig = () => config;
@@ -2042,57 +2058,21 @@ var Appmap = (class Appmap {
   }
 });
 
-const checkHas = (object, key) => {
-  if (Reflect.getOwnPropertyDescriptor(object, key) === undefined) {
-    throw new Error(`Missing property: ${String(key)}`);
-  }
-};
-
-const checkNotNull = (any) => {
-  if (any === null) {
-    throw new Error('Unexpected null');
-  }
-};
-
-const checkTypeof = (value, type) => {
-  if (typeof value !== type) {
-    throw new Error(
-      `Invalid value type: expected a ${type} and got a ${typeof value}`,
-    );
-  }
-};
-
-const checkAnyof = (value, values) => {
-  if (!values.includes(value)) {
-    throw new Error('Invalid enumeration-based value');
-  }
-};
-
-const sources = ['script', 'module'];
-
 var Dispatcher = (class Dispatcher {
   constructor(config) {
     this.config = config;
     this.appmaps = { __proto__: null };
   }
-  dispatch(json) {
-    checkTypeof(json, 'object');
-    checkNotNull(json);
-    checkHas(json, 'name');
-    if (json.name === 'initialize') {
-      // checkHas(json, 'hook');
-      // checkHas(json, "process");
-      // checkHas(json, 'init');
-      // checkTypeof(json.init, 'object');
-      // checkNotNull(json);
-      // checkHas(json, 'env');
-      // checkTypeof(json.init, 'object');
-      // checkNotNull(json);
+  dispatch(request) {
+    validateRequest(request);
+    if (request.name === 'initialize') {
       let session;
       do {
         session = Math.random().toString(36).substring(2);
       } while (session in this.appmaps);
-      const config = this.config.extendWithJson(json.config, process.cwd()).extendWithEnv(json.process.env, process.cwd());
+      const config = this.config
+        .extendWithData(request.configuration, process.cwd())
+        .extendWithEnv(request.process.env, process.cwd());
       const appmap = new Appmap(config);
       this.appmaps[session] = appmap;
       return {
@@ -2100,33 +2080,24 @@ var Dispatcher = (class Dispatcher {
         prefix: config.getEscapePrefix(),
       };
     }
-    checkHas(json, 'session');
-    checkTypeof(json.session, 'string');
-    checkHas(this.appmaps, json.session);
-    const appmap = this.appmaps[json.session];
-    if (json.name === 'terminate') {
-      checkHas(json, 'sync');
-      checkHas(json, 'reason');
-      checkTypeof(json.sync, 'boolean');
-      appmap.terminate(json.sync, json.reason);
-      delete this.appmaps[json.session];
+    const appmap = this.appmaps[request.session];
+    if (request.name === 'terminate') {
+      appmap.terminate(request.sync, request.reason);
+      delete this.appmaps[request.session];
       return null;
     }
-    if (json.name === 'instrument') {
-      checkHas(json, 'source');
-      checkHas(json, 'path');
-      checkHas(json, 'content');
-      checkAnyof(json.source, sources);
-      checkTypeof(json.path, 'string');
-      checkTypeof(json.content, 'string');
-      return appmap.instrument(json.source, json.path, json.content);
+    if (request.name === 'instrument') {
+      return appmap.instrument(request.source, request.path, request.content);
     }
-    if (json.name === 'emit') {
-      checkHas(json, 'event');
-      appmap.emit(json.event);
+    if (request.name === 'emit') {
+      appmap.emit(request.event);
       return null;
     }
-    throw new Error('Unrecognized name');
+    /* c8 ignore start */
+    throw new Error(
+      'This should never happen: invalid name which passed validation',
+    );
+    /* c8 ignore stop */
   }
 });
 

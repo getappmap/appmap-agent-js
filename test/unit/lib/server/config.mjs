@@ -41,33 +41,33 @@ FileSystem.writeFileSync(
   JSON.stringify({ enabled: true }),
   'utf8',
 );
-Assert.ok(config.extendWithFile('tmp/test/foo.json').conf.enabled, true);
+Assert.ok(config.extendWithFile('tmp/test/foo.json').data.enabled, true);
 
 FileSystem.writeFileSync('tmp/test/foo.yml', 'enabled: true', 'utf8');
-Assert.ok(config.extendWithFile('tmp/test/foo.yml').conf.enabled, true);
+Assert.ok(config.extendWithFile('tmp/test/foo.yml').data.enabled, true);
 
 /////////////////////
 // extendsWithJson //
 /////////////////////
 
 Assert.throws(
-  () => config.extendWithJson({ extends: 'tmp/test/foo' }, null),
+  () => config.extendWithData({ extends: 'tmp/test/foo' }, null),
   /^Error: Missing base directory path/,
 );
 
 Assert.equal(
-  config.extendWithJson({ 'git-dir': 'bar' }, '/foo').conf['git-dir'],
+  config.extendWithData({ 'git-dir': 'bar' }, '/foo').data['git-dir'],
   '/foo/bar',
 );
 
 Assert.deepEqual(
-  config.extendWithJson({ exclude: ['foo', 'bar'] }, process.cwd()).conf
+  config.extendWithData({ exclude: ['foo', 'bar'] }, process.cwd()).data
     .exclude,
   ['foo', 'bar'],
 );
 
 Assert.deepEqual(
-  config.extendWithJson(
+  config.extendWithData(
     {
       packages: [
         'dist-or-path',
@@ -84,7 +84,7 @@ Assert.deepEqual(
       ],
     },
     '/foo',
-  ).conf.packages,
+  ).data.packages,
   [
     {
       shallow: false,
@@ -125,7 +125,7 @@ Assert.equal(
       APPMAP_BAR: 'qux',
     },
     '/foo',
-  ).conf.enabled,
+  ).data.enabled,
   true,
 );
 
@@ -135,13 +135,13 @@ Assert.deepEqual(
       APPMAP_PACKAGES: ' bar , qux ',
     },
     '/foo',
-  ).conf.packages,
-  config.extendWithJson(
+  ).data.packages,
+  config.extendWithData(
     {
       packages: ['bar', 'qux'],
     },
     '/foo',
-  ).conf.packages,
+  ).data.packages,
 );
 
 /////////////
@@ -150,36 +150,36 @@ Assert.deepEqual(
 
 Assert.equal(
   config
-    .extendWithJson({ 'escape-prefix': 'ESCAPE_PREFIX' }, null)
+    .extendWithData({ 'escape-prefix': 'ESCAPE_PREFIX' }, null)
     .getEscapePrefix(),
   'ESCAPE_PREFIX',
 );
 
 Assert.equal(
-  config.extendWithJson({ 'app-name': 'APP_NAME' }, null).getAppName(),
+  config.extendWithData({ 'app-name': 'APP_NAME' }, null).getAppName(),
   'APP_NAME',
 );
 
 Assert.equal(
-  config.extendWithJson({ 'map-name': 'MAP_NAME' }, null).getMapName(),
+  config.extendWithData({ 'map-name': 'MAP_NAME' }, null).getMapName(),
   'MAP_NAME',
 );
 
 Assert.equal(
-  config.extendWithJson({ 'output-dir': '/OUTPUT_DIR' }, null).getOutputDir(),
+  config.extendWithData({ 'output-dir': '/OUTPUT_DIR' }, null).getOutputDir(),
   '/OUTPUT_DIR',
 );
 
 Assert.equal(
   config
-    .extendWithJson({ 'language-version': '5.1' }, null)
+    .extendWithData({ 'language-version': '5.1' }, null)
     .getLanguageVersion(),
   '5.1',
 );
 
 {
   const metadata = config
-    .extendWithJson(
+    .extendWithData(
       {
         'map-name': 'MAP_NAME',
         labels: ['LABEL0', 'LABEL1'],
@@ -245,35 +245,35 @@ Assert.equal(
 
 Assert.equal(
   config
-    .extendWithJson({ packages: ['bar'] }, '/foo')
+    .extendWithData({ packages: ['bar'] }, '/foo')
     .getFileInstrumentation('/foo/bar'),
   null,
 );
 
 Assert.equal(
   config
-    .extendWithJson({ enabled: true }, '/foo')
+    .extendWithData({ enabled: true }, '/foo')
     .getFileInstrumentation('/foo/bar'),
   null,
 );
 
 Assert.equal(
   config
-    .extendWithJson({ enabled: true, packages: ['bar'] }, '/foo')
+    .extendWithData({ enabled: true, packages: ['bar'] }, '/foo')
     .getFileInstrumentation('bar'),
   null,
 );
 
 Assert.equal(
   config
-    .extendWithJson({ enabled: true, packages: ['bar'] }, '/foo')
+    .extendWithData({ enabled: true, packages: ['bar'] }, '/foo')
     .getFileInstrumentation('/foo/bar'),
   'deep',
 );
 
 Assert.equal(
   config
-    .extendWithJson(
+    .extendWithData(
       { enabled: true, packages: [{ path: 'bar', shallow: true }] },
       '/foo',
     )
@@ -289,14 +289,14 @@ Assert.equal(config.isNameExcluded('/foo/bar', 'name'), true);
 
 Assert.equal(
   config
-    .extendWithJson({ enabled: true }, '/foo')
+    .extendWithData({ enabled: true }, '/foo')
     .isNameExcluded('/foo/bar', 'name'),
   true,
 );
 
 Assert.equal(
   config
-    .extendWithJson(
+    .extendWithData(
       { enabled: true, packages: ['bar'], exclude: ['name'] },
       '/foo',
     )
@@ -306,7 +306,7 @@ Assert.equal(
 
 Assert.equal(
   config
-    .extendWithJson(
+    .extendWithData(
       { enabled: true, packages: [{ path: 'bar', exclude: ['name'] }] },
       '/foo',
     )
@@ -316,7 +316,7 @@ Assert.equal(
 
 Assert.equal(
   config
-    .extendWithJson({ enabled: true, packages: ['bar'] }, '/foo')
+    .extendWithData({ enabled: true, packages: ['bar'] }, '/foo')
     .isNameExcluded('/foo/bar', 'name'),
   false,
 );

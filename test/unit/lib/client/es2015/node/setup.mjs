@@ -42,7 +42,7 @@ Object.assign(emitter, data, {
 });
 
 const { instrumentScript, instrumentModule } = setup(
-  { argv: ['hook'] },
+  { esm: false, cjs: true, argv: ['hook'] },
   emitter,
 );
 
@@ -78,15 +78,15 @@ Assert.deepEqual(trace, [
     {
       name: 'initialize',
       options: {
-        __proto__: null,
+        esm: false,
+        cjs: true,
         'hook-child-process': false,
         host: 'localhost',
         port: 0,
         protocol,
       },
-      hook: { argv: ['hook'] },
       process: data,
-      config: {
+      configuration: {
         'map-name': 'main.js',
         'recorder-name': 'TODO',
         feature: 'TODO',

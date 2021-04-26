@@ -1,3 +1,5 @@
+// https://github.com/ajv-validator/ajv/blob/master/docs/standalone.md
+
 import Ajv from 'ajv';
 import YAML from 'yaml';
 import * as FileSystem from 'fs';
@@ -7,12 +9,7 @@ import makeStandaloneCode from 'ajv/dist/standalone/index.js';
 
 const ajv = new Ajv({ code: { source: true } });
 
-['config', 'protocol'].forEach((name) => {
-  ajv.addSchema(
-    YAML.parse(FileSystem.readFileSync(`src/${name}.schema.yml`, 'utf8')),
-    name,
-  );
-});
+ajv.addSchema(YAML.parse(FileSystem.readFileSync(`src/schema.yml`, 'utf8')));
 
 FileSystem.writeFileSync(
   'dist/schema.js',

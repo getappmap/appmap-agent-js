@@ -6,10 +6,19 @@ const dispatcher = new Dispatcher(getDefaultConfig());
 
 const { session, prefix } = dispatcher.dispatch({
   name: 'initialize',
+  options: {
+    protocol: 'messaging',
+    host: 'localhost',
+    port: 8080,
+    esm: false,
+    cjs: false,
+    'hook-child-process': false,
+  },
   process: {
+    version: 'foo',
     env: {},
   },
-  config: {},
+  configuration: {},
 });
 
 Assert.equal(typeof prefix, 'string');
@@ -67,5 +76,7 @@ Assert.throws(() =>
   dispatcher.dispatch({
     name: 'terminate',
     session,
+    sync: true,
+    reason: null,
   }),
 );

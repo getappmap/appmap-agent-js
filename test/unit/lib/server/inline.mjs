@@ -5,10 +5,19 @@ const { requestSync, requestAsync } = makeChannel();
 
 const { session, prefix } = requestSync({
   name: 'initialize',
+  options: {
+    protocol: 'inline',
+    host: 'localhost',
+    port: 0,
+    esm: false,
+    cjs: false,
+    'hook-child-process': false,
+  },
   process: {
+    version: 'version',
     env: {},
   },
-  config: {},
+  configuration: {},
 });
 
 Assert.equal(typeof prefix, 'string');
@@ -24,11 +33,11 @@ requestAsync(
 
 requestAsync(
   {
-    name: 'initialize',
-    process: {
-      env: {},
-    },
-    config: {},
+    name: 'instrument',
+    session,
+    source: 'script',
+    path: 'main.js',
+    content: '123;',
   },
   null,
 );
@@ -56,7 +65,8 @@ requestAsync(
       resolve: () => Assert.fail(),
     },
   );
-  Assert.deepEqual(trace, ['Missing property: session']);
+  Assert.deepEqual(trace.length, 1);
+  Assert.ok(trace[0].startsWith('invalid request'));
 }
 
 {
