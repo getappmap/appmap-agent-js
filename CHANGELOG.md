@@ -1,3 +1,10 @@
+# [2.6.0](https://github.com/applandinc/appmap-agent-js/compare/v2.5.0...v2.6.0) (2021-04-27)
+
+
+### Features
+
+* improved command line interface ([5ed31b4](https://github.com/applandinc/appmap-agent-js/commit/5ed31b45c43f656f043d6389b33d48928eaea228))
+
 # [2.5.0](https://github.com/applandinc/appmap-agent-js/compare/v2.4.0...v2.5.0) (2021-04-22)
 
 
