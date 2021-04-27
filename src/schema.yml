@@ -1,5 +1,23 @@
 
-- $id: "configuration"
+- $id: options
+  type: object
+  additionalProperties: false
+  properties:
+    protocol:
+      enum: [inline, messaging, http1, http2]
+    host: {const: localhost}
+    port:
+      anyOf:
+        - type: integer
+          minimum: 0
+          maximum: 65535
+        - type: string
+    hook-cjs: {type: boolean}
+    hook-esm: {type: boolean}
+    hook-child-process: {type: boolean}
+    rc-file: {type: string}
+
+- $id: configuration
   type: object
   additionalProperties: false
   properties:
@@ -67,7 +85,7 @@
       type: array
       items: {type: string}
 
-- $id: "request"
+- $id: request
   anyOf:
     - type: object
       additionalProperties: false

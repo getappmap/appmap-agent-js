@@ -24,6 +24,7 @@ export const server = [
   'response/index',
   'index',
   'inline',
+  'main',
 ];
 
 export const client = [

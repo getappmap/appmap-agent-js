@@ -71,6 +71,7 @@ ajv.addSchema(
 );
 const validateRequestSchema = ajv.getSchema('request');
 const validateConfigurationSchema = ajv.getSchema('configuration');
+ajv.getSchema('options');
 
 const makeValidate = (name, callback) => (json) => {
   if (!callback(json)) {
@@ -229,10 +230,12 @@ const npm = JSON.parse(
 
 const makeOverwrite = (key, transform) => (value, object, context) => {
   object[key] = transform(value, context);
+  return object;
 };
 
 const makeConcat = (key) => (value, object, context) => {
   object[key] = [...object[key], ...value];
+  return object;
 };
 
 const sortPackage = (specifier1, specifier2) =>
@@ -240,9 +243,10 @@ const sortPackage = (specifier1, specifier2) =>
 
 const mergers = {
   __proto__: null,
-  extends: (path, data, base) =>
+  extends: (path, data, base) => {
     /* eslint-disable no-use-before-define */
-    extendWithFile(data, resolve(base, path)),
+    return extendWithFile(data, resolve(base, path));
+  },
   /* eslint-enable no-use-before-define */
   packages: (specifiers, data, base) => {
     data.packages = [
@@ -275,6 +279,7 @@ const mergers = {
       ...data.packages,
     ];
     data.packages.sort(sortPackage);
+    return data;
   },
   exclude: makeConcat('exclude'),
   enabled: makeOverwrite('enabled', identity),
@@ -302,7 +307,7 @@ const extendWithData = (data1, data2, base) => {
     base = resolve(process.cwd(), base);
   }
   Reflect.ownKeys(data2).forEach((key) => {
-    mergers[key](data2[key], data1, base);
+    data1 = mergers[key](data2[key], data1, base);
   });
   return data1;
 };
@@ -314,8 +319,7 @@ const extendWithData = (data1, data2, base) => {
 const mapping = {
   __proto__: null,
   APPMAP: ['enabled', (string) => string.toLowerCase() === 'true'],
-  APPMAP_CONFIG: ['extends', identity],
-  APPMAP_NAME: ['name', identity],
+  APPMAP_RC_FILE: ['extends', identity],
   APPMAP_APP_NAME: ['app-name', identity],
   APPMAP_MAP_NAME: ['map-name', identity],
   APPMAP_OUTPUT_DIR: ['output-dir', identity],
@@ -1981,6 +1985,8 @@ var Namespace = (class Namespace {
   }
 });
 
+const escape = (name) => name.replace(/([\0\/])/g, '-');
+
 const VERSION = '1.4';
 
 var Appmap = (class Appmap {
@@ -2027,7 +2033,7 @@ var Appmap = (class Appmap {
     this.terminated = true;
     const path = Path__namespace.join(
       this.config.getOutputDir(),
-      `${this.config.getMapName()}.appmap.json`,
+      `${escape(this.config.getMapName())}.appmap.json`,
     );
     logger.info(
       'Appmap terminate sync = %j path = %s reason = %j',
@@ -2070,9 +2076,9 @@ var Dispatcher = (class Dispatcher {
       do {
         session = Math.random().toString(36).substring(2);
       } while (session in this.appmaps);
-      const config = this.config
-        .extendWithData(request.configuration, process.cwd())
-        .extendWithEnv(request.process.env, process.cwd());
+      let config = this.config;
+      config = config.extendWithData(request.configuration, process.cwd());
+      config = config.extendWithEnv(request.process.env, process.cwd());
       const appmap = new Appmap(config);
       this.appmaps[session] = appmap;
       return {

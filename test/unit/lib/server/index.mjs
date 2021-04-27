@@ -3,78 +3,94 @@ import { Server } from 'net';
 import * as FileSystem from 'fs';
 import * as Agent from '../../../../lib/server/index.mjs';
 
-const env = {
-  APPMAP_FOO: 'BAR',
-  QUX: 'BUZ',
-};
-Assert.ok(Agent.createServer('messaging', env, {}) instanceof Server);
-Assert.deepEqual(env, { QUX: 'BUZ' });
+Assert.ok(Agent.createServer('messaging', null, {}) instanceof Server);
 
-Assert.deepEqual(
-  Agent.hookForkOptions(
-    {
-      env: {
-        FOO: 'BAR',
-        APPMAP_FOO: 'APPMAP_BAR',
-      },
-      execArgv: ['foo', 'bar'],
-    },
-    {
-      protocol: 'http3',
-      port: 1234,
-      esm: false,
-      cjs: false,
-    },
-  ),
-  {
-    env: {
-      FOO: 'BAR',
-      APPMAP_FOO: 'APPMAP_BAR',
-      APPMAP_PROTOCOL: 'http3',
-      APPMAP_HOST: 'localhost',
-      APPMAP_PORT: '1234',
-      APPMAP_HOOK_CHILD_PROCESS: 'true',
-    },
-    execArgv: ['foo', 'bar'],
-  },
+Assert.ok(
+  Agent.createServer('messaging', { name: 'app-name' }, {}) instanceof Server,
 );
 
+FileSystem.writeFileSync(
+  'tmp/test/appmap.json',
+  JSON.stringify({ name: 'app-name' }),
+  'utf8',
+);
+Assert.ok(
+  Agent.createServer('messaging', 'tmp/test/appmap.json', {}) instanceof Server,
+);
+
+const env = {
+  APPMAP_PROTOCOL: 'messaging',
+  APPMAP_HOST: 'localhost',
+  APPMAP_PORT: '0',
+  APPMAP_HOOK_CHILD_PROCESS: 'false',
+};
+
 Assert.deepEqual(
-  Agent.hookForkOptions(
-    {
-      env: {},
-      execArgv: [],
-    },
-    {
-      ecma: 'es5',
-      port: 'tmp/unix-socket.sock',
-      esm: false,
-      cjs: false,
-    },
-  ),
+  Agent.compileOptions({
+    'hook-esm': false,
+    'hook-cjs': false,
+    port: 'unix-domain-socket',
+    'ecma-version': 'es5',
+    'rc-file': 'appmap.yml',
+  }),
   {
     env: {
-      APPMAP_PROTOCOL: 'messaging',
-      APPMAP_HOST: 'localhost',
-      APPMAP_PORT: 'tmp/unix-socket.sock',
-      APPMAP_HOOK_CHILD_PROCESS: 'true',
+      ...env,
+      APPMAP_PORT: 'unix-domain-socket',
+      APPMAP_RC_FILE: 'appmap.yml',
     },
     execArgv: [],
   },
 );
 
-[true, false].forEach((esm) => {
-  [true, false].forEach((cjs) => {
-    Agent.hookForkOptions({}, { esm, cjs });
-  });
-});
+Assert.deepEqual(
+  Agent.compileOptions({
+    'hook-esm': false,
+    'hook-cjs': true,
+  }),
+  {
+    env,
+    execArgv: [
+      '--require',
+      `${process.cwd()}/lib/client/es2015/node/index-cjs.js`,
+    ],
+  },
+);
+
+Assert.deepEqual(
+  Agent.compileOptions({
+    'hook-esm': true,
+    'hook-cjs': false,
+  }),
+  {
+    env,
+    execArgv: [
+      '--experimental-loader',
+      `${process.cwd()}/lib/client/es2015/node/index-esm.js`,
+    ],
+  },
+);
+
+Assert.deepEqual(
+  Agent.compileOptions({
+    'hook-esm': true,
+    'hook-cjs': true,
+  }),
+  {
+    env,
+    execArgv: [
+      '--experimental-loader',
+      `${process.cwd()}/lib/client/es2015/node/index-esm-cjs.js`,
+    ],
+  },
+);
 
 {
   const path = 'tmp/test/main.js';
   const options = {
     protocol: 'inline',
-    esm: false,
-    cjs: false,
+    'hook-esm': false,
+    'hook-cjs': false,
   };
   FileSystem.writeFileSync(path, `123;`, 'utf8');
   Agent.fork(path, [], {}, options);

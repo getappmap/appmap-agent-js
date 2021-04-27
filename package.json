@@ -7,7 +7,7 @@
     "prettify": "npx prettier --write 'lib/server/**/*.mjs' 'lib/client/**/*.js' 'test/**/*.mjs' 'bin/*.mjs' 'build/*.mjs'",
     "commit": "npx cz",
     "lint": "npx eslint 'lib/client/**/*.js' 'lib/server/**/*.mjs' 'test/**/*.mjs' 'bin/*.mjs' 'build/*.mjs'",
-    "test": "node test/unit/run.mjs && node test/integration/run.mjs",
+    "test": "node test/unit/run.mjs",
     "deploy": "npx semantic-release"
   },
   "files": [
@@ -46,7 +46,8 @@
     "mocha": "^8.3.2",
     "nyc": "^15.1.0",
     "prettier": "^2.2.1",
-    "rollup": "^2.45.2"
+    "rollup": "^2.45.2",
+    "tap": "^15.0.5"
   },
   "repository": {
     "type": "git",
