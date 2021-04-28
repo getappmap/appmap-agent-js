@@ -1,3 +1,10 @@
+# [2.9.0](https://github.com/applandinc/appmap-agent-js/compare/v2.8.1...v2.9.0) (2021-04-28)
+
+
+### Features
+
+* cache to prevent appmaps from overwritting themselves and add default map name ([8724059](https://github.com/applandinc/appmap-agent-js/commit/8724059609d1c63be684f747ff1193e9ed5937a1))
+
 ## [2.8.1](https://github.com/applandinc/appmap-agent-js/compare/v2.8.0...v2.8.1) (2021-04-28)
 
 
