@@ -1,3 +1,10 @@
+## [2.8.1](https://github.com/applandinc/appmap-agent-js/compare/v2.8.0...v2.8.1) (2021-04-28)
+
+
+### Bug Fixes
+
+* remove legacy code dependent on node's argument rather than NODE_OPTIONS ([0ce1b42](https://github.com/applandinc/appmap-agent-js/commit/0ce1b427a1c1b5e936d40fd5e1f367aa7a00dbbc))
+
 # [2.8.0](https://github.com/applandinc/appmap-agent-js/compare/v2.7.1...v2.8.0) (2021-04-28)
 
 
