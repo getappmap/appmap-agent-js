@@ -1,3 +1,10 @@
+## [2.7.1](https://github.com/applandinc/appmap-agent-js/compare/v2.7.0...v2.7.1) (2021-04-28)
+
+
+### Bug Fixes
+
+* fix argv processing in bin/index ([bab6a53](https://github.com/applandinc/appmap-agent-js/commit/bab6a5315f625c5b320739c69e1c4e4f4f0e6062))
+
 # [2.7.0](https://github.com/applandinc/appmap-agent-js/compare/v2.6.0...v2.7.0) (2021-04-28)
 
 
