@@ -1,3 +1,10 @@
+# [2.8.0](https://github.com/applandinc/appmap-agent-js/compare/v2.7.1...v2.8.0) (2021-04-28)
+
+
+### Features
+
+* use NODE_OPTIONS instead of node's argv which provides automatic support for child_process ([b9c1dd3](https://github.com/applandinc/appmap-agent-js/commit/b9c1dd3c7a8ca6ecc8dd63ee31f8f58f2db4c12c))
+
 ## [2.7.1](https://github.com/applandinc/appmap-agent-js/compare/v2.7.0...v2.7.1) (2021-04-28)
 
 
