@@ -55,9 +55,9 @@ Assert.throws(
   /^Error: Missing base directory path/,
 );
 
-Assert.equal(
-  config.extendWithData({ 'git-dir': 'bar' }, '/foo').data['git-dir'],
-  '/foo/bar',
+Assert.deepEqual(
+  config.extendWithData({ 'git-dir': '.' }, process.cwd()).data.git,
+  config.data.git,
 );
 
 Assert.deepEqual(

@@ -3,6 +3,8 @@
   type: object
   additionalProperties: false
   properties:
+    node-version:
+      enum: ["14.x", "15.x", "16.x"]
     protocol:
       enum: [inline, messaging, http1, http2]
     host: {const: localhost}

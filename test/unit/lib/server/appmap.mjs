@@ -63,7 +63,7 @@ Assert.deepEqual(json, {
     app: null,
     feature: null,
     feature_group: null,
-    language: { name: 'javascript', engine: null, version: 'es2015' },
+    language: { name: 'javascript', engine: null, version: '2015' },
     frameworks: [],
     client: {
       name: '@appland/appmap-agent-js',

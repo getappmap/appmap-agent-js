@@ -202,8 +202,6 @@ const trim = (string) => string.trim();
 
 const identity = (any) => any;
 
-const flip = (callback) => (arg0, arg1) => callback(arg1, arg0);
-
 const resolve = (base, path) => {
   if (Path__namespace.isAbsolute(path)) {
     return path;
@@ -243,10 +241,9 @@ const sortPackage = (specifier1, specifier2) =>
 
 const mergers = {
   __proto__: null,
-  extends: (path, data, base) => {
+  extends: (path, data, base) =>
     /* eslint-disable no-use-before-define */
-    return extendWithFile(data, resolve(base, path));
-  },
+    extendWithFile(data, resolve(base, path)),
   /* eslint-enable no-use-before-define */
   packages: (specifiers, data, base) => {
     data.packages = [
@@ -289,8 +286,14 @@ const mergers = {
   'language-version': makeOverwrite('language-version', identity),
   'language-engine': makeOverwrite('language-engine', identity),
   'escape-prefix': makeOverwrite('escape-prefix', identity),
-  'output-dir': makeOverwrite('output-dir', flip(resolve)),
-  'git-dir': makeOverwrite('git-dir', flip(resolve)),
+  'output-dir': (path, data, base) => {
+    data['output-dir'] = resolve(base, path);
+    return data;
+  },
+  'git-dir': (path, data, base) => {
+    data.git = git(resolve(base, path));
+    return data;
+  },
   labels: makeConcat('labels'),
   frameworks: makeConcat('frameworks'),
   feature: makeOverwrite('feature', identity),
@@ -463,7 +466,7 @@ class Config {
         defined_class: this.data['recording-defined-class'],
         method_id: this.data['recording-method-id'],
       },
-      git: git(this.data['git-dir']),
+      git: this.data.git,
     };
   }
 }
@@ -486,12 +489,12 @@ const config = new Config({
   feature: null,
   'feature-group': null,
   'language-engine': null,
-  'language-version': 'es2015',
+  'language-version': '2015',
   frameworks: [],
   'recorder-name': null,
   'recording-defined-class': null,
   'recording-method-id': null,
-  'git-dir': '.',
+  git: git('.'),
 });
 
 const getDefaultConfig = () => config;
@@ -1985,7 +1988,8 @@ var Namespace = (class Namespace {
   }
 });
 
-const escape = (name) => name.replace(/([\0\/])/g, '-');
+const sanitize = (name) =>
+  name === null ? 'anonymous' : name.replace(/\0|\//g, '-');
 
 const VERSION = '1.4';
 
@@ -2033,7 +2037,7 @@ var Appmap = (class Appmap {
     this.terminated = true;
     const path = Path__namespace.join(
       this.config.getOutputDir(),
-      `${escape(this.config.getMapName())}.appmap.json`,
+      `${sanitize(this.config.getMapName())}.appmap.json`,
     );
     logger.info(
       'Appmap terminate sync = %j path = %s reason = %j',
@@ -2072,11 +2076,12 @@ var Dispatcher = (class Dispatcher {
   dispatch(request) {
     validateRequest(request);
     if (request.name === 'initialize') {
+      // console.log("initialize", request);
       let session;
       do {
         session = Math.random().toString(36).substring(2);
       } while (session in this.appmaps);
-      let config = this.config;
+      let { config } = this;
       config = config.extendWithData(request.configuration, process.cwd());
       config = config.extendWithEnv(request.process.env, process.cwd());
       const appmap = new Appmap(config);
@@ -2088,11 +2093,13 @@ var Dispatcher = (class Dispatcher {
     }
     const appmap = this.appmaps[request.session];
     if (request.name === 'terminate') {
+      // console.log("terminate", request);
       appmap.terminate(request.sync, request.reason);
       delete this.appmaps[request.session];
       return null;
     }
     if (request.name === 'instrument') {
+      // console.log("instrument", request.path);
       return appmap.instrument(request.source, request.path, request.content);
     }
     if (request.name === 'emit') {

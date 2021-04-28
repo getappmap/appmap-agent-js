@@ -1,6 +1,13 @@
 {
   "name": "@appland/appmap-agent-js",
   "version": "2.5.0",
+  "os": [
+    "linux",
+    "darwin"
+  ],
+  "engine": {
+    "node": ">=14.0.0"
+  },
   "scripts": {
     "coverage": "npx c8 --reporter=html --require $TARGET node test/unit/$TARGET",
     "build": "node build/index.mjs",
@@ -47,7 +54,8 @@
     "nyc": "^15.1.0",
     "prettier": "^2.2.1",
     "rollup": "^2.45.2",
-    "tap": "^15.0.5"
+    "tap": "^15.0.5",
+    "tape": "^5.2.2"
   },
   "repository": {
     "type": "git",

@@ -30,7 +30,7 @@ Assert.deepEqual(
     'hook-esm': false,
     'hook-cjs': false,
     port: 'unix-domain-socket',
-    'ecma-version': 'es5',
+    'node-version': '14.x',
     'rc-file': 'appmap.yml',
   }),
   {
@@ -39,7 +39,10 @@ Assert.deepEqual(
       APPMAP_PORT: 'unix-domain-socket',
       APPMAP_RC_FILE: 'appmap.yml',
     },
-    execArgv: [],
+    execArgv: [
+      '--require',
+      `${process.cwd()}/lib/client/es2015/node14x/check-version.js`,
+    ],
   },
 );
 
@@ -52,7 +55,9 @@ Assert.deepEqual(
     env,
     execArgv: [
       '--require',
-      `${process.cwd()}/lib/client/es2015/node/index-cjs.js`,
+      `${process.cwd()}/lib/client/es2015/node14x/check-version.js`,
+      '--require',
+      `${process.cwd()}/lib/client/es2015/node14x/index-cjs.js`,
     ],
   },
 );
@@ -65,8 +70,10 @@ Assert.deepEqual(
   {
     env,
     execArgv: [
+      '--require',
+      `${process.cwd()}/lib/client/es2015/node14x/check-version.js`,
       '--experimental-loader',
-      `${process.cwd()}/lib/client/es2015/node/index-esm.js`,
+      `${process.cwd()}/lib/client/es2015/node14x/index-esm.js`,
     ],
   },
 );
@@ -79,8 +86,10 @@ Assert.deepEqual(
   {
     env,
     execArgv: [
+      '--require',
+      `${process.cwd()}/lib/client/es2015/node14x/check-version.js`,
       '--experimental-loader',
-      `${process.cwd()}/lib/client/es2015/node/index-esm-cjs.js`,
+      `${process.cwd()}/lib/client/es2015/node14x/index-esm-cjs.js`,
     ],
   },
 );
