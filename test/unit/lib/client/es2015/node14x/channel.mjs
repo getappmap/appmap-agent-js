@@ -1,20 +1,20 @@
 import { strict as Assert } from 'assert';
 import makeChannel from '../../../../../../lib/client/es2015/node14x/channel.js';
 
-Assert.equal(typeof makeChannel({ protocol: 'inline' }), 'object');
+Assert.equal(typeof makeChannel({ APPMAP_PROTOCOL: 'inline' }), 'object');
 
 Assert.equal(
   typeof makeChannel({
-    protocol: 'http1',
-    host: 'localhost',
-    port: '0',
+    APPMAP_PROTOCOL: 'http1',
+    APPMAP_HOST: 'localhost',
+    APPMAP_PORT: '0',
   }),
   'object',
 );
 
 Assert.deepEqual(
   makeChannel({
-    protocol: {
+    APPMAP_PROTOCOL: {
       requestSync: 123,
       requestAsync: 456,
     },
@@ -28,6 +28,6 @@ Assert.deepEqual(
 
 Assert.throws(() => {
   makeChannel({
-    protocol: 'foobar',
+    APPMAP_PROTOCOL: 'foobar',
   });
 }, /^Error: Invalid APPMAP_PROTOCOL/);

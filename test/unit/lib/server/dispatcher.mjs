@@ -6,14 +6,6 @@ const dispatcher = new Dispatcher(getDefaultConfig());
 
 const { session, prefix } = dispatcher.dispatch({
   name: 'initialize',
-  options: {
-    protocol: 'messaging',
-    host: 'localhost',
-    port: 8080,
-    esm: false,
-    cjs: false,
-    'hook-child-process': false,
-  },
   process: {
     version: 'foo',
     env: {},

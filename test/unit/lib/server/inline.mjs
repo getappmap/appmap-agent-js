@@ -5,14 +5,6 @@ const { requestSync, requestAsync } = makeChannel();
 
 const { session, prefix } = requestSync({
   name: 'initialize',
-  options: {
-    protocol: 'inline',
-    host: 'localhost',
-    port: 0,
-    esm: false,
-    cjs: false,
-    'hook-child-process': false,
-  },
   process: {
     version: 'version',
     env: {},

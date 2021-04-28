@@ -4,6 +4,6 @@ const copy = {...cp};
 Error.stackTraceLimit = Infinity;
 cp.spawn = (...args) => {
   console.log(new Error("FOOBAR").stack);
-  console.log(...args.slice(0, 2));
+  console.log(...args);
   return copy.spawn(...args);
 };

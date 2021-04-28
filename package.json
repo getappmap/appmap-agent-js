@@ -8,6 +8,16 @@
   "engine": {
     "node": ">=14.0.0"
   },
+  "keywords": [
+    "appmap",
+    "appland",
+    "javascript",
+    "instrumentation",
+    "visualization",
+    "tracing",
+    "recording",
+    "testing"
+  ],
   "scripts": {
     "coverage": "npx c8 --reporter=html --require $TARGET node test/unit/$TARGET",
     "build": "node build/index.mjs",

@@ -7,18 +7,6 @@ import setup from '../../../../../../lib/client/es2015/node14x/setup.js';
 const emitter = new EventEmitter();
 const trace = [];
 
-const data = {
-  env: {},
-  execPath: 'exec-path',
-  pid: 'pid',
-  ppid: 'ppid',
-  execArgv: ['exec-arg0'],
-  argv: ['node', 'main.js', 'arg0'],
-  platform: 'platform',
-  arch: 'arch',
-  version: 'version',
-};
-
 const protocol = {
   requestSync: (json) => {
     trace.push(['sync', json]);
@@ -35,11 +23,21 @@ const protocol = {
   },
 };
 
-Object.assign(emitter, data, {
+const data = {
   env: {
     APPMAP_PROTOCOL: protocol,
   },
-});
+  execPath: 'exec-path',
+  pid: 'pid',
+  ppid: 'ppid',
+  execArgv: ['exec-arg0'],
+  argv: ['node', 'main.js', 'arg0'],
+  platform: 'platform',
+  arch: 'arch',
+  version: 'version',
+};
+
+Object.assign(emitter, data);
 
 const { instrumentScript, instrumentModule } = setup(
   { esm: false, cjs: true, argv: ['hook'] },
@@ -77,14 +75,6 @@ Assert.deepEqual(trace, [
     'sync',
     {
       name: 'initialize',
-      options: {
-        esm: false,
-        cjs: true,
-        'hook-child-process': false,
-        host: 'localhost',
-        port: 0,
-        protocol,
-      },
       process: data,
       configuration: {},
       // {

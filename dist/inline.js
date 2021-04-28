@@ -2084,6 +2084,9 @@ var Dispatcher = (class Dispatcher {
       let { config } = this;
       config = config.extendWithData(request.configuration, process.cwd());
       config = config.extendWithEnv(request.process.env, process.cwd());
+      // if (config.getMapName() === null) {
+      //   config = config.extendWithData({"map-name": Path.relative(process.cwd(), request.process.argv[1])});
+      // }
       const appmap = new Appmap(config);
       this.appmaps[session] = appmap;
       return {

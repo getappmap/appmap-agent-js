@@ -91,24 +91,24 @@
   anyOf:
     - type: object
       additionalProperties: false
-      required: [name, options, process, configuration]
+      required: [name, process, configuration]
       properties:
         name: {const: initialize}
-        options:
-          type: object
-          additionalProperties: false
-          required: [protocol, host, port, esm, cjs, hook-child-process]
-          properties:
-            protocol:
-              enum: [inline, messaging, http1, http2, http3]
-            host: {type: string}
-            port:
-              anyOf:
-                - {type: integer}
-                - {type: string}
-            esm: {type: boolean}
-            cjs: {type: boolean}
-            hook-child-process: {type: boolean}
+        # options:
+        #   type: object
+        #   additionalProperties: false
+        #   required: [protocol, host, port, esm, cjs, hook-child-process]
+        #   properties:
+        #     protocol:
+        #       enum: [inline, messaging, http1, http2, http3]
+        #     host: {type: string}
+        #     port:
+        #       anyOf:
+        #         - {type: integer}
+        #         - {type: string}
+        #     esm: {type: boolean}
+        #     cjs: {type: boolean}
+        #     hook-child-process: {type: boolean}
         process:
           type: object
           additionalProperties: false
