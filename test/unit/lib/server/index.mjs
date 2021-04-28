@@ -39,10 +39,7 @@ Assert.deepEqual(
       APPMAP_PORT: 'unix-domain-socket',
       APPMAP_RC_FILE: 'appmap.yml',
     },
-    execArgv: [
-      '--require',
-      `${process.cwd()}/lib/client/es2015/node14x/check-version.js`,
-    ],
+    execArgv: [],
   },
 );
 
@@ -54,8 +51,6 @@ Assert.deepEqual(
   {
     env,
     execArgv: [
-      '--require',
-      `${process.cwd()}/lib/client/es2015/node14x/check-version.js`,
       '--require',
       `${process.cwd()}/lib/client/es2015/node14x/index-cjs.js`,
     ],
@@ -70,8 +65,6 @@ Assert.deepEqual(
   {
     env,
     execArgv: [
-      '--require',
-      `${process.cwd()}/lib/client/es2015/node14x/check-version.js`,
       '--experimental-loader',
       `${process.cwd()}/lib/client/es2015/node14x/index-esm.js`,
     ],
@@ -86,8 +79,6 @@ Assert.deepEqual(
   {
     env,
     execArgv: [
-      '--require',
-      `${process.cwd()}/lib/client/es2015/node14x/check-version.js`,
       '--experimental-loader',
       `${process.cwd()}/lib/client/es2015/node14x/index-esm-cjs.js`,
     ],
