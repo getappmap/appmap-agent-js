@@ -9,6 +9,7 @@ const { session, prefix } = dispatcher.dispatch({
   process: {
     version: 'foo',
     env: {},
+    argv: ['node', 'script.js'],
   },
   configuration: {},
 });

@@ -1994,7 +1994,8 @@ const sanitize = (name) =>
 const VERSION = '1.4';
 
 var Appmap = (class Appmap {
-  constructor(config) {
+  constructor(config, cache) {
+    this.cache = cache;
     this.config = config;
     this.namespace = new Namespace(config.getEscapePrefix());
     this.terminated = false;
@@ -2035,10 +2036,19 @@ var Appmap = (class Appmap {
       throw new Error('Terminated appmap can no longer be terminated');
     }
     this.terminated = true;
-    const path = Path__namespace.join(
+    let path = Path__namespace.join(
       this.config.getOutputDir(),
-      `${sanitize(this.config.getMapName())}.appmap.json`,
+      `${sanitize(this.config.getMapName())}`,
     );
+    if (path in this.cache) {
+      let counter = 0;
+      while (`${path}-${String(counter)}` in this.cache) {
+        counter += 1;
+      }
+      path = `${path}-${String(counter)}`;
+    }
+    this.cache[path] = null;
+    path = `${path}.appmap.json`;
     logger.info(
       'Appmap terminate sync = %j path = %s reason = %j',
       sync,
@@ -2070,6 +2080,7 @@ var Appmap = (class Appmap {
 
 var Dispatcher = (class Dispatcher {
   constructor(config) {
+    this.cache = { __proto__: null };
     this.config = config;
     this.appmaps = { __proto__: null };
   }
@@ -2084,10 +2095,13 @@ var Dispatcher = (class Dispatcher {
       let { config } = this;
       config = config.extendWithData(request.configuration, process.cwd());
       config = config.extendWithEnv(request.process.env, process.cwd());
-      // if (config.getMapName() === null) {
-      //   config = config.extendWithData({"map-name": Path.relative(process.cwd(), request.process.argv[1])});
-      // }
-      const appmap = new Appmap(config);
+      if (config.getMapName() === null) {
+        config = config.extendWithData(
+          { 'map-name': Path__namespace.relative(process.cwd(), request.process.argv[1]) },
+          null,
+        );
+      }
+      const appmap = new Appmap(config, this.cache);
       this.appmaps[session] = appmap;
       return {
         session,

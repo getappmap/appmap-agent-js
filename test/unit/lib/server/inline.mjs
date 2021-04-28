@@ -8,6 +8,7 @@ const { session, prefix } = requestSync({
   process: {
     version: 'version',
     env: {},
+    argv: ['node', 'script.js'],
   },
   configuration: {},
 });

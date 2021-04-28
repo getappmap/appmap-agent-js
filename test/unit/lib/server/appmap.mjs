@@ -13,7 +13,7 @@ try {
 }
 
 Assert.equal(
-  new Appmap(getDefaultConfig()).instrument(
+  new Appmap(getDefaultConfig(), { __proto__: null }).instrument(
     'script',
     Path.resolve(process.cwd(), 'foo.js'),
     '(function f () {} ())',
@@ -31,6 +31,7 @@ const appmap = new Appmap(
     },
     process.cwd(),
   ),
+  { __proto__: null },
 );
 
 appmap.instrument('script', Path.resolve(process.cwd(), 'path1'), '({});');
@@ -87,7 +88,7 @@ Assert.deepEqual(json, {
   events: ['event1'],
 });
 
-new Appmap(getDefaultConfig(), {}).terminate(false, 'reason');
+new Appmap(getDefaultConfig(), { __proto__: null }).terminate(false, 'reason');
 
 new Appmap(
   getDefaultConfig().extendWithEnv(
@@ -96,5 +97,30 @@ new Appmap(
     },
     process.cwd(),
   ),
-  {},
+  { __proto__: null },
 ).terminate(false, 'reason');
+
+try {
+  FileSystem.unlinkSync(
+    Path.join(process.cwd(), 'tmp', 'test', 'foo-1.appmap.json'),
+  );
+} catch (error) {
+  Assert.equal(error.code, 'ENOENT');
+}
+new Appmap(
+  getDefaultConfig().extendWithData(
+    {
+      'output-dir': Path.join(process.cwd(), 'tmp', 'test'),
+      'map-name': 'foo',
+    },
+    null,
+  ),
+  {
+    __proto__: null,
+    [Path.join(process.cwd(), 'tmp', 'test', 'foo')]: null,
+    [Path.join(process.cwd(), 'tmp', 'test', 'foo-0')]: null,
+  },
+).terminate(true, 'reason');
+FileSystem.readFileSync(
+  Path.join(process.cwd(), 'tmp', 'test', 'foo-1.appmap.json'),
+);
