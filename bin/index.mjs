@@ -3,7 +3,7 @@
 import minimist from 'minimist';
 import main from '../lib/server/main.mjs';
 
-let argv = process.argv();
+let { argv } = process;
 
 let method = 'spawn';
 if (process.argv[2][0] !== '-') {
@@ -12,7 +12,7 @@ if (process.argv[2][0] !== '-') {
 } else {
   argv = argv.slice(2);
 }
-const { _: command, ...options } = minimist(process.argv.slice(3));
+const { _: command, ...options } = minimist(argv);
 main(method, options, command, (error, server, client) => {
   if (error !== null) {
     process.stdout.write(`${error.message}${'\n'}`);
