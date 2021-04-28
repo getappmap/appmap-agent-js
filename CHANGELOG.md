@@ -1,3 +1,15 @@
+# [2.7.0](https://github.com/applandinc/appmap-agent-js/compare/v2.6.0...v2.7.0) (2021-04-28)
+
+
+### Bug Fixes
+
+* merge from ci ([f0940f6](https://github.com/applandinc/appmap-agent-js/commit/f0940f647de9a980993c68b16c66d997352c6819))
+
+
+### Features
+
+* better handling of node version to diagnose requirements issue ([cd900ac](https://github.com/applandinc/appmap-agent-js/commit/cd900acb330fdb0ecd68bd2403bf35ef5377c779))
+
 # [2.6.0](https://github.com/applandinc/appmap-agent-js/compare/v2.5.0...v2.6.0) (2021-04-27)
 
 
