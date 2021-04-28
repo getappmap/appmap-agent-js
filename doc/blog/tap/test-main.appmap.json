@@ -1,1 +1,539 @@
-{"version":"1.4","metadata":{"name":"tmp/test/test.js","labels":[],"app":null,"feature":null,"feature_group":null,"language":{"name":"javascript","engine":null,"version":"2015"},"frameworks":[],"client":{"name":"@appland/appmap-agent-js","url":"https://github.com/applandinc/appmap-agent-js.git","version":"2.8.1"},"recorder":{"name":null},"recording":{"defined_class":null,"method_id":null},"git":{"repository":"https://github.com/applandinc/appmap-agent-js","branch":"alpha","commit":"8724059609d1c63be684f747ff1193e9ed5937a1","status":["D .nyc_output/bfbd1fd4-e299-4c86-8f00-ca479beb684e.json","D .nyc_output/processinfo/bfbd1fd4-e299-4c86-8f00-ca479beb684e.json","M .nyc_output/processinfo/index.json","D doc/test-runner.md","M lib/server/dispatcher.mjs","?? .nyc_output/44e8490f-8af2-412a-aa63-45ced27541b9.json","?? .nyc_output/6f432012-642b-4178-82cf-c4e78fdd8e8d.json","?? .nyc_output/processinfo/44e8490f-8af2-412a-aa63-45ced27541b9.json","?? .nyc_output/processinfo/6f432012-642b-4178-82cf-c4e78fdd8e8d.json","?? doc/blog/"],"tag":"v2.8.1","annotated_tag":null,"commits_since_tag":1,"commits_since_annotated_tag":null}},"classMap":[{"type":"package","name":"/Users/soft/Desktop/workspace/appmap-agent-js/tmp/test/test.js","childeren":[]},{"type":"package","name":"/Users/soft/Desktop/workspace/appmap-agent-js/tmp/test/main.js","childeren":[{"type":"class","name":"@cov_2nrbpqcouw|function","childeren":[{"type":"function","name":"()","source":"function cov_2nrbpqcouw(){var path=\"/Users/soft/Desktop/workspace/appmap-agent-js/tmp/test/main.js\";var hash=\"f4b2c0bbe5000af8bd0a409f51d06e5d50f31803\";var global=new Function(\"return this\")();var gcv=\"__coverage__\";var coverageData={path:\"/Users/soft/Desktop/workspace/appmap-agent-js/tmp/test/main.js\",statementMap:{\"0\":{start:{line:2,column:4},end:{line:2,column:30}},\"1\":{start:{line:2,column:24},end:{line:2,column:29}},\"2\":{start:{line:3,column:4},end:{line:3,column:28}}},fnMap:{\"0\":{name:\"(anonymous_0)\",decl:{start:{line:2,column:18},end:{line:2,column:19}},loc:{start:{line:2,column:24},end:{line:2,column:29}},line:2},\"1\":{name:\"f\",decl:{start:{line:3,column:15},end:{line:3,column:16}},loc:{start:{line:3,column:20},end:{line:3,column:22}},line:3}},branchMap:{},s:{\"0\":0,\"1\":0,\"2\":0},f:{\"0\":0,\"1\":0},b:{},_coverageSchema:\"1a1c01bbd47fc00a2c39e90264f33305004495a9\",hash:\"f4b2c0bbe5000af8bd0a409f51d06e5d50f31803\"};var coverage=global[gcv]||(global[gcv]={});if(!coverage[path]||coverage[path].hash!==hash){coverage[path]=coverageData;}var actualCoverage=coverage[path];{// @ts-ignore\ncov_2nrbpqcouw=function(){return actualCoverage;};}return actualCoverage;}","location":"/Users/soft/Desktop/workspace/appmap-agent-js/tmp/test/main.js:1","labels":[],"comment":null,"static":false},{"type":"class","name":"@coverageData|var","childeren":[{"type":"class","name":"singleton.statementMap|init","childeren":[{"type":"class","name":"singleton[\"0\"]|init","childeren":[{"type":"class","name":"singleton.start|init","childeren":[]},{"type":"class","name":"singleton.end|init","childeren":[]}]},{"type":"class","name":"singleton[\"1\"]|init","childeren":[{"type":"class","name":"singleton.start|init","childeren":[]},{"type":"class","name":"singleton.end|init","childeren":[]}]},{"type":"class","name":"singleton[\"2\"]|init","childeren":[{"type":"class","name":"singleton.start|init","childeren":[]},{"type":"class","name":"singleton.end|init","childeren":[]}]}]},{"type":"class","name":"singleton.fnMap|init","childeren":[{"type":"class","name":"singleton[\"0\"]|init","childeren":[{"type":"class","name":"singleton.decl|init","childeren":[{"type":"class","name":"singleton.start|init","childeren":[]},{"type":"class","name":"singleton.end|init","childeren":[]}]},{"type":"class","name":"singleton.loc|init","childeren":[{"type":"class","name":"singleton.start|init","childeren":[]},{"type":"class","name":"singleton.end|init","childeren":[]}]}]},{"type":"class","name":"singleton[\"1\"]|init","childeren":[{"type":"class","name":"singleton.decl|init","childeren":[{"type":"class","name":"singleton.start|init","childeren":[]},{"type":"class","name":"singleton.end|init","childeren":[]}]},{"type":"class","name":"singleton.loc|init","childeren":[{"type":"class","name":"singleton.start|init","childeren":[]},{"type":"class","name":"singleton.end|init","childeren":[]}]}]}]},{"type":"class","name":"singleton.branchMap|init","childeren":[]},{"type":"class","name":"singleton.s|init","childeren":[]},{"type":"class","name":"singleton.f|init","childeren":[]},{"type":"class","name":"singleton.b|init","childeren":[]}]},{"type":"class","name":"@#pattern|assignment","childeren":[]},{"type":"class","name":"@cov_2nrbpqcouw|assignment","childeren":[{"type":"function","name":"()","source":"function(){return actualCoverage;}","location":"/Users/soft/Desktop/workspace/appmap-agent-js/tmp/test/main.js:2","labels":[],"comment":null,"static":false}]}]},{"type":"class","name":"@#pattern|assignment","childeren":[{"type":"function","name":"()","source":"()=>{cov_2nrbpqcouw().f[0]++;cov_2nrbpqcouw().s[1]++;return\"foo\";}","location":"/Users/soft/Desktop/workspace/appmap-agent-js/tmp/test/main.js:2","labels":[],"comment":null,"static":false}]},{"type":"class","name":"§none","childeren":[{"type":"function","name":"()","source":"function f(){cov_2nrbpqcouw().f[1]++;}","location":"/Users/soft/Desktop/workspace/appmap-agent-js/tmp/test/main.js:2","labels":[],"comment":null,"static":false}]}]}],"events":[{"id":1,"event":"call","thread_id":60867,"defined_class":"/Users/soft/Desktop/workspace/appmap-agent-js/tmp/test/main.js","method_id":"@cov_2nrbpqcouw|function","path":"/Users/soft/Desktop/workspace/appmap-agent-js/tmp/test/main.js","lineno":1,"receiver":{"name":"this","object_id":1,"class":"Object","value":"[object global]"},"parameters":[],"static":false},{"id":2,"event":"return","thread_id":60867,"parent_id":1,"ellapsed":1,"return_value":{"name":"return","object_id":2,"class":"Object","value":"[object Object]"},"exceptions":[]},{"id":3,"event":"call","thread_id":60867,"defined_class":"@cov_2nrbpqcouw|function","method_id":"@cov_2nrbpqcouw|assignment","path":"/Users/soft/Desktop/workspace/appmap-agent-js/tmp/test/main.js","lineno":2,"receiver":{"name":"this","object_id":1,"class":"Object","value":"[object global]"},"parameters":[],"static":false},{"id":4,"event":"return","thread_id":60867,"parent_id":3,"ellapsed":0,"return_value":{"name":"return","object_id":2,"class":"Object","value":"[object Object]"},"exceptions":[]},{"id":5,"event":"call","thread_id":60867,"defined_class":"@cov_2nrbpqcouw|function","method_id":"@cov_2nrbpqcouw|assignment","path":"/Users/soft/Desktop/workspace/appmap-agent-js/tmp/test/main.js","lineno":2,"receiver":{"name":"this","object_id":1,"class":"Object","value":"[object global]"},"parameters":[],"static":false},{"id":6,"event":"return","thread_id":60867,"parent_id":5,"ellapsed":0,"return_value":{"name":"return","object_id":2,"class":"Object","value":"[object Object]"},"exceptions":[]},{"id":7,"event":"call","thread_id":60867,"defined_class":"/Users/soft/Desktop/workspace/appmap-agent-js/tmp/test/main.js","method_id":"§none","path":"/Users/soft/Desktop/workspace/appmap-agent-js/tmp/test/main.js","lineno":2,"receiver":{"name":"this","object_id":1,"class":"Object","value":"[object global]"},"parameters":[],"static":false},{"id":8,"event":"call","thread_id":60867,"defined_class":"@cov_2nrbpqcouw|function","method_id":"@cov_2nrbpqcouw|assignment","path":"/Users/soft/Desktop/workspace/appmap-agent-js/tmp/test/main.js","lineno":2,"receiver":{"name":"this","object_id":1,"class":"Object","value":"[object global]"},"parameters":[],"static":false},{"id":9,"event":"return","thread_id":60867,"parent_id":8,"ellapsed":0,"return_value":{"name":"return","object_id":2,"class":"Object","value":"[object Object]"},"exceptions":[]},{"id":10,"event":"return","thread_id":60867,"parent_id":7,"ellapsed":0,"return_value":{"name":"return","object_id":3,"class":"symbol","value":"empty"},"exceptions":[]},{"id":11,"event":"call","thread_id":60867,"defined_class":"/Users/soft/Desktop/workspace/appmap-agent-js/tmp/test/main.js","method_id":"@#pattern|assignment","path":"/Users/soft/Desktop/workspace/appmap-agent-js/tmp/test/main.js","lineno":2,"receiver":{"name":"this","object_id":3,"class":"symbol","value":"empty"},"parameters":[],"static":false},{"id":12,"event":"call","thread_id":60867,"defined_class":"@cov_2nrbpqcouw|function","method_id":"@cov_2nrbpqcouw|assignment","path":"/Users/soft/Desktop/workspace/appmap-agent-js/tmp/test/main.js","lineno":2,"receiver":{"name":"this","object_id":1,"class":"Object","value":"[object global]"},"parameters":[],"static":false},{"id":13,"event":"return","thread_id":60867,"parent_id":12,"ellapsed":0,"return_value":{"name":"return","object_id":2,"class":"Object","value":"[object Object]"},"exceptions":[]},{"id":14,"event":"call","thread_id":60867,"defined_class":"@cov_2nrbpqcouw|function","method_id":"@cov_2nrbpqcouw|assignment","path":"/Users/soft/Desktop/workspace/appmap-agent-js/tmp/test/main.js","lineno":2,"receiver":{"name":"this","object_id":1,"class":"Object","value":"[object global]"},"parameters":[],"static":false},{"id":15,"event":"return","thread_id":60867,"parent_id":14,"ellapsed":0,"return_value":{"name":"return","object_id":2,"class":"Object","value":"[object Object]"},"exceptions":[]},{"id":16,"event":"return","thread_id":60867,"parent_id":11,"ellapsed":0,"return_value":{"name":"return","object_id":null,"class":"string","value":"\"foo\""},"exceptions":[]}]}
+{
+  "version": "1.4",
+  "metadata": {
+    "name": "tmp/test/test.js",
+    "labels": [],
+    "app": null,
+    "feature": null,
+    "feature_group": null,
+    "language": {
+      "name": "javascript",
+      "engine": null,
+      "version": "2015"
+    },
+    "frameworks": [],
+    "client": {
+      "name": "@appland/appmap-agent-js",
+      "url": "https://github.com/applandinc/appmap-agent-js.git",
+      "version": "2.8.1"
+    },
+    "recorder": {
+      "name": null
+    },
+    "recording": {
+      "defined_class": null,
+      "method_id": null
+    },
+    "git": {
+      "repository": "https://github.com/applandinc/appmap-agent-js",
+      "branch": "alpha",
+      "commit": "8724059609d1c63be684f747ff1193e9ed5937a1",
+      "status": [
+        "D .nyc_output/bfbd1fd4-e299-4c86-8f00-ca479beb684e.json",
+        "D .nyc_output/processinfo/bfbd1fd4-e299-4c86-8f00-ca479beb684e.json",
+        "M .nyc_output/processinfo/index.json",
+        "D doc/test-runner.md",
+        "M lib/server/dispatcher.mjs",
+        "?? .nyc_output/44e8490f-8af2-412a-aa63-45ced27541b9.json",
+        "?? .nyc_output/6f432012-642b-4178-82cf-c4e78fdd8e8d.json",
+        "?? .nyc_output/processinfo/44e8490f-8af2-412a-aa63-45ced27541b9.json",
+        "?? .nyc_output/processinfo/6f432012-642b-4178-82cf-c4e78fdd8e8d.json",
+        "?? doc/blog/"
+      ],
+      "tag": "v2.8.1",
+      "annotated_tag": null,
+      "commits_since_tag": 1,
+      "commits_since_annotated_tag": null
+    }
+  },
+  "classMap": [
+    {
+      "type": "package",
+      "name": "/Users/soft/Desktop/workspace/appmap-agent-js/tmp/test/test.js",
+      "childeren": []
+    },
+    {
+      "type": "package",
+      "name": "/Users/soft/Desktop/workspace/appmap-agent-js/tmp/test/main.js",
+      "childeren": [
+        {
+          "type": "class",
+          "name": "@cov_2nrbpqcouw|function",
+          "childeren": [
+            {
+              "type": "function",
+              "name": "()",
+              "source": "function cov_2nrbpqcouw(){var path=\"/Users/soft/Desktop/workspace/appmap-agent-js/tmp/test/main.js\";var hash=\"f4b2c0bbe5000af8bd0a409f51d06e5d50f31803\";var global=new Function(\"return this\")();var gcv=\"__coverage__\";var coverageData={path:\"/Users/soft/Desktop/workspace/appmap-agent-js/tmp/test/main.js\",statementMap:{\"0\":{start:{line:2,column:4},end:{line:2,column:30}},\"1\":{start:{line:2,column:24},end:{line:2,column:29}},\"2\":{start:{line:3,column:4},end:{line:3,column:28}}},fnMap:{\"0\":{name:\"(anonymous_0)\",decl:{start:{line:2,column:18},end:{line:2,column:19}},loc:{start:{line:2,column:24},end:{line:2,column:29}},line:2},\"1\":{name:\"f\",decl:{start:{line:3,column:15},end:{line:3,column:16}},loc:{start:{line:3,column:20},end:{line:3,column:22}},line:3}},branchMap:{},s:{\"0\":0,\"1\":0,\"2\":0},f:{\"0\":0,\"1\":0},b:{},_coverageSchema:\"1a1c01bbd47fc00a2c39e90264f33305004495a9\",hash:\"f4b2c0bbe5000af8bd0a409f51d06e5d50f31803\"};var coverage=global[gcv]||(global[gcv]={});if(!coverage[path]||coverage[path].hash!==hash){coverage[path]=coverageData;}var actualCoverage=coverage[path];{// @ts-ignore\ncov_2nrbpqcouw=function(){return actualCoverage;};}return actualCoverage;}",
+              "location": "/Users/soft/Desktop/workspace/appmap-agent-js/tmp/test/main.js:1",
+              "labels": [],
+              "comment": null,
+              "static": false
+            },
+            {
+              "type": "class",
+              "name": "@coverageData|var",
+              "childeren": [
+                {
+                  "type": "class",
+                  "name": "singleton.statementMap|init",
+                  "childeren": [
+                    {
+                      "type": "class",
+                      "name": "singleton[\"0\"]|init",
+                      "childeren": [
+                        {
+                          "type": "class",
+                          "name": "singleton.start|init",
+                          "childeren": []
+                        },
+                        {
+                          "type": "class",
+                          "name": "singleton.end|init",
+                          "childeren": []
+                        }
+                      ]
+                    },
+                    {
+                      "type": "class",
+                      "name": "singleton[\"1\"]|init",
+                      "childeren": [
+                        {
+                          "type": "class",
+                          "name": "singleton.start|init",
+                          "childeren": []
+                        },
+                        {
+                          "type": "class",
+                          "name": "singleton.end|init",
+                          "childeren": []
+                        }
+                      ]
+                    },
+                    {
+                      "type": "class",
+                      "name": "singleton[\"2\"]|init",
+                      "childeren": [
+                        {
+                          "type": "class",
+                          "name": "singleton.start|init",
+                          "childeren": []
+                        },
+                        {
+                          "type": "class",
+                          "name": "singleton.end|init",
+                          "childeren": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "class",
+                  "name": "singleton.fnMap|init",
+                  "childeren": [
+                    {
+                      "type": "class",
+                      "name": "singleton[\"0\"]|init",
+                      "childeren": [
+                        {
+                          "type": "class",
+                          "name": "singleton.decl|init",
+                          "childeren": [
+                            {
+                              "type": "class",
+                              "name": "singleton.start|init",
+                              "childeren": []
+                            },
+                            {
+                              "type": "class",
+                              "name": "singleton.end|init",
+                              "childeren": []
+                            }
+                          ]
+                        },
+                        {
+                          "type": "class",
+                          "name": "singleton.loc|init",
+                          "childeren": [
+                            {
+                              "type": "class",
+                              "name": "singleton.start|init",
+                              "childeren": []
+                            },
+                            {
+                              "type": "class",
+                              "name": "singleton.end|init",
+                              "childeren": []
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "class",
+                      "name": "singleton[\"1\"]|init",
+                      "childeren": [
+                        {
+                          "type": "class",
+                          "name": "singleton.decl|init",
+                          "childeren": [
+                            {
+                              "type": "class",
+                              "name": "singleton.start|init",
+                              "childeren": []
+                            },
+                            {
+                              "type": "class",
+                              "name": "singleton.end|init",
+                              "childeren": []
+                            }
+                          ]
+                        },
+                        {
+                          "type": "class",
+                          "name": "singleton.loc|init",
+                          "childeren": [
+                            {
+                              "type": "class",
+                              "name": "singleton.start|init",
+                              "childeren": []
+                            },
+                            {
+                              "type": "class",
+                              "name": "singleton.end|init",
+                              "childeren": []
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "class",
+                  "name": "singleton.branchMap|init",
+                  "childeren": []
+                },
+                {
+                  "type": "class",
+                  "name": "singleton.s|init",
+                  "childeren": []
+                },
+                {
+                  "type": "class",
+                  "name": "singleton.f|init",
+                  "childeren": []
+                },
+                {
+                  "type": "class",
+                  "name": "singleton.b|init",
+                  "childeren": []
+                }
+              ]
+            },
+            {
+              "type": "class",
+              "name": "@#pattern|assignment",
+              "childeren": []
+            },
+            {
+              "type": "class",
+              "name": "@cov_2nrbpqcouw|assignment",
+              "childeren": [
+                {
+                  "type": "function",
+                  "name": "()",
+                  "source": "function(){return actualCoverage;}",
+                  "location": "/Users/soft/Desktop/workspace/appmap-agent-js/tmp/test/main.js:2",
+                  "labels": [],
+                  "comment": null,
+                  "static": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "class",
+          "name": "@#pattern|assignment",
+          "childeren": [
+            {
+              "type": "function",
+              "name": "()",
+              "source": "()=>{cov_2nrbpqcouw().f[0]++;cov_2nrbpqcouw().s[1]++;return\"foo\";}",
+              "location": "/Users/soft/Desktop/workspace/appmap-agent-js/tmp/test/main.js:2",
+              "labels": [],
+              "comment": null,
+              "static": false
+            }
+          ]
+        },
+        {
+          "type": "class",
+          "name": "§none",
+          "childeren": [
+            {
+              "type": "function",
+              "name": "()",
+              "source": "function f(){cov_2nrbpqcouw().f[1]++;}",
+              "location": "/Users/soft/Desktop/workspace/appmap-agent-js/tmp/test/main.js:2",
+              "labels": [],
+              "comment": null,
+              "static": false
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "events": [
+    {
+      "id": 1,
+      "event": "call",
+      "thread_id": 60867,
+      "defined_class": "/Users/soft/Desktop/workspace/appmap-agent-js/tmp/test/main.js",
+      "method_id": "@cov_2nrbpqcouw|function",
+      "path": "/Users/soft/Desktop/workspace/appmap-agent-js/tmp/test/main.js",
+      "lineno": 1,
+      "receiver": {
+        "name": "this",
+        "object_id": 1,
+        "class": "Object",
+        "value": "[object global]"
+      },
+      "parameters": [],
+      "static": false
+    },
+    {
+      "id": 2,
+      "event": "return",
+      "thread_id": 60867,
+      "parent_id": 1,
+      "ellapsed": 1,
+      "return_value": {
+        "name": "return",
+        "object_id": 2,
+        "class": "Object",
+        "value": "[object Object]"
+      },
+      "exceptions": []
+    },
+    {
+      "id": 3,
+      "event": "call",
+      "thread_id": 60867,
+      "defined_class": "@cov_2nrbpqcouw|function",
+      "method_id": "@cov_2nrbpqcouw|assignment",
+      "path": "/Users/soft/Desktop/workspace/appmap-agent-js/tmp/test/main.js",
+      "lineno": 2,
+      "receiver": {
+        "name": "this",
+        "object_id": 1,
+        "class": "Object",
+        "value": "[object global]"
+      },
+      "parameters": [],
+      "static": false
+    },
+    {
+      "id": 4,
+      "event": "return",
+      "thread_id": 60867,
+      "parent_id": 3,
+      "ellapsed": 0,
+      "return_value": {
+        "name": "return",
+        "object_id": 2,
+        "class": "Object",
+        "value": "[object Object]"
+      },
+      "exceptions": []
+    },
+    {
+      "id": 5,
+      "event": "call",
+      "thread_id": 60867,
+      "defined_class": "@cov_2nrbpqcouw|function",
+      "method_id": "@cov_2nrbpqcouw|assignment",
+      "path": "/Users/soft/Desktop/workspace/appmap-agent-js/tmp/test/main.js",
+      "lineno": 2,
+      "receiver": {
+        "name": "this",
+        "object_id": 1,
+        "class": "Object",
+        "value": "[object global]"
+      },
+      "parameters": [],
+      "static": false
+    },
+    {
+      "id": 6,
+      "event": "return",
+      "thread_id": 60867,
+      "parent_id": 5,
+      "ellapsed": 0,
+      "return_value": {
+        "name": "return",
+        "object_id": 2,
+        "class": "Object",
+        "value": "[object Object]"
+      },
+      "exceptions": []
+    },
+    {
+      "id": 7,
+      "event": "call",
+      "thread_id": 60867,
+      "defined_class": "/Users/soft/Desktop/workspace/appmap-agent-js/tmp/test/main.js",
+      "method_id": "§none",
+      "path": "/Users/soft/Desktop/workspace/appmap-agent-js/tmp/test/main.js",
+      "lineno": 2,
+      "receiver": {
+        "name": "this",
+        "object_id": 1,
+        "class": "Object",
+        "value": "[object global]"
+      },
+      "parameters": [],
+      "static": false
+    },
+    {
+      "id": 8,
+      "event": "call",
+      "thread_id": 60867,
+      "defined_class": "@cov_2nrbpqcouw|function",
+      "method_id": "@cov_2nrbpqcouw|assignment",
+      "path": "/Users/soft/Desktop/workspace/appmap-agent-js/tmp/test/main.js",
+      "lineno": 2,
+      "receiver": {
+        "name": "this",
+        "object_id": 1,
+        "class": "Object",
+        "value": "[object global]"
+      },
+      "parameters": [],
+      "static": false
+    },
+    {
+      "id": 9,
+      "event": "return",
+      "thread_id": 60867,
+      "parent_id": 8,
+      "ellapsed": 0,
+      "return_value": {
+        "name": "return",
+        "object_id": 2,
+        "class": "Object",
+        "value": "[object Object]"
+      },
+      "exceptions": []
+    },
+    {
+      "id": 10,
+      "event": "return",
+      "thread_id": 60867,
+      "parent_id": 7,
+      "ellapsed": 0,
+      "return_value": {
+        "name": "return",
+        "object_id": 3,
+        "class": "symbol",
+        "value": "empty"
+      },
+      "exceptions": []
+    },
+    {
+      "id": 11,
+      "event": "call",
+      "thread_id": 60867,
+      "defined_class": "/Users/soft/Desktop/workspace/appmap-agent-js/tmp/test/main.js",
+      "method_id": "@#pattern|assignment",
+      "path": "/Users/soft/Desktop/workspace/appmap-agent-js/tmp/test/main.js",
+      "lineno": 2,
+      "receiver": {
+        "name": "this",
+        "object_id": 3,
+        "class": "symbol",
+        "value": "empty"
+      },
+      "parameters": [],
+      "static": false
+    },
+    {
+      "id": 12,
+      "event": "call",
+      "thread_id": 60867,
+      "defined_class": "@cov_2nrbpqcouw|function",
+      "method_id": "@cov_2nrbpqcouw|assignment",
+      "path": "/Users/soft/Desktop/workspace/appmap-agent-js/tmp/test/main.js",
+      "lineno": 2,
+      "receiver": {
+        "name": "this",
+        "object_id": 1,
+        "class": "Object",
+        "value": "[object global]"
+      },
+      "parameters": [],
+      "static": false
+    },
+    {
+      "id": 13,
+      "event": "return",
+      "thread_id": 60867,
+      "parent_id": 12,
+      "ellapsed": 0,
+      "return_value": {
+        "name": "return",
+        "object_id": 2,
+        "class": "Object",
+        "value": "[object Object]"
+      },
+      "exceptions": []
+    },
+    {
+      "id": 14,
+      "event": "call",
+      "thread_id": 60867,
+      "defined_class": "@cov_2nrbpqcouw|function",
+      "method_id": "@cov_2nrbpqcouw|assignment",
+      "path": "/Users/soft/Desktop/workspace/appmap-agent-js/tmp/test/main.js",
+      "lineno": 2,
+      "receiver": {
+        "name": "this",
+        "object_id": 1,
+        "class": "Object",
+        "value": "[object global]"
+      },
+      "parameters": [],
+      "static": false
+    },
+    {
+      "id": 15,
+      "event": "return",
+      "thread_id": 60867,
+      "parent_id": 14,
+      "ellapsed": 0,
+      "return_value": {
+        "name": "return",
+        "object_id": 2,
+        "class": "Object",
+        "value": "[object Object]"
+      },
+      "exceptions": []
+    },
+    {
+      "id": 16,
+      "event": "return",
+      "thread_id": 60867,
+      "parent_id": 11,
+      "ellapsed": 0,
+      "return_value": {
+        "name": "return",
+        "object_id": null,
+        "class": "string",
+        "value": "\"foo\""
+      },
+      "exceptions": []
+    }
+  ]
+}

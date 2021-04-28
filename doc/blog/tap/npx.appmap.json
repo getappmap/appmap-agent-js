@@ -1,1 +1,51 @@
-{"version":"1.4","metadata":{"name":"../../../../../usr/local/bin/npx","labels":[],"app":null,"feature":null,"feature_group":null,"language":{"name":"javascript","engine":null,"version":"2015"},"frameworks":[],"client":{"name":"@appland/appmap-agent-js","url":"https://github.com/applandinc/appmap-agent-js.git","version":"2.8.1"},"recorder":{"name":null},"recording":{"defined_class":null,"method_id":null},"git":{"repository":"https://github.com/applandinc/appmap-agent-js","branch":"alpha","commit":"8724059609d1c63be684f747ff1193e9ed5937a1","status":["D .nyc_output/bfbd1fd4-e299-4c86-8f00-ca479beb684e.json","D .nyc_output/processinfo/bfbd1fd4-e299-4c86-8f00-ca479beb684e.json","M .nyc_output/processinfo/index.json","D doc/test-runner.md","M lib/server/dispatcher.mjs","?? .nyc_output/44e8490f-8af2-412a-aa63-45ced27541b9.json","?? .nyc_output/6f432012-642b-4178-82cf-c4e78fdd8e8d.json","?? .nyc_output/processinfo/44e8490f-8af2-412a-aa63-45ced27541b9.json","?? .nyc_output/processinfo/6f432012-642b-4178-82cf-c4e78fdd8e8d.json","?? doc/blog/"],"tag":"v2.8.1","annotated_tag":null,"commits_since_tag":1,"commits_since_annotated_tag":null}},"classMap":[],"events":[]}
+{
+  "version": "1.4",
+  "metadata": {
+    "name": "../../../../../usr/local/bin/npx",
+    "labels": [],
+    "app": null,
+    "feature": null,
+    "feature_group": null,
+    "language": {
+      "name": "javascript",
+      "engine": null,
+      "version": "2015"
+    },
+    "frameworks": [],
+    "client": {
+      "name": "@appland/appmap-agent-js",
+      "url": "https://github.com/applandinc/appmap-agent-js.git",
+      "version": "2.8.1"
+    },
+    "recorder": {
+      "name": null
+    },
+    "recording": {
+      "defined_class": null,
+      "method_id": null
+    },
+    "git": {
+      "repository": "https://github.com/applandinc/appmap-agent-js",
+      "branch": "alpha",
+      "commit": "8724059609d1c63be684f747ff1193e9ed5937a1",
+      "status": [
+        "D .nyc_output/bfbd1fd4-e299-4c86-8f00-ca479beb684e.json",
+        "D .nyc_output/processinfo/bfbd1fd4-e299-4c86-8f00-ca479beb684e.json",
+        "M .nyc_output/processinfo/index.json",
+        "D doc/test-runner.md",
+        "M lib/server/dispatcher.mjs",
+        "?? .nyc_output/44e8490f-8af2-412a-aa63-45ced27541b9.json",
+        "?? .nyc_output/6f432012-642b-4178-82cf-c4e78fdd8e8d.json",
+        "?? .nyc_output/processinfo/44e8490f-8af2-412a-aa63-45ced27541b9.json",
+        "?? .nyc_output/processinfo/6f432012-642b-4178-82cf-c4e78fdd8e8d.json",
+        "?? doc/blog/"
+      ],
+      "tag": "v2.8.1",
+      "annotated_tag": null,
+      "commits_since_tag": 1,
+      "commits_since_annotated_tag": null
+    }
+  },
+  "classMap": [],
+  "events": []
+}

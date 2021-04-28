@@ -151,7 +151,7 @@ Only the last import to `./main.js` is actually being modified.
 
 ### Appmap analysis
 
-Because no file is actually modified within the three first processes, their respective appmaps are empty: [npz](npz.appmap.json), [tap](tap.appmap.json), and [tap-nyc](tap-nyc.appmap.json).
+Because no file is actually modified within the three first processes, their respective appmaps are empty: [npx](npx.appmap.json), [tap](tap.appmap.json), and [tap-nyc](tap-nyc.appmap.json).
 Only the last appmap is not empty: [test-main](test-main.appmap.json).
 Interestingly, it is much more complex than or very simply `./main.js` file.
 
