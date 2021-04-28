@@ -22,66 +22,74 @@ const env = {
   APPMAP_PROTOCOL: 'messaging',
   APPMAP_HOST: 'localhost',
   APPMAP_PORT: '0',
-  APPMAP_HOOK_CHILD_PROCESS: 'false',
+  // APPMAP_HOOK_CHILD_PROCESS: 'true',
 };
 
 Assert.deepEqual(
-  Agent.compileOptions({
-    'hook-esm': false,
-    'hook-cjs': false,
-    port: 'unix-domain-socket',
-    'node-version': '14.x',
-    'rc-file': 'appmap.yml',
-  }),
-  {
-    env: {
-      ...env,
-      APPMAP_PORT: 'unix-domain-socket',
-      APPMAP_RC_FILE: 'appmap.yml',
+  Agent.compileOptions(
+    {
+      'hook-esm': false,
+      'hook-cjs': false,
+      port: 'unix-domain-socket',
+      'node-version': '14.x',
+      'rc-file': 'appmap.yml',
     },
-    execArgv: [],
+    { FOO: 'BAR', NODE_OPTIONS: 'foo bar' },
+  ),
+  {
+    ...env,
+    FOO: 'BAR',
+    APPMAP_PORT: 'unix-domain-socket',
+    APPMAP_RC_FILE: 'appmap.yml',
+    NODE_OPTIONS: 'foo bar',
   },
 );
 
 Assert.deepEqual(
-  Agent.compileOptions({
-    'hook-esm': false,
-    'hook-cjs': true,
-  }),
+  Agent.compileOptions(
+    {
+      'hook-esm': false,
+      'hook-cjs': true,
+      port: 1234,
+    },
+    { NODE_OPTIONS: 'foo bar' },
+  ),
   {
-    env,
-    execArgv: [
-      '--require',
-      `${process.cwd()}/lib/client/es2015/node14x/index-cjs.js`,
-    ],
+    ...env,
+    APPMAP_PORT: '1234',
+    NODE_OPTIONS: `foo bar --require ${process.cwd()}/lib/client/es2015/node14x/index-cjs.js`,
   },
 );
 
 Assert.deepEqual(
-  Agent.compileOptions({
-    'hook-esm': true,
-    'hook-cjs': false,
-  }),
+  Agent.compileOptions(
+    {
+      'hook-esm': true,
+      'hook-cjs': false,
+      port: 1234,
+    },
+    {},
+  ),
   {
-    env,
-    execArgv: [
-      '--experimental-loader',
-      `${process.cwd()}/lib/client/es2015/node14x/index-esm.js`,
-    ],
+    ...env,
+    APPMAP_PORT: '1234',
+    NODE_OPTIONS: `--experimental-loader ${process.cwd()}/lib/client/es2015/node14x/index-esm.js`,
   },
 );
 
 Assert.deepEqual(
-  Agent.compileOptions({
-    'hook-esm': true,
-    'hook-cjs': true,
-  }),
+  Agent.compileOptions(
+    {
+      'hook-esm': true,
+      'hook-cjs': true,
+      port: 1234,
+    },
+    {},
+  ),
   {
-    env,
-    execArgv: [
-      '--experimental-loader',
-      `${process.cwd()}/lib/client/es2015/node14x/index-esm-cjs.js`,
-    ],
+    ...env,
+    APPMAP_PORT: '1234',
+    NODE_OPTIONS: `--experimental-loader ${process.cwd()}/lib/client/es2015/node14x/index-esm-cjs.js`,
   },
 );
 
