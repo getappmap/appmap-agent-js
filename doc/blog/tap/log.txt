@@ -1,0 +1,2067 @@
+soft@softs-MacBook-Pro appmap-agent-js % node bin/index.mjs --no-hook-esm --rc-file tmp/test/rc.json -- npx tap tmp/test/test.js
+initialize >> argv = [
+  '/usr/local/bin/node',
+  '/usr/local/bin/npx',
+  'tap',
+  'tmp/test/test.js'
+] env = {
+  TMPDIR: '/var/folders/ws/mzqzv89s4ps9mshcl70bjkgh0000gn/T/',
+  XPC_FLAGS: '0x0',
+  TERM_PROGRAM_VERSION: '433',
+  TERM_PROGRAM: 'Apple_Terminal',
+  XPC_SERVICE_NAME: '0',
+  TERM_SESSION_ID: '0210F72F-675D-48D6-81A5-A5151D327AFB',
+  TERM: 'xterm-256color',
+  SSH_AUTH_SOCK: '/private/tmp/com.apple.launchd.qqf22NNDWX/Listeners',
+  SHELL: '/bin/zsh',
+  HOME: '/Users/soft',
+  LOGNAME: 'soft',
+  USER: 'soft',
+  PATH: '/Users/soft/.rbenv/shims:/Users/soft/.rbenv/bin:/Library/Frameworks/Python.framework/Versions/3.9/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Library/TeX/texbin',
+  SHLVL: '1',
+  PWD: '/Users/soft/Desktop/workspace/appmap-agent-js',
+  OLDPWD: '/Users/soft',
+  RBENV_SHELL: 'zsh',
+  LC_CTYPE: 'UTF-8',
+  _: '/usr/local/bin/node',
+  __CF_USER_TEXT_ENCODING: '0x1F5:0x0:0x0',
+  APPMAP_PROTOCOL: 'messaging',
+  APPMAP_HOST: 'localhost',
+  APPMAP_PORT: '59475',
+  NODE_OPTIONS: '--require /Users/soft/Desktop/workspace/appmap-agent-js/lib/client/es2015/node14x/index-cjs.js'
+}
+instrument >> path = /usr/local/lib/node_modules/npm/bin/npx-cli.js
+instrument >> path = /usr/local/lib/node_modules/npm/lib/cli.js
+instrument >> path = /usr/local/lib/node_modules/npm/lib/utils/config/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/lib/utils/config/flatten.js
+instrument >> path = /usr/local/lib/node_modules/npm/lib/utils/config/definitions.js
+instrument >> path = /usr/local/lib/node_modules/npm/lib/utils/config/definition.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/config/lib/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/walk-up-path/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/ini/ini.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/nopt/lib/nopt.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/abbrev/abbrev.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/mkdirp-infer-owner/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/infer-owner/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/mkdirp/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/mkdirp/lib/opts-arg.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/mkdirp/lib/path-arg.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/mkdirp/lib/mkdirp-native.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/mkdirp/lib/find-made.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/mkdirp/lib/mkdirp-manual.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/mkdirp/lib/use-native.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/chownr/chownr.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/config/lib/type-defs.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/config/lib/umask.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/semver/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/semver/internal/re.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/semver/internal/constants.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/semver/internal/debug.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/semver/classes/semver.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/semver/internal/parse-options.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/semver/internal/identifiers.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/semver/functions/parse.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/semver/functions/valid.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/semver/functions/clean.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/semver/functions/inc.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/semver/functions/diff.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/semver/functions/eq.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/semver/functions/compare.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/semver/functions/major.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/semver/functions/minor.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/semver/functions/patch.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/semver/functions/prerelease.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/semver/functions/rcompare.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/semver/functions/compare-loose.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/semver/functions/compare-build.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/semver/functions/sort.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/semver/functions/rsort.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/semver/functions/gt.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/semver/functions/lt.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/semver/functions/neq.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/semver/functions/gte.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/semver/functions/lte.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/semver/functions/cmp.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/semver/functions/coerce.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/semver/classes/comparator.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/semver/classes/range.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/lru-cache/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/yallist/yallist.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/yallist/iterator.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/semver/functions/satisfies.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/semver/ranges/to-comparators.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/semver/ranges/max-satisfying.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/semver/ranges/min-satisfying.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/semver/ranges/min-version.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/semver/ranges/valid.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/semver/ranges/outside.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/semver/ranges/gtr.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/semver/ranges/ltr.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/semver/ranges/intersects.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/semver/ranges/simplify.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/semver/ranges/subset.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/config/lib/nerf-dart.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/config/lib/env-replace.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/config/lib/parse-field.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/config/lib/type-description.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/config/lib/set-envs.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/ci-detect/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/lib/utils/is-windows.js
+instrument >> path = /usr/local/lib/node_modules/npm/lib/utils/config/describe-all.js
+instrument >> path = /usr/local/lib/node_modules/npm/lib/utils/unsupported.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/npmlog/log.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/are-we-there-yet/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/are-we-there-yet/tracker-group.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/are-we-there-yet/tracker-base.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/are-we-there-yet/tracker.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/are-we-there-yet/tracker-stream.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/readable-stream/readable.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/readable-stream/lib/_stream_readable.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/process-nextick-args/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/isarray/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/readable-stream/lib/internal/streams/stream.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/safe-buffer/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/core-util-is/lib/util.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/inherits/inherits.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/readable-stream/lib/internal/streams/BufferList.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/readable-stream/lib/internal/streams/destroy.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/readable-stream/lib/_stream_writable.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/util-deprecate/node.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/readable-stream/lib/_stream_duplex.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/readable-stream/lib/_stream_transform.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/readable-stream/lib/_stream_passthrough.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/delegates/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/gauge/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/gauge/plumbing.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/console-control-strings/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/gauge/render-template.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/wide-align/align.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/string-width/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/string-width/node_modules/strip-ansi/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/string-width/node_modules/ansi-regex/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/is-fullwidth-code-point/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/gauge/node_modules/aproba/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/object-assign/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/gauge/wide-truncate.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/gauge/node_modules/string-width/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/strip-ansi/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/ansi-regex/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/code-point-at/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/gauge/node_modules/is-fullwidth-code-point/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/number-is-nan/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/gauge/error.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/gauge/template-item.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/has-unicode/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/gauge/has-color.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/signal-exit/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/signal-exit/signals.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/gauge/themes.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/gauge/theme-set.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/gauge/base-theme.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/gauge/spin.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/gauge/progress-bar.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/gauge/set-interval.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/gauge/process.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/gauge/set-immediate.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/set-blocking/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/lib/npm.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/graceful-fs/graceful-fs.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/graceful-fs/polyfills.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/graceful-fs/legacy-streams.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/graceful-fs/clone.js
+instrument >> path = /usr/local/lib/node_modules/npm/lib/utils/proc-log-listener.js
+instrument >> path = /usr/local/lib/node_modules/npm/lib/utils/cmd-list.js
+instrument >> path = /usr/local/lib/node_modules/npm/lib/utils/npm-usage.js
+instrument >> path = /usr/local/lib/node_modules/npm/lib/utils/perf.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/config/lib/proc-log.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/which/which.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/isexe/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/isexe/mode.js
+instrument >> path = /usr/local/lib/node_modules/npm/lib/utils/deref-command.js
+instrument >> path = /usr/local/lib/node_modules/npm/lib/utils/setup-log.js
+instrument >> path = /usr/local/lib/node_modules/npm/lib/utils/explain-eresolve.js
+instrument >> path = /usr/local/lib/node_modules/npm/lib/utils/explain-dep.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/chalk/source/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/ansi-styles/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/supports-color/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/has-flag/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/chalk/source/util.js
+instrument >> path = /usr/local/lib/node_modules/npm/lib/utils/cleanup-log-files.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/rimraf/rimraf.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/glob/glob.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/fs.realpath/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/fs.realpath/old.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/minimatch/minimatch.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/brace-expansion/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/concat-map/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/balanced-match/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/path-is-absolute/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/glob/sync.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/glob/common.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/inflight/inflight.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/wrappy/wrappy.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/once/once.js
+instrument >> path = /usr/local/lib/node_modules/npm/lib/utils/get-project-scope.js
+instrument >> path = /usr/local/lib/node_modules/npm/lib/utils/error-handler.js
+instrument >> path = /usr/local/lib/node_modules/npm/lib/utils/error-message.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/validate-npm-package-name/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/lib/utils/replace-info.js
+instrument >> path = /usr/local/lib/node_modules/npm/lib/utils/cache-file.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/write-file-atomic/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/imurmurhash/imurmurhash.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/is-typedarray/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/typedarray-to-buffer/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/lib/utils/update-notifier.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/pacote/lib/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/pacote/lib/fetcher.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/npm-package-arg/npa.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/ssri/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/minipass/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/tar/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/tar/lib/create.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/tar/lib/high-level-opt.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/tar/lib/pack.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/minizlib/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/minizlib/constants.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/tar/lib/read-entry.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/tar/lib/write-entry.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/tar/lib/pax.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/tar/lib/header.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/tar/lib/types.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/tar/lib/large-numbers.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/tar/lib/warn-mixin.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/tar/lib/winchars.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/tar/lib/mode-fix.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/fs-minipass/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/tar/lib/list.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/tar/lib/parse.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/tar/lib/replace.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/tar/lib/update.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/tar/lib/extract.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/tar/lib/unpack.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/tar/lib/mkdir.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/tar/lib/path-reservations.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/tar/lib/get-write-flag.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/pacote/lib/util/proc-log.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/promise-retry/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/err-code/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/retry/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/retry/lib/retry.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/retry/lib/retry_operation.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/cacache/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/cacache/ls.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/cacache/lib/entry-index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/cacache/lib/content/path.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/cacache/lib/util/hash-to-segments.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/cacache/lib/util/fix-owner.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/promise-inflight/inflight.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/cacache/get.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/cacache/lib/memoization.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/cacache/lib/content/read.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/minipass-pipeline/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/minipass-collect/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/cacache/put.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/cacache/lib/content/write.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/cacache/lib/util/move-file.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/move-file/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/minipass-flush/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/unique-filename/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/unique-slug/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/cacache/lib/util/disposer.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/cacache/rm.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/cacache/lib/content/rm.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/cacache/verify.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/cacache/lib/verify.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/p-map/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/aggregate-error/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/indent-string/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/clean-stack/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/cacache/lib/util/tmp.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/pacote/lib/util/is-package-bin.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/installed-package-contents/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/npm-bundled/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/npm-normalize-package-bin/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/pacote/lib/util/cache-dir.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/pacote/lib/git.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/pacote/lib/file.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/read-package-json-fast/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/json-parse-even-better-errors/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/pacote/lib/remote.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/npm-registry-fetch/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/npm-registry-fetch/check-response.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/npm-registry-fetch/errors.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/minipass-fetch/lib/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/minipass-fetch/lib/body.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/minipass-sized/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/minipass-fetch/lib/blob.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/minipass-fetch/lib/fetch-error.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/encoding/lib/encoding.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/iconv-lite/lib/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/safer-buffer/safer.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/iconv-lite/lib/bom-handling.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/iconv-lite/lib/streams.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/minipass-fetch/lib/response.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/minipass-fetch/lib/headers.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/minipass-fetch/lib/request.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/minipass-fetch/lib/abort-error.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/npm-registry-fetch/default-opts.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/npm-registry-fetch/silentlog.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/npm-registry-fetch/auth.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/make-fetch-happen/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/make-fetch-happen/agent.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/is-lambda/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/make-fetch-happen/warning.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/make-fetch-happen/utils/configure-options.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/make-fetch-happen/utils/initialize-cache.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/make-fetch-happen/utils/is-header-conditional.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/make-fetch-happen/cache.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/make-fetch-happen/utils/iterable-to-object.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/make-fetch-happen/utils/make-policy.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/http-cache-semantics/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/minipass-json-stream/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/jsonparse/jsonparse.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/pacote/lib/dir.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/pacote/lib/util/tar-create-options.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/npm-packlist/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/ignore-walk/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/run-script/lib/run-script.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/run-script/lib/run-script-pkg.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/run-script/lib/make-spawn-args.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/run-script/lib/is-windows.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/run-script/lib/set-path.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/promise-spawn/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/run-script/lib/package-envs.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/node-gyp/lib/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/run-script/lib/signal-manager.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/run-script/lib/is-server-package.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/run-script/lib/validate-options.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/git/lib/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/git/lib/clone.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/git/lib/revs.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/git/lib/spawn.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/git/lib/should-retry.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/git/lib/which.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/git/lib/opts.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/git/lib/env.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/git/lib/proc-log.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/git/lib/lines-to-revs.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/npm-pick-manifest/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/npm-install-checks/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/git/lib/is.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/git/lib/find.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/git/lib/is-clean.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/pacote/lib/util/npm.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/pacote/lib/util/add-git-sha.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/pacote/lib/registry.js
+instrument >> path = /usr/local/lib/node_modules/npm/lib/exec.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/read/lib/read.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/mute-stream/mute.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/arborist/lib/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/arborist/lib/arborist/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/arborist/lib/proc-log.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/arborist/lib/tracker.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/arborist/lib/arborist/pruner.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/arborist/lib/arborist/deduper.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/arborist/lib/arborist/audit.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/arborist/lib/audit-report.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/arborist/lib/vuln.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/metavuln-calculator/lib/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/metavuln-calculator/lib/advisory.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/metavuln-calculator/lib/hash.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/metavuln-calculator/lib/get-dep-spec.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/arborist/lib/arborist/build-ideal-tree.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/promise-call-limit/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/arborist/lib/peer-set.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/arborist/lib/realpath.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/arborist/lib/tree-check.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/arborist/lib/debug.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/readdir-scoped-modules/readdir.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/dezalgo/dezalgo.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/asap/asap.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/asap/raw.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/debuglog/debuglog.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/arborist/lib/from-path.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/arborist/lib/calc-dep-flags.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/treeverse/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/treeverse/lib/breadth.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/treeverse/lib/depth.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/treeverse/lib/depth-descent.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/arborist/lib/shrinkwrap.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/arborist/lib/yarn-lock.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/arborist/lib/consistent-resolve.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/arborist/lib/relpath.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/arborist/lib/spec-from-lock.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/arborist/lib/version-from-tgz.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/parse-conflict-json/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/just-diff/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/just-diff-apply/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/json-stringify-nice/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/arborist/lib/node.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/name-from-folder/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/arborist/lib/edge.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/arborist/lib/dep-valid.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/arborist/lib/inventory.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/bin-links/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/bin-links/lib/link-bins.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/bin-links/lib/is-windows.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/bin-links/lib/bin-target.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/bin-links/lib/get-prefix.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/bin-links/lib/get-node-modules.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/bin-links/lib/link-bin.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/bin-links/lib/link-gently.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/bin-links/lib/fix-bin.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/bin-links/lib/link-mans.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/bin-links/lib/man-target.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/bin-links/lib/shim-bin.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/cmd-shim/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/cmd-shim/lib/to-batch-syntax.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/read-cmd-shim/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/bin-links/lib/check-bins.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/bin-links/lib/check-bin.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/bin-links/lib/get-paths.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/arborist/lib/gather-dep-set.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/arborist/lib/printable.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/arborist/lib/link.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/arborist/lib/add-rm-pkg-deps.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/arborist/lib/optional-set.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/arborist/lib/reset-dep-flags.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/arborist/lib/arborist/load-workspaces.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/map-workspaces/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/arborist/lib/arborist/load-actual.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/common-ancestor-path/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/arborist/lib/arborist/load-virtual.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/arborist/lib/arborist/rebuild.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/promise-all-reject-late/index.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/arborist/lib/arborist/reify.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/arborist/lib/signal-handling.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/arborist/lib/signals.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/arborist/lib/dep-spec.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/arborist/lib/diff.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/arborist/lib/retire-path.js
+instrument >> path = /usr/local/lib/node_modules/npm/node_modules/@npmcli/arborist/lib/update-root-package-json.js
+instrument >> path = /usr/local/lib/node_modules/npm/lib/utils/file-exists.js
+instrument >> path = /usr/local/lib/node_modules/npm/lib/utils/path.js
+instrument >> path = /usr/local/lib/node_modules/npm/lib/base-command.js
+instrument >> path = /usr/local/lib/node_modules/npm/lib/utils/usage.js
+instrument >> path = /usr/local/lib/node_modules/npm/lib/workspaces/get-workspaces.js
+initialize >> argv = [
+  '/usr/local/bin/node',
+  '/Users/soft/Desktop/workspace/appmap-agent-js/node_modules/.bin/tap',
+  'tmp/test/test.js'
+] env = {
+  TERM_PROGRAM: 'Apple_Terminal',
+  NODE: '/usr/local/bin/node',
+  INIT_CWD: '/Users/soft/Desktop/workspace/appmap-agent-js',
+  SHELL: '/bin/zsh',
+  TERM: 'xterm-256color',
+  npm_config_metrics_registry: 'https://registry.npmjs.org/',
+  TMPDIR: '/var/folders/ws/mzqzv89s4ps9mshcl70bjkgh0000gn/T/',
+  APPMAP_HOST: 'localhost',
+  TERM_PROGRAM_VERSION: '433',
+  NODE_OPTIONS: '--require /Users/soft/Desktop/workspace/appmap-agent-js/lib/client/es2015/node14x/index-cjs.js',
+  npm_package_config_commitizen_path: './node_modules/cz-conventional-changelog',
+  COLOR: '1',
+  TERM_SESSION_ID: '0210F72F-675D-48D6-81A5-A5151D327AFB',
+  npm_config_noproxy: '',
+  USER: 'soft',
+  npm_config_globalconfig: '/usr/local/etc/npmrc',
+  'npm_package_bin_appmap-agent': 'bin/index.mjs',
+  SSH_AUTH_SOCK: '/private/tmp/com.apple.launchd.qqf22NNDWX/Listeners',
+  __CF_USER_TEXT_ENCODING: '0x1F5:0x0:0x0',
+  npm_execpath: '/usr/local/lib/node_modules/npm/bin/npx-cli.js',
+  PATH: '/Users/soft/Desktop/workspace/appmap-agent-js/node_modules/.bin:/Users/soft/Desktop/workspace/node_modules/.bin:/Users/soft/Desktop/node_modules/.bin:/Users/soft/node_modules/.bin:/Users/node_modules/.bin:/node_modules/.bin:/usr/local/lib/node_modules/npm/node_modules/@npmcli/run-script/lib/node-gyp-bin:/Users/soft/Desktop/workspace/appmap-agent-js/node_modules/.bin:/Users/soft/.rbenv/shims:/Users/soft/.rbenv/bin:/Library/Frameworks/Python.framework/Versions/3.9/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Library/TeX/texbin',
+  npm_package_json: '/Users/soft/Desktop/workspace/appmap-agent-js/package.json',
+  _: '/Users/soft/Desktop/workspace/appmap-agent-js/node_modules/.bin/tap',
+  npm_config_userconfig: '/Users/soft/.npmrc',
+  npm_config_init_module: '/Users/soft/.npm-init.js',
+  npm_command: 'exec',
+  PWD: '/Users/soft/Desktop/workspace/appmap-agent-js',
+  npm_lifecycle_event: 'npx',
+  EDITOR: 'vi',
+  npm_package_name: '@appland/appmap-agent-js',
+  XPC_FLAGS: '0x0',
+  APPMAP_PROTOCOL: 'messaging',
+  npm_config_node_gyp: '/usr/local/lib/node_modules/npm/node_modules/node-gyp/bin/node-gyp.js',
+  RBENV_SHELL: 'zsh',
+  npm_package_version: '2.8.1',
+  XPC_SERVICE_NAME: '0',
+  SHLVL: '2',
+  HOME: '/Users/soft',
+  npm_config_cache: '/Users/soft/.npm',
+  LOGNAME: 'soft',
+  npm_lifecycle_script: 'tap "tmp/test/test.js"',
+  LC_CTYPE: 'UTF-8',
+  npm_config_user_agent: 'npm/7.9.0 node/v14.13.1 darwin x64',
+  APPMAP_PORT: '59475',
+  npm_node_execpath: '/usr/local/bin/node',
+  npm_config_prefix: '/usr/local'
+}
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/bin/run.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/signal-exit/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/signal-exit/signals.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/opener/lib/opener.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/foreground-child/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/signal-exit/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/signal-exit/signals.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/glob/glob.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/fs.realpath/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/fs.realpath/old.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/minimatch/minimatch.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/brace-expansion/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/concat-map/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/balanced-match/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/inherits/inherits.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/path-is-absolute/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/glob/sync.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/glob/common.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/inflight/inflight.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/wrappy/wrappy.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/once/once.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/isexe/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/isexe/mode.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/tap-yaml/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/tap-yaml/lib/parse.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/tap-yaml/lib/types/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/yaml/types.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/yaml/dist/types.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/yaml/dist/resolveSeq-d03cb037.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/yaml/dist/PlainValue-ec8e588e.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/yaml/dist/Schema-88e323a7.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/yaml/dist/warnings-1000a372.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/tap-yaml/lib/types/error.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/yaml/util.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/yaml/dist/util.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/tap-yaml/lib/types/symbol.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/tap-yaml/lib/types/shared-symbol.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/tap-yaml/lib/types/function.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/tap-yaml/lib/types/regexp.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/tap-yaml/lib/types/date.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/tap-yaml/lib/types/domain.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/tap-yaml/lib/types/null-object.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/yaml/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/yaml/dist/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/yaml/dist/parse-cst.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/yaml/dist/Document-9b4560a1.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/tap-yaml/lib/stringify.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/fs-exists-cached/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/which/which.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-processinfo/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/uuid/v4.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/uuid/lib/rng.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/uuid/lib/bytesToUuid.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/archy/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-coverage/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-coverage/lib/file-coverage.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-coverage/lib/percent.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-coverage/lib/data-properties.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-coverage/lib/coverage-summary.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-coverage/lib/coverage-map.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/cross-spawn/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/cross-spawn/lib/parse.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/cross-spawn/lib/util/resolveCommand.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/path-key/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/cross-spawn/lib/util/escape.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/cross-spawn/lib/util/readShebang.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/shebang-command/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/shebang-regex/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/cross-spawn/lib/enoent.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/rimraf/rimraf.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/glob/glob.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/fs.realpath/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/fs.realpath/old.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/minimatch/minimatch.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/brace-expansion/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/concat-map/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/balanced-match/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/inherits/inherits.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/path-is-absolute/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/glob/sync.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/glob/common.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/inflight/inflight.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/wrappy/wrappy.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/once/once.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/p-map/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/aggregate-error/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/indent-string/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/clean-stack/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/rimraf/rimraf.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/lib/repl.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/lib/watch.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/chokidar/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/readdirp/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/picomatch/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/picomatch/lib/picomatch.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/picomatch/lib/scan.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/picomatch/lib/utils.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/picomatch/lib/constants.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/picomatch/lib/parse.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/anymatch/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/normalize-path/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/glob-parent/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/is-glob/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/is-extglob/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/braces/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/braces/lib/stringify.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/braces/lib/utils.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/braces/lib/compile.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/fill-range/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/to-regex-range/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/is-number/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/braces/lib/expand.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/braces/lib/parse.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/braces/lib/constants.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/chokidar/lib/nodefs-handler.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/is-binary-path/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/binary-extensions/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/chokidar/lib/constants.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/chokidar/lib/fsevents-handler.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/fsevents/fsevents.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/minipass/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/yallist/yallist.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/yallist/iterator.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/bin/jack.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/jackspeak/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/jackspeak/node_modules/cliui/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/jackspeak/node_modules/string-width/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/jackspeak/node_modules/strip-ansi/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/jackspeak/node_modules/ansi-regex/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/jackspeak/node_modules/is-fullwidth-code-point/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/jackspeak/node_modules/wrap-ansi/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/jackspeak/node_modules/wrap-ansi/node_modules/string-width/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/jackspeak/node_modules/wrap-ansi/node_modules/strip-ansi/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/jackspeak/node_modules/wrap-ansi/node_modules/ansi-regex/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/code-point-at/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/jackspeak/node_modules/wrap-ansi/node_modules/is-fullwidth-code-point/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/number-is-nan/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/color-support/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/lib/reporters/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/lib/reporters/dot.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/lib/reporters/base.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/node_modules/diff/lib/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/node_modules/diff/lib/diff/base.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/node_modules/diff/lib/diff/character.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/node_modules/diff/lib/diff/word.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/node_modules/diff/lib/util/params.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/node_modules/diff/lib/diff/line.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/node_modules/diff/lib/diff/sentence.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/node_modules/diff/lib/diff/css.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/node_modules/diff/lib/diff/json.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/node_modules/diff/lib/diff/array.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/node_modules/diff/lib/patch/apply.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/node_modules/diff/lib/patch/parse.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/node_modules/diff/lib/util/distance-iterator.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/node_modules/diff/lib/patch/merge.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/node_modules/diff/lib/patch/create.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/node_modules/diff/lib/util/array.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/node_modules/diff/lib/convert/dmp.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/node_modules/diff/lib/convert/xml.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/lib/ms.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/lib/utils.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/debug/src/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/debug/src/node.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/supports-color/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/has-flag/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/debug/src/common.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/ms/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/lib/reporters/doc.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/lib/reporters/json.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/lib/reporters/list.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/lib/reporters/min.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/lib/reporters/spec.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/lib/reporters/nyan.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/lib/reporters/xunit.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/lib/reporters/markdown.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/lib/reporters/progress.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/lib/reporters/landing.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/lib/reporters/json-stream.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/lib/reporters/dump.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/lib/reporters/classic.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-yaml/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-yaml/lib/parse.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-yaml/lib/types/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/yaml/types.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/yaml/dist/types.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/yaml/dist/PlainValue-ec8e588e.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/yaml/dist/resolveSeq-4a68b39b.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/yaml/dist/Schema-42e9705c.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/yaml/dist/warnings-39684f17.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-yaml/lib/types/error.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/yaml/util.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/yaml/dist/util.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-yaml/lib/types/symbol.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-yaml/lib/types/shared-symbol.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-yaml/lib/types/function.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-yaml/lib/types/regexp.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-yaml/lib/types/date.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-yaml/lib/types/domain.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-yaml/lib/types/null-object.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/yaml/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/yaml/dist/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/yaml/dist/parse-cst.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/yaml/dist/Document-2cf6b08c.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-yaml/lib/stringify.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/unicode-length/lib/unicode-length.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/unicode-length/node_modules/strip-ansi/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/unicode-length/node_modules/ansi-regex/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/lib/reporters/silent.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/lib/runner.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/lib/test.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/lib/suite.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-parser/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/minipass/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/yallist/yallist.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/yallist/iterator.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/events-to-array/etoa.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/treport/types.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/settings.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/source-map-support/source-map-support.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/source-map-support/node_modules/source-map/source-map.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/source-map-support/node_modules/source-map/lib/source-map-generator.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/source-map-support/node_modules/source-map/lib/base64-vlq.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/source-map-support/node_modules/source-map/lib/base64.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/source-map-support/node_modules/source-map/lib/util.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/source-map-support/node_modules/source-map/lib/array-set.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/source-map-support/node_modules/source-map/lib/mapping-list.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/source-map-support/node_modules/source-map/lib/source-map-consumer.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/source-map-support/node_modules/source-map/lib/binary-search.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/source-map-support/node_modules/source-map/lib/quick-sort.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/source-map-support/node_modules/source-map/lib/source-node.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/buffer-from/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/libtap/settings.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/stack-utils/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/stack-utils/node_modules/escape-string-regexp/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/nyc/bin/nyc.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/nyc/lib/config-util.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/nyc/node_modules/find-up/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/nyc/node_modules/locate-path/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/nyc/node_modules/p-locate/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/nyc/node_modules/p-limit/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/nyc/node_modules/p-try/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/nyc/node_modules/path-exists/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/yargs/yargs.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/yargs/build/lib/yargs.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/yargs/build/lib/command.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/yargs/build/lib/common-types.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/yargs/build/lib/is-promise.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/yargs/build/lib/middleware.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/yargs/build/lib/argsert.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/yargs/build/lib/yerror.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/yargs/build/lib/parse-command.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/require-directory/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/which-module/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/yargs-parser/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/camelcase/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/decamelize/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/yargs-parser/lib/tokenize-arg-string.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/yargs/build/lib/usage.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/yargs/build/lib/obj-filter.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/set-blocking/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/string-width/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/strip-ansi/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/ansi-regex/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/is-fullwidth-code-point/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/emoji-regex/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/yargs/build/lib/completion.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/yargs/build/lib/completion-templates.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/yargs/build/lib/validation.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/yargs/build/lib/levenshtein.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/yargs/build/lib/apply-extends.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/yargs/build/lib/process-argv.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/y18n/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/yargs/node_modules/find-up/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/yargs/node_modules/locate-path/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/yargs/node_modules/p-locate/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/yargs/node_modules/p-limit/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/yargs/node_modules/p-try/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/yargs/node_modules/path-exists/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/require-main-filename/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/nyc/lib/commands/helpers.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/@istanbuljs/schema/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/@istanbuljs/schema/default-exclude.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/@istanbuljs/schema/default-extension.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/nyc/lib/process-args.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/@istanbuljs/load-nyc-config/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/@istanbuljs/load-nyc-config/node_modules/find-up/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/@istanbuljs/load-nyc-config/node_modules/locate-path/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/@istanbuljs/load-nyc-config/node_modules/p-locate/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/@istanbuljs/load-nyc-config/node_modules/p-limit/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/@istanbuljs/load-nyc-config/node_modules/p-try/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/@istanbuljs/load-nyc-config/node_modules/path-exists/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/@istanbuljs/load-nyc-config/node_modules/resolve-from/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/get-package-type/index.cjs
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/get-package-type/async.cjs
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/get-package-type/is-node-modules.cjs
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/get-package-type/cache.cjs
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/get-package-type/sync.cjs
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/nyc/node_modules/resolve-from/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/nyc/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/caching-transform/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/hasha/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/is-stream/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/make-dir/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/make-dir/node_modules/semver/semver.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/write-file-atomic/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/imurmurhash/imurmurhash.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/is-typedarray/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/typedarray-to-buffer/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/package-hash/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/graceful-fs/graceful-fs.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/graceful-fs/polyfills.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/graceful-fs/legacy-streams.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/graceful-fs/clone.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/lodash.flattendeep/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/release-zalgo/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/release-zalgo/lib/Async.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/release-zalgo/lib/Sync.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/release-zalgo/lib/Thenable.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/release-zalgo/lib/constants.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/release-zalgo/lib/unwrapSync.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/es6-error/lib/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/find-cache-dir/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/commondir/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/find-cache-dir/node_modules/pkg-dir/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/find-cache-dir/node_modules/find-up/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/find-cache-dir/node_modules/locate-path/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/find-cache-dir/node_modules/p-locate/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/find-cache-dir/node_modules/p-limit/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/find-cache-dir/node_modules/p-try/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/find-cache-dir/node_modules/path-exists/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/nyc/lib/fs-promises.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/nyc/lib/hash.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-hook/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-hook/lib/hook.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/append-transform/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/default-require-extensions/js.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/default-require-extensions/node_modules/strip-bom/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/nyc/lib/source-maps.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/convert-source-map/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/safe-buffer/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-source-maps/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-source-maps/lib/map-store.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-source-maps/node_modules/source-map/source-map.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-source-maps/node_modules/source-map/lib/source-map-generator.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-source-maps/node_modules/source-map/lib/base64-vlq.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-source-maps/node_modules/source-map/lib/base64.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-source-maps/node_modules/source-map/lib/util.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-source-maps/node_modules/source-map/lib/array-set.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-source-maps/node_modules/source-map/lib/mapping-list.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-source-maps/node_modules/source-map/lib/source-map-consumer.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-source-maps/node_modules/source-map/lib/binary-search.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-source-maps/node_modules/source-map/lib/quick-sort.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-source-maps/node_modules/source-map/lib/source-node.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-source-maps/lib/pathutils.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-source-maps/lib/transformer.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-source-maps/lib/mapped.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-source-maps/lib/get-mapping.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-source-maps/lib/transform-utils.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/test-exclude/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/test-exclude/is-outside-dir.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/test-exclude/is-outside-dir-posix.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/nyc/lib/commands/check-coverage.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/nyc/lib/commands/instrument.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/nyc/lib/commands/report.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/nyc/lib/commands/merge.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/nyc/lib/instrumenters/istanbul.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/node-preload/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/node-preload/hook-spawn.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/process-on-spawn/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/fromentries/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/node-preload/generate-require.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/node-preload/process-node-options.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/node-preload/preload-list.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/node-preload/preload-list-env.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/nyc/lib/register-env.js
+initialize >> argv = [
+  '/usr/local/bin/node',
+  '/Users/soft/Desktop/workspace/appmap-agent-js/node_modules/.bin/tap',
+  'tmp/test/test.js'
+] env = {
+  TERM_PROGRAM: 'Apple_Terminal',
+  NODE: '/usr/local/bin/node',
+  INIT_CWD: '/Users/soft/Desktop/workspace/appmap-agent-js',
+  SHELL: '/bin/zsh',
+  TERM: 'xterm-256color',
+  npm_config_metrics_registry: 'https://registry.npmjs.org/',
+  TMPDIR: '/var/folders/ws/mzqzv89s4ps9mshcl70bjkgh0000gn/T/',
+  APPMAP_HOST: 'localhost',
+  TERM_PROGRAM_VERSION: '433',
+  NODE_OPTIONS: '--require /Users/soft/Desktop/workspace/appmap-agent-js/lib/client/es2015/node14x/index-cjs.js --require /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/node-preload/preload-path/node-preload.js',
+  npm_package_config_commitizen_path: './node_modules/cz-conventional-changelog',
+  COLOR: '1',
+  TERM_SESSION_ID: '0210F72F-675D-48D6-81A5-A5151D327AFB',
+  npm_config_noproxy: '',
+  USER: 'soft',
+  npm_config_globalconfig: '/usr/local/etc/npmrc',
+  'npm_package_bin_appmap-agent': 'bin/index.mjs',
+  SSH_AUTH_SOCK: '/private/tmp/com.apple.launchd.qqf22NNDWX/Listeners',
+  __CF_USER_TEXT_ENCODING: '0x1F5:0x0:0x0',
+  npm_execpath: '/usr/local/lib/node_modules/npm/bin/npx-cli.js',
+  PATH: '/Users/soft/Desktop/workspace/appmap-agent-js/node_modules/.bin:/Users/soft/Desktop/workspace/node_modules/.bin:/Users/soft/Desktop/node_modules/.bin:/Users/soft/node_modules/.bin:/Users/node_modules/.bin:/node_modules/.bin:/usr/local/lib/node_modules/npm/node_modules/@npmcli/run-script/lib/node-gyp-bin:/Users/soft/Desktop/workspace/appmap-agent-js/node_modules/.bin:/Users/soft/.rbenv/shims:/Users/soft/.rbenv/bin:/Library/Frameworks/Python.framework/Versions/3.9/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Library/TeX/texbin',
+  npm_package_json: '/Users/soft/Desktop/workspace/appmap-agent-js/package.json',
+  _: '/Users/soft/Desktop/workspace/appmap-agent-js/node_modules/.bin/tap',
+  npm_config_userconfig: '/Users/soft/.npmrc',
+  npm_config_init_module: '/Users/soft/.npm-init.js',
+  npm_command: 'exec',
+  PWD: '/Users/soft/Desktop/workspace/appmap-agent-js',
+  npm_lifecycle_event: 'npx',
+  EDITOR: 'vi',
+  npm_package_name: '@appland/appmap-agent-js',
+  XPC_FLAGS: '0x0',
+  APPMAP_PROTOCOL: 'messaging',
+  npm_config_node_gyp: '/usr/local/lib/node_modules/npm/node_modules/node-gyp/bin/node-gyp.js',
+  RBENV_SHELL: 'zsh',
+  npm_package_version: '2.8.1',
+  XPC_SERVICE_NAME: '0',
+  SHLVL: '2',
+  HOME: '/Users/soft',
+  npm_config_cache: '/Users/soft/.npm',
+  LOGNAME: 'soft',
+  npm_lifecycle_script: 'tap "tmp/test/test.js"',
+  LC_CTYPE: 'UTF-8',
+  npm_config_user_agent: 'npm/7.9.0 node/v14.13.1 darwin x64',
+  APPMAP_PORT: '59475',
+  npm_node_execpath: '/usr/local/bin/node',
+  npm_config_prefix: '/usr/local',
+  FORCE_COLOR: '3',
+  BABEL_DISABLE_CACHE: '1',
+  NYC_CONFIG: '{"_":["/usr/local/bin/node"],"exclude":["coverage/**","packages/*/test/**","test/**","test{,-*}.js","**/*{.,-}test.js","**/__tests__/**","**/{ava,babel,jest,nyc,rollup,webpack}.config.js","tmp/test/test.js"],"x":["coverage/**","packages/*/test/**","test/**","test{,-*}.js","**/*{.,-}test.js","**/__tests__/**","**/{ava,babel,jest,nyc,rollup,webpack}.config.js","tmp/test/test.js"],"produce-source-map":true,"produceSourceMap":true,"cache":true,"c":true,"branches":100,"watermarks":{"branches":[100,100],"functions":[100,100],"lines":[100,100],"statements":[100,100]},"functions":100,"lines":100,"statements":100,"extension":[".js",".jsx",".mjs",".cjs",".ts",".tsx"],"e":[".js",".jsx",".mjs",".cjs",".ts",".tsx"],"check-coverage":true,"checkCoverage":true,"cwd":"/Users/soft/Desktop/workspace/appmap-agent-js","temp-dir":"./.nyc_output","t":"./.nyc_output","tempDir":"./.nyc_output","exclude-node-modules":true,"excludeNodeModules":true,"include":[],"n":[],"ignore-class-methods":[],"ignoreClassMethods":[],"auto-wrap":true,"autoWrap":true,"es-modules":true,"esModules":true,"parser-plugins":["asyncGenerators","bigInt","classProperties","classPrivateProperties","classPrivateMethods","dynamicImport","importMeta","numericSeparator","objectRestSpread","optionalCatchBinding","topLevelAwait"],"parserPlugins":["asyncGenerators","bigInt","classProperties","classPrivateProperties","classPrivateMethods","dynamicImport","importMeta","numericSeparator","objectRestSpread","optionalCatchBinding","topLevelAwait"],"compact":true,"preserve-comments":true,"preserveComments":true,"source-map":true,"sourceMap":true,"require":[],"i":[],"instrument":true,"exclude-after-remap":true,"excludeAfterRemap":true,"per-file":false,"perFile":false,"reporter":["text"],"r":["text"],"report-dir":"coverage","reportDir":"coverage","show-process-tree":false,"showProcessTree":false,"skip-empty":false,"skipEmpty":false,"skip-full":false,"skipFull":false,"silent":false,"s":false,"all":false,"a":false,"eager":false,"babel-cache":false,"babelCache":false,"use-spawn-wrap":false,"useSpawnWrap":false,"hook-require":true,"hookRequire":true,"hook-run-in-context":false,"hookRunInContext":false,"hook-run-in-this-context":false,"hookRunInThisContext":false,"clean":true,"in-place":false,"inPlace":false,"exit-on-error":false,"exitOnError":false,"delete":false,"complete-copy":false,"completeCopy":false,"$0":"node_modules/nyc/bin/nyc.js","instrumenter":"./lib/instrumenters/istanbul"}',
+  NYC_CWD: '/Users/soft/Desktop/workspace/appmap-agent-js',
+  NODE_PRELOAD_ec3ce98e996ab3cb28088867d51b8b33f564b8e4: '/Users/soft/Desktop/workspace/appmap-agent-js/node_modules/nyc/lib/register-env.js:/Users/soft/Desktop/workspace/appmap-agent-js/node_modules/nyc/lib/wrap.js'
+}
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/node-preload/preload-path/node-preload.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/node-preload/internal-preload-module.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/node-preload/preload-list.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/node-preload/preload-list-env.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/node-preload/hook-spawn.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/process-on-spawn/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/fromentries/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/node-preload/generate-require.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/node-preload/process-node-options.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/nyc/lib/register-env.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/nyc/lib/wrap.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/nyc/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/caching-transform/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/hasha/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/is-stream/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/make-dir/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/make-dir/node_modules/semver/semver.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/write-file-atomic/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/imurmurhash/imurmurhash.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/signal-exit/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/signal-exit/signals.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/is-typedarray/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/typedarray-to-buffer/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/package-hash/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/graceful-fs/graceful-fs.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/graceful-fs/polyfills.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/graceful-fs/legacy-streams.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/graceful-fs/clone.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/lodash.flattendeep/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/release-zalgo/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/release-zalgo/lib/Async.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/release-zalgo/lib/Sync.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/release-zalgo/lib/Thenable.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/release-zalgo/lib/constants.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/release-zalgo/lib/unwrapSync.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/es6-error/lib/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/find-cache-dir/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/commondir/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/find-cache-dir/node_modules/pkg-dir/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/find-cache-dir/node_modules/find-up/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/find-cache-dir/node_modules/locate-path/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/find-cache-dir/node_modules/p-locate/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/find-cache-dir/node_modules/p-limit/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/find-cache-dir/node_modules/p-try/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/find-cache-dir/node_modules/path-exists/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/nyc/lib/fs-promises.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/glob/glob.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/fs.realpath/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/fs.realpath/old.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/minimatch/minimatch.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/brace-expansion/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/concat-map/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/balanced-match/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/inherits/inherits.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/path-is-absolute/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/glob/sync.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/glob/common.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/inflight/inflight.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/wrappy/wrappy.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/once/once.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/nyc/lib/hash.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-coverage/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-coverage/lib/file-coverage.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-coverage/lib/percent.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-coverage/lib/data-properties.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-coverage/lib/coverage-summary.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-coverage/lib/coverage-map.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-hook/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-hook/lib/hook.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/append-transform/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/default-require-extensions/js.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/default-require-extensions/node_modules/strip-bom/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-processinfo/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/uuid/v4.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/uuid/lib/rng.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/uuid/lib/bytesToUuid.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/archy/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/cross-spawn/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/cross-spawn/lib/parse.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/cross-spawn/lib/util/resolveCommand.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/which/which.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/isexe/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/isexe/mode.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/path-key/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/cross-spawn/lib/util/escape.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/cross-spawn/lib/util/readShebang.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/shebang-command/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/shebang-regex/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/cross-spawn/lib/enoent.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/rimraf/rimraf.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/p-map/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/aggregate-error/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/indent-string/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/clean-stack/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/nyc/lib/source-maps.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/convert-source-map/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/safe-buffer/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-source-maps/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-source-maps/lib/map-store.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/debug/src/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/debug/src/node.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/supports-color/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/has-flag/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/debug/src/common.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/ms/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-source-maps/node_modules/source-map/source-map.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-source-maps/node_modules/source-map/lib/source-map-generator.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-source-maps/node_modules/source-map/lib/base64-vlq.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-source-maps/node_modules/source-map/lib/base64.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-source-maps/node_modules/source-map/lib/util.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-source-maps/node_modules/source-map/lib/array-set.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-source-maps/node_modules/source-map/lib/mapping-list.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-source-maps/node_modules/source-map/lib/source-map-consumer.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-source-maps/node_modules/source-map/lib/binary-search.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-source-maps/node_modules/source-map/lib/quick-sort.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-source-maps/node_modules/source-map/lib/source-node.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-source-maps/lib/pathutils.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-source-maps/lib/transformer.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-source-maps/lib/mapped.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-source-maps/lib/get-mapping.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-source-maps/lib/transform-utils.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/test-exclude/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/@istanbuljs/schema/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/@istanbuljs/schema/default-exclude.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/@istanbuljs/schema/default-extension.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/test-exclude/is-outside-dir.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/test-exclude/is-outside-dir-posix.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/get-package-type/index.cjs
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/get-package-type/async.cjs
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/get-package-type/is-node-modules.cjs
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/get-package-type/cache.cjs
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/get-package-type/sync.cjs
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/nyc/lib/instrumenters/istanbul.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/bin/run.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/signal-exit/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/signal-exit/signals.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/opener/lib/opener.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/foreground-child/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/glob/glob.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/fs.realpath/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/fs.realpath/old.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/minimatch/minimatch.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/brace-expansion/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/concat-map/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/balanced-match/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/inherits/inherits.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/path-is-absolute/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/glob/sync.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/glob/common.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/inflight/inflight.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/wrappy/wrappy.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/once/once.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/tap-yaml/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/tap-yaml/lib/parse.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/tap-yaml/lib/types/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/yaml/types.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/yaml/dist/types.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/yaml/dist/resolveSeq-d03cb037.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/yaml/dist/PlainValue-ec8e588e.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/yaml/dist/Schema-88e323a7.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/yaml/dist/warnings-1000a372.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/tap-yaml/lib/types/error.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/yaml/util.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/yaml/dist/util.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/tap-yaml/lib/types/symbol.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/tap-yaml/lib/types/shared-symbol.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/tap-yaml/lib/types/function.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/tap-yaml/lib/types/regexp.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/tap-yaml/lib/types/date.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/tap-yaml/lib/types/domain.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/tap-yaml/lib/types/null-object.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/yaml/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/yaml/dist/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/yaml/dist/parse-cst.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/yaml/dist/Document-9b4560a1.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/tap-yaml/lib/stringify.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/fs-exists-cached/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/rimraf/rimraf.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/lib/repl.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/lib/watch.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/chokidar/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/readdirp/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/picomatch/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/picomatch/lib/picomatch.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/picomatch/lib/scan.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/picomatch/lib/utils.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/picomatch/lib/constants.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/picomatch/lib/parse.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/anymatch/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/normalize-path/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/glob-parent/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/is-glob/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/is-extglob/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/braces/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/braces/lib/stringify.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/braces/lib/utils.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/braces/lib/compile.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/fill-range/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/to-regex-range/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/is-number/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/braces/lib/expand.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/braces/lib/parse.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/braces/lib/constants.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/chokidar/lib/nodefs-handler.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/is-binary-path/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/binary-extensions/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/chokidar/lib/constants.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/chokidar/lib/fsevents-handler.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/fsevents/fsevents.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/minipass/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/yallist/yallist.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/yallist/iterator.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/bin/jack.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/jackspeak/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/jackspeak/node_modules/cliui/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/jackspeak/node_modules/string-width/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/jackspeak/node_modules/strip-ansi/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/jackspeak/node_modules/ansi-regex/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/jackspeak/node_modules/is-fullwidth-code-point/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/jackspeak/node_modules/wrap-ansi/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/jackspeak/node_modules/wrap-ansi/node_modules/string-width/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/jackspeak/node_modules/wrap-ansi/node_modules/strip-ansi/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/jackspeak/node_modules/wrap-ansi/node_modules/ansi-regex/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/code-point-at/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/jackspeak/node_modules/wrap-ansi/node_modules/is-fullwidth-code-point/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/number-is-nan/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/color-support/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/lib/reporters/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/lib/reporters/dot.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/lib/reporters/base.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/node_modules/diff/lib/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/node_modules/diff/lib/diff/base.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/node_modules/diff/lib/diff/character.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/node_modules/diff/lib/diff/word.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/node_modules/diff/lib/util/params.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/node_modules/diff/lib/diff/line.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/node_modules/diff/lib/diff/sentence.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/node_modules/diff/lib/diff/css.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/node_modules/diff/lib/diff/json.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/node_modules/diff/lib/diff/array.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/node_modules/diff/lib/patch/apply.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/node_modules/diff/lib/patch/parse.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/node_modules/diff/lib/util/distance-iterator.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/node_modules/diff/lib/patch/merge.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/node_modules/diff/lib/patch/create.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/node_modules/diff/lib/util/array.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/node_modules/diff/lib/convert/dmp.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/node_modules/diff/lib/convert/xml.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/lib/ms.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/lib/utils.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/lib/reporters/doc.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/lib/reporters/json.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/lib/reporters/list.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/lib/reporters/min.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/lib/reporters/spec.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/lib/reporters/nyan.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/lib/reporters/xunit.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/lib/reporters/markdown.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/lib/reporters/progress.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/lib/reporters/landing.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/lib/reporters/json-stream.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/lib/reporters/dump.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/lib/reporters/classic.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-yaml/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-yaml/lib/parse.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-yaml/lib/types/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/yaml/types.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/yaml/dist/types.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/yaml/dist/PlainValue-ec8e588e.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/yaml/dist/resolveSeq-4a68b39b.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/yaml/dist/Schema-42e9705c.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/yaml/dist/warnings-39684f17.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-yaml/lib/types/error.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/yaml/util.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/yaml/dist/util.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-yaml/lib/types/symbol.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-yaml/lib/types/shared-symbol.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-yaml/lib/types/function.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-yaml/lib/types/regexp.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-yaml/lib/types/date.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-yaml/lib/types/domain.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-yaml/lib/types/null-object.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/yaml/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/yaml/dist/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/yaml/dist/parse-cst.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/yaml/dist/Document-2cf6b08c.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-yaml/lib/stringify.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/unicode-length/lib/unicode-length.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/unicode-length/node_modules/strip-ansi/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/unicode-length/node_modules/ansi-regex/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/lib/reporters/silent.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/lib/runner.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/lib/test.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-mocha-reporter/lib/suite.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-parser/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/minipass/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/yallist/yallist.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/yallist/iterator.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/events-to-array/etoa.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/treport/types.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/settings.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/source-map-support/source-map-support.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/source-map-support/node_modules/source-map/source-map.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/source-map-support/node_modules/source-map/lib/source-map-generator.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/source-map-support/node_modules/source-map/lib/base64-vlq.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/source-map-support/node_modules/source-map/lib/base64.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/source-map-support/node_modules/source-map/lib/util.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/source-map-support/node_modules/source-map/lib/array-set.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/source-map-support/node_modules/source-map/lib/mapping-list.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/source-map-support/node_modules/source-map/lib/source-map-consumer.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/source-map-support/node_modules/source-map/lib/binary-search.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/source-map-support/node_modules/source-map/lib/quick-sort.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/source-map-support/node_modules/source-map/lib/source-node.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/buffer-from/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/libtap/settings.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/stack-utils/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/stack-utils/node_modules/escape-string-regexp/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/lib/tap.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/libtap/lib/tap.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/async-hook-domain/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/libtap/lib/test.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tcompare/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tcompare/lib/format.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tcompare/lib/same.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tcompare/node_modules/diff/lib/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tcompare/node_modules/diff/lib/diff/base.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tcompare/node_modules/diff/lib/diff/character.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tcompare/node_modules/diff/lib/diff/word.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tcompare/node_modules/diff/lib/util/params.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tcompare/node_modules/diff/lib/diff/line.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tcompare/node_modules/diff/lib/diff/sentence.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tcompare/node_modules/diff/lib/diff/css.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tcompare/node_modules/diff/lib/diff/json.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tcompare/node_modules/diff/lib/diff/array.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tcompare/node_modules/diff/lib/patch/apply.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tcompare/node_modules/diff/lib/patch/parse.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tcompare/node_modules/diff/lib/util/distance-iterator.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tcompare/node_modules/diff/lib/patch/merge.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tcompare/node_modules/diff/lib/patch/create.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tcompare/node_modules/diff/lib/util/array.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tcompare/node_modules/diff/lib/convert/dmp.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tcompare/node_modules/diff/lib/convert/xml.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tcompare/lib/strict.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tcompare/lib/has.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tcompare/lib/has-strict.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tcompare/lib/match.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/trivial-deferred/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/function-loop/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/yapool/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/own-or/own-or.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/own-or-env/own-or-env.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/bind-obj-methods/bind-obj-methods.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/libtap/lib/base.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/libtap/lib/extra-from-error.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/libtap/lib/stack.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/libtap/lib/spawn.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/libtap/lib/clean-yaml-object.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/libtap/node_modules/diff/lib/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/libtap/node_modules/diff/lib/diff/base.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/libtap/node_modules/diff/lib/diff/character.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/libtap/node_modules/diff/lib/diff/word.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/libtap/node_modules/diff/lib/util/params.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/libtap/node_modules/diff/lib/diff/line.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/libtap/node_modules/diff/lib/diff/sentence.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/libtap/node_modules/diff/lib/diff/css.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/libtap/node_modules/diff/lib/diff/json.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/libtap/node_modules/diff/lib/diff/array.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/libtap/node_modules/diff/lib/patch/apply.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/libtap/node_modules/diff/lib/patch/parse.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/libtap/node_modules/diff/lib/util/distance-iterator.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/libtap/node_modules/diff/lib/patch/merge.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/libtap/node_modules/diff/lib/patch/create.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/libtap/node_modules/diff/lib/util/array.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/libtap/node_modules/diff/lib/convert/dmp.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/libtap/node_modules/diff/lib/convert/xml.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/libtap/lib/stdin.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/libtap/lib/point.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/libtap/lib/diags.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/libtap/lib/obj-to-yaml.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/libtap/lib/parse-test-args.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/libtap/lib/fixture.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/libtap/lib/mock.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/libtap/lib/snapshot.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/libtap/lib/find-main-script.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/libtap/lib/waiter.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/lib/mocha.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/lib/cb-promise.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/lib/synonyms.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/treport/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/import-jsx/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/resolve-from/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/caller-path/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/caller-callsite/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/callsites/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/import-jsx/cache.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/make-dir/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/semver/semver.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/find-cache-dir/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/commondir/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/pkg-dir/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/find-up/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/locate-path/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/p-locate/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/p-limit/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/p-try/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/path-exists/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/import-jsx/transform.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/treport/lib/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/react/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/react/cjs/react.development.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/object-assign/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/prop-types/checkPropTypes.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/prop-types/lib/ReactPropTypesSecret.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/ink/build/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/ink/build/render.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/ink/build/instance.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/lodash.throttle/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/auto-bind/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/log-update/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/log-update/node_modules/ansi-escapes/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/log-update/node_modules/cli-cursor/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/log-update/node_modules/restore-cursor/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/log-update/node_modules/onetime/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/log-update/node_modules/mimic-fn/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/log-update/node_modules/wrap-ansi/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/log-update/node_modules/string-width/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/log-update/node_modules/strip-ansi/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/log-update/node_modules/ansi-regex/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/log-update/node_modules/is-fullwidth-code-point/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/log-update/node_modules/emoji-regex/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/ansi-styles/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/color-convert/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/color-convert/conversions.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/color-name/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/color-convert/route.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/is-ci/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/ci-info/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/ansi-escapes/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/ink/build/reconciler.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/scheduler/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/scheduler/cjs/scheduler.development.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/react-reconciler/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/react-reconciler/cjs/react-reconciler.development.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/ink/build/dom.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/object-assign/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/prop-types/checkPropTypes.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/prop-types/lib/ReactPropTypesSecret.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/scheduler/tracing.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/scheduler/cjs/scheduler-tracing.development.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/ink/build/experimental/reconciler.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/ink/build/experimental/dom.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/yoga-layout-prebuilt/yoga-layout/dist/entry-browser.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/yoga-layout-prebuilt/yoga-layout/dist/entry-common.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/yoga-layout-prebuilt/yoga-layout/dist/YGEnums.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/yoga-layout-prebuilt/yoga-layout/build/Release/nbind.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/ink/build/measure-text.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/widest-line/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/string-width/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/string-width/node_modules/strip-ansi/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/string-width/node_modules/ansi-regex/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/is-fullwidth-code-point/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/emoji-regex/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/ink/build/experimental/apply-style.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/ink/build/renderer.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/ink/build/output.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/string-length/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/string-length/node_modules/strip-ansi/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/string-length/node_modules/ansi-regex/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/string-length/node_modules/astral-regex/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/slice-ansi/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/astral-regex/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/slice-ansi/node_modules/ansi-styles/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/ink/build/build-layout.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/ink/build/apply-styles.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/ink/build/render-node-to-output.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/ink/build/wrap-text.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/wrap-ansi/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/wrap-ansi/node_modules/strip-ansi/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/wrap-ansi/node_modules/ansi-regex/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/wrap-ansi/node_modules/ansi-styles/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/cli-truncate/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/ink/build/get-max-width.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/ink/build/calculate-wrapped-text.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/ink/build/experimental/renderer.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/ink/build/experimental/output.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/ink/build/instances.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/ink/build/components/App.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/prop-types/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/react-is/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/react-is/cjs/react-is.development.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/prop-types/factoryWithTypeCheckers.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/cli-cursor/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/restore-cursor/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/onetime/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/mimic-fn/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/ink/build/components/AppContext.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/ink/build/components/StdinContext.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/ink/build/components/StdoutContext.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/ink/build/components/Box.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/ink/build/components/Text.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/ink/node_modules/chalk/source/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/ink/node_modules/ansi-styles/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/ink/node_modules/supports-color/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/ink/node_modules/has-flag/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/ink/node_modules/chalk/source/util.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/ink/build/components/Color.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/arrify/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/ink/build/components/Static.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/ink/build/hooks/use-input.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/ink/build/hooks/use-app.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/ink/build/hooks/use-stdin.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/ink/build/hooks/use-stdout.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/treport/lib/reports/base/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/ms/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/tap-parser/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/events-to-array/etoa.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/treport/node_modules/chalk/source/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/treport/node_modules/ansi-styles/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/treport/node_modules/supports-color/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/treport/node_modules/has-flag/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/treport/node_modules/chalk/source/util.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/treport/lib/reports/base/assert-counts.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/treport/lib/reports/base/assert-name.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/treport/lib/reports/base/counts.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/treport/lib/reports/base/footer.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/treport/lib/reports/base/suite-counts.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/treport/lib/reports/base/log.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/treport/lib/reports/base/result.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/treport/lib/reports/base/test-point.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/treport/lib/pretty-diff.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/treport/lib/pretty-source.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/cardinal/cardinal.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/cardinal/lib/highlight.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/redeyed/redeyed.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/esprima/dist/esprima.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/cardinal/themes/default.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/ansicolors/ansicolors.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/cardinal/lib/highlightFile.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/cardinal/lib/highlightFileSync.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/treport/lib/cardinal-theme.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/treport/node_modules/color-convert/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/treport/node_modules/color-convert/conversions.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/treport/node_modules/color-name/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/treport/node_modules/color-convert/route.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/treport/lib/reports/base/pass-fail.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/treport/lib/reports/base/status-mark.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/treport/lib/reports/base/test.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/treport/lib/reports/base/runs.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/treport/lib/reports/base/summary.js
+Suites:   0 of 1 completed
+Asserts:  0 of 0
+Time:     101ms
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/node_modules/ink/node_modules/color-convert/index.js
+ RUNS  tmp/test/test.js 98ms
+Suites:   0 of 1 completed
+Asserts:  0 of 0
+Time:     207ms
+initialize >> argv = [
+  '/usr/local/bin/node',
+  '/Users/soft/Desktop/workspace/appmap-agent-js/tmp/test/test.js'
+] env = {
+  TERM_PROGRAM: 'Apple_Terminal',
+  NODE: '/usr/local/bin/node',
+  INIT_CWD: '/Users/soft/Desktop/workspace/appmap-agent-js',
+  SHELL: '/bin/zsh',
+  TERM: 'xterm-256color',
+  npm_config_metrics_registry: 'https://registry.npmjs.org/',
+  TMPDIR: '/var/folders/ws/mzqzv89s4ps9mshcl70bjkgh0000gn/T/',
+  APPMAP_HOST: 'localhost',
+  TERM_PROGRAM_VERSION: '433',
+  NODE_OPTIONS: '--require /Users/soft/Desktop/workspace/appmap-agent-js/lib/client/es2015/node14x/index-cjs.js --require /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/node-preload/preload-path/node-preload.js',
+  npm_package_config_commitizen_path: './node_modules/cz-conventional-changelog',
+  COLOR: '1',
+  TERM_SESSION_ID: '0210F72F-675D-48D6-81A5-A5151D327AFB',
+  npm_config_noproxy: '',
+  USER: 'soft',
+  npm_config_globalconfig: '/usr/local/etc/npmrc',
+  'npm_package_bin_appmap-agent': 'bin/index.mjs',
+  SSH_AUTH_SOCK: '/private/tmp/com.apple.launchd.qqf22NNDWX/Listeners',
+  __CF_USER_TEXT_ENCODING: '0x1F5:0x0:0x0',
+  npm_execpath: '/usr/local/lib/node_modules/npm/bin/npx-cli.js',
+  PATH: '/Users/soft/Desktop/workspace/appmap-agent-js/node_modules/.bin:/Users/soft/Desktop/workspace/node_modules/.bin:/Users/soft/Desktop/node_modules/.bin:/Users/soft/node_modules/.bin:/Users/node_modules/.bin:/node_modules/.bin:/usr/local/lib/node_modules/npm/node_modules/@npmcli/run-script/lib/node-gyp-bin:/Users/soft/Desktop/workspace/appmap-agent-js/node_modules/.bin:/Users/soft/.rbenv/shims:/Users/soft/.rbenv/bin:/Library/Frameworks/Python.framework/Versions/3.9/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Library/TeX/texbin',
+  npm_package_json: '/Users/soft/Desktop/workspace/appmap-agent-js/package.json',
+  _: '/Users/soft/Desktop/workspace/appmap-agent-js/node_modules/.bin/tap',
+  npm_config_userconfig: '/Users/soft/.npmrc',
+  npm_config_init_module: '/Users/soft/.npm-init.js',
+  npm_command: 'exec',
+  PWD: '/Users/soft/Desktop/workspace/appmap-agent-js',
+  npm_lifecycle_event: 'npx',
+  EDITOR: 'vi',
+  npm_package_name: '@appland/appmap-agent-js',
+  XPC_FLAGS: '0x0',
+  APPMAP_PROTOCOL: 'messaging',
+  npm_config_node_gyp: '/usr/local/lib/node_modules/npm/node_modules/node-gyp/bin/node-gyp.js',
+  RBENV_SHELL: 'zsh',
+  npm_package_version: '2.8.1',
+  XPC_SERVICE_NAME: '0',
+  SHLVL: '2',
+  HOME: '/Users/soft',
+  npm_config_cache: '/Users/soft/.npm',
+  LOGNAME: 'soft',
+  npm_lifecycle_script: 'tap "tmp/test/test.js"',
+  LC_CTYPE: 'UTF-8',
+  npm_config_user_agent: 'npm/7.9.0 node/v14.13.1 darwin x64',
+  APPMAP_PORT: '59475',
+  npm_node_execpath: '/usr/local/bin/node',
+  npm_config_prefix: '/usr/local',
+  FORCE_COLOR: '3',
+  BABEL_DISABLE_CACHE: '1',
+  NYC_CONFIG: '{"_":["/usr/local/bin/node"],"exclude":["coverage/**","packages/*/test/**","test/**","test{,-*}.js","**/*{.,-}test.js","**/__tests__/**","**/{ava,babel,jest,nyc,rollup,webpack}.config.js","tmp/test/test.js"],"x":["coverage/**","packages/*/test/**","test/**","test{,-*}.js","**/*{.,-}test.js","**/__tests__/**","**/{ava,babel,jest,nyc,rollup,webpack}.config.js","tmp/test/test.js"],"produce-source-map":true,"produceSourceMap":true,"cache":true,"c":true,"branches":100,"watermarks":{"branches":[100,100],"functions":[100,100],"lines":[100,100],"statements":[100,100]},"functions":100,"lines":100,"statements":100,"extension":[".js",".jsx",".mjs",".cjs",".ts",".tsx"],"e":[".js",".jsx",".mjs",".cjs",".ts",".tsx"],"check-coverage":true,"checkCoverage":true,"cwd":"/Users/soft/Desktop/workspace/appmap-agent-js","temp-dir":"./.nyc_output","t":"./.nyc_output","tempDir":"./.nyc_output","exclude-node-modules":true,"excludeNodeModules":true,"include":[],"n":[],"ignore-class-methods":[],"ignoreClassMethods":[],"auto-wrap":true,"autoWrap":true,"es-modules":true,"esModules":true,"parser-plugins":["asyncGenerators","bigInt","classProperties","classPrivateProperties","classPrivateMethods","dynamicImport","importMeta","numericSeparator","objectRestSpread","optionalCatchBinding","topLevelAwait"],"parserPlugins":["asyncGenerators","bigInt","classProperties","classPrivateProperties","classPrivateMethods","dynamicImport","importMeta","numericSeparator","objectRestSpread","optionalCatchBinding","topLevelAwait"],"compact":true,"preserve-comments":true,"preserveComments":true,"source-map":true,"sourceMap":true,"require":[],"i":[],"instrument":true,"exclude-after-remap":true,"excludeAfterRemap":true,"per-file":false,"perFile":false,"reporter":["text"],"r":["text"],"report-dir":"coverage","reportDir":"coverage","show-process-tree":false,"showProcessTree":false,"skip-empty":false,"skipEmpty":false,"skip-full":false,"skipFull":false,"silent":false,"s":false,"all":false,"a":false,"eager":false,"babel-cache":false,"babelCache":false,"use-spawn-wrap":false,"useSpawnWrap":false,"hook-require":true,"hookRequire":true,"hook-run-in-context":false,"hookRunInContext":false,"hook-run-in-this-context":false,"hookRunInThisContext":false,"clean":true,"in-place":false,"inPlace":false,"exit-on-error":false,"exitOnError":false,"delete":false,"complete-copy":false,"completeCopy":false,"$0":"node_modules/nyc/bin/nyc.js","instrumenter":"./lib/instrumenters/istanbul"}',
+  NYC_CWD: '/Users/soft/Desktop/workspace/appmap-agent-js',
+  NODE_PRELOAD_ec3ce98e996ab3cb28088867d51b8b33f564b8e4: '/Users/soft/Desktop/workspace/appmap-agent-js/node_modules/nyc/lib/register-env.js:/Users/soft/Desktop/workspace/appmap-agent-js/node_modules/nyc/lib/wrap.js',
+  NYC_PROCESS_ID: '44e8490f-8af2-412a-aa63-45ced27541b9',
+  TAP_TIMEOUT: '30',
+  TAP_COLORS: '1',
+  TAP_CHILD_ID: '1',
+  TAP: '1',
+  TAP_BAIL: '0',
+  NYC_PROCESSINFO_EXTERNAL_ID: 'tmp/test/test.js'
+}
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/node-preload/preload-path/node-preload.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/node-preload/internal-preload-module.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/node-preload/preload-list.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/node-preload/preload-list-env.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/node-preload/hook-spawn.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/process-on-spawn/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/fromentries/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/node-preload/generate-require.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/node-preload/process-node-options.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/nyc/lib/register-env.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/nyc/lib/wrap.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/nyc/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/caching-transform/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/hasha/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/is-stream/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/make-dir/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/make-dir/node_modules/semver/semver.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/write-file-atomic/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/imurmurhash/imurmurhash.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/signal-exit/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/signal-exit/signals.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/is-typedarray/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/typedarray-to-buffer/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/package-hash/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/graceful-fs/graceful-fs.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/graceful-fs/polyfills.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/graceful-fs/legacy-streams.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/graceful-fs/clone.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/lodash.flattendeep/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/release-zalgo/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/release-zalgo/lib/Async.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/release-zalgo/lib/Sync.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/release-zalgo/lib/Thenable.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/release-zalgo/lib/constants.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/release-zalgo/lib/unwrapSync.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/es6-error/lib/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/find-cache-dir/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/commondir/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/find-cache-dir/node_modules/pkg-dir/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/find-cache-dir/node_modules/find-up/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/find-cache-dir/node_modules/locate-path/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/find-cache-dir/node_modules/p-locate/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/find-cache-dir/node_modules/p-limit/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/find-cache-dir/node_modules/p-try/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/find-cache-dir/node_modules/path-exists/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/nyc/lib/fs-promises.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/glob/glob.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/fs.realpath/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/fs.realpath/old.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/minimatch/minimatch.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/brace-expansion/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/concat-map/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/balanced-match/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/inherits/inherits.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/path-is-absolute/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/glob/sync.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/glob/common.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/inflight/inflight.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/wrappy/wrappy.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/once/once.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/nyc/lib/hash.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-coverage/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-coverage/lib/file-coverage.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-coverage/lib/percent.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-coverage/lib/data-properties.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-coverage/lib/coverage-summary.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-coverage/lib/coverage-map.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-hook/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-hook/lib/hook.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/append-transform/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/default-require-extensions/js.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/default-require-extensions/node_modules/strip-bom/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-processinfo/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/uuid/v4.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/uuid/lib/rng.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/uuid/lib/bytesToUuid.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/archy/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/cross-spawn/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/cross-spawn/lib/parse.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/cross-spawn/lib/util/resolveCommand.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/which/which.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/isexe/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/isexe/mode.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/path-key/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/cross-spawn/lib/util/escape.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/cross-spawn/lib/util/readShebang.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/shebang-command/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/shebang-regex/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/cross-spawn/lib/enoent.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/rimraf/rimraf.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/p-map/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/aggregate-error/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/indent-string/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/clean-stack/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/nyc/lib/source-maps.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/convert-source-map/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/safe-buffer/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-source-maps/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-source-maps/lib/map-store.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/debug/src/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/debug/src/node.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/supports-color/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/has-flag/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/debug/src/common.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/ms/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-source-maps/node_modules/source-map/source-map.js
+ RUNS  tmp/test/test.js 301ms
+Suites:   0 of 1 completed
+Asserts:  0 of 0
+Time:     410ms
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-source-maps/node_modules/source-map/lib/array-set.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-source-maps/node_modules/source-map/lib/mapping-list.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-source-maps/node_modules/source-map/lib/source-map-consumer.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-source-maps/node_modules/source-map/lib/binary-search.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-source-maps/node_modules/source-map/lib/quick-sort.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-source-maps/node_modules/source-map/lib/source-node.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-source-maps/lib/pathutils.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-source-maps/lib/transformer.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-source-maps/lib/mapped.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-source-maps/lib/get-mapping.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-source-maps/lib/transform-utils.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/test-exclude/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/@istanbuljs/schema/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/@istanbuljs/schema/default-exclude.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/@istanbuljs/schema/default-extension.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/test-exclude/is-outside-dir.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/test-exclude/is-outside-dir-posix.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/get-package-type/index.cjs
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/get-package-type/async.cjs
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/get-package-type/is-node-modules.cjs
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/get-package-type/cache.cjs
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/get-package-type/sync.cjs
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/nyc/lib/instrumenters/istanbul.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/tmp/test/test.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/lib/tap.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/settings.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/source-map-support/source-map-support.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/source-map-support/node_modules/source-map/source-map.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/source-map-support/node_modules/source-map/lib/source-map-generator.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/source-map-support/node_modules/source-map/lib/base64-vlq.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/source-map-support/node_modules/source-map/lib/base64.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/source-map-support/node_modules/source-map/lib/util.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/source-map-support/node_modules/source-map/lib/array-set.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/source-map-support/node_modules/source-map/lib/mapping-list.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/source-map-support/node_modules/source-map/lib/source-map-consumer.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/source-map-support/node_modules/source-map/lib/binary-search.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/source-map-support/node_modules/source-map/lib/quick-sort.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/source-map-support/node_modules/source-map/lib/source-node.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/buffer-from/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/libtap/settings.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/stack-utils/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/stack-utils/node_modules/escape-string-regexp/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/libtap/lib/tap.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/async-hook-domain/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/libtap/lib/test.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tcompare/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tcompare/lib/format.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tcompare/lib/same.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tcompare/node_modules/diff/lib/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tcompare/node_modules/diff/lib/diff/base.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tcompare/node_modules/diff/lib/diff/character.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tcompare/node_modules/diff/lib/diff/word.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tcompare/node_modules/diff/lib/util/params.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tcompare/node_modules/diff/lib/diff/line.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tcompare/node_modules/diff/lib/diff/sentence.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tcompare/node_modules/diff/lib/diff/css.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tcompare/node_modules/diff/lib/diff/json.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tcompare/node_modules/diff/lib/diff/array.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tcompare/node_modules/diff/lib/patch/apply.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tcompare/node_modules/diff/lib/patch/parse.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tcompare/node_modules/diff/lib/util/distance-iterator.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tcompare/node_modules/diff/lib/patch/merge.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tcompare/node_modules/diff/lib/patch/create.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tcompare/node_modules/diff/lib/util/array.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tcompare/node_modules/diff/lib/convert/dmp.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tcompare/node_modules/diff/lib/convert/xml.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tcompare/lib/strict.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tcompare/lib/has.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tcompare/lib/has-strict.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tcompare/lib/match.js
+ RUNS  tmp/test/test.js 506ms
+Suites:   0 of 1 completed
+Asserts:  0 of 0
+Time:     615ms
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/own-or-env/own-or-env.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/bind-obj-methods/bind-obj-methods.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/libtap/lib/base.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/minipass/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/yallist/yallist.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/yallist/iterator.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-parser/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/events-to-array/etoa.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-yaml/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-yaml/lib/parse.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-yaml/lib/types/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/yaml/types.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/yaml/dist/types.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/yaml/dist/PlainValue-ec8e588e.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/yaml/dist/resolveSeq-4a68b39b.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/yaml/dist/Schema-42e9705c.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/yaml/dist/warnings-39684f17.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-yaml/lib/types/error.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/yaml/util.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/yaml/dist/util.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-yaml/lib/types/symbol.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-yaml/lib/types/shared-symbol.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-yaml/lib/types/function.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-yaml/lib/types/regexp.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-yaml/lib/types/date.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-yaml/lib/types/domain.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-yaml/lib/types/null-object.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/yaml/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/yaml/dist/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/yaml/dist/parse-cst.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/yaml/dist/Document-2cf6b08c.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap-yaml/lib/stringify.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/libtap/lib/extra-from-error.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/libtap/lib/stack.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/libtap/lib/spawn.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/libtap/lib/clean-yaml-object.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/libtap/node_modules/diff/lib/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/libtap/node_modules/diff/lib/diff/base.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/libtap/node_modules/diff/lib/diff/character.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/libtap/node_modules/diff/lib/diff/word.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/libtap/node_modules/diff/lib/util/params.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/libtap/node_modules/diff/lib/diff/line.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/libtap/node_modules/diff/lib/diff/sentence.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/libtap/node_modules/diff/lib/diff/css.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/libtap/node_modules/diff/lib/diff/json.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/libtap/node_modules/diff/lib/diff/array.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/libtap/node_modules/diff/lib/patch/apply.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/libtap/node_modules/diff/lib/patch/parse.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/libtap/node_modules/diff/lib/util/distance-iterator.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/libtap/node_modules/diff/lib/patch/merge.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/libtap/node_modules/diff/lib/patch/create.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/libtap/node_modules/diff/lib/util/array.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/libtap/node_modules/diff/lib/convert/dmp.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/libtap/node_modules/diff/lib/convert/xml.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/libtap/lib/stdin.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/libtap/lib/point.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/libtap/lib/diags.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/libtap/lib/obj-to-yaml.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/libtap/lib/parse-test-args.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/libtap/lib/fixture.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/libtap/lib/mock.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/libtap/lib/snapshot.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/libtap/lib/find-main-script.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/libtap/lib/waiter.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/lib/mocha.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/lib/cb-promise.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/lib/synonyms.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/tmp/test/main.js
+emit >> event = {
+  id: 1,
+  event: 'call',
+  thread_id: 60592,
+  defined_class: '/Users/soft/Desktop/workspace/appmap-agent-js/tmp/test/main.js',
+  method_id: '@cov_2nrbpqcouw|function',
+  path: '/Users/soft/Desktop/workspace/appmap-agent-js/tmp/test/main.js',
+  lineno: 1,
+  receiver: {
+    name: 'this',
+    object_id: 1,
+    class: 'Object',
+    value: '[object global]'
+  },
+  parameters: [],
+  static: false
+}
+emit >> event = {
+  id: 2,
+  event: 'return',
+  thread_id: 60592,
+  parent_id: 1,
+  ellapsed: 1,
+  return_value: {
+    name: 'return',
+    object_id: 2,
+    class: 'Object',
+    value: '[object Object]'
+  },
+  exceptions: []
+}
+emit >> event = {
+  id: 3,
+  event: 'call',
+  thread_id: 60592,
+  defined_class: '@cov_2nrbpqcouw|function',
+  method_id: '@cov_2nrbpqcouw|assignment',
+  path: '/Users/soft/Desktop/workspace/appmap-agent-js/tmp/test/main.js',
+  lineno: 2,
+  receiver: {
+    name: 'this',
+    object_id: 1,
+    class: 'Object',
+    value: '[object global]'
+  },
+  parameters: [],
+  static: false
+}
+emit >> event = {
+  id: 4,
+  event: 'return',
+ RUNS  tmp/test/test.js 711ms
+Suites:   0 of 1 completed
+Asserts:  0 of 0
+Time:     820ms
+name: 'return',
+    object_id: 2,
+    class: 'Object',
+    value: '[object Object]'
+  },
+  exceptions: []
+}
+emit >> event = {
+  id: 5,
+  event: 'call',
+  thread_id: 60592,
+  defined_class: '@cov_2nrbpqcouw|function',
+  method_id: '@cov_2nrbpqcouw|assignment',
+  path: '/Users/soft/Desktop/workspace/appmap-agent-js/tmp/test/main.js',
+  lineno: 2,
+  receiver: {
+    name: 'this',
+    object_id: 1,
+    class: 'Object',
+    value: '[object global]'
+  },
+  parameters: [],
+  static: false
+}
+emit >> event = {
+  id: 6,
+  event: 'return',
+  thread_id: 60592,
+  parent_id: 5,
+  ellapsed: 0,
+  return_value: {
+    name: 'return',
+    object_id: 2,
+    class: 'Object',
+    value: '[object Object]'
+  },
+  exceptions: []
+}
+emit >> event = {
+  id: 7,
+  event: 'call',
+  thread_id: 60592,
+  defined_class: '/Users/soft/Desktop/workspace/appmap-agent-js/tmp/test/main.js',
+  method_id: '§none',
+  path: '/Users/soft/Desktop/workspace/appmap-agent-js/tmp/test/main.js',
+  lineno: 2,
+  receiver: {
+    name: 'this',
+    object_id: 1,
+    class: 'Object',
+    value: '[object global]'
+  },
+  parameters: [],
+  static: false
+}
+emit >> event = {
+  id: 8,
+  event: 'call',
+  thread_id: 60592,
+  defined_class: '@cov_2nrbpqcouw|function',
+  method_id: '@cov_2nrbpqcouw|assignment',
+  path: '/Users/soft/Desktop/workspace/appmap-agent-js/tmp/test/main.js',
+  lineno: 2,
+  receiver: {
+    name: 'this',
+    object_id: 1,
+    class: 'Object',
+    value: '[object global]'
+  },
+  parameters: [],
+  static: false
+}
+emit >> event = {
+  id: 9,
+  event: 'return',
+  thread_id: 60592,
+  parent_id: 8,
+  ellapsed: 0,
+  return_value: {
+    name: 'return',
+    object_id: 2,
+    class: 'Object',
+    value: '[object Object]'
+  },
+  exceptions: []
+}
+emit >> event = {
+  id: 10,
+  event: 'return',
+  thread_id: 60592,
+  parent_id: 7,
+  ellapsed: 1,
+  return_value: { name: 'return', object_id: 3, class: 'symbol', value: 'empty' },
+  exceptions: []
+}
+emit >> event = {
+  id: 11,
+  event: 'call',
+  thread_id: 60592,
+  defined_class: '/Users/soft/Desktop/workspace/appmap-agent-js/tmp/test/main.js',
+  method_id: '@#pattern|assignment',
+  path: '/Users/soft/Desktop/workspace/appmap-agent-js/tmp/test/main.js',
+  lineno: 2,
+  receiver: { name: 'this', object_id: 3, class: 'symbol', value: 'empty' },
+  parameters: [],
+  static: false
+}
+emit >> event = {
+  id: 12,
+  event: 'call',
+  thread_id: 60592,
+  defined_class: '@cov_2nrbpqcouw|function',
+  method_id: '@cov_2nrbpqcouw|assignment',
+  path: '/Users/soft/Desktop/workspace/appmap-agent-js/tmp/test/main.js',
+  lineno: 2,
+  receiver: {
+    name: 'this',
+    object_id: 1,
+    class: 'Object',
+    value: '[object global]'
+  },
+  parameters: [],
+  static: false
+}
+emit >> event = {
+  id: 13,
+  event: 'return',
+  thread_id: 60592,
+  parent_id: 12,
+  ellapsed: 0,
+  return_value: {
+    name: 'return',
+    object_id: 2,
+    class: 'Object',
+    value: '[object Object]'
+  },
+  exceptions: []
+}
+emit >> event = {
+  id: 14,
+  event: 'call',
+  thread_id: 60592,
+  defined_class: '@cov_2nrbpqcouw|function',
+  method_id: '@cov_2nrbpqcouw|assignment',
+  path: '/Users/soft/Desktop/workspace/appmap-agent-js/tmp/test/main.js',
+  lineno: 2,
+  receiver: {
+    name: 'this',
+    object_id: 1,
+    class: 'Object',
+    value: '[object global]'
+  },
+  parameters: [],
+  static: false
+}
+emit >> event = {
+  id: 15,
+  event: 'return',
+  thread_id: 60592,
+  parent_id: 14,
+  ellapsed: 0,
+  return_value: {
+    name: 'return',
+    object_id: 2,
+    class: 'Object',
+    value: '[object Object]'
+  },
+  exceptions: []
+}
+emit >> event = {
+  id: 16,
+  event: 'return',
+  thread_id: 60592,
+  parent_id: 11,
+  ellapsed: 0,
+ PASS  tmp/test/test.js 1 OK 28.039ms
+
+                         
+  🌈 SUMMARY RESULTS 🌈  
+                         
+
+Suites:   1 passed, 1 of 1 completed
+Asserts:  1 passed, of 1
+Time:     891.556ms
+terminate >> reason = { type: 'exit', code: 0 }
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-report/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-report/lib/context.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-report/lib/file-writer.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-report/node_modules/supports-color/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-report/node_modules/has-flag/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-report/lib/xml-writer.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-report/lib/tree.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-report/lib/watermarks.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-report/lib/summarizer-factory.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-report/lib/path.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-lib-report/lib/report-base.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-reports/index.js
+instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/istanbul-reports/lib/text/index.js
+----------|---------|----------|---------|---------|-------------------
+File      | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+----------|---------|----------|---------|---------|-------------------
+All files |     100 |      100 |     100 |     100 |                   
+ main.js  |     100 |      100 |     100 |     100 |                   
+----------|---------|----------|---------|---------|-------------------
+terminate >> reason = { type: 'exit', code: 0 }
+terminate >> reason = { type: 'exit', code: 0 }
+Child process exit with code 0
+soft@softs-MacBook-Pro appmap-agent-js % 
