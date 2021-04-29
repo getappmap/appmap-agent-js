@@ -1,3 +1,10 @@
+# [2.11.0](https://github.com/applandinc/appmap-agent-js/compare/v2.10.0...v2.11.0) (2021-04-29)
+
+
+### Features
+
+* support for glob pattern for the 'enabled' configuration option ([707cc97](https://github.com/applandinc/appmap-agent-js/commit/707cc9703b55042712a5e8e0139c88e3f11bf9bb))
+
 # [2.10.0](https://github.com/applandinc/appmap-agent-js/compare/v2.9.0...v2.10.0) (2021-04-29)
 
 
