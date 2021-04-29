@@ -28,7 +28,7 @@ Assert.throws(
 
 FileSystem.writeFileSync(
   'tmp/test/foo.json',
-  JSON.stringify({ enabled: 'foo' }),
+  JSON.stringify({ enabled: 123 }),
   'utf8',
 );
 Assert.throws(
@@ -52,7 +52,7 @@ Assert.ok(configuration.extendWithFile('tmp/test/foo.yml').data.enabled, true);
 
 Assert.throws(
   () => configuration.extendWithData({ extends: 'tmp/test/foo' }, null),
-  /^Error: Missing base directory path/,
+  /^Error: missing base to resolve path/,
 );
 
 Assert.deepEqual(
@@ -144,28 +144,56 @@ Assert.deepEqual(
   ).data.packages,
 );
 
-/////////////
-// Enabled //
-/////////////
+///////////////
+// isEnabled //
+///////////////
 
-Assert.equal(getDefaultConfiguration().isEnabled(), true);
+Assert.throws(
+  () => getDefaultConfiguration().extendWithData({ enabled: '*.js' }, null),
+  /^Error: missing base for glob/,
+);
+
+Assert.equal(getDefaultConfiguration().isEnabled('main.js'), true);
 
 Assert.equal(
   getDefaultConfiguration()
-    .extendWithData({ enabled: false }, null)
-    .isEnabled(),
+    .extendWithData({ enabled: '*.js' }, '.')
+    .isEnabled('main.js'),
+  true,
+);
+
+Assert.equal(
+  getDefaultConfiguration()
+    .extendWithData({ enabled: '*.js' }, '.')
+    .isEnabled('main.json'),
   false,
 );
 
-Assert.equal(getDefaultConfiguration().checkEnabled(), undefined);
-
-Assert.throws(
-  () =>
-    getDefaultConfiguration()
-      .extendWithData({ enabled: false }, null)
-      .checkEnabled(),
-  /^Error: disabled configuration/,
+Assert.equal(
+  getDefaultConfiguration()
+    .extendWithData({ enabled: '*.js' }, '.')
+    .extendWithData({ enabled: false }, null)
+    .isEnabled('main.js'),
+  false,
 );
+
+//
+// Assert.equal(
+//   getDefaultConfiguration()
+//     .extendWithData({ enabled: false }, null)
+//     .isEnabled(),
+//   false,
+// );
+//
+// Assert.equal(getDefaultConfiguration().checkEnabled(), undefined);
+//
+// Assert.throws(
+//   () =>
+//     getDefaultConfiguration()
+//       .extendWithData({ enabled: false }, null)
+//       .checkEnabled(),
+//   /^Error: disabled configuration/,
+// );
 
 /////////////
 // Getters //
