@@ -5,7 +5,7 @@ import { getDefaultConfiguration } from '../../../../lib/server/configuration.mj
 import Appmap from '../../../../lib/server/appmap.mjs';
 
 try {
-  FileSystem.unlinkSync('tmp/appmap/map-name.appmap.json');
+  FileSystem.unlinkSync('tmp/appmap/main.js.appmap.json');
 } catch (error) {
   if (error !== null) {
     Assert.equal(error.code, 'ENOENT');
@@ -15,7 +15,7 @@ try {
 Assert.equal(
   new Appmap(getDefaultConfiguration(), { __proto__: null }).instrument(
     'script',
-    Path.resolve(process.cwd(), 'foo.js'),
+    Path.resolve('./foo.js'),
     '(function f () {} ())',
   ),
   '(function f () {} ())',
@@ -25,16 +25,16 @@ const appmap = new Appmap(
   getDefaultConfiguration().extendWithEnv(
     {
       APPMAP: 'true',
+      APPMAP_MAIN: Path.resolve('./main.js'),
       APPMAP_PACKAGES: 'path1',
       APPMAP_OUTPUT_DIR: 'tmp/appmap',
-      APPMAP_MAP_NAME: 'map-name',
     },
-    process.cwd(),
+    '.',
   ),
   { __proto__: null },
 );
 
-appmap.instrument('script', Path.resolve(process.cwd(), 'path1'), '({});');
+appmap.instrument('script', Path.resolve('./path1'), '({});');
 appmap.record('event1');
 appmap.terminate(true, 'reason1');
 
@@ -43,7 +43,7 @@ Assert.throws(() => appmap.record('event2'));
 Assert.throws(() => appmap.terminate(true, 'reason2'));
 
 const json = JSON.parse(
-  FileSystem.readFileSync('tmp/appmap/map-name.appmap.json', 'utf8'),
+  FileSystem.readFileSync('tmp/appmap/main.js.appmap.json', 'utf8'),
 );
 
 // Failing with travis: I guess that whether .git is included or not depends on the original git clone command
@@ -59,7 +59,7 @@ delete json.metadata.client.version;
 Assert.deepEqual(json, {
   version: '1.4',
   metadata: {
-    name: 'map-name',
+    name: Path.resolve('./main.js'),
     labels: [],
     app: null,
     feature: null,
@@ -81,49 +81,48 @@ Assert.deepEqual(json, {
   classMap: [
     {
       type: 'package',
-      name: Path.resolve(process.cwd(), 'path1'),
+      name: Path.resolve('./path1'),
       childeren: [{ type: 'class', name: '§none', childeren: [] }],
     },
   ],
   events: ['event1'],
 });
 
-new Appmap(getDefaultConfiguration(), { __proto__: null }).terminate(
-  false,
-  'reason',
-);
+new Appmap(getDefaultConfiguration().extendWithData({ main: 'main.js' }, '.'), {
+  __proto__: null,
+}).terminate(false, 'reason');
 
 new Appmap(
   getDefaultConfiguration().extendWithEnv(
     {
       APPMAP_OUTPUT_DIR: 'tmp/missing/',
+      APPMAP_MAIN: 'main.mjs',
     },
-    process.cwd(),
+    '.',
   ),
   { __proto__: null },
 ).terminate(false, 'reason');
 
 try {
-  FileSystem.unlinkSync(
-    Path.join(process.cwd(), 'tmp', 'test', 'foo-1.appmap.json'),
-  );
+  FileSystem.unlinkSync('./tmp/test/foo-1.appmap.json');
 } catch (error) {
   Assert.equal(error.code, 'ENOENT');
 }
 new Appmap(
   getDefaultConfiguration().extendWithData(
     {
-      'output-dir': Path.join(process.cwd(), 'tmp', 'test'),
-      'map-name': 'foo',
+      output: {
+        dir: 'tmp/test',
+        base: '.',
+      },
+      main: './main.js',
     },
-    null,
+    '.',
   ),
   {
     __proto__: null,
-    [Path.join(process.cwd(), 'tmp', 'test', 'foo')]: null,
-    [Path.join(process.cwd(), 'tmp', 'test', 'foo-0')]: null,
+    [Path.resolve('./tmp/test/main.js')]: null,
+    [Path.resolve('./tmp/test/main.js-0')]: null,
   },
 ).terminate(true, 'reason');
-FileSystem.readFileSync(
-  Path.join(process.cwd(), 'tmp', 'test', 'foo-1.appmap.json'),
-);
+FileSystem.readFileSync('./tmp/test/main.js-1.appmap.json');

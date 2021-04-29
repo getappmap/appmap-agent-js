@@ -46,9 +46,9 @@ Assert.ok(configuration.extendWithFile('tmp/test/foo.json').data.enabled, true);
 FileSystem.writeFileSync('tmp/test/foo.yml', 'enabled: true', 'utf8');
 Assert.ok(configuration.extendWithFile('tmp/test/foo.yml').data.enabled, true);
 
-/////////////////////
-// extendsWithJson //
-/////////////////////
+////////////////////
+// extendWithData //
+////////////////////
 
 Assert.throws(
   () => configuration.extendWithData({ extends: 'tmp/test/foo' }, null),
@@ -132,6 +132,19 @@ Assert.equal(
 Assert.deepEqual(
   configuration.extendWithEnv(
     {
+      APPMAP_OUTPUT_DIR: 'bar',
+    },
+    '/foo',
+  ).data.output,
+  {
+    dir: '/foo/bar',
+    base: '/foo'
+  }
+);
+
+Assert.deepEqual(
+  configuration.extendWithEnv(
+    {
       APPMAP_PACKAGES: ' bar , qux ',
     },
     '/foo',
@@ -206,21 +219,23 @@ Assert.equal(
   'ESCAPE_PREFIX',
 );
 
-Assert.equal(
-  configuration.extendWithData({ 'app-name': 'APP_NAME' }, null).getAppName(),
-  'APP_NAME',
-);
+Assert.throws(() => configuration.getPath(), /^Error: missing main option/);
 
 Assert.equal(
-  configuration.extendWithData({ 'map-name': 'MAP_NAME' }, null).getMapName(),
-  'MAP_NAME',
+  configuration
+    .extendWithData(
+      { output: { dir: '/foo', base: '/bar' }, main: '/bar/qux.js' },
+      '/',
+    )
+    .getPath(),
+  '/foo/qux.js',
 );
 
 Assert.equal(
   configuration
-    .extendWithData({ 'output-dir': '/OUTPUT_DIR' }, null)
-    .getOutputDir(),
-  '/OUTPUT_DIR',
+    .extendWithData({ output: 'alongside', main: '/foo/bar.js' }, '/')
+    .getPath(),
+  '/foo/bar.js',
 );
 
 Assert.equal(
@@ -231,6 +246,12 @@ Assert.equal(
 );
 
 {
+  Assert.equal(
+    getDefaultConfiguration()
+      .extendWithData({ main: 'main.js' }, '/foo')
+      .getMetaData().name,
+    '/foo/main.js',
+  );
   const metadata = configuration
     .extendWithData(
       {

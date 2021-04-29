@@ -6,9 +6,7 @@ import main from '../../../../lib/server/main.mjs';
 FileSystem.writeFileSync(
   'tmp/test/rc.json',
   JSON.stringify({
-    'output-dir': '.',
-    'map-name': 'foo',
-    enabled: true,
+    'output': 'alongside',
     packages: ['.'],
   }),
   'utf8',

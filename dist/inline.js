@@ -5,6 +5,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 var Util = require('util');
 var FileSystem = require('fs');
 var Path = require('path');
+var minimatch = require('minimatch');
 var YAML = require('yaml');
 var Ajv = require('ajv');
 var ChildProcess = require('child_process');
@@ -37,6 +38,7 @@ var Util__namespace = /*#__PURE__*/_interopNamespace(Util);
 var FileSystem__namespace = /*#__PURE__*/_interopNamespace(FileSystem);
 var Path__default = /*#__PURE__*/_interopDefaultLegacy(Path);
 var Path__namespace = /*#__PURE__*/_interopNamespace(Path);
+var minimatch__default = /*#__PURE__*/_interopDefaultLegacy(minimatch);
 var YAML__default = /*#__PURE__*/_interopDefaultLegacy(YAML);
 var Ajv__default = /*#__PURE__*/_interopDefaultLegacy(Ajv);
 var ChildProcess__namespace = /*#__PURE__*/_interopNamespace(ChildProcess);
@@ -210,9 +212,7 @@ const resolve = (base, path) => {
     return path;
   }
   if (base === null) {
-    throw new Error(
-      `Missing base directory path to resolve relative path: ${path}`,
-    );
+    throw new Error('missing base to resolve path');
   }
   return Path__namespace.resolve(base, path);
 };
@@ -282,17 +282,47 @@ const mergers = {
     return data;
   },
   exclude: makeConcat('exclude'),
-  enabled: makeOverwrite('enabled', identity),
+  enabled: (enabled, data, base) => {
+    if (typeof enabled === 'boolean') {
+      data.enabled = enabled;
+      return data;
+    }
+    if (base === null) {
+      throw new Error('missing base for glob');
+    }
+    if (typeof enabled === 'string') {
+      enabled = [enabled];
+    }
+    if (typeof data.enabled === 'boolean') {
+      data.enabled = [];
+    }
+    data.enabled = [
+      ...data.enabled,
+      ...enabled.map((glob) => ({ base, glob })),
+    ];
+    return data;
+  },
   name: makeOverwrite('map-name', identity),
+  main: (path, data, base) => {
+    data.main = resolve(base, path);
+    return data;
+  },
+  output: (output, data, base) => {
+    if (output === 'alongside') {
+      data.output = 'alongside';
+    } else {
+      data.output = {
+        dir: resolve(base, output.dir),
+        base: resolve(base, output.base),
+      };
+    }
+    return data;
+  },
   'app-name': makeOverwrite('app-name', identity),
   'map-name': makeOverwrite('map-name', identity),
   'language-version': makeOverwrite('language-version', identity),
   'language-engine': makeOverwrite('language-engine', identity),
   'escape-prefix': makeOverwrite('escape-prefix', identity),
-  'output-dir': (path, data, base) => {
-    data['output-dir'] = resolve(base, path);
-    return data;
-  },
   'git-dir': (path, data, base) => {
     data.git = git(resolve(base, path));
     return data;
@@ -310,7 +340,7 @@ const extendWithData = (data1, data2, base) => {
   data1 = { ...data1 };
   logger.info('Configuration extended with data: %j', data2);
   if (base !== null) {
-    base = resolve(process.cwd(), base);
+    base = Path__namespace.resolve(base);
   }
   Reflect.ownKeys(data2).forEach((key) => {
     data1 = mergers[key](data2[key], data1, base);
@@ -325,10 +355,17 @@ const extendWithData = (data1, data2, base) => {
 const mapping = {
   __proto__: null,
   APPMAP: ['enabled', (string) => string.toLowerCase() === 'true'],
+  APPMAP_MAIN: ['main', identity],
   APPMAP_RC_FILE: ['extends', identity],
   APPMAP_APP_NAME: ['app-name', identity],
   APPMAP_MAP_NAME: ['map-name', identity],
-  APPMAP_OUTPUT_DIR: ['output-dir', identity],
+  APPMAP_OUTPUT_DIR: [
+    'output',
+    (string) => ({
+      dir: string,
+      base: '.',
+    }),
+  ],
   APPMAP_GIT_DIR: ['git-dir', identity],
   APPMAP_LANGUAGE_VERSION: ['language-version', identity],
   APPMAP_PACKAGES: ['packages', (string) => string.split(',').map(trim)],
@@ -404,28 +441,22 @@ class Configuration {
   extendWithEnv(env, base) {
     return new Configuration(extendWithEnv({ ...this.data }, env, base));
   }
-  checkEnabled() {
-    if (!this.data.enabled) {
-      throw new Error('disabled configuration');
+  isEnabled(main) {
+    if (typeof this.data.enabled === 'boolean') {
+      return this.data.enabled;
     }
-  }
-  isEnabled() {
-    return this.data.enabled;
+    main = Path__namespace.resolve(main);
+    return this.data.enabled.some(({ base, glob }) =>
+      minimatch__default['default'](Path__namespace.relative(base, main), glob),
+    );
   }
   getEscapePrefix() {
-    this.checkEnabled();
     return this.data['escape-prefix'];
   }
-  getOutputDir() {
-    this.checkEnabled();
-    return this.data['output-dir'];
-  }
   getLanguageVersion() {
-    this.checkEnabled();
     return this.data['language-version'];
   }
   getFileInstrumentation(path) {
-    this.checkEnabled();
     const specifier = getSpecifier(this.data.packages, path);
     if (specifier === undefined) {
       return null;
@@ -433,29 +464,33 @@ class Configuration {
     return specifier.shallow ? 'shallow' : 'deep';
   }
   isNameExcluded(path, name) {
-    this.checkEnabled();
     if (this.data.exclude.includes(name)) {
       return true;
     }
     const specifier = getSpecifier(this.data.packages, path);
     if (specifier === undefined) {
-      logger.error('Missing package for %', path);
+      logger.error('missing package for %', path);
       return true;
     }
     return specifier.exclude.includes(name);
   }
-  getAppName() {
-    this.checkEnabled();
-    return this.data['app-name'];
-  }
-  getMapName() {
-    this.checkEnabled();
-    return this.data['map-name'];
+  getPath() {
+    if (this.data.main === null) {
+      throw new Error(`missing main option`);
+    }
+    if (this.data.output === 'alongside') {
+      return this.data.main;
+    }
+    // node checks for null bytes so checking for slashes is enough
+    return Path__namespace.join(
+      this.data.output.dir,
+      Path__namespace.relative(this.data.output.base, this.data.main).replace(/\//g, '-'),
+    );
   }
   getMetaData() {
-    this.checkEnabled();
     return {
-      name: this.data['map-name'],
+      name:
+        this.data['map-name'] === null ? this.data.main : this.data['map-name'],
       labels: this.data.labels,
       app: this.data['app-name'],
       feature: this.data.feature,
@@ -491,10 +526,14 @@ const configuration = new Configuration({
   // Logic //
   enabled: true,
   'escape-prefix': 'APPMAP',
-  'output-dir': 'tmp/appmap',
+  output: {
+    dir: 'tmp/appmap',
+    base: '.',
+  },
   packages: [],
   exclude: [],
   // MetaData //
+  main: null,
   'map-name': null,
   labels: [],
   'app-name': null,
@@ -2000,9 +2039,6 @@ var Namespace = (class Namespace {
   }
 });
 
-const sanitize = (name) =>
-  name === null ? 'anonymous' : name.replace(/\0|\//g, '-');
-
 const VERSION = '1.4';
 
 var Appmap = (class Appmap {
@@ -2048,10 +2084,7 @@ var Appmap = (class Appmap {
       throw new Error('Terminated appmap can no longer be terminated');
     }
     this.terminated = true;
-    let path = Path__namespace.join(
-      this.configuration.getOutputDir(),
-      `${sanitize(this.configuration.getMapName())}`,
-    );
+    let path = this.configuration.getPath();
     if (path in this.cache) {
       let counter = 0;
       while (`${path}-${String(counter)}` in this.cache) {
@@ -2101,6 +2134,12 @@ var Dispatcher = (class Dispatcher {
     if (request.name === 'initialize') {
       let { configuration } = this;
       configuration = configuration.extendWithData(
+        {
+          main: Path__namespace.resolve(process.cwd(), request.process.argv[1]),
+        },
+        null,
+      );
+      configuration = configuration.extendWithData(
         request.configuration,
         process.cwd(),
       );
@@ -2108,7 +2147,7 @@ var Dispatcher = (class Dispatcher {
         request.process.env,
         process.cwd(),
       );
-      if (!configuration.isEnabled()) {
+      if (!configuration.isEnabled(request.process.argv[1])) {
         logger.info(
           'initialize (disabled) process = %j configuration = %j',
           request.process,
@@ -2118,12 +2157,6 @@ var Dispatcher = (class Dispatcher {
           session: null,
           prefix: null,
         };
-      }
-      if (configuration.getMapName() === null) {
-        configuration = configuration.extendWithData(
-          { 'map-name': Path__namespace.relative(process.cwd(), request.process.argv[1]) },
-          null,
-        );
       }
       let session;
       do {
