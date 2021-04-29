@@ -1,8 +1,8 @@
 import * as FileSystem from 'fs';
 import { strict as Assert } from 'assert';
-import { getDefaultConfig } from '../../../../lib/server/config.mjs';
+import { getDefaultConfiguration } from '../../../../lib/server/configuration.mjs';
 
-const config = getDefaultConfig();
+const configuration = getDefaultConfiguration();
 
 ////////////////////
 // extendWithFile //
@@ -16,13 +16,13 @@ try {
   }
 }
 Assert.throws(
-  () => config.extendWithFile('tmp/test/foo', process.cwd()),
+  () => configuration.extendWithFile('tmp/test/foo', process.cwd()),
   /^Error: ENOENT/,
 );
 
 FileSystem.writeFileSync('tmp/test/foo', '123', 'utf8');
 Assert.throws(
-  () => config.extendWithFile('tmp/test/foo'),
+  () => configuration.extendWithFile('tmp/test/foo'),
   /^Error: invalid file extension/,
 );
 
@@ -32,7 +32,7 @@ FileSystem.writeFileSync(
   'utf8',
 );
 Assert.throws(
-  () => config.extendWithFile('tmp/test/foo.json'),
+  () => configuration.extendWithFile('tmp/test/foo.json'),
   /^Error: invalid configuration/,
 );
 
@@ -41,33 +41,33 @@ FileSystem.writeFileSync(
   JSON.stringify({ enabled: true }),
   'utf8',
 );
-Assert.ok(config.extendWithFile('tmp/test/foo.json').data.enabled, true);
+Assert.ok(configuration.extendWithFile('tmp/test/foo.json').data.enabled, true);
 
 FileSystem.writeFileSync('tmp/test/foo.yml', 'enabled: true', 'utf8');
-Assert.ok(config.extendWithFile('tmp/test/foo.yml').data.enabled, true);
+Assert.ok(configuration.extendWithFile('tmp/test/foo.yml').data.enabled, true);
 
 /////////////////////
 // extendsWithJson //
 /////////////////////
 
 Assert.throws(
-  () => config.extendWithData({ extends: 'tmp/test/foo' }, null),
+  () => configuration.extendWithData({ extends: 'tmp/test/foo' }, null),
   /^Error: Missing base directory path/,
 );
 
 Assert.deepEqual(
-  config.extendWithData({ 'git-dir': '.' }, process.cwd()).data.git,
-  config.data.git,
+  configuration.extendWithData({ 'git-dir': '.' }, process.cwd()).data.git,
+  configuration.data.git,
 );
 
 Assert.deepEqual(
-  config.extendWithData({ exclude: ['foo', 'bar'] }, process.cwd()).data
+  configuration.extendWithData({ exclude: ['foo', 'bar'] }, process.cwd()).data
     .exclude,
   ['foo', 'bar'],
 );
 
 Assert.deepEqual(
-  config.extendWithData(
+  configuration.extendWithData(
     {
       packages: [
         'dist-or-path',
@@ -119,7 +119,7 @@ Assert.deepEqual(
 ///////////////////
 
 Assert.equal(
-  config.extendWithEnv(
+  configuration.extendWithEnv(
     {
       APPMAP: 'TruE',
       APPMAP_BAR: 'qux',
@@ -130,13 +130,13 @@ Assert.equal(
 );
 
 Assert.deepEqual(
-  config.extendWithEnv(
+  configuration.extendWithEnv(
     {
       APPMAP_PACKAGES: ' bar , qux ',
     },
     '/foo',
   ).data.packages,
-  config.extendWithData(
+  configuration.extendWithData(
     {
       packages: ['bar', 'qux'],
     },
@@ -145,40 +145,65 @@ Assert.deepEqual(
 );
 
 /////////////
+// Enabled //
+/////////////
+
+Assert.equal(getDefaultConfiguration().isEnabled(), true);
+
+Assert.equal(
+  getDefaultConfiguration()
+    .extendWithData({ enabled: false }, null)
+    .isEnabled(),
+  false,
+);
+
+Assert.equal(getDefaultConfiguration().checkEnabled(), undefined);
+
+Assert.throws(
+  () =>
+    getDefaultConfiguration()
+      .extendWithData({ enabled: false }, null)
+      .checkEnabled(),
+  /^Error: disabled configuration/,
+);
+
+/////////////
 // Getters //
 /////////////
 
 Assert.equal(
-  config
+  configuration
     .extendWithData({ 'escape-prefix': 'ESCAPE_PREFIX' }, null)
     .getEscapePrefix(),
   'ESCAPE_PREFIX',
 );
 
 Assert.equal(
-  config.extendWithData({ 'app-name': 'APP_NAME' }, null).getAppName(),
+  configuration.extendWithData({ 'app-name': 'APP_NAME' }, null).getAppName(),
   'APP_NAME',
 );
 
 Assert.equal(
-  config.extendWithData({ 'map-name': 'MAP_NAME' }, null).getMapName(),
+  configuration.extendWithData({ 'map-name': 'MAP_NAME' }, null).getMapName(),
   'MAP_NAME',
 );
 
 Assert.equal(
-  config.extendWithData({ 'output-dir': '/OUTPUT_DIR' }, null).getOutputDir(),
+  configuration
+    .extendWithData({ 'output-dir': '/OUTPUT_DIR' }, null)
+    .getOutputDir(),
   '/OUTPUT_DIR',
 );
 
 Assert.equal(
-  config
+  configuration
     .extendWithData({ 'language-version': '5.1' }, null)
     .getLanguageVersion(),
   '5.1',
 );
 
 {
-  const metadata = config
+  const metadata = configuration
     .extendWithData(
       {
         'map-name': 'MAP_NAME',
@@ -244,35 +269,28 @@ Assert.equal(
 ////////////////////////////
 
 Assert.equal(
-  config
-    .extendWithData({ packages: ['bar'] }, '/foo')
-    .getFileInstrumentation('/foo/bar'),
-  null,
-);
-
-Assert.equal(
-  config
+  configuration
     .extendWithData({ enabled: true }, '/foo')
     .getFileInstrumentation('/foo/bar'),
   null,
 );
 
 Assert.equal(
-  config
+  configuration
     .extendWithData({ enabled: true, packages: ['bar'] }, '/foo')
     .getFileInstrumentation('bar'),
   null,
 );
 
 Assert.equal(
-  config
+  configuration
     .extendWithData({ enabled: true, packages: ['bar'] }, '/foo')
     .getFileInstrumentation('/foo/bar'),
   'deep',
 );
 
 Assert.equal(
-  config
+  configuration
     .extendWithData(
       { enabled: true, packages: [{ path: 'bar', shallow: true }] },
       '/foo',
@@ -285,17 +303,17 @@ Assert.equal(
 // isNameExcluded //
 //////////////////////
 
-Assert.equal(config.isNameExcluded('/foo/bar', 'name'), true);
+Assert.equal(configuration.isNameExcluded('/foo/bar', 'name'), true);
 
 Assert.equal(
-  config
+  configuration
     .extendWithData({ enabled: true }, '/foo')
     .isNameExcluded('/foo/bar', 'name'),
   true,
 );
 
 Assert.equal(
-  config
+  configuration
     .extendWithData(
       { enabled: true, packages: ['bar'], exclude: ['name'] },
       '/foo',
@@ -305,7 +323,7 @@ Assert.equal(
 );
 
 Assert.equal(
-  config
+  configuration
     .extendWithData(
       { enabled: true, packages: [{ path: 'bar', exclude: ['name'] }] },
       '/foo',
@@ -315,7 +333,7 @@ Assert.equal(
 );
 
 Assert.equal(
-  config
+  configuration
     .extendWithData({ enabled: true, packages: ['bar'] }, '/foo')
     .isNameExcluded('/foo/bar', 'name'),
   false,

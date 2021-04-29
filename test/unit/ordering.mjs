@@ -1,7 +1,7 @@
 export const server = [
   'logger',
   'validate',
-  'config',
+  'configuration',
   'git',
   'namespace',
   'file',

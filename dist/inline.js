@@ -41,7 +41,7 @@ var YAML__default = /*#__PURE__*/_interopDefaultLegacy(YAML);
 var Ajv__default = /*#__PURE__*/_interopDefaultLegacy(Ajv);
 var ChildProcess__namespace = /*#__PURE__*/_interopNamespace(ChildProcess);
 
-// I'm not about the debuglog api because modifying process.env.NODE_DEBUG has no effect.
+// I'm not sure about the debuglog api because modifying process.env.NODE_DEBUG has no effect.
 // Why not directly provide the optimize logging function then?
 // https://github.com/nodejs/node/blob/master/lib/internal/util/debuglog.js
 
@@ -55,6 +55,9 @@ const logger = {
   info: Util__namespace.debuglog('appmap-info', (log) => {
     logger.info = log;
   }),
+  debug: Util__namespace.debuglog('appmap-debug', (log) => {
+    logger.debug = log;
+  })
 };
 
 // This file must be placed at lib/home.js because it also bundled into dist/inline.js and __dirname is not modified.
@@ -388,32 +391,41 @@ const getSpecifier = (specifiers, path) => {
   return specifiers.find((specifier) => path.startsWith(specifier.path));
 };
 
-class Config {
+class Configuration {
   constructor(data) {
     this.data = data;
   }
   extendWithData(data, base) {
-    return new Config(extendWithData({ ...this.data }, data, base));
+    return new Configuration(extendWithData({ ...this.data }, data, base));
   }
   extendWithFile(path) {
-    return new Config(extendWithFile({ ...this.data }, path));
+    return new Configuration(extendWithFile({ ...this.data }, path));
   }
   extendWithEnv(env, base) {
-    return new Config(extendWithEnv({ ...this.data }, env, base));
+    return new Configuration(extendWithEnv({ ...this.data }, env, base));
+  }
+  checkEnabled() {
+    if (!this.data.enabled) {
+      throw new Error("disabled configuration");
+    }
+  }
+  isEnabled() {
+    return this.data.enabled;
   }
   getEscapePrefix() {
+    this.checkEnabled();
     return this.data['escape-prefix'];
   }
   getOutputDir() {
+    this.checkEnabled();
     return this.data['output-dir'];
   }
   getLanguageVersion() {
+    this.checkEnabled();
     return this.data['language-version'];
   }
   getFileInstrumentation(path) {
-    if (!this.data.enabled) {
-      return null;
-    }
+    this.checkEnabled();
     const specifier = getSpecifier(this.data.packages, path);
     if (specifier === undefined) {
       return null;
@@ -421,10 +433,7 @@ class Config {
     return specifier.shallow ? 'shallow' : 'deep';
   }
   isNameExcluded(path, name) {
-    if (!this.data.enabled) {
-      logger.error('Call isNameExcluded(%) on disabled appmap', path);
-      return true;
-    }
+    this.checkEnabled();
     if (this.data.exclude.includes(name)) {
       return true;
     }
@@ -436,12 +445,15 @@ class Config {
     return specifier.exclude.includes(name);
   }
   getAppName() {
+    this.checkEnabled();
     return this.data['app-name'];
   }
   getMapName() {
+    this.checkEnabled();
     return this.data['map-name'];
   }
   getMetaData() {
+    this.checkEnabled();
     return {
       name: this.data['map-name'],
       labels: this.data.labels,
@@ -475,9 +487,9 @@ class Config {
 // Default Config //
 ////////////////////
 
-const config = new Config({
+const configuration = new Configuration({
   // Logic //
-  enabled: false,
+  enabled: true,
   'escape-prefix': 'APPMAP',
   'output-dir': 'tmp/appmap',
   packages: [],
@@ -497,7 +509,7 @@ const config = new Config({
   git: git('.'),
 });
 
-const getDefaultConfig = () => config;
+const getDefaultConfiguration = () => configuration;
 
 class File {
   constructor(
@@ -1015,7 +1027,7 @@ setVisitor(
   const makeEnterStatement = (node, context) =>
     buildExpressionStatement(
       buildCallExpression(
-        buildIdentifier(context.namespace.getGlobal('EMIT')),
+        buildIdentifier(context.namespace.getGlobal('RECORD')),
         [
           buildObjectExpression([
             buildRegularProperty(
@@ -1948,7 +1960,7 @@ var globals = [
   "EMPTY_MARKER",
   "UNDEFINED",
   "GET_NOW",
-  "EMIT",
+  "RECORD",
   "PROCESS_ID",
   "EVENT_COUNTER",
   "GET_CLASS_NAME",
@@ -1994,14 +2006,14 @@ const sanitize = (name) =>
 const VERSION = '1.4';
 
 var Appmap = (class Appmap {
-  constructor(config, cache) {
+  constructor(configuration, cache) {
     this.cache = cache;
-    this.config = config;
-    this.namespace = new Namespace(config.getEscapePrefix());
+    this.configuration = configuration;
+    this.namespace = new Namespace(configuration.getEscapePrefix());
     this.terminated = false;
     this.appmap = {
       version: VERSION,
-      metadata: config.getMetaData(),
+      metadata: configuration.getMetaData(),
       classMap: [],
       events: [],
     };
@@ -2010,21 +2022,21 @@ var Appmap = (class Appmap {
     if (this.terminated) {
       throw new Error(`Terminated appmap can no longer instrument code`);
     }
-    const instrumentation = this.config.getFileInstrumentation(path);
+    const instrumentation = this.configuration.getFileInstrumentation(path);
     if (instrumentation === null) {
       return content;
     }
     return instrument(
-      new File(this.config.getLanguageVersion(), source, path, content),
+      new File(this.configuration.getLanguageVersion(), source, path, content),
       this.namespace,
-      (name) => this.config.isNameExcluded(path, name),
+      (name) => this.configuration.isNameExcluded(path, name),
       (entity) => {
         logger.info('Appmap receive code entity: %j', entity);
         this.appmap.classMap.push(entity);
       },
     );
   }
-  emit(event) {
+  record(event) {
     if (this.terminated) {
       throw new Error('Terminated appmap can no longer receive events');
     }
@@ -2037,8 +2049,8 @@ var Appmap = (class Appmap {
     }
     this.terminated = true;
     let path = Path__namespace.join(
-      this.config.getOutputDir(),
-      `${sanitize(this.config.getMapName())}`,
+      this.configuration.getOutputDir(),
+      `${sanitize(this.configuration.getMapName())}`,
     );
     if (path in this.cache) {
       let counter = 0;
@@ -2079,60 +2091,60 @@ var Appmap = (class Appmap {
 });
 
 var Dispatcher = (class Dispatcher {
-  constructor(config) {
+  constructor(configuration) {
     this.cache = { __proto__: null };
-    this.config = config;
+    this.configuration = configuration;
     this.appmaps = { __proto__: null };
   }
   dispatch(request) {
     validateRequest(request);
     if (request.name === 'initialize') {
-      // console.log("initialize", request);
       let session;
       do {
         session = Math.random().toString(36).substring(2);
       } while (session in this.appmaps);
-      let { config } = this;
-      config = config.extendWithData(request.configuration, process.cwd());
-      config = config.extendWithEnv(request.process.env, process.cwd());
-      if (config.getMapName() === null) {
-        config = config.extendWithData(
+      let { configuration } = this;
+      logger.info("initialize %s process = %j configuration = %j", session, request.process, request.configuration);
+      configuration = configuration.extendWithData(request.configuration, process.cwd());
+      configuration = configuration.extendWithEnv(request.process.env, process.cwd());
+      if (configuration.getMapName() === null) {
+        configuration = configuration.extendWithData(
           { 'map-name': Path__namespace.relative(process.cwd(), request.process.argv[1]) },
           null,
         );
       }
-      const appmap = new Appmap(config, this.cache);
+      const appmap = new Appmap(configuration, this.cache);
       this.appmaps[session] = appmap;
       return {
         session,
-        prefix: config.getEscapePrefix(),
+        enabled: configuration.isEnabled(),
+        prefix: configuration.getEscapePrefix(),
       };
     }
     const appmap = this.appmaps[request.session];
     if (request.name === 'terminate') {
-      // console.log("terminate", request);
+      logger.info("terminate %s %j", request.session, request.reason);
       appmap.terminate(request.sync, request.reason);
       delete this.appmaps[request.session];
       return null;
     }
     if (request.name === 'instrument') {
-      // console.log("instrument", request.path);
+      logger.info("instrument %s %s %s", request.session, request.source, request.path);
       return appmap.instrument(request.source, request.path, request.content);
     }
-    if (request.name === 'emit') {
-      appmap.emit(request.event);
+    if (request.name === 'record') {
+      logger.info("record %s %s %i", request.session, request.event.event, request.event.id);
+      appmap.record(request.event);
       return null;
     }
     /* c8 ignore start */
-    throw new Error(
-      'This should never happen: invalid name which passed validation',
-    );
+    throw new Error('invalid request name');
     /* c8 ignore stop */
   }
 });
 
 const makeChannel = () => {
-  const dispatcher = new Dispatcher(getDefaultConfig());
+  const dispatcher = new Dispatcher(getDefaultConfiguration());
   return {
     requestSync: (json1) => {
       logger.info('inline sync request: %j', json1);

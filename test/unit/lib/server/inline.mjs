@@ -17,9 +17,12 @@ Assert.equal(typeof prefix, 'string');
 
 requestAsync(
   {
-    name: 'emit',
+    name: 'record',
     session,
-    event: 'foo',
+    event: {
+      id: 123,
+      event: 'call',
+    },
   },
   null,
 );
@@ -46,8 +49,11 @@ requestAsync(
   const trace = [];
   requestAsync(
     {
-      name: 'emit',
-      event: 'foo',
+      name: 'record',
+      event: {
+        id: 456,
+        event: 'call',
+      },
     },
     {
       reject: (...args) => {
@@ -66,9 +72,12 @@ requestAsync(
   const trace = [];
   requestAsync(
     {
-      name: 'emit',
+      name: 'record',
       session,
-      event: 'foo',
+      event: {
+        id: 789,
+        event: 'call',
+      },
     },
     {
       reject: () => Assert.fail,

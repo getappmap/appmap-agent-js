@@ -29,7 +29,7 @@ test({
       $_LOCAL_EVENT_ID = $_GLOBAL_EVENT_COUNTER += 1,
       $_LOCAL_SUCCESS = $_GLOBAL_EMPTY_MARKER,
       $_LOCAL_FAILURE = $_GLOBAL_EMPTY_MARKER;
-    $_GLOBAL_EMIT({
+    $_GLOBAL_RECORD({
       id: $_LOCAL_EVENT_ID,
       event: 'call',
       thread_id: $_GLOBAL_PROCESS_ID,
@@ -54,7 +54,7 @@ test({
     } catch ($_LOCAL_ERROR) {
       throw $_LOCAL_FAILURE = $_LOCAL_ERROR;
     } finally {
-      $_GLOBAL_EMIT({
+      $_GLOBAL_RECORD({
         id: $_GLOBAL_EVENT_COUNTER += 1,
         event: 'return',
         thread_id: $_GLOBAL_PROCESS_ID,
@@ -78,7 +78,7 @@ test({
       $_LOCAL_EVENT_ID = $_GLOBAL_EVENT_COUNTER += 1,
       $_LOCAL_SUCCESS = $_GLOBAL_EMPTY_MARKER,
       $_LOCAL_FAILURE = $_GLOBAL_EMPTY_MARKER;
-    $_GLOBAL_EMIT({
+    $_GLOBAL_RECORD({
       id: $_LOCAL_EVENT_ID,
       event: 'call',
       thread_id: $_GLOBAL_PROCESS_ID,
@@ -95,7 +95,7 @@ test({
     } catch ($_LOCAL_ERROR) {
       throw $_LOCAL_FAILURE = $_LOCAL_ERROR;
     } finally {
-      $_GLOBAL_EMIT({
+      $_GLOBAL_RECORD({
         id: $_GLOBAL_EVENT_COUNTER += 1,
         event: 'return',
         thread_id: $_GLOBAL_PROCESS_ID,

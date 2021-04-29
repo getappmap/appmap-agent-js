@@ -1,7 +1,7 @@
 import { strict as Assert } from 'assert';
 import * as Path from 'path';
 import * as FileSystem from 'fs';
-import { getDefaultConfig } from '../../../../lib/server/config.mjs';
+import { getDefaultConfiguration } from '../../../../lib/server/configuration.mjs';
 import Appmap from '../../../../lib/server/appmap.mjs';
 
 try {
@@ -13,7 +13,7 @@ try {
 }
 
 Assert.equal(
-  new Appmap(getDefaultConfig(), { __proto__: null }).instrument(
+  new Appmap(getDefaultConfiguration(), { __proto__: null }).instrument(
     'script',
     Path.resolve(process.cwd(), 'foo.js'),
     '(function f () {} ())',
@@ -22,7 +22,7 @@ Assert.equal(
 );
 
 const appmap = new Appmap(
-  getDefaultConfig().extendWithEnv(
+  getDefaultConfiguration().extendWithEnv(
     {
       APPMAP: 'true',
       APPMAP_PACKAGES: 'path1',
@@ -35,11 +35,11 @@ const appmap = new Appmap(
 );
 
 appmap.instrument('script', Path.resolve(process.cwd(), 'path1'), '({});');
-appmap.emit('event1');
+appmap.record('event1');
 appmap.terminate(true, 'reason1');
 
 Assert.throws(() => appmap.instrument('script', 'path2', 'content'));
-Assert.throws(() => appmap.emit('event2'));
+Assert.throws(() => appmap.record('event2'));
 Assert.throws(() => appmap.terminate(true, 'reason2'));
 
 const json = JSON.parse(
@@ -88,10 +88,13 @@ Assert.deepEqual(json, {
   events: ['event1'],
 });
 
-new Appmap(getDefaultConfig(), { __proto__: null }).terminate(false, 'reason');
+new Appmap(getDefaultConfiguration(), { __proto__: null }).terminate(
+  false,
+  'reason',
+);
 
 new Appmap(
-  getDefaultConfig().extendWithEnv(
+  getDefaultConfiguration().extendWithEnv(
     {
       APPMAP_OUTPUT_DIR: 'tmp/missing/',
     },
@@ -108,7 +111,7 @@ try {
   Assert.equal(error.code, 'ENOENT');
 }
 new Appmap(
-  getDefaultConfig().extendWithData(
+  getDefaultConfiguration().extendWithData(
     {
       'output-dir': Path.join(process.cwd(), 'tmp', 'test'),
       'map-name': 'foo',

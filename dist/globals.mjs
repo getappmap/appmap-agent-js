@@ -2,7 +2,7 @@ export default [
   "EMPTY_MARKER",
   "UNDEFINED",
   "GET_NOW",
-  "EMIT",
+  "RECORD",
   "PROCESS_ID",
   "EVENT_COUNTER",
   "GET_CLASS_NAME",

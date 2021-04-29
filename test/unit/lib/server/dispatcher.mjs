@@ -1,13 +1,26 @@
 import { strict as Assert } from 'assert';
-import { getDefaultConfig } from '../../../../lib/server/config.mjs';
+import { getDefaultConfiguration } from '../../../../lib/server/configuration.mjs';
 import Dispatcher from '../../../../lib/server/dispatcher.mjs';
 
-const dispatcher = new Dispatcher(getDefaultConfig());
+Assert.deepEqual(
+  new Dispatcher(
+    getDefaultConfiguration().extendWithData({ enabled: false }, null),
+  ).dispatch({
+    name: 'initialize',
+    process: {
+      env: {},
+      argv: ['node', 'script.js'],
+    },
+    configuration: {},
+  }),
+  { session: null, prefix: null },
+);
+
+const dispatcher = new Dispatcher(getDefaultConfiguration());
 
 const { session, prefix } = dispatcher.dispatch({
   name: 'initialize',
   process: {
-    version: 'foo',
     env: {},
     argv: ['node', 'script.js'],
   },
@@ -42,9 +55,12 @@ Assert.throws(() =>
 );
 
 dispatcher.dispatch({
-  name: 'emit',
+  name: 'record',
   session,
-  event: 'event',
+  event: {
+    event: 'call',
+    id: 0,
+  },
 });
 
 dispatcher.dispatch({
