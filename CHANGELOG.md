@@ -1,3 +1,15 @@
+# [2.10.0](https://github.com/applandinc/appmap-agent-js/compare/v2.9.0...v2.10.0) (2021-04-29)
+
+
+### Bug Fixes
+
+* update build with latest changes ([57b766a](https://github.com/applandinc/appmap-agent-js/commit/57b766a53ff838c7bf5ee1d56ee2f17c7656a92b))
+
+
+### Features
+
+* it is now possible to disabled recording on process-scale ([8b45199](https://github.com/applandinc/appmap-agent-js/commit/8b45199b37cf34e6625c2a8623501dcd105b21e1))
+
 # [2.9.0](https://github.com/applandinc/appmap-agent-js/compare/v2.8.1...v2.9.0) (2021-04-28)
 
 
