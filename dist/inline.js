@@ -57,7 +57,7 @@ const logger = {
   }),
   debug: Util__namespace.debuglog('appmap-debug', (log) => {
     logger.debug = log;
-  })
+  }),
 };
 
 // This file must be placed at lib/home.js because it also bundled into dist/inline.js and __dirname is not modified.
@@ -406,7 +406,7 @@ class Configuration {
   }
   checkEnabled() {
     if (!this.data.enabled) {
-      throw new Error("disabled configuration");
+      throw new Error('disabled configuration');
     }
   }
   isEnabled() {
@@ -1106,7 +1106,7 @@ setVisitor(
   const makeLeaveStatement = (node, context) =>
     buildExpressionStatement(
       buildCallExpression(
-        buildIdentifier(context.namespace.getGlobal('EMIT')),
+        buildIdentifier(context.namespace.getGlobal('RECORD')),
         [
           buildObjectExpression([
             buildRegularProperty(
@@ -2099,41 +2099,72 @@ var Dispatcher = (class Dispatcher {
   dispatch(request) {
     validateRequest(request);
     if (request.name === 'initialize') {
-      let session;
-      do {
-        session = Math.random().toString(36).substring(2);
-      } while (session in this.appmaps);
       let { configuration } = this;
-      logger.info("initialize %s process = %j configuration = %j", session, request.process, request.configuration);
-      configuration = configuration.extendWithData(request.configuration, process.cwd());
-      configuration = configuration.extendWithEnv(request.process.env, process.cwd());
+      configuration = configuration.extendWithData(
+        request.configuration,
+        process.cwd(),
+      );
+      configuration = configuration.extendWithEnv(
+        request.process.env,
+        process.cwd(),
+      );
+      if (!configuration.isEnabled()) {
+        logger.info(
+          'initialize (disabled) process = %j configuration = %j',
+          request.process,
+          request.configuration,
+        );
+        return {
+          session: null,
+          prefix: null,
+        };
+      }
       if (configuration.getMapName() === null) {
         configuration = configuration.extendWithData(
           { 'map-name': Path__namespace.relative(process.cwd(), request.process.argv[1]) },
           null,
         );
       }
+      let session;
+      do {
+        session = Math.random().toString(36).substring(2);
+      } while (session in this.appmaps);
+      logger.info(
+        'initialize %s process = %j configuration = %j',
+        session,
+        request.process,
+        configuration.data,
+      );
       const appmap = new Appmap(configuration, this.cache);
       this.appmaps[session] = appmap;
       return {
         session,
-        enabled: configuration.isEnabled(),
         prefix: configuration.getEscapePrefix(),
       };
     }
     const appmap = this.appmaps[request.session];
     if (request.name === 'terminate') {
-      logger.info("terminate %s %j", request.session, request.reason);
+      logger.info('terminate %s %j', request.session, request.reason);
       appmap.terminate(request.sync, request.reason);
       delete this.appmaps[request.session];
       return null;
     }
     if (request.name === 'instrument') {
-      logger.info("instrument %s %s %s", request.session, request.source, request.path);
+      logger.info(
+        'instrument %s %s %s',
+        request.session,
+        request.source,
+        request.path,
+      );
       return appmap.instrument(request.source, request.path, request.content);
     }
     if (request.name === 'record') {
-      logger.info("record %s %s %i", request.session, request.event.event, request.event.id);
+      logger.info(
+        'record %s %s %i',
+        request.session,
+        request.event.event,
+        request.event.id,
+      );
       appmap.record(request.event);
       return null;
     }
