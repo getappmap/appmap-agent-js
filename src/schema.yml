@@ -16,7 +16,6 @@
         - type: string
     hook-cjs: {type: boolean}
     hook-esm: {type: boolean}
-    hook-child-process: {type: boolean}
     rc-file: {type: string}
 
 - $id: configuration

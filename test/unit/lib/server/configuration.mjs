@@ -138,8 +138,8 @@ Assert.deepEqual(
   ).data.output,
   {
     dir: '/foo/bar',
-    base: '/foo'
-  }
+    base: '/foo',
+  },
 );
 
 Assert.deepEqual(

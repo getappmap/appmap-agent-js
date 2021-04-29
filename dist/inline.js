@@ -338,7 +338,7 @@ const mergers = {
 
 const extendWithData = (data1, data2, base) => {
   data1 = { ...data1 };
-  logger.info('Configuration extended with data: %j', data2);
+  logger.debug('Configuration extended with data: %j', data2);
   if (base !== null) {
     base = Path__namespace.resolve(base);
   }
@@ -372,7 +372,7 @@ const mapping = {
 };
 
 const extendWithEnv = (data1, env, base) => {
-  logger.info('Configuration extended with environment: %j', env);
+  logger.debug('Configuration extended with environment: %j', env);
   env = { __proto__: null, ...env };
   const data2 = { __proto__: null };
   Reflect.ownKeys(env).forEach((key1) => {
@@ -400,7 +400,7 @@ const parseDefault = () => {
 };
 
 const extendWithFile = (data1, path) => {
-  logger.info('Configuration extended with file: %s', path);
+  logger.debug('Configuration extended with file: %s', path);
   const content = FileSystem__namespace.readFileSync(path, 'utf8');
   let parse;
   if (path.endsWith('.json')) {
@@ -2067,7 +2067,7 @@ var Appmap = (class Appmap {
       this.namespace,
       (name) => this.configuration.isNameExcluded(path, name),
       (entity) => {
-        logger.info('Appmap receive code entity: %j', entity);
+        logger.debug('Appmap receive code entity: %j', entity);
         this.appmap.classMap.push(entity);
       },
     );
@@ -2076,7 +2076,7 @@ var Appmap = (class Appmap {
     if (this.terminated) {
       throw new Error('Terminated appmap can no longer receive events');
     }
-    logger.info('Appmap receive event: %j', event);
+    logger.debug('Appmap receive event: %j', event);
     this.appmap.events.push(event);
   }
   terminate(sync, json) {
@@ -2094,7 +2094,7 @@ var Appmap = (class Appmap {
     }
     this.cache[path] = null;
     path = `${path}.appmap.json`;
-    logger.info(
+    logger.debug(
       'Appmap terminate sync = %j path = %s reason = %j',
       sync,
       path,
@@ -2115,7 +2115,7 @@ var Appmap = (class Appmap {
               error.message,
             );
           } else {
-            logger.info('Appmap written to %', path);
+            logger.debug('Appmap written to %', path);
           }
         },
       );
@@ -2211,13 +2211,13 @@ const makeChannel = () => {
   const dispatcher = new Dispatcher(getDefaultConfiguration());
   return {
     requestSync: (json1) => {
-      logger.info('inline sync request: %j', json1);
+      logger.debug('inline sync request: %j', json1);
       const json2 = dispatcher.dispatch(json1);
-      logger.info('inline sync response: %j', json2);
+      logger.debug('inline sync response: %j', json2);
       return json2;
     },
     requestAsync: (json1, pending) => {
-      logger.info('inline async request: %j', json1);
+      logger.debug('inline async request: %j', json1);
       let json2;
       try {
         json2 = dispatcher.dispatch(json1);
@@ -2229,7 +2229,7 @@ const makeChannel = () => {
         return null;
       }
       if (pending !== null) {
-        logger.info('inline async success response: %j', json2);
+        logger.debug('inline async success response: %j', json2);
         pending.resolve(json2);
         return null;
       }
@@ -2240,7 +2240,7 @@ const makeChannel = () => {
         );
         return null;
       }
-      logger.info('inline async success response (not transmitted): null');
+      logger.debug('inline async success response (not transmitted): null');
       return null;
     },
   };
