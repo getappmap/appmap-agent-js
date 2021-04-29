@@ -1,3 +1,10 @@
+# [2.12.0](https://github.com/applandinc/appmap-agent-js/compare/v2.11.0...v2.12.0) (2021-04-29)
+
+
+### Features
+
+* provide more options to output appmaps ([9046f0e](https://github.com/applandinc/appmap-agent-js/commit/9046f0ee7623351ead2d95140300606712faf5b3))
+
 # [2.11.0](https://github.com/applandinc/appmap-agent-js/compare/v2.10.0...v2.11.0) (2021-04-29)
 
 
