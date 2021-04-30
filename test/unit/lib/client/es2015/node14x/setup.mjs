@@ -139,8 +139,8 @@ import setup from '../../../../../../lib/client/es2015/node14x/setup.js';
 // Disabled //
 //////////////
 
-{
-  const { instrumentScript, instrumentModule } = setup({
+Assert.deepEqual(
+  setup({
     env: {
       APPMAP_PROTOCOL: {
         requestSync: (json) => {
@@ -152,16 +152,10 @@ import setup from '../../../../../../lib/client/es2015/node14x/setup.js';
         },
       },
     },
-  });
-
-  Assert.equal(instrumentScript('script.js', '123;'), '123;');
-
-  instrumentModule('module.mjs', '123;', {
-    resolve: (content) => {
-      Assert.equal(content, '123;');
-    },
-    reject: (error) => {
-      Assert.fail();
-    },
-  });
-}
+  }),
+  {
+    enabled: false,
+    instrumentScript: null,
+    instrumentModule: null,
+  },
+);
