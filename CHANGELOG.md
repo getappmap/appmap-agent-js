@@ -1,3 +1,10 @@
+## [2.12.1](https://github.com/applandinc/appmap-agent-js/compare/v2.12.0...v2.12.1) (2021-04-30)
+
+
+### Performance Improvements
+
+* disabled processes will no longer hook require/import ([1037385](https://github.com/applandinc/appmap-agent-js/commit/103738592c7d69e6ccfc79911952a55d4e6f6399))
+
 # [2.12.0](https://github.com/applandinc/appmap-agent-js/compare/v2.11.0...v2.12.0) (2021-04-29)
 
 
