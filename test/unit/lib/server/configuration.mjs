@@ -2,8 +2,6 @@ import * as FileSystem from 'fs';
 import { strict as Assert } from 'assert';
 import { getDefaultConfiguration } from '../../../../lib/server/configuration.mjs';
 
-const configuration = getDefaultConfiguration();
-
 ////////////////////
 // extendWithFile //
 ////////////////////
@@ -16,13 +14,13 @@ try {
   }
 }
 Assert.throws(
-  () => configuration.extendWithFile('tmp/test/foo', process.cwd()),
+  () => getDefaultConfiguration().extendWithFile('tmp/test/foo', process.cwd()),
   /^Error: ENOENT/,
 );
 
 FileSystem.writeFileSync('tmp/test/foo', '123', 'utf8');
 Assert.throws(
-  () => configuration.extendWithFile('tmp/test/foo'),
+  () => getDefaultConfiguration().extendWithFile('tmp/test/foo'),
   /^Error: invalid file extension/,
 );
 
@@ -32,129 +30,169 @@ FileSystem.writeFileSync(
   'utf8',
 );
 Assert.throws(
-  () => configuration.extendWithFile('tmp/test/foo.json'),
+  () => getDefaultConfiguration().extendWithFile('tmp/test/foo.json'),
   /^Error: invalid configuration/,
 );
 
 FileSystem.writeFileSync(
   'tmp/test/foo.json',
-  JSON.stringify({ enabled: true }),
+  JSON.stringify({ enabled: false }),
   'utf8',
 );
-Assert.ok(configuration.extendWithFile('tmp/test/foo.json').data.enabled, true);
+Assert.ok(getDefaultConfiguration().extendWithFile('tmp/test/foo.json').data.enabled, true);
 
 FileSystem.writeFileSync('tmp/test/foo.yml', 'enabled: true', 'utf8');
-Assert.ok(configuration.extendWithFile('tmp/test/foo.yml').data.enabled, true);
+Assert.ok(getDefaultConfiguration().extendWithFile('tmp/test/foo.yml').data.enabled, true);
 
 ////////////////////
 // extendWithData //
 ////////////////////
 
 Assert.throws(
-  () => configuration.extendWithData({ extends: 'tmp/test/foo' }, null),
+  () => getDefaultConfiguration().extendWithData({ extends: 'tmp/test/foo' }, null),
   /^Error: missing base to resolve path/,
 );
 
 Assert.deepEqual(
-  configuration.extendWithData({ 'git-dir': '.' }, process.cwd()).data.git,
-  configuration.data.git,
+  getDefaultConfiguration().extendWithData({ 'base-directory': '.' }, process.cwd()).data.git,
+  getDefaultConfiguration().data.git,
 );
 
 Assert.deepEqual(
-  configuration.extendWithData({ exclude: ['foo', 'bar'] }, process.cwd()).data
+  getDefaultConfiguration().extendWithData({ exclude: ['foo', 'bar'] }, process.cwd()).data
     .exclude,
   ['foo', 'bar'],
 );
 
 Assert.deepEqual(
-  configuration.extendWithData(
-    {
-      packages: [
-        'dist-or-path',
-        {
-          dist: 'dist',
-        },
-        {
-          path: 'shallow-path',
-          shallow: true,
-        },
-        {
-          path: 'deep-path',
-        },
-      ],
-    },
-    '/foo',
-  ).data.packages,
-  [
-    {
-      shallow: false,
-      path: '/foo/node_modules/dist-or-path',
-      dist: 'dist-or-path',
-      exclude: [],
-    },
-    {
-      shallow: false,
-      path: '/foo/node_modules/dist',
-      dist: 'dist',
-      exclude: [],
-    },
-    {
-      shallow: false,
-      path: '/foo/dist-or-path',
-      dist: 'dist-or-path',
-      exclude: [],
-    },
-    {
-      shallow: true,
-      path: '/foo/shallow-path',
-      dist: null,
-      exclude: [],
-    },
-    { shallow: false, path: '/foo/deep-path', dist: null, exclude: [] },
-  ],
-);
-
-///////////////////
-// extendWithEnv //
-///////////////////
-
-Assert.equal(
-  configuration.extendWithEnv(
-    {
-      APPMAP: 'TruE',
-      APPMAP_BAR: 'qux',
-    },
-    '/foo',
-  ).data.enabled,
-  true,
+  getDefaultConfiguration().extendWithData({
+    packages: ["raw"]
+  }, '/base').data.packages,
+  [{
+    glob: 'raw',
+    base: '/base',
+    shallow: false,
+    enabled: true,
+    exclude: []
+  }]
 );
 
 Assert.deepEqual(
-  configuration.extendWithEnv(
-    {
-      APPMAP_OUTPUT_DIR: 'bar',
-    },
-    '/foo',
-  ).data.output,
-  {
-    dir: '/foo/bar',
-    base: '/foo',
+  getDefaultConfiguration().extendWithData({
+    packages: [{
+      glob: "glob"
+    }]
+  }, '/base').data.packages,
+  [{
+    glob: 'glob',
+    base: '/base',
+    shallow: false,
+    enabled: true,
+    exclude: []
+  }]
+);
+
+Assert.deepEqual(
+  getDefaultConfiguration().extendWithData({
+    packages: [{
+      path: "path.js"
+    }]
+  }, '/base').data.packages,
+  [{
+    glob: 'path.js',
+    base: '/base',
+    shallow: false,
+    enabled: true,
+    exclude: []
+  }]
+);
+
+Assert.deepEqual(
+  getDefaultConfiguration().extendWithData({
+    packages: [{
+      path: "path"
+    }]
+  }, '/base').data.packages,
+  [{
+    glob: 'path/**/*',
+    base: '/base',
+    shallow: false,
+    enabled: true,
+    exclude: []
+  }]
+);
+
+Assert.deepEqual(
+  getDefaultConfiguration().extendWithData({
+    packages: [{
+      path: "path/"
+    }]
+  }, '/base').data.packages,
+  [{
+    glob: 'path/**/*',
+    base: '/base',
+    shallow: false,
+    enabled: true,
+    exclude: []
+  }]
+);
+
+Assert.deepEqual(
+  getDefaultConfiguration().extendWithData({
+    packages: [{
+      dist: "dist"
+    }]
+  }, '/base').data.packages,
+  [{
+    glob: 'node_module/dist/**/*',
+    base: '/base',
+    shallow: false,
+    enabled: true,
+    exclude: []
+  }]
+);
+
+Assert.deepEqual(
+  getDefaultConfiguration().extendWithData({
+    packages: [{
+      dist: {
+        name: "dist",
+        deep: true
+      }
+    }]
+  }, '/base').data.packages,
+  [{
+    glob: '**/node_module/dist/**/*',
+    base: '/base',
+    shallow: false,
+    enabled: true,
+    exclude: []
+  }]
+);
+
+Assert.deepEqual(
+  getDefaultConfiguration().extendWithData({
+    packages: [{
+      dist: {
+        name: "dist",
+        external: true
+      }
+    }]
+  }, '/base').data.packages,
+  [{
+    glob: 'node_module/dist/**/*',
+    base: '/base',
+    shallow: false,
+    enabled: true,
+    exclude: []
   },
-);
-
-Assert.deepEqual(
-  configuration.extendWithEnv(
-    {
-      APPMAP_PACKAGES: ' bar , qux ',
-    },
-    '/foo',
-  ).data.packages,
-  configuration.extendWithData(
-    {
-      packages: ['bar', 'qux'],
-    },
-    '/foo',
-  ).data.packages,
+  {
+    glob: '../node_module/dist/**/*',
+    base: '/base',
+    shallow: false,
+    enabled: true,
+    exclude: []
+  }]
 );
 
 ///////////////
@@ -162,50 +200,28 @@ Assert.deepEqual(
 ///////////////
 
 Assert.throws(
-  () => getDefaultConfiguration().extendWithData({ enabled: '*.js' }, null),
-  /^Error: missing base for glob/,
-);
-
-Assert.equal(getDefaultConfiguration().isEnabled('main.js'), true);
-
-Assert.equal(
-  getDefaultConfiguration()
-    .extendWithData({ enabled: '*.js' }, '.')
-    .isEnabled('main.js'),
-  true,
+  () => getDefaultConfiguration().isEnabled(),
+  /^Error: missing main path for enabled query/
 );
 
 Assert.equal(
-  getDefaultConfiguration()
-    .extendWithData({ enabled: '*.js' }, '.')
-    .isEnabled('main.json'),
-  false,
+  getDefaultConfiguration().extendWithData({'main-path':'main.js'}, '/base').isEnabled(),
+  true
 );
 
-Assert.equal(
-  getDefaultConfiguration()
-    .extendWithData({ enabled: '*.js' }, '.')
-    .extendWithData({ enabled: false }, null)
-    .isEnabled('main.js'),
-  false,
-);
-
+// Assert.equal(
+//   getDefaultConfiguration()
+//     .extendWithData({ enabled: '*.js' }, '.')
+//     .isEnabled('main.js'),
+//   true,
+// );
 //
 // Assert.equal(
 //   getDefaultConfiguration()
+//     .extendWithData({ enabled: '*.js' }, '.')
 //     .extendWithData({ enabled: false }, null)
-//     .isEnabled(),
+//     .isEnabled('main.js'),
 //   false,
-// );
-//
-// Assert.equal(getDefaultConfiguration().checkEnabled(), undefined);
-//
-// Assert.throws(
-//   () =>
-//     getDefaultConfiguration()
-//       .extendWithData({ enabled: false }, null)
-//       .checkEnabled(),
-//   /^Error: disabled configuration/,
 // );
 
 /////////////
@@ -213,13 +229,18 @@ Assert.equal(
 /////////////
 
 Assert.equal(
-  configuration
+  getDefaultConfiguration()
     .extendWithData({ 'escape-prefix': 'ESCAPE_PREFIX' }, null)
     .getEscapePrefix(),
   'ESCAPE_PREFIX',
 );
 
-Assert.throws(() => configuration.getPath(), /^Error: missing main option/);
+Assert.equal(
+  getDefaultConfiguration()
+    .extendWithData({ 'output-file-name': 'foo' }, null)
+    .getPath(),
+  'tmp/appmap/foo',
+);
 
 Assert.equal(
   configuration
@@ -229,13 +250,6 @@ Assert.equal(
     )
     .getPath(),
   '/foo/qux.js',
-);
-
-Assert.equal(
-  configuration
-    .extendWithData({ output: 'alongside', main: '/foo/bar.js' }, '/')
-    .getPath(),
-  '/foo/bar.js',
 );
 
 Assert.equal(

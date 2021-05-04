@@ -1,8 +1,8 @@
 import { strict as Assert } from 'assert';
 import {
   validateRequest,
-  validateConfiguration,
-  validateOptions,
+  validateConfigurationData,
+  validateCLIOptions,
 } from '../../../../lib/server/validate.mjs';
 
 Assert.throws(
@@ -10,6 +10,6 @@ Assert.throws(
   /^Error: invalid request/,
 );
 
-Assert.equal(validateConfiguration({ 'app-name': 'foo' }), undefined);
+Assert.equal(validateConfigurationData({ 'app-name': 'foo' }), undefined);
 
-Assert.equal(validateOptions({ port: 0 }), undefined);
+Assert.equal(validateCLIOptions({ port: 0 }), undefined);

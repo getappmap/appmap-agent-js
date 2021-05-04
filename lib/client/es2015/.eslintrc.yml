@@ -1,5 +1,8 @@
 # https://node.green
 env:
   es6: true
+globals:
+  require: readonly
+  exports: readonly
 parserOptions:
   ecmaVersion: 2015
