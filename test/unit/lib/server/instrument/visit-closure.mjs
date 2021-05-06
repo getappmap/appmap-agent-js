@@ -8,14 +8,14 @@ const prefix = '$';
 test({
   prefix,
   input: `function f () { return x; }`,
-  output: `function f () { return $_LOCAL_SUCCESS = x; }`,
+  output: `function f () { return $_SUCCESS = x; }`,
   keys: [['body', 0], 'body', ['body', 0]],
 });
 
 test({
   prefix,
   input: `function f () { return; }`,
-  output: `function f () { return $_LOCAL_SUCCESS = $_GLOBAL_UNDEFINED; }`,
+  output: `function f () { return $_SUCCESS = $.undefined; }`,
   keys: [['body', 0], 'body', ['body', 0]],
 });
 
@@ -23,45 +23,45 @@ test({
   prefix,
   path: 'filename.js',
   input: `const f = (x, y, ...z) => t;`,
-  output: `const f = ($_LOCAL_ARGUMENT_0, $_LOCAL_ARGUMENT_1, ...$_LOCAL_ARGUMENT_2) => {
+  output: `const f = ($_ARGUMENT_0, $_ARGUMENT_1, ...$_ARGUMENT_2) => {
     var
-      $_LOCAL_TIMER = $_GLOBAL_GET_NOW(),
-      $_LOCAL_EVENT_ID = $_GLOBAL_EVENT_COUNTER += 1,
-      $_LOCAL_SUCCESS = $_GLOBAL_EMPTY_MARKER,
-      $_LOCAL_FAILURE = $_GLOBAL_EMPTY_MARKER;
-    $_GLOBAL_RECORD({
-      id: $_LOCAL_EVENT_ID,
+      $_TIMER = $.getNow(),
+      $_EVENT_ID = $.counter += 1,
+      $_SUCCESS = $.empty,
+      $_FAILURE = $.empty;
+    $.record({
+      id: $_EVENT_ID,
       event: 'call',
-      thread_id: $_GLOBAL_PROCESS_ID,
+      thread_id: $.pid,
       defined_class: 'filename.js',
       method_id: '@f|const',
       path: 'filename.js',
       lineno: 1,
-      receiver: $_GLOBAL_SERIALIZE_PARAMETER($_GLOBAL_EMPTY_MARKER, 'this'),
+      receiver: $.serializeParameter($.empty, 'this'),
       parameters: [
-        $_GLOBAL_SERIALIZE_PARAMETER($_LOCAL_ARGUMENT_0, 'x'),
-        $_GLOBAL_SERIALIZE_PARAMETER($_LOCAL_ARGUMENT_1, 'y'),
-        $_GLOBAL_SERIALIZE_PARAMETER($_LOCAL_ARGUMENT_2, '...z')
+        $.serializeParameter($_ARGUMENT_0, 'x'),
+        $.serializeParameter($_ARGUMENT_1, 'y'),
+        $.serializeParameter($_ARGUMENT_2, '...z')
       ],
       static: false
     });
     try {
       var
-        x = $_LOCAL_ARGUMENT_0,
-        y = $_LOCAL_ARGUMENT_1,
-        z = $_LOCAL_ARGUMENT_2;
-      return $_LOCAL_SUCCESS = t;
-    } catch ($_LOCAL_ERROR) {
-      throw $_LOCAL_FAILURE = $_LOCAL_ERROR;
+        x = $_ARGUMENT_0,
+        y = $_ARGUMENT_1,
+        z = $_ARGUMENT_2;
+      return $_SUCCESS = t;
+    } catch ($_ERROR) {
+      throw $_FAILURE = $_ERROR;
     } finally {
-      $_GLOBAL_RECORD({
-        id: $_GLOBAL_EVENT_COUNTER += 1,
+      $.record({
+        id: $.counter += 1,
         event: 'return',
-        thread_id: $_GLOBAL_PROCESS_ID,
-        parent_id: $_LOCAL_EVENT_ID,
-        ellapsed: $_GLOBAL_GET_NOW() - $_LOCAL_TIMER,
-        return_value: $_GLOBAL_SERIALIZE_PARAMETER($_LOCAL_SUCCESS, 'return'),
-        exceptions: $_GLOBAL_SERIALIZE_EXCEPTION($_LOCAL_FAILURE)
+        thread_id: $.pid,
+        parent_id: $_EVENT_ID,
+        ellapsed: $.getNow() - $_TIMER,
+        return_value: $.serializeParameter($_SUCCESS, 'return'),
+        exceptions: $.serializeException($_FAILURE)
       });
     }
   };`,
@@ -74,35 +74,35 @@ test({
   input: `async function * f () { 123; }`,
   output: `async function * f () {
     var
-      $_LOCAL_TIMER = $_GLOBAL_GET_NOW(),
-      $_LOCAL_EVENT_ID = $_GLOBAL_EVENT_COUNTER += 1,
-      $_LOCAL_SUCCESS = $_GLOBAL_EMPTY_MARKER,
-      $_LOCAL_FAILURE = $_GLOBAL_EMPTY_MARKER;
-    $_GLOBAL_RECORD({
-      id: $_LOCAL_EVENT_ID,
+      $_TIMER = $.getNow(),
+      $_EVENT_ID = $.counter += 1,
+      $_SUCCESS = $.empty,
+      $_FAILURE = $.empty;
+    $.record({
+      id: $_EVENT_ID,
       event: 'call',
-      thread_id: $_GLOBAL_PROCESS_ID,
+      thread_id: $.pid,
       defined_class: 'filename.js',
       method_id: '@f|function',
       path: 'filename.js',
       lineno: 1,
-      receiver: $_GLOBAL_SERIALIZE_PARAMETER(this, 'this'),
+      receiver: $.serializeParameter(this, 'this'),
       parameters: [],
       static: false
     });
     try {
       123;
-    } catch ($_LOCAL_ERROR) {
-      throw $_LOCAL_FAILURE = $_LOCAL_ERROR;
+    } catch ($_ERROR) {
+      throw $_FAILURE = $_ERROR;
     } finally {
-      $_GLOBAL_RECORD({
-        id: $_GLOBAL_EVENT_COUNTER += 1,
+      $.record({
+        id: $.counter += 1,
         event: 'return',
-        thread_id: $_GLOBAL_PROCESS_ID,
-        parent_id: $_LOCAL_EVENT_ID,
-        ellapsed: $_GLOBAL_GET_NOW() - $_LOCAL_TIMER,
-        return_value: $_GLOBAL_SERIALIZE_PARAMETER($_LOCAL_SUCCESS, 'return'),
-        exceptions: $_GLOBAL_SERIALIZE_EXCEPTION($_LOCAL_FAILURE)
+        thread_id: $.pid,
+        parent_id: $_EVENT_ID,
+        ellapsed: $.getNow() - $_TIMER,
+        return_value: $.serializeParameter($_SUCCESS, 'return'),
+        exceptions: $.serializeException($_FAILURE)
       });
     }
   };`,

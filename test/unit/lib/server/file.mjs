@@ -16,35 +16,28 @@ FileSystem.writeFileSync(
   Assert.equal(file.getLanguageVersion(), 5);
   Assert.equal(file.getSourceType(), 'script');
   Assert.equal(file.getContent(), `var x = 123;`);
-  Assert.doesNotThrow(() => {
-    file.parse();
-  });
+  Assert.equal(
+    file.parse().fromRight().type,
+    "Program"
+  );
 }
 
-{
-  const file = new File(2015, 'script', 'tmp/test/script-es2015.js');
-  Assert.doesNotThrow(() => {
-    file.parse();
-  });
-}
+Assert.equal(
+  new File(2015, 'script', 'tmp/test/script-es2015.js').parse().fromRight().type,
+  "Program"
+);
 
-{
-  const file = new File(2015, 'module', 'tmp/test/module-es2015.js');
-  Assert.doesNotThrow(() => {
-    file.parse();
-  });
-}
+Assert.equal(
+  new File(2015, 'module', 'tmp/test/module-es2015.js').parse().fromRight().type,
+  "Program"
+);
 
-{
-  const file = new File(5, 'script', 'tmp/test/script-es2015.js');
-  Assert.throws(() => {
-    file.parse();
-  }, SyntaxError);
-}
+Assert.match(
+  new File(5, 'script', 'tmp/test/script-es2015.js').parse().fromLeft(),
+  /^failed to parse/
+);
 
-{
-  const file = new File(2015, 'script', 'tmp/test/module-es2015.js');
-  Assert.throws(() => {
-    file.parse();
-  }, SyntaxError);
-}
+Assert.match(
+  new File(2015, 'script', 'tmp/test/module-es2015.js').parse().fromLeft(),
+  /^failed to parse/
+);

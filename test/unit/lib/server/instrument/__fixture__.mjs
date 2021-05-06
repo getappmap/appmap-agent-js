@@ -4,11 +4,27 @@ import { generate as escodegen } from 'escodegen';
 
 import { RootLocation } from '../../../../../lib/server/instrument/location.mjs';
 import File from '../../../../../lib/server/file.mjs';
-import Namespace from '../../../../../lib/server/namespace.mjs';
 import {
+  setVisitor,
   visit,
   getResultNode,
 } from '../../../../../lib/server/instrument/visit.mjs';
+
+[
+  "Identifier",
+  "FunctionExpression",
+  "Literal",
+  "BlockStatement",
+  "Property",
+  "ExpressionStatement",
+  "AwaitExpression",
+].forEach((type) => {
+  setVisitor(
+    type,
+    (node, context) => [],
+    (node, context, child) => node
+  );
+});
 
 export const test = (options) => {
   const { path, ecma, source, input, output, prefix, keys } = {
@@ -21,14 +37,12 @@ export const test = (options) => {
     keys: null,
     ...options,
   };
-  const isNameExcluded = (name) => false;
-  let location = new RootLocation();
-  const namespace = new Namespace(prefix);
   const file = new File(ecma, source, path, input);
-  let node1 = file.parse();
+  let location = new RootLocation(file);
+  let node1 = file.parse().fromRight();
   let node2 = node1;
   if (output !== null) {
-    node2 = new File(ecma, source, path, output).parse();
+    node2 = new File(ecma, source, path, output).parse().fromRight();
   }
   const step = (key) => {
     node1 = node1[key];
@@ -43,10 +57,11 @@ export const test = (options) => {
     }
   });
   const result = visit(node1, {
-    namespace,
     location,
-    file,
-    isNameExcluded,
+    options: {
+      prefix,
+      exclude: new Set()
+    }
   });
   Assert.equal(escodegen(getResultNode(result)), escodegen(node2));
 };

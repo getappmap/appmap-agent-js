@@ -1,20 +1,16 @@
 import { strict as Assert } from 'assert';
 import File from '../../../../../lib/server/file.mjs';
-import Namespace from '../../../../../lib/server/namespace.mjs';
 import instrument from '../../../../../lib/server/instrument/index.mjs';
 
-const file = new File(2020, 'script', 'filename.js', `123;`);
-const isNameExcluded = () => false;
-const namespace = new Namespace('PREFIX');
-const entities = [];
-const content = instrument(file, namespace, isNameExcluded, (entity) => {
-  entities.push(entity);
-});
-Assert.equal(content, `123;`);
-Assert.deepEqual(entities, [
+Assert.deepEqual(
+  instrument(new File(2020, 'script', 'filename.js', `123;`), {prefix:"$", exclude:new Set()}).fromRight(),
   {
-    type: 'package',
-    name: 'filename.js',
-    childeren: [],
-  },
-]);
+    content: `123;`,
+    entities: []
+  }
+);
+
+Assert.match(
+  instrument(new File(2020, 'script', 'filename.js', `$;`), {prefix:"$", exclude:new Set()}).fromLeft(),
+  /^identifier collision/
+);

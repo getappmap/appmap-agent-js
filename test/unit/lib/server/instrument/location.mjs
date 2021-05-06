@@ -29,18 +29,8 @@ const file = new File(
   export default class {}`,
 );
 
-const location0 = new RootLocation();
-Assert.throws(() => location0.makeEntity([], file));
-Assert.throws(() => location0.isNonScopingIdentifier());
-Assert.throws(() => location0.isChildNonScopingIdentifier(null));
-Assert.throws(() => location0.isStaticMethod());
-Assert.throws(() => location0.isChildStaticMethod(null));
-Assert.throws(() => location0.getStartLine());
-Assert.throws(() => location0.getName(file));
-Assert.throws(() => location0.getChildName(null));
-Assert.throws(() => location0.getKind());
-Assert.throws(() => location0.getContainerName(file));
-Assert.throws(() => location0.getParentContainerName(file));
+const location0 = new RootLocation(file);
+Assert.equal(location0.getFile(), file);
 
 ///////////////////////
 // ScopingIdentifier //
@@ -73,13 +63,9 @@ Assert.throws(() => location0.getParentContainerName(file));
 // Program //
 /////////////
 
-const node1 = file.parse();
+const node1 = file.parse().fromRight();
 const location1 = location0.extend(node1);
-Assert.deepEqual(location1.makeEntity(['child'], file), {
-  type: 'package',
-  name: file.getPath(),
-  childeren: ['child'],
-});
+Assert.deepEqual(location1.makeEntity(['child']), null);
 
 /////////////
 // Invalid //
@@ -90,14 +76,16 @@ Assert.deepEqual(location1.makeEntity(['child'], file), {
   Assert.throws(() => location2.isNonScopingIdentifier());
   const node3 = node2.expression;
   const location3 = location2.extend(node3);
-  Assert.equal(location3.makeEntity([], file), null);
+  Assert.equal(location3.makeEntity([]), null);
   Assert.equal(location3.isStaticMethod(), false);
   Assert.equal(location3.isNonScopingIdentifier(), false);
   Assert.equal(location3.getStartLine(), 2);
-  Assert.ok(location3.getName(file), '§none');
+  Assert.equal(location3.getFile(), file);
+  Assert.equal(location3.getStartColumn(), 2);
+  Assert.ok(location3.getName(), '§none');
   Assert.ok(location3.getChildName(null), '§none');
   Assert.throws(() => location3.getKind());
-  Assert.equal(location3.getParentContainerName(file), path);
+  Assert.equal(location3.getParentContainerName(), path);
 }
 
 /////////////////////////
@@ -106,7 +94,7 @@ Assert.deepEqual(location1.makeEntity(['child'], file), {
 {
   const node2 = node1.body[1];
   const location2 = location1.extend(node2);
-  Assert.deepEqual(location2.makeEntity(['child'], file), {
+  Assert.deepEqual(location2.makeEntity(['child']), {
     type: 'class',
     name: `@f|function`,
     childeren: [
@@ -133,7 +121,7 @@ Assert.deepEqual(location1.makeEntity(['child'], file), {
   {
     const node3 = node2.body;
     const location3 = location2.extend(node3);
-    Assert.deepEqual(location3.makeEntity(['child'], file), {
+    Assert.deepEqual(location3.makeEntity(['child']), {
       type: 'class',
       name: `@c|class`,
       childeren: ['child'],
@@ -145,7 +133,7 @@ Assert.deepEqual(location1.makeEntity(['child'], file), {
       {
         const node5 = node4.value;
         const location5 = location4.extend(node5);
-        Assert.deepEqual(location5.makeEntity(['child'], file), {
+        Assert.deepEqual(location5.makeEntity(['child']), {
           type: 'class',
           name: `prototype.constructor|constructor`,
           childeren: [
@@ -170,7 +158,7 @@ Assert.deepEqual(location1.makeEntity(['child'], file), {
       {
         const node5 = node4.value;
         const location5 = location4.extend(node5);
-        Assert.deepEqual(location5.makeEntity(['child'], file), {
+        Assert.deepEqual(location5.makeEntity(['child']), {
           type: 'class',
           name: `prototype.m1|method`,
           childeren: [
@@ -195,7 +183,7 @@ Assert.deepEqual(location1.makeEntity(['child'], file), {
       {
         const node5 = node4.value;
         const location5 = location4.extend(node5);
-        Assert.deepEqual(location5.makeEntity(['child'], file), {
+        Assert.deepEqual(location5.makeEntity(['child']), {
           type: 'class',
           name: `constructor.m2|get`,
           childeren: [
@@ -225,7 +213,7 @@ Assert.deepEqual(location1.makeEntity(['child'], file), {
   {
     const node3 = node2.expression;
     const location3 = location2.extend(node3);
-    Assert.deepEqual(location3.makeEntity(['child'], file), {
+    Assert.deepEqual(location3.makeEntity(['child']), {
       type: 'class',
       name: `§none`,
       childeren: ['child'],
@@ -237,7 +225,7 @@ Assert.deepEqual(location1.makeEntity(['child'], file), {
       {
         const node5 = node4.value;
         const location5 = location4.extend(node5);
-        Assert.deepEqual(location5.makeEntity(['child'], file), {
+        Assert.deepEqual(location5.makeEntity(['child']), {
           type: 'class',
           name: `singleton.k1|init`,
           childeren: ['child'],
@@ -251,7 +239,7 @@ Assert.deepEqual(location1.makeEntity(['child'], file), {
       {
         const node5 = node4.value;
         const location5 = location4.extend(node5);
-        Assert.deepEqual(location5.makeEntity(['child'], file), {
+        Assert.deepEqual(location5.makeEntity(['child']), {
           type: 'class',
           name: `singleton["k2"]|init`,
           childeren: ['child'],
@@ -265,7 +253,7 @@ Assert.deepEqual(location1.makeEntity(['child'], file), {
       {
         const node5 = node4.value;
         const location5 = location4.extend(node5);
-        Assert.deepEqual(location5.makeEntity(['child'], file), {
+        Assert.deepEqual(location5.makeEntity(['child']), {
           type: 'class',
           name: `singleton["k3"]|init`,
           childeren: ['child'],
@@ -279,7 +267,7 @@ Assert.deepEqual(location1.makeEntity(['child'], file), {
       {
         const node5 = node4.value;
         const location5 = location4.extend(node5);
-        Assert.deepEqual(location5.makeEntity(['child'], file), {
+        Assert.deepEqual(location5.makeEntity(['child']), {
           type: 'class',
           name: `singleton[#dynamic]|init`,
           childeren: ['child'],
@@ -293,7 +281,7 @@ Assert.deepEqual(location1.makeEntity(['child'], file), {
       {
         const node5 = node4.value;
         const location5 = location4.extend(node5);
-        Assert.deepEqual(location5.makeEntity(['child'], file), {
+        Assert.deepEqual(location5.makeEntity(['child']), {
           type: 'class',
           name: `singleton.k5|method`,
           childeren: [
@@ -318,7 +306,7 @@ Assert.deepEqual(location1.makeEntity(['child'], file), {
       {
         const node5 = node4.value;
         const location5 = location4.extend(node5);
-        Assert.deepEqual(location5.makeEntity(['child'], file), {
+        Assert.deepEqual(location5.makeEntity(['child']), {
           type: 'class',
           name: `singleton.k6|get`,
           childeren: [
@@ -352,7 +340,7 @@ Assert.deepEqual(location1.makeEntity(['child'], file), {
     {
       const node4 = node3.init;
       const location4 = location3.extend(node4);
-      Assert.deepEqual(location4.makeEntity(['child'], file), {
+      Assert.deepEqual(location4.makeEntity(['child']), {
         type: 'class',
         name: '@o1|var',
         childeren: ['child'],
@@ -366,7 +354,7 @@ Assert.deepEqual(location1.makeEntity(['child'], file), {
     {
       const node4 = node3.init;
       const location4 = location3.extend(node4);
-      Assert.deepEqual(location4.makeEntity(['child'], file), {
+      Assert.deepEqual(location4.makeEntity(['child']), {
         type: 'class',
         name: '@#pattern|var',
         childeren: ['child'],
@@ -387,7 +375,7 @@ Assert.deepEqual(location1.makeEntity(['child'], file), {
     {
       const node4 = node3.right;
       const location4 = location3.extend(node4);
-      Assert.deepEqual(location4.makeEntity(['child'], file), {
+      Assert.deepEqual(location4.makeEntity(['child']), {
         type: 'class',
         name: '@o4|assignment',
         childeren: ['child'],

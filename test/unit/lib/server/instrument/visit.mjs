@@ -13,8 +13,6 @@ Assert.deepEqual(getEmptyResult(), {
   entities: [],
 });
 
-const namespace = 'namespace';
-
 const file = 'file';
 
 const input = {
@@ -31,20 +29,19 @@ const output = {
   [false, 'entity0'],
   [true, null],
 ].forEach(([excluded, entity], index) => {
-  const isNameExcluded = (...args) => {
-    Assert.deepEqual(args, ['???']);
-    return excluded;
+  const options = {
+    exclude: new Set(excluded ? ["???"] : [])
   };
   const extended = {
     __proto__: null,
     getName(...args) {
       Assert.equal(this, extended);
-      Assert.deepEqual(args, [file]);
+      Assert.deepEqual(args, []);
       return '???';
     },
     makeEntity(...args) {
       Assert.equal(this, extended);
-      Assert.deepEqual(args, [['entity1', 'entity2', 'entite3'], file]);
+      Assert.deepEqual(args, [['entity1', 'entity2', 'entite3']]);
       return entity;
     },
   };
@@ -59,10 +56,10 @@ const output = {
   setVisitor(
     'Identifier',
     (...args) => {
-      Assert.equal(excluded, false);
+      Assert.ok(!excluded);
       Assert.deepEqual(args, [
         input,
-        { location: extended, namespace, file, isNameExcluded },
+        { location: extended, options },
       ]);
       return [
         {
@@ -78,10 +75,10 @@ const output = {
       ];
     },
     (...args) => {
-      Assert.equal(excluded, false);
+      Assert.ok(!excluded);
       Assert.deepEqual(args, [
         input,
-        { location: extended, namespace, file, isNameExcluded },
+        { location: extended, options },
         'child1',
         ['child2'],
       ]);
@@ -90,7 +87,7 @@ const output = {
   );
 
   Assert.deepEqual(
-    visit(input, { location, namespace, file, isNameExcluded }),
+    visit(input, { location, options }),
     excluded
       ? {
           node: input,
@@ -103,22 +100,3 @@ const output = {
         },
   );
 });
-
-{
-  const isNameExcluded = () => false;
-  const location = {
-    __proto__: null,
-    extend: () => location,
-    getName: () => '???',
-    makeEntity: () => null,
-  };
-  Assert.deepEqual(
-    visit({ type: 'Foo' }, { location, namespace, file, isNameExcluded }),
-    {
-      node: {
-        type: 'Foo',
-      },
-      entities: [],
-    },
-  );
-}
