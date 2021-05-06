@@ -1,4 +1,4 @@
-import logger from '../../../../lib/server/logger.mjs';
+import {logger} from '../../../../lib/server/logger.mjs';
 
 logger.error('error');
 logger.warning('warning');

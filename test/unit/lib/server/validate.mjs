@@ -5,11 +5,10 @@ import {
   validateCLIOptions,
 } from '../../../../lib/server/validate.mjs';
 
-Assert.throws(
-  () => validateRequest({ name: 'foo' }),
-  /^Error: invalid request/,
+Assert.ok(
+  validateRequest({ name: 'foo' }).fromLeft().startsWith("invalid request"),
 );
 
-Assert.equal(validateConfigurationData({ 'app-name': 'foo' }), undefined);
+Assert.deepEqual(validateConfigurationData({ 'app-name': 'foo' }).fromRight(), {'app-name':'foo'});
 
-Assert.equal(validateCLIOptions({ port: 0 }), undefined);
+Assert.deepEqual(validateCLIOptions({ port: 0 }).fromRight(), {port:0});

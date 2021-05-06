@@ -1,7 +1,7 @@
 import * as FileSystem from 'fs';
 import * as ChildProcess from 'child_process';
 import { strict as Assert } from 'assert';
-import git from '../../../../lib/server/git.mjs';
+import { getGitInformation } from '../../../../../lib/server/configuration/git.mjs';
 
 const AssertStrict = Assert.strict;
 
@@ -13,7 +13,7 @@ if (!FileSystem.existsSync(path)) {
 }
 
 {
-  const infos = git(path);
+  const infos = getGitInformation(path);
   AssertStrict.ok(infos.repository, url);
   AssertStrict.equal(infos.branch, 'main');
   AssertStrict.equal(typeof infos.commit, 'string');
@@ -24,4 +24,14 @@ if (!FileSystem.existsSync(path)) {
   AssertStrict.equal(typeof infos.commits_since_tag, 'number');
 }
 
-Assert.equal(git('/'), null);
+Assert.equal(getGitInformation('/'), null);
+
+try {
+  FileSystem.unlinkSync("tmp/test/foo.txt");
+} catch (error) {
+  Assert.equal(error.code, "ENOENT");
+}
+Assert.equal(getGitInformation('tmp/test/foo.txt'), null);
+
+FileSystem.writeFileSync("tmp/test/foo.txt", "bar", "utf8");
+Assert.equal(getGitInformation('tmp/test/foo.txt'), null);

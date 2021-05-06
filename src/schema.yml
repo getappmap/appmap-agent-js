@@ -52,6 +52,67 @@
         deep: {type: boolean}
         external: {type: boolean}
 
+- $id: name-version
+  anyOf:
+    - type: string
+      pattern: "^[^@]+@[^@]+$"
+    - type: object
+      additionalProperties: false
+      required: [name, version]
+      properties:
+        name: {type: string}
+        version: {type: string}
+
+- $id: enabling-specifier
+  anyOf:
+    - {type: string}
+    - type: object
+      additionalProperties: false
+      required: [glob]
+      properties:
+        glob: {type: string}
+        enabled: {type: boolean}
+    - type: object
+      additionalProperties: false
+      required: [path]
+      properties:
+        path: {type: string}
+        enabled: {type: boolean}
+    - type: object
+      additionalProperties: false
+      required: [dist]
+      properties:
+        dist: {$ref: dist}
+        enabled: {type: boolean}
+
+- $id: package-specifier
+  anyOf:
+    - {type: string}
+    - type: object
+      additionalProperties: false
+      required: [glob]
+      properties:
+        glob: {type: string}
+        enabled: {type: boolean}
+        shallow: {type: boolean}
+        exclude: {$ref: exclude}
+    - type: object
+      additionalProperties: false
+      required: [path]
+      properties:
+        path: {type: string}
+        enabled: {type: boolean}
+        shallow: {type: boolean}
+        exclude: {$ref: exclude}
+    - type: object
+      additionalProperties: false
+      required: [dist]
+      properties:
+        dist: {$ref: dist}
+        enabled: {type: boolean}
+        shallow: {type: boolean}
+        exclude: {$ref: exclude}
+
 - $id: configuration-data
   type: object
   additionalProperties: false
@@ -61,90 +122,74 @@
       anyOf:
         - {type: boolean}
         - {type: string}
+        - {$ref: enabling-specifier}
         - type: array
-          items:
-            anyOf:
-              - {type: string}
-              - type: object
-                additionalProperties: false
-                required: [glob]
-                properties:
-                  glob: {type: string}
-                  enabled: {type: boolean}
-              - type: object
-                additionalProperties: false
-                required: [path]
-                properties:
-                  path: {type: string}
-                  enabled: {type: boolean}
-              - type: object
-                additionalProperties: false
-                required: [dist]
-                properties:
-                  dist: {$ref: dist}
-                  enabled: {type: boolean}
+          items: {$ref: enabling-specifier}
     class-map-pruning: {type: boolean} # the code entities of a file are only included if the file fired a recorded event
     event-pruning: {type: boolean} # events are only recorded if they originated from an included file
     escape-prefix:
       type: string
       pattern: "^[a-zA-Z_$][a-zA-Z_$-9]*$"
-    output-directory: {type: string}
-    output-file-name: {type: string}
-    main-path: {type: string}
+    output:
+      anyOf:
+        - {type: string}
+        - type: object
+          additionalProperties: false
+          properties:
+            directory: {type: string}
+            filename:
+              type: string
+              pattern: "^[^\/]+$"
+    base:
+      anyOf:
+        - {type: string}
+        - type: object
+          additionalProperties: false
+          required: [path]
+          properties:
+            path: {type: string}
+    main:
+      anyOf:
+        - {type: string}
+        - type: object
+          additionalProperties: false
+          required: [path]
+          properties:
+            path: {type: string}
     app-name: {type: string}
     name: {type: string}
     map-name: {type: string}
-    base-directory: {type: string}
     feature: {type: string}
     feature-group: {type: string}
     labels:
       type: array
       items: {type: string}
-    recorder-name: {type: string}
-    recording-defined-class: {type: string}
-    recording-method-id: {type: string}
+    recorder:
+      anyOf:
+        - {type: string}
+        - type: object
+          additionalProperties: false
+          required: [name]
+          properties:
+            name: {type: string}
+    recording:
+      anyOf:
+        - type: string
+          pattern: "^[^.]+.[^.]+$"
+        - type: object
+          additionalProperties: false
+          required: [defined-class, method-id]
+          properties:
+            defined-class: {type: string}
+            method-id: {type: string}
     frameworks:
       type: array
-      items:
-        anyOf:
-          - {type: string}
-          - type: object
-            additionalProperties: false
-            required: [name, version]
-            properties:
-              name: {type: string}
-              version: {type: string}
-    language-engine: {type: string}
-    language-version: {$ref: language-version}
+      items: {$ref: name-version}
+    engine: {$ref: name-version}
+    language: {$ref: name-version}
     packages:
       type: array
-      items:
-        anyOf:
-          - {type: string}
-          - type: object
-            additionalProperties: false
-            required: [glob]
-            properties:
-              glob: {type: string}
-              enabled: {type: boolean}
-              shallow: {type: boolean}
-              exclude: {$ref: exclude}
-          - type: object
-            additionalProperties: false
-            required: [path]
-            properties:
-              path: {type: string}
-              enabled: {type: boolean}
-              shallow: {type: boolean}
-              exclude: {$ref: exclude}
-          - type: object
-            additionalProperties: false
-            required: [dist]
-            properties:
-              dist: {$ref: dist}
-              enabled: {type: boolean}
-              shallow: {type: boolean}
-              exclude: {$ref: exclude}
+      items: {$ref: package-specifier}
     exclude: {$ref: exclude}
 
 - $id: configuration
@@ -174,8 +219,9 @@
               properties:
                 env:
                   type: object
+                  additionalProperties: false
                   patternProperties:
-                    ".": {type: string}
+                    "^[^=]+$": {type: string}
                 version: {type: string}
                 arch: {type: string}
                 platform: {type: string}
@@ -195,11 +241,10 @@
         configuration: {$ref: configuration}
     - type: object
       additionalProperties: false
-      required: [action, session, synchronous, reason]
+      required: [action, session, reason]
       properties:
         action: {const: terminate}
         session: {type: string}
-        synchronous: {type: boolean}
         reason:
           type: object
           additionalProperties: true
@@ -238,14 +283,6 @@
         action: {const: start}
         session: {type: string}
         configuration: {$ref: configuration}
-        # Configuration options that should be avoided here:
-        # - extends
-        # - enabled
-        # - escape-prefix
-        # - main-path
-        # - base-directory
-        # - packages
-        # - exclude
     - type: object
       additionalProperties: false
       required: [action, session, recording]

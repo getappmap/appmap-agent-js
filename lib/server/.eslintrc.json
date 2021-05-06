@@ -8,6 +8,7 @@
     "sourceType": "module"
   },
   "rules": {
+    "no-lonely-if": ["off"],
     "import/extensions": ["error", "always"]
   },
   "settings": {
