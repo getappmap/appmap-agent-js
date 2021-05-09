@@ -4,20 +4,20 @@ import '../../../../../lib/server/instrument/visit-identifier.mjs';
 
 test({
   input: `$: 123;`,
-  prefix: "$",
+  session: "$",
   keys: [['body', 0], 'label'],
 });
 
 test({
   input: `x;`,
-  prefix: "$",
+  session: "$",
   keys: [['body', 0], 'expression'],
 });
 
 Assert.throws(
   () => test({
     input: `$;`,
-    prefix: "$",
+    session: "$",
     keys: [['body', 0], 'expression'],
   }),
   (error) => error.getMessage().startsWith("identifier collision")

@@ -38,13 +38,8 @@ Assert.match(
 // extendWithData //
 ////////////////////
 
-Assert.match(
-  getInitialConfiguration().extendWithData('foo', null).fromLeft(),
-  /^invalid configuration/,
-);
-
 Assert.equal(
-  getInitialConfiguration().extendWithData({'app-name':'foo'}, null).fromRight().data['app-name'],
+  getInitialConfiguration().extendWithData({'app-name':'foo'}, '/base').fromRight().data['app-name'],
   "foo"
 );
 

@@ -24,14 +24,21 @@ if (!FileSystem.existsSync(path)) {
   AssertStrict.equal(typeof infos.commits_since_tag, 'number');
 }
 
-Assert.equal(getGitInformation('/'), null);
+Assert.ok(getGitInformation('.') !== null);
 
-try {
-  FileSystem.unlinkSync("tmp/test/foo.txt");
-} catch (error) {
-  Assert.equal(error.code, "ENOENT");
-}
-Assert.equal(getGitInformation('tmp/test/foo.txt'), null);
+FileSystem.rmSync("tmp/test/git", {force:true, recursive:true});
+Assert.equal(getGitInformation('tmp/test/git'), null);
 
-FileSystem.writeFileSync("tmp/test/foo.txt", "bar", "utf8");
-Assert.equal(getGitInformation('tmp/test/foo.txt'), null);
+FileSystem.mkdirSync("tmp/test/git");
+Assert.equal(getGitInformation('tmp/test/git'), null);
+
+//
+// try {
+//   FileSystem.unlinkSync("tmp/test/foo.txt");
+// } catch (error) {
+//   Assert.equal(error.code, "ENOENT");
+// }
+// Assert.equal(getGitInformation('tmp/test/foo.txt'), null);
+//
+// FileSystem.writeFileSync("tmp/test/foo.txt", "bar", "utf8");
+// Assert.equal(getGitInformation('tmp/test/foo.txt'), null);

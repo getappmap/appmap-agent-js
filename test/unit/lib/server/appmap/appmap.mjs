@@ -1,8 +1,8 @@
 import { strict as Assert } from 'assert';
 import * as Path from 'path';
 import * as FileSystem from 'fs';
-import { getDefaultConfiguration } from '../../../../lib/server/configuration.mjs';
-import Appmap from '../../../../lib/server/appmap.mjs';
+import { getInitialConfiguration } from '../../../../lib/server/configuration/index.mjs';
+import {Appmap} from '../../../../lib/server/appmap.mjs';
 
 try {
   FileSystem.unlinkSync('tmp/appmap/main.js.appmap.json');
@@ -15,7 +15,7 @@ try {
 const cache = {__proto__:null};
 
 // Assert.equal(
-//   new Appmap(getDefaultConfiguration(), { __proto__: null }).instrument(
+//   new Appmap(getInitialConfiguration(), { __proto__: null }).instrument(
 //     'script',
 //     Path.resolve('./foo.js'),
 //     '(function f () {} ())',
@@ -24,7 +24,7 @@ const cache = {__proto__:null};
 // );
 
 const appmap = new Appmap(
-  getDefaultConfiguration().extendWithData(
+  getInitialConfiguration().extendWithData(
     {
       enabled: true,
       'map-name': 'map-nam1',
@@ -33,7 +33,7 @@ const appmap = new Appmap(
         {dist: 'dist1'}
       ]
     },
-    null,
+    "/base",
   ),
   { __proto__: null },
 );
@@ -92,12 +92,12 @@ Assert.deepEqual(json, {
   events: ['event1'],
 });
 
-new Appmap(getDefaultConfiguration().extendWithData({ main: 'main.js' }, '.'), {
+new Appmap(getInitialConfiguration().extendWithData({ main: 'main.js' }, '.'), {
   __proto__: null,
 }).terminate(false, 'reason');
 
 new Appmap(
-  getDefaultConfiguration().extendWithEnv(
+  getInitialConfiguration().extendWithEnv(
     {
       APPMAP_OUTPUT_DIR: 'tmp/missing/',
       APPMAP_MAIN: 'main.mjs',
@@ -113,7 +113,7 @@ try {
   Assert.equal(error.code, 'ENOENT');
 }
 new Appmap(
-  getDefaultConfiguration().extendWithData(
+  getInitialConfiguration().extendWithData(
     {
       output: {
         dir: 'tmp/test',

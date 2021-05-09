@@ -1,5 +1,9 @@
 root: true
-extends: [airbnb-base, prettier]
+extends:
+  - eslint:recommended
+  - plugin:import/errors
+  - plugin:import/warnings
+  - prettier
 rules:
   lines-between-class-members: off
   camelcase:

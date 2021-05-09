@@ -1,9 +1,8 @@
 import { strict as Assert } from 'assert';
-// import { parse as acorn } from 'acorn';
 import { generate as escodegen } from 'escodegen';
 
 import { RootLocation } from '../../../../../lib/server/instrument/location.mjs';
-import File from '../../../../../lib/server/file.mjs';
+import {File} from '../../../../../lib/server/appmap/file.mjs';
 import {
   setVisitor,
   visit,
@@ -27,13 +26,14 @@ import {
 });
 
 export const test = (options) => {
-  const { path, ecma, source, input, output, prefix, keys } = {
+  const { path, ecma, source, input, output, session, origin, keys } = {
     path: 'filname.js',
     ecma: 2020,
     source: 'script',
     input: null,
     output: null,
-    prefix: '$',
+    session: '$',
+    origin: "origin",
     keys: null,
     ...options,
   };
@@ -59,7 +59,8 @@ export const test = (options) => {
   const result = visit(node1, {
     location,
     options: {
-      prefix,
+      session,
+      origin,
       exclude: new Set()
     }
   });

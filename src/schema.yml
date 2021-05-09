@@ -195,13 +195,10 @@
 - $id: configuration
   type: object
   additionalProperties: false
-  required: [data, path]
+  required: [path, data]
   properties:
+    path: {type: string}
     data: {$ref: configuration-data}
-    path:
-      anyOf:
-        - {const: null}
-        - {type: string}
 
 - $id: request
   anyOf:
