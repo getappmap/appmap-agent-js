@@ -89,16 +89,16 @@ Assert.deepEqual(
 Assert.deepEqual(
   extend("output", "foo"),
   {
-    directory: Path.resolve("foo"),
-    filename: null
+    "directory-path": Path.resolve("foo"),
+    "file-name": null
   }
 );
 
 Assert.deepEqual(
-  extend("output", {filename:"foo"}),
+  extend("output", {"file-name":"foo"}),
   {
-    directory: Path.resolve("tmp", "appmap"),
-    filename: "foo"
+    "directory-path": Path.resolve("tmp", "appmap"),
+    "file-name": "foo"
   }
 );
 

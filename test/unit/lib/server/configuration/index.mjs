@@ -85,14 +85,14 @@ Assert.deepEqual(
 
 Assert.equal(
   getInitialConfiguration().extendWithData({
-    output: {directory: 'foo', filename:'bar'},
+    output: {"directory-path": 'foo', "file-name":'bar'},
   }, '/base').fromRight().getOutputPath(),
   '/base/foo/bar'
 );
 
 Assert.equal(
   getInitialConfiguration().extendWithData({
-    output: {directory: 'foo'},
+    output: {"directory-path": 'foo'},
     main: 'bar/qux',
   }, '/base').fromRight().getOutputPath(),
   '/base/foo/-base-bar-qux'
@@ -100,10 +100,32 @@ Assert.equal(
 
 Assert.equal(
   getInitialConfiguration().extendWithData({
-    output: {directory: 'foo'},
+    output: {"directory-path": 'foo'},
     "map-name": 'bar/qux',
   }, '/base').fromRight().getOutputPath(),
   '/base/foo/bar-qux'
+);
+
+/////////////////
+// getMetaData //
+/////////////////
+
+
+Assert.equal(
+  typeof getInitialConfiguration().getMetaData(),
+  "object"
+);
+
+Assert.equal(
+  getInitialConfiguration().getMetaData().language.engine,
+  null
+);
+
+Assert.equal(
+  getInitialConfiguration().extendWithData({
+    engine: "foo@bar"
+  }, "/").fromRight().getMetaData().language.engine,
+  "foo@bar"
 );
 
 ////////////
@@ -111,13 +133,13 @@ Assert.equal(
 ////////////
 
 Assert.equal(
-  getInitialConfiguration().getEscapePrefix(),
-  "APPMAP"
+  getInitialConfiguration().getBasePath(),
+  "/"
 );
 
 Assert.equal(
-  typeof getInitialConfiguration().getMetaData(),
-  "object"
+  getInitialConfiguration().getEscapePrefix(),
+  "APPMAP"
 );
 
 Assert.equal(

@@ -136,8 +136,8 @@
         - type: object
           additionalProperties: false
           properties:
-            directory: {type: string}
-            filename:
+            directory-path: {type: string}
+            file-name:
               type: string
               pattern: "^[^\/]+$"
     base:
