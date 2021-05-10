@@ -1,74 +1,47 @@
+
 import { strict as Assert } from 'assert';
-import { request as connect } from 'http';
+import * as Http from 'http';
+import { getInitialConfiguration } from '../../../../../lib/server/configuration/index.mjs';
+import { makeDispatching } from '../../../../../lib/server/dispatching.mjs';
 import { makeServer } from '../../../../../lib/server/response/http1.mjs';
 
-const dispatcher = {
-  __proto__: null,
-};
-
-const iterator = [
-  {
-    dispatch(...args) {
-      Assert.equal(this, dispatcher);
-      Assert.deepEqual(args, [123]);
-      return 456;
-    },
-    input: JSON.stringify(123),
-    status: 200,
-    body: JSON.stringify(456),
-  },
-  {
-    dispatch(...args) {
-      Assert.equal(this, dispatcher);
-      Assert.deepEqual(args, [123]);
-      return null;
-    },
-    input: JSON.stringify(123),
-    status: 200,
-    body: '',
-  },
-  {
-    dispatch(...args) {
-      Assert.equal(this, dispatcher);
-      Assert.deepEqual(args, [123]);
-      throw new Error('BOUM');
-    },
-    input: JSON.stringify(123),
-    status: 400,
-    body: 'BOUM',
-  },
-][Symbol.iterator]();
-
-const server = makeServer(dispatcher, {});
-
-server.on('request', (request, response) => {
-  request.emit('error', new Error('Foo'));
-  response.emit('error', new Error('Bar'));
-});
-
+const server = makeServer(makeDispatching(getInitialConfiguration()), {});
 server.listen(0, () => {
+  const iterator = [
+    ["foo", 400, /^failed to parse as json http1 body/],
+    [JSON.stringify({
+      action: "initialize",
+      session: null,
+      data: {
+        data: {
+          main: "main.js"
+        },
+        path: "/"
+      }
+    }), 200, "null"]
+  ][Symbol.iterator]();
   const step = () => {
-    const { done, value } = iterator.next();
+    const {done, value} = iterator.next();
     if (done) {
       server.close();
     } else {
-      dispatcher.dispatch = value.dispatch;
-      const request = connect({
+      const request = Http.request({
         host: 'localhost',
         port: server.address().port,
         method: 'PUT',
         path: '/',
       });
-      request.end(value.input, 'utf8');
-      request.on('response', (response) => {
-        Assert.equal(response.statusCode, value.status);
-        response.setEncoding('utf8');
-        let body = '';
-        response.on('data', (data) => {
-          body += data;
-        });
+      request.end(value[0], "utf8");
+      request.on("response", (response) => {
+        Assert.equal(response.statusCode, value[1]);
+        let body = "";
+        response.on('data', (data) => { body += data });
         response.on('end', () => {
-          Assert.equal(body, value.body);
+          if (value[2] instanceof RegExp) {
+            Assert.match(body, value[2]);
+          } else {
+            Assert.equal(body, value[2]);
+          }
           step();
         });
       });

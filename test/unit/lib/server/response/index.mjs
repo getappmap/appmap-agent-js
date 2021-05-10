@@ -1,11 +1,5 @@
+import { getInitialConfiguration } from '../../../../../lib/server/configuration/index.mjs';
+import { makeDispatching } from '../../../../../lib/server/dispatching.mjs';
 import { makeServer } from '../../../../../lib/server/response/index.mjs';
 
-const dispatcher = { __proto__: null };
-const options = {};
-makeServer('foobar', dispatcher, options);
-
-const server = makeServer('messaging', dispatcher, options);
-server.emit('error', new Error('FooBar'));
-server.listen(0, () => {
-  server.close();
-});
+makeServer('messaging', makeDispatching(getInitialConfiguration()), {});

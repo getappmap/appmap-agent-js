@@ -68,15 +68,18 @@ Assert.equal(
   "bar"
 );
 
-// mapRight //
+// mapBoth //
 
 Assert.equal(
-  new Left("foo").mapRight(() => { Assert.fail() }).fromLeft(),
-  "foo"
+  new Left("foo").mapBoth((...args) => {
+    Assert.deepEqual(args, ["foo"]);
+    return "bar";
+  }).fromLeft(),
+  "bar"
 );
 
 Assert.equal(
-  new Right("foo").mapRight((...args) => {
+  new Right("foo").mapBoth((...args) => {
     Assert.deepEqual(args, ["foo"]);
     return "bar";
   }).fromRight(),
@@ -95,6 +98,21 @@ Assert.equal(
     Assert.deepEqual(args, ["foo"]);
     return "bar";
   }).fromLeft(),
+  "bar"
+);
+
+// mapRight //
+
+Assert.equal(
+  new Left("foo").mapRight(() => { Assert.fail() }).fromLeft(),
+  "foo"
+);
+
+Assert.equal(
+  new Right("foo").mapRight((...args) => {
+    Assert.deepEqual(args, ["foo"]);
+    return "bar";
+  }).fromRight(),
   "bar"
 );
 

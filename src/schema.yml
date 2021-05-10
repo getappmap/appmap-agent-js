@@ -204,45 +204,46 @@
   anyOf:
     - type: object
       additionalProperties: false
-      required: [action, process, navigator, configuration]
+      required: [action, session, data]
       properties:
         action: {const: initialize}
-        process:
-          anyOf:
-            - {const: null}
-            - type: object
-              additionalProperties: false
-              required: [env, argv]
-              properties:
-                env:
-                  type: object
-                  additionalProperties: false
-                  patternProperties:
-                    "^[^=]+$": {type: string}
-                version: {type: string}
-                arch: {type: string}
-                platform: {type: string}
-                pid: {type: integer}
-                ppid: {type: integer}
-                execPath: {type: string}
-                execArgv:
-                  type: array
-                  items: {type: string}
-                argv:
-                  type: array
-                  items: {type: string}
-        navigator:
-          anyOf:
-            - {const: null}
-            - {type: object}
-        configuration: {$ref: configuration}
+        session: {const: null}
+        data: {$ref: configuration}
+        # process:
+        #   anyOf:
+        #     - {const: null}
+        #     - type: object
+        #       additionalProperties: false
+        #       required: [env, argv]
+        #       properties:
+        #         env:
+        #           type: object
+        #           additionalProperties: false
+        #           patternProperties:
+        #             "^[^=]+$": {type: string}
+        #         version: {type: string}
+        #         arch: {type: string}
+        #         platform: {type: string}
+        #         pid: {type: integer}
+        #         ppid: {type: integer}
+        #         execPath: {type: string}
+        #         execArgv:
+        #           type: array
+        #           items: {type: string}
+        #         argv:
+        #           type: array
+        #           items: {type: string}
+        # navigator:
+        #   anyOf:
+        #     - {const: null}
+        #     - {type: object}
     - type: object
       additionalProperties: false
-      required: [action, session, reason]
+      required: [action, session, data]
       properties:
         action: {const: terminate}
         session: {type: string}
-        reason:
+        data:
           type: object
           additionalProperties: true
           required: [type]
@@ -250,55 +251,57 @@
             type: {type: string}
     - type: object
       additionalProperties: false
-      required: [action, session, source, path, content]
+      required: [action, session, data]
       properties:
         action: {const: instrument}
         session: {type: string}
-        source:
-          enum: [script, module]
-        path: {type: string}
-        content: {type: string}
+        data:
+          type: object
+          additionalProperties: false
+          required: [source, path, content]
+          properties:
+            source:
+              enum: [script, module]
+            path: {type: string}
+            content: {type: string}
     - type: object
       additionalProperties: false
-      required: [action, session, origin, event]
+      required: [action, session, data]
       properties:
         action: {const: record}
         session: {type: string}
-        origin: {type: string}
-        event:
+        data:
           type: object
-          additionalProperties: true
-          required: [id, event]
+          additionalProperties: false
+          required: [origin, event]
           properties:
-            id: {type: integer}
+            origin: {type: string}
             event:
-              enum: [call, return]
+              type: object
+              additionalProperties: true
+              required: [id, event]
+              properties:
+                id: {type: integer}
+                event:
+                  enum: [call, return]
     - type: object
       additionalProperties: false
-      required: [action, session, configuration]
+      required: [action, session, data]
       properties:
         action: {const: start}
         session: {type: string}
-        configuration: {$ref: configuration}
+        data: {$ref: configuration}
     - type: object
       additionalProperties: false
-      required: [action, session, recording]
+      required: [action, session, data]
       properties:
         action: {const: stop}
         session: {type: string}
-        recording: {type: string}
-        synchronous: {type: boolean}
+        data: {type: string}
     - type: object
       additionalProperties: false
-      required: [action, session, recording]
+      required: [action, session, data]
       properties:
-        action: {const: play}
+        action: {const: toggle}
         session: {type: string}
-        recording: {type: string}
-    - type: object
-      additionalProperties: false
-      required: [action, session, recording]
-      properties:
-        action: {const: pause}
-        session: {type: string}
-        recording: {type: string}
+        data: {type: string}

@@ -47,8 +47,13 @@ Assert.equal(
 // isEnabled //
 ///////////////
 
+Assert.match(
+  getInitialConfiguration().isEnabled().fromLeft(),
+  /^missing main path/
+);
+
 Assert.equal(
-  getInitialConfiguration().extendWithData({main:'main.js'}, '/base').fromRight().isEnabled(),
+  getInitialConfiguration().extendWithData({main:'main.js'}, '/base').fromRight().isEnabled().fromRight(),
   false
 );
 
@@ -56,7 +61,7 @@ Assert.equal(
   getInitialConfiguration().extendWithData({
     enabled: true,
     main:'main.js'
-  }, '/base').fromRight().isEnabled(),
+  }, '/base').fromRight().isEnabled().fromRight(),
   true
 );
 ////////////////////////

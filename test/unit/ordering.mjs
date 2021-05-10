@@ -22,7 +22,7 @@ export const server = [
   'appmap/file',
   'appmap/recording',
   'appmap/index',
-  'dispatcher',
+  'dispatching',
   'response/messaging',
   'response/http1',
   'response/http2',

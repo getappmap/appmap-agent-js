@@ -65,9 +65,9 @@ const unlink = (path) => {
   const origin = appmap.origins.keys().next().value;
 
   Assert.equal((await appmap.recordAsync({origin, event:'event1'})).fromRight(), null);
-  Assert.equal((await appmap.toggleAsync(key)).fromRight(), null);
+  Assert.equal((await appmap.toggleAsync(key)).fromRight(), false);
   Assert.equal((await appmap.recordAsync({origin, event:'event2'})).fromRight(), null);
-  Assert.equal((await appmap.toggleAsync(key)).fromRight(), null);
+  Assert.equal((await appmap.toggleAsync(key)).fromRight(), true);
   Assert.equal((await appmap.recordAsync({origin, event:'event3'})).fromRight(), null);
 
   unlink("tmp/test/bar.appmap.json");

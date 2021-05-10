@@ -1,136 +1,67 @@
 import { strict as Assert } from 'assert';
-import { connect } from 'net';
+import * as Net from 'net';
 import { patch } from 'net-socket-messaging';
+import { getInitialConfiguration } from '../../../../../lib/server/configuration/index.mjs';
+import { makeDispatching } from '../../../../../lib/server/dispatching.mjs';
+
 import { makeServer } from '../../../../../lib/server/response/messaging.mjs';
 
-const dispatcher = {
-  __proto__: null,
-};
-
-const server = makeServer(dispatcher, {});
-
-server.on('connection', (socket) => {
-  socket.emit('error', new Error('FooBar'));
-});
-
-const noop = () => {};
-
-const iterator = [
-  {
-    dispatch(...args) {
-      Assert.equal(this, dispatcher);
-      Assert.deepEqual(args, [123]);
-      return 456;
-    },
-    input: JSON.stringify({
-      index: 789,
-      query: 123,
-    }),
-    output: {
-      index: 789,
-      success: 456,
-      failure: null,
-    },
-  },
-  {
-    dispatch(...args) {
-      Assert.equal(this, dispatcher);
-      Assert.deepEqual(args, [123]);
-      throw new Error('BOUM');
-    },
-    input: JSON.stringify({
-      index: 789,
-      query: 123,
-    }),
-    output: {
-      index: 789,
-      success: null,
-      failure: 'BOUM',
-    },
-  },
-  {
-    dispatch: noop,
-    input: '@invalid-json',
-    output: {
-      index: null,
-      success: null,
-      failure: 'Unexpected token @ in JSON at position 0',
-    },
-  },
-  {
-    dispatch: noop,
-    input: JSON.stringify({
-      query: 123,
-    }),
-    output: {
-      index: null,
-      success: null,
-      failure: 'Missing index field',
-    },
-  },
-  {
-    dispatch: noop,
-    input: JSON.stringify({
-      index: 789,
-    }),
-    output: {
-      index: 789,
-      success: null,
-      failure: 'Missing query field',
-    },
-  },
-  {
-    dispatch: noop,
-    input: JSON.stringify({
-      index: 789,
-    }),
-    output: {
-      index: 789,
-      success: null,
-      failure: 'Missing query field',
-    },
-  },
-  {
-    dispatch: () => 456,
-    input: JSON.stringify({
-      index: null,
-      query: 123,
-    }),
-    output: {
-      index: null,
-      success: null,
-      failure: 'Query expected null as a response',
-    },
-  },
-  {
-    dispatch: () => null,
-    input: JSON.stringify({
-      index: null,
-      query: 123,
-    }),
-    output: null,
-  },
-][Symbol.iterator]();
-
-const step = () => {
-  const { done, value } = iterator.next();
-  if (done) {
-    server.close();
-  } else {
-    dispatcher.dispatch = value.dispatch;
-    const socket = connect(server.address().port);
-    patch(socket);
-    socket.send(value.input);
-    if (value.output === null) {
+const server = makeServer(makeDispatching(getInitialConfiguration()), {});
+server.listen(0, () => {
+  const socket =  Net.connect(server.address().port);
+  patch(socket);
+  const iterator = [
+    ["foo", {head:null, type:"left", body:/^failed to parse json message/}],
+    [JSON.stringify({body:"foo"}), {head:null, type:"left", body:"missing head field"}],
+    [JSON.stringify({head:123}), {head:123, type:"left", body:"missing body field"}],
+    [JSON.stringify({head:456, body: {
+      action: "initialize",
+      session: null,
+      data: {
+        data: {
+          main: {
+            path: "main.js"
+          }
+        },
+        path: "/"
+      }
+    }}), {head:456, type:"right", body:null}],
+    [
+      JSON.stringify({head:null, body: {
+        action: "initialize",
+        session: null,
+        data: {
+          data: {
+            enabled: true,
+            main: {
+              path: "main.js"
+            }
+          },
+          path: "/"
+        }
+      }}), {head:null, type:"left", body: /^expected a null result/}],
+  ][Symbol.iterator]();
+  const step = () => {
+    const {done, value} = iterator.next();
+    if (done) {
       socket.end();
+      server.close();
     } else {
-      socket.on('message', (message) => {
-        Assert.deepEqual(JSON.parse(message), value.output);
-        socket.end();
+      socket.removeAllListeners("message");
+      socket.on("message", (response) => {
+        let data = JSON.parse(response);
+        if (value[1].body instanceof RegExp) {
+          data = {__proto__:null, ...data};
+          Assert.equal(data.head, value[1].head);
+          Assert.equal(data.type, value[1].type);
+          Assert.match(data.body, value[1].body);
+        } else {
+          Assert.deepEqual(data, value[1]);
+        }
+        step();
       });
+      socket.send(value[0]);
     }
-    socket.on('close', step);
   }
-};
-
-server.listen(0, step);
+  step();
+});
