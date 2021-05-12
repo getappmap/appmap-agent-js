@@ -7,7 +7,9 @@ Assert.equal(
     getInitialConfiguration()
       .extendWithData({ enabled: false }, '/')
       .fromRight(),
-    () => { Assert.fail() }
+    () => {
+      Assert.fail();
+    },
   )
     .dispatch({
       action: 'initialize',
@@ -23,26 +25,30 @@ Assert.equal(
   null,
 );
 
-
 {
   const dispatching = new Dispatching(
-    getInitialConfiguration().extendWithData({ enabled: false }, '/').fromRight(),
-    () => { Assert.fail() }
-  );
-  dispatching.dispatchAsync({
-    action: 'initialize',
-    session: null,
-    data: {
-      data: {
-        main: 'main.js',
-      },
-      path: '/',
+    getInitialConfiguration()
+      .extendWithData({ enabled: false }, '/')
+      .fromRight(),
+    () => {
+      Assert.fail();
     },
-  })
-  .then((either) => {
-    Assert.equal(either.fromRight(), null);
-    Assert.equal(dispatching.terminate().fromRight(), null);
-  });
+  );
+  dispatching
+    .dispatchAsync({
+      action: 'initialize',
+      session: null,
+      data: {
+        data: {
+          main: 'main.js',
+        },
+        path: '/',
+      },
+    })
+    .then((either) => {
+      Assert.equal(either.fromRight(), null);
+      Assert.equal(dispatching.terminate().fromRight(), null);
+    });
 }
 
 {
@@ -50,22 +56,26 @@ Assert.equal(
     getInitialConfiguration()
       .extendWithData({ enabled: true }, '/')
       .fromRight(),
-    () => { Assert.fail() }
-  );
-  const { session, hooking } = dispatching.dispatch({
-    action: 'initialize',
-    session: null,
-    data: {
-      data: {
-        main: 'main.js',
-      },
-      path: '/',
+    () => {
+      Assert.fail();
     },
-  }).fromRight();
+  );
+  const { session, hooking } = dispatching
+    .dispatch({
+      action: 'initialize',
+      session: null,
+      data: {
+        data: {
+          main: 'main.js',
+        },
+        path: '/',
+      },
+    })
+    .fromRight();
   Assert.equal(typeof session, 'string');
   Assert.deepEqual(hooking, {
     esm: true,
-    cjs: true
+    cjs: true,
   });
   const data = {
     data: {
@@ -76,24 +86,28 @@ Assert.equal(
     },
     path: process.cwd(),
   };
-  dispatching.dispatch({
-    action: 'start',
-    session,
-    data,
-  }).fromRight();
+  dispatching
+    .dispatch({
+      action: 'start',
+      session,
+      data,
+    })
+    .fromRight();
   dispatching.dispatch({
     action: 'start',
     session,
     data,
   });
-  dispatching.dispatchAsync({
-    action: 'terminate',
-    session,
-    data: { type: 'reason-type' },
-  }).then((either) => {
-    Assert.deepEqual(either.fromRight(), null);
-    dispatching.terminateAsync().then((either) => {
-      Assert.equal(either.fromRight(), null);
+  dispatching
+    .dispatchAsync({
+      action: 'terminate',
+      session,
+      data: { type: 'reason-type' },
+    })
+    .then((either) => {
+      Assert.deepEqual(either.fromRight(), null);
+      dispatching.terminateAsync().then((either) => {
+        Assert.equal(either.fromRight(), null);
+      });
     });
-  });
 }
