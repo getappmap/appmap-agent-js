@@ -63,23 +63,14 @@
   additionalProperties: false
   required: [base, pattern, flags, data]
   properties:
-    cooked:
+    base:
       type: string
       pattern: "^/"
     pattern:
       type: string
     flags:
       type: string
-    data:
-      type: object
-      additionalProperties: false
-      required: [enabled, shallow, exclude]
-      properties:
-        enabled: {type: boolean}
-        shallow: {type: boolean}
-        exclude:
-          type: array
-          items: {type: string}
+    data: {type: object}
 
 - $id: raw-specifier
   anyOf:
@@ -181,7 +172,7 @@
             items: {type: string}
           - type: object
             additionalProperties: false
-            required: [type, hook, exec, argv, options]
+            minProperties: 12
             properties:
               type: {const: cooked}
               base:

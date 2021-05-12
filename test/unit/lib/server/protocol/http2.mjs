@@ -2,10 +2,11 @@ import { strict as Assert } from 'assert';
 import * as Http2 from 'http2';
 import { getInitialConfiguration } from '../../../../../lib/server/configuration/index.mjs';
 import { makeDispatching } from '../../../../../lib/server/dispatching.mjs';
-import { createServer } from '../../../../../lib/server/protocol/http2.mjs';
+import { createServer, attach } from '../../../../../lib/server/protocol/http2.mjs';
 
-const server = createServer(makeDispatching(getInitialConfiguration()), {});
+const server = createServer();
 server.listen(0, () => {
+  attach(server, makeDispatching(getInitialConfiguration()));
   const client = Http2.connect(`http://localhost:${server.address().port}`);
   const iterator = [
     ['foo', 400, /^failed to parse as json http2 body/],

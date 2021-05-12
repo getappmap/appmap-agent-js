@@ -3,10 +3,11 @@ import * as Net from 'net';
 import { patch } from 'net-socket-messaging';
 import { getInitialConfiguration } from '../../../../../lib/server/configuration/index.mjs';
 import { makeDispatching } from '../../../../../lib/server/dispatching.mjs';
-import { createServer } from '../../../../../lib/server/protocol/messaging.mjs';
+import { createServer, attach } from '../../../../../lib/server/protocol/messaging.mjs';
 
-const server = createServer(makeDispatching(getInitialConfiguration()), {});
+const server = createServer();
 server.listen(0, () => {
+  attach(server, makeDispatching(getInitialConfiguration()));
   const socket = Net.connect(server.address().port);
   patch(socket);
   const iterator = [

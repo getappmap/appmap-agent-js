@@ -171,6 +171,18 @@ new Right('foo')
     Assert.equal(either.fromRight(), 'bar');
   });
 
+// unwrap //
+
+Assert.throws(
+  () => (new Left("foo")).unwrap(),
+  /^Error: foo$/
+);
+
+Assert.equal(
+  (new Right("foo")).unwrap(),
+  "foo"
+);
+
 // toEither //
 
 Assert.equal(

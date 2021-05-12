@@ -30,7 +30,13 @@ const unlink = (path) => {
     },
   );
 
-  Assert.equal((await appmap.initializeAsync('$')).fromRight(), '$');
+  Assert.deepEqual((await appmap.initializeAsync('$')).fromRight(), {
+    session: '$',
+    hooking: {
+      cjs: true,
+      esm: true
+    }
+  });
 
   const key = (
     await appmap.startAsync({

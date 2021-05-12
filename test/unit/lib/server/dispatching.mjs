@@ -45,7 +45,7 @@ makeDispatching(
       .extendWithData({ enabled: true }, '/')
       .fromRight(),
   );
-  const session = dispatch({
+  const {session, hooking} = dispatch({
     action: 'initialize',
     session: null,
     data: {
