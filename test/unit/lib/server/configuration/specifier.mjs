@@ -2,7 +2,7 @@
 import * as Path from 'path';
 import { strict as Assert } from 'assert';
 import {changeWorkingDirectory} from '../../../../../lib/server/configuration/cwd.mjs';
-import { makeGroupArray, lookupGroupArray } from '../../../../../lib/server/configuration/group.mjs';
+import { normalizeSpecifier, lookupNormalizedSpecifierArray } from '../../../../../lib/server/configuration/specifier.mjs';
 
 //////////
 // glob //

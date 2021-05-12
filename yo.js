@@ -1,5 +1,9 @@
+#!/usr/bin/env node
+
+console.log(process.pid, process.argv);
+
 // test/hooks.js
-console.log(require("module"));
+// console.log(require("module"));
 // console.log(module);
 // require("./yoyo.js");
 //
