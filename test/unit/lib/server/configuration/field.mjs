@@ -1,5 +1,5 @@
 import * as Path from 'path';
-import * as OperatingSystem from "os";
+import * as OperatingSystem from 'os';
 import { strict as Assert } from 'assert';
 import {
   extendField,
@@ -81,11 +81,16 @@ Assert.equal(extend('app-name', 'foo'), 'foo');
 // enabled //
 
 Assert.deepEqual(extend('enabled', true), [
-  { base: '/', pattern: "[\\s\\S]*", flags: "", data: { enabled: true } },
+  { base: '/', pattern: '[\\s\\S]*', flags: '', data: { enabled: true } },
 ]);
 
 Assert.deepEqual(extend('enabled', ['foo']), [
-  { base: process.cwd(), pattern: '^(?:foo)$', flags: "", data: { enabled: true } },
+  {
+    base: process.cwd(),
+    pattern: '^(?:foo)$',
+    flags: '',
+    data: { enabled: true },
+  },
 ]);
 
 // packages //
@@ -94,21 +99,18 @@ Assert.deepEqual(extend('packages', ['foo']), [
   {
     base: process.cwd(),
     pattern: '^(?:foo)$',
-    flags: "",
+    flags: '',
     data: { shallow: false, enabled: true, exclude: [] },
   },
 ]);
 
 // childeren //
 
-Assert.equal(
-  extend('childeren', [['node', 'main.js']]).length,
-  1
-);
+Assert.equal(extend('childeren', [['node', 'main.js']]).length, 1);
 
 // concurency //
 
 Assert.equal(
-  extend('concurrency', "50%"),
-  Math.floor(OperatingSystem.cpus().length / 2)
+  extend('concurrency', '50%'),
+  Math.floor(OperatingSystem.cpus().length / 2),
 );

@@ -1,12 +1,13 @@
 import { strict as Assert } from 'assert';
 import { getInitialConfiguration } from '../../../../lib/server/configuration/index.mjs';
-import { makeDispatching } from '../../../../lib/server/dispatching.mjs';
+import { Dispatching } from '../../../../lib/server/dispatching.mjs';
 
 Assert.equal(
-  makeDispatching(
+  new Dispatching(
     getInitialConfiguration()
       .extendWithData({ enabled: false }, '/')
       .fromRight(),
+    () => { Assert.fail() }
   )
     .dispatch({
       action: 'initialize',
@@ -22,10 +23,13 @@ Assert.equal(
   null,
 );
 
-makeDispatching(
-  getInitialConfiguration().extendWithData({ enabled: false }, '/').fromRight(),
-)
-  .dispatchAsync({
+
+{
+  const dispatching = new Dispatching(
+    getInitialConfiguration().extendWithData({ enabled: false }, '/').fromRight(),
+    () => { Assert.fail() }
+  );
+  dispatching.dispatchAsync({
     action: 'initialize',
     session: null,
     data: {
@@ -37,15 +41,18 @@ makeDispatching(
   })
   .then((either) => {
     Assert.equal(either.fromRight(), null);
+    Assert.equal(dispatching.terminate().fromRight(), null);
   });
+}
 
 {
-  const { dispatch, dispatchAsync } = makeDispatching(
+  const dispatching = new Dispatching(
     getInitialConfiguration()
       .extendWithData({ enabled: true }, '/')
       .fromRight(),
+    () => { Assert.fail() }
   );
-  const {session, hooking} = dispatch({
+  const { session, hooking } = dispatching.dispatch({
     action: 'initialize',
     session: null,
     data: {
@@ -56,6 +63,10 @@ makeDispatching(
     },
   }).fromRight();
   Assert.equal(typeof session, 'string');
+  Assert.deepEqual(hooking, {
+    esm: true,
+    cjs: true
+  });
   const data = {
     data: {
       output: {
@@ -65,21 +76,24 @@ makeDispatching(
     },
     path: process.cwd(),
   };
-  dispatch({
+  dispatching.dispatch({
     action: 'start',
     session,
     data,
   }).fromRight();
-  dispatch({
+  dispatching.dispatch({
     action: 'start',
     session,
     data,
   });
-  dispatchAsync({
+  dispatching.dispatchAsync({
     action: 'terminate',
     session,
     data: { type: 'reason-type' },
   }).then((either) => {
     Assert.deepEqual(either.fromRight(), null);
+    dispatching.terminateAsync().then((either) => {
+      Assert.equal(either.fromRight(), null);
+    });
   });
 }

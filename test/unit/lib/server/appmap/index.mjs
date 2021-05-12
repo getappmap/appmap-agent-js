@@ -34,8 +34,8 @@ const unlink = (path) => {
     session: '$',
     hooking: {
       cjs: true,
-      esm: true
-    }
+      esm: true,
+    },
   });
 
   const key = (

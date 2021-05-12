@@ -2,12 +2,15 @@ import { strict as Assert } from 'assert';
 import * as Net from 'net';
 import { patch } from 'net-socket-messaging';
 import { getInitialConfiguration } from '../../../../../lib/server/configuration/index.mjs';
-import { makeDispatching } from '../../../../../lib/server/dispatching.mjs';
-import { createServer, attach } from '../../../../../lib/server/protocol/messaging.mjs';
+import { Dispatching } from '../../../../../lib/server/dispatching.mjs';
+import {
+  createServer,
+  attach,
+} from '../../../../../lib/server/protocol/messaging.mjs';
 
 const server = createServer();
 server.listen(0, () => {
-  attach(server, makeDispatching(getInitialConfiguration()));
+  attach(server, new Dispatching(getInitialConfiguration(), () => {}));
   const socket = Net.connect(server.address().port);
   patch(socket);
   const iterator = [

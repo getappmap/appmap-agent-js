@@ -10,8 +10,8 @@ import {
 //////////
 
 Assert.deepEqual(
-  normalizeSpecifier({base:"/", pattern: ".", flags: "", data:123}),
-  {base:"/", pattern: ".", flags: "", data:123}
+  normalizeSpecifier({ base: '/', pattern: '.', flags: '', data: 123 }),
+  { base: '/', pattern: '.', flags: '', data: 123 },
 );
 
 /////////////

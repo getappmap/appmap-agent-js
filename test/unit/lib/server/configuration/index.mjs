@@ -1,6 +1,6 @@
 import * as FileSystem from 'fs';
 import { strict as Assert } from 'assert';
-import { setSpawnForTesting }from '../../../../../lib/server/configuration/child.mjs';
+import { setSpawnForTesting } from '../../../../../lib/server/configuration/child.mjs';
 import { getInitialConfiguration } from '../../../../../lib/server/configuration/index.mjs';
 
 ////////////////////
@@ -186,15 +186,18 @@ Assert.equal(
 ///////////////
 
 {
-  const configuration = getInitialConfiguration().extendWithData({
-    childeren: [["node", "main.js"]]
-  }, "/").fromRight();
-  setSpawnForTesting(() => "foo");
+  const configuration = getInitialConfiguration()
+    .extendWithData(
+      {
+        childeren: [['node', 'main.js']],
+      },
+      '/',
+    )
+    .fromRight();
+  setSpawnForTesting(() => 'foo');
   Assert.equal(
-    configuration.spawnChild(
-      configuration.getChilderen()[0]
-    ).fromRight(),
-    "foo"
+    configuration.spawnChild(configuration.getChilderen()[0]).fromRight(),
+    'foo',
   );
 }
 
@@ -214,9 +217,9 @@ Assert.equal(getInitialConfiguration().isEventPruned(), false);
 
 Assert.equal(getInitialConfiguration().getConcurrency(), 1);
 
-Assert.equal(getInitialConfiguration().getProtocol(), "messaging");
+Assert.equal(getInitialConfiguration().getProtocol(), 'messaging');
 
-Assert.equal(getInitialConfiguration().getHost(), "localhost");
+Assert.equal(getInitialConfiguration().getHost(), 'localhost');
 
 Assert.equal(getInitialConfiguration().getPort(), 0);
 
@@ -224,5 +227,5 @@ Assert.deepEqual(getInitialConfiguration().getChilderen(), []);
 
 Assert.deepEqual(getInitialConfiguration().getHooking(), {
   esm: true,
-  cjs: true
+  cjs: true,
 });

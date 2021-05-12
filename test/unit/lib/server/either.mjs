@@ -1,5 +1,7 @@
 import { strict as Assert } from 'assert';
 import {
+  forEither,
+  forEitherAsync,
   toEither,
   isLeft,
   isRight,
@@ -173,15 +175,9 @@ new Right('foo')
 
 // unwrap //
 
-Assert.throws(
-  () => (new Left("foo")).unwrap(),
-  /^Error: foo$/
-);
+Assert.throws(() => new Left('foo').unwrap(), /^Error: foo$/);
 
-Assert.equal(
-  (new Right("foo")).unwrap(),
-  "foo"
-);
+Assert.equal(new Right('foo').unwrap(), 'foo');
 
 // toEither //
 
@@ -220,3 +216,28 @@ Assert.equal(isRight(new Right('foo')), true);
 Assert.equal(fromLeft(new Left('foo')), 'foo');
 
 Assert.equal(fromRight(new Right('foo')), 'foo');
+
+// forEither //
+
+{
+  const trace = [];
+  Assert.equal(
+    forEither([1, 2, 3][Symbol.iterator](), (...args) => {
+      trace.push(args);
+      return new Right(undefined);
+    }).fromRight(),
+    null,
+  );
+  Assert.deepEqual(trace, [[1], [2], [3]]);
+}
+
+{
+  const trace = [];
+  forEitherAsync([1, 2, 3][Symbol.iterator](), (...args) => {
+    trace.push(args);
+    return Promise.resolve(new Right(undefined));
+  }).then((either) => {
+    Assert.equal(either.fromRight(), null);
+    Assert.deepEqual(trace, [[1], [2], [3]]);
+  });
+}
