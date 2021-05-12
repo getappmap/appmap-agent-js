@@ -3,9 +3,9 @@ import { strict as Assert } from 'assert';
 import * as Http2 from 'http2';
 import { getInitialConfiguration } from '../../../../../lib/server/configuration/index.mjs';
 import { makeDispatching } from '../../../../../lib/server/dispatching.mjs';
-import { makeServer } from '../../../../../lib/server/response/http2.mjs';
+import { createServer } from '../../../../../lib/server/protocol/http2.mjs';
 
-const server = makeServer(makeDispatching(getInitialConfiguration()), {});
+const server = createServer(makeDispatching(getInitialConfiguration()), {});
 server.listen(0, () => {
   const client = Http2.connect(`http://localhost:${server.address().port}`);
   const iterator = [

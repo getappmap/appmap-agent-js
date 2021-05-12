@@ -26,9 +26,7 @@ export const server = [
   'response/messaging',
   'response/http1',
   'response/http2',
-  'response/http3',
   'response/index',
-  'index',
   'inline',
   'main',
 ];
@@ -51,8 +49,8 @@ export const client = [
   // 'es2015/node14x/hook/esm',
   // 'es2015/node14x/hook/index',
   // 'es2015/node14x/index',
-  // 'es2015/node14x/plugin/check-version',
-  // 'es2015/node14x/plugin/env',
-  // 'es2015/node14x/plugin/mono-main',
-  // 'es2015/node14x/plugin/mono-bin',
+  // 'es2015/node14x/recorder/check-version',
+  // 'es2015/node14x/recorder/env',
+  // 'es2015/node14x/recorder/normal-main',
+  // 'es2015/node14x/recorder/normal-bin',
 ];

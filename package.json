@@ -40,6 +40,7 @@
     "acorn": "^8.1.1",
     "ajv": "^8.1.0",
     "escodegen": "^2.0.0",
+    "glob": "^7.1.7",
     "minimatch": "^3.0.4",
     "minimist": "^1.2.5",
     "net-socket-messaging": "^0.1.5",

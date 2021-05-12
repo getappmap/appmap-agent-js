@@ -3,4 +3,4 @@
 import minimist from 'minimist';
 import {main} from '../lib/server/main.mjs';
 
-main(minimist(argv)).then(process.exit);
+main(process, minimist(process.argv)).then(process.exit);

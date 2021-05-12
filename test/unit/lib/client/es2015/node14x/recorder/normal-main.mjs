@@ -1,8 +1,7 @@
-/* globals prefix_GLOBAL_PROCESS_ID, prefix_GLOBAL_RECORD */
 
 import { strict as Assert } from 'assert';
 import { EventEmitter } from 'events';
-import {main} from '../../../../../../../lib/client/es2015/node14x/plugin/mono-main.js';
+import {main} from '../../../../../../../lib/client/es2015/node14x/recorder/normal-main.js';
 
 ['0', 'foo'].forEach((port) => {
 

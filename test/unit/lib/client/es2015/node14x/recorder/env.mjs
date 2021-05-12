@@ -1,5 +1,5 @@
 import {strict as Assert} from "assert";
-import {parseConfigurationData} from '../../../../../../../lib/client/es2015/node14x/plugin/env.js';
+import {parseConfigurationData} from '../../../../../../../lib/client/es2015/node14x/recorder/env.js';
 
 Assert.throws(
   () => parseConfigurationData({

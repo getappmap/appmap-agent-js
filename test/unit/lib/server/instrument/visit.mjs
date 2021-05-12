@@ -13,8 +13,6 @@ Assert.deepEqual(getEmptyResult(), {
   entities: [],
 });
 
-const file = 'file';
-
 const input = {
   type: 'Identifier',
   name: 'x',

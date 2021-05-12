@@ -1,5 +1,4 @@
 import { strict as Assert } from 'assert';
-import * as Path from 'path';
 import * as FileSystem from 'fs';
 import { getInitialConfiguration } from '../../../../../lib/server/configuration/index.mjs';
 import {Appmap} from '../../../../../lib/server/appmap/index.mjs';
@@ -103,12 +102,13 @@ const unlink = (path) => {
     either.fromRight(),
     null
   ));
-  const key3 = appmap.start({data:{
+  // key3
+  appmap.start({data:{
     output: {
       "directory-path": "missing",
     },
   }, path:process.cwd()}).fromRight();
   Assert.ok(
-    appmap.terminate(key2).isLeft(),
+    appmap.terminate().isLeft(),
   );
 }

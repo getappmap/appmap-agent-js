@@ -1,7 +1,6 @@
 
 import * as Path from 'path';
 import { strict as Assert } from 'assert';
-import {changeWorkingDirectory} from '../../../../../lib/server/configuration/cwd.mjs';
 import { normalizeSpecifier, lookupNormalizedSpecifierArray } from '../../../../../lib/server/configuration/specifier.mjs';
 
 //////////
@@ -11,8 +10,8 @@ import { normalizeSpecifier, lookupNormalizedSpecifierArray } from '../../../../
 // normal //
 
 Assert.equal(
-  lookupGroupArray(
-    makeGroupArray({glob:"*.js"}, 123),
+  lookupNormalizedSpecifierArray(
+    normalizeSpecifier({glob:"*.js"}, 123),
     Path.resolve("foo.js"),
     456,
   ),
@@ -20,8 +19,8 @@ Assert.equal(
 );
 
 Assert.equal(
-  lookupGroupArray(
-    makeGroupArray({glob:"*.js"}, 123),
+  lookupNormalizedSpecifierArray(
+    normalizeSpecifier({glob:"*.js"}, 123),
     Path.resolve("foo.mjs"),
     456
   ),
@@ -29,8 +28,8 @@ Assert.equal(
 );
 
 Assert.equal(
-  lookupGroupArray(
-    makeGroupArray({glob:"**/*.js"}, 123),
+  lookupNormalizedSpecifierArray(
+    normalizeSpecifier({glob:"**/*.js"}, 123),
     Path.resolve("foo/bar.js"),
     456,
   ),
@@ -38,8 +37,8 @@ Assert.equal(
 );
 
 Assert.equal(
-  lookupGroupArray(
-    makeGroupArray({glob:"**/*.js"}, 123),
+  lookupNormalizedSpecifierArray(
+    normalizeSpecifier({glob:"**/*.js"}, 123),
     Path.resolve("../foo/bar.js"),
     456,
   ),
@@ -49,8 +48,8 @@ Assert.equal(
 // shortcut //
 
 Assert.equal(
-  lookupGroupArray(
-    makeGroupArray("*.js", 123),
+  lookupNormalizedSpecifierArray(
+    normalizeSpecifier("*.js", 123),
     Path.resolve("foo.js"),
     456,
   ),
@@ -58,8 +57,8 @@ Assert.equal(
 );
 
 Assert.equal(
-  lookupGroupArray(
-    makeGroupArray("*.js", 123),
+  lookupNormalizedSpecifierArray(
+    normalizeSpecifier("*.js", 123),
     Path.resolve("foo.mjs"),
     456
   ),
@@ -73,8 +72,8 @@ Assert.equal(
 // file //
 
 Assert.deepEqual(
-  lookupGroupArray(
-    makeGroupArray({path:{name:"foo.js"}}, 123),
+  lookupNormalizedSpecifierArray(
+    normalizeSpecifier({path:{name:"foo.js"}}, 123),
     Path.resolve("foo.js"),
     456,
   ),
@@ -82,8 +81,8 @@ Assert.deepEqual(
 );
 
 Assert.deepEqual(
-  lookupGroupArray(
-    makeGroupArray({path:{name:"foo.js"}}, 123),
+  lookupNormalizedSpecifierArray(
+    normalizeSpecifier({path:{name:"foo.js"}}, 123),
     Path.resolve("foo.js/bar.js"),
     456,
   ),
@@ -93,8 +92,8 @@ Assert.deepEqual(
 // shortcut //
 
 Assert.deepEqual(
-  lookupGroupArray(
-    makeGroupArray({path:"foo.js"}, 123),
+  lookupNormalizedSpecifierArray(
+    normalizeSpecifier({path:"foo.js"}, 123),
     Path.resolve("foo.js"),
     456,
   ),
@@ -102,8 +101,8 @@ Assert.deepEqual(
 );
 
 Assert.deepEqual(
-  lookupGroupArray(
-    makeGroupArray({path:"foo.js"}, 123),
+  lookupNormalizedSpecifierArray(
+    normalizeSpecifier({path:"foo.js"}, 123),
     Path.resolve("bar.js"),
     456,
   ),
@@ -113,8 +112,8 @@ Assert.deepEqual(
 // directory //
 
 Assert.deepEqual(
-  lookupGroupArray(
-    makeGroupArray({path:{name:"foo"}}, 123),
+  lookupNormalizedSpecifierArray(
+    normalizeSpecifier({path:{name:"foo"}}, 123),
     Path.resolve("foo/bar.js"),
     456,
   ),
@@ -122,8 +121,8 @@ Assert.deepEqual(
 );
 
 Assert.deepEqual(
-  lookupGroupArray(
-    makeGroupArray({path:{name:"foo.js/"}}, 123),
+  lookupNormalizedSpecifierArray(
+    normalizeSpecifier({path:{name:"foo.js/"}}, 123),
     Path.resolve("foo.js/bar.js"),
     456,
   ),
@@ -133,8 +132,8 @@ Assert.deepEqual(
 // deep //
 
 Assert.deepEqual(
-  lookupGroupArray(
-    makeGroupArray({path:{name:"foo"}}, 123),
+  lookupNormalizedSpecifierArray(
+    normalizeSpecifier({path:{name:"foo"}}, 123),
     Path.resolve("foo/bar/qux.js"),
     456,
   ),
@@ -142,8 +141,8 @@ Assert.deepEqual(
 );
 
 Assert.deepEqual(
-  lookupGroupArray(
-    makeGroupArray({path:{name:"foo", deep:true}}, 123),
+  lookupNormalizedSpecifierArray(
+    normalizeSpecifier({path:{name:"foo", deep:true}}, 123),
     Path.resolve("foo/bar/qux.js"),
     456,
   ),
@@ -157,8 +156,8 @@ Assert.deepEqual(
 // normal //
 
 Assert.deepEqual(
-  lookupGroupArray(
-    makeGroupArray({dist:{name:"foo"}}, 123),
+  lookupNormalizedSpecifierArray(
+    normalizeSpecifier({dist:{name:"foo"}}, 123),
     Path.resolve("node_module/foo/bar.js"),
     456
   ),
@@ -166,8 +165,8 @@ Assert.deepEqual(
 );
 
 Assert.deepEqual(
-  lookupGroupArray(
-    makeGroupArray({dist:{name:"foo"}}, 123),
+  lookupNormalizedSpecifierArray(
+    normalizeSpecifier({dist:{name:"foo"}}, 123),
     Path.resolve("node_module/qux/bar.js"),
     456
   ),
@@ -177,8 +176,8 @@ Assert.deepEqual(
 // shortcut //
 
 Assert.deepEqual(
-  lookupGroupArray(
-    makeGroupArray({dist:"foo"}, 123),
+  lookupNormalizedSpecifierArray(
+    normalizeSpecifier({dist:"foo"}, 123),
     Path.resolve("node_module/foo/bar.js"),
     456,
   ),
@@ -186,8 +185,8 @@ Assert.deepEqual(
 );
 
 Assert.deepEqual(
-  lookupGroupArray(
-    makeGroupArray({dist:"foo"}, 123),
+  lookupNormalizedSpecifierArray(
+    normalizeSpecifier({dist:"foo"}, 123),
     Path.resolve("node_module/qux/bar.js"),
     456
   ),
@@ -197,8 +196,8 @@ Assert.deepEqual(
 // deep //
 
 Assert.deepEqual(
-  lookupGroupArray(
-    makeGroupArray({dist:{name:"foo"}}, 123),
+  lookupNormalizedSpecifierArray(
+    normalizeSpecifier({dist:{name:"foo"}}, 123),
     Path.resolve("node_module/foo/bar/qux.js"),
     456,
   ),
@@ -206,8 +205,8 @@ Assert.deepEqual(
 );
 
 Assert.deepEqual(
-  lookupGroupArray(
-    makeGroupArray({dist:{name:"foo", deep:true}}, 123),
+  lookupNormalizedSpecifierArray(
+    normalizeSpecifier({dist:{name:"foo", deep:true}}, 123),
     Path.resolve("node_module/foo/bar/qux.js"),
     456,
   ),
@@ -217,8 +216,8 @@ Assert.deepEqual(
 // nested //
 
 Assert.deepEqual(
-  lookupGroupArray(
-    makeGroupArray({dist:{name:"foo"}}, 123),
+  lookupNormalizedSpecifierArray(
+    normalizeSpecifier({dist:{name:"foo"}}, 123),
     Path.resolve("bar/node_module/foo/qux.js"),
     456,
   ),
@@ -226,8 +225,8 @@ Assert.deepEqual(
 );
 
 Assert.deepEqual(
-  lookupGroupArray(
-    makeGroupArray({dist:{name:"foo", nested:true}}, 123),
+  lookupNormalizedSpecifierArray(
+    normalizeSpecifier({dist:{name:"foo", nested:true}}, 123),
     Path.resolve("bar/node_module/foo/qux.js"),
     456,
   ),
@@ -237,8 +236,8 @@ Assert.deepEqual(
 // external //
 
 Assert.deepEqual(
-  lookupGroupArray(
-    makeGroupArray({dist:{name:"foo"}}, 123),
+  lookupNormalizedSpecifierArray(
+    normalizeSpecifier({dist:{name:"foo"}}, 123),
     Path.resolve("../node_module/foo/bar.js"),
     456,
   ),
@@ -246,8 +245,8 @@ Assert.deepEqual(
 );
 
 Assert.deepEqual(
-  lookupGroupArray(
-    makeGroupArray({dist:{name:"foo", external:true}}, 123),
+  lookupNormalizedSpecifierArray(
+    normalizeSpecifier({dist:{name:"foo", external:true}}, 123),
     Path.resolve("../node_module/foo/bar.js"),
     456,
   ),

@@ -135,7 +135,7 @@ import {getDisabledRecorder} from '../../../../../lib/client/es2015/recorder.js'
       }, hook, run, options);
       try {
         await makeAppmap({requestSync: () => { Assert.fail(); }, request: () => { Assert.fail(); }}, hook, run, {});
-        () => { Assert.fail(); }();
+        Assert.fail();
       } catch (error) {
         Assert.equal(error.message, "Another appmap is already running");
       }

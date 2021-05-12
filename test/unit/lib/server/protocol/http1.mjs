@@ -3,9 +3,9 @@ import { strict as Assert } from 'assert';
 import * as Http from 'http';
 import { getInitialConfiguration } from '../../../../../lib/server/configuration/index.mjs';
 import { makeDispatching } from '../../../../../lib/server/dispatching.mjs';
-import { makeServer } from '../../../../../lib/server/response/http1.mjs';
+import { createServer } from '../../../../../lib/server/protocol/http1.mjs';
 
-const server = makeServer(makeDispatching(getInitialConfiguration()), {});
+const server = createServer(makeDispatching(getInitialConfiguration()), {});
 server.listen(0, () => {
   const iterator = [
     ["foo", 400, /^failed to parse as json http1 body/],

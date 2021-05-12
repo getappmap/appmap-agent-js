@@ -20,6 +20,6 @@ process.env = {
 
 const require = Module.createRequire(import.meta.url);
 
-require('../../../../../../../lib/client/es2015/node14x/plugin/mono-bin.js');
+require('../../../../../../../lib/client/es2015/node14x/recorder/normal-bin.js');
 
 Assert.equal(counter, 1);

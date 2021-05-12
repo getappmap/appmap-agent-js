@@ -3,10 +3,9 @@ import * as Net from 'net';
 import { patch } from 'net-socket-messaging';
 import { getInitialConfiguration } from '../../../../../lib/server/configuration/index.mjs';
 import { makeDispatching } from '../../../../../lib/server/dispatching.mjs';
+import { createServer } from '../../../../../lib/server/protocol/messaging.mjs';
 
-import { makeServer } from '../../../../../lib/server/response/messaging.mjs';
-
-const server = makeServer(makeDispatching(getInitialConfiguration()), {});
+const server = createServer(makeDispatching(getInitialConfiguration()), {});
 server.listen(0, () => {
   const socket =  Net.connect(server.address().port);
   patch(socket);

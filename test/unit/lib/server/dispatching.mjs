@@ -51,12 +51,12 @@ makeDispatching(getInitialConfiguration().extendWithData({ enabled: false }, "/"
     },
     path: process.cwd()
   };
-  const recording1 = dispatch({
+  dispatch({
     action: "start",
     session,
     data
   }).fromRight();
-  const recording2 = dispatch({
+  dispatch({
     action: "start",
     session,
     data

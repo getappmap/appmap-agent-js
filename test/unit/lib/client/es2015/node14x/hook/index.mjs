@@ -1,7 +1,5 @@
 import { strict as Assert } from 'assert';
 import * as Path from 'path';
-import * as FileSystem from 'fs';
-import * as ChildProcess from 'child_process';
 import * as Module from 'module';
 
 const require = Module.createRequire(import.meta.url);
