@@ -4,10 +4,10 @@ import * as FileSystem from 'fs';
 import * as ChildProcess from 'child_process';
 
 const preload = Path.resolve('lib/client/es2015/node14x/hook/esm.js');
-const main = Path.resolve("tmp/test/main.mjs");
-const path1 = Path.resolve("tmp/test/module1.mjs");
-const path2 = Path.resolve("tmp/test/module2.mjs");
-const path3 = Path.resolve("tmp/test/module3.mjs");
+const main = Path.resolve('tmp/test/main.mjs');
+const path1 = Path.resolve('tmp/test/module1.mjs');
+const path2 = Path.resolve('tmp/test/module2.mjs');
+const path3 = Path.resolve('tmp/test/module3.mjs');
 
 FileSystem.writeFileSync(
   main,
@@ -34,25 +34,17 @@ FileSystem.writeFileSync(
       Assert.equal((await import('${path3}')).foo, 'bar');
     }) ());
   `,
-  "utf8"
+  'utf8',
 );
 
 [path1, path2, path3].forEach((path) => {
   FileSystem.writeFileSync(path, `export const foo = 'bar';`, 'utf8');
 });
 
-ChildProcess.fork(
-  main,
-  [],
-  {
-    execArgv: [
-      ...process.execArgv,
-      "--experimental-loader",
-      preload
-    ],
-    stdio: "inherit"
-  }
-).on('exit', (code, signal) => {
+ChildProcess.fork(main, [], {
+  execArgv: [...process.execArgv, '--experimental-loader', preload],
+  stdio: 'inherit',
+}).on('exit', (code, signal) => {
   Assert.equal(signal, null);
   Assert.equal(code, 0);
 });

@@ -1,5 +1,5 @@
 import { strict as Assert } from 'assert';
-import {checkVersion} from '../../../../../../../lib/client/es2015/node14x/recorder/check-version.js';
+import { checkVersion } from '../../../../../../../lib/client/es2015/node14x/recorder/check-version.js';
 
 Assert.equal(checkVersion({ version: 'v14.0.0' }), undefined);
 

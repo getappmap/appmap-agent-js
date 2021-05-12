@@ -28,7 +28,7 @@ const output = {
   [true, null],
 ].forEach(([excluded, entity], index) => {
   const options = {
-    exclude: new Set(excluded ? ["???"] : [])
+    exclude: new Set(excluded ? ['???'] : []),
   };
   const extended = {
     __proto__: null,
@@ -55,10 +55,7 @@ const output = {
     'Identifier',
     (...args) => {
       Assert.ok(!excluded);
-      Assert.deepEqual(args, [
-        input,
-        { location: extended, options },
-      ]);
+      Assert.deepEqual(args, [input, { location: extended, options }]);
       return [
         {
           node: 'child1',

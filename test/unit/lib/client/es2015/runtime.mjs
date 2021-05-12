@@ -1,6 +1,5 @@
-
 import { strict as Assert } from 'assert';
-import {getRuntime} from '../../../../../lib/client/es2015/runtime.js';
+import { getRuntime } from '../../../../../lib/client/es2015/runtime.js';
 
 const runtime = getRuntime();
 
@@ -27,21 +26,21 @@ Assert.equal(
 );
 Assert.equal(
   runtime.getClassName({
-    "constructor": {
-      name: 123
-    }
+    constructor: {
+      name: 123,
+    },
   }),
   'Unknown',
 );
 Assert.equal(
   runtime.getClassName({
-    "constructor": {},
+    constructor: {},
   }),
   'Unknown',
 );
 Assert.equal(
   runtime.getClassName({
-    "constructor": {
+    constructor: {
       get name() {
         return 'foo';
       },
@@ -85,10 +84,7 @@ Assert.deepEqual(runtime.serializeParameter(Symbol('foo'), 'pattern'), {
 
 {
   const error = new Error('foo');
-  Assert.deepEqual(
-    runtime.serializeException(runtime.empty),
-    [],
-  );
+  Assert.deepEqual(runtime.serializeException(runtime.empty), []);
   Assert.deepEqual(runtime.serializeException(null), [
     {
       class: 'null',

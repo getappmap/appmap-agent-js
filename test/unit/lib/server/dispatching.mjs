@@ -1,74 +1,85 @@
 import { strict as Assert } from 'assert';
 import { getInitialConfiguration } from '../../../../lib/server/configuration/index.mjs';
-import {makeDispatching} from '../../../../lib/server/dispatching.mjs';
+import { makeDispatching } from '../../../../lib/server/dispatching.mjs';
 
 Assert.equal(
-  makeDispatching(getInitialConfiguration().extendWithData({ enabled: false }, "/").fromRight()).dispatch({
-    action: "initialize",
-    session: null,
-    data: {
+  makeDispatching(
+    getInitialConfiguration()
+      .extendWithData({ enabled: false }, '/')
+      .fromRight(),
+  )
+    .dispatch({
+      action: 'initialize',
+      session: null,
       data: {
-        "main": "main.js"
+        data: {
+          main: 'main.js',
+        },
+        path: '/',
       },
-      path: "/"
-    }
-  }).fromRight(),
-  null
+    })
+    .fromRight(),
+  null,
 );
 
-makeDispatching(getInitialConfiguration().extendWithData({ enabled: false }, "/").fromRight()).dispatchAsync({
-  action: "initialize",
-  session: null,
-  data: {
-    data: {
-      "main": "main.js"
-    },
-    path: "/"
-  }
-}).then((either) => {
-  Assert.equal(either.fromRight(), null);
-});
-
-{
-  const {dispatch, dispatchAsync} = makeDispatching(getInitialConfiguration().extendWithData({ enabled: true }, "/").fromRight());
-  const session = dispatch({
-    action: "initialize",
+makeDispatching(
+  getInitialConfiguration().extendWithData({ enabled: false }, '/').fromRight(),
+)
+  .dispatchAsync({
+    action: 'initialize',
     session: null,
     data: {
       data: {
-        "main": "main.js"
+        main: 'main.js',
       },
-      path: "/"
-    }
+      path: '/',
+    },
+  })
+  .then((either) => {
+    Assert.equal(either.fromRight(), null);
+  });
+
+{
+  const { dispatch, dispatchAsync } = makeDispatching(
+    getInitialConfiguration()
+      .extendWithData({ enabled: true }, '/')
+      .fromRight(),
+  );
+  const session = dispatch({
+    action: 'initialize',
+    session: null,
+    data: {
+      data: {
+        main: 'main.js',
+      },
+      path: '/',
+    },
   }).fromRight();
-  Assert.equal(typeof session, "string");
+  Assert.equal(typeof session, 'string');
   const data = {
     data: {
       output: {
-        "directory-path": "tmp/test",
-        "file-name": "foo"
-      }
+        'directory-path': 'tmp/test',
+        'file-name': 'foo',
+      },
     },
-    path: process.cwd()
+    path: process.cwd(),
   };
   dispatch({
-    action: "start",
+    action: 'start',
     session,
-    data
+    data,
   }).fromRight();
   dispatch({
-    action: "start",
+    action: 'start',
     session,
-    data
+    data,
   });
   dispatchAsync({
-    action: "terminate",
+    action: 'terminate',
     session,
-    data: {type:"reason-type"}
+    data: { type: 'reason-type' },
   }).then((either) => {
-    Assert.deepEqual(
-      either.fromRight(),
-      null
-    );
+    Assert.deepEqual(either.fromRight(), null);
   });
 }

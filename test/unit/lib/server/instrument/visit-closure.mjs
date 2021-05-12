@@ -4,7 +4,7 @@ import '../../../../../lib/server/instrument/visit-closure.mjs';
 Error.stackTraceLimit = Infinity;
 
 test({
-  session: "$",
+  session: '$',
   input: `function f () { return x; }`,
   output: `function f () { return $_SUCCESS = x; }`,
   keys: [['body', 0], 'body', ['body', 0]],
@@ -19,7 +19,7 @@ test({
 
 test({
   session: '$',
-  origin: "origin",
+  origin: 'origin',
   path: 'filename.js',
   input: `const f = (x, y, ...z) => t;`,
   output: `const f = ($_ARGUMENT_0, $_ARGUMENT_1, ...$_ARGUMENT_2) => {

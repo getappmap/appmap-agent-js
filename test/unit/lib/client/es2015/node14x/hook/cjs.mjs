@@ -1,6 +1,6 @@
 import { strict as Assert } from 'assert';
 import * as FileSystem from 'fs';
-import * as Module from "module";
+import * as Module from 'module';
 import * as Path from 'path';
 import HookCJS from '../../../../../../../lib/client/es2015/node14x/hook/cjs.js';
 
@@ -11,27 +11,27 @@ FileSystem.writeFileSync(path, content, 'utf8');
 const require = Module.createRequire(import.meta.url);
 
 delete require.cache[path];
-Assert.equal(require(path).foo, "bar");
+Assert.equal(require(path).foo, 'bar');
 
 HookCJS.start((...args) => {
-  Assert.deepEqual(args, ["script", path, content, null]);
+  Assert.deepEqual(args, ['script', path, content, null]);
   return 'exports.foo = "qux";';
 });
 
 Assert.throws(
-  () => HookCJS.start(() => { Assert.fail() }),
-  /^Error: cjs modules are already hooked/u
+  () =>
+    HookCJS.start(() => {
+      Assert.fail();
+    }),
+  /^Error: cjs modules are already hooked/u,
 );
 
 delete require.cache[path];
-Assert.equal(require(path).foo, "qux");
+Assert.equal(require(path).foo, 'qux');
 
 HookCJS.stop();
 
-Assert.throws(
-  () => HookCJS.stop(),
-  /^Error: cjs modules are not yet hooked/u
-);
+Assert.throws(() => HookCJS.stop(), /^Error: cjs modules are not yet hooked/u);
 
 delete require.cache[path];
-Assert.equal(require(path).foo, "bar");
+Assert.equal(require(path).foo, 'bar');

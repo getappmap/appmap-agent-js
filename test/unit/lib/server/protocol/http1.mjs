@@ -1,4 +1,3 @@
-
 import { strict as Assert } from 'assert';
 import * as Http from 'http';
 import { getInitialConfiguration } from '../../../../../lib/server/configuration/index.mjs';
@@ -8,20 +7,24 @@ import { createServer } from '../../../../../lib/server/protocol/http1.mjs';
 const server = createServer(makeDispatching(getInitialConfiguration()), {});
 server.listen(0, () => {
   const iterator = [
-    ["foo", 400, /^failed to parse as json http1 body/],
-    [JSON.stringify({
-      action: "initialize",
-      session: null,
-      data: {
+    ['foo', 400, /^failed to parse as json http1 body/],
+    [
+      JSON.stringify({
+        action: 'initialize',
+        session: null,
         data: {
-          main: "main.js"
+          data: {
+            main: 'main.js',
+          },
+          path: '/',
         },
-        path: "/"
-      }
-    }), 200, "null"]
+      }),
+      200,
+      'null',
+    ],
   ][Symbol.iterator]();
   const step = () => {
-    const {done, value} = iterator.next();
+    const { done, value } = iterator.next();
     if (done) {
       server.close();
     } else {
@@ -31,11 +34,13 @@ server.listen(0, () => {
         method: 'PUT',
         path: '/',
       });
-      request.end(value[0], "utf8");
-      request.on("response", (response) => {
+      request.end(value[0], 'utf8');
+      request.on('response', (response) => {
         Assert.equal(response.statusCode, value[1]);
-        let body = "";
-        response.on('data', (data) => { body += data });
+        let body = '';
+        response.on('data', (data) => {
+          body += data;
+        });
         response.on('end', () => {
           if (value[2] instanceof RegExp) {
             Assert.match(body, value[2]);

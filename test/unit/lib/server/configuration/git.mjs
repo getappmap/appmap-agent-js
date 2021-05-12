@@ -26,10 +26,10 @@ if (!FileSystem.existsSync(path)) {
 
 Assert.ok(getGitInformation('.') !== null);
 
-FileSystem.rmSync("tmp/test/git", {force:true, recursive:true});
+FileSystem.rmSync('tmp/test/git', { force: true, recursive: true });
 Assert.equal(getGitInformation('tmp/test/git'), null);
 
-FileSystem.mkdirSync("tmp/test/git");
+FileSystem.mkdirSync('tmp/test/git');
 Assert.equal(getGitInformation('tmp/test/git'), null);
 
 //

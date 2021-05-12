@@ -2,7 +2,7 @@ import { strict as Assert } from 'assert';
 import { generate as escodegen } from 'escodegen';
 
 import { RootLocation } from '../../../../../lib/server/instrument/location.mjs';
-import {File} from '../../../../../lib/server/appmap/file.mjs';
+import { File } from '../../../../../lib/server/appmap/file.mjs';
 import {
   setVisitor,
   visit,
@@ -10,18 +10,18 @@ import {
 } from '../../../../../lib/server/instrument/visit.mjs';
 
 [
-  "Identifier",
-  "FunctionExpression",
-  "Literal",
-  "BlockStatement",
-  "Property",
-  "ExpressionStatement",
-  "AwaitExpression",
+  'Identifier',
+  'FunctionExpression',
+  'Literal',
+  'BlockStatement',
+  'Property',
+  'ExpressionStatement',
+  'AwaitExpression',
 ].forEach((type) => {
   setVisitor(
     type,
     (node, context) => [],
-    (node, context, child) => node
+    (node, context, child) => node,
   );
 });
 
@@ -33,7 +33,7 @@ export const test = (options) => {
     input: null,
     output: null,
     session: '$',
-    origin: "origin",
+    origin: 'origin',
     keys: null,
     ...options,
   };
@@ -61,8 +61,8 @@ export const test = (options) => {
     options: {
       session,
       origin,
-      exclude: new Set()
-    }
+      exclude: new Set(),
+    },
   });
   Assert.equal(escodegen(getResultNode(result)), escodegen(node2));
 };
