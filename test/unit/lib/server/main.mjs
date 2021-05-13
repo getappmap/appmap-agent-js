@@ -1,8 +1,12 @@
+import { main } from '../../../../lib/server/main.mjs';
+
+main();
+
 // import { strict as Assert } from 'assert';
 // import * as FileSystem from 'fs';
 // import {main} from '../../../../lib/server/main.mjs';
 // Error.stackTraceLimit = Infinity;
-
+//
 // FileSystem.writeFileSync(
 //   'tmp/test/rc.json',
 //   JSON.stringify({

@@ -8,10 +8,9 @@ main(process, minimist(process.argv)).then((either) => {
     (message) => {
       process.stderr.write(message);
       process.stderr.write('\n');
-      process.exit(1);
     },
     (code) => {
-      process.exitCode = 0;
+      process.exitCode = code;
     },
   );
 });
