@@ -1,3 +1,28 @@
+# [3.0.0](https://github.com/applandinc/appmap-agent-js/compare/v2.12.1...v3.0.0) (2021-05-13)
+
+
+### Bug Fixes
+
+* eslint ([4383c7e](https://github.com/applandinc/appmap-agent-js/commit/4383c7e61eef6983440e0f9b98bf87975aa59493))
+* eslint the entire project ([e230a6b](https://github.com/applandinc/appmap-agent-js/commit/e230a6b0ce41e477df4c55e6cf392e41ced94030))
+* merge from ci ([615afde](https://github.com/applandinc/appmap-agent-js/commit/615afde4613e1987d1e68f7aff2341440a8b11c9))
+* more robust error reporting for configuration throuhg haskell--inspired either ([31b9a68](https://github.com/applandinc/appmap-agent-js/commit/31b9a685342ea8b99000697a85acc50045ddef6a))
+* updated instrumentation to new error handling and runtime variables ([f28eefc](https://github.com/applandinc/appmap-agent-js/commit/f28eefccbbe74d8eeeb8046d87fcbb5c58847a7f))
+
+
+### Features
+
+* add termination for entire dispatcher to ensure appmaps are saved on disk ([c2fb027](https://github.com/applandinc/appmap-agent-js/commit/c2fb027ae727670034feee629fe2d5442df0a87d))
+* done refactoring the server still need testing ([f333032](https://github.com/applandinc/appmap-agent-js/commit/f3330328ae19253bc87f7cbe9da9a7410e424311))
+* extensive refactoring of the client to support flexible recording ([18974f7](https://github.com/applandinc/appmap-agent-js/commit/18974f78df2506b7cd872a66c559865134002ffe))
+* user can now spawn multiple child processes ([c338c29](https://github.com/applandinc/appmap-agent-js/commit/c338c29493d9d83e3d61698ac144be1f9ec14654))
+
+
+### BREAKING CHANGES
+
+* The way to launch a process-wide client has been modified. The client can now be
+recorded through a library as well.
+
 ## [2.12.1](https://github.com/applandinc/appmap-agent-js/compare/v2.12.0...v2.12.1) (2021-04-30)
 
 
