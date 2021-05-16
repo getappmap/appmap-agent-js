@@ -8,8 +8,9 @@ import {
 } from '../../../../../lib/server/configuration/child.mjs';
 
 {
-  const childeren = normalizeChild(['node', '/main.js']);
+  const childeren = normalizeChild('node /main.js');
   Assert.deepEqual(childeren, childeren.flatMap(normalizeChild));
+  Assert.deepEqual(childeren, normalizeChild('node /main.js'));
   Assert.deepEqual(
     childeren,
     normalizeChild({

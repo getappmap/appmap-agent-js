@@ -25,6 +25,16 @@ Assert.equal(
   null,
 );
 
+Assert.match(
+  new Dispatching(getInitialConfiguration(), (...args) => {
+    Assert.equal(args.length, 1);
+    Assert.match(args[0], /^invalid request/);
+  })
+    .dispatch('invalid')
+    .fromLeft(),
+  /^invalid request/,
+);
+
 {
   const dispatching = new Dispatching(
     getInitialConfiguration()

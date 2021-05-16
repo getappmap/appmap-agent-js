@@ -167,6 +167,7 @@
       type: array
       items:
         anyOf:
+          - type: string
           - type: array
             minItems: 1
             items: {type: string}
@@ -259,10 +260,8 @@
       type: array
       items: {$ref: package-specifier}
     exclude:
-      anyOf:
-        - type: string
-        - type: array
-          items: {type: string}
+      type: array
+      items: {type: string}
     # recording
     recording:
       anyOf:
@@ -309,69 +308,6 @@
         - type: string
         - type: array
           items: {$ref: name-version}
-
-# - $id: appmap-configuration
-#   data:
-#     allOf:
-#       - $ref: configuration
-#       - not:
-#           anyOf:
-#             # server
-#             - type: object
-#               required: [extends]
-#             - type: object
-#               required: [protocol]
-#             - type: object
-#               required: [host]
-#             - type: object
-#               required: [port]
-#             - type: object
-#               required: [concurrency]
-#             - type: object
-#               required: [childeren]
-#
-# - $id: recording-configuration
-#   data:
-#     allOf:
-#       - $ref: configuration
-#       - not:
-#           anyOf:
-#             # server
-#             - type: object
-#               required: [extends]
-#             - type: object
-#               required: [protocol]
-#             - type: object
-#               required: [host]
-#             - type: object
-#               required: [port]
-#             - type: object
-#               required: [concurrency]
-#             - type: object
-#               required: [childeren]
-#             # client
-#             - type: object
-#               required: [recorder]
-#             - type: object
-#               required: [hook-cjs]
-#             - type: object
-#               required: [hook-esm]
-#             - type: object
-#               required: [main]
-#             - type: object
-#               required: [enabled]
-#             - type: object
-#               required: [escape-prefix]
-#             - type: object
-#               required: [engine]
-#             - type: object
-#               required: [node-version]
-#             - type: object
-#               required: [language]
-#             - type: object
-#               required: [packages]
-#             - type: object
-#               required: [exclude]
 
 # request #
 
