@@ -9,13 +9,12 @@ import { main } from '../../../../../../../lib/client/es2015/node14x/recorder/no
   const data = {
     env: {
       APPMAP_PROTOCOL: {
-        requestSync: (json) => {
+        request: (json) => {
           trace.push(json);
           if (json.action === 'initialize') {
             return {
-              enabled: true,
-              session: 'session',
-              namespace: `__HIDDEN_${port}__`,
+              session: `__HIDDEN_${port}__`,
+              hooking: { cjs: false, esm: false },
             };
           }
           return null;
@@ -49,25 +48,21 @@ import { main } from '../../../../../../../lib/client/es2015/node14x/recorder/no
   Assert.deepEqual(trace, [
     {
       action: 'initialize',
-      process: {
-        ...data,
-        cwd: '/cwd',
-      },
-      navigator: null,
-      configuration: {
+      session: null,
+      data: {
         data: { __proto__: null, 'app-name': 'app-name' },
         path: '/cwd',
       },
     },
     {
       action: 'start',
-      session: 'session',
-      configuration: { data: {}, path: null },
+      session: `__HIDDEN_${port}__`,
+      data: { data: {}, path: null },
     },
     {
       action: 'terminate',
-      session: 'session',
-      reason: { type: 'exit', code: 'code', signal: 'signal' },
+      session: `__HIDDEN_${port}__`,
+      data: { type: 'exit', code: 'code', signal: 'signal' },
     },
   ]);
 });

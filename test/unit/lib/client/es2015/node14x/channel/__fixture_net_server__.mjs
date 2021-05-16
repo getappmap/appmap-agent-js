@@ -11,9 +11,9 @@ server.on('connection', (socket) => {
     const json = JSON.parse(message);
     socket.send(
       JSON.stringify({
-        index: json.index,
-        success: json.query.success,
-        failure: json.query.failure,
+        head: json.head,
+        type: json.body.type,
+        body: json.body.body,
       }),
     );
   });

@@ -2,20 +2,14 @@ import * as VirtualMachine from 'vm';
 import { strict as Assert } from 'assert';
 import {
   makeAppmap,
-  makeAppmapSync,
+  makeAppmapAsync,
 } from '../../../../../lib/client/es2015/appmap.js';
-import { getDisabledRecorder } from '../../../../../lib/client/es2015/recorder.js';
+import { getDisabledRecording } from '../../../../../lib/client/es2015/recording.js';
 
 (async () => {
-  const options = {
-    process: 'process',
-    navigator: 'navigator',
-    configuration: 'configuration',
-  };
-
-  /////////////
-  // Enabled //
-  /////////////
+  //////////////
+  // Enabled  //
+  //////////////
 
   {
     let counter = 0;
@@ -24,70 +18,72 @@ import { getDisabledRecorder } from '../../../../../lib/client/es2015/recorder.j
     const getRuntime = () => global.eval(`HIDDEN${String(counter)}`);
     /* eslint-enable no-eval */
 
-    const trace1 = [
+    const makeTrace = () => [
       {
         action: 'initialize',
-        process: 'process',
-        navigator: 'navigator',
-        configuration: 'configuration',
+        session: null,
+        data: 'appmap-configuration',
       },
       'hook-start',
       {
         action: 'start',
-        session: 'session',
-        configuration: 'configuration-recording',
+        session: `HIDDEN${String(counter)}`,
+        data: 'configuration-recording',
       },
       {
         action: 'instrument',
-        session: 'session',
-        source: 'source',
-        path: 'path',
-        content: 'content',
+        session: `HIDDEN${String(counter)}`,
+        data: {
+          source: 'source',
+          path: 'path',
+          content: 'content',
+        },
       },
       {
         action: 'record',
-        session: 'session',
-        origin: 'origin',
-        event: 'event',
+        session: `HIDDEN${String(counter)}`,
+        data: {
+          origin: 'origin',
+          event: 'event',
+        },
       },
       {
         action: 'stop',
-        session: 'session',
-        recording: 'recording',
+        session: `HIDDEN${String(counter)}`,
+        data: 'recording',
       },
       {
         action: 'terminate',
-        session: 'session',
-        reason: 'reason',
+        session: `HIDDEN${String(counter)}`,
+        data: 'reason',
       },
       'hook-stop',
     ];
 
-    let trace2;
+    let trace;
 
-    const hook = {
-      instrument: null,
-      start(...args) {
-        Assert.equal(this, hook);
-        Assert.equal(args.length, 1);
-        trace2.push('hook-start');
-        this.instrument = args[0];
-      },
-      stop(...args) {
-        Assert.equal(this, hook);
+    let traps = null;
+
+    const hook = (...args) => {
+      Assert.equal(traps, null);
+      Assert.equal(args.length, 1);
+      trace.push('hook-start');
+      traps = args[0];
+      return (...args) => {
+        Assert.notEqual(traps, null);
         Assert.equal(args.length, 0);
-        trace2.push('hook-stop');
-      },
+        trace.push('hook-stop');
+        traps = null;
+      };
     };
 
     const respond = (json) => {
-      trace2.push(json);
+      trace.push(json);
       if (json.action === 'initialize') {
         counter += 1;
         return {
-          enabled: true,
-          session: 'session',
-          namespace: `HIDDEN${String(counter)}`,
+          session: `HIDDEN${String(counter)}`,
+          hooking: { esm: true, cjs: true },
         };
       }
       if (json.action === 'start') {
@@ -99,103 +95,145 @@ import { getDisabledRecorder } from '../../../../../lib/client/es2015/recorder.j
     const run = (script) => VirtualMachine.runInThisContext(script);
 
     {
-      trace2 = [];
-      hook.instrument = null;
-      const appmap = makeAppmapSync(
+      trace = [];
+      const appmap = makeAppmap(
         {
-          requestSync: (...args) => {
+          request: (...args) => {
             Assert.equal(args.length, 1);
             return respond(args[0]);
           },
-          request: (...args) => {
+          requestAsync: (...args) => {
             Assert.equal(args.length, 2);
-            Assert.equal(args[1], null);
             Assert.equal(args[0].action, 'record');
+            Assert.equal(args[1], true);
             respond(args[0]);
           },
         },
         hook,
         run,
-        options,
+        'appmap-configuration',
       );
       Assert.equal(appmap.isEnabled(), true);
       Assert.throws(
         () =>
-          makeAppmapSync(
+          makeAppmap(
             {
-              requestSync: () => {
+              request: () => {
                 Assert.fail();
               },
-              request: () => {
+              requestAsync: () => {
                 Assert.fail();
               },
             },
             hook,
             run,
-            options,
+            'appmap-configuration',
           ),
         /Error: Another appmap is already running/,
       );
-      const recording = appmap.startSync('configuration-recording');
-      Assert.equal(hook.instrument('source', 'path', 'content', null), null);
+      const recording = appmap.start('configuration-recording');
+      Assert.equal(traps.cjs('source', 'path', 'content'), null);
       Assert.equal(getRuntime().record('origin', 'event'), undefined);
-      Assert.equal(recording.stopSync(), undefined);
-      Assert.equal(appmap.terminateSync('reason'), undefined);
+      Assert.equal(recording.stop(), undefined);
+      Assert.equal(appmap.terminate('reason'), undefined);
       Assert.equal(getRuntime().record('origin', 'event'), undefined);
-      Assert.deepEqual(trace2, trace1);
+      Assert.deepEqual(trace, makeTrace());
     }
 
     {
-      trace2 = [];
-      hook.instrument = null;
-      const appmap = await makeAppmap(
+      trace = [];
+      const appmap = await makeAppmapAsync(
         {
-          requestSync: () => {
+          request: () => {
             Assert.fail();
           },
-          request: (...args) => {
+          requestAsync: (...args) => {
             Assert.equal(args.length, 2);
-            const result = respond(args[0]);
-            if (args[1] !== null) {
-              args[1].resolve(result);
-            }
+            Assert.equal(args[1], args[0].action === 'record');
+            return Promise.resolve(respond(args[0]));
           },
         },
         hook,
         run,
-        options,
+        'appmap-configuration',
       );
       try {
-        await makeAppmap(
+        await makeAppmapAsync(
           {
-            requestSync: () => {
+            request: () => {
               Assert.fail();
             },
-            request: () => {
+            requestAsync: () => {
               Assert.fail();
             },
           },
           hook,
           run,
-          {},
+          'appmap-configuration',
         );
         Assert.fail();
       } catch (error) {
         Assert.equal(error.message, 'Another appmap is already running');
       }
-      const recording = await appmap.start('configuration-recording');
-      Assert.equal(
-        await new Promise((resolve, reject) => {
-          hook.instrument('source', 'path', 'content', { resolve, reject });
-        }),
-        null,
-      );
+      const recording = await appmap.startAsync('configuration-recording');
+      Assert.equal(await traps.esm('source', 'path', 'content'), null);
+      Assert.equal(await getRuntime().record('origin', 'event'), null);
+      Assert.equal(await recording.stopAsync(), undefined);
+      Assert.equal(await appmap.terminateAsync('reason'), undefined);
       Assert.equal(getRuntime().record('origin', 'event'), undefined);
-      Assert.equal(await recording.stop(), undefined);
-      Assert.equal(await appmap.terminate('reason'), undefined);
-      Assert.equal(getRuntime().record('origin', 'event'), undefined);
-      Assert.deepEqual(trace2, trace1);
+      Assert.deepEqual(trace, makeTrace());
     }
+  }
+
+  /////////////////////////////
+  // Enabled >> Empty Hooking //
+  /////////////////////////////
+
+  {
+    let trace = [];
+    Assert.equal(
+      await makeAppmap(
+        {
+          request: (...args) => {
+            trace.push('request', args);
+            return { session: 'foo', hooking: { cjs: false, esm: false } };
+          },
+          requestAsync: (...args) => {
+            trace.push('request-async', args);
+            return Promise.resolve(null);
+          },
+        },
+        (...args) => {
+          trace.push('hook-start', args);
+          return (...args) => {
+            trace.push('hook-stop', args);
+          };
+        },
+        (script) => {
+          trace.push('run');
+          global.foo = {};
+        },
+        'appmap-configuration',
+      ).terminateAsync('reason'),
+      undefined,
+    );
+    Assert.deepEqual(trace, [
+      'request',
+      [
+        {
+          action: 'initialize',
+          session: null,
+          data: 'appmap-configuration',
+        },
+      ],
+      'run',
+      'hook-start',
+      [{ cjs: null, esm: null }],
+      'request-async',
+      [{ action: 'terminate', session: 'foo', data: 'reason' }, false],
+      'hook-stop',
+      [],
+    ]);
   }
 
   //////////////
@@ -203,13 +241,8 @@ import { getDisabledRecorder } from '../../../../../lib/client/es2015/recorder.j
   //////////////
 
   {
-    const hook = {
-      start: () => {
-        Assert.fail();
-      },
-      stop: () => {
-        Assert.fail();
-      },
+    const hook = () => {
+      Assert.fail();
     };
 
     const run = () => {
@@ -217,16 +250,17 @@ import { getDisabledRecorder } from '../../../../../lib/client/es2015/recorder.j
     };
 
     {
-      const appmap = makeAppmapSync(
+      const appmap = makeAppmap(
         {
-          requestSync: (...args) => {
+          request: (...args) => {
             Assert.deepEqual(args, [
               {
                 action: 'initialize',
-                ...options,
+                session: null,
+                data: 'appmap-configuration',
               },
             ]);
-            return { enabled: false, session: null, namespace: null };
+            return null;
           },
           requestAsync: () => {
             Assert.fail();
@@ -234,38 +268,37 @@ import { getDisabledRecorder } from '../../../../../lib/client/es2015/recorder.j
         },
         hook,
         run,
-        options,
+        'appmap-configuration',
       );
       Assert.equal(appmap.isEnabled(), false);
-      Assert.equal(appmap.startSync(), getDisabledRecorder());
-      Assert.equal(appmap.terminateSync('reason'), undefined);
+      Assert.equal(appmap.start(), getDisabledRecording());
+      Assert.equal(appmap.terminate('reason'), undefined);
     }
 
     {
-      const appmap = await makeAppmap(
+      const appmap = await makeAppmapAsync(
         {
-          requestSync: () => {
+          request: () => {
             Assert.fail();
           },
-          request: (...args) => {
-            Assert.equal(args.length, 2);
-            Assert.deepEqual(args[0], {
-              action: 'initialize',
-              ...options,
-            });
-            return args[1].resolve({
-              enabled: false,
-              session: null,
-              namespace: null,
-            });
+          requestAsync: (...args) => {
+            Assert.deepEqual(args, [
+              {
+                action: 'initialize',
+                session: null,
+                data: 'appmap-configuration',
+              },
+              false,
+            ]);
+            return Promise.resolve(null);
           },
         },
         hook,
         run,
-        options,
+        'appmap-configuration',
       );
-      Assert.equal(await appmap.start(), getDisabledRecorder());
-      Assert.equal(await appmap.terminate(), undefined);
+      Assert.equal(await appmap.startAsync(), getDisabledRecording());
+      Assert.equal(await appmap.terminateAsync(), undefined);
     }
   }
 })();

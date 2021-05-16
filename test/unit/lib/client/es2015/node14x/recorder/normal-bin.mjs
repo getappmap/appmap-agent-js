@@ -6,12 +6,12 @@ let counter = 0;
 process.env = {
   ...process.env,
   APPMAP_PROTOCOL: {
-    requestSync: (json) => {
+    request: (json) => {
       Assert.equal(json.action, 'initialize');
       counter += 1;
-      return { enabled: false, session: null, namespace: null };
+      return null;
     },
-    request: () => {
+    requestAsync: () => {
       Assert.fail();
     },
   },

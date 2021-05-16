@@ -1,9 +1,9 @@
 import { strict as Assert } from 'assert';
 import {
-  getDisabledRecorder,
-  start,
-  startSync,
-} from '../../../../../lib/client/es2015/recorder.js';
+  getDisabledRecording,
+  makeRecording,
+  makeRecordingAsync,
+} from '../../../../../lib/client/es2015/recording.js';
 
 (async () => {
   /////////////
@@ -15,22 +15,22 @@ import {
       {
         action: 'start',
         session: 'session',
-        configuration: 'configuration',
+        data: 'configuration',
       },
       {
         action: 'pause',
         session: 'session',
-        recording: 'recording',
+        data: 'recording',
       },
       {
         action: 'play',
         session: 'session',
-        recording: 'recording',
+        data: 'recording',
       },
       {
         action: 'stop',
         session: 'session',
-        recording: 'recording',
+        data: 'recording',
       },
     ];
 
@@ -47,12 +47,12 @@ import {
     // Enabled - Sync //
     {
       trace2 = [];
-      const recorder = startSync(
+      const recorder = makeRecording(
         {
-          request: () => {
+          requestAsync: () => {
             Assert.fail();
           },
-          requestSync: (...args) => {
+          request: (...args) => {
             Assert.equal(args.length, 1);
             return respond(args[0]);
           },
@@ -61,43 +61,43 @@ import {
         'configuration',
       );
       Assert.equal(recorder.isEnabled(), true);
-      Assert.equal(recorder.pauseSync(), undefined);
-      Assert.equal(recorder.playSync(), undefined);
-      Assert.equal(recorder.stopSync(), undefined);
+      Assert.equal(recorder.pause(), undefined);
+      Assert.equal(recorder.play(), undefined);
+      Assert.equal(recorder.stop(), undefined);
       Assert.deepEqual(trace2, trace1);
     }
 
     // Enabled - Async //
     {
       trace2 = [];
-      const recorder = await start(
+      const recorder = await makeRecordingAsync(
         {
-          request: (...args) => {
+          requestAsync: (...args) => {
             Assert.equal(args.length, 2);
-            args[1].resolve(respond(args[0]));
+            return Promise.resolve(respond(args[0]));
           },
-          requestSync: () => {
+          request: () => {
             Assert.fail();
           },
         },
         'session',
         'configuration',
       );
-      Assert.equal(await recorder.pause(), undefined);
-      Assert.equal(await recorder.play(), undefined);
-      Assert.equal(await recorder.stop(), undefined);
+      Assert.equal(await recorder.pauseAsync(), undefined);
+      Assert.equal(await recorder.playAsync(), undefined);
+      Assert.equal(await recorder.stopAsync(), undefined);
       Assert.deepEqual(trace2, trace1);
     }
   }
 
   // Disabled - Sync //
-  Assert.equal(getDisabledRecorder().isEnabled(), false);
-  Assert.equal(getDisabledRecorder().pauseSync(), undefined);
-  Assert.equal(getDisabledRecorder().playSync(), undefined);
-  Assert.equal(getDisabledRecorder().stopSync(), undefined);
+  Assert.equal(getDisabledRecording().isEnabled(), false);
+  Assert.equal(getDisabledRecording().pause(), undefined);
+  Assert.equal(getDisabledRecording().play(), undefined);
+  Assert.equal(getDisabledRecording().stop(), undefined);
 
   // Disabled - Async //
-  Assert.equal(await getDisabledRecorder().play(), undefined);
-  Assert.equal(await getDisabledRecorder().pause(), undefined);
-  Assert.equal(await getDisabledRecorder().stop(), undefined);
+  Assert.equal(await getDisabledRecording().playAsync(), undefined);
+  Assert.equal(await getDisabledRecording().pauseAsync(), undefined);
+  Assert.equal(await getDisabledRecording().stopAsync(), undefined);
 })();

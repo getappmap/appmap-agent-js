@@ -1,16 +1,18 @@
-import * as Path from 'path';
 import * as ChildProcess from 'child_process';
+import * as Path from 'path';
 import { strict as Assert } from 'assert';
 import { fileURLToPath } from 'url';
-import makeRequestSync from '../../../../../../../../lib/client/es2015/node14x/channel/request-sync/messaging.js';
+import { makeRequest } from '../../../../../../../../lib/client/es2015/node14x/channel/request/curl.js';
+
+makeRequest(1, 'localhost', '/missing/unix-socket.sock');
 
 const child = ChildProcess.fork(
   Path.join(
     Path.dirname(fileURLToPath(import.meta.url)),
     '..',
-    '__fixture_net_server__.mjs',
+    '__fixture_http_server__.mjs',
   ),
-  ['0'],
+  ['http1', '0'],
   {
     stdio: ['inherit', 'inherit', 'inherit', 'ipc'],
   },
@@ -21,25 +23,21 @@ child.on('exit', (code, signal) => {
 });
 
 child.on('message', (port) => {
-  const requestSync = makeRequestSync('localhost', port);
+  const request = makeRequest(1, 'localhost', port);
   Assert.equal(
-    requestSync({
-      success: 123,
-      failure: null,
+    request({
+      status: 200,
+      body: '123',
     }),
     123,
   );
   Assert.throws(
     () =>
-      requestSync({
-        success: null,
-        failure: 'BOUM',
+      request({
+        status: 400,
+        body: 'BOUM',
       }),
-    /^Error: BOUM/,
+    /^Error: http status 400 >> BOUM/,
   );
   child.kill('SIGINT');
 });
-
-Assert.throws(() => makeRequestSync('invalid-address', 0));
-
-Assert.throws(() => makeRequestSync('foobar', '/missing-ipc-socket.sock'));

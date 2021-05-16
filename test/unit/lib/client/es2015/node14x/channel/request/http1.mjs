@@ -1,6 +1,3 @@
-import makeRequestAsync from '../../../../../../../../lib/client/es2015/node14x/channel/request/http1.js';
-import fixture from './__fixture__.mjs';
+import { makeRequest } from '../../../../../../../../lib/client/es2015/node14x/channel/request/http1.js';
 
-makeRequestAsync('localhost', 'tmp/ipc.sock');
-
-fixture('http1', makeRequestAsync);
+makeRequest('localhost', 0);
