@@ -86,6 +86,7 @@ Assert.match(
   Assert.deepEqual(hooking, {
     esm: true,
     cjs: true,
+    http: true,
   });
   const data = {
     data: {

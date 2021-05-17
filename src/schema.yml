@@ -238,6 +238,7 @@
     node-version: {$ref: node-version}
     hook-cjs: {type: boolean}
     hook-esm: {type: boolean}
+    hook-http: {type: boolean}
     enabled:
       anyOf:
         - type: boolean
@@ -365,7 +366,10 @@
           additionalProperties: false
           required: [origin, event]
           properties:
-            origin: {type: string}
+            origin:
+              anyOf:
+                - const: null
+                - type: string
             event:
               type: object
               additionalProperties: true

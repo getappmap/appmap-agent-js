@@ -14,5 +14,9 @@ class TestHello < Minitest::Test
   def test_foo
     assert_equal 'bar', @hello.foo
   end
+  
+  def test_req
+    assert_equal 'req', @hello.req
+  end
 
 end

@@ -117,6 +117,29 @@ const identity = (any) => any;
   Assert.deepEqual(appmap.events, ['event1']);
 }
 
+{
+  const recording = new Recording(
+    getInitialConfiguration()
+      .extendWithData(
+        {
+          output: {
+            'directory-path': 'tmp/test/',
+            'file-name': 'foo',
+          },
+        },
+        process.cwd(),
+      )
+      .fromRight(),
+  );
+  recording.record(null, 'event');
+  unlink('tmp/test/foo.appmap.json');
+  recording.terminate(identity);
+  const appmap = JSON.parse(
+    FileSystem.readFileSync('tmp/test/foo.appmap.json', 'utf8'),
+  );
+  Assert.deepEqual(appmap.events, ['event']);
+}
+
 Assert.match(
   new Recording(
     getInitialConfiguration()

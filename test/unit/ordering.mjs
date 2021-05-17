@@ -46,6 +46,7 @@ export const client = [
   'es2015/node14x/channel/index',
   'es2015/node14x/hook/cjs',
   'es2015/node14x/hook/esm',
+  'es2015/node14x/hook/http',
   'es2015/node14x/hook/index',
   'es2015/node14x/index',
   'es2015/node14x/recorder/check-version',

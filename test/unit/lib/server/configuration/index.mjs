@@ -228,4 +228,5 @@ Assert.deepEqual(getInitialConfiguration().getChilderen(), []);
 Assert.deepEqual(getInitialConfiguration().getHooking(), {
   esm: true,
   cjs: true,
+  http: true,
 });

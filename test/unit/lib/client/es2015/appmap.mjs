@@ -83,7 +83,7 @@ import { getDisabledRecording } from '../../../../../lib/client/es2015/recording
         counter += 1;
         return {
           session: `HIDDEN${String(counter)}`,
-          hooking: { esm: true, cjs: true },
+          hooking: { esm: true, cjs: true, http: true },
         };
       }
       if (json.action === 'start') {
@@ -196,7 +196,10 @@ import { getDisabledRecording } from '../../../../../lib/client/es2015/recording
         {
           request: (...args) => {
             trace.push('request', args);
-            return { session: 'foo', hooking: { cjs: false, esm: false } };
+            return {
+              session: 'foo',
+              hooking: { cjs: false, esm: false, http: false },
+            };
           },
           requestAsync: (...args) => {
             trace.push('request-async', args);
@@ -228,7 +231,7 @@ import { getDisabledRecording } from '../../../../../lib/client/es2015/recording
       ],
       'run',
       'hook-start',
-      [{ cjs: null, esm: null }],
+      [{ cjs: null, esm: null, http: null }],
       'request-async',
       [{ action: 'terminate', session: 'foo', data: 'reason' }, false],
       'hook-stop',

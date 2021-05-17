@@ -22,6 +22,7 @@ requestAsync({
   Assert.deepEqual(hooking, {
     esm: true,
     cjs: false,
+    http: true,
   });
   Assert.equal(
     typeof request({

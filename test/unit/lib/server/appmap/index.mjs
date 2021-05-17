@@ -35,6 +35,7 @@ const unlink = (path) => {
     hooking: {
       cjs: true,
       esm: true,
+      http: true,
     },
   });
 
@@ -99,6 +100,10 @@ const unlink = (path) => {
     (await appmap.recordAsync({ origin, event: 'event3' })).fromRight(),
     null,
   );
+  Assert.equal(
+    (await appmap.recordAsync({ origin: null, event: 'event4' })).fromRight(),
+    null,
+  );
 
   unlink('tmp/test/bar.appmap.json');
 
@@ -110,7 +115,7 @@ const unlink = (path) => {
   Assert.equal(json.classMap.length, 1);
   Assert.equal(json.classMap[0].type, 'package');
   Assert.equal(json.classMap[0].name, 'qux');
-  Assert.deepEqual(json.events, ['event1', 'event3']);
+  Assert.deepEqual(json.events, ['event1', 'event3', 'event4']);
 })();
 
 {
