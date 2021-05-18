@@ -1,10 +1,14 @@
-import * as VirtualMachine from 'vm';
+import * as FileSystem from 'fs';
+import * as Url from 'url';
+import * as Path from 'path';
+import * as Module from 'module';
 import { strict as Assert } from 'assert';
+import { transformSource } from '../../../../../../lib/client/es2015/node14x/hook/esm.js';
 import {
   makeAppmap,
   makeAppmapAsync,
-} from '../../../../../lib/client/es2015/appmap.js';
-import { getDisabledRecording } from '../../../../../lib/client/es2015/recording.js';
+} from '../../../../../../lib/client/es2015/node14x/appmap.js';
+import { getDisabledRecording } from '../../../../../../lib/client/es2015/node14x/recording.js';
 
 (async () => {
   //////////////
@@ -18,13 +22,12 @@ import { getDisabledRecording } from '../../../../../lib/client/es2015/recording
     const getRuntime = () => global.eval(`HIDDEN${String(counter)}`);
     /* eslint-enable no-eval */
 
-    const makeTrace = () => [
+    const makeTrace = (file) => [
       {
         action: 'initialize',
         session: null,
         data: 'appmap-configuration',
       },
-      'hook-start',
       {
         action: 'start',
         session: `HIDDEN${String(counter)}`,
@@ -33,11 +36,7 @@ import { getDisabledRecording } from '../../../../../lib/client/es2015/recording
       {
         action: 'instrument',
         session: `HIDDEN${String(counter)}`,
-        data: {
-          source: 'source',
-          path: 'path',
-          content: 'content',
-        },
+        data: file,
       },
       {
         action: 'record',
@@ -57,25 +56,9 @@ import { getDisabledRecording } from '../../../../../lib/client/es2015/recording
         session: `HIDDEN${String(counter)}`,
         data: 'reason',
       },
-      'hook-stop',
     ];
 
     let trace;
-
-    let traps = null;
-
-    const hook = (...args) => {
-      Assert.equal(traps, null);
-      Assert.equal(args.length, 1);
-      trace.push('hook-start');
-      traps = args[0];
-      return (...args) => {
-        Assert.notEqual(traps, null);
-        Assert.equal(args.length, 0);
-        trace.push('hook-stop');
-        traps = null;
-      };
-    };
 
     const respond = (json) => {
       trace.push(json);
@@ -89,99 +72,89 @@ import { getDisabledRecording } from '../../../../../lib/client/es2015/recording
       if (json.action === 'start') {
         return 'recording';
       }
+      if (json.action === 'instrument') {
+        if (json.data.source === 'script') return 'exports.yo = 456;';
+        if (json.data.source === 'module') {
+          return 'export const yo = 456;';
+        }
+        Assert.fail();
+      }
       return null;
     };
 
-    const run = (script) => VirtualMachine.runInThisContext(script);
+    const protocol = {
+      request: (...args) => {
+        Assert.equal(args.length, 1);
+        return respond(args[0]);
+      },
+      requestAsync: (...args) => {
+        Assert.equal(args.length, 2);
+        Assert.equal(typeof args[1], 'boolean');
+        return Promise.resolve(respond(args[0]));
+      },
+    };
 
     {
       trace = [];
-      const appmap = makeAppmap(
-        {
-          request: (...args) => {
-            Assert.equal(args.length, 1);
-            return respond(args[0]);
-          },
-          requestAsync: (...args) => {
-            Assert.equal(args.length, 2);
-            Assert.equal(args[0].action, 'record');
-            Assert.equal(args[1], true);
-            respond(args[0]);
-          },
-        },
-        hook,
-        run,
-        'appmap-configuration',
-      );
+      const appmap = makeAppmap({
+        protocol: protocol,
+        configuration: 'appmap-configuration',
+      });
       Assert.equal(appmap.isEnabled(), true);
-      Assert.throws(
-        () =>
-          makeAppmap(
-            {
-              request: () => {
-                Assert.fail();
-              },
-              requestAsync: () => {
-                Assert.fail();
-              },
-            },
-            hook,
-            run,
-            'appmap-configuration',
-          ),
-        /Error: Another appmap is already running/,
-      );
       const recording = appmap.start('configuration-recording');
-      Assert.equal(traps.cjs('source', 'path', 'content'), null);
-      Assert.equal(getRuntime().record('origin', 'event'), undefined);
+      FileSystem.writeFileSync('tmp/test/yo.js', 'exports.yo = 123;', 'utf8');
+      Assert.equal(
+        Module.createRequire(import.meta.url)(Path.resolve('tmp/test/yo.js'))
+          .yo,
+        456,
+      );
+      getRuntime().record('origin', 'event');
       Assert.equal(recording.stop(), undefined);
       Assert.equal(appmap.terminate('reason'), undefined);
       Assert.equal(getRuntime().record('origin', 'event'), undefined);
-      Assert.deepEqual(trace, makeTrace());
+      Assert.deepEqual(
+        trace,
+        makeTrace({
+          source: 'script',
+          path: Path.resolve('tmp/test/yo.js'),
+          content: 'exports.yo = 123;',
+        }),
+      );
     }
 
     {
       trace = [];
-      const appmap = await makeAppmapAsync(
-        {
-          request: () => {
+      const appmap = await makeAppmapAsync({
+        protocol,
+        configuration: 'appmap-configuration',
+      });
+      const recording = await appmap.startAsync('configuration-recording');
+      // FileSystem.writeFileSync("tmp/test/yo.mjs", "export const yo = 123;", "utf8");
+      Assert.deepEqual(
+        await transformSource(
+          'export const yo = 123;',
+          {
+            format: 'module',
+            url: Url.pathToFileURL(Path.resolve('tmp/test/yo.mjs')),
+          },
+          () => {
             Assert.fail();
           },
-          requestAsync: (...args) => {
-            Assert.equal(args.length, 2);
-            Assert.equal(args[1], args[0].action === 'record');
-            return Promise.resolve(respond(args[0]));
-          },
-        },
-        hook,
-        run,
-        'appmap-configuration',
+        ),
+        { source: 'export const yo = 456;' },
       );
-      try {
-        await makeAppmapAsync(
-          {
-            request: () => {
-              Assert.fail();
-            },
-            requestAsync: () => {
-              Assert.fail();
-            },
-          },
-          hook,
-          run,
-          'appmap-configuration',
-        );
-        Assert.fail();
-      } catch (error) {
-        Assert.equal(error.message, 'Another appmap is already running');
-      }
-      const recording = await appmap.startAsync('configuration-recording');
-      Assert.equal(await traps.esm('source', 'path', 'content'), null);
       Assert.equal(await getRuntime().record('origin', 'event'), null);
       Assert.equal(await recording.stopAsync(), undefined);
       Assert.equal(await appmap.terminateAsync('reason'), undefined);
       Assert.equal(getRuntime().record('origin', 'event'), undefined);
-      Assert.deepEqual(trace, makeTrace());
+      Assert.deepEqual(
+        trace,
+        makeTrace({
+          source: 'module',
+          path: Path.resolve('tmp/test/yo.mjs'),
+          content: 'export const yo = 123;',
+        }),
+      );
     }
   }
 
@@ -192,8 +165,8 @@ import { getDisabledRecording } from '../../../../../lib/client/es2015/recording
   {
     let trace = [];
     Assert.equal(
-      await makeAppmap(
-        {
+      await makeAppmap({
+        protocol: {
           request: (...args) => {
             trace.push('request', args);
             return {
@@ -206,18 +179,8 @@ import { getDisabledRecording } from '../../../../../lib/client/es2015/recording
             return Promise.resolve(null);
           },
         },
-        (...args) => {
-          trace.push('hook-start', args);
-          return (...args) => {
-            trace.push('hook-stop', args);
-          };
-        },
-        (script) => {
-          trace.push('run');
-          global.foo = {};
-        },
-        'appmap-configuration',
-      ).terminateAsync('reason'),
+        configuration: 'appmap-configuration',
+      }).terminateAsync('reason'),
       undefined,
     );
     Assert.deepEqual(trace, [
@@ -229,13 +192,8 @@ import { getDisabledRecording } from '../../../../../lib/client/es2015/recording
           data: 'appmap-configuration',
         },
       ],
-      'run',
-      'hook-start',
-      [{ cjs: null, esm: null, http: null }],
       'request-async',
       [{ action: 'terminate', session: 'foo', data: 'reason' }, false],
-      'hook-stop',
-      [],
     ]);
   }
 
@@ -244,17 +202,9 @@ import { getDisabledRecording } from '../../../../../lib/client/es2015/recording
   //////////////
 
   {
-    const hook = () => {
-      Assert.fail();
-    };
-
-    const run = () => {
-      Assert.fail();
-    };
-
     {
-      const appmap = makeAppmap(
-        {
+      const appmap = makeAppmap({
+        protocol: {
           request: (...args) => {
             Assert.deepEqual(args, [
               {
@@ -269,18 +219,16 @@ import { getDisabledRecording } from '../../../../../lib/client/es2015/recording
             Assert.fail();
           },
         },
-        hook,
-        run,
-        'appmap-configuration',
-      );
+        configuration: 'appmap-configuration',
+      });
       Assert.equal(appmap.isEnabled(), false);
       Assert.equal(appmap.start(), getDisabledRecording());
       Assert.equal(appmap.terminate('reason'), undefined);
     }
 
     {
-      const appmap = await makeAppmapAsync(
-        {
+      const appmap = await makeAppmapAsync({
+        protocol: {
           request: () => {
             Assert.fail();
           },
@@ -296,10 +244,8 @@ import { getDisabledRecording } from '../../../../../lib/client/es2015/recording
             return Promise.resolve(null);
           },
         },
-        hook,
-        run,
-        'appmap-configuration',
-      );
+        configuration: 'appmap-configuration',
+      });
       Assert.equal(await appmap.startAsync(), getDisabledRecording());
       Assert.equal(await appmap.terminateAsync(), undefined);
     }

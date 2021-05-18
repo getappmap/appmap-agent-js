@@ -33,13 +33,13 @@ export const server = [
 ];
 
 export const client = [
-  'es2015/runtime',
-  'es2015/recording',
-  'es2015/appmap',
+  'es2015/node14x/check',
+  'es2015/node14x/version',
   'es2015/node14x/channel/request/messaging',
   'es2015/node14x/channel/request/curl',
   'es2015/node14x/channel/request/http1',
   'es2015/node14x/channel/request/http2',
+  'es2015/node14x/channel/request-async/error',
   'es2015/node14x/channel/request-async/messaging',
   'es2015/node14x/channel/request-async/http1',
   'es2015/node14x/channel/request-async/http2',
@@ -48,9 +48,13 @@ export const client = [
   'es2015/node14x/hook/esm',
   'es2015/node14x/hook/http',
   'es2015/node14x/hook/index',
-  'es2015/node14x/index',
-  'es2015/node14x/recorder/check-version',
-  'es2015/node14x/recorder/env',
+  'es2015/node14x/run',
+  'es2015/node14x/runtime',
+  'es2015/node14x/recording',
+  'es2015/node14x/appmap',
+  'es2015/node14x/recorder/options',
   'es2015/node14x/recorder/normal-main',
   'es2015/node14x/recorder/normal-bin',
+  'es2015/node14x/recorder/mocha-main',
+  'es2015/node14x/recorder/mocha-bin',
 ];

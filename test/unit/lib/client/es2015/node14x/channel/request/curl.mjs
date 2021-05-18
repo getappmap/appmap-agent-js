@@ -31,13 +31,5 @@ child.on('message', (port) => {
     }),
     123,
   );
-  Assert.throws(
-    () =>
-      request({
-        status: 400,
-        body: 'BOUM',
-      }),
-    /^Error: http status 400 >> BOUM/,
-  );
   child.kill('SIGINT');
 });

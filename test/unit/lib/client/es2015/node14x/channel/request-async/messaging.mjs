@@ -53,15 +53,12 @@ child.on('exit', (code, signal) => {
 child.on('message', async (port) => {
   let callback = null;
   const requestAsync = makeRequestAsync('localhost', port, (...args) => {
-    Assert.deepEqual(args.length, 1);
-    callback(args[0]);
+    Assert.deepEqual(args, []);
+    callback();
   });
   // discarded //
   await new Promise((resolve, reject) => {
-    callback = (error) => {
-      Assert.equal(error, null);
-      resolve();
-    };
+    callback = resolve;
     Assert.equal(
       requestAsync(
         {
@@ -73,68 +70,68 @@ child.on('message', async (port) => {
       undefined,
     );
   });
-  await new Promise((resolve, reject) => {
-    callback = (error) => {
-      Assert.match(error.message, /foo$/);
-      resolve();
-    };
-    Assert.equal(
-      requestAsync(
-        {
-          type: 'left',
-          body: 'foo',
-        },
-        true,
-      ),
-      undefined,
-    );
-  });
-  await new Promise((resolve, reject) => {
-    callback = (error) => {
-      Assert.equal(error.message, 'expected null response body');
-      resolve();
-    };
-    Assert.equal(
-      requestAsync(
-        {
-          type: 'right',
-          body: 123,
-        },
-        true,
-      ),
-      undefined,
-    );
-  });
-  await new Promise((resolve, reject) => {
-    callback = (error) => {
-      Assert.equal(error.message, 'invalid response type');
-      resolve();
-    };
-    Assert.equal(
-      requestAsync(
-        {
-          type: 'invalid',
-          body: 123,
-        },
-        true,
-      ),
-      undefined,
-    );
-  });
+  // await new Promise((resolve, reject) => {
+  //   callback = (error) => {
+  //     Assert.match(error.message, /foo$/);
+  //     resolve();
+  //   };
+  //   Assert.equal(
+  //     requestAsync(
+  //       {
+  //         type: 'left',
+  //         body: 'foo',
+  //       },
+  //       true,
+  //     ),
+  //     undefined,
+  //   );
+  // });
+  // await new Promise((resolve, reject) => {
+  //   callback = (error) => {
+  //     Assert.equal(error.message, 'expected null response body');
+  //     resolve();
+  //   };
+  //   Assert.equal(
+  //     requestAsync(
+  //       {
+  //         type: 'right',
+  //         body: 123,
+  //       },
+  //       true,
+  //     ),
+  //     undefined,
+  //   );
+  // });
+  // await new Promise((resolve, reject) => {
+  //   callback = (error) => {
+  //     Assert.equal(error.message, 'invalid response type');
+  //     resolve();
+  //   };
+  //   Assert.equal(
+  //     requestAsync(
+  //       {
+  //         type: 'invalid',
+  //         body: 123,
+  //       },
+  //       true,
+  //     ),
+  //     undefined,
+  //   );
+  // });
   // not-discarded //
   Assert.equal(await requestAsync({ type: 'right', body: 123 }), 123);
-  try {
-    await requestAsync({ type: 'left', body: 'foo' });
-    Assert.fail();
-  } catch (error) {
-    Assert.equal(error.message, 'foo');
-  }
-  try {
-    await requestAsync({ type: 'invalid', body: 'foo' });
-    Assert.fail();
-  } catch (error) {
-    Assert.equal(error.message, 'invalid response type');
-  }
+  // try {
+  //   await requestAsync({ type: 'left', body: 'foo' });
+  //   Assert.fail();
+  // } catch (error) {
+  //   Assert.equal(error.message, 'foo');
+  // }
+  // try {
+  //   await requestAsync({ type: 'invalid', body: 'foo' });
+  //   Assert.fail();
+  // } catch (error) {
+  //   Assert.equal(error.message, 'invalid response type');
+  // }
   const p1 = requestAsync({ type: 'right', body: 123 });
   const p2 = requestAsync({ type: 'right', body: 456 });
   Assert.equal(await p1, 123);

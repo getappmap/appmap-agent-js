@@ -235,7 +235,7 @@
               timeout: {type: integer}
               kill-signal: {$ref: signal}
     # client
-    node-version: {$ref: node-version}
+    recorder: {$ref: recorder}
     hook-cjs: {type: boolean}
     hook-esm: {type: boolean}
     hook-http: {type: boolean}

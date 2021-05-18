@@ -1,6 +1,6 @@
 import { strict as Assert } from 'assert';
 import * as Module from 'module';
-import { getRuntime } from '../../../../../../../lib/client/es2015/runtime.js';
+import { getRuntime } from '../../../../../../../lib/client/es2015/node14x/runtime.js';
 import { hookHTTP } from '../../../../../../../lib/client/es2015/node14x/hook/http.js';
 
 const require = Module.createRequire(import.meta.url);

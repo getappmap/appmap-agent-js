@@ -27,16 +27,6 @@ export const test = (protocol, makeRequestAsync) => {
       await requestAsync({ status: 200, body: 'null' }, false),
       null,
     );
-    try {
-      await requestAsync({ status: 400, body: 'foo' }, false);
-      Assert.fail();
-    } catch (error) {
-      Assert.match(error.message, /foo$/);
-    }
-    try {
-      await requestAsync({ status: 200, body: 'foo' }, false);
-      Assert.fail();
-    } catch (error) /* eslint-disable no-empty */ {} /* eslint-enable no-empty */
     child.kill('SIGINT');
   });
 };

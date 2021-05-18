@@ -1,5 +1,5 @@
 import { strict as Assert } from 'assert';
-import { getRuntime } from '../../../../../lib/client/es2015/runtime.js';
+import { getRuntime } from '../../../../../../lib/client/es2015/node14x/runtime.js';
 
 const runtime = getRuntime();
 

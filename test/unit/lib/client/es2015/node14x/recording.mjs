@@ -3,7 +3,7 @@ import {
   getDisabledRecording,
   makeRecording,
   makeRecordingAsync,
-} from '../../../../../lib/client/es2015/recording.js';
+} from '../../../../../../lib/client/es2015/node14x/recording.js';
 
 (async () => {
   /////////////

@@ -19,7 +19,3 @@ Assert.deepEqual(
     request: 456,
   },
 );
-
-Assert.throws(() => {
-  makeChannel('foobar', 'localhost', 0);
-}, /^Error: invalid protocol/u);
