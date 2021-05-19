@@ -36,18 +36,12 @@ class Writable {
       const child = new Events.EventEmitter();
       child.stdout = new Events.EventEmitter();
       child.stderr = new Events.EventEmitter();
-      child.spawnargs = ['foo', 'bar'];
-      child.kill = () => {
-        Assert.fail();
-      };
       setImmediate(() => {
+        child.emit('exit', 0, null);
         child.stdout.emit('data', 'stdout-data');
-        setImmediate(() => {
-          child.stderr.emit('data', 'stderr-data');
-          setImmediate(() => {
-            child.emit('exit', 0, null);
-          });
-        });
+        child.stdout.emit('end');
+        child.stderr.emit('data', 'stderr-data');
+        child.stderr.emit('end');
       });
       return child;
     });
@@ -62,38 +56,15 @@ class Writable {
       },
       (code) => {
         Assert.equal(code, 0);
-        Assert.equal(
-          writable.buffer.join(''),
-          [
-            'foo bar exit with 0',
-            'stdout:',
-            'stdout-data',
-            'stderr:',
-            'stderr-data',
-            '',
-          ].join('\n'),
-        );
-      },
-    );
-  }
-  // no childeren //
-  {
-    const writable = new Writable();
-    setSpawnForTesting(() => {
-      Assert.fail();
-    });
-    (
-      await main(process.cwd(), writable, {
-        extends: 'tmp/test/appmap.json',
-        _: [],
-      })
-    ).either(
-      (message) => {
-        Assert.fail();
-      },
-      (code) => {
-        Assert.equal(code, 0);
-        Assert.deepEqual(writable.buffer, []);
+        Assert.deepEqual(writable.buffer.join('').split('\n'), [
+          '#0 (out of 1): node main.js ...',
+          '#0 stdout >>',
+          '  | stdout-data',
+          '#0 stderr >>',
+          '  | stderr-data',
+          '#0 exit with: 0',
+          '',
+        ]);
       },
     );
   }
@@ -119,45 +90,100 @@ class Writable {
       },
     );
   }
-  // multiple inline childeren //
+  // // multiple inline childeren //
+  // {
+  //   const writable = new Writable();
+  //   setSpawnForTesting((...args) => {
+  //     Assert.deepEqual(args.slice(0, 2), ['node', ['main1.js']]);
+  //     setSpawnForTesting((...args) => {
+  //       Assert.deepEqual(args.slice(0, 2), ['node', ['main2.js']]);
+  //       throw new Error('BOUM');
+  //     });
+  //     const child = new Events.EventEmitter();
+  //     child.stdout = null;
+  //     child.stderr = null;
+  //     return child;
+  //   });
+  //   (
+  //     await main(process.cwd(), writable, {
+  //       extends: 'tmp/test/appmap.json',
+  //       childeren: ['node main1.js', 'node main2.js'],
+  //       protocol: 'inline',
+  //       _: [],
+  //     })
+  //   ).either(
+  //     (message) => {
+  //       Assert.equal(message, 'child errors:\n  - #1 spawning error >> failed to spawn child >> BOUM');
+  //       Assert.deepEqual(writable.buffer, [
+  //         '#0 (out of 2): node main1.js ...\n',
+  //         '#1 (out of 2): node main2.js ...\n',
+  //         '#1 failed with: spawning error >> failed to spawn child >> BOUM\n'
+  //       ]);
+  //     },
+  //     (code) => {
+  //       Assert.fail();
+  //     },
+  //   );
+  // }
+  // child running error
   {
     const writable = new Writable();
     setSpawnForTesting((...args) => {
       Assert.deepEqual(args.slice(0, 2), ['node', ['main1.js']]);
       setSpawnForTesting((...args) => {
-        Assert.deepEqual(args.slice(0, 2), ['node', ['main2.js']]);
-        throw new Error('BOUM');
+        Assert.fail();
       });
       const child = new Events.EventEmitter();
-      child.kill = (...args) => {
-        Assert.deepEqual(args, ['SIGKILL']);
-        setImmediate(() => {
-          child.emit('exit', null, 'SIGKILL');
-        });
-      };
       child.stdout = null;
       child.stderr = null;
-      child.spawnargs = ['foo', 'bar'];
+      setImmediate(() => {
+        child.emit('error', new Error('BOUM'));
+      });
       return child;
     });
     (
       await main(process.cwd(), writable, {
         extends: 'tmp/test/appmap.json',
-        childeren: ['node main1.js', 'node main2.js'],
+        childeren: ['node main1.js'],
         protocol: 'inline',
         _: [],
       })
     ).either(
       (message) => {
-        Assert.equal(message, 'failed to spawn child >> BOUM');
-        Assert.deepEqual(writable.buffer, []);
+        Assert.equal(message, 'child errors:\n  - #0 running error >> BOUM');
       },
       (code) => {
         Assert.fail();
       },
     );
   }
-  // signal child //
+  // child spawning error
+  {
+    const writable = new Writable();
+    setSpawnForTesting((...args) => {
+      Assert.deepEqual(args.slice(0, 2), ['node', ['main.js']]);
+      setSpawnForTesting((...args) => {
+        Assert.fail();
+      });
+      throw new Error('BOUM');
+    });
+    (
+      await main(process.cwd(), writable, {
+        extends: 'tmp/test/appmap.json',
+        childeren: 'node main.js',
+        protocol: 'inline',
+        _: [],
+      })
+    ).either(
+      (message) => {
+        Assert.equal(message, 'child errors:\n  - #0 spawning error >> BOUM');
+      },
+      (code) => {
+        Assert.fail();
+      },
+    );
+  }
+  // killed child //
   {
     const writable = new Writable();
     setSpawnForTesting((...args) => {
@@ -166,12 +192,8 @@ class Writable {
         Assert.fail();
       });
       const child = new Events.EventEmitter();
-      child.kill = () => {
-        Assert.fail();
-      };
       child.stdout = null;
       child.stderr = null;
-      child.spawnargs = ['foo', 'bar'];
       setImmediate(() => {
         child.emit('exit', null, 'SIGINT');
       });
@@ -181,6 +203,7 @@ class Writable {
       await main(process.cwd(), writable, {
         extends: 'tmp/test/appmap.json',
         childeren: 'node main.js',
+        protocol: 'inline',
         _: [],
       })
     ).either(
@@ -189,11 +212,14 @@ class Writable {
       },
       (code) => {
         Assert.equal(code, 1);
-        Assert.equal(writable.buffer.join(''), 'foo bar killed with SIGINT\n');
+        Assert.deepEqual(writable.buffer, [
+          '#0 (out of 1): node main.js ...\n',
+          '#0 killed with: SIGINT\n',
+        ]);
       },
     );
   }
-  // non-zero exit child //
+  // 123 exit child //
   {
     const writable = new Writable();
     setSpawnForTesting((...args) => {
@@ -202,14 +228,10 @@ class Writable {
         Assert.fail();
       });
       const child = new Events.EventEmitter();
-      child.kill = () => {
-        Assert.fail();
-      };
       child.stdout = null;
       child.stderr = null;
-      child.spawnargs = ['foo', 'bar'];
       setImmediate(() => {
-        child.emit('exit', 1, null);
+        child.emit('exit', 123, null);
       });
       return child;
     });
@@ -217,15 +239,15 @@ class Writable {
       await main(process.cwd(), writable, {
         extends: 'tmp/test/appmap.json',
         childeren: 'node main.js',
+        protocol: 'inline',
         _: [],
       })
     ).either(
       (message) => {
-        Assert.fail();
+        Assert.equal(message, 'child errors:\n  - #0 client agent error');
       },
       (code) => {
-        Assert.equal(code, 1);
-        Assert.equal(writable.buffer.join(''), 'foo bar exit with 1\n');
+        Assert.fail();
       },
     );
   }

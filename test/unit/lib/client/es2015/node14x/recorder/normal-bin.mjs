@@ -1,24 +1,9 @@
-import { strict as Assert } from 'assert';
-import * as Module from 'module';
-
-let counter = 0;
-
 process.env = {
   ...process.env,
   APPMAP_PROTOCOL: {
-    request: (json) => {
-      Assert.equal(json.action, 'initialize');
-      counter += 1;
-      return null;
-    },
-    requestAsync: () => {
-      Assert.fail();
-    },
+    request: (json) => null,
+    requestAsync: (json, discarded) => Promise.resolve(null),
   },
 };
 
-const require = Module.createRequire(import.meta.url);
-
-require('../../../../../../../lib/client/es2015/node14x/recorder/normal-bin.js');
-
-Assert.equal(counter, 1);
+import('../../../../../../../lib/client/es2015/node14x/recorder/normal-bin.js');

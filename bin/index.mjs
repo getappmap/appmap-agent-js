@@ -7,9 +7,8 @@ main(process.cwd(), process.stdout, minimist(process.argv.slice(2))).then(
   (either) => {
     either.either(
       (message) => {
-        process.stderr.write(message);
-        process.stderr.write('\n');
-        process.exitCode = 1;
+        process.stderr.write(`${message}${'\n'}`);
+        process.exitCode = 123;
       },
       (code) => {
         process.exitCode = code;
