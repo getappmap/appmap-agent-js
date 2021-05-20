@@ -24,20 +24,16 @@ const identity = (any) => any;
   };
   const recording = new Recording(
     getInitialConfiguration()
-      .extendWithData(
-        {
-          'class-map-pruning': false,
-          'event-pruning': false,
-          base: {
-            path: '/base',
-          },
-          output: {
-            'directory-path': 'tmp/test/',
-            'file-name': 'foo',
-          },
+      .extendWithData({
+        cwd: process.cwd(),
+        'class-map-pruning': false,
+        'event-pruning': false,
+        base: '/base',
+        output: {
+          directory: 'tmp/test/',
+          'file-name': 'foo',
         },
-        process.cwd(),
-      )
+      })
       .fromRight(),
   );
   recording.register(origin1);
@@ -86,17 +82,15 @@ const identity = (any) => any;
   };
   const recording = new Recording(
     getInitialConfiguration()
-      .extendWithData(
-        {
-          'class-map-pruning': false,
-          'event-pruning': true,
-          output: {
-            'directory-path': 'tmp/test/',
-            'file-name': 'foo',
-          },
+      .extendWithData({
+        cwd: process.cwd(),
+        'class-map-pruning': false,
+        'event-pruning': true,
+        output: {
+          directory: 'tmp/test/',
+          'file-name': 'foo',
         },
-        process.cwd(),
-      )
+      })
       .fromRight(),
   );
   recording.register(origin1);
@@ -120,15 +114,13 @@ const identity = (any) => any;
 {
   const recording = new Recording(
     getInitialConfiguration()
-      .extendWithData(
-        {
-          output: {
-            'directory-path': 'tmp/test/',
-            'file-name': 'foo',
-          },
+      .extendWithData({
+        cwd: process.cwd(),
+        output: {
+          directory: 'tmp/test/',
+          'file-name': 'foo',
         },
-        process.cwd(),
-      )
+      })
       .fromRight(),
   );
   recording.record(null, 'event');
@@ -143,15 +135,13 @@ const identity = (any) => any;
 Assert.match(
   new Recording(
     getInitialConfiguration()
-      .extendWithData(
-        {
-          output: {
-            'directory-path': 'missing',
-            'file-name': 'foo',
-          },
+      .extendWithData({
+        cwd: process.cwd(),
+        output: {
+          directory: 'missing',
+          'file-name': 'foo',
         },
-        process.cwd(),
-      )
+      })
       .fromRight(),
   )
     .terminate(identity)
@@ -161,15 +151,13 @@ Assert.match(
 
 new Recording(
   getInitialConfiguration()
-    .extendWithData(
-      {
-        output: {
-          'directory-path': 'missing',
-          'file-name': 'foo',
-        },
+    .extendWithData({
+      cwd: process.cwd(),
+      output: {
+        directory: 'missing',
+        'file-name': 'foo',
       },
-      process.cwd(),
-    )
+    })
     .fromRight(),
 )
   .terminateAsync(identity)
@@ -179,15 +167,13 @@ new Recording(
 
 new Recording(
   getInitialConfiguration()
-    .extendWithData(
-      {
-        output: {
-          'directory-path': 'tmp/test',
-          'file-name': 'foo',
-        },
+    .extendWithData({
+      cwd: process.cwd(),
+      output: {
+        directory: 'tmp/test',
+        'file-name': 'foo',
       },
-      process.cwd(),
-    )
+    })
     .fromRight(),
 )
   .terminateAsync(identity)

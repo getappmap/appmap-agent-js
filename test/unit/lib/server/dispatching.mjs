@@ -5,37 +5,25 @@ import { Dispatching } from '../../../../lib/server/dispatching.mjs';
 Assert.equal(
   new Dispatching(
     getInitialConfiguration()
-      .extendWithData({ enabled: false }, '/')
+      .extendWithData({ enabled: false, cwd: '/' })
       .fromRight(),
   )
     .dispatch({
       action: 'initialize',
       session: null,
       data: {
-        data: {
-          main: 'main.js',
-        },
-        path: '/',
+        cwd: '/',
+        main: 'main.js',
       },
     })
     .fromRight(),
   null,
 );
 
-// Assert.match(
-//   new Dispatching(getInitialConfiguration(), (...args) => {
-//     Assert.equal(args.length, 1);
-//     Assert.match(args[0], /^invalid request/);
-//   })
-//     .dispatch('invalid')
-//     .fromLeft(),
-//   /^invalid request/,
-// );
-
 {
   const dispatching = new Dispatching(
     getInitialConfiguration()
-      .extendWithData({ enabled: false }, '/')
+      .extendWithData({ enabled: false, cwd: '/' })
       .fromRight(),
   );
   dispatching
@@ -43,10 +31,8 @@ Assert.equal(
       action: 'initialize',
       session: null,
       data: {
-        data: {
-          main: 'main.js',
-        },
-        path: '/',
+        cwd: '/',
+        main: 'main.js',
       },
     })
     .then((either) => {
@@ -58,7 +44,7 @@ Assert.equal(
 {
   const dispatching = new Dispatching(
     getInitialConfiguration()
-      .extendWithData({ enabled: true }, '/')
+      .extendWithData({ enabled: true, cwd: '/' })
       .fromRight(),
   );
   const { session, hooking } = dispatching
@@ -66,10 +52,8 @@ Assert.equal(
       action: 'initialize',
       session: null,
       data: {
-        data: {
-          main: 'main.js',
-        },
-        path: '/',
+        cwd: '/',
+        main: 'main.js',
       },
     })
     .fromRight();
@@ -80,13 +64,11 @@ Assert.equal(
     http: true,
   });
   const data = {
-    data: {
-      output: {
-        'directory-path': 'tmp/test',
-        'file-name': 'foo',
-      },
+    cwd: process.cwd(),
+    output: {
+      directory: 'tmp/test',
+      'file-name': 'foo',
     },
-    path: process.cwd(),
   };
   dispatching
     .dispatch({
@@ -95,11 +77,18 @@ Assert.equal(
       data,
     })
     .fromRight();
-  dispatching.dispatch({
-    action: 'start',
-    session,
-    data,
-  });
+  dispatching
+    .dispatch({
+      action: 'start',
+      session,
+      data,
+    })
+    .fromRight();
+  // dispatching.dispatch({
+  //   action: 'start',
+  //   session,
+  //   data,
+  // }).fromRight();
   dispatching
     .dispatchAsync({
       action: 'terminate',

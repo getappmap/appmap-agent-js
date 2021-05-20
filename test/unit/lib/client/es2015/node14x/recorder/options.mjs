@@ -1,14 +1,6 @@
 import { strict as Assert } from 'assert';
 import { makeOptions } from '../../../../../../../lib/client/es2015/node14x/recorder/options.js';
 
-// Assert.throws(
-//   () =>
-//     makeOptions({
-//       APPMAP_FOO: 'TruE',
-//     }),
-//   /^Error: invalid appmap environment variable/,
-// );
-
 Assert.deepEqual(
   makeOptions({
     ...process,
@@ -19,17 +11,15 @@ Assert.deepEqual(
     port: 0,
     protocol: 'inline',
     configuration: {
-      data: {
-        __proto__: null,
-        engine: {
-          name: 'node',
-          version: process.versions.node,
-        },
-        main: {
-          path: process.argv[1],
-        },
+      __proto__: null,
+      cwd: process.cwd(),
+      engine: {
+        name: 'node',
+        version: process.versions.node,
       },
-      path: process.cwd(),
+      main: {
+        path: process.argv[1],
+      },
     },
   },
 );
@@ -42,7 +32,7 @@ Assert.equal(
     env: {
       APPMAP: 'TruE',
     },
-  }).configuration.data.enabled,
+  }).configuration.enabled,
   true,
 );
 
@@ -52,7 +42,7 @@ Assert.equal(
     env: {
       APPMAP: 'FalsE',
     },
-  }).configuration.data.enabled,
+  }).configuration.enabled,
   false,
 );
 
@@ -62,7 +52,7 @@ Assert.deepEqual(
     env: {
       APPMAP: ' foo , bar ',
     },
-  }).configuration.data.enabled,
+  }).configuration.enabled,
   ['foo', 'bar'],
 );
 
@@ -74,7 +64,7 @@ Assert.deepEqual(
     env: {
       APPMAP_OUTPUT_FILE_NAME: 'foo',
     },
-  }).configuration.data.output['file-name'],
+  }).configuration.output['file-name'],
   'foo',
 );
 
@@ -86,8 +76,20 @@ Assert.deepEqual(
     env: {
       APPMAP_OUTPUT_DIRECTORY: '/foo',
     },
-  }).configuration.data.output.directory,
+  }).configuration.output.directory,
   '/foo',
+);
+
+// configuration //
+
+Assert.deepEqual(
+  makeOptions({
+    ...process,
+    env: {
+      APPMAP_CONFIGURATION: '123',
+    },
+  }).configuration.extends,
+  123,
 );
 
 // parse-boolean //
@@ -98,7 +100,7 @@ Assert.deepEqual(
     env: {
       APPMAP_EVENT_PRUNING: 'TruE',
     },
-  }).configuration.data['event-pruning'],
+  }).configuration['event-pruning'],
   true,
 );
 
@@ -110,7 +112,7 @@ Assert.deepEqual(
     env: {
       APPMAP_MAP_NAME: 'foo',
     },
-  }).configuration.data['map-name'],
+  }).configuration['map-name'],
   'foo',
 );
 

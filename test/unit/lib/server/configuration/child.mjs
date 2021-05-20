@@ -34,7 +34,7 @@ const makeMockConfiguration = (options) => {
     },
     extendWithData(...args) {
       Assert.equal(this, configuration1);
-      Assert.deepEqual(args, [{}, process.cwd()]);
+      Assert.deepEqual(args, [{ cwd: process.cwd() }]);
       Assert.equal(this.protocol, 'inline');
       const configuration2 = {
         getData(...args) {
@@ -152,6 +152,7 @@ const spawnAsync = (child, options) =>
             home,
             'lib',
             'client',
+            'es2015',
             'node14x',
             'recorder',
             'mocha-bin.js',
@@ -205,6 +206,7 @@ const spawnAsync = (child, options) =>
             home,
             'lib',
             'client',
+            'es2015',
             'node14x',
             'recorder',
             'mocha-bin.js',
@@ -213,8 +215,7 @@ const spawnAsync = (child, options) =>
           'bar',
         ],
         configuration: {
-          data: {},
-          path: process.cwd(),
+          cwd: process.cwd(),
         },
         protocol: 'messaging',
         host: 'localhost',

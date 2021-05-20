@@ -33,12 +33,10 @@ server.listen(0, () => {
           action: 'initialize',
           session: null,
           data: {
-            data: {
-              main: {
-                path: 'main.js',
-              },
+            cwd: '/',
+            main: {
+              path: 'main.js',
             },
-            path: '/',
           },
         },
       }),
@@ -51,13 +49,11 @@ server.listen(0, () => {
           action: 'initialize',
           session: null,
           data: {
-            data: {
-              enabled: true,
-              main: {
-                path: 'main.js',
-              },
+            cwd: '/',
+            enabled: true,
+            main: {
+              path: 'main.js',
             },
-            path: '/',
           },
         },
       }),

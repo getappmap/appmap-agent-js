@@ -42,6 +42,10 @@
       maxItems: 3
       items: {$ref: stdio-stream}
 
+- $id: cwd
+  type: string
+  pattern: "^/"
+
 # - $id: recorder
 #   anyOf:
 #     -
@@ -74,9 +78,7 @@
   additionalProperties: false
   required: [base, pattern, flags, data]
   properties:
-    base:
-      type: string
-      pattern: "^/"
+    cwd: {$ref: cwd}
     pattern:
       type: string
     flags:
@@ -157,8 +159,13 @@
 - $id: configuration
   type: object
   additionalProperties: false
+  required: [cwd]
   properties:
-    extends: {type: string}
+    cwd: {$ref: cwd}
+    extends:
+      anyOf:
+        - type: string
+        - $ref: configuration
     # server
     protocol: {$ref: protocol}
     host: {const: localhost}
@@ -187,9 +194,7 @@
             required: [type, base, exec, argv, options]
             properties:
               type: {const: cooked}
-              base:
-                type: string
-                pattern: "^/"
+              cwd: {$ref: cwd}
               exec: {type: string}
               argv:
                 type: array
@@ -237,7 +242,7 @@
                   killSignal: {$ref: signal}
           - type: object
             additionalProperties: false
-            required: [type, exec, main]
+            required: [type, main]
             properties:
               type: {const: fork}
               recorder:
@@ -313,7 +318,7 @@
         - type: object
           additionalProperties: false
           properties:
-            directory-path: {type: string}
+            directory: {type: string}
             file-name:
               type: string
               pattern: "^[^\/]+$"
@@ -324,7 +329,7 @@
           additionalProperties: false
           required: [path]
           properties:
-            path: {type: string}
+            directory: {type: string}
     app-name: {type: string}
     map-name: {type: string}
     name: {type: string} # synonym for map-name
@@ -351,15 +356,7 @@
       properties:
         action: {const: initialize}
         session: {const: null}
-        data:
-          type: object
-          additionalProperties: false
-          required: [data, path]
-          properties:
-            data: {}
-            path:
-              type: string
-              pattern: "^/"
+        data: {}
     - type: object
       additionalProperties: false
       required: [action, session, data]
@@ -414,15 +411,7 @@
       properties:
         action: {const: start}
         session: {type: string}
-        data:
-          type: object
-          additionalProperties: false
-          required: [data, path]
-          properties:
-            data: {}
-            path:
-              type: string
-              pattern: "^/"
+        data: {}
     - type: object
       additionalProperties: false
       required: [action, session, data]

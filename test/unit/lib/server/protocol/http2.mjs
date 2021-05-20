@@ -18,10 +18,8 @@ server.listen(0, () => {
         action: 'initialize',
         session: null,
         data: {
-          data: {
-            main: 'main.js',
-          },
-          path: '/',
+          cwd: '/',
+          main: 'main.js',
         },
       }),
       200,

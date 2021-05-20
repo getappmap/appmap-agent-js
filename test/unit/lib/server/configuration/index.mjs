@@ -49,7 +49,7 @@ Assert.match(
 
 Assert.equal(
   getInitialConfiguration()
-    .extendWithData({ 'app-name': 'foo' }, '/base')
+    .extendWithData({ 'app-name': 'foo', cwd: '/base' })
     .fromRight().data['app-name'],
   'foo',
 );
@@ -65,7 +65,7 @@ Assert.match(
 
 Assert.equal(
   getInitialConfiguration()
-    .extendWithData({ main: 'main.js' }, '/base')
+    .extendWithData({ main: 'main.js', cwd: '/base' })
     .fromRight()
     .isEnabled()
     .fromRight(),
@@ -74,13 +74,11 @@ Assert.equal(
 
 Assert.equal(
   getInitialConfiguration()
-    .extendWithData(
-      {
-        enabled: true,
-        main: 'main.js',
-      },
-      '/base',
-    )
+    .extendWithData({
+      enabled: true,
+      main: 'main.js',
+      cwd: '/base',
+    })
     .fromRight()
     .isEnabled()
     .fromRight(),
@@ -92,20 +90,18 @@ Assert.equal(
 
 Assert.deepEqual(
   getInitialConfiguration()
-    .extendWithData(
-      {
-        exclude: ['foo'],
-        packages: [
-          {
-            exclude: ['bar'],
-            path: 'qux.js',
-            shallow: true,
-            enabled: true,
-          },
-        ],
-      },
-      '/base',
-    )
+    .extendWithData({
+      exclude: ['foo'],
+      packages: [
+        {
+          exclude: ['bar'],
+          path: 'qux.js',
+          shallow: true,
+          enabled: true,
+        },
+      ],
+      cwd: '/base',
+    })
     .fromRight()
     .getInstrumentation('/base/qux.js'),
   {
@@ -121,12 +117,10 @@ Assert.deepEqual(
 
 Assert.equal(
   getInitialConfiguration()
-    .extendWithData(
-      {
-        output: { 'directory-path': 'foo', 'file-name': 'bar' },
-      },
-      '/base',
-    )
+    .extendWithData({
+      output: { directory: 'foo', 'file-name': 'bar' },
+      cwd: '/base',
+    })
     .fromRight()
     .getOutputPath(),
   '/base/foo/bar',
@@ -134,13 +128,11 @@ Assert.equal(
 
 Assert.equal(
   getInitialConfiguration()
-    .extendWithData(
-      {
-        output: { 'directory-path': 'foo' },
-        main: 'bar/qux',
-      },
-      '/base',
-    )
+    .extendWithData({
+      output: { directory: 'foo' },
+      main: 'bar/qux',
+      cwd: '/base',
+    })
     .fromRight()
     .getOutputPath(),
   '/base/foo/-base-bar-qux',
@@ -148,13 +140,11 @@ Assert.equal(
 
 Assert.equal(
   getInitialConfiguration()
-    .extendWithData(
-      {
-        output: { 'directory-path': 'foo' },
-        'map-name': 'bar/qux',
-      },
-      '/base',
-    )
+    .extendWithData({
+      output: { directory: 'foo' },
+      'map-name': 'bar/qux',
+      cwd: '/base',
+    })
     .fromRight()
     .getOutputPath(),
   '/base/foo/bar-qux',
@@ -170,12 +160,10 @@ Assert.equal(getInitialConfiguration().getMetaData().language.engine, null);
 
 Assert.equal(
   getInitialConfiguration()
-    .extendWithData(
-      {
-        engine: 'foo@bar',
-      },
-      '/',
-    )
+    .extendWithData({
+      engine: 'foo@bar',
+      cwd: '/',
+    })
     .fromRight()
     .getMetaData().language.engine,
   'foo@bar',
@@ -187,12 +175,10 @@ Assert.equal(
 
 {
   const configuration = getInitialConfiguration()
-    .extendWithData(
-      {
-        childeren: [['node', 'main.js']],
-      },
-      '/',
-    )
+    .extendWithData({
+      childeren: [['node', 'main.js']],
+      cwd: '/',
+    })
     .fromRight();
   setSpawnForTesting(() => 'foo');
   Assert.equal(

@@ -40,30 +40,26 @@ Assert.deepEqual(trace, [
     action: 'initialize',
     session: null,
     data: {
-      data: {
-        __proto__: null,
-        engine: {
-          name: 'node',
-          version: '123.456',
-        },
-        main: {
-          path: 'main.js',
-        },
+      __proto__: null,
+      cwd: '/cwd',
+      engine: {
+        name: 'node',
+        version: '123.456',
       },
-      path: '/cwd',
+      main: {
+        path: 'main.js',
+      },
     },
   },
   {
     action: 'start',
     session: `__HIDDEN__`,
     data: {
-      data: {
-        'class-map-pruning': false,
-        'event-pruning': false,
-        base: '.',
-        recorder: 'normal',
-      },
-      path: '/cwd',
+      cwd: '/cwd',
+      'class-map-pruning': false,
+      'event-pruning': false,
+      base: '.',
+      recorder: 'normal',
     },
   },
   {

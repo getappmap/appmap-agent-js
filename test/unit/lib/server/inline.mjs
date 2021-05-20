@@ -1,37 +1,27 @@
 import { strict as Assert } from 'assert';
 import { makeChannel } from '../../../../lib/server/inline.mjs';
 
-const { request, requestAsync } = makeChannel(
-  {
-    'hook-esm': true,
-    'hook-cjs': false,
-    main: 'main.js',
-    enabled: true,
-  },
-  '/',
-);
+const { request, requestAsync } = makeChannel();
 
 requestAsync({
   action: 'initialize',
   session: null,
   data: {
-    data: {},
-    path: '/',
+    cwd: '/',
+    main: 'main.js',
+    enabled: true,
   },
 }).then(({ session, hooking }) => {
   Assert.deepEqual(hooking, {
     esm: true,
-    cjs: false,
+    cjs: true,
     http: true,
   });
   Assert.equal(
     typeof request({
       action: 'start',
       session,
-      data: {
-        data: {},
-        path: '/',
-      },
+      data: { cwd: '/' },
     }),
     'string',
   );

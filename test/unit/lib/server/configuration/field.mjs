@@ -65,12 +65,12 @@ Assert.deepEqual(extend('frameworks', ['foo@bar']), [
 // output //
 
 Assert.deepEqual(extend('output', 'foo'), {
-  'directory-path': Path.resolve('foo'),
+  directory: Path.resolve('foo'),
   'file-name': null,
 });
 
 Assert.deepEqual(extend('output', { 'file-name': 'foo' }), {
-  'directory-path': Path.resolve('tmp', 'appmap'),
+  directory: Path.resolve('tmp', 'appmap'),
   'file-name': 'foo',
 });
 

@@ -5,12 +5,14 @@ Object.defineProperty(exports, '__esModule', { value: true });
 var Util = require('util');
 var FileSystem = require('fs');
 var Path = require('path');
-var minimatch = require('minimatch');
 var YAML = require('yaml');
 var Ajv = require('ajv');
+var Minimatch = require('minimatch');
 var ChildProcess = require('child_process');
-var acorn = require('acorn');
+var Glob = require('glob');
+var OperatingSystem = require('os');
 var escodegen = require('escodegen');
+var acorn = require('acorn');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
@@ -38,10 +40,12 @@ var Util__namespace = /*#__PURE__*/_interopNamespace(Util);
 var FileSystem__namespace = /*#__PURE__*/_interopNamespace(FileSystem);
 var Path__default = /*#__PURE__*/_interopDefaultLegacy(Path);
 var Path__namespace = /*#__PURE__*/_interopNamespace(Path);
-var minimatch__default = /*#__PURE__*/_interopDefaultLegacy(minimatch);
 var YAML__default = /*#__PURE__*/_interopDefaultLegacy(YAML);
 var Ajv__default = /*#__PURE__*/_interopDefaultLegacy(Ajv);
+var Minimatch__namespace = /*#__PURE__*/_interopNamespace(Minimatch);
 var ChildProcess__namespace = /*#__PURE__*/_interopNamespace(ChildProcess);
+var Glob__namespace = /*#__PURE__*/_interopNamespace(Glob);
+var OperatingSystem__namespace = /*#__PURE__*/_interopNamespace(OperatingSystem);
 
 // I'm not sure about the debuglog api because modifying process.env.NODE_DEBUG has no effect.
 // Why not directly provide the optimize logging function then?
@@ -68,6 +72,170 @@ const logger = {
 
 var home_1 = Path__default['default'].resolve(__dirname, "..");
 
+const assert = (boolean, format, ...values) => {
+  if (!boolean) {
+    throw new Error(Util__namespace.format(format, ...values));
+  }
+};
+
+//                 | InternalError | ExternalError  | InnerExternalError   | OuterExternalError |
+// ==============================================================================================
+// Location of the | Inside the    | Out of the     | Out of the module or | Out of the package |
+// root cause of   | module or its | module or its  | its deps. but still  |                    |
+// the error       | deps.         | deps           | inside the package   |                    |
+// ==============================================================================================
+// Did the module  | No            | Yes            | Yes                  | Yes                |
+// and its deps.   |               |                |                      |                    |
+// behaved as      |               |                |                      |                    |
+// expected?       |               |                |                      |                    |
+// ==============================================================================================
+// Did the package | No            | Maybe          | No                   | Yes                |
+// behaved as      |               |                |                      |                    |
+// expected?       |               |                |                      |                    |
+// ==============================================================================================
+// Is a bug?       | Yes           | Maybe          | Yes                  | No                 |
+// ==============================================================================================
+//
+// ** Any other kind of error must be considered as an internal error. **
+//
+// NB: The classification above presuposes that types are correct.
+// For instance, consider the following function:
+//
+// const exponent = (base /* integer */, exponent /* integer */) => {
+//   if (exponent < 0) {
+//     throw new ExternalError("expected a positive integer");
+//   }
+//   let result = 1;
+//   for (let index = 0; index < exponent; index++) {
+//     result *= base;
+//   }
+//   if (result !== base ** exponent) {
+//     throw new InternalError("unexpected result");
+//   }
+//   return result;
+// };
+//
+// Its implementation is correct and as long as it is given integers,
+// it will never throw any other exceptions than ExternalError.
+// However if we pass floats it will throw a ModuleInternalError.
+// And if we pass symbols it will throw a TypeError.
+//
+// export class InternalError extends Error;
+//
+// export class ExternalError extends Error;
+//
+// export class InnerExternalError extends ExternalError;
+//
+// export class OuterExternalError extends ExternalError;
+
+class Either {
+  constructor(data) {
+    this.data = data;
+  }
+}
+
+class Left extends Either {
+  isLeft() {
+    return true;
+  }
+  isRight() {
+    return false;
+  }
+  fromLeft() {
+    return this.data;
+  }
+  fromRight() {
+    assert(
+      false,
+      'expected a right either, got a left either with: %o',
+      this.data,
+    );
+  }
+  either(closure1, closure2) {
+    return closure1(this.data);
+  }
+  mapBoth(closure) {
+    return new Left(closure(this.data));
+  }
+  mapLeft(closure) {
+    return new Left(closure(this.data));
+  }
+  mapRight(closure) {
+    return this;
+  }
+  bind(closure) {
+    return this;
+  }
+  bindAsync(closure) {
+    return Promise.resolve(this);
+  }
+  unwrap() {
+    throw new Error(this.data);
+  }
+}
+
+class Right extends Either {
+  isLeft() {
+    return false;
+  }
+  isRight() {
+    return true;
+  }
+  fromLeft() {
+    assert(
+      false,
+      'expected a left either, got a right either with: %o',
+      this.data,
+    );
+  }
+  fromRight() {
+    return this.data;
+  }
+  either(closure1, closure2) {
+    return closure2(this.data);
+  }
+  mapBoth(closure) {
+    return new Right(closure(this.data));
+  }
+  mapLeft(closure) {
+    return this;
+  }
+  mapRight(closure) {
+    return new Right(closure(this.data));
+  }
+  bind(closure) {
+    return closure(this.data);
+  }
+  bindAsync(closure) {
+    return closure(this.data);
+  }
+  unwrap() {
+    return this.data;
+  }
+}
+
+const forEither = (iterator, closure) => {
+  const step = () => {
+    const { done, value } = iterator.next();
+    if (done) {
+      return new Right(null);
+    }
+    return closure(value).bind(step);
+  };
+  return step();
+};
+
+const forEitherAsync = async (iterator, closure) => {
+  const step = async () => {
+    const { done, value } = iterator.next();
+    if (done) {
+      return new Right(null);
+    }
+    return (await closure(value)).bind(step);
+  };
+  return await step();
+};
+
 const ajv = new Ajv__default['default']();
 ajv.addSchema(
   YAML__default['default'].parse(
@@ -76,19 +244,19 @@ ajv.addSchema(
 );
 const validateRequestSchema = ajv.getSchema('request');
 const validateConfigurationSchema = ajv.getSchema('configuration');
-ajv.getSchema('options');
 
 const makeValidate = (name, callback) => (json) => {
   if (!callback(json)) {
-    logger.warning(`Invalid json for schema %s: %j`, name, callback.errors);
-    // console.asset(validateConfiguration.errors.length > 0)
+    logger.warning(`invalid json for schema %s: %j`, name, callback.errors);
+    assert(callback.errors.length > 0, `unexpected empty error array`);
     const error = callback.errors[0];
-    throw new Error(
+    return new Left(
       `invalid ${name} at ${error.schemaPath}, it ${
         error.message
       } (${JSON.stringify(error.params)})`,
     );
   }
+  return new Right(json);
 };
 
 const validateRequest = makeValidate('request', validateRequestSchema);
@@ -98,12 +266,356 @@ const validateConfiguration = makeValidate(
   validateConfigurationSchema,
 );
 
-const trim$1 = (string) => string.trim();
+let cwd = process.cwd();
 
-const format = (command, path, reason, detail, stderr) =>
-  `Command failure cwd=${path}: ${command} >> ${reason} ${detail} ${stderr}`;
+const changeWorkingDirectory = (path, callback) => {
+  assert(
+    path === null || Path__namespace.isAbsolute(path),
+    'expected an absolute path, got: %j',
+    path,
+  );
+  const save = cwd;
+  cwd = path;
+  try {
+    return callback();
+  } finally {
+    cwd = save;
+  }
+};
 
-const spawnSync = (command, path) => {
+const resolvePath = (path) => {
+  if (Path__namespace.isAbsolute(path)) {
+    return Path__namespace.resolve(path);
+  }
+  assert(cwd !== null, 'missing cwd to resolve relative path: %j', path);
+  return Path__namespace.resolve(cwd, path);
+};
+
+const options = {
+  nocomment: true,
+};
+
+const cache = new Map();
+
+const lookupNormalizedSpecifierArray = (
+  specifiers,
+  path,
+  placeholder,
+) => {
+  assert(Path__namespace.isAbsolute(path), 'expected an absolute path, got: %o', path);
+  for (let index = 0; index < specifiers.length; index += 1) {
+    const { base, pattern, flags, data } = specifiers[index];
+    const key = `${pattern}|${flags}`;
+    let regexp = cache.get(key);
+    if (regexp === undefined) {
+      regexp = new RegExp(pattern, flags);
+      cache.set(key, regexp);
+    }
+    if (regexp.test(Path__namespace.relative(base, path))) {
+      return data;
+    }
+  }
+  return placeholder;
+};
+
+const normalizeSpecifier = (specifier, data) => {
+  if (Reflect.getOwnPropertyDescriptor(specifier, 'base') !== undefined) {
+    return specifier;
+  }
+  specifier = {
+    glob: null,
+    path: null,
+    dist: null,
+    pattern: null,
+    flags: '',
+    recursive: false,
+    nested: false,
+    external: false,
+    ...specifier,
+  };
+  const base = resolvePath('.');
+  if (specifier.pattern !== null) {
+    return [
+      {
+        base,
+        pattern: specifier.pattern,
+        flags: specifier.flags,
+        data,
+      },
+    ];
+  }
+  const globs = [];
+  if (specifier.glob !== null) {
+    globs.push(specifier.glob);
+  } else if (specifier.path !== null) {
+    let glob = specifier.path;
+    if (!/\.[a-zA-Z0-9]+$/u.test(glob)) {
+      if (!glob.endsWith('/')) {
+        glob = `${glob}/`;
+      }
+      if (specifier.recursive) {
+        glob = `${glob}**/`;
+      }
+      glob = `${glob}*`;
+    }
+    globs.push(glob);
+  } else if (specifier.dist !== null) {
+    let glob = `node_module/${specifier.dist}`;
+    if (specifier.nested) {
+      glob = `**/${glob}`;
+    }
+    if (specifier.recursive) {
+      glob = `${glob}/**`;
+    }
+    glob = `${glob}/*`;
+    if (specifier.external) {
+      const depth = base.split('/').length - 1;
+      for (let index = 0; index <= depth; index += 1) {
+        globs.push(`${'../'.repeat(index)}${glob}`);
+      }
+    } else {
+      globs.push(glob);
+    }
+  }
+  return globs.map((glob) => {
+    const regexp = new Minimatch__namespace.default.Minimatch(glob, options).makeRe();
+    return {
+      base,
+      pattern: regexp.source,
+      flags: regexp.flags,
+      data,
+    };
+  });
+};
+
+let spawn = ChildProcess__namespace.spawn;
+
+///////////////
+// Normalize //
+///////////////
+
+const mapping = {
+  __proto__: null,
+  '14.x': 'node14x',
+  '15.x': 'node14x',
+  '16.x': 'node14x',
+};
+
+const getLoaderPath = (version) =>
+  Path__namespace.join(home_1, 'lib', 'client', 'es2015', mapping[version], 'hook', 'esm.js');
+
+const getRecorderPath = (version, name) =>
+  Path__namespace.join(
+    home_1,
+    'lib',
+    'client',
+    'es2015',
+    mapping[version],
+    'recorder',
+    `${name}-bin.js`,
+  );
+
+const normalizeChild = (child) => {
+  if (typeof child === 'string') {
+    child = {
+      type: 'spawn',
+      exec: '/bin/sh',
+      argv: ['-c', child],
+    };
+  } else if (Array.isArray(child)) {
+    child = {
+      type: 'spawn',
+      exec: child[0],
+      argv: child.slice(1),
+    };
+  }
+  if (child.type === 'cooked') {
+    return [child];
+  }
+  const cwd = resolvePath('.');
+  if (child.type === 'spawn') {
+    child = {
+      type: undefined,
+      'node-version': '14.x',
+      recorder: 'normal',
+      configuration: {},
+      exec: undefined,
+      argv: [],
+      options: {},
+      ...child,
+    };
+    if (!Array.isArray(child.exec)) {
+      child.exec = [child.exec];
+    }
+    child.options = {
+      encoding: 'utf8',
+      cwd: '.',
+      env: {},
+      stdio: 'pipe',
+      timeout: 0,
+      killSignal: 'SIGTERM',
+      ...child.options,
+    };
+    child.options.env = {
+      NODE_OPTIONS: '',
+      ...child.options.env,
+    };
+    child.options.env.NODE_OPTIONS += ` --experimental-loader=${getLoaderPath(
+      child['node-version'],
+    )}`;
+    if (child.recorder === 'mocha') {
+      return [
+        {
+          type: 'cooked',
+          cwd,
+          exec: child.exec[0],
+          argv: [
+            ...child.exec.slice(1),
+            '--require',
+            getRecorderPath(child['node-version'], 'mocha'),
+            ...child.argv,
+          ],
+          configuration: child.configuration,
+          options: child.options,
+        },
+      ];
+    }
+    if (child.recorder === 'normal') {
+      child.options.env.NODE_OPTIONS += ` --require=${getRecorderPath(
+        child['node-version'],
+        'normal',
+      )}`;
+    }
+    return [
+      {
+        type: 'cooked',
+        cwd,
+        exec: child.exec[0],
+        argv: [...child.exec.slice(1), ...child.argv],
+        configuration: child.configuration,
+        options: child.options,
+      },
+    ];
+  }
+  if (child.type === 'fork') {
+    child = {
+      type: undefined,
+      recorder: 'normal',
+      'node-version': '14.x',
+      configuration: {},
+      globbing: true,
+      main: undefined,
+      argv: [],
+      options: {},
+      ...child,
+    };
+    child.options = {
+      execPath: 'node',
+      execArgv: [],
+      encoding: 'utf8',
+      cwd: '.',
+      env: {},
+      stdio: 'pipe',
+      timeout: 0,
+      killSignal: 'SIGTERM',
+      ...child.options,
+    };
+    child.options.env = {
+      NODE_OPTIONS: '',
+      ...child.options.env,
+    };
+    const exec = {
+      path: child.options.execPath,
+      argv: child.options.execArgv,
+    };
+    delete child.options.execPath;
+    delete child.options.execArgv;
+    const argv = [
+      ...exec.argv,
+      '--experimental-loader',
+      getLoaderPath(child['node-version']),
+    ];
+    if (child.recorder === 'normal') {
+      argv.push('--require', getRecorderPath(child['node-version'], 'normal'));
+    }
+    return (child.globbing
+      ? Glob__namespace.default.sync(child.main, { cwd, nodir: true })
+      : [resolvePath(child.main)]
+    ).map((main) => ({
+      type: 'cooked',
+      exec: exec.path,
+      argv: [...argv, main, ...child.argv],
+      cwd,
+      configuration: child.configuration,
+      options: child.options,
+    }));
+  }
+  /* c8 ignore start */
+  assert(false, 'invalid child type %o', child);
+  /* c8 ignore stop */
+};
+
+///////////
+// Spawn //
+///////////
+
+const spawnNormalizedChild = (child, configuration) => {
+  let either;
+  if (configuration.getProtocol() === 'inline') {
+    either = configuration
+      .extendWithData({
+        cwd: child.cwd,
+        ... child.configuration
+      })
+      .mapRight((configuration) => ({
+        ...process.env,
+        ...child.env,
+        APPMAP_PROTOCOL: 'inline',
+        APPMAP_CONFIGURATION: JSON.stringify({
+          data: configuration.getData(),
+          path: '/',
+        }),
+      }));
+  } else {
+    either = new Right({
+      ...process.env,
+      ...child.env,
+      APPMAP_PROTOCOL: configuration.getProtocol(),
+      APPMAP_HOST: configuration.getHost(),
+      APPMAP_PORT:
+        typeof configuration.getPort() === 'number'
+          ? String(configuration.getPort())
+          : configuration.getPort(),
+      APPMAP_CONFIGURATION: JSON.stringify({
+        cwd: child.cwd,
+        ... child.configuration
+      }),
+    });
+  }
+  const save = process.cwd();
+  process.chdir(child.cwd);
+  try {
+    return either.mapRight((env) =>
+      spawn(child.exec, child.argv, {
+        ...child.options,
+        env,
+      }),
+    );
+  } catch (error) {
+    return new Left(error.message);
+    // NB: No idea why we need to ignore the finally below; maybe a c8 bug?
+    /* c8 ignore start */
+  } finally {
+    /* c8 ignore stop */
+    process.chdir(save);
+  }
+};
+
+const trim = (string) => string.trim();
+
+const identity$1 = (any) => any;
+
+const run = (command, path) => {
   const result = ChildProcess__namespace.spawnSync(
     command.split(' ')[0],
     command.split(' ').slice(1),
@@ -114,391 +626,556 @@ const spawnSync = (command, path) => {
       stdio: ['ignore', 'pipe', 'pipe'],
     },
   );
-  /* c8 ignore start */
-  if (Reflect.getOwnPropertyDescriptor(result, 'error') !== undefined) {
-    logger.warning(
-      format(command, path, 'failed with', result.error.message, result.stderr),
-    );
-    return null;
+  assert(
+    Reflect.getOwnPropertyDescriptor(result, 'error') === undefined,
+    `unexpected error for command %o and cwd %o >> %o`,
+    command,
+    path,
+    result.error,
+  );
+  assert(
+    result.signal === null,
+    `unexpected signal %o for command %o and path %o`,
+    result.signal,
+    command,
+    path,
+  );
+  if (result.status === 0) {
+    return new Right(result.stdout.trim());
   }
-  if (result.signal !== null) {
-    logger.warning(
-      format(
-        command,
-        path,
-        'killed with',
-        String(result.signal),
-        result.stderr,
-      ),
-    );
-    return null;
-  }
-  /* c8 ignore stop */
-  return result;
+  logger.warning(
+    `command %o on cwd %o failed with %o >> %o`,
+    command,
+    path,
+    result.status,
+    result.stderr,
+  );
+  return new Left(null);
 };
 
-const parseStatus = (status) => {
-  /* c8 ignore start */
-  if (status === null) {
-    return null;
-  }
-  /* c8 ignore stop */
-  return status.split('\n').map(trim$1);
-};
+const parseStatus = (stdout) => stdout.split('\n').map(trim);
 
-const parseDescription = (description) => {
-  /* c8 ignore start */
-  if (description === null) {
-    return null;
-  }
-  /* c8 ignore stop */
-  const parts = /^([^-]*)-([0-9]+)-/.exec(description);
-  /* c8 ignore start */
-  if (parts === null) {
-    logger.warning(`Failed to parse git description, got: ${description}`);
-    return null;
-  }
-  /* c8 ignore stop */
+const parseDescription = (stdout) => {
+  const parts = /^([^-]*)-([0-9]+)-/u.exec(stdout);
+  assert(parts !== null, `failed to parse git description %o`, stdout);
   return parseInt(parts[2], 10);
 };
 
-const run = (command, path) => {
-  const result = spawnSync(command, path);
-  /* c8 ignore start */
-  if (result === null) {
+const getGitInformation = (path) => {
+  let names;
+  try {
+    names = FileSystem__namespace.readdirSync(path);
+  } catch (error) {
+    logger.warning('failed to read %o >> %s', path, error.message);
     return null;
   }
-  if (result.status !== 0) {
-    logger.warning(
-      format(
-        command,
-        path,
-        'exit with status',
-        String(result.status),
-        result.stderr,
-      ),
-    );
-    return null;
-  }
-  /* c8 ignore stop */
-  return result.stdout.trim();
-};
-
-var git = (path) => {
-  if (run(`git rev-parse --git-dir`, path) === null) {
-    logger.warning(`Not a git repository`);
+  if (!names.includes('.git')) {
+    logger.warning('not a path to a git directory %o', path);
     return null;
   }
   return {
-    repository: run(`git config --get remote.origin.url`, path),
-    branch: run(`git rev-parse --abbrev-ref HEAD`, path),
-    commit: run(`git rev-parse HEAD`, path),
-    status: parseStatus(run(`git status --porcelain`, path)),
-    tag: run(`git describe --abbrev=0 --tags`, path),
-    annotated_tag: run(`git describe --abbrev=0`, path),
-    commits_since_tag: parseDescription(run(`git describe --long --tag`, path)),
-    commits_since_annotated_tag: parseDescription(
-      run(`git describe --long`, path),
+    repository: run(`git config --get remote.origin.url`, path).fromRight(),
+    branch: run(`git rev-parse --abbrev-ref HEAD`, path).fromRight(),
+    commit: run(`git rev-parse HEAD`, path).fromRight(),
+    status: run(`git status --porcelain`, path)
+      .mapRight(parseStatus)
+      .fromRight(),
+    tag: run(`git describe --abbrev=0 --tags`, path).either(identity$1, identity$1),
+    annotated_tag: run(`git describe --abbrev=0`, path).either(
+      identity$1,
+      identity$1,
+    ),
+    commits_since_tag: run(`git describe --long --tags`, path).either(
+      identity$1,
+      parseDescription,
+    ),
+    commits_since_annotated_tag: run(`git describe --long`, path).either(
+      identity$1,
+      parseDescription,
     ),
   };
 };
 
-const trim = (string) => string.trim();
-
 const identity = (any) => any;
 
-const resolve = (base, path) => {
-  if (Path__namespace.isAbsolute(path)) {
-    return path;
-  }
-  if (base === null) {
-    throw new Error('missing base to resolve path');
-  }
-  return Path__namespace.resolve(base, path);
+const cpus = OperatingSystem__namespace.cpus().length;
+
+////////////
+// Extend //
+////////////
+
+const assign = (fields, name, value) => {
+  fields[name] = {
+    ...fields[name],
+    ...value,
+  };
 };
 
-////////////
-// Client //
-////////////
+const overwrite = (fields, name, value) => {
+  fields[name] = value;
+};
 
-const npm = JSON.parse(
-  FileSystem__namespace.readFileSync(resolve(home_1, './package.json'), 'utf8'),
+const prepend = (fields, name, value) => {
+  fields[name] = [...value, ...fields[name]];
+};
+
+///////////////
+// Normalize //
+///////////////
+
+const makeNormalizeSplit = (separator, key1, key2) => (value) => {
+  if (typeof value === 'string') {
+    const [head, ...tail] = value.split(separator);
+    return {
+      [key1]: head,
+      [key2]: tail.length === 0 ? null : tail.join(separator),
+    };
+  }
+  return value;
+};
+
+const normalizeRecording = makeNormalizeSplit(
+  '.',
+  'defined-class',
+  'method-id',
 );
 
-////////////////////
-// extendWithData //
-////////////////////
+const normalizeLanguage = makeNormalizeSplit('@', 'name', 'version');
 
-const makeOverwrite = (key, transform) => (value, object, context) => {
-  object[key] = transform(value, context);
-  return object;
-};
+const normalizeEngine = makeNormalizeSplit('@', 'name', 'version');
 
-const makeConcat = (key) => (value, object, context) => {
-  object[key] = [...object[key], ...value];
-  return object;
-};
+const normalizeFrameworksHelper = makeNormalizeSplit('@', 'name', 'version');
+const normalizeFrameworks = (frameworks) =>
+  frameworks.map(normalizeFrameworksHelper);
 
-const sortPackage = (specifier1, specifier2) =>
-  specifier2.path.length - specifier1.path.length;
-
-const mergers = {
-  __proto__: null,
-  extends: (path, data, base) =>
-    /* eslint-disable no-use-before-define */
-    extendWithFile(data, resolve(base, path)),
-  /* eslint-enable no-use-before-define */
-  packages: (specifiers, data, base) => {
-    data.packages = [
-      ...specifiers.flatMap((specifier) => {
-        if (typeof specifier === 'string') {
-          specifier = { path: specifier, dist: specifier };
-        }
-        specifier = {
-          shallow: false,
-          path: null,
-          dist: null,
-          exclude: [],
-          ...specifier,
-        };
-        const specifiers = [];
-        if (specifier.dist !== null) {
-          specifiers.push({
-            ...specifier,
-            path: resolve(base, Path__namespace.join('node_modules', specifier.dist)),
-          });
-        }
-        if (specifier.path !== null) {
-          specifiers.push({
-            ...specifier,
-            path: resolve(base, specifier.path),
-          });
-        }
-        return specifiers;
-      }),
-      ...data.packages,
-    ];
-    data.packages.sort(sortPackage);
-    return data;
-  },
-  exclude: makeConcat('exclude'),
-  enabled: (enabled, data, base) => {
-    if (typeof enabled === 'boolean') {
-      data.enabled = enabled;
-      return data;
-    }
-    if (base === null) {
-      throw new Error('missing base for glob');
-    }
-    if (typeof enabled === 'string') {
-      enabled = [enabled];
-    }
-    if (typeof data.enabled === 'boolean') {
-      data.enabled = [];
-    }
-    data.enabled = [
-      ...data.enabled,
-      ...enabled.map((glob) => ({ base, glob })),
-    ];
-    return data;
-  },
-  name: makeOverwrite('map-name', identity),
-  main: (path, data, base) => {
-    data.main = resolve(base, path);
-    return data;
-  },
-  output: (output, data, base) => {
-    if (output === 'alongside') {
-      data.output = 'alongside';
-    } else {
-      data.output = {
-        dir: resolve(base, output.dir),
-        base: resolve(base, output.base),
-      };
-    }
-    return data;
-  },
-  'app-name': makeOverwrite('app-name', identity),
-  'map-name': makeOverwrite('map-name', identity),
-  'language-version': makeOverwrite('language-version', identity),
-  'language-engine': makeOverwrite('language-engine', identity),
-  'escape-prefix': makeOverwrite('escape-prefix', identity),
-  'git-dir': (path, data, base) => {
-    data.git = git(resolve(base, path));
-    return data;
-  },
-  labels: makeConcat('labels'),
-  frameworks: makeConcat('frameworks'),
-  feature: makeOverwrite('feature', identity),
-  'feature-group': makeOverwrite('feature-group', identity),
-  'recorder-name': makeOverwrite('recorder-name', identity),
-  'recording-defined-class': makeOverwrite('recording-defined-class', identity),
-  'recording-method-id': makeOverwrite('recording-method-id', identity),
-};
-
-const extendWithData = (data1, data2, base) => {
-  data1 = { ...data1 };
-  logger.debug('Configuration extended with data: %j', data2);
-  if (base !== null) {
-    base = Path__namespace.resolve(base);
+const normalizeConcurrency = (concurrency) => {
+  if (typeof concurrency === 'string') {
+    concurrency = parseInt(concurrency.substring(0, concurrency.length - 1));
+    concurrency = Math.floor((cpus * concurrency) / 100);
+    concurrency = Math.max(1, concurrency);
   }
-  Reflect.ownKeys(data2).forEach((key) => {
-    data1 = mergers[key](data2[key], data1, base);
-  });
-  return data1;
+  return concurrency;
 };
 
-///////////////////
-// extendWithEnv //
-///////////////////
-
-const mapping = {
-  __proto__: null,
-  APPMAP: ['enabled', (string) => string.toLowerCase() === 'true'],
-  APPMAP_MAIN: ['main', identity],
-  APPMAP_RC_FILE: ['extends', identity],
-  APPMAP_APP_NAME: ['app-name', identity],
-  APPMAP_MAP_NAME: ['map-name', identity],
-  APPMAP_OUTPUT_DIR: [
-    'output',
-    (string) => ({
-      dir: string,
-      base: '.',
-    }),
-  ],
-  APPMAP_GIT_DIR: ['git-dir', identity],
-  APPMAP_LANGUAGE_VERSION: ['language-version', identity],
-  APPMAP_PACKAGES: ['packages', (string) => string.split(',').map(trim)],
-};
-
-const extendWithEnv = (data1, env, base) => {
-  logger.debug('Configuration extended with environment: %j', env);
-  env = { __proto__: null, ...env };
-  const data2 = { __proto__: null };
-  Reflect.ownKeys(env).forEach((key1) => {
-    if (key1.startsWith('APPMAP')) {
-      if (key1 in mapping) {
-        const [key2, transform] = mapping[key1];
-        data2[key2] = transform(env[key1]);
-      } else {
-        logger.warning('Unrecognized appmap env key: %s', key1);
-      }
-    }
-  });
-  validateConfiguration(data2);
-  return extendWithData(data1, data2, base);
-};
-
-////////////////////
-// extendWithFile //
-////////////////////
-
-const parseDefault = () => {
-  throw new Error(
-    "invalid file extension, expected one of: '.yml', '.yaml', or '.json'",
-  );
-};
-
-const extendWithFile = (data1, path) => {
-  logger.debug('Configuration extended with file: %s', path);
-  const content = FileSystem__namespace.readFileSync(path, 'utf8');
-  let parse;
-  if (path.endsWith('.json')) {
-    parse = JSON.parse;
-  } else if (path.endsWith('.yml') || path.endsWith('.yaml')) {
-    parse = YAML__default['default'].parse;
-  } else {
-    parse = parseDefault;
+const normalizeMain = (main) => {
+  if (typeof main === 'string') {
+    main = { path: main };
   }
-  const data2 = parse(content);
-  validateConfiguration(data2);
-  return extendWithData(data1, data2, Path__namespace.dirname(path));
+  return {
+    path: resolvePath(main.path),
+  };
+};
+
+const normalizeBase = (base) => {
+  if (typeof base === 'string') {
+    base = { path: base };
+  }
+  const path = resolvePath(base.path);
+  return {
+    path,
+    git: getGitInformation(path),
+  };
+};
+
+const normalizeRecorder = (recorder) => {
+  if (typeof recorder === 'string') {
+    recorder = { name: recorder };
+  }
+  return recorder;
+};
+
+const normalizeOutput = (output) => {
+  if (typeof output === 'string') {
+    output = { directory: output };
+  }
+  if (
+    Reflect.getOwnPropertyDescriptor(output, 'directory') === undefined
+  ) {
+    return output;
+  }
+  return {
+    ...output,
+    directory: resolvePath(output.directory),
+  };
+};
+
+const normalizePackageSpecifier = (specifier) => {
+  if (typeof specifier === 'string') {
+    specifier = { glob: specifier };
+  }
+  specifier = {
+    enabled: true,
+    shallow: false,
+    exclude: [],
+    ...specifier,
+  };
+  return normalizeSpecifier(specifier, {
+    enabled: specifier.enabled,
+    shallow: specifier.shallow,
+    exclude: specifier.exclude,
+  });
+};
+
+const normalizePackages = (specifiers) =>
+  specifiers.flatMap(normalizePackageSpecifier);
+
+const normalizeChilderen = (childeren) => childeren.flatMap(normalizeChild);
+
+const normalizeEnablingSpecifier = (specifier) => {
+  if (typeof specifier === 'string') {
+    specifier = { glob: specifier };
+  }
+  specifier = {
+    enabled: true,
+    ...specifier,
+  };
+  return normalizeSpecifier(specifier, {
+    enabled: specifier.enabled,
+  });
+};
+
+const normalizeEnabled = (specifiers) => {
+  if (typeof specifiers === 'boolean') {
+    return [
+      {
+        base: '/',
+        pattern: '[\\s\\S]*',
+        flags: '',
+        data: {
+          enabled: specifiers,
+        },
+      },
+    ];
+  }
+  return specifiers.flatMap(normalizeEnablingSpecifier);
 };
 
 ////////////
-// Config //
+// fields //
 ////////////
 
-const getSpecifier = (specifiers, path) => {
-  if (!Path__namespace.isAbsolute(path)) {
-    logger.error('Expected an absolute path and got: %s', path);
-    return undefined;
+const infos = {
+  __proto__: null,
+  // server //
+  protocol: {
+    extend: overwrite,
+    normalize: identity,
+    initial: 'messaging',
+  },
+  host: {
+    extend: overwrite,
+    normalize: identity,
+    initial: 'localhost',
+  },
+  port: {
+    extend: overwrite,
+    normalize: identity,
+    initial: 0,
+  },
+  concurrency: {
+    extend: overwrite,
+    normalize: normalizeConcurrency,
+    initial: 1,
+  },
+  childeren: {
+    extend: prepend,
+    normalize: normalizeChilderen,
+    initial: [],
+  },
+  // client //
+  recorder: {
+    extend: overwrite,
+    normalize: normalizeRecorder,
+    initial: { name: 'regular' },
+  },
+  'hook-cjs': {
+    extend: overwrite,
+    normalize: identity,
+    initial: true,
+  },
+  'hook-esm': {
+    extend: overwrite,
+    normalize: identity,
+    initial: true,
+  },
+  'hook-http': {
+    extend: overwrite,
+    normalize: identity,
+    initial: true,
+  },
+  enabled: {
+    extend: prepend,
+    normalize: normalizeEnabled,
+    initial: [],
+  },
+  'escape-prefix': {
+    extend: overwrite,
+    normalize: identity,
+    initial: 'APPMAP',
+  },
+  main: {
+    extend: overwrite,
+    normalize: normalizeMain,
+    initial: { path: null },
+  },
+  language: {
+    extend: overwrite,
+    normalize: normalizeLanguage,
+    initial: {
+      name: 'ecmascript',
+      version: '2020',
+    },
+  },
+  engine: {
+    extend: overwrite,
+    normalize: normalizeEngine,
+    initial: {
+      name: null,
+      version: null,
+    },
+  },
+  packages: {
+    extend: prepend,
+    normalize: normalizePackages,
+    initial: [],
+  },
+  exclude: {
+    extend: prepend,
+    normalize: identity,
+    initial: [],
+  },
+  // recording //
+  recording: {
+    extend: overwrite,
+    normalize: normalizeRecording,
+    initial: {
+      'defined-class': null,
+      'method-id': null,
+    },
+  },
+  output: {
+    extend: assign,
+    normalize: normalizeOutput,
+    initial: {
+      'directory': resolvePath(`tmp${Path__namespace.sep}appmap`),
+      'file-name': null,
+    },
+  },
+  base: {
+    extend: overwrite,
+    normalize: normalizeBase,
+    initial: {
+      path: '/',
+      git: null,
+    },
+  },
+  'event-pruning': {
+    extend: overwrite,
+    normalize: identity,
+    initial: false,
+  },
+  'class-map-pruning': {
+    extend: overwrite,
+    normalize: identity,
+    initial: false,
+  },
+  'app-name': {
+    extend: overwrite,
+    normalize: identity,
+    initial: null,
+  },
+  'map-name': {
+    extend: overwrite,
+    normalize: identity,
+    initial: null,
+  },
+  labels: {
+    extend: prepend,
+    normalize: identity,
+    initial: [],
+  },
+  feature: {
+    extend: overwrite,
+    normalize: identity,
+    initial: null,
+  },
+  'feature-group': {
+    extend: overwrite,
+    normalize: identity,
+    initial: null,
+  },
+  frameworks: {
+    extend: prepend,
+    normalize: normalizeFrameworks,
+    initial: [],
+  },
+};
+
+////////////
+// export //
+////////////
+
+const makeInitialFieldObject = () => {
+  const data = { __proto__: null };
+  for (const key in infos) {
+    data[key] = infos[key].initial;
   }
-  path = Path__namespace.normalize(path);
-  return specifiers.find((specifier) => path.startsWith(specifier.path));
+  return data;
+};
+
+const extendField = (data, key, value) => {
+  assert(key in infos, `invalid field key %o`, key);
+  const { normalize, extend } = infos[key];
+  extend(data, key, normalize(value));
+};
+
+const npm = JSON.parse(
+  FileSystem__namespace.readFileSync(Path__namespace.join(home_1, 'package.json'), 'utf8'),
+);
+
+const isEnabledDefault = { enabled: false };
+
+const getInstrumentationDefault = {
+  enabled: false,
+  shallow: false,
+  exclude: [],
+};
+
+const parsers = {
+  __proto__: null,
+  '.json': JSON.parse,
+  '.yml': YAML__default['default'].parse,
+  '.yaml': YAML__default['default'].parse,
 };
 
 class Configuration {
   constructor(data) {
     this.data = data;
   }
-  extendWithData(data, base) {
-    return new Configuration(extendWithData({ ...this.data }, data, base));
+  extendWithData(data2, done = []) {
+    return validateConfiguration(data2).bind((data2) => changeWorkingDirectory(data2.cwd, () => {
+      data2 = {...data2};
+      delete data2.cwd;
+      data2 = { __proto__: null, ...data2 };
+      let either;
+      if ('extends' in data2) {
+        either = this.extendWithFile(resolvePath(data2.extends), done);
+        delete data2.extends;
+      } else {
+        either = new Right(this);
+      }
+      return either.mapRight(({ data: data1 }) => {
+        data1 = { __proto__: null, ...data1 };
+        for (const key in data2) {
+          extendField(data1, key, data2[key]);
+        }
+        return new Configuration(data1);
+      });
+    }));
   }
-  extendWithFile(path) {
-    return new Configuration(extendWithFile({ ...this.data }, path));
-  }
-  extendWithEnv(env, base) {
-    return new Configuration(extendWithEnv({ ...this.data }, env, base));
-  }
-  isEnabled(main) {
-    if (typeof this.data.enabled === 'boolean') {
-      return this.data.enabled;
+  extendWithFile(path, done = []) {
+    path = Path__namespace.resolve(path);
+    const parse = parsers[Path__namespace.extname(path)];
+    if (parse === undefined) {
+      return new Left(
+        `invalid extension for configuration file ${JSON.stringify(
+          path,
+        )}, expected one of: ${Reflect.ownKeys(parsers).join(', ')}`,
+      );
     }
-    main = Path__namespace.resolve(main);
-    return this.data.enabled.some(({ base, glob }) =>
-      minimatch__default['default'](Path__namespace.relative(base, main), glob),
+    if (done.includes(path)) {
+      return new Left(
+        `detected loop in configuration file hierarchy ${[...done, path]
+          .map(JSON.stringify)
+          .join(' -> ')}`,
+      );
+    }
+    let content;
+    try {
+      content = FileSystem__namespace.readFileSync(path, 'utf8');
+    } catch (error) {
+      return new Left(
+        `failed to read configuration file ${path} >> ${error.message}`,
+      );
+    }
+    let data;
+    try {
+      data = parse(content);
+    } catch (error) {
+      return new Left(
+        `failed to parse configuration file ${path} >> ${error.message}`,
+      );
+    }
+    data = {
+      cwd: Path__namespace.dirname(path),
+      ...data
+    };
+    return this.extendWithData(data, [...done, path]);
+  }
+  isEnabled() {
+    if (this.data.main.path === null) {
+      return new Left('missing main path for availability query');
+    }
+    return new Right(
+      lookupNormalizedSpecifierArray(
+        this.data.enabled,
+        this.data.main.path,
+        isEnabledDefault,
+      ).enabled,
     );
+  }
+  isClassMapPruned() {
+    return this.data['class-map-pruning'];
+  }
+  isEventPruned() {
+    return this.data['event-pruning'];
   }
   getEscapePrefix() {
     return this.data['escape-prefix'];
   }
   getLanguageVersion() {
-    return this.data['language-version'];
+    return this.data.language.version;
   }
-  getFileInstrumentation(path) {
-    const specifier = getSpecifier(this.data.packages, path);
-    if (specifier === undefined) {
-      return null;
-    }
-    return specifier.shallow ? 'shallow' : 'deep';
-  }
-  isNameExcluded(path, name) {
-    if (this.data.exclude.includes(name)) {
-      return true;
-    }
-    const specifier = getSpecifier(this.data.packages, path);
-    if (specifier === undefined) {
-      logger.error('missing package for %', path);
-      return true;
-    }
-    return specifier.exclude.includes(name);
-  }
-  getPath() {
-    if (this.data.main === null) {
-      throw new Error(`missing main option`);
-    }
-    if (this.data.output === 'alongside') {
-      return this.data.main;
-    }
-    // node checks for null bytes so checking for slashes is enough
-    return Path__namespace.join(
-      this.data.output.dir,
-      Path__namespace.relative(this.data.output.base, this.data.main).replace(/\//g, '-'),
+  getInstrumentation(path) {
+    const { enabled, shallow, exclude } = lookupNormalizedSpecifierArray(
+      this.data.packages,
+      path,
+      getInstrumentationDefault,
     );
+    return {
+      enabled,
+      shallow,
+      exclude: [...exclude, ...this.data.exclude],
+    };
+  }
+  getBasePath() {
+    return this.data.base.path;
+  }
+  getOutputPath() {
+    let filename = 'anonymous';
+    if (this.data.output['file-name'] !== null) {
+      filename = this.data.output['file-name'];
+    } else if (this.data.main.path !== null) {
+      filename = this.data.main.path.replace(/\//g, '-');
+    } else if (this.data['map-name'] !== null) {
+      filename = this.data['map-name'].replace(/\//g, '-');
+    }
+    return Path__namespace.join(this.data.output.directory, filename);
   }
   getMetaData() {
     return {
-      name:
-        this.data['map-name'] === null ? this.data.main : this.data['map-name'],
+      name: this.data['map-name'],
       labels: this.data.labels,
       app: this.data['app-name'],
       feature: this.data.feature,
       feature_group: this.data['feature-group'],
       language: {
-        name: 'javascript',
-        engine: this.data['language-engine'],
-        version: this.data['language-version'],
+        name: this.data.language.name,
+        version: this.data.language.version,
+        engine:
+          this.data.engine.name === null
+            ? null
+            : `${this.data.engine.name}@${this.data.engine.version}`,
       },
       frameworks: this.data.frameworks,
       client: {
@@ -507,79 +1184,83 @@ class Configuration {
         version: npm.version,
       },
       recorder: {
-        name: this.data['recorder-name'],
+        name: this.data.recorder,
       },
-      recording: {
-        defined_class: this.data['recording-defined-class'],
-        method_id: this.data['recording-method-id'],
-      },
-      git: this.data.git,
+      recording: this.data.recording,
+      git: this.data.base.git,
     };
+  }
+  getHooking() {
+    return {
+      esm: this.data['hook-esm'],
+      cjs: this.data['hook-cjs'],
+      http: this.data['hook-http'],
+    };
+  }
+  getConcurrency() {
+    return this.data.concurrency;
+  }
+  getProtocol() {
+    return this.data.protocol;
+  }
+  getHost() {
+    return this.data.host;
+  }
+  getPort() {
+    return this.data.port;
+  }
+  getChilderen() {
+    return this.data.childeren;
+  }
+  spawnChild(child) {
+    return spawnNormalizedChild(child, this);
+  }
+  getData() {
+    return this.data;
   }
 }
 
-////////////////////
-// Default Config //
-////////////////////
+const configuration = new Configuration(makeInitialFieldObject());
 
-const configuration = new Configuration({
-  // Logic //
-  enabled: true,
-  'escape-prefix': 'APPMAP',
-  output: {
-    dir: 'tmp/appmap',
-    base: '.',
-  },
-  packages: [],
-  exclude: [],
-  // MetaData //
-  main: null,
-  'map-name': null,
-  labels: [],
-  'app-name': null,
-  feature: null,
-  'feature-group': null,
-  'language-engine': null,
-  'language-version': '2015',
-  frameworks: [],
-  'recorder-name': null,
-  'recording-defined-class': null,
-  'recording-method-id': null,
-  git: git('.'),
-});
+const getInitialConfiguration = () => configuration;
 
-const getDefaultConfiguration = () => configuration;
-
-class File {
-  constructor(
-    version,
-    source,
-    path,
-    content = FileSystem__namespace.readFileSync(path, 'utf8'),
-  ) {
-    this.path = path;
-    this.version = version;
-    this.source = source;
-    this.content = content;
+class EitherMap extends Map {
+  constructor() {
+    super();
+    this.counter = 0n;
   }
-  getPath() {
-    return this.path;
+  push(value) {
+    this.counter += 1n;
+    const key = this.counter.toString(36);
+    super.set(key, value);
+    return key;
   }
-  getLanguageVersion() {
-    return this.version;
+  take(key) {
+    if (super.has(key)) {
+      const value = super.get(key);
+      super.delete(key);
+      return new Right(value);
+    }
+    return new Left(`missing key: ${key}`);
   }
-  getSourceType() {
-    return this.source;
+  get(key) {
+    if (super.has(key)) {
+      return new Right(super.get(key));
+    }
+    return new Left(`missing key: ${key}`);
   }
-  getContent() {
-    return this.content;
+  set(key, value) {
+    if (super.has(key)) {
+      super.set(key, value);
+      return new Right(null);
+    }
+    return new Left(`missing key: ${key}`);
   }
-  parse() {
-    return acorn.parse(this.content, {
-      ecmaVersion: this.version,
-      sourceType: this.source,
-      locations: true,
-    });
+  delete(key) {
+    if (super.delete(key)) {
+      return new Right(null);
+    }
+    return new Left(`missing key: ${key}`);
   }
 }
 
@@ -607,12 +1288,16 @@ const getKeyName = (node) => {
 };
 
 class Location {
-  constructor(node, location) {
+  constructor(node, location, file) {
     this.node = node;
     this.parent = location;
+    this.file = file;
   }
   extend(node) {
-    return new Location(node, this);
+    return new Location(node, this, this.file);
+  }
+  getFile() {
+    return this.file;
   }
   getKind() {
     if (this.node.type !== 'VariableDeclaration') {
@@ -641,10 +1326,7 @@ class Location {
     }
     return `§none`;
   }
-  getName(file) {
-    if (this.node.type === 'Program') {
-      return file.getPath();
-    }
+  getName() {
     if (this.node.type === 'FunctionDeclaration') {
       return `${getPatternName(this.node.id)}|function`;
     }
@@ -652,14 +1334,17 @@ class Location {
       return `${getPatternName(this.node.id)}|class`;
     }
     if (this.node.type === 'ClassBody') {
-      return this.parent.getName(file);
+      return this.parent.getName();
+    }
+    if (this.node.type === 'Program') {
+      return this.file.getPath();
     }
     return this.parent.getChildName(this.node);
   }
-  getParentContainerName(file) {
-    return this.parent.getContainerName(file);
+  getParentContainerName() {
+    return this.parent.getContainerName();
   }
-  getContainerName(file) {
+  getContainerName() {
     if (
       this.node.type === 'Program' ||
       this.node.type === 'ObjectExpression' ||
@@ -669,9 +1354,9 @@ class Location {
       this.node.type === 'FunctionDeclaration' ||
       this.node.type === 'ArrowFunctionExpression'
     ) {
-      return this.getName(file);
+      return this.getName();
     }
-    return this.parent.getContainerName(file);
+    return this.parent.getContainerName();
   }
   isChildStaticMethod(node) {
     return (
@@ -686,6 +1371,9 @@ class Location {
   }
   getStartLine() {
     return this.node.loc.start.line;
+  }
+  getStartColumn() {
+    return this.node.loc.start.column;
   }
   isChildNonScopingIdentifier(node) {
     if (node.type !== 'Identifier') {
@@ -720,7 +1408,7 @@ class Location {
   isNonScopingIdentifier() {
     return this.parent.isChildNonScopingIdentifier(this.node);
   }
-  makeEntity(childeren, file) {
+  makeEntity(childeren) {
     if (
       this.node.type === 'ArrowFunctionExpression' ||
       this.node.type === 'FunctionExpression' ||
@@ -728,13 +1416,15 @@ class Location {
     ) {
       return {
         type: 'class',
-        name: this.getName(file),
+        name: this.getName(),
         childeren: [
           {
             type: 'function',
             name: '()',
-            source: file.getContent().substring(this.node.start, this.node.end),
-            location: `${file.getPath()}:${this.node.loc.start.line}`,
+            source: this.file
+              .getContent()
+              .substring(this.node.start, this.node.end),
+            location: `${this.file.getPath()}:${this.node.loc.start.line}`,
             labels: [],
             comment: null,
             static: this.isStaticMethod(),
@@ -748,14 +1438,7 @@ class Location {
     ) {
       return {
         type: 'class',
-        name: this.getName(file),
-        childeren,
-      };
-    }
-    if (this.node.type === 'Program') {
-      return {
-        type: 'package',
-        name: this.getName(file),
+        name: this.getName(),
         childeren,
       };
     }
@@ -764,41 +1447,14 @@ class Location {
 }
 
 class RootLocation {
+  constructor(file) {
+    this.file = file;
+  }
   extend(node) {
-    return new Location(node, this);
+    return new Location(node, this, this.file);
   }
-  makeEntity(childeren, file) {
-    throw new Error(`RootLocation.makeEntity()`);
-  }
-  isStaticMethod() {
-    throw new Error(`RootLocation.isStaticMethod()`);
-  }
-  isChildStaticMethod() {
-    throw new Error(`RootLocation.isChildStaticMethod()`);
-  }
-  isChildNonScopingIdentifier() {
-    throw new Error(`RootLocation.isChildScopingIdentifier()`);
-  }
-  isNonScopingIdentifier() {
-    throw new Error(`RootLocation.isScopingIdentifier()`);
-  }
-  getStartLine() {
-    throw new Error(`RootLocation.getStartLine()`);
-  }
-  getName(file) {
-    throw new Error(`RootLocation.getName()`);
-  }
-  getChildName() {
-    throw new Error(`RootLocation.getChildName()`);
-  }
-  getKind() {
-    throw new Error(`RootLocation.getKind()`);
-  }
-  getContainerName(file) {
-    throw new Error(`RootLocation.getContainerName()`);
-  }
-  getParentContainerName() {
-    throw new Error(`RootLocation.getParentContainerName()`);
+  getFile(node) {
+    return this.file;
   }
 }
 
@@ -808,51 +1464,43 @@ const setVisitor = (type, split, join) => {
   visitors[type] = { split, join };
 };
 
-const emptyArray = [];
+const empty = [];
 
-const getEmptyArray = () => emptyArray;
+const getEmptyArray = () => empty;
 
-const emptyResult = {
+const singleton = {
   node: null,
-  entities: emptyArray,
+  entities: empty,
 };
 
-const getEmptyResult = () => emptyResult;
+const getEmptyResult = () => singleton;
 
 const getResultEntities = ({ entities }) => entities;
 
 const getResultNode = ({ node }) => node;
 
-const visit = (node, { location, isNameExcluded, namespace, file }) => {
+const visit = (node, { location, options }) => {
   location = location.extend(node);
   let entities = [];
-  if (!isNameExcluded(location.getName(file))) {
-    if (node.type in visitors) {
-      const context = {
-        location,
-        file,
-        isNameExcluded,
-        namespace,
-      };
-      const { split, join } = visitors[node.type];
-      const parts = split(node, context);
-      const fields = [];
-      for (let index = 0; index < parts.length; index += 1) {
-        if (Array.isArray(parts[index])) {
-          entities.push(...parts[index].flatMap(getResultEntities));
-          fields[index] = parts[index].map(getResultNode);
-        } else {
-          entities.push(...parts[index].entities);
-          fields[index] = parts[index].node;
-        }
+  assert(node.type in visitors, 'invalid node type %o', node.type);
+  if (!options.exclude.has(location.getName())) {
+    const context = { location, options };
+    const { split, join } = visitors[node.type];
+    const parts = split(node, context);
+    const fields = [];
+    for (let index = 0; index < parts.length; index += 1) {
+      if (Array.isArray(parts[index])) {
+        entities.push(...parts[index].flatMap(getResultEntities));
+        fields[index] = parts[index].map(getResultNode);
+      } else {
+        entities.push(...parts[index].entities);
+        fields[index] = parts[index].node;
       }
-      node = join(node, context, ...fields);
-      const entity = location.makeEntity(entities, file);
-      if (entity !== null) {
-        entities = [entity];
-      }
-    } else {
-      logger.error('Cannot visit node of type %s', node.type);
+    }
+    node = join(node, context, ...fields);
+    const entity = location.makeEntity(entities);
+    if (entity !== null) {
+      entities = [entity];
     }
   }
   return {
@@ -1008,18 +1656,24 @@ const buildExpressionStatement = (node) => ({
   expression: node,
 });
 
+const buildRegularMemberExpression = (name1, name2) => ({
+  type: 'MemberExpression',
+  optional: false,
+  computed: false,
+  object: buildIdentifier(name1),
+  property: buildIdentifier(name2),
+});
+
 /////////////////////
 // ReturnStatement //
 /////////////////////
 
-const joinReturnStatement = (node, context, child) => ({
+const joinReturnStatement = (node, { options: { session } }, child) => ({
   type: 'ReturnStatement',
   argument: buildAssignmentExpression(
     '=',
-    buildIdentifier(context.namespace.getLocal('SUCCESS')),
-    child === null
-      ? buildIdentifier(context.namespace.getGlobal('UNDEFINED'))
-      : child,
+    buildIdentifier(`${session}_SUCCESS`),
+    child === null ? buildRegularMemberExpression(session, 'undefined') : child,
   ),
 });
 
@@ -1036,182 +1690,157 @@ setVisitor(
 /////////////
 
 {
-  const makeSetupStatement = (node, context) =>
+  const makeSetupStatement = (node, { options: { session } }) =>
     buildVariableDeclaration('var', [
       buildVariableDeclarator(
-        buildIdentifier(context.namespace.getLocal('TIMER')),
+        buildIdentifier(`${session}_TIMER`),
         buildCallExpression(
-          buildIdentifier(context.namespace.getGlobal('GET_NOW')),
+          buildRegularMemberExpression(session, 'getNow'),
           [],
         ),
       ),
       buildVariableDeclarator(
-        buildIdentifier(context.namespace.getLocal('EVENT_ID')),
+        buildIdentifier(`${session}_EVENT_ID`),
         buildAssignmentExpression(
           '+=',
-          buildIdentifier(context.namespace.getGlobal('EVENT_COUNTER')),
+          buildRegularMemberExpression(session, 'counter'),
           buildLiteral(1),
         ),
       ),
       buildVariableDeclarator(
-        buildIdentifier(context.namespace.getLocal('SUCCESS')),
-        buildIdentifier(context.namespace.getGlobal('EMPTY_MARKER')),
+        buildIdentifier(`${session}_SUCCESS`),
+        buildRegularMemberExpression(session, 'empty'),
       ),
       buildVariableDeclarator(
-        buildIdentifier(context.namespace.getLocal('FAILURE')),
-        buildIdentifier(context.namespace.getGlobal('EMPTY_MARKER')),
+        buildIdentifier(`${session}_FAILURE`),
+        buildRegularMemberExpression(session, 'empty'),
       ),
     ]);
 
-  const makeEnterStatement = (node, context) =>
+  const makeEnterStatement = (
+    node,
+    { location, options: { origin, session } },
+  ) =>
     buildExpressionStatement(
-      buildCallExpression(
-        buildIdentifier(context.namespace.getGlobal('RECORD')),
-        [
-          buildObjectExpression([
-            buildRegularProperty(
-              'id',
-              buildIdentifier(context.namespace.getLocal('EVENT_ID')),
+      buildCallExpression(buildRegularMemberExpression(session, 'record'), [
+        buildLiteral(origin),
+        buildObjectExpression([
+          buildRegularProperty('id', buildIdentifier(`${session}_EVENT_ID`)),
+          buildRegularProperty('event', buildLiteral('call')),
+          buildRegularProperty(
+            'thread_id',
+            buildRegularMemberExpression(session, 'pid'),
+          ),
+          buildRegularProperty(
+            'defined_class',
+            buildLiteral(location.getParentContainerName()),
+          ),
+          buildRegularProperty('method_id', buildLiteral(location.getName())),
+          buildRegularProperty(
+            'path',
+            buildLiteral(location.getFile().getPath()),
+          ),
+          buildRegularProperty('lineno', buildLiteral(location.getStartLine())),
+          buildRegularProperty(
+            'receiver',
+            buildCallExpression(
+              buildRegularMemberExpression(session, 'serializeParameter'),
+              [
+                node.type === 'ArrowFunctionExpression'
+                  ? buildRegularMemberExpression(session, 'empty')
+                  : buildThisExpression(),
+                buildLiteral('this'),
+              ],
             ),
-            buildRegularProperty('event', buildLiteral('call')),
-            buildRegularProperty(
-              'thread_id',
-              buildIdentifier(context.namespace.getGlobal('PROCESS_ID')),
-            ),
-            buildRegularProperty(
-              'defined_class',
-              buildLiteral(
-                context.location.getParentContainerName(context.file),
-              ),
-            ),
-            buildRegularProperty(
-              'method_id',
-              buildLiteral(context.location.getName(context.file)),
-            ),
-            buildRegularProperty('path', buildLiteral(context.file.getPath())),
-            buildRegularProperty(
-              'lineno',
-              buildLiteral(context.location.getStartLine()),
-            ),
-            buildRegularProperty(
-              'receiver',
-              buildCallExpression(
-                buildIdentifier(
-                  context.namespace.getGlobal('SERIALIZE_PARAMETER'),
-                ),
-                [
-                  node.type === 'ArrowFunctionExpression'
-                    ? buildIdentifier(
-                        context.namespace.getGlobal('EMPTY_MARKER'),
-                      )
-                    : buildThisExpression(),
-                  buildLiteral('this'),
-                ],
-              ),
-            ),
-            buildRegularProperty(
-              'parameters',
-              buildArrayExpression(
-                node.params.map((child, index) =>
-                  buildCallExpression(
-                    buildIdentifier(
-                      context.namespace.getGlobal('SERIALIZE_PARAMETER'),
-                    ),
-                    [
-                      buildIdentifier(
-                        `${context.namespace.getLocal('ARGUMENT')}_${String(
-                          index,
-                        )}`,
-                      ),
-                      buildLiteral(
-                        context.file
-                          .getContent()
-                          .substring(child.start, child.end),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            buildRegularProperty(
-              'static',
-              buildLiteral(context.location.isStaticMethod()),
-            ),
-          ]),
-        ],
-      ),
-    );
-
-  const makeLeaveStatement = (node, context) =>
-    buildExpressionStatement(
-      buildCallExpression(
-        buildIdentifier(context.namespace.getGlobal('RECORD')),
-        [
-          buildObjectExpression([
-            buildRegularProperty(
-              'id',
-              buildAssignmentExpression(
-                '+=',
-                buildIdentifier(context.namespace.getGlobal('EVENT_COUNTER')),
-                buildLiteral(1),
-              ),
-            ),
-            buildRegularProperty('event', buildLiteral('return')),
-            buildRegularProperty(
-              'thread_id',
-              buildIdentifier(context.namespace.getGlobal('PROCESS_ID')),
-            ),
-            buildRegularProperty(
-              'parent_id',
-              buildIdentifier(context.namespace.getLocal('EVENT_ID')),
-            ),
-            buildRegularProperty(
-              'ellapsed',
-              buildBinaryExpression(
-                '-',
+          ),
+          buildRegularProperty(
+            'parameters',
+            buildArrayExpression(
+              node.params.map((child, index) =>
                 buildCallExpression(
-                  buildIdentifier(context.namespace.getGlobal('GET_NOW')),
-                  [],
+                  buildRegularMemberExpression(session, 'serializeParameter'),
+                  [
+                    buildIdentifier(`${session}_ARGUMENT_${String(index)}`),
+                    buildLiteral(
+                      location
+                        .getFile()
+                        .getContent()
+                        .substring(child.start, child.end),
+                    ),
+                  ],
                 ),
-                buildIdentifier(context.namespace.getLocal('TIMER')),
               ),
             ),
-            buildRegularProperty(
-              'return_value',
-              buildCallExpression(
-                buildIdentifier(
-                  context.namespace.getGlobal('SERIALIZE_PARAMETER'),
-                ),
-                [
-                  buildIdentifier(context.namespace.getLocal('SUCCESS')),
-                  buildLiteral('return'),
-                ],
-              ),
-            ),
-            buildRegularProperty(
-              'exceptions',
-              buildCallExpression(
-                buildIdentifier(
-                  context.namespace.getGlobal('SERIALIZE_EXCEPTION'),
-                ),
-                [buildIdentifier(context.namespace.getLocal('FAILURE'))],
-              ),
-            ),
-          ]),
-        ],
-      ),
+          ),
+          buildRegularProperty(
+            'static',
+            buildLiteral(location.isStaticMethod()),
+          ),
+        ]),
+      ]),
     );
 
-  const makeFailureStatement = (node, context) =>
+  const makeLeaveStatement = (node, { options: { session, origin } }) =>
+    buildExpressionStatement(
+      buildCallExpression(buildRegularMemberExpression(session, 'record'), [
+        buildLiteral(origin),
+        buildObjectExpression([
+          buildRegularProperty(
+            'id',
+            buildAssignmentExpression(
+              '+=',
+              buildRegularMemberExpression(session, 'counter'),
+              buildLiteral(1),
+            ),
+          ),
+          buildRegularProperty('event', buildLiteral('return')),
+          buildRegularProperty(
+            'thread_id',
+            buildRegularMemberExpression(session, 'pid'),
+          ),
+          buildRegularProperty(
+            'parent_id',
+            buildIdentifier(`${session}_EVENT_ID`),
+          ),
+          buildRegularProperty(
+            'ellapsed',
+            buildBinaryExpression(
+              '-',
+              buildCallExpression(
+                buildRegularMemberExpression(session, 'getNow'),
+                [],
+              ),
+              buildIdentifier(`${session}_TIMER`),
+            ),
+          ),
+          buildRegularProperty(
+            'return_value',
+            buildCallExpression(
+              buildRegularMemberExpression(session, 'serializeParameter'),
+              [buildIdentifier(`${session}_SUCCESS`), buildLiteral('return')],
+            ),
+          ),
+          buildRegularProperty(
+            'exceptions',
+            buildCallExpression(
+              buildRegularMemberExpression(session, 'serializeException'),
+              [buildIdentifier(`${session}_FAILURE`)],
+            ),
+          ),
+        ]),
+      ]),
+    );
+
+  const makeFailureStatement = (node, { options: { session } }) =>
     buildThrowStatement(
       buildAssignmentExpression(
         '=',
-        buildIdentifier(context.namespace.getLocal('FAILURE')),
-        buildIdentifier(context.namespace.getLocal('ERROR')),
+        buildIdentifier(`${session}_FAILURE`),
+        buildIdentifier(`${session}_ERROR`),
       ),
     );
 
-  const makeHeadStatementArray = (node, context, childeren) =>
+  const makeHeadStatementArray = (node, { options: { session } }, childeren) =>
     childeren.length === 0
       ? []
       : [
@@ -1220,9 +1849,7 @@ setVisitor(
             childeren.map((child, index) =>
               buildVariableDeclarator(
                 child,
-                buildIdentifier(
-                  `${context.namespace.getLocal('ARGUMENT')}_${String(index)}`,
-                ),
+                buildIdentifier(`${session}_ARGUMENT_${String(index)}`),
               ),
             ),
           ),
@@ -1241,7 +1868,7 @@ setVisitor(
     generator: node.generator,
     params: node.params.map((child, index) => {
       let pattern = buildIdentifier(
-        `${context.namespace.getLocal('ARGUMENT')}_${String(index)}`,
+        `${context.options.session}_ARGUMENT_${String(index)}`,
       );
       if (child.type === 'RestElement') {
         pattern = buildRestElement(pattern);
@@ -1257,7 +1884,7 @@ setVisitor(
           ...makeBodyStatementArray(node, context, child2),
         ]),
         buildCatchClause(
-          buildIdentifier(context.namespace.getLocal('ERROR')),
+          buildIdentifier(`${context.options.session}_ERROR`),
           buildBlockStatement([makeFailureStatement(node, context)]),
         ),
         buildBlockStatement([makeLeaveStatement(node, context)]),
@@ -1573,15 +2200,37 @@ setVisitor(
   }),
 );
 
-setVisitor('Identifier', getEmptyArray, (node, context) => {
-  if (!context.location.isNonScopingIdentifier()) {
-    context.namespace.checkCollision(node.name);
+class Collision {
+  constructor(message) {
+    this.message = message;
   }
-  return {
-    type: 'Identifier',
-    name: node.name,
-  };
-});
+  getMessage() {
+    return this.message;
+  }
+}
+
+setVisitor(
+  'Identifier',
+  getEmptyArray,
+  (node, { location, options: { session } }) => {
+    if (!location.isNonScopingIdentifier()) {
+      if (node.name.startsWith(session)) {
+        // Would be cleaner to use either because this is not a bug
+        throw new Collision(
+          `identifier collision detected at ${location
+            .getFile()
+            .getPath()}@${location.getStartLine()}-${location.getStartColumn()}: ${
+            node.name
+          } should not start with ${session}`,
+        );
+      }
+    }
+    return {
+      type: 'Identifier',
+      name: node.name,
+    };
+  },
+);
 
 // Identifier cf visit-common-other.mjs
 
@@ -1983,265 +2632,408 @@ setVisitor(
   }),
 );
 
-var instrument = (file, namespace, isNameExcluded, callback) => {
-  const location = new RootLocation();
-  const result = visit(file.parse(), {
-    location,
-    file,
-    namespace,
-    isNameExcluded,
-  });
-  getResultEntities(result).forEach(callback);
-  return escodegen.generate(getResultNode(result));
+const instrument = (file, options) => {
+  try {
+    return file.parse().mapRight((node) => {
+      const result = visit(node, {
+        location: new RootLocation(file),
+        options,
+      });
+      return {
+        content: escodegen.generate(getResultNode(result)),
+        entities: getResultEntities(result),
+      };
+    });
+  } catch (error) {
+    if (error instanceof Collision) {
+      return new Left(error.getMessage());
+    }
+    /* c8 ignore start */ throw error;
+  } /* c8 ignore stop */
 };
 
-var globals = [
-  "EMPTY_MARKER",
-  "UNDEFINED",
-  "GET_NOW",
-  "RECORD",
-  "PROCESS_ID",
-  "EVENT_COUNTER",
-  "GET_CLASS_NAME",
-  "GET_IDENTITY",
-  "SERIALIZE",
-  "SERIALIZE_EXCEPTION",
-  "SERIALIZE_PARAMETER"
-];
-
-const locals = ['EVENT_ID', 'ARGUMENT', 'ERROR', 'SUCCESS', 'FAILURE', 'TIMER'];
-
-var Namespace = (class Namespace {
-  constructor(prefix) {
-    if (!/^[A-Za-z_$][0-9A-Za-z_$]*$/u.test(prefix)) {
-      throw new Error(`Invalid prefix: ${prefix}`);
-    }
-    this.prefix = prefix;
+class File {
+  constructor(
+    version,
+    source,
+    path,
+    content = FileSystem__namespace.readFileSync(path, 'utf8'),
+  ) {
+    this.path = path;
+    this.version = version;
+    this.source = source;
+    this.content = content;
   }
-  checkCollision(identifier) {
-    if (identifier.startsWith(this.prefix)) {
-      throw new Error(
-        `Base-level identifier should never start with the escape prefix ${this.prefix}, got: ${identifier}`,
+  getPath() {
+    return this.path;
+  }
+  getLanguageVersion() {
+    return this.version;
+  }
+  getSourceType() {
+    return this.source;
+  }
+  getContent() {
+    return this.content;
+  }
+  parse() {
+    try {
+      return new Right(
+        acorn.parse(this.content, {
+          ecmaVersion: this.version,
+          sourceType: this.source,
+          locations: true,
+        }),
+      );
+    } catch (error) {
+      return new Left(`failed to parse ${this.path} >> ${error.message}`);
+    }
+  }
+}
+
+const VERSION = '1.5.0';
+
+const navigate = (childeren, name) => {
+  for (const child of childeren) {
+    if (child.type === 'package' && child.name === name) {
+      return child.childeren;
+    }
+  }
+  const child = {
+    type: 'package',
+    name,
+    childeren: [],
+  };
+  childeren.push(child);
+  return child.childeren;
+};
+
+const split = (path) => {
+  if (path === '') {
+    return [];
+  }
+  return path.split(Path__namespace.sep);
+};
+
+const save = (recording, versioning) => {
+  assert(recording.running !== null, 'terminated recording %o', recording);
+  recording.running = null;
+  const roots = [];
+  for (const { path, entities } of recording.origins) {
+    split(
+      Path__namespace.relative(recording.configuration.getBasePath(), Path__namespace.dirname(path)),
+    )
+      .reduce(navigate, roots)
+      .push({
+        type: 'class',
+        name: Path__namespace.basename(path),
+        childeren: entities,
+      });
+  }
+  return {
+    content: JSON.stringify({
+      version: VERSION,
+      metadata: recording.configuration.getMetaData(),
+      classMap: roots,
+      events: recording.events,
+    }),
+    path: `${versioning(recording.configuration.getOutputPath())}.appmap.json`,
+  };
+};
+
+class Recording {
+  constructor(configuration) {
+    this.configuration = configuration;
+    this.events = [];
+    this.origins = new Set();
+    this.running = true;
+  }
+  terminate(versioning) {
+    const { path, content } = save(this, versioning);
+    try {
+      FileSystem__namespace.writeFileSync(path, content, 'utf8');
+    } catch (error) {
+      return new Left(
+        `failed to write appmap to file ${path} >> ${error.message}`,
       );
     }
+    return new Right(null);
   }
-  getGlobal(name) {
-    if (!globals.includes(name)) {
-      throw new Error(`Invalid global identifier name: ${name}`);
+  terminateAsync(versioning) {
+    const { path, content } = save(this, versioning);
+    return new Promise((resolve, reject) => {
+      FileSystem__namespace.writeFile(path, content, 'utf8', (error) => {
+        if (error) {
+          resolve(
+            new Left(
+              `failed to write appmap to file ${path} >> ${error.message}`,
+            ),
+          );
+        } else {
+          resolve(new Right(null));
+        }
+      });
+    });
+  }
+  toggle() {
+    assert(this.running !== null, 'terminated recording %o', this);
+    this.running = !this.running;
+    return this.running;
+  }
+  register(origin) {
+    assert(this.running !== null, 'terminated recording %o', this);
+    if (this.running && !this.configuration.isClassMapPruned()) {
+      this.origins.add(origin);
     }
-    return `${this.prefix}_GLOBAL_${name}`;
   }
-  getLocal(name) {
-    if (!locals.includes(name)) {
-      throw new Error(`Invalid local identifier name: ${name}`);
+  record(origin, event) {
+    assert(this.running !== null, 'terminated recording %o', this);
+    if (origin === null) {
+      this.events.push(event);
+    } else {
+      if (this.running) {
+        if (this.configuration.isEventPruned()) {
+          if (this.origins.has(origin)) {
+            this.events.push(event);
+          }
+        } else {
+          this.origins.add(origin);
+          this.events.push(event);
+        }
+      }
     }
-    return `${this.prefix}_LOCAL_${name}`;
   }
-});
+}
 
-const VERSION = '1.4';
-
-var Appmap = (class Appmap {
-  constructor(configuration, cache) {
-    this.cache = cache;
+class Appmap {
+  constructor(configuration, versioning) {
+    this.versioning = versioning;
+    this.session = null;
     this.configuration = configuration;
-    this.namespace = new Namespace(configuration.getEscapePrefix());
+    this.origins = new EitherMap();
+    this.recordings = new EitherMap();
     this.terminated = false;
-    this.appmap = {
-      version: VERSION,
-      metadata: configuration.getMetaData(),
-      classMap: [],
-      events: [],
-    };
   }
-  instrument(source, path, content) {
-    if (this.terminated) {
-      throw new Error(`Terminated appmap can no longer instrument code`);
+  initialize(session) {
+    assert(this.session === null, 'already initialized appmap %o', this);
+    this.session = session;
+    return new Right({
+      session: session,
+      hooking: this.configuration.getHooking(),
+    });
+  }
+  initializeAsync(session) {
+    return Promise.resolve(this.initialize(session));
+  }
+  terminate(reason) {
+    assert(this.session !== null, 'non-initialized appmap %o', this);
+    assert(!this.terminated, 'terminated appmap %o', this);
+    this.terminated = true;
+    return forEither(this.recordings.values(), (recording) =>
+      recording.terminate(this.versioning),
+    );
+  }
+  terminateAsync(reason) {
+    assert(this.session !== null, 'non-initialized appmap %o', this);
+    assert(!this.terminated, 'terminated appmap %o', this);
+    this.terminated = true;
+    return forEitherAsync(this.recordings.values(), (recording) =>
+      recording.terminateAsync(this.versioning),
+    );
+  }
+  instrument({ source, path, content }) {
+    assert(this.session !== null, 'non-initialized appmap %o', this);
+    assert(!this.terminated, 'terminated appmap %o', this);
+    if (!Path__namespace.isAbsolute(path)) {
+      return new Left(`expected an absolute path and got: ${path}`);
     }
-    const instrumentation = this.configuration.getFileInstrumentation(path);
-    if (instrumentation === null) {
-      return content;
+    const { enabled, shallow, exclude } = this.configuration.getInstrumentation(
+      path,
+    );
+    if (!enabled) {
+      return new Right(content);
     }
+    const origin = {
+      path,
+      entities: null,
+    };
+    const key = this.origins.push(origin);
     return instrument(
       new File(this.configuration.getLanguageVersion(), source, path, content),
-      this.namespace,
-      (name) => this.configuration.isNameExcluded(path, name),
-      (entity) => {
-        logger.debug('Appmap receive code entity: %j', entity);
-        this.appmap.classMap.push(entity);
+      {
+        session: this.session,
+        origin: key,
+        exclude: new Set(exclude),
+        shallow,
       },
-    );
+    )
+      .mapLeft((message) => {
+        this.origins.delete(key).fromRight();
+        return message;
+      })
+      .mapRight(({ entities, content }) => {
+        origin.entities = entities;
+        for (const recording of this.recordings.values()) {
+          recording.register(origin);
+        }
+        return content;
+      });
   }
-  record(event) {
-    if (this.terminated) {
-      throw new Error('Terminated appmap can no longer receive events');
-    }
-    logger.debug('Appmap receive event: %j', event);
-    this.appmap.events.push(event);
+  instrumentAsync(data) {
+    return Promise.resolve(this.instrument(data));
   }
-  terminate(sync, json) {
-    if (this.terminated) {
-      throw new Error('Terminated appmap can no longer be terminated');
-    }
-    this.terminated = true;
-    let path = this.configuration.getPath();
-    if (path in this.cache) {
-      let counter = 0;
-      while (`${path}-${String(counter)}` in this.cache) {
-        counter += 1;
-      }
-      path = `${path}-${String(counter)}`;
-    }
-    this.cache[path] = null;
-    path = `${path}.appmap.json`;
-    logger.debug(
-      'Appmap terminate sync = %j path = %s reason = %j',
-      sync,
-      path,
-      json,
-    );
-    if (sync) {
-      FileSystem__namespace.writeFileSync(path, JSON.stringify(this.appmap), 'utf8');
-    } else {
-      FileSystem__namespace.writeFile(
-        path,
-        JSON.stringify(this.appmap),
-        'utf8',
-        (error) => {
-          if (error !== null) {
-            logger.error(
-              `Could not write appmap to %s >> $s`,
-              path,
-              error.message,
-            );
-          } else {
-            logger.debug('Appmap written to %', path);
-          }
-        },
+  start(data) {
+    assert(this.session !== null, 'non-initialized appmap %o', this);
+    assert(!this.terminated, 'terminated appmap %o', this);
+    return this.configuration
+      .extendWithData(data)
+      .mapRight((configuration) =>
+        this.recordings.push(new Recording(configuration)),
       );
-    }
   }
-});
+  startAsync(data) {
+    return Promise.resolve(this.start(data));
+  }
+  toggle(key) {
+    assert(this.session !== null, 'non-initialized appmap %o', this);
+    assert(!this.terminated, 'terminated appmap %o', this);
+    return this.recordings.get(key).mapRight((recording) => recording.toggle());
+  }
+  toggleAsync(key) {
+    return Promise.resolve(this.toggle(key));
+  }
+  stop(key) {
+    assert(this.session !== null, 'non-initialized appmap %o', this);
+    assert(!this.terminated, 'terminated appmap %o', this);
+    return this.recordings
+      .take(key)
+      .bind((recording) => recording.terminate(this.versioning));
+  }
+  stopAsync(key) {
+    assert(this.session !== null, 'non-initialized appmap %o', this);
+    assert(!this.terminated, 'terminated appmap %o', this);
+    return this.recordings
+      .take(key)
+      .bindAsync((recording) => recording.terminateAsync(this.versioning));
+  }
+  record({ origin: key, event }) {
+    assert(this.session !== null, 'non-initialized appmap %o', this);
+    assert(!this.terminated, 'terminated appmap %o', this);
+    if (key === null) {
+      for (const recording of this.recordings.values()) {
+        recording.record(null, event);
+      }
+      return new Right(null);
+    }
+    return this.origins.get(key).mapRight((origin) => {
+      for (const recording of this.recordings.values()) {
+        recording.record(origin, event);
+      }
+      return null;
+    });
+  }
+  recordAsync(data) {
+    return Promise.resolve(this.record(data));
+  }
+}
 
-var Dispatcher = (class Dispatcher {
+const getLast = (array) => array[array.length - 1];
+
+const right = new Right(null);
+
+const dummy = {
+  appmap: {
+    initialize: (session) => /* assert(session === null) */ right,
+    initializeAsync: (session) =>
+      /* assert(session === null) */ Promise.resolve(right),
+  },
+  action: 'initialize',
+  data: null,
+};
+
+const execute = ({ appmap, action, data }) => appmap[action](data);
+
+const executeAsync = ({ appmap, action, data }) =>
+  appmap[`${action}Async`](data);
+
+class Dispatching {
   constructor(configuration) {
-    this.cache = { __proto__: null };
     this.configuration = configuration;
-    this.appmaps = { __proto__: null };
+    const paths = new Map();
+    this.versioning = (path) => {
+      if (paths.has(path)) {
+        const counter = paths.get(path) + 1;
+        paths.set(path, counter);
+        return `${path}-${counter.toString(10)}`;
+      }
+      paths.set(path, 0);
+      return path;
+    };
+    this.appmaps = new EitherMap();
+    this.terminated = false;
+    this.prepare = (request) => {
+      logger.info('request %s on %j', request.action, request.session);
+      if (request.action === 'initialize') {
+        return configuration
+          .extendWithData(request.data)
+          .bind((configuration) =>
+            configuration.isEnabled().mapRight((enabled) => {
+              if (enabled) {
+                const appmap = new Appmap(configuration, this.versioning);
+                const key = this.appmaps.push(appmap);
+                return {
+                  appmap,
+                  action: 'initialize',
+                  data: `${configuration.getEscapePrefix()}_${key}`,
+                };
+              }
+              return dummy;
+            }),
+          );
+      }
+      return this.appmaps[request.action === 'terminate' ? 'take' : 'get'](
+        getLast(request.session.split('_')),
+      ).mapRight((appmap) => ({
+        appmap,
+        action: request.action,
+        data: request.data,
+      }));
+    };
   }
   dispatch(request) {
-    validateRequest(request);
-    if (request.name === 'initialize') {
-      let { configuration } = this;
-      configuration = configuration.extendWithData(
-        {
-          main: Path__namespace.resolve(process.cwd(), request.process.argv[1]),
-        },
-        null,
-      );
-      configuration = configuration.extendWithData(
-        request.configuration,
-        process.cwd(),
-      );
-      configuration = configuration.extendWithEnv(
-        request.process.env,
-        process.cwd(),
-      );
-      if (!configuration.isEnabled(request.process.argv[1])) {
-        logger.info(
-          'initialize (disabled) process = %j configuration = %j',
-          request.process,
-          request.configuration,
-        );
-        return {
-          session: null,
-          prefix: null,
-        };
-      }
-      let session;
-      do {
-        session = Math.random().toString(36).substring(2);
-      } while (session in this.appmaps);
-      logger.info(
-        'initialize %s process = %j configuration = %j',
-        session,
-        request.process,
-        configuration.data,
-      );
-      const appmap = new Appmap(configuration, this.cache);
-      this.appmaps[session] = appmap;
-      return {
-        session,
-        prefix: configuration.getEscapePrefix(),
-      };
-    }
-    const appmap = this.appmaps[request.session];
-    if (request.name === 'terminate') {
-      logger.info('terminate %s %j', request.session, request.reason);
-      appmap.terminate(request.sync, request.reason);
-      delete this.appmaps[request.session];
-      return null;
-    }
-    if (request.name === 'instrument') {
-      logger.info(
-        'instrument %s %s %s',
-        request.session,
-        request.source,
-        request.path,
-      );
-      return appmap.instrument(request.source, request.path, request.content);
-    }
-    if (request.name === 'record') {
-      logger.info(
-        'record %s %s %i',
-        request.session,
-        request.event.event,
-        request.event.id,
-      );
-      appmap.record(request.event);
-      return null;
-    }
-    /* c8 ignore start */
-    throw new Error('invalid request name');
-    /* c8 ignore stop */
+    assert(!this.terminated, 'terminated dispatching %o', this);
+    return validateRequest(request).bind(this.prepare).bind(execute);
   }
-});
+  terminate() {
+    assert(!this.terminated, 'terminated dispatching %o', this);
+    this.terminated = true;
+    return forEither(this.appmaps.values(), (appmap) => appmap.terminate());
+  }
+  dispatchAsync(request) {
+    assert(!this.terminated, 'terminated dispatching %o', this);
+    return validateRequest(request).bind(this.prepare).bindAsync(executeAsync);
+  }
+  terminateAsync() {
+    assert(!this.terminated, 'terminated dispatching %o', this);
+    this.terminated = true;
+    return forEitherAsync(this.appmaps.values(), (appmap) =>
+      appmap.terminateAsync(),
+    );
+  }
+}
+
+const unwrap = (either) => either.unwrap();
 
 const makeChannel = () => {
-  const dispatcher = new Dispatcher(getDefaultConfiguration());
+  const dispatching = new Dispatching(getInitialConfiguration());
   return {
-    requestSync: (json1) => {
-      logger.debug('inline sync request: %j', json1);
-      const json2 = dispatcher.dispatch(json1);
-      logger.debug('inline sync response: %j', json2);
-      return json2;
+    request: (data) => {
+      logger.debug('inline request (synchronous): %j', data);
+      return dispatching.dispatch(data).unwrap();
     },
-    requestAsync: (json1, pending) => {
-      logger.debug('inline async request: %j', json1);
-      let json2;
-      try {
-        json2 = dispatcher.dispatch(json1);
-      } catch (error) {
-        logger.error('inline async failure response: %s', error.stack);
-        if (pending !== null) {
-          pending.reject(error);
-        }
-        return null;
-      }
-      if (pending !== null) {
-        logger.debug('inline async success response: %j', json2);
-        pending.resolve(json2);
-        return null;
-      }
-      if (json2 !== null) {
-        logger.error(
-          'inline async request expected a null result and got: %j',
-          json2,
-        );
-        return null;
-      }
-      logger.debug('inline async success response (not transmitted): null');
-      return null;
+    requestAsync: (data) => {
+      logger.debug('inline request (asynchronous): %j', data);
+      return dispatching.dispatchAsync(data).then(unwrap);
     },
   };
 };

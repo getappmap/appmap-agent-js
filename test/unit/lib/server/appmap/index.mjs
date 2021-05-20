@@ -16,13 +16,11 @@ const unlink = (path) => {
 (async () => {
   const appmap = new Appmap(
     getInitialConfiguration()
-      .extendWithData(
-        {
-          enabled: true,
-          packages: [{ path: 'qux' }],
-        },
-        '/base',
-      )
+      .extendWithData({
+        cwd: '/base',
+        enabled: true,
+        packages: [{ path: 'qux' }],
+      })
       .fromRight(),
     (path) => {
       Assert.equal(path, `${process.cwd()}/tmp/test/foo`);
@@ -41,16 +39,12 @@ const unlink = (path) => {
 
   const key = (
     await appmap.startAsync({
-      data: {
-        base: {
-          path: '/base',
-        },
-        output: {
-          'directory-path': 'tmp/test',
-          'file-name': 'foo',
-        },
+      cwd: process.cwd(),
+      base: '/base',
+      output: {
+        directory: 'tmp/test',
+        'file-name': 'foo',
       },
-      path: process.cwd(),
     })
   ).fromRight();
 
@@ -131,21 +125,19 @@ const unlink = (path) => {
       .fromRight(),
     'function f () {}',
   );
-  const key1 = appmap.start({ data: {}, path: process.cwd() }).fromRight();
+  const key1 = appmap.start({ cwd: process.cwd() }).fromRight();
   Assert.equal(appmap.stop(key1).fromRight(), null);
-  const key2 = appmap.start({ data: {}, path: process.cwd() }).fromRight();
+  const key2 = appmap.start({ cwd: process.cwd() }).fromRight();
   appmap
     .stopAsync(key2)
     .then((either) => Assert.equal(either.fromRight(), null));
   // key3
   appmap
     .start({
-      data: {
-        output: {
-          'directory-path': 'missing',
-        },
+      cwd: process.cwd(),
+      output: {
+        directory: 'missing',
       },
-      path: process.cwd(),
     })
     .fromRight();
   Assert.ok(appmap.terminate().isLeft());
