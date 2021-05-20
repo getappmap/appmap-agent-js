@@ -205,7 +205,7 @@ Assert.equal(
 // Others //
 ////////////
 
-Assert.equal(getInitialConfiguration().getBasePath(), '/');
+Assert.equal(getInitialConfiguration().getBaseDirectory(), process.cwd());
 
 Assert.equal(getInitialConfiguration().getEscapePrefix(), 'APPMAP');
 
@@ -231,4 +231,4 @@ Assert.deepEqual(getInitialConfiguration().getHooking(), {
   http: true,
 });
 
-Assert.equal(typeof getInitialConfiguration().getData(), 'object');
+Assert.equal(typeof getInitialConfiguration().serialize(), 'string');

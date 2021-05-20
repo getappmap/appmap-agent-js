@@ -295,6 +295,13 @@ const options = {
   nocomment: true,
 };
 
+const escape = (char) => `\\${char}`;
+
+const sanitizeForRegExp = (string) =>
+  string.replace(/[/\\+*?.^$()[\]{}|]/g, escape);
+
+const sanitizeForGlob = (string) => string.replace(/[*?[\]]/g, escape);
+
 const cache = new Map();
 
 const lookupNormalizedSpecifierArray = (
@@ -304,14 +311,14 @@ const lookupNormalizedSpecifierArray = (
 ) => {
   assert(Path__namespace.isAbsolute(path), 'expected an absolute path, got: %o', path);
   for (let index = 0; index < specifiers.length; index += 1) {
-    const { base, pattern, flags, data } = specifiers[index];
+    const { pattern, flags, data } = specifiers[index];
     const key = `${pattern}|${flags}`;
     let regexp = cache.get(key);
     if (regexp === undefined) {
       regexp = new RegExp(pattern, flags);
       cache.set(key, regexp);
     }
-    if (regexp.test(Path__namespace.relative(base, path))) {
+    if (regexp.test(path)) {
       return data;
     }
   }
@@ -319,7 +326,7 @@ const lookupNormalizedSpecifierArray = (
 };
 
 const normalizeSpecifier = (specifier, data) => {
-  if (Reflect.getOwnPropertyDescriptor(specifier, 'base') !== undefined) {
+  if (Reflect.getOwnPropertyDescriptor(specifier, 'data') !== undefined) {
     return specifier;
   }
   specifier = {
@@ -333,59 +340,50 @@ const normalizeSpecifier = (specifier, data) => {
     external: false,
     ...specifier,
   };
-  const base = resolvePath('.');
   if (specifier.pattern !== null) {
-    return [
-      {
-        base,
-        pattern: specifier.pattern,
-        flags: specifier.flags,
-        data,
-      },
-    ];
-  }
-  const globs = [];
-  if (specifier.glob !== null) {
-    globs.push(specifier.glob);
-  } else if (specifier.path !== null) {
-    let glob = specifier.path;
-    if (!/\.[a-zA-Z0-9]+$/u.test(glob)) {
-      if (!glob.endsWith('/')) {
-        glob = `${glob}/`;
-      }
-      if (specifier.recursive) {
-        glob = `${glob}**/`;
-      }
-      glob = `${glob}*`;
-    }
-    globs.push(glob);
-  } else if (specifier.dist !== null) {
-    let glob = `node_module/${specifier.dist}`;
-    if (specifier.nested) {
-      glob = `**/${glob}`;
-    }
-    if (specifier.recursive) {
-      glob = `${glob}/**`;
-    }
-    glob = `${glob}/*`;
-    if (specifier.external) {
-      const depth = base.split('/').length - 1;
-      for (let index = 0; index <= depth; index += 1) {
-        globs.push(`${'../'.repeat(index)}${glob}`);
-      }
-    } else {
-      globs.push(glob);
-    }
-  }
-  return globs.map((glob) => {
-    const regexp = new Minimatch__namespace.default.Minimatch(glob, options).makeRe();
     return {
-      base,
+      pattern: specifier.pattern,
+      flags: specifier.flags,
+      data,
+    };
+  }
+  if (specifier.glob !== null) {
+    const regexp = new Minimatch__namespace.default.Minimatch(
+      Path__namespace.resolve(sanitizeForGlob(resolvePath('.')), specifier.glob),
+      options,
+    ).makeRe();
+    return {
       pattern: regexp.source,
       flags: regexp.flags,
       data,
     };
-  });
+  }
+  if (specifier.path !== null) {
+    return {
+      pattern: `^${sanitizeForRegExp(resolvePath(specifier.path))}($|/${
+        specifier.recursive ? '' : '[^/]*$'
+      })`,
+      flags: '',
+      data,
+    };
+  }
+  if (specifier.dist !== null) {
+    let pattern = `/node_modules/${sanitizeForRegExp(specifier.dist)}/`;
+    if (!specifier.external) {
+      pattern = `^${sanitizeForRegExp(resolvePath('.'))}${pattern}`;
+    }
+    if (!specifier.recursive) {
+      pattern = `${pattern}[^/]*$`;
+    }
+    return {
+      pattern,
+      flags: '',
+      data,
+    };
+  }
+  /* c8 ignore start */
+  assert(false, 'invalid specifier %o', specifier);
+  /* c8 ignore stop */
 };
 
 let spawn = ChildProcess__namespace.spawn;
@@ -446,7 +444,7 @@ const normalizeChild = (child) => {
       type: undefined,
       'node-version': '14.x',
       recorder: 'normal',
-      configuration: {},
+      configuration: { cwd },
       exec: undefined,
       argv: [],
       options: {},
@@ -510,7 +508,7 @@ const normalizeChild = (child) => {
       type: undefined,
       recorder: 'normal',
       'node-version': '14.x',
-      configuration: {},
+      configuration: { cwd },
       globbing: true,
       main: undefined,
       argv: [],
@@ -579,10 +577,7 @@ const spawnNormalizedChild = (child, configuration) => {
         ...process.env,
         ...child.env,
         APPMAP_PROTOCOL: 'inline',
-        APPMAP_CONFIGURATION: JSON.stringify({
-          data: configuration.getData(),
-          path: '/',
-        }),
+        APPMAP_CONFIGURATION: configuration.serialize(),
       }));
   } else {
     either = new Right({
@@ -770,27 +765,27 @@ const normalizeMain = (main) => {
     main = { path: main };
   }
   return {
-    path: resolvePath(main.path),
+    path: main.path === null ? main.path : resolvePath(main.path),
   };
 };
 
 const normalizeBase = (base) => {
   if (typeof base === 'string') {
-    base = { path: base };
+    base = { directory: base };
   }
-  const path = resolvePath(base.path);
+  const directory = resolvePath(base.directory);
   return {
-    path,
-    git: getGitInformation(path),
+    directory,
+    git: getGitInformation(directory),
   };
 };
 
-const normalizeRecorder = (recorder) => {
-  if (typeof recorder === 'string') {
-    recorder = { name: recorder };
-  }
-  return recorder;
-};
+// const normalizeRecorder = (recorder) => {
+//   if (typeof recorder === 'string') {
+//     recorder = { name: recorder };
+//   }
+//   return recorder;
+// };
 
 const normalizeOutput = (output) => {
   if (typeof output === 'string') {
@@ -807,7 +802,7 @@ const normalizeOutput = (output) => {
 
 const normalizePackageSpecifier = (specifier) => {
   if (typeof specifier === 'string') {
-    specifier = { glob: specifier };
+    specifier = { path: specifier };
   }
   specifier = {
     enabled: true,
@@ -823,13 +818,13 @@ const normalizePackageSpecifier = (specifier) => {
 };
 
 const normalizePackages = (specifiers) =>
-  specifiers.flatMap(normalizePackageSpecifier);
+  specifiers.map(normalizePackageSpecifier);
 
 const normalizeChilderen = (childeren) => childeren.flatMap(normalizeChild);
 
 const normalizeEnablingSpecifier = (specifier) => {
   if (typeof specifier === 'string') {
-    specifier = { glob: specifier };
+    specifier = { path: specifier };
   }
   specifier = {
     enabled: true,
@@ -844,7 +839,6 @@ const normalizeEnabled = (specifiers) => {
   if (typeof specifiers === 'boolean') {
     return [
       {
-        base: '/',
         pattern: '[\\s\\S]*',
         flags: '',
         data: {
@@ -853,7 +847,7 @@ const normalizeEnabled = (specifiers) => {
       },
     ];
   }
-  return specifiers.flatMap(normalizeEnablingSpecifier);
+  return specifiers.map(normalizeEnablingSpecifier);
 };
 
 ////////////
@@ -891,8 +885,8 @@ const infos = {
   // client //
   recorder: {
     extend: overwrite,
-    normalize: normalizeRecorder,
-    initial: { name: 'regular' },
+    normalize: identity,
+    initial: 'normal',
   },
   'hook-cjs': {
     extend: overwrite,
@@ -963,7 +957,7 @@ const infos = {
     extend: assign,
     normalize: normalizeOutput,
     initial: {
-      directory: resolvePath(`tmp${Path__namespace.sep}appmap`),
+      directory: resolvePath(`tmp/appmap`),
       'file-name': null,
     },
   },
@@ -971,7 +965,7 @@ const infos = {
     extend: overwrite,
     normalize: normalizeBase,
     initial: {
-      path: '/',
+      directory: resolvePath('.'),
       git: null,
     },
   },
@@ -1066,7 +1060,11 @@ class Configuration {
         data2 = { __proto__: null, ...data2 };
         let either;
         if ('extends' in data2) {
-          either = this.extendWithFile(resolvePath(data2.extends), done);
+          if (typeof data2.extends === 'string') {
+            either = this.extendWithFile(resolvePath(data2.extends), done);
+          } else {
+            either = this.extendWithData(data2.extends, done);
+          }
           delete data2.extends;
         } else {
           either = new Right(this);
@@ -1156,8 +1154,8 @@ class Configuration {
       exclude: [...exclude, ...this.data.exclude],
     };
   }
-  getBasePath() {
-    return this.data.base.path;
+  getBaseDirectory() {
+    return this.data.base.directory;
   }
   getOutputPath() {
     let filename = 'anonymous';
@@ -1223,8 +1221,11 @@ class Configuration {
   spawnChild(child) {
     return spawnNormalizedChild(child, this);
   }
-  getData() {
-    return this.data;
+  serialize() {
+    return JSON.stringify({
+      cwd: '/',
+      ...this.data,
+    });
   }
 }
 
@@ -1711,7 +1712,7 @@ setVisitor(
         buildIdentifier(`${session}_EVENT_ID`),
         buildAssignmentExpression(
           '+=',
-          buildRegularMemberExpression(session, 'counter'),
+          buildRegularMemberExpression(session, 'event'),
           buildLiteral(1),
         ),
       ),
@@ -1797,7 +1798,7 @@ setVisitor(
             'id',
             buildAssignmentExpression(
               '+=',
-              buildRegularMemberExpression(session, 'counter'),
+              buildRegularMemberExpression(session, 'event'),
               buildLiteral(1),
             ),
           ),
@@ -2729,7 +2730,10 @@ const save = (recording, versioning) => {
   const roots = [];
   for (const { path, entities } of recording.origins) {
     split(
-      Path__namespace.relative(recording.configuration.getBasePath(), Path__namespace.dirname(path)),
+      Path__namespace.relative(
+        recording.configuration.getBaseDirectory(),
+        Path__namespace.dirname(path),
+      ),
     )
       .reduce(navigate, roots)
       .push({

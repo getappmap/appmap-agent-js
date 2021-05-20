@@ -14,7 +14,7 @@ FileSystem.writeFileSync(
       enabled: true,
       packages: [
         {
-          path: '*',
+          path: '.',
         },
       ],
       childeren: [
@@ -61,8 +61,7 @@ FileSystem.writeFileSync(
 );
 
 (async () => {
-  // , 'http1', 'http2', 'inline'
-  for (let protocol of ['messaging']) {
+  for (let protocol of ['messaging', 'http1', 'http2', 'inline']) {
     try {
       FileSystem.unlinkSync('tmp/test/foo.appmap.json');
     } catch (error) {
@@ -78,8 +77,7 @@ FileSystem.writeFileSync(
       ).fromRight(),
       0,
     );
-    console.log('asokdaokdsdsko');
-    console.log(FileSystem.readFileSync('tmp/test/foo.appmap.json', 'utf8'));
+    // console.log(FileSystem.readFileSync('tmp/test/foo.appmap.json', 'utf8'));
   }
 })();
 //

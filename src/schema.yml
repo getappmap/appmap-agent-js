@@ -70,8 +70,14 @@
       additionalProperties: false
       required: [name, version]
       properties:
-        name: {type: string}
-        version: {type: string}
+        name:
+          anyOf:
+            - const: null
+            - type: string
+        version:
+          anyOf:
+            - const: null
+            - type: string
 
 - $id: cooked-specifier
   type: object
@@ -162,8 +168,8 @@
     cwd: {$ref: cwd}
     extends:
       anyOf:
-        - type: string
         - $ref: configuration
+        - type: string
     # server
     protocol: {$ref: protocol}
     host: {const: localhost}
@@ -189,7 +195,7 @@
             items: {type: string}
           - type: object
             additionalProperties: false
-            required: [type, base, exec, argv, options]
+            required: [type, cwd, exec, argv, configuration, options]
             properties:
               type: {const: cooked}
               cwd: {$ref: cwd}
@@ -197,6 +203,7 @@
               argv:
                 type: array
                 items: {type: string}
+              configuration: {$ref: configuration}
               options:
                 type: object
                 additionalProperties: false
@@ -288,7 +295,10 @@
           additionalProperties: false
           required: [path]
           properties:
-            path: {type: string}
+            path:
+              anyOf:
+                - const: null
+                - type: string
     engine: {$ref: name-version}
     language: {$ref: name-version}
     packages:
@@ -306,8 +316,14 @@
           additionalProperties: false
           required: [defined-class, method-id]
           properties:
-            defined-class: {type: string}
-            method-id: {type: string}
+            defined-class:
+              anyOf:
+                - const: null
+                - type: string
+            method-id:
+              anyOf:
+                - const: null
+                - type: string
     class-map-pruning: {type: boolean} # the code entities of a file are only included if the file fired a recorded event
     event-pruning: {type: boolean} # events are only recorded if they originated from an included file
     output:
@@ -318,21 +334,42 @@
           properties:
             directory: {type: string}
             file-name:
-              type: string
-              pattern: "^[^\/]+$"
+              anyOf:
+                - const: null
+                - type: string
+                  pattern: "^[^\/]+$"
     base:
       anyOf:
         - type: string
         - type: object
           additionalProperties: false
-          required: [path]
+          required: [directory]
           properties:
             directory: {type: string}
-    app-name: {type: string}
-    map-name: {type: string}
-    name: {type: string} # synonym for map-name
-    feature: {type: string}
-    feature-group: {type: string}
+            git:
+              anyOf:
+                - const: null
+                - type: object
+    app-name:
+      anyOf:
+        - const: null
+        - type: string
+    map-name:
+      anyOf:
+        - const: null
+        - type: string
+    name: # synonym for map-name
+      anyOf:
+        - const: null
+        - type: string
+    feature:
+      anyOf:
+        - const: null
+        - type: string
+    feature-group:
+      anyOf:
+        - const: null
+        - type: string
     labels:
       anyOf:
         - type: string

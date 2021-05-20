@@ -25,7 +25,7 @@ test({
   output: `const f = ($_ARGUMENT_0, $_ARGUMENT_1, ...$_ARGUMENT_2) => {
     var
       $_TIMER = $.getNow(),
-      $_EVENT_ID = $.counter += 1,
+      $_EVENT_ID = $.event += 1,
       $_SUCCESS = $.empty,
       $_FAILURE = $.empty;
     $.record(
@@ -59,7 +59,7 @@ test({
       $.record(
         'origin',
         {
-          id: $.counter += 1,
+          id: $.event += 1,
           event: 'return',
           thread_id: $.pid,
           parent_id: $_EVENT_ID,
@@ -80,7 +80,7 @@ test({
   output: `async function * f () {
     var
       $_TIMER = $.getNow(),
-      $_EVENT_ID = $.counter += 1,
+      $_EVENT_ID = $.event += 1,
       $_SUCCESS = $.empty,
       $_FAILURE = $.empty;
     $.record(
@@ -106,7 +106,7 @@ test({
       $.record(
         'origin',
         {
-          id: $.counter += 1,
+          id: $.event += 1,
           event: 'return',
           thread_id: $.pid,
           parent_id: $_EVENT_ID,

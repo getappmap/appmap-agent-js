@@ -83,6 +83,7 @@ const identity = (any) => any;
   const recording = new Recording(
     getInitialConfiguration()
       .extendWithData({
+        base: '/',
         cwd: process.cwd(),
         'class-map-pruning': false,
         'event-pruning': true,

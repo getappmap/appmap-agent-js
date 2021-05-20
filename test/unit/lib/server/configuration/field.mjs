@@ -16,9 +16,11 @@ const extend = (name, value) => {
 
 Assert.deepEqual(extend('main', 'foo.js'), { path: Path.resolve('foo.js') });
 
+Assert.deepEqual(extend('main', { path: null }), { path: null });
+
 // base //
 
-Assert.equal(extend('base', 'foo').path, Path.resolve('foo'));
+Assert.equal(extend('base', 'foo').directory, Path.resolve('foo'));
 
 // language //
 
@@ -81,7 +83,7 @@ Assert.equal(extend('app-name', 'foo'), 'foo');
 // enabled //
 
 Assert.deepEqual(extend('enabled', true), [
-  { base: '/', pattern: '[\\s\\S]*', flags: '', data: { enabled: true } },
+  { pattern: '[\\s\\S]*', flags: '', data: { enabled: true } },
 ]);
 
 Assert.deepEqual(extend('enabled', ['/foo']), [

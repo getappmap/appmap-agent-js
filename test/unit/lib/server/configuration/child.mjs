@@ -37,7 +37,7 @@ const makeMockConfiguration = (options) => {
       Assert.deepEqual(args, [{ cwd: process.cwd() }]);
       Assert.equal(this.protocol, 'inline');
       const configuration2 = {
-        getData(...args) {
+        serialize(...args) {
           Assert.equal(this, configuration2);
           Assert.deepEqual(args, []);
           return configuration1.data;
@@ -160,10 +160,7 @@ const spawnAsync = (child, options) =>
           'foo',
           'bar',
         ],
-        configuration: {
-          data: 123,
-          path: '/',
-        },
+        configuration: 123,
         protocol: 'inline',
       },
     );
