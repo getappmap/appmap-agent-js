@@ -1,24 +1,35 @@
 import { strict as Assert } from 'assert';
-import * as Util from 'util';
-import {
+import * as Module from 'module';
+
+process.exit = (...args) => {
+  Assert.deepEqual(args, [123]);
+  throw new Error('exit');
+};
+
+const require = Module.createRequire(import.meta.url);
+
+const {
   assert,
   expect,
   expectSuccess,
-  setExitForTesting,
-} from '../../../../../../lib/client/es2015/node14x/check.js';
+  switchExpectToTestingMode,
+} = require('../../../../../../lib/client/es2015/node14x/check.js');
 
-setExitForTesting((template, values) => {
-  throw new Error(Util.format(template, ...values));
-});
+// setExitForTesting((template, values) => {
+//   throw new Error(Util.format(template, ...values));
+// });
 
 Assert.equal(assert(true, 'foo'), undefined);
 Assert.throws(() => assert(false, 'foo %j', 456), /^Error: foo 456$/);
 Assert.equal(expect(true, 'foo'), undefined);
-Assert.throws(() => expect(false, 'foo %j', 456), /^Error: foo 456$/);
+Assert.throws(() => expect(false, 'foo %j', 456), /^Error: exit$/);
 Assert.equal(
   expectSuccess(() => {}, 'foo'),
   undefined,
 );
+
+switchExpectToTestingMode();
+
 Assert.throws(
   () =>
     expectSuccess(

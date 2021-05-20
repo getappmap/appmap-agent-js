@@ -29,7 +29,7 @@ class Writable {
   {
     const writable = new Writable();
     setSpawnForTesting((...args) => {
-      Assert.deepEqual(args.slice(0, 2), ['node', ['main.js']]);
+      Assert.deepEqual(args.slice(0, 2), ['/bin/sh', ['-c', 'node main.js']]);
       setSpawnForTesting(() => {
         Assert.fail();
       });
@@ -48,7 +48,8 @@ class Writable {
     (
       await main(process.cwd(), writable, {
         extends: 'tmp/test/appmap.json',
-        _: ['node', 'main.js'],
+        childeren: 'node main.js',
+        _: [],
       })
     ).either(
       (message) => {
@@ -57,7 +58,7 @@ class Writable {
       (code) => {
         Assert.equal(code, 0);
         Assert.deepEqual(writable.buffer.join('').split('\n'), [
-          '#0 (out of 1): node main.js ...',
+          "#0 (out of 1): /bin/sh '-c' 'node main.js' ...",
           '#0 stdout >>',
           '  | stdout-data',
           '#0 stderr >>',
@@ -68,6 +69,7 @@ class Writable {
       },
     );
   }
+
   // invalid port //
   {
     const writable = new Writable();
@@ -78,7 +80,8 @@ class Writable {
       await main(process.cwd(), writable, {
         extends: 'tmp/test/appmap.json',
         port: 'missing/socket.sock',
-        _: ['node', 'main.js'],
+        childeren: ['node main.js'],
+        _: [],
       })
     ).either(
       (message) => {
@@ -90,46 +93,12 @@ class Writable {
       },
     );
   }
-  // // multiple inline childeren //
-  // {
-  //   const writable = new Writable();
-  //   setSpawnForTesting((...args) => {
-  //     Assert.deepEqual(args.slice(0, 2), ['node', ['main1.js']]);
-  //     setSpawnForTesting((...args) => {
-  //       Assert.deepEqual(args.slice(0, 2), ['node', ['main2.js']]);
-  //       throw new Error('BOUM');
-  //     });
-  //     const child = new Events.EventEmitter();
-  //     child.stdout = null;
-  //     child.stderr = null;
-  //     return child;
-  //   });
-  //   (
-  //     await main(process.cwd(), writable, {
-  //       extends: 'tmp/test/appmap.json',
-  //       childeren: ['node main1.js', 'node main2.js'],
-  //       protocol: 'inline',
-  //       _: [],
-  //     })
-  //   ).either(
-  //     (message) => {
-  //       Assert.equal(message, 'child errors:\n  - #1 spawning error >> failed to spawn child >> BOUM');
-  //       Assert.deepEqual(writable.buffer, [
-  //         '#0 (out of 2): node main1.js ...\n',
-  //         '#1 (out of 2): node main2.js ...\n',
-  //         '#1 failed with: spawning error >> failed to spawn child >> BOUM\n'
-  //       ]);
-  //     },
-  //     (code) => {
-  //       Assert.fail();
-  //     },
-  //   );
-  // }
+
   // child running error
   {
     const writable = new Writable();
     setSpawnForTesting((...args) => {
-      Assert.deepEqual(args.slice(0, 2), ['node', ['main1.js']]);
+      Assert.deepEqual(args.slice(0, 2), ['node', ['main.js']]);
       setSpawnForTesting((...args) => {
         Assert.fail();
       });
@@ -144,9 +113,8 @@ class Writable {
     (
       await main(process.cwd(), writable, {
         extends: 'tmp/test/appmap.json',
-        childeren: ['node main1.js'],
         protocol: 'inline',
-        _: [],
+        _: ['node', 'main.js'],
       })
     ).either(
       (message) => {
@@ -157,6 +125,7 @@ class Writable {
       },
     );
   }
+
   // child spawning error
   {
     const writable = new Writable();
@@ -170,9 +139,8 @@ class Writable {
     (
       await main(process.cwd(), writable, {
         extends: 'tmp/test/appmap.json',
-        childeren: 'node main.js',
         protocol: 'inline',
-        _: [],
+        _: ['node', 'main.js'],
       })
     ).either(
       (message) => {
@@ -202,9 +170,8 @@ class Writable {
     (
       await main(process.cwd(), writable, {
         extends: 'tmp/test/appmap.json',
-        childeren: 'node main.js',
         protocol: 'inline',
-        _: [],
+        _: ['node', 'main.js'],
       })
     ).either(
       (message) => {
@@ -213,7 +180,7 @@ class Writable {
       (code) => {
         Assert.equal(code, 1);
         Assert.deepEqual(writable.buffer, [
-          '#0 (out of 1): node main.js ...\n',
+          "#0 (out of 1): node 'main.js' ...\n",
           '#0 killed with: SIGINT\n',
         ]);
       },
@@ -238,9 +205,8 @@ class Writable {
     (
       await main(process.cwd(), writable, {
         extends: 'tmp/test/appmap.json',
-        childeren: 'node main.js',
         protocol: 'inline',
-        _: [],
+        _: ['node', 'main.js'],
       })
     ).either(
       (message) => {

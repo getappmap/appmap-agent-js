@@ -2,12 +2,10 @@ import * as Path from 'path';
 import * as ChildProcess from 'child_process';
 import { strict as Assert } from 'assert';
 import { fileURLToPath } from 'url';
-import { setExitForTesting } from '../../../../../../../../lib/client/es2015/node14x/check.js';
+import { switchExpectToTestingMode } from '../../../../../../../../lib/client/es2015/node14x/check.js';
 import { makeRequest } from '../../../../../../../../lib/client/es2015/node14x/channel/request/messaging.js';
 
-setExitForTesting((code) => {
-  throw new Error(code);
-});
+switchExpectToTestingMode();
 
 const child = ChildProcess.fork(
   Path.join(
@@ -39,9 +37,7 @@ child.on('message', (port) => {
   child.kill('SIGINT');
 });
 
-// Assert.throws(() => makeRequest('invalid-address', 0), /^Error: 123$/);
-
 Assert.throws(
   () => makeRequest('foobar', './missing/ipc-socket.sock'),
-  /^Error: 123$/,
+  /^Error: failed to connect socket/,
 );

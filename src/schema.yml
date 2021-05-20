@@ -1,14 +1,24 @@
 
 # enumeration #
 
+- $id: encoding
+  enum:
+    - buffer
+    - utf8
+    - utf16le
+    - latin1
+
 - $id: event
   enum: [call, return]
 
 - $id: source
   enum: [script, module]
 
-- $id: recorder-name
-  enum: [normal]
+- $id: recorder
+  enum:
+    - null
+    - normal
+    - mocha
 
 - $id: protocol
   enum: [inline, messaging, http1, http2]
@@ -32,14 +42,15 @@
       maxItems: 3
       items: {$ref: stdio-stream}
 
-- $id: recorder
-  anyOf:
-    - $ref: recorder-name
-    - type: object
-      additionalProperties: false
-      required: [name]
-      properties:
-        name: {$ref: recorder-name}
+# - $id: recorder
+#   anyOf:
+#     -
+#     - $ref: recorder-name
+#     - type: object
+#       additionalProperties: false
+#       required: [name]
+#       properties:
+#         name: {$ref: recorder-name}
 
 - $id: env
   type: object
@@ -179,15 +190,16 @@
               base:
                 type: string
                 pattern: "^/"
-              command:
+              exec: {type: string}
+              argv:
                 type: array
-                minItems: 1
                 items: {type: string}
               options:
                 type: object
                 additionalProperties: false
-                required: [cwd, env, stdio, timeout, killSignal]
+                required: [encoding, cwd, env, stdio, timeout, killSignal]
                 properties:
+                  encoding: {$ref: encoding}
                   cwd: {type: string}
                   env: {$ref: env}
                   stdio: {$ref: stdio}
@@ -198,13 +210,18 @@
             required: [type, exec]
             properties:
               type: {const: spawn}
-              recorder: {$ref: recorder}
+              recorder:
+                enum:
+                  - null
+                  - normal
+                  - mocha
               node-version: {$ref: node-version}
               configuration: {$ref: configuration}
-              launcher:
-                type: array
-                items: {type: string}
-              exec: {type: string}
+              exec:
+                anyOf:
+                  - type: string
+                  - type: array
+                    items: {type: string}
               argv:
                 type: array
                 items: {type: string}
@@ -212,6 +229,7 @@
                 type: object
                 additionalProperties: false
                 properties:
+                  encoding: {$ref: encoding}
                   cwd: {type: string}
                   env: {$ref: env}
                   stdio: {$ref: stdio}
@@ -222,7 +240,10 @@
             required: [type, exec, main]
             properties:
               type: {const: fork}
-              recorder: {const: normal}
+              recorder:
+                enum:
+                  - null
+                  - normal
               node-version: {$ref: node-version}
               configuration: {$ref: configuration}
               globbing: {type: boolean}
@@ -238,6 +259,7 @@
                   execArgv:
                     type: array
                     items: {type: string}
+                  encoding: {$ref: encoding}
                   cwd: {type: string}
                   env: {$ref: env}
                   stdio: {$ref: stdio}

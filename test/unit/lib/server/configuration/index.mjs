@@ -230,3 +230,5 @@ Assert.deepEqual(getInitialConfiguration().getHooking(), {
   cjs: true,
   http: true,
 });
+
+Assert.equal(typeof getInitialConfiguration().getData(), 'object');
