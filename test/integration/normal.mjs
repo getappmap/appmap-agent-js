@@ -7,14 +7,24 @@ FileSystem.writeFileSync(
   'tmp/test/appmap.json',
   JSON.stringify(
     {
-      output: 'tmp/test/',
+      output: {
+        directory: '.',
+        'file-name': 'foo',
+      },
       enabled: true,
-      packages: ['.'],
+      packages: [
+        {
+          path: '*',
+        },
+      ],
       childeren: [
         {
           type: 'fork',
           recorder: 'normal',
-          main: 'main.js',
+          main: 'main.mjs',
+          options: {
+            stdio: 'inherit',
+          },
         },
       ],
     },
@@ -51,7 +61,13 @@ FileSystem.writeFileSync(
 );
 
 (async () => {
-  for (let protocol of ['messaging', 'http1', 'http2', 'inline']) {
+  // , 'http1', 'http2', 'inline'
+  for (let protocol of ['messaging']) {
+    try {
+      FileSystem.unlinkSync('tmp/test/foo.appmap.json');
+    } catch (error) {
+      Assert.equal(error.code, 'ENOENT');
+    }
     Assert.equal(
       (
         await main(process.cwd(), process.stdout, {
@@ -62,6 +78,8 @@ FileSystem.writeFileSync(
       ).fromRight(),
       0,
     );
+    console.log('asokdaokdsdsko');
+    console.log(FileSystem.readFileSync('tmp/test/foo.appmap.json', 'utf8'));
   }
 })();
 //

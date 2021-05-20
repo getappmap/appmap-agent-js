@@ -33,6 +33,20 @@ Assert.match(
   /^failed to parse/,
 );
 
+Assert.equal(
+  getInitialConfiguration()
+    .extendWithData({
+      cwd: '/',
+      extends: {
+        cwd: '/',
+        port: 1234,
+      },
+    })
+    .fromRight()
+    .getPort(),
+  1234,
+);
+
 FileSystem.writeFileSync(
   'tmp/test/foo.json',
   JSON.stringify({ extends: 'foo.json' }),

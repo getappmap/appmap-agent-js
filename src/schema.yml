@@ -76,9 +76,8 @@
 - $id: cooked-specifier
   type: object
   additionalProperties: false
-  required: [base, pattern, flags, data]
+  required: [pattern, flags, data]
   properties:
-    cwd: {$ref: cwd}
     pattern:
       type: string
     flags:
@@ -127,7 +126,6 @@
       properties:
         dist: {type: string}
         recursive: {type: boolean}
-        nested: {type: boolean}
         external: {type: boolean}
         enabled: {type: boolean}
         shallow: {type: boolean}

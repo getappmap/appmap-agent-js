@@ -402,7 +402,15 @@ const mapping = {
 };
 
 const getLoaderPath = (version) =>
-  Path__namespace.join(home_1, 'lib', 'client', 'es2015', mapping[version], 'hook', 'esm.js');
+  Path__namespace.join(
+    home_1,
+    'lib',
+    'client',
+    'es2015',
+    mapping[version],
+    'hook',
+    'esm.js',
+  );
 
 const getRecorderPath = (version, name) =>
   Path__namespace.join(
@@ -565,7 +573,7 @@ const spawnNormalizedChild = (child, configuration) => {
     either = configuration
       .extendWithData({
         cwd: child.cwd,
-        ... child.configuration
+        ...child.configuration,
       })
       .mapRight((configuration) => ({
         ...process.env,
@@ -588,7 +596,7 @@ const spawnNormalizedChild = (child, configuration) => {
           : configuration.getPort(),
       APPMAP_CONFIGURATION: JSON.stringify({
         cwd: child.cwd,
-        ... child.configuration
+        ...child.configuration,
       }),
     });
   }
@@ -788,9 +796,7 @@ const normalizeOutput = (output) => {
   if (typeof output === 'string') {
     output = { directory: output };
   }
-  if (
-    Reflect.getOwnPropertyDescriptor(output, 'directory') === undefined
-  ) {
+  if (Reflect.getOwnPropertyDescriptor(output, 'directory') === undefined) {
     return output;
   }
   return {
@@ -957,7 +963,7 @@ const infos = {
     extend: assign,
     normalize: normalizeOutput,
     initial: {
-      'directory': resolvePath(`tmp${Path__namespace.sep}appmap`),
+      directory: resolvePath(`tmp${Path__namespace.sep}appmap`),
       'file-name': null,
     },
   },
@@ -1053,25 +1059,27 @@ class Configuration {
     this.data = data;
   }
   extendWithData(data2, done = []) {
-    return validateConfiguration(data2).bind((data2) => changeWorkingDirectory(data2.cwd, () => {
-      data2 = {...data2};
-      delete data2.cwd;
-      data2 = { __proto__: null, ...data2 };
-      let either;
-      if ('extends' in data2) {
-        either = this.extendWithFile(resolvePath(data2.extends), done);
-        delete data2.extends;
-      } else {
-        either = new Right(this);
-      }
-      return either.mapRight(({ data: data1 }) => {
-        data1 = { __proto__: null, ...data1 };
-        for (const key in data2) {
-          extendField(data1, key, data2[key]);
+    return validateConfiguration(data2).bind((data2) =>
+      changeWorkingDirectory(data2.cwd, () => {
+        data2 = { ...data2 };
+        delete data2.cwd;
+        data2 = { __proto__: null, ...data2 };
+        let either;
+        if ('extends' in data2) {
+          either = this.extendWithFile(resolvePath(data2.extends), done);
+          delete data2.extends;
+        } else {
+          either = new Right(this);
         }
-        return new Configuration(data1);
-      });
-    }));
+        return either.mapRight(({ data: data1 }) => {
+          data1 = { __proto__: null, ...data1 };
+          for (const key in data2) {
+            extendField(data1, key, data2[key]);
+          }
+          return new Configuration(data1);
+        });
+      }),
+    );
   }
   extendWithFile(path, done = []) {
     path = Path__namespace.resolve(path);
@@ -1108,7 +1116,7 @@ class Configuration {
     }
     data = {
       cwd: Path__namespace.dirname(path),
-      ...data
+      ...data,
     };
     return this.extendWithData(data, [...done, path]);
   }

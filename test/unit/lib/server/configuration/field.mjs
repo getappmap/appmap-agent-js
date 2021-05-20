@@ -44,7 +44,7 @@ Assert.deepEqual(extend('language', { name: 'foo', version: 'bar' }), {
 
 // recorder //
 
-Assert.deepEqual(extend('recorder', 'foo'), { name: 'foo' });
+Assert.deepEqual(extend('recorder', 'foo'), 'foo');
 
 // recording //
 
@@ -84,10 +84,9 @@ Assert.deepEqual(extend('enabled', true), [
   { base: '/', pattern: '[\\s\\S]*', flags: '', data: { enabled: true } },
 ]);
 
-Assert.deepEqual(extend('enabled', ['foo']), [
+Assert.deepEqual(extend('enabled', ['/foo']), [
   {
-    base: process.cwd(),
-    pattern: '^(?:foo)$',
+    pattern: '^\\/foo($|/[^/]*$)',
     flags: '',
     data: { enabled: true },
   },
@@ -95,10 +94,9 @@ Assert.deepEqual(extend('enabled', ['foo']), [
 
 // packages //
 
-Assert.deepEqual(extend('packages', ['foo']), [
+Assert.deepEqual(extend('packages', ['/foo']), [
   {
-    base: process.cwd(),
-    pattern: '^(?:foo)$',
+    pattern: '^\\/foo($|/[^/]*$)',
     flags: '',
     data: { shallow: false, enabled: true, exclude: [] },
   },
