@@ -29,10 +29,10 @@
     "deploy": "npm i -D @semantic-release/changelog @semantic-release/git && npx semantic-release"
   },
   "files": [
-    "/home.js",
     "/dist/*.{js,mjs}",
     "/lib/**/*.{js,mjs}",
-    "/bin/*.{js,mjs}"
+    "/bin/*.{js,mjs}",
+    "/src/*.json"
   ],
   "bin": {
     "appmap-agent-js": "bin/index.mjs"
