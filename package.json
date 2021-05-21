@@ -24,9 +24,8 @@
     "prettify": "npx prettier --write 'lib/server/**/*.mjs' 'lib/client/**/*.js' 'test/**/*.mjs' 'bin/*.mjs' 'build/*.mjs'",
     "commit": "npx cz",
     "lint": "npx eslint 'lib/client/**/*.js' 'lib/server/**/*.mjs' 'test/**/*.mjs' 'bin/*.mjs' 'build/*.mjs'",
-    "test-unit": "node test/unit/index.mjs",
+    "test": "node test/unit/index.mjs",
     "test-integration": "node test/integration/index.mjs",
-    "test": "node test/index.mjs",
     "deploy": "npx semantic-release"
   },
   "files": [
@@ -36,8 +35,9 @@
     "/bin/*.{js,mjs}"
   ],
   "bin": {
-    "appmap-agent": "bin/index.mjs"
+    "appmap-agent-js": "bin/index.mjs"
   },
+  "main": "/lib/client/es2015/node14x/appmap.js",
   "dependencies": {
     "acorn": "^8.1.1",
     "ajv": "^8.1.0",

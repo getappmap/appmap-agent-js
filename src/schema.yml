@@ -185,7 +185,7 @@
           minimum: 1
         - type: string
           pattern: "^[0-9]+%$"
-    childeren:
+    children:
       type: array
       items:
         anyOf:

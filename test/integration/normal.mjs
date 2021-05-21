@@ -20,7 +20,7 @@ FileSystem.writeFileSync(
           path: 'module1.js',
         },
       ],
-      childeren: [
+      children: [
         {
           type: 'fork',
           recorder: 'normal',

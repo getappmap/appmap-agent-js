@@ -54,16 +54,16 @@ const identity = (any) => any;
     {
       type: 'package',
       name: 'foo',
-      childeren: [
+      children: [
         {
           type: 'class',
           name: 'bar.js',
-          childeren: ['entity1'],
+          children: ['entity1'],
         },
         {
           type: 'class',
           name: 'qux.js',
-          childeren: ['entity2'],
+          children: ['entity2'],
         },
       ],
     },
@@ -106,7 +106,7 @@ const identity = (any) => any;
     {
       type: 'class',
       name: 'foo.js',
-      childeren: ['entity1'],
+      children: ['entity1'],
     },
   ]);
   Assert.deepEqual(appmap.events, ['event1']);

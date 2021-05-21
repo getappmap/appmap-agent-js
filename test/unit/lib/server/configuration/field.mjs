@@ -104,9 +104,9 @@ Assert.deepEqual(extend('packages', ['/foo']), [
   },
 ]);
 
-// childeren //
+// children //
 
-Assert.equal(extend('childeren', [['node', 'main.js']]).length, 1);
+Assert.equal(extend('children', [['node', 'main.js']]).length, 1);
 
 // concurency //
 

@@ -77,14 +77,14 @@ const spawnAsync = (child, options) =>
   // normal recorder //
   {
     FileSystem.writeFileSync('tmp/test/foo.txt', 'bar', 'utf8');
-    const childeren = normalizeChild('cat tmp/test/foo.txt');
-    Assert.ok(Array.isArray(childeren));
-    Assert.equal(childeren.length, 1);
-    Assert.equal(await spawnAsync(childeren[0], {}), 'bar');
+    const children = normalizeChild('cat tmp/test/foo.txt');
+    Assert.ok(Array.isArray(children));
+    Assert.equal(children.length, 1);
+    Assert.equal(await spawnAsync(children[0], {}), 'bar');
     Assert.ok(
       spawnNormalizedChild(
         {
-          ...childeren[0],
+          ...children[0],
           exec: null,
         },
         makeMockConfiguration(),
@@ -95,12 +95,12 @@ const spawnAsync = (child, options) =>
   // normal recorder //
   {
     FileSystem.writeFileSync('tmp/test/foo.txt', 'bar', 'utf8');
-    const childeren = normalizeChild(['cat', 'tmp/test/foo.txt']);
-    Assert.ok(Array.isArray(childeren));
-    Assert.equal(childeren.length, 1);
-    Assert.deepEqual(childeren, childeren.flatMap(normalizeChild));
+    const children = normalizeChild(['cat', 'tmp/test/foo.txt']);
+    Assert.ok(Array.isArray(children));
+    Assert.equal(children.length, 1);
+    Assert.deepEqual(children, children.flatMap(normalizeChild));
     Assert.deepEqual(
-      childeren,
+      children,
       normalizeChild({
         type: 'spawn',
         exec: 'cat',
@@ -108,14 +108,14 @@ const spawnAsync = (child, options) =>
       }),
     );
     Assert.deepEqual(
-      childeren,
+      children,
       normalizeChild({
         type: 'spawn',
         exec: ['cat'],
         argv: ['tmp/test/foo.txt'],
       }),
     );
-    Assert.equal(await spawnAsync(childeren[0], {}), 'bar');
+    Assert.equal(await spawnAsync(children[0], {}), 'bar');
   }
 
   // mocha recorder (inline) //
@@ -129,17 +129,17 @@ const spawnAsync = (child, options) =>
     }));`,
       'utf8',
     );
-    const childeren = normalizeChild({
+    const children = normalizeChild({
       type: 'spawn',
       recorder: 'mocha',
       exec: ['node', 'tmp/test/main.js'],
       argv: ['foo', 'bar'],
     });
-    Assert.ok(Array.isArray(childeren));
-    Assert.equal(childeren.length, 1);
+    Assert.ok(Array.isArray(children));
+    Assert.equal(children.length, 1);
     Assert.deepEqual(
       JSON.parse(
-        await spawnAsync(childeren[0], {
+        await spawnAsync(children[0], {
           protocol: 'inline',
           data: 123,
         }),
@@ -179,17 +179,17 @@ const spawnAsync = (child, options) =>
     }));`,
       'utf8',
     );
-    const childeren = normalizeChild({
+    const children = normalizeChild({
       type: 'spawn',
       recorder: 'mocha',
       exec: ['node', 'tmp/test/main.js'],
       argv: ['foo', 'bar'],
     });
-    Assert.ok(Array.isArray(childeren));
-    Assert.equal(childeren.length, 1);
+    Assert.ok(Array.isArray(children));
+    Assert.equal(children.length, 1);
     Assert.deepEqual(
       JSON.parse(
-        await spawnAsync(childeren[0], {
+        await spawnAsync(children[0], {
           port,
           host: 'localhost',
           protocol: 'messaging',

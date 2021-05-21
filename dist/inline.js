@@ -820,7 +820,7 @@ const normalizePackageSpecifier = (specifier) => {
 const normalizePackages = (specifiers) =>
   specifiers.map(normalizePackageSpecifier);
 
-const normalizeChilderen = (childeren) => childeren.flatMap(normalizeChild);
+const normalizeChilderen = (children) => children.flatMap(normalizeChild);
 
 const normalizeEnablingSpecifier = (specifier) => {
   if (typeof specifier === 'string') {
@@ -877,7 +877,7 @@ const infos = {
     normalize: normalizeConcurrency,
     initial: 1,
   },
-  childeren: {
+  children: {
     extend: prepend,
     normalize: normalizeChilderen,
     initial: [],
@@ -1216,7 +1216,7 @@ class Configuration {
     return this.data.port;
   }
   getChilderen() {
-    return this.data.childeren;
+    return this.data.children;
   }
   spawnChild(child) {
     return spawnNormalizedChild(child, this);
@@ -1417,7 +1417,7 @@ class Location {
   isNonScopingIdentifier() {
     return this.parent.isChildNonScopingIdentifier(this.node);
   }
-  makeEntity(childeren) {
+  makeEntity(children) {
     if (
       this.node.type === 'ArrowFunctionExpression' ||
       this.node.type === 'FunctionExpression' ||
@@ -1426,7 +1426,7 @@ class Location {
       return {
         type: 'class',
         name: this.getName(),
-        childeren: [
+        children: [
           {
             type: 'function',
             name: '()',
@@ -1438,7 +1438,7 @@ class Location {
             comment: null,
             static: this.isStaticMethod(),
           },
-        ].concat(childeren),
+        ].concat(children),
       };
     }
     if (
@@ -1448,7 +1448,7 @@ class Location {
       return {
         type: 'class',
         name: this.getName(),
-        childeren,
+        children,
       };
     }
     return null;
@@ -1534,9 +1534,9 @@ setVisitor(
 setVisitor(
   'ClassBody',
   (node, context) => [node.body.map((child) => visit(child, context))],
-  (node, context, childeren) => ({
+  (node, context, children) => ({
     type: 'ClassBody',
-    body: childeren,
+    body: children,
   }),
 );
 
@@ -1849,13 +1849,13 @@ setVisitor(
       ),
     );
 
-  const makeHeadStatementArray = (node, { options: { session } }, childeren) =>
-    childeren.length === 0
+  const makeHeadStatementArray = (node, { options: { session } }, children) =>
+    children.length === 0
       ? []
       : [
           buildVariableDeclaration(
             'var',
-            childeren.map((child, index) =>
+            children.map((child, index) =>
               buildVariableDeclarator(
                 child,
                 buildIdentifier(`${session}_ARGUMENT_${String(index)}`),
@@ -1869,7 +1869,7 @@ setVisitor(
       ? child.body
       : [joinReturnStatement(node, context, child)];
 
-  const joinClosure = (node, context, child1, childeren, child2) => ({
+  const joinClosure = (node, context, child1, children, child2) => ({
     type: node.type,
     id: child1,
     expression: false,
@@ -1889,7 +1889,7 @@ setVisitor(
       makeEnterStatement(node, context),
       buildTryStatement(
         buildBlockStatement([
-          ...makeHeadStatementArray(node, context, childeren),
+          ...makeHeadStatementArray(node, context, children),
           ...makeBodyStatementArray(node, context, child2),
         ]),
         buildCatchClause(
@@ -1967,10 +1967,10 @@ setVisitor(
     node.quasis.map((child) => visit(child, context)),
     node.expressions.map((child) => visit(child, context)),
   ],
-  (node, context, childeren1, childeren2) => ({
+  (node, context, children1, children2) => ({
     type: 'TemplateLiteral',
-    quasis: childeren1,
-    expressions: childeren2,
+    quasis: children1,
+    expressions: children2,
   }),
 );
 
@@ -2000,9 +2000,9 @@ setVisitor(
       child == null ? getEmptyResult() : visit(child, context),
     ),
   ],
-  (node, context, childeren) => ({
+  (node, context, children) => ({
     type: 'ArrayExpression',
-    elements: childeren,
+    elements: children,
   }),
 );
 
@@ -2023,9 +2023,9 @@ setVisitor(
 setVisitor(
   'ObjectExpression',
   (node, context) => [node.properties.map((child) => visit(child, context))],
-  (node, context, childeren) => ({
+  (node, context, children) => ({
     type: 'ObjectExpression',
-    properties: childeren,
+    properties: children,
   }),
 );
 
@@ -2135,9 +2135,9 @@ setVisitor(
 setVisitor(
   'SequenceExpression',
   (node, context) => [node.expressions.map((child) => visit(child, context))],
-  (node, context, childeren) => ({
+  (node, context, children) => ({
     type: 'SequenceExpression',
-    expressions: childeren,
+    expressions: children,
   }),
 );
 
@@ -2188,11 +2188,11 @@ setVisitor(
     visit(node.callee, context),
     node.arguments.map((child) => visit(child, context)),
   ],
-  (node, context, child, childeren) => ({
+  (node, context, child, children) => ({
     type: 'CallExpression',
     optional: node.optional,
     callee: child,
-    arguments: childeren,
+    arguments: children,
   }),
 );
 
@@ -2202,10 +2202,10 @@ setVisitor(
     visit(node.callee, context),
     node.arguments.map((child) => visit(child, context)),
   ],
-  (node, context, child, childeren) => ({
+  (node, context, child, children) => ({
     type: 'NewExpression',
     callee: child,
-    arguments: childeren,
+    arguments: children,
   }),
 );
 
@@ -2257,9 +2257,9 @@ setVisitor(
 setVisitor(
   'ObjectPattern',
   (node, context) => [node.properties.map((child) => visit(child, context))],
-  (node, context, childeren) => ({
+  (node, context, children) => ({
     type: 'ObjectPattern',
-    properties: childeren,
+    properties: children,
   }),
 );
 
@@ -2270,9 +2270,9 @@ setVisitor(
       child === null ? getEmptyResult() : visit(child, context),
     ),
   ],
-  (node, context, childeren) => ({
+  (node, context, children) => ({
     type: 'ArrayPattern',
-    elements: childeren,
+    elements: children,
   }),
 );
 
@@ -2288,10 +2288,10 @@ setVisitor(
 setVisitor(
   'Program',
   (node, context) => [node.body.map((child) => visit(child, context))],
-  (node, context, childeren) => ({
+  (node, context, children) => ({
     type: 'Program',
     sourceType: node.sourceType,
-    body: childeren,
+    body: children,
   }),
 );
 
@@ -2372,10 +2372,10 @@ setVisitor(
 setVisitor(
   'VariableDeclaration',
   (node, context) => [node.declarations.map((child) => visit(child, context))],
-  (node, context, childeren) => ({
+  (node, context, children) => ({
     type: 'VariableDeclaration',
     kind: node.kind,
-    declarations: childeren,
+    declarations: children,
   }),
 );
 
@@ -2416,9 +2416,9 @@ setVisitor(
     node.specifiers.map((child) => visit(child, context)),
     visit(node.source, context),
   ],
-  (node, context, childeren, child) => ({
+  (node, context, children, child) => ({
     type: 'ImportDeclaration',
-    specifiers: childeren,
+    specifiers: children,
     source: child,
   }),
 );
@@ -2445,10 +2445,10 @@ setVisitor(
     node.specifiers.map((child) => visit(child, context)),
     node.source === null ? getEmptyResult() : visit(node.source, context),
   ],
-  (node, context, child1, childeren, child2) => ({
+  (node, context, child1, children, child2) => ({
     type: 'ExportNamedDeclaration',
     declaration: child1,
-    specifiers: childeren,
+    specifiers: children,
     source: child2,
   }),
 );
@@ -2478,9 +2478,9 @@ setVisitor(
 setVisitor(
   'BlockStatement',
   (node, context) => [node.body.map((child) => visit(child, context))],
-  (node, context, childeren) => ({
+  (node, context, children) => ({
     type: 'BlockStatement',
-    body: childeren,
+    body: children,
   }),
 );
 
@@ -2621,10 +2621,10 @@ setVisitor(
     node.test === null ? getEmptyResult() : visit(node.test, context),
     node.consequent.map((child) => visit(child, context)),
   ],
-  (node, context, child, childeren) => ({
+  (node, context, child, children) => ({
     type: 'SwitchCase',
     test: child,
-    consequent: childeren,
+    consequent: children,
   }),
 );
 
@@ -2634,10 +2634,10 @@ setVisitor(
     visit(node.discriminant, context),
     node.cases.map((child) => visit(child, context)),
   ],
-  (node, context, child, childeren) => ({
+  (node, context, child, children) => ({
     type: 'SwitchStatement',
     discriminant: child,
-    cases: childeren,
+    cases: children,
   }),
 );
 
@@ -2702,19 +2702,19 @@ class File {
 
 const VERSION = '1.5.0';
 
-const navigate = (childeren, name) => {
-  for (const child of childeren) {
+const navigate = (children, name) => {
+  for (const child of children) {
     if (child.type === 'package' && child.name === name) {
-      return child.childeren;
+      return child.children;
     }
   }
   const child = {
     type: 'package',
     name,
-    childeren: [],
+    children: [],
   };
-  childeren.push(child);
-  return child.childeren;
+  children.push(child);
+  return child.children;
 };
 
 const split = (path) => {
@@ -2739,7 +2739,7 @@ const save = (recording, versioning) => {
       .push({
         type: 'class',
         name: Path__namespace.basename(path),
-        childeren: entities,
+        children: entities,
       });
   }
   return {

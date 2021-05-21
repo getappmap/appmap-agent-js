@@ -97,7 +97,7 @@ Assert.deepEqual(location1.makeEntity(['child']), null);
   Assert.deepEqual(location2.makeEntity(['child']), {
     type: 'class',
     name: `@f|function`,
-    childeren: [
+    children: [
       {
         type: 'function',
         name: '()',
@@ -124,7 +124,7 @@ Assert.deepEqual(location1.makeEntity(['child']), null);
     Assert.deepEqual(location3.makeEntity(['child']), {
       type: 'class',
       name: `@c|class`,
-      childeren: ['child'],
+      children: ['child'],
     });
     // constructor //
     {
@@ -136,7 +136,7 @@ Assert.deepEqual(location1.makeEntity(['child']), null);
         Assert.deepEqual(location5.makeEntity(['child']), {
           type: 'class',
           name: `prototype.constructor|constructor`,
-          childeren: [
+          children: [
             {
               type: 'function',
               name: '()',
@@ -161,7 +161,7 @@ Assert.deepEqual(location1.makeEntity(['child']), null);
         Assert.deepEqual(location5.makeEntity(['child']), {
           type: 'class',
           name: `prototype.m1|method`,
-          childeren: [
+          children: [
             {
               type: 'function',
               name: '()',
@@ -186,7 +186,7 @@ Assert.deepEqual(location1.makeEntity(['child']), null);
         Assert.deepEqual(location5.makeEntity(['child']), {
           type: 'class',
           name: `constructor.m2|get`,
-          childeren: [
+          children: [
             {
               type: 'function',
               name: '()',
@@ -216,7 +216,7 @@ Assert.deepEqual(location1.makeEntity(['child']), null);
     Assert.deepEqual(location3.makeEntity(['child']), {
       type: 'class',
       name: `§none`,
-      childeren: ['child'],
+      children: ['child'],
     });
     // non-computed identifier key //
     {
@@ -228,7 +228,7 @@ Assert.deepEqual(location1.makeEntity(['child']), null);
         Assert.deepEqual(location5.makeEntity(['child']), {
           type: 'class',
           name: `singleton.k1|init`,
-          childeren: ['child'],
+          children: ['child'],
         });
       }
     }
@@ -242,7 +242,7 @@ Assert.deepEqual(location1.makeEntity(['child']), null);
         Assert.deepEqual(location5.makeEntity(['child']), {
           type: 'class',
           name: `singleton["k2"]|init`,
-          childeren: ['child'],
+          children: ['child'],
         });
       }
     }
@@ -256,7 +256,7 @@ Assert.deepEqual(location1.makeEntity(['child']), null);
         Assert.deepEqual(location5.makeEntity(['child']), {
           type: 'class',
           name: `singleton["k3"]|init`,
-          childeren: ['child'],
+          children: ['child'],
         });
       }
     }
@@ -270,7 +270,7 @@ Assert.deepEqual(location1.makeEntity(['child']), null);
         Assert.deepEqual(location5.makeEntity(['child']), {
           type: 'class',
           name: `singleton[#dynamic]|init`,
-          childeren: ['child'],
+          children: ['child'],
         });
       }
     }
@@ -284,7 +284,7 @@ Assert.deepEqual(location1.makeEntity(['child']), null);
         Assert.deepEqual(location5.makeEntity(['child']), {
           type: 'class',
           name: `singleton.k5|method`,
-          childeren: [
+          children: [
             {
               type: 'function',
               name: '()',
@@ -309,7 +309,7 @@ Assert.deepEqual(location1.makeEntity(['child']), null);
         Assert.deepEqual(location5.makeEntity(['child']), {
           type: 'class',
           name: `singleton.k6|get`,
-          childeren: [
+          children: [
             {
               type: 'function',
               name: '()',
@@ -343,7 +343,7 @@ Assert.deepEqual(location1.makeEntity(['child']), null);
       Assert.deepEqual(location4.makeEntity(['child']), {
         type: 'class',
         name: '@o1|var',
-        childeren: ['child'],
+        children: ['child'],
       });
     }
   }
@@ -357,7 +357,7 @@ Assert.deepEqual(location1.makeEntity(['child']), null);
       Assert.deepEqual(location4.makeEntity(['child']), {
         type: 'class',
         name: '@#pattern|var',
-        childeren: ['child'],
+        children: ['child'],
       });
     }
   }
@@ -378,7 +378,7 @@ Assert.deepEqual(location1.makeEntity(['child']), null);
       Assert.deepEqual(location4.makeEntity(['child']), {
         type: 'class',
         name: '@o4|assignment',
-        childeren: ['child'],
+        children: ['child'],
       });
     }
   }

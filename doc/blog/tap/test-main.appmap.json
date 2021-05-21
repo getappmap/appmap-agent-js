@@ -50,16 +50,16 @@
     {
       "type": "package",
       "name": "/Users/soft/Desktop/workspace/appmap-agent-js/tmp/test/test.js",
-      "childeren": []
+      "children": []
     },
     {
       "type": "package",
       "name": "/Users/soft/Desktop/workspace/appmap-agent-js/tmp/test/main.js",
-      "childeren": [
+      "children": [
         {
           "type": "class",
           "name": "@cov_2nrbpqcouw|function",
-          "childeren": [
+          "children": [
             {
               "type": "function",
               "name": "()",
@@ -72,56 +72,56 @@
             {
               "type": "class",
               "name": "@coverageData|var",
-              "childeren": [
+              "children": [
                 {
                   "type": "class",
                   "name": "singleton.statementMap|init",
-                  "childeren": [
+                  "children": [
                     {
                       "type": "class",
                       "name": "singleton[\"0\"]|init",
-                      "childeren": [
+                      "children": [
                         {
                           "type": "class",
                           "name": "singleton.start|init",
-                          "childeren": []
+                          "children": []
                         },
                         {
                           "type": "class",
                           "name": "singleton.end|init",
-                          "childeren": []
+                          "children": []
                         }
                       ]
                     },
                     {
                       "type": "class",
                       "name": "singleton[\"1\"]|init",
-                      "childeren": [
+                      "children": [
                         {
                           "type": "class",
                           "name": "singleton.start|init",
-                          "childeren": []
+                          "children": []
                         },
                         {
                           "type": "class",
                           "name": "singleton.end|init",
-                          "childeren": []
+                          "children": []
                         }
                       ]
                     },
                     {
                       "type": "class",
                       "name": "singleton[\"2\"]|init",
-                      "childeren": [
+                      "children": [
                         {
                           "type": "class",
                           "name": "singleton.start|init",
-                          "childeren": []
+                          "children": []
                         },
                         {
                           "type": "class",
                           "name": "singleton.end|init",
-                          "childeren": []
+                          "children": []
                         }
                       ]
                     }
@@ -130,40 +130,40 @@
                 {
                   "type": "class",
                   "name": "singleton.fnMap|init",
-                  "childeren": [
+                  "children": [
                     {
                       "type": "class",
                       "name": "singleton[\"0\"]|init",
-                      "childeren": [
+                      "children": [
                         {
                           "type": "class",
                           "name": "singleton.decl|init",
-                          "childeren": [
+                          "children": [
                             {
                               "type": "class",
                               "name": "singleton.start|init",
-                              "childeren": []
+                              "children": []
                             },
                             {
                               "type": "class",
                               "name": "singleton.end|init",
-                              "childeren": []
+                              "children": []
                             }
                           ]
                         },
                         {
                           "type": "class",
                           "name": "singleton.loc|init",
-                          "childeren": [
+                          "children": [
                             {
                               "type": "class",
                               "name": "singleton.start|init",
-                              "childeren": []
+                              "children": []
                             },
                             {
                               "type": "class",
                               "name": "singleton.end|init",
-                              "childeren": []
+                              "children": []
                             }
                           ]
                         }
@@ -172,36 +172,36 @@
                     {
                       "type": "class",
                       "name": "singleton[\"1\"]|init",
-                      "childeren": [
+                      "children": [
                         {
                           "type": "class",
                           "name": "singleton.decl|init",
-                          "childeren": [
+                          "children": [
                             {
                               "type": "class",
                               "name": "singleton.start|init",
-                              "childeren": []
+                              "children": []
                             },
                             {
                               "type": "class",
                               "name": "singleton.end|init",
-                              "childeren": []
+                              "children": []
                             }
                           ]
                         },
                         {
                           "type": "class",
                           "name": "singleton.loc|init",
-                          "childeren": [
+                          "children": [
                             {
                               "type": "class",
                               "name": "singleton.start|init",
-                              "childeren": []
+                              "children": []
                             },
                             {
                               "type": "class",
                               "name": "singleton.end|init",
-                              "childeren": []
+                              "children": []
                             }
                           ]
                         }
@@ -212,34 +212,34 @@
                 {
                   "type": "class",
                   "name": "singleton.branchMap|init",
-                  "childeren": []
+                  "children": []
                 },
                 {
                   "type": "class",
                   "name": "singleton.s|init",
-                  "childeren": []
+                  "children": []
                 },
                 {
                   "type": "class",
                   "name": "singleton.f|init",
-                  "childeren": []
+                  "children": []
                 },
                 {
                   "type": "class",
                   "name": "singleton.b|init",
-                  "childeren": []
+                  "children": []
                 }
               ]
             },
             {
               "type": "class",
               "name": "@#pattern|assignment",
-              "childeren": []
+              "children": []
             },
             {
               "type": "class",
               "name": "@cov_2nrbpqcouw|assignment",
-              "childeren": [
+              "children": [
                 {
                   "type": "function",
                   "name": "()",
@@ -256,7 +256,7 @@
         {
           "type": "class",
           "name": "@#pattern|assignment",
-          "childeren": [
+          "children": [
             {
               "type": "function",
               "name": "()",
@@ -271,7 +271,7 @@
         {
           "type": "class",
           "name": "§none",
-          "childeren": [
+          "children": [
             {
               "type": "function",
               "name": "()",

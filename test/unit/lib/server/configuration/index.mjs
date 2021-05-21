@@ -190,14 +190,14 @@ Assert.equal(
 {
   const configuration = getInitialConfiguration()
     .extendWithData({
-      childeren: [['node', 'main.js']],
+      children: [['node', 'main.js']],
       cwd: '/',
     })
     .fromRight();
-  setSpawnForTesting(() => ({stdout:null, stderr:null}));
+  setSpawnForTesting(() => ({ stdout: null, stderr: null }));
   Assert.deepEqual(
     configuration.spawnChild(configuration.getChilderen()[0]).fromRight(),
-    {stdout:null, stderr:null},
+    { stdout: null, stderr: null },
   );
 }
 

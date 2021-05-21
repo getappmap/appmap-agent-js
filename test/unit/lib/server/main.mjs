@@ -27,7 +27,7 @@ class Writable {
 }
 
 (async () => {
-  // inline with multiple childeren
+  // inline with multiple children
   {
     const iterator = [
       // success with pipe
@@ -118,7 +118,7 @@ class Writable {
       await main(process.cwd(), writable, {
         extends: 'tmp/test/appmap.json',
         protocol: 'inline',
-        childeren: [
+        children: [
           ['node', 'success-pipe.js'],
           ['node', 'base-exit.js'],
           ['node', 'meta-exit.js'],
@@ -131,12 +131,12 @@ class Writable {
       (message) => {
         Assert.equal(
           message,
-          'there was some appmap-related errors on spawned childeren',
+          'there was some appmap-related errors on spawned children',
         );
         Assert.deepEqual(
           writable.buffer.join(''),
           [
-            'Spawing 6 childeren (max 1 concurrent childeren) ...',
+            'Spawing 6 children (max 1 concurrent children) ...',
             '#0: spawn node success-pipe.js ...',
             '#0 stdout >>',
             '  | stdout',
@@ -169,7 +169,7 @@ class Writable {
     );
   }
 
-  // messaging with a single success childeren //
+  // messaging with a single success children //
   {
     const writable = new Writable();
     setSpawnForTesting((...args) => {
@@ -186,7 +186,7 @@ class Writable {
       await main(process.cwd(), writable, {
         extends: 'tmp/test/appmap.json',
         port: 0,
-        childeren: 'node main.js',
+        children: 'node main.js',
         _: [],
       })
     ).either(
@@ -195,7 +195,7 @@ class Writable {
       },
       (code) => {
         Assert.deepEqual(writable.buffer, [
-          'Spawing 1 childeren (max 1 concurrent childeren) ...\n',
+          'Spawing 1 children (max 1 concurrent children) ...\n',
           "#0: spawn /bin/sh -c 'node main.js' ...\n",
           '#0 exit with: 0\n',
         ]);
@@ -214,7 +214,7 @@ class Writable {
       await main(process.cwd(), writable, {
         extends: 'tmp/test/appmap.json',
         port: 'missing/socket.sock',
-        childeren: ['node main.js'],
+        children: ['node main.js'],
         _: [],
       })
     ).either(

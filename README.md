@@ -9,31 +9,72 @@ npm install @appland/appmap-agent-js
 
 To run:
 ```sh
-npx appmap-agent -- main.mjs argv0 argv1
+mkdir tmp
+mkdir tmp/appmap
+npx appmap-agent-js -- main.mjs argv0 argv1
+cat tmp/appmap/main.appmap.json
 ```
 
 ## Requirements
 
 * unix-like os
-* node v14.x
 * git
+* node >= v14.x
 * curl >= 7.55.0
 
-* `--experimental-loader` requires `>= nodev9.0.0` 
+<!-- * `--experimental-loader` requires `>= nodev9.0.0` 
 * `NODE_OPTIONS` requires `>= nodev8.0.0`
-* `--require` requires `>= nodev1.6.0`
+* `--require` requires `>= nodev1.6.0` -->
+
+## Configuration
+
+### Agent-related Options
+
+* `protocol <string>` Protocol by which. *Default*: `"messaging"`.
+  * `"messaging"`: Simple TCP messaging protocol (faster than `http1` and `http2`). 
+  * `"http1"` and `"http2"`: Standard `http` communication. Will be useful in the future to support browser recording and recording of node processes located on a remote host.
+  * `"inline"`: This protocol indicates the agent to inline its logic into the client process. This removes some communication overhead but comes at the cost of worsening the separation between the agent logic and the program under recording logic. For instance, the program under test may mess with the recording in the following ways:
+    * Removing hooks to write the appmap before exiting the process -- eg: `process.removeAllListeners('exit')`.
+    * Modifying the global object -- eg: `global.String.prototype.substring = null`.
+* `port <number> | <string>`: Communication port; a string indicates a path to unix domain socket which is faster. *Default*: `0` which will use a random available port.
+* `concurrency <number> | <string>`: Set the maximum number of concurrent children. If it is a string, it should be formatted as `/[0-9]+%/` and it is interpreted as a percentage of the host's number of logical core. For instance `"50%"` will results in maximum 2 concurrent children on a machine of 4 logical cores. *Default*: `1` (sequential children spawning).
+* `children <Child[]>`: A list of childeren to spawn.
+  * `<string>`: same as `/bin/sh`
+  * `<string[]>`: same as `{spawn, exec:}`
+  * ``
+
+### Appmap-related Options
+
+A 
+
+* `hook-cjs <boolean>`: Indicates whether commonjs modules should be instrumented to record call events. *Default*: true.
+* `hook-esm <boolean>`: Indicates whether native modules should be instrumented to record call events. *Default*: true. 
+* `hook-http <boolean>`: Indicates whether the native modules `http` and `https` should be monkey-patched to record `http` traffic. *Default*: true.
+* `enabled <boolean> | <Specifier[]>`:
+* `escape-prefix`: The prefix of the variables used to store recording-related data. If variables from the program under recording starts with this prefix, the instrumentation will fail. *Default*: `"APPMAP"`.
+* `packages`
+* `exclude <string[]>`: A list of name to always exclude from function
+
+### Recording-related Options
+
+A single appmap may have multiple recordings enable at the same time.
+
+* recording
+* `class-map-pruning <boolean>`: Indicates whether all the code entities (ie elements of the `classMap` array) of a file should be pruned off the file did not produce any call/return event. *Default*: `false`.
+* `event-pruning <boolean>`: Indicates whether call/return events should be pruned off if they are not located .
+* `output <string> | <object>`: Path of the directory where appmap files should be written. The name of the file is based on the `map-name` option if it is present. Else, it is based on the path of the main module. It is also possible to explicitly set the name of the file using the object form: `{"directory": "path/to/output", "file-name": "my-file-name"}`. Note that `.appmap.json` will appened to the provided 
+
+If it is an object is may contain two string properties: `directory` and `file-name`. 
+* `base <string> | <object>`: Path of the directory to which paths from the recording should be express relatively. If it is an object it should be of the form `{"directory": "path/to/base"}`. `"path/to/base"` is the same as `{directory:"path/to/base/"}`. *Default*: current working directory of the agent process.
+* `app-name <string>`: Name of the app that is being recorded.
+* `map-name <string>`: Name of the recording.
+* `name <string>`: Synonym to `map-name`.
 
 ## CLI
 
 ```text
 npx appmap-agent <method> <options> -- <command>
 ```
-
-### Method
-
-At the moment there is only one method. In the future, new functionalities will be added here.
-
-* `spawn`: Spawn a node process (the default method).
 
 ### Command
 

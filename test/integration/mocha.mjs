@@ -3,7 +3,7 @@ import * as FileSystem from 'fs';
 import { strict as Assert } from 'assert';
 import { main } from '../../lib/server/main.mjs';
 
-const getEvent = ({event}) => event;
+const getEvent = ({ event }) => event;
 
 FileSystem.writeFileSync(
   'tmp/test/appmap.json',
@@ -18,12 +18,12 @@ FileSystem.writeFileSync(
           path: '.',
         },
       ],
-      childeren: [
+      children: [
         {
           type: 'spawn',
           recorder: 'mocha',
-          exec: ["npx", "mocha"],
-          argv: ["mod.test.js"]
+          exec: ['npx', 'mocha'],
+          argv: ['mod.test.js'],
         },
       ],
     },
@@ -88,19 +88,18 @@ const unlink = (path) => {
   } catch (error) {
     Assert.equal(error.code, 'ENOENT');
   }
-}
+};
 
-const readEventArray = (path) => JSON.parse(
-  FileSystem.readFileSync(path, "utf8")
-).events.map(getEvent);
+const readEventArray = (path) =>
+  JSON.parse(FileSystem.readFileSync(path, 'utf8')).events.map(getEvent);
 
 (async () => {
-   // 'http1', 'http2', 'inline'
-  for (let protocol of ['messaging',]) {
-    unlink("tmp/test/mod-foo-0.appmap.json");
-    unlink("tmp/test/mod-foo-1.appmap.json");
-    unlink("tmp/test/mod-bar-0.appmap.json");
-    unlink("tmp/test/mod-bar-1.appmap.json");
+  // 'http1', 'http2', 'inline'
+  for (let protocol of ['messaging']) {
+    unlink('tmp/test/mod-foo-0.appmap.json');
+    unlink('tmp/test/mod-foo-1.appmap.json');
+    unlink('tmp/test/mod-bar-0.appmap.json');
+    unlink('tmp/test/mod-bar-1.appmap.json');
     Assert.equal(
       (
         await main(process.cwd(), process.stdout, {
@@ -111,21 +110,31 @@ const readEventArray = (path) => JSON.parse(
       ).fromRight(),
       0,
     );
-    Assert.deepEqual(
-      readEventArray(`tmp/test/mod-foo-0.appmap.json`, "utf8"),
-      ["call", "call", "return", "return"]
-    );
-    Assert.deepEqual(
-      readEventArray(`tmp/test/mod-foo-1.appmap.json`, "utf8"),
-      ["call", "call", "return", "return", "call", "return"]
-    );
-    Assert.deepEqual(
-      readEventArray(`tmp/test/mod-bar-0.appmap.json`, "utf8"),
-      ["call", "call", "return", "return"]
-    );
-    Assert.deepEqual(
-      readEventArray(`tmp/test/mod-bar-1.appmap.json`, "utf8"),
-      ["call", "call", "return", "return"]
-    );
+    Assert.deepEqual(readEventArray(`tmp/test/mod-foo-0.appmap.json`, 'utf8'), [
+      'call',
+      'call',
+      'return',
+      'return',
+    ]);
+    Assert.deepEqual(readEventArray(`tmp/test/mod-foo-1.appmap.json`, 'utf8'), [
+      'call',
+      'call',
+      'return',
+      'return',
+      'call',
+      'return',
+    ]);
+    Assert.deepEqual(readEventArray(`tmp/test/mod-bar-0.appmap.json`, 'utf8'), [
+      'call',
+      'call',
+      'return',
+      'return',
+    ]);
+    Assert.deepEqual(readEventArray(`tmp/test/mod-bar-1.appmap.json`, 'utf8'), [
+      'call',
+      'call',
+      'return',
+      'return',
+    ]);
   }
 })();
