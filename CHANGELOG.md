@@ -1,3 +1,10 @@
+## [3.1.2](https://github.com/applandinc/appmap-agent-js/compare/v3.1.1...v3.1.2) (2021-05-21)
+
+
+### Bug Fixes
+
+* add ajv schema *yml* ([63de260](https://github.com/applandinc/appmap-agent-js/commit/63de2606eaf92b42d44744cf35a269ad9d4437bc))
+
 ## [3.1.1](https://github.com/applandinc/appmap-agent-js/compare/v3.1.0...v3.1.1) (2021-05-21)
 
 
