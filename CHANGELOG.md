@@ -1,3 +1,10 @@
+## [3.1.1](https://github.com/applandinc/appmap-agent-js/compare/v3.1.0...v3.1.1) (2021-05-21)
+
+
+### Bug Fixes
+
+* bump to push new npm version ([f4bc231](https://github.com/applandinc/appmap-agent-js/commit/f4bc231f98a14022127deb5a759c713fdc2a457c))
+
 # [3.1.0](https://github.com/applandinc/appmap-agent-js/compare/v3.0.0...v3.1.0) (2021-05-21)
 
 
