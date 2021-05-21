@@ -198,6 +198,7 @@
             required: [type, cwd, exec, argv, configuration, options]
             properties:
               type: {const: cooked}
+              description: {type: string}
               cwd: {$ref: cwd}
               exec: {type: string}
               argv:

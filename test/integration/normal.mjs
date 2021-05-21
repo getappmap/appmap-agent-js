@@ -14,7 +14,10 @@ FileSystem.writeFileSync(
       enabled: true,
       packages: [
         {
-          path: '.',
+          path: 'main.mjs',
+        },
+        {
+          path: 'module1.js',
         },
       ],
       childeren: [
@@ -23,7 +26,7 @@ FileSystem.writeFileSync(
           recorder: 'normal',
           main: 'main.mjs',
           options: {
-            stdio: 'inherit',
+            stdio: 'pipe',
           },
         },
       ],
@@ -37,25 +40,27 @@ FileSystem.writeFileSync(
 FileSystem.writeFileSync(
   'tmp/test/main.mjs',
   `
-    import "./script1.js";
-    (function main () {} ());
+    import * as module1 from "./module1.js";
+    (function main () {
+      module1.foo();
+    } ());
   `,
   'utf8',
 );
 
 FileSystem.writeFileSync(
-  'tmp/test/script1.js',
+  'tmp/test/module1.js',
   `
-    require("./script2.js");
-    (function script1 () {} ());
+    const module2 = require("./module2.js");
+    exports.foo = function module1 () { module2.bar(); };
   `,
   'utf8',
 );
 
 FileSystem.writeFileSync(
-  'tmp/test/script2.js',
+  'tmp/test/module2.js',
   `
-    (function script2 () {} ());
+    exports.bar = function module2 () {};
   `,
   'utf8',
 );
@@ -77,7 +82,12 @@ FileSystem.writeFileSync(
       ).fromRight(),
       0,
     );
-    // console.log(FileSystem.readFileSync('tmp/test/foo.appmap.json', 'utf8'));
+    Assert.deepEqual(
+      JSON.parse(
+        FileSystem.readFileSync('tmp/test/foo.appmap.json', 'utf8'),
+      ).events.map(({ event }) => event),
+      ['call', 'call', 'return', 'return'],
+    );
   }
 })();
 //
