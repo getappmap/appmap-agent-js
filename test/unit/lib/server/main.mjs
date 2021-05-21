@@ -4,6 +4,8 @@ import { strict as Assert } from 'assert';
 import { setSpawnForTesting } from '../../../../lib/server/configuration/child.mjs';
 import { main } from '../../../../lib/server/main.mjs';
 
+Error.stackTraceLimit = Infinity;
+
 FileSystem.writeFileSync(
   'tmp/test/appmap.json',
   JSON.stringify({
@@ -33,8 +35,10 @@ class Writable {
         Assert.deepEqual(args.slice(0, 2), ['node', ['success-pipe.js']]);
         const child = new Events.EventEmitter();
         child.stdout = new Events.EventEmitter();
+        child.stdout.setEncoding = () => {};
         child.stdout.readableEncoding = 'utf8';
         child.stderr = new Events.EventEmitter();
+        child.stdout.setEncoding = () => {};
         child.stderr.readableEncoding = 'buffer';
         setImmediate(() => {
           child.emit('exit', 0, null);

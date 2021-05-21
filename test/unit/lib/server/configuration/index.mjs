@@ -194,10 +194,10 @@ Assert.equal(
       cwd: '/',
     })
     .fromRight();
-  setSpawnForTesting(() => 'foo');
-  Assert.equal(
+  setSpawnForTesting(() => ({stdout:null, stderr:null}));
+  Assert.deepEqual(
     configuration.spawnChild(configuration.getChilderen()[0]).fromRight(),
-    'foo',
+    {stdout:null, stderr:null},
   );
 }
 

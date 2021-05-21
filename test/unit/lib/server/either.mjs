@@ -187,7 +187,6 @@ Assert.equal(
       Assert.deepEqual(args, ['foo', 'bar']);
       return 'qux';
     },
-    'prefix',
     'foo',
     'bar',
   ).fromRight(),
@@ -200,11 +199,10 @@ Assert.equal(
       Assert.deepEqual(args, ['foo', 'bar']);
       throw new Error('qux');
     },
-    'prefix',
     'foo',
     'bar',
   ).fromLeft(),
-  'prefix >> qux',
+  'qux',
 );
 
 // others //

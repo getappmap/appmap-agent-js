@@ -25,9 +25,6 @@ FileSystem.writeFileSync(
           type: 'fork',
           recorder: 'normal',
           main: 'main.mjs',
-          options: {
-            stdio: 'pipe',
-          },
         },
       ],
     },
@@ -90,72 +87,3 @@ FileSystem.writeFileSync(
     );
   }
 })();
-//
-//
-// const iterator = ['inline', 'messaging', 'http1', 'http2'][Symbol.iterator]();
-//
-// const checkAppmap = () => {
-//   const appmap = JSON.parse(
-//     FileSystem.readFileSync('tmp/test/module.mjs.appmap.json', 'utf8'),
-//   );
-//   Assert.deepEqual(
-//     appmap.classMap.map(({ type, name }) => ({ type, name })),
-//     [
-//       {
-//         type: 'package',
-//         name: Path.resolve('tmp/test/module.mjs'),
-//       },
-//       {
-//         type: 'package',
-//         name: Path.resolve('tmp/test/script1.js'),
-//       },
-//       {
-//         type: 'package',
-//         name: Path.resolve('tmp/test/script2.js'),
-//       },
-//     ],
-//   );
-// };
-//
-// const step = () => {
-//   const { done, value } = iterator.next();
-//   if (done) {
-//     process.stdout.write('DONE\n');
-//   } else {
-//     try {
-//       FileSystem.unlinkSync('tmp/test/module.mjs.appmap.json');
-//     } catch (error) {
-//       Assert.equal(error.code, 'ENOENT');
-//     }
-//     main(
-//       'spawn',
-//       {
-//         'rc-file': 'tmp/test/appmap.json',
-//         protocol: value,
-//       },
-//       ['node', 'tmp/test/module.mjs'],
-//       (error, server, client) => {
-//         if (error) {
-//           throw error;
-//         }
-//         client.on('exit', (exit, signal) => {
-//           Assert.equal(signal, null);
-//           Assert.equal(exit, 0);
-//         });
-//         if (server === null) {
-//           client.on('exit', (exit, signal) => {
-//             checkAppmap();
-//             step();
-//           });
-//         } else {
-//           server.on('close', () => {
-//             checkAppmap();
-//             step();
-//           });
-//         }
-//       },
-//     );
-//   }
-// };
-//
-// step();

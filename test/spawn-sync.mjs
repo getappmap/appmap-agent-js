@@ -1,6 +1,6 @@
 import * as ChildProcess from 'child_process';
 
-export default (cmd, argv, options) => {
+export const spawnSync = (cmd, argv, options) => {
   const result = ChildProcess.spawnSync(cmd, argv, {
     ...options,
     stdio: 'inherit',

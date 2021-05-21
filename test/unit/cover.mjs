@@ -1,4 +1,4 @@
-import spawnSync from '../spawn-sync.mjs';
+import {spawnSync} from '../spawn-sync.mjs';
 
 export default (path1, path2, options) => {
   options = {
