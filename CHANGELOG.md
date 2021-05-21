@@ -1,3 +1,23 @@
+# [3.1.0](https://github.com/applandinc/appmap-agent-js/compare/v3.0.0...v3.1.0) (2021-05-21)
+
+
+### Bug Fixes
+
+* catch network error (due to ECONRESET) and less globs and more regexp) ([7a14afb](https://github.com/applandinc/appmap-agent-js/commit/7a14afbe5d539226934fc7ea292a30be3bc96092))
+* correct a few bugs where the client and the server protocol did not match ([2c44044](https://github.com/applandinc/appmap-agent-js/commit/2c44044d6acb4afdeedc7fbe47b79fd9e6884679))
+* fix infinite http recursion and change conf format to conform to initial values ([4ca1ff9](https://github.com/applandinc/appmap-agent-js/commit/4ca1ff9a0e398a8063dd24cbe902f3300b4b5e35))
+* test child spawning and correct a few bugs linked to client expect checks ([471b955](https://github.com/applandinc/appmap-agent-js/commit/471b95511b21b9a58f6e6d30437cd7d377a272b7))
+* various bug fixes and better seperation of errors between the base and the meta layer ([cc80044](https://github.com/applandinc/appmap-agent-js/commit/cc80044c5b1338b19a6301bb3685299f802388c8))
+
+
+### Features
+
+* add hook for http request ([3421530](https://github.com/applandinc/appmap-agent-js/commit/34215308f2e8ac5aa2c98da7ff26e917f1bff00c))
+* add https hooking ([598d87e](https://github.com/applandinc/appmap-agent-js/commit/598d87e452051a37f11de0501801628753445ec8))
+* add inline extends field for configuration and embeded cwd ([e4addf3](https://github.com/applandinc/appmap-agent-js/commit/e4addf3ea837cb6a37fb54feae92e8f179c221c9))
+* cosmetic improvements ([eafc86a](https://github.com/applandinc/appmap-agent-js/commit/eafc86a96d123c492ec6f9ceaaeb86b18cf6edec))
+* provide more options to the user to spawn child processes ([61522a3](https://github.com/applandinc/appmap-agent-js/commit/61522a3a1809b7abdecddaf4196f854036cd9cc7))
+
 # [3.0.0](https://github.com/applandinc/appmap-agent-js/compare/v2.12.1...v3.0.0) (2021-05-13)
 
 
