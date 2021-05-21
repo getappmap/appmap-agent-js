@@ -57,4 +57,5 @@ export const client = [
   'es2015/node14x/recorder/normal-bin',
   'es2015/node14x/recorder/mocha-main',
   'es2015/node14x/recorder/mocha-bin',
+  'es2015/node14x/recorder/empty-main',
 ];

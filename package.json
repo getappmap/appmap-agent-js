@@ -37,7 +37,7 @@
   "bin": {
     "appmap-agent-js": "bin/index.mjs"
   },
-  "main": "/lib/client/es2015/node14x/appmap.js",
+  "main": "/lib/client/es2015/node14x/recorder/empty-main.js",
   "dependencies": {
     "acorn": "^8.1.1",
     "ajv": "^8.1.0",

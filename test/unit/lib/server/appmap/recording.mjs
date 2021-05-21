@@ -38,9 +38,10 @@ const identity = (any) => any;
   );
   recording.register(origin1);
   recording.record(origin1, 'event1');
-  recording.toggle();
+  recording.toggle(false).fromRight();
   recording.record(origin1, 'event2');
-  recording.toggle();
+  recording.toggle(true).fromRight();
+  recording.toggle(true).fromLeft();
   recording.record(origin2, 'event3');
   unlink('tmp/test/bar.appmap.json');
   recording.terminate((path) => {

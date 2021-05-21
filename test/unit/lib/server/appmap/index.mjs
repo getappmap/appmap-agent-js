@@ -84,12 +84,12 @@ const unlink = (path) => {
     (await appmap.recordAsync({ origin, event: 'event1' })).fromRight(),
     null,
   );
-  Assert.equal((await appmap.toggleAsync(key)).fromRight(), false);
+  Assert.equal((await appmap.pauseAsync(key)).fromRight(), null);
   Assert.equal(
     (await appmap.recordAsync({ origin, event: 'event2' })).fromRight(),
     null,
   );
-  Assert.equal((await appmap.toggleAsync(key)).fromRight(), true);
+  Assert.equal((await appmap.playAsync(key)).fromRight(), null);
   Assert.equal(
     (await appmap.recordAsync({ origin, event: 'event3' })).fromRight(),
     null,

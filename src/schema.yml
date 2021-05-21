@@ -459,6 +459,13 @@
       additionalProperties: false
       required: [action, session, data]
       properties:
-        action: {const: toggle}
+        action: {const: play}
+        session: {type: string}
+        data: {type: string}
+    - type: object
+      additionalProperties: false
+      required: [action, session, data]
+      properties:
+        action: {const: pause}
         session: {type: string}
         data: {type: string}
