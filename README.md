@@ -287,3 +287,4 @@ If it is an object is may contain two string properties: `directory` and `file-n
 * `app-name <string>`: Name of the app that is being recorded.
 * `map-name <string>`: Name of the recording.
 * `name <string>`: Synonym to `map-name`.
+
