@@ -19,4 +19,4 @@ deploy:
     cleanup: false  # keep semantic release! (and npm modules?)
     script: npm run deploy
     on:
-      branch: alpha
+      branch: main
