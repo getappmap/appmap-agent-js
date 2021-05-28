@@ -1,3 +1,10 @@
+# [3.2.0](https://github.com/applandinc/appmap-agent-js/compare/v3.1.2...v3.2.0) (2021-05-28)
+
+
+### Features
+
+* support for node12 (latest still maintained node version)) ([74d1056](https://github.com/applandinc/appmap-agent-js/commit/74d105687fb4ddce1c99b780f2507df17f997004))
+
 ## [3.1.2](https://github.com/applandinc/appmap-agent-js/compare/v3.1.1...v3.1.2) (2021-05-21)
 
 
