@@ -23,9 +23,6 @@
 - $id: protocol
   enum: [inline, messaging, http1, http2]
 
-- $id: node-version
-  enum: ["14.x", "15.x", "16.x"]
-
 - $id: stdio-stream
   enum: [ignore, pipe, inherit]
 
@@ -226,7 +223,6 @@
                   - null
                   - normal
                   - mocha
-              node-version: {$ref: node-version}
               configuration: {$ref: configuration}
               exec:
                 anyOf:
@@ -255,7 +251,6 @@
                 enum:
                   - null
                   - normal
-              node-version: {$ref: node-version}
               configuration: {$ref: configuration}
               globbing: {type: boolean}
               main: {type: string}

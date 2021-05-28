@@ -148,15 +148,7 @@ const spawnAsync = (child, options) =>
       {
         argv: [
           '--require',
-          Path.join(
-            home,
-            'lib',
-            'client',
-            'es2015',
-            'node12x',
-            'recorder',
-            'mocha-bin.js',
-          ),
+          Path.join(home, 'lib', 'client', 'node', 'recorder', 'mocha-bin.js'),
           'foo',
           'bar',
         ],
@@ -199,15 +191,7 @@ const spawnAsync = (child, options) =>
       {
         argv: [
           '--require',
-          Path.join(
-            home,
-            'lib',
-            'client',
-            'es2015',
-            'node12x',
-            'recorder',
-            'mocha-bin.js',
-          ),
+          Path.join(home, 'lib', 'client', 'node', 'recorder', 'mocha-bin.js'),
           'foo',
           'bar',
         ],
