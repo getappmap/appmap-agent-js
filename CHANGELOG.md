@@ -1,3 +1,10 @@
+## [3.2.1](https://github.com/applandinc/appmap-agent-js/compare/v3.2.0...v3.2.1) (2021-05-28)
+
+
+### Bug Fixes
+
+* remove node-version from configuration.childeren ([5d72714](https://github.com/applandinc/appmap-agent-js/commit/5d727143ef7d176b388d7bf252bdf83fef53538a))
+
 # [3.2.0](https://github.com/applandinc/appmap-agent-js/compare/v3.1.2...v3.2.0) (2021-05-28)
 
 
