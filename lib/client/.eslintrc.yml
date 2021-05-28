@@ -1,7 +1,10 @@
 env:
   node: false
   browser: false
-  es6: false
+  es6: true
+globals:
+  require: readonly
+  exports: readonly
 rules:
   eslint-disable prefer-object-spread: off
   prefer-object-spread: off
@@ -10,3 +13,5 @@ rules:
     - error
     - allow: ["^global_"]
       properties: never
+parserOptions:
+  ecmaVersion: 2015
