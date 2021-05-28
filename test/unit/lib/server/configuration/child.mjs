@@ -153,7 +153,7 @@ const spawnAsync = (child, options) =>
             'lib',
             'client',
             'es2015',
-            'node14x',
+            'node12x',
             'recorder',
             'mocha-bin.js',
           ),
@@ -204,7 +204,7 @@ const spawnAsync = (child, options) =>
             'lib',
             'client',
             'es2015',
-            'node14x',
+            'node12x',
             'recorder',
             'mocha-bin.js',
           ),
@@ -245,12 +245,22 @@ const spawnAsync = (child, options) =>
   );
 
   setSpawnForTesting(() => {
-    return 'foo';
+    return {
+      foo: 'bar',
+      stdout: null,
+      stderr: null,
+    };
   });
   Assert.deepEqual(
     normalizeChild('foo bar')
       .map((child) => spawnNormalizedChild(child, makeMockConfiguration()))
       .map(fromRight),
-    ['foo'],
+    [
+      {
+        foo: 'bar',
+        stdout: null,
+        stderr: null,
+      },
+    ],
   );
 })();

@@ -65,7 +65,7 @@ initialize >> argv = [
   APPMAP_PROTOCOL: 'messaging',
   APPMAP_HOST: 'localhost',
   APPMAP_PORT: '61443',
-  NODE_OPTIONS: '--require /Users/soft/Desktop/workspace/appmap-agent-js/lib/client/es2015/node14x/index-cjs.js'
+  NODE_OPTIONS: '--require /Users/soft/Desktop/workspace/appmap-agent-js/lib/client/es2015/node12x/index-cjs.js'
 }
 instrument >> path = /usr/local/lib/node_modules/npm/bin/npx-cli.js
 ...
@@ -91,7 +91,7 @@ initialize >> argv = [
   APPMAP_PROTOCOL: 'messaging',
   APPMAP_HOST: 'localhost',
   APPMAP_PORT: '61443',
-  NODE_OPTIONS: '--require /Users/soft/Desktop/workspace/appmap-agent-js/lib/client/es2015/node14x/
+  NODE_OPTIONS: '--require /Users/soft/Desktop/workspace/appmap-agent-js/lib/client/es2015/node12x/
 }
 instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/tap/bin/run.js
 ...
@@ -117,7 +117,7 @@ initialize >> argv = [
   APPMAP_PROTOCOL: 'messaging',
   APPMAP_HOST: 'localhost',
   APPMAP_PORT: '61443',
-  NODE_OPTIONS: '--require /Users/soft/Desktop/workspace/appmap-agent-js/lib/client/es2015/node14x/index-cjs.js --require /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/node-preload/preload-path/node-preload.js',
+  NODE_OPTIONS: '--require /Users/soft/Desktop/workspace/appmap-agent-js/lib/client/es2015/node12x/index-cjs.js --require /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/node-preload/preload-path/node-preload.js',
 }
 instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/node-preload/preload-path/node-preload.js
 ...
@@ -139,7 +139,7 @@ initialize >> argv = [
   APPMAP_PROTOCOL: 'messaging',
   APPMAP_HOST: 'localhost',
   APPMAP_PORT: '61443',
-  NODE_OPTIONS: '--require /Users/soft/Desktop/workspace/appmap-agent-js/lib/client/es2015/node14x/index-cjs.js --require /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/node-preload/preload-path/node-preload.js'
+  NODE_OPTIONS: '--require /Users/soft/Desktop/workspace/appmap-agent-js/lib/client/es2015/node12x/index-cjs.js --require /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/node-preload/preload-path/node-preload.js'
 }
 instrument >> path = /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/node-preload/preload-path/node-preload.js
 ...

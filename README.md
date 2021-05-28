@@ -1,6 +1,6 @@
 # appmap-agent-js
 
-JavaScript client agent for the AppMap framework.
+JavaScript agent for the AppMap framework.
 
 To install:
 ```sh
@@ -20,8 +20,9 @@ cat tmp/appmap/main.appmap.json
 
 * unix-like os
 * git
-* node >= v14.x
-* curl >= 7.55.0
+* node (>= 12.0.0 && <= 13.0.0) || >= 14.0.0 (ie any major node version that is still maintained)
+* curl >= 7.55.0 (because of `--data @-` CLI option)
+* mocha >= 8.0.0 (because of root hooks)
 
 <!-- * `--experimental-loader` requires `>= nodev9.0.0` 
 * `NODE_OPTIONS` requires `>= nodev8.0.0`
@@ -29,22 +30,22 @@ cat tmp/appmap/main.appmap.json
 
 ## CLI (Automated Recording)
 
-The agent's CLI is essentially a test runner augmented with recording capability.
-More precisely, the agent spawns/forks child processes based on configuration data and coordinates their recording.
-To reduce the risk of the recording interfering with the program under recording we move as much logic as possible on the parent process.
-For instance, instrumentation is performed on the parent process.
+The agent's CLI is essentially a test runner for node processes which is capable of recording appmaps.
+More precisely, the agent spawns child processes based on configuration data and coordinates their recording via a server-client communication.
+<!-- To reduce the risk of the recording interfering with the program under recording we moved as much logic as possible on the server (ie parent) process.
+For instance, instrumentation is performed on the server process and events recorded on client processes are streamed to the server process . -->
 
 By default, the agent will read configuration data on the file `./appmap.yml`.
 A custom location for the configuration file can be provided with the `--rc-file` CLI argument.
-At the moment, the presence of a configuration file is mandatory.
+At the moment, the presence of a configuration file is mandatory but this might change in the future.
 
-Below we present the three logics currently supported by the agent to perform recording.
+Below, we present the three strategies currently supported by the agent to record node processes.
 
 ### Normal Recorder
 
-The normal recorder will create a single appmap file for the entire child process.
-This is the default recorder that will be used by the agent.
-For instance, by specifying a forked child:
+The normal recorder will create a single appmap file for the entire spawn child process.
+It is the default recorder used by the agent.
+For instance using the fork format:
 
 ```yaml
 # appmap.yml
@@ -52,7 +53,7 @@ enabled: true
 childeren:
   - type: fork
     recorder: normal # superfluous
-    main: main.js
+    main: lib/main.js
     argv: [argv0, argv1]
 ```
 
@@ -63,13 +64,14 @@ Globbing is also supported:
 enabled: true
 childeren:
   - type: fork
-    recorder: normal # superfluous
-    globbing: true # false by default
-    main: *.js
+    recorder: normal # Superfluous
+    globbing: true   # False by default
+    main: lib/*.js   # Will spawn as many children as there
+                     # is js files in the lib directory
     argv: [argv0, argv1]
 ```
 
-Child processes can also be spawned which provides more flexibility but does not support globbing:
+There exists another format called "spawn" which provides more flexibility but does not support globbing:
 
 ```yaml
 # appmap.yml
@@ -94,24 +96,22 @@ Spawning children can also be done via CLI arguments:
 ```sh
 npx appmap-agent-js
   --enabled true
-  # multiple children can be provided with the string format
+  # Multiple children can be provided with the string format
   --childeren 'node main1.js argv0 argv1'
   --childeren 'node main2.js argv0 argv2'
-  # the array format can be provided as positional arguments:
+  # The array format can be provided as positional arguments:
   -- node main3.js argv0 argv2
 ```
 
-An important difference between forked and spawned children is that: forked children will not propagate the recording to their own child processes while spawned children will. This is because, under the hood, forked children use command line arguments while spawned children use environment variables.
-
-The `enabled` option can be tuned to prevent recording unwanted processes.
-For instance:
+An important difference between the fork and spawn format is that: the fork format will not propagate recording to grand-child processes while the spawn format will. This is because, under the hood, the fork format uses command line arguments while the spawn format uses environment variables. A typical scenario where this matters consists in executing a node package with the `npx` command. There is at least two processes at play: the npx child process and the package grand child process. To fine tune the per-process recording, the `enabled` option accepts other values than boolean. For instance:
 
 ```yaml
 # appmap.yml
 enabled:
   # Only record node processes whose main module is
-  # located (deep) inside the cwd. Hence the npx
-  # command will not be recorded.
+  # (recursively) located inside the cwd. Hence the
+  # npx executable will not be recorded (if its not
+  # in the current directory).
   - path: .
     recursive: true
 childeren:
@@ -119,6 +119,35 @@ childeren:
     recorder: normal # superfluous
     exec: npx
     argv: [package-name, argv0, argv1]
+```
+
+The normal recorder is suitable to record the test suites of test frameworks such as `node-tap`, `tape`, and `ava`. For instance with `node-tap`:
+
+```yaml
+enabled:
+  # Do not record the tap test runner
+  # but only its child processes.
+  - path: test/
+    recursive: true
+childeren:
+  - type: spawn
+    recorder: normal # superfluous
+    exec: npx tap
+    # Disable code coverage so that
+    # the appmap will not show code
+    # generated by istanbul.
+    argv: [test/**/*.js, --no-coverage]
+```
+
+It is also possible to directly use the agent's runner:
+
+```yaml
+enabled: true
+childeren:
+  - type: fork
+    globbing: true
+    main: test/**/*.js
+    recorder: normal # superfluous
 ```
 
 ### Mocha Recorder
@@ -136,11 +165,11 @@ import {abs} from "../lib/abs.mjs";
 import {strict as Assert} from "assert";
 describe("abs", function () {
   // will generate tmp/appmap/abs-0.appmap.json
-  it("should return a positive number when provided a positive number", function () {
+  it("should return a positive number", function () {
     Assert.ok(abs(-3) > 0);
   });
   // will generate tmp/appmap/abs-1.appmap.json
-  it("should return a positive number when provided a negative number", function () {
+  it("should also return a positive number", function () {
     Assert.ok(abs(3) > 0);
   });
 });
@@ -184,7 +213,7 @@ cat tmp/appmap/abs-1.appmap.json
 ### Empty Recorder
 
 By itself, the empty recorder will not generate any appmap file.
-It is useful for increasing the capabilities of manual recording or simply for using the agent as a regular test runner.
+It is useful for increasing the capabilities of manual recording or for using the agent as a regular test runner.
 More information [here](api-manual-recording).
 
 ```yaml
@@ -221,6 +250,7 @@ recording.stop();
 ```
 
 An asynchronous api is also provided:
+
 ```js
 import {makeAppmapAsync} from "appmap-agent-js";
 ((async () => {
@@ -235,33 +265,69 @@ import {makeAppmapAsync} from "appmap-agent-js";
 Note that the synchronous and asynchronous API's can be intertwined freely .
 In clear, a synchronously created appmap can perform asynchronous methods and vice-versa.
 
-Under the hood, the API chooses between modes.
-In the remote mode, the API detected that it has been required within a process that has been spawned/forked by the agent's CLI (with the empty recorder) and start communicating with the agent process.
-In the inline mode, the API will embeds the logic the is normally located on the agent process.
-This eliminates some communication overhead but comes at the price of blurring the separation between the recorder and the recordee.
+Under the hood, the API chooses between two modes.
+In remote mode, the API detected that it has been required within a process that has been spawned by the agent's CLI (with the empty recorder) and start communicating with the agent process.
+In inline mode, the API will embed the logic that is normally located on the agent process.
+Below we summarize the pros and cons of inline mode vs remote mode.
+
+|     | Inline Mode | Remote Mode |
+| --- | ----------- | ----------- |
+| Native module recording | Function calls/returns cannot be recorded within native modules. This is because instrumentation of native module can only be done via the `--experimental-loader` CLI option. | |
+| Communication overhead | Eliminated. | |
+| Recording Saving | Can be prevented by the program under recording with operations such as: `process.removeAllListeners('exit')`. Conflict resolution of appmap files span across a single appmap instance. | Is guaranteed to happen. |
+| Appmap files conflict resolution | Spans across a single appmap instance. | Spans across all the spawned child processes. |
+| Proper Layering | The program under recording can mess with the inlined logic by modifying the global object -- eg: `delete String.prototype.substring`. | Resilient to modification of the global object. |
 
 ## Configuration
 
-**Work in progress**
-
-Source: [json-schema](src/schema.yml)
+The actual format requirements for configuration can be found as a json-schema [here](src/schema.yml).
 
 ### Agent-related Options
 
 These options define the behaviour of the agent as a test runner.
 
-* `protocol <string>` Protocol by which the agent process and its children processes should communicate. *Default*: `"messaging"`.
+* `protocol <string>` Communication protocol between the server process and its client processes by which the agent process and its children processes should communicate. *Default*: `"messaging"`. Valid values are:
   * `"messaging"`: Simple TCP messaging protocol (faster than `http1` and `http2`). 
   * `"http1"` and `"http2"`: Standard `http` communication. Will be useful in the future to support browser recording and recording of node processes located on a remote host.
-  * `"inline"`: This protocol indicates the agent to inline its logic into the client process. This removes some communication overhead but comes at the cost of blurring the separation between the agent logic and the program under recording logic. For instance, the program under test may mess with the recording in the following ways:
+  * `"inline"`: This protocol indicates the agent to inline its logic into the client process. This removes some communication overhead but comes at the cost of blurring the separation between the recording and the program under recording. For instance, the program under test may mess with the recording in the following ways:
     * Removing hooks to write the appmap before exiting the process -- eg: `process.removeAllListeners('exit')`.
     * Modifying the global object -- eg: `global.String.prototype.substring = null`.
-* `port <number> | <string>`: Port through which the agent process and its childeren processes should communicate. A string indicates a path to a unix domain socket which is faster. *Default*: `0` which will use a random available port.
-* `concurrency <number> | <string>`: Set the maximum number of concurrent children. If it is a string, it should be formatted as `/[0-9]+%/` and it is interpreted as a percentage of the host's number of logical core. For instance `"50%"` in machine with 4 logical core will results in maximum 2 concurrent children. *Default*: `1` (sequential children spawning).
-* `children <Child[]>`: A list of childeren to spawn.
-  * `<string>`: same as `/bin/sh`
-  * `<string[]>`: same as `{spawn, exec:}`
-  * ``
+* `port <number> | <string>`: Port through which the agent process and its children processes should communicate. A string indicates a path to a unix domain socket which is faster. *Default*: `0` which will use a random available port.
+* `concurrency <number> | <string>`: Set the maximum number of concurrent children. If it is a string, it should be formatted as `/[0-9]+%/` and it is interpreted as a percentage of the host's number of logical core. For instance `"50%"` in machine with 4 logical cores will result in maximum 2 concurrent children. *Default*: `1` (sequential children spawning).
+* `children <[]>`: List of children to spawn. Valid children types are:
+  * `<string>`: Command to pass to `/bin/sh`. For instance `"node $HOME/main.js"` is equivalent to `{type:"spawn", exec:"/bin/sh", argv:["-c", "node $HOME/main.js"]}`. Note that the command is actually parsed by bash (eg environment variables will be be substituted).
+  * `<string[]>`: A parsed command. For instance `["node", "./main.js"]` is equivalent to `{type:"spawn", exec:"node", argv:["./main.js"]}`. Note that every elements is provided as literal to bash (eg environment variables will not be substituted).
+  * `<object>`: Object describing the spawning of a child process whose structure is largely inspired from `require('child_process').spawn`.
+    * `type "spawn"`
+    * `exec <string> | <string[]>`: Executable to run. An array of string indicates the usage of an actual executable to run a pseudo executable. Currently, this is only useful for the `mocha` recorder to indicate where to insert hooks. So `{type:"spawn", exec:"npx", argv:["mocha", "test/*.js"]}` will not work as expected where `{type:"spawn", exec:["npx", "mocha"], argv:["test/*.js"]}` will.
+    * `argv <string[]>`: List of command line arguments to pass to the child process.
+    * `options <object>`: Options object
+      * `require('child_process').spawn` options.
+      * `cwd <string>`: Current working directory of the child process. *Default*: `process.cwd()`.
+      * `env <object>`: Mapping from environment variables to their respective value. This object will be used to extend the environment of the agent process. So the actual environment given to the child process will be: `{...process.env, ...child.options.env}`. *Default* `{}`
+      * `stdio <string> | [string, string]`: Child's stdio configuration.
+      * `encoding`: Encoding of all the child's stdio streams.
+      * `timeout <number>`: The maximum number of millisecond the child process is allowed to run before being killed. *Default*: `0` (no timeout).
+      * `killSignal <string>`: The signal used to kill the child process when it runs out of time. *Default*: `"SIGTERM"`.
+    * `configuration <object>`: The child process will use a configuration that is . 
+    * `recorder <string> | null`: Name of the runtime that should be used to record the child process. *Default*: `"normal"`. Valid values are:
+      * `"normal"`
+      * `"mocha"`
+      * `null`
+  * `<object>`: An object describing the spawning of a child process whose structure is largely inspired from `require('child_process').fork`. Note that when globbing is enabled, this object may actually spawn multiple child processes at runtime.
+    * `type "fork"`
+    * `globbing <boolean>`: Indicates whether the `main` property should be interpreted as a glob. *Default*: `true`.
+    * `main <string>`: Path to the main module.
+    * `argv <string[]>`: List of command line arguments to pass to the main module.
+    * `options <object>`
+      * `execPath`: path to a node executable
+      * `execArgv`: list of command line arguments to pass to the node executable.
+      * ``
+    * `configuration Configuration`
+    * `recorder <string> | null`: name of the runtime that should be use to record the child process. *Default*: `"normal"`. Valid values are:
+      * `"normal"`
+      * `null`
+
 
 ### Appmap-related Options
 

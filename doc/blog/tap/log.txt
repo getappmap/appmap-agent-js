@@ -28,7 +28,7 @@ initialize >> argv = [
   APPMAP_PROTOCOL: 'messaging',
   APPMAP_HOST: 'localhost',
   APPMAP_PORT: '59475',
-  NODE_OPTIONS: '--require /Users/soft/Desktop/workspace/appmap-agent-js/lib/client/es2015/node14x/index-cjs.js'
+  NODE_OPTIONS: '--require /Users/soft/Desktop/workspace/appmap-agent-js/lib/client/es2015/node12x/index-cjs.js'
 }
 instrument >> path = /usr/local/lib/node_modules/npm/bin/npx-cli.js
 instrument >> path = /usr/local/lib/node_modules/npm/lib/cli.js
@@ -458,7 +458,7 @@ initialize >> argv = [
   TMPDIR: '/var/folders/ws/mzqzv89s4ps9mshcl70bjkgh0000gn/T/',
   APPMAP_HOST: 'localhost',
   TERM_PROGRAM_VERSION: '433',
-  NODE_OPTIONS: '--require /Users/soft/Desktop/workspace/appmap-agent-js/lib/client/es2015/node14x/index-cjs.js',
+  NODE_OPTIONS: '--require /Users/soft/Desktop/workspace/appmap-agent-js/lib/client/es2015/node12x/index-cjs.js',
   npm_package_config_commitizen_path: './node_modules/cz-conventional-changelog',
   COLOR: '1',
   TERM_SESSION_ID: '0210F72F-675D-48D6-81A5-A5151D327AFB',
@@ -886,7 +886,7 @@ initialize >> argv = [
   TMPDIR: '/var/folders/ws/mzqzv89s4ps9mshcl70bjkgh0000gn/T/',
   APPMAP_HOST: 'localhost',
   TERM_PROGRAM_VERSION: '433',
-  NODE_OPTIONS: '--require /Users/soft/Desktop/workspace/appmap-agent-js/lib/client/es2015/node14x/index-cjs.js --require /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/node-preload/preload-path/node-preload.js',
+  NODE_OPTIONS: '--require /Users/soft/Desktop/workspace/appmap-agent-js/lib/client/es2015/node12x/index-cjs.js --require /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/node-preload/preload-path/node-preload.js',
   npm_package_config_commitizen_path: './node_modules/cz-conventional-changelog',
   COLOR: '1',
   TERM_SESSION_ID: '0210F72F-675D-48D6-81A5-A5151D327AFB',
@@ -1500,7 +1500,7 @@ initialize >> argv = [
   TMPDIR: '/var/folders/ws/mzqzv89s4ps9mshcl70bjkgh0000gn/T/',
   APPMAP_HOST: 'localhost',
   TERM_PROGRAM_VERSION: '433',
-  NODE_OPTIONS: '--require /Users/soft/Desktop/workspace/appmap-agent-js/lib/client/es2015/node14x/index-cjs.js --require /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/node-preload/preload-path/node-preload.js',
+  NODE_OPTIONS: '--require /Users/soft/Desktop/workspace/appmap-agent-js/lib/client/es2015/node12x/index-cjs.js --require /Users/soft/Desktop/workspace/appmap-agent-js/node_modules/node-preload/preload-path/node-preload.js',
   npm_package_config_commitizen_path: './node_modules/cz-conventional-changelog',
   COLOR: '1',
   TERM_SESSION_ID: '0210F72F-675D-48D6-81A5-A5151D327AFB',

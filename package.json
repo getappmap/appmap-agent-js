@@ -6,7 +6,7 @@
     "darwin"
   ],
   "engine": {
-    "node": ">=14.0.0"
+    "node": ">=12.0.0 <13.0.0 || >= 14.0.0"
   },
   "keywords": [
     "appmap",
@@ -37,7 +37,7 @@
   "bin": {
     "appmap-agent-js": "bin/index.mjs"
   },
-  "main": "/lib/client/es2015/node14x/recorder/empty-main.js",
+  "main": "/lib/client/es2015/node12x/recorder/empty-main.js",
   "dependencies": {
     "acorn": "^8.1.1",
     "ajv": "^8.1.0",
@@ -47,7 +47,7 @@
     "minimist": "^1.2.5",
     "net-socket-messaging": "^0.1.5",
     "npm": "^6.14.12",
-    "posix-socket": "^1.0.1",
+    "posix-socket": "^1.1.0",
     "posix-socket-messaging": "^0.0.1",
     "yaml": "^1.10.0"
   },

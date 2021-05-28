@@ -394,9 +394,9 @@ let spawn = ChildProcess__namespace.spawn;
 
 const mapping = {
   __proto__: null,
-  '14.x': 'node14x',
-  '15.x': 'node14x',
-  '16.x': 'node14x',
+  '14.x': 'node12x',
+  '15.x': 'node12x',
+  '16.x': 'node12x',
 };
 
 const getLoaderPath = (version) =>
