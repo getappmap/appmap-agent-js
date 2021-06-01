@@ -229,7 +229,7 @@ childeren:
     main: main.js
 ```
 
-### API (Manual Recording)
+## API (Manual Recording)
 
 An API is provided to perform manual recording.
 
@@ -278,13 +278,175 @@ Below we summarize the pros and cons of inline mode vs remote mode.
 | Appmap files conflict resolution | Spans across a single appmap instance. | Spans across all the spawned child processes. |
 | Proper Layering | The program under recording can mess with the inlined logic by modifying the global object -- eg: `delete String.prototype.substring`. | Resilient to modification of the global object. |
 
+## Class Map
+
+At the base of the class map tree, the file structure is mirrored by `package` code objects.
+That is that each directory and each file will be represented by a `package` code object.
+Within a file, there are two types of nodes that are eligible to be part of the class map: *class-like* nodes and *function-like* nodes.
+
+### Class-like Nodes
+
+These nodes are the JavaScript (most common) means to implement classes.
+As expected, they are each represented by a `class` code object.
+There are three types of class-like nodes:
+
+* *Class Declaration*
+```js
+class Counter {
+  constructor () { this.state = 0; }
+  increment () { this.state++; }
+}
+const counter = new Counter();
+```
+* *Class Expression*
+```js
+const Counter = class {
+  constructor () { this.state = 0; }
+  increment () { this.state++; }
+};
+const counter = new Counter();
+```
+* *Object Expression*
+  In javascript, object literals are used to implement multiple concepts.
+  The most common usages are:
+  * Singleton: an object literal can be used to implement a class with a single instance.
+    For instance:
+    ```js
+    const counter = {
+      state: 0,
+      increment () { this.state++; }
+    };
+    ```
+  * Prototype: an object can be used to embed the sharable fields / methods of a class.
+    For instance:
+    ```js
+    const prototype = {
+      increment () { this.state++; }
+    };
+    const counter = {
+      __proto__: prototype,
+      state: 0
+    };
+    ```
+  * Mapping: an object can be used to map strings / symbols to values of any type.
+    In principle, this usage should prevent the object literal from appearing in the class map.
+    Unfortunately, there is no general solution to tell this usage apart from the others.
+
+The `class` code object of class-like node will contain the code object of all the eligible nodes that occur as its property value.
+In that case, we say that the node is *bound* to the class-like node.
+
+```js
+const isBound (node) => (
+  (
+    (
+      node.parent.type === "MethodDefinition" &&
+      node.parent.parent.type === "ClassBody") ||
+    (
+      node.parent.type === "Property" &&
+      node.parent.parent.type === "ObjectExpression")) &&
+  node.parent.value === node
+);
+```
+
+Bound nodes will be named according to the following algorithm:
+
+```js
+const getBoundName = (node) => {
+  node = node.parent;
+  if (node.type === "MethodDefinition") {
+    if (node.kind === "constructor") {
+      console.assert(!node.static);
+      return "constructor";
+    }
+    if (node.kind === "method") {
+      return `${node.static ? "static " : ""}${getKeyName(node)}`;
+    }
+    console.assert(node.kind === "get" || node.kind === "set");
+    return `${node.static ? "static " : ""}${node.kind} ${getKeyName(node)}`;
+  }
+  if (node.type === "Property") {
+    if (node.kind === "init") {
+      return getKeyName(node);
+    }
+    console.assert(node.kind === "get" || node.kind === "set");
+    return `${node.kind} ${getKeyName(node)}`;
+  }
+  console.assert(false);
+};
+
+const getKeyName = (node) => {
+  console.assert(node.type === "MethodDefinition" || node.type === "Property");
+  if (node.computed) {
+    return "[#computed]";
+  }
+  if (node.key.type === "Identifier") {
+    return node.key.name;
+  }
+  if (node.key.type === "Literal") {
+    console.assert(typeof node.key.value === "string");
+    return JSON.stringify(node.key.value);
+  }
+  console.assert(false);
+};
+```
+
+For instance:
+* `var o = { f: function g () {} });`: `"f"`
+* `({ "f": function g () {} });`: `"\"f\""`
+* `({ [f]: function g () {} });`: `"[#computed]"`
+* `({ m () {} })`: `"m"`
+* `({ get x () {} });`: `"get x"`
+* `(class { constructor () {} });`: `"constructor"`
+* `(class { m () {} });`: `"m"`
+* `(class { get x () {} });`: `"get x"`
+* `(class { static m () {} });`: `"static m"`
+* `(class { static get x () {} });`: `"static get x"`
+
+### Function-like Nodes
+
+These nodes are the JavaScript (most common) means to implement functions.
+They are each represented by a `class` code object which is guaranteed to includes one and only one `function` code object named `()`.
+This trick is necessary because `function` code objects are not allowed to contain children in the appmap specification whereas nesting functions and classes inside other functions is one of the key aspect of JavaScript.
+There are three types of function-like nodes:
+* *Function Declaration*: `function f () {};`
+* *Function Expression*: `const f = function () {};`
+* *Arrow Function Expression*: `const a = () => {};`
+
+The `class` code object of a function-like node will contain all the eligible nodes that are not bound to a class-like node.
+Also, they will be named accordingly to the ECMAScript static naming algorithm.
+If the node has no static name, `null` is provided.
+For instance:
+* Declaration:
+  * `function f () {}`: `"f"`
+  * `class c () {}`: `"c"`
+  * `export default function () {}`: `"default"`
+  * `export default class {}`: `"default"`
+* Simple Variable Initializer:
+  * `var f = function g () {};`: `"g"`
+  * `var c = class d () {};`: `"d"`
+  * `var f = function () {};`: `"f"`
+  * `var c = class () {};`: `"c"`
+  * `var o = {}`: `"o"`
+  * `var a = () => {}`: `"a"`
+* Simple Right-Hand Side:
+  * `(f = function g () {});`: `"g"`
+  * `(c = class d () {})`: `"d"`
+  * `(f = function () {});`: `"f"`
+  * `(c = class () {})`: `"c"`
+  * `(o = {})`: `"o"`
+  * `(a = () => {})`: `"a"`
+* Anonymous:
+  * `var {o} = {{}}`: `null`
+  * `(o += {});`: `null`
+  * `o.f = function () {}`: `null`
+
 ## Configuration
 
 The actual format requirements for configuration can be found as a json-schema [here](src/schema.yml).
 
 ### Agent-related Options
 
-These options define the behaviour of the agent as a test runner.
+These options define the behavior of the agent as a test runner.
 
 * `protocol <string>` Communication protocol between the server process and its client processes by which the agent process and its children processes should communicate. *Default*: `"messaging"`. Valid values are:
   * `"messaging"`: Simple TCP messaging protocol (faster than `http1` and `http2`). 
@@ -353,4 +515,3 @@ If it is an object is may contain two string properties: `directory` and `file-n
 * `app-name <string>`: Name of the app that is being recorded.
 * `map-name <string>`: Name of the recording.
 * `name <string>`: Synonym to `map-name`.
-

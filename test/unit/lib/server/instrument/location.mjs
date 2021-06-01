@@ -65,7 +65,7 @@ Assert.equal(location0.getFile(), file);
 
 const node1 = file.parse().fromRight();
 const location1 = location0.extend(node1);
-Assert.deepEqual(location1.makeEntity(['child']), null);
+Assert.deepEqual(location1.wrapEntityArray(['child']), ['child']);
 
 /////////////
 // Invalid //
@@ -76,7 +76,7 @@ Assert.deepEqual(location1.makeEntity(['child']), null);
   Assert.throws(() => location2.isNonScopingIdentifier());
   const node3 = node2.expression;
   const location3 = location2.extend(node3);
-  Assert.equal(location3.makeEntity([]), null);
+  Assert.deepEqual(location3.wrapEntityArray([]), []);
   Assert.equal(location3.isStaticMethod(), false);
   Assert.equal(location3.isNonScopingIdentifier(), false);
   Assert.equal(location3.getStartLine(), 2);
