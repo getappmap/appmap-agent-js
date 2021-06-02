@@ -391,16 +391,16 @@ const getKeyName = (node) => {
 ```
 
 For instance:
-* `var o = { f: function g () {} });`: `"f"`
-* `({ "f": function g () {} });`: `"\"f\""`
-* `({ [f]: function g () {} });`: `"[#computed]"`
-* `({ m () {} })`: `"m"`
-* `({ get x () {} });`: `"get x"`
-* `(class { constructor () {} });`: `"constructor"`
-* `(class { m () {} });`: `"m"`
-* `(class { get x () {} });`: `"get x"`
-* `(class { static m () {} });`: `"static m"`
-* `(class { static get x () {} });`: `"static get x"`
+* `var o = { f: function g () {} });`: `f`
+* `({ "f": function g () {} });`: `"f"`
+* `({ [f]: function g () {} });`: `[#computed]`
+* `({ m () {} })`: `m`
+* `({ get x () {} });`: `get x`
+* `(class { constructor () {} });`: `constructor`
+* `(class { m () {} });`: `m`
+* `(class { get x () {} });`: `get x`
+* `(class { static m () {} });`: `static m`
+* `(class { static get x () {} });`: `static get x`
 
 ### Function-like Nodes
 
@@ -413,32 +413,32 @@ There are three types of function-like nodes:
 * *Arrow Function Expression*: `const a = () => {};`
 
 The `class` code object of a function-like node will contain all the eligible nodes that are not bound to a class-like node.
-Also, they will be named accordingly to the ECMAScript static naming algorithm.
-If the node has no static name, `null` is provided.
+Also, they will be named based on the ECMAScript static naming algorithm and prepended by the `@` character.
+If the node has no static name, `@anonymous` is provided.
 For instance:
 * Declaration:
-  * `function f () {}`: `"f"`
-  * `class c () {}`: `"c"`
-  * `export default function () {}`: `"default"`
-  * `export default class {}`: `"default"`
+  * `function f () {}`: `@f`
+  * `class c () {}`: `@c`
+  * `export default function () {}`: `@default`
+  * `export default class {}`: `@default`
 * Simple Variable Initializer:
-  * `var f = function g () {};`: `"g"`
-  * `var c = class d () {};`: `"d"`
-  * `var f = function () {};`: `"f"`
-  * `var c = class () {};`: `"c"`
-  * `var o = {}`: `"o"`
-  * `var a = () => {}`: `"a"`
+  * `var f = function g () {};`: `@g`
+  * `var c = class d () {};`: `@d`
+  * `var f = function () {};`: `@f`
+  * `var c = class () {};`: `@c`
+  * `var o = {}`: `@o`
+  * `var a = () => {}`: `@a`
 * Simple Right-Hand Side:
-  * `(f = function g () {});`: `"g"`
-  * `(c = class d () {})`: `"d"`
-  * `(f = function () {});`: `"f"`
-  * `(c = class () {})`: `"c"`
-  * `(o = {})`: `"o"`
-  * `(a = () => {})`: `"a"`
+  * `(f = function g () {});`: `@g`
+  * `(c = class d () {})`: `@d`
+  * `(f = function () {});`: `@f`
+  * `(c = class () {})`: `@c`
+  * `(o = {})`: `@o`
+  * `(a = () => {})`: `@a`
 * Anonymous:
-  * `var {o} = {{}}`: `null`
-  * `(o += {});`: `null`
-  * `o.f = function () {}`: `null`
+  * `var {o} = {{}}`: `@anonymous`
+  * `(o += {});`: `@anonymous`
+  * `o.f = function () {}`: `@anonymous`
 
 ## Configuration
 

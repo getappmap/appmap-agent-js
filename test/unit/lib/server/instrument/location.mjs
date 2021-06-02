@@ -9,14 +9,14 @@ const file = new File(
   'module',
   path,
   `
-  x;
+   x;
   function f () {}
   class c {
     constructor () { "constructor"; }
     m1 () { "m1"; }
     static get m2 () { "m2"; }
   }
-  ({
+  var o = ({
     k1: {k1},
     "k2": {k2},
     ["k3"]: {k3},
@@ -26,7 +26,8 @@ const file = new File(
   });
   var o1 = {}, {o2, o3} = {};
   o4 = {};
-  export default class {}`,
+  export default class {}
+  let g = function h () {}`,
 );
 
 const location0 = new RootLocation(file);
@@ -65,7 +66,9 @@ Assert.equal(location0.getFile(), file);
 
 const node1 = file.parse().fromRight();
 const location1 = location0.extend(node1);
-Assert.deepEqual(location1.wrapEntityArray(['child']), ['child']);
+Assert.deepEqual(location1.wrapEntityArray([{ name: 'child' }]), [
+  { name: 'child' },
+]);
 
 /////////////
 // Invalid //
@@ -73,19 +76,21 @@ Assert.deepEqual(location1.wrapEntityArray(['child']), ['child']);
 {
   const node2 = node1.body[0];
   const location2 = location1.extend(node2);
-  Assert.throws(() => location2.isNonScopingIdentifier());
-  const node3 = node2.expression;
-  const location3 = location2.extend(node3);
-  Assert.deepEqual(location3.wrapEntityArray([]), []);
-  Assert.equal(location3.isStaticMethod(), false);
-  Assert.equal(location3.isNonScopingIdentifier(), false);
-  Assert.equal(location3.getStartLine(), 2);
-  Assert.equal(location3.getFile(), file);
-  Assert.equal(location3.getStartColumn(), 2);
-  Assert.ok(location3.getName(), '§none');
-  Assert.ok(location3.getChildName(null), '§none');
-  Assert.throws(() => location3.getKind());
-  Assert.equal(location3.getParentContainerName(), path);
+  {
+    const node3 = node2.expression;
+    const location3 = location2.extend(node3);
+    Assert.deepEqual(location3.wrapEntityArray([{ name: '@child' }]), [
+      { name: '@child' },
+    ]);
+    Assert.equal(location3.isStaticMethod(), false);
+    Assert.equal(location3.isNonScopingIdentifier(), false);
+    Assert.equal(location3.getStartLine(), 2);
+    Assert.equal(location3.getStartColumn(), 3);
+    Assert.equal(location3.getFile(), file);
+    Assert.equal(location3.hasName(), false);
+    Assert.throws(() => location3.getKind());
+    Assert.equal(location3.getContainerName(), null);
+  }
 }
 
 /////////////////////////
@@ -94,22 +99,29 @@ Assert.deepEqual(location1.wrapEntityArray(['child']), ['child']);
 {
   const node2 = node1.body[1];
   const location2 = location1.extend(node2);
-  Assert.deepEqual(location2.makeEntity(['child']), {
-    type: 'class',
-    name: `@f|function`,
-    children: [
+  Assert.equal(location2.getName(), '@f');
+  Assert.deepEqual(
+    location2.wrapEntityArray([{ name: '@child' }, { name: '#child' }]),
+    [
       {
-        type: 'function',
-        name: '()',
-        source: 'function f () {}',
-        location: `${path}:3`,
-        labels: [],
-        comment: null,
-        static: false,
+        type: 'class',
+        name: `@f`,
+        children: [
+          {
+            type: 'function',
+            name: '()',
+            source: 'function f () {}',
+            location: `${path}:3`,
+            labels: [],
+            comment: null,
+            static: false,
+          },
+          { name: '@child' },
+          { name: '#child' },
+        ],
       },
-      'child',
     ],
-  });
+  );
 }
 
 //////////////////////
@@ -118,14 +130,21 @@ Assert.deepEqual(location1.wrapEntityArray(['child']), ['child']);
 {
   const node2 = node1.body[2];
   const location2 = location1.extend(node2);
+  Assert.equal(location2.getName(), '@c');
+  Assert.deepEqual(
+    location2.wrapEntityArray([{ name: '@child' }, { name: '#child' }]),
+    [
+      {
+        type: 'class',
+        name: `@c`,
+        children: [{ name: '#child' }],
+      },
+      { name: '@child' },
+    ],
+  );
   {
     const node3 = node2.body;
     const location3 = location2.extend(node3);
-    Assert.deepEqual(location3.makeEntity(['child']), {
-      type: 'class',
-      name: `@c|class`,
-      children: ['child'],
-    });
     // constructor //
     {
       const node4 = node3.body[0];
@@ -133,22 +152,8 @@ Assert.deepEqual(location1.wrapEntityArray(['child']), ['child']);
       {
         const node5 = node4.value;
         const location5 = location4.extend(node5);
-        Assert.deepEqual(location5.makeEntity(['child']), {
-          type: 'class',
-          name: `prototype.constructor|constructor`,
-          children: [
-            {
-              type: 'function',
-              name: '()',
-              source: '() { "constructor"; }',
-              location: `${path}:5`,
-              labels: [],
-              comment: null,
-              static: false,
-            },
-            'child',
-          ],
-        });
+        Assert.equal(location5.getName(), 'constructor');
+        Assert.equal(location5.getContainerName(), '@c');
       }
     }
     // method //
@@ -158,22 +163,7 @@ Assert.deepEqual(location1.wrapEntityArray(['child']), ['child']);
       {
         const node5 = node4.value;
         const location5 = location4.extend(node5);
-        Assert.deepEqual(location5.makeEntity(['child']), {
-          type: 'class',
-          name: `prototype.m1|method`,
-          children: [
-            {
-              type: 'function',
-              name: '()',
-              source: '() { "m1"; }',
-              location: `${path}:6`,
-              labels: [],
-              comment: null,
-              static: false,
-            },
-            'child',
-          ],
-        });
+        Assert.equal(location5.getName(), 'm1');
       }
     }
     // static accessor //
@@ -183,22 +173,8 @@ Assert.deepEqual(location1.wrapEntityArray(['child']), ['child']);
       {
         const node5 = node4.value;
         const location5 = location4.extend(node5);
-        Assert.deepEqual(location5.makeEntity(['child']), {
-          type: 'class',
-          name: `constructor.m2|get`,
-          children: [
-            {
-              type: 'function',
-              name: '()',
-              source: '() { "m2"; }',
-              location: `${path}:7`,
-              labels: [],
-              comment: null,
-              static: true,
-            },
-            'child',
-          ],
-        });
+        Assert.equal(location5.isStaticMethod(), true);
+        Assert.equal(location5.getName(), 'static get m2');
       }
     }
   }
@@ -211,13 +187,11 @@ Assert.deepEqual(location1.wrapEntityArray(['child']), ['child']);
   const node2 = node1.body[3];
   const location2 = location1.extend(node2);
   {
-    const node3 = node2.expression;
-    const location3 = location2.extend(node3);
-    Assert.deepEqual(location3.makeEntity(['child']), {
-      type: 'class',
-      name: `§none`,
-      children: ['child'],
-    });
+    let node3 = node2.declarations[0];
+    let location3 = location2.extend(node3);
+    node3 = node3.init;
+    location3 = location3.extend(node3);
+    Assert.equal(location3.getName(), '@o');
     // non-computed identifier key //
     {
       const node4 = node3.properties[0];
@@ -225,11 +199,8 @@ Assert.deepEqual(location1.wrapEntityArray(['child']), ['child']);
       {
         const node5 = node4.value;
         const location5 = location4.extend(node5);
-        Assert.deepEqual(location5.makeEntity(['child']), {
-          type: 'class',
-          name: `singleton.k1|init`,
-          children: ['child'],
-        });
+        Assert.equal(location5.getName(), 'k1');
+        Assert.equal(location5.getContainerName(), '@o');
       }
     }
     // non-computed literal key //
@@ -239,11 +210,7 @@ Assert.deepEqual(location1.wrapEntityArray(['child']), ['child']);
       {
         const node5 = node4.value;
         const location5 = location4.extend(node5);
-        Assert.deepEqual(location5.makeEntity(['child']), {
-          type: 'class',
-          name: `singleton["k2"]|init`,
-          children: ['child'],
-        });
+        Assert.equal(location5.getName(), '"k2"');
       }
     }
     // computed literal key //
@@ -253,11 +220,7 @@ Assert.deepEqual(location1.wrapEntityArray(['child']), ['child']);
       {
         const node5 = node4.value;
         const location5 = location4.extend(node5);
-        Assert.deepEqual(location5.makeEntity(['child']), {
-          type: 'class',
-          name: `singleton["k3"]|init`,
-          children: ['child'],
-        });
+        Assert.equal(location5.getName(), '[#computed]');
       }
     }
     // computed key //
@@ -267,11 +230,7 @@ Assert.deepEqual(location1.wrapEntityArray(['child']), ['child']);
       {
         const node5 = node4.value;
         const location5 = location4.extend(node5);
-        Assert.deepEqual(location5.makeEntity(['child']), {
-          type: 'class',
-          name: `singleton[#dynamic]|init`,
-          children: ['child'],
-        });
+        Assert.equal(location5.getName(), '[#computed]');
       }
     }
     // method //
@@ -281,22 +240,7 @@ Assert.deepEqual(location1.wrapEntityArray(['child']), ['child']);
       {
         const node5 = node4.value;
         const location5 = location4.extend(node5);
-        Assert.deepEqual(location5.makeEntity(['child']), {
-          type: 'class',
-          name: `singleton.k5|method`,
-          children: [
-            {
-              type: 'function',
-              name: '()',
-              source: '() { "k5"; }',
-              location: `${path}:14`,
-              labels: [],
-              comment: null,
-              static: false,
-            },
-            'child',
-          ],
-        });
+        Assert.equal(location5.getName(), 'k5');
       }
     }
     // accessor //
@@ -306,22 +250,7 @@ Assert.deepEqual(location1.wrapEntityArray(['child']), ['child']);
       {
         const node5 = node4.value;
         const location5 = location4.extend(node5);
-        Assert.deepEqual(location5.makeEntity(['child']), {
-          type: 'class',
-          name: `singleton.k6|get`,
-          children: [
-            {
-              type: 'function',
-              name: '()',
-              source: '() { "k6"; }',
-              location: `${path}:15`,
-              labels: [],
-              comment: null,
-              static: false,
-            },
-            'child',
-          ],
-        });
+        Assert.equal(location5.getName(), 'get k6');
       }
     }
   }
@@ -340,11 +269,7 @@ Assert.deepEqual(location1.wrapEntityArray(['child']), ['child']);
     {
       const node4 = node3.init;
       const location4 = location3.extend(node4);
-      Assert.deepEqual(location4.makeEntity(['child']), {
-        type: 'class',
-        name: '@o1|var',
-        children: ['child'],
-      });
+      Assert.equal(location4.getName(), '@o1');
     }
   }
   // non-identifier pattern //
@@ -354,11 +279,7 @@ Assert.deepEqual(location1.wrapEntityArray(['child']), ['child']);
     {
       const node4 = node3.init;
       const location4 = location3.extend(node4);
-      Assert.deepEqual(location4.makeEntity(['child']), {
-        type: 'class',
-        name: '@#pattern|var',
-        children: ['child'],
-      });
+      Assert.equal(location4.getName(), '@anonymous');
     }
   }
 }
@@ -375,11 +296,7 @@ Assert.deepEqual(location1.wrapEntityArray(['child']), ['child']);
     {
       const node4 = node3.right;
       const location4 = location3.extend(node4);
-      Assert.deepEqual(location4.makeEntity(['child']), {
-        type: 'class',
-        name: '@o4|assignment',
-        children: ['child'],
-      });
+      Assert.equal(location4.getName(), '@o4');
     }
   }
 }
@@ -393,6 +310,23 @@ Assert.deepEqual(location1.wrapEntityArray(['child']), ['child']);
   {
     const node3 = node2.declaration;
     const location3 = location2.extend(node3);
-    Assert.deepEqual(location3.getName(), '@#default|class');
+    Assert.deepEqual(location3.getName(), '@default');
+  }
+}
+
+//////////////////////////////
+// Named FunctionExpression //
+//////////////////////////////
+{
+  const node2 = node1.body[7];
+  const location2 = location1.extend(node2);
+  {
+    const node3 = node2.declarations[0];
+    const location3 = location2.extend(node3);
+    {
+      const node4 = node3.init;
+      const location4 = location3.extend(node4);
+      Assert.deepEqual(location4.getName(), '@h');
+    }
   }
 }

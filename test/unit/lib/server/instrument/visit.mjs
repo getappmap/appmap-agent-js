@@ -32,15 +32,20 @@ const output = {
   };
   const extended = {
     __proto__: null,
+    hasName(...args) {
+      Assert.equal(this, extended);
+      Assert.deepEqual(args, []);
+      return true;
+    },
     getName(...args) {
       Assert.equal(this, extended);
       Assert.deepEqual(args, []);
       return '???';
     },
-    makeEntity(...args) {
+    wrapEntityArray(...args) {
       Assert.equal(this, extended);
       Assert.deepEqual(args, [['entity1', 'entity2', 'entite3']]);
-      return entity;
+      return [entity];
     },
   };
   const location = {
