@@ -1,22 +1,38 @@
 import { strict as Assert } from 'assert';
 import * as Module from 'module';
-import { getRuntime } from '../../../../../../lib/client/node/runtime.js';
 import { hookHTTP } from '../../../../../../lib/client/node/hook/http.js';
 
 const require = Module.createRequire(import.meta.url);
 const Http = require('http');
 
+const makeRecord = () => {
+  const events = [];
+  return {
+    events,
+    recordCall: (...args) => {
+      Assert.equal(args.length, 2);
+      const index = events.length;
+      events.push({
+        index: null,
+        key: args[0],
+        value: args[1],
+      });
+      return (...args) => {
+        Assert.equal(args.length, 2);
+        events.push({
+          index,
+          key: args[0],
+          value: args[1],
+        });
+      };
+    },
+  };
+};
+
 (async () => {
   await new Promise((resolve, reject) => {
-    const events = [];
-    const unhook = hookHTTP({
-      ...getRuntime(),
-      record: (...args) => {
-        Assert.equal(args.length, 2);
-        Assert.equal(args[0], null);
-        events.push(args[1]);
-      },
-    });
+    const { events, recordCall } = makeRecord();
+    const unhook = hookHTTP(recordCall);
     const server = Http.createServer();
     server.on('close', resolve);
     server.on('request', (request, response) => {
@@ -47,19 +63,11 @@ const Http = require('http');
         });
         response.on('end', () => {
           Assert.equal(body, 'foo');
-          for (let event of events) {
-            if (
-              Reflect.getOwnPropertyDescriptor(event, 'elapsed') !== undefined
-            ) {
-              delete event.elapsed;
-            }
-          }
           Assert.deepEqual(events, [
             {
-              id: 1,
-              event: 'call',
-              thread_id: null,
-              http_client_request: {
+              index: null,
+              key: 'http_client_request',
+              value: {
                 request_method: 'PUT',
                 url: `http://localhost:${server.address().port}/path`,
                 message: 'param=123#hash',
@@ -70,10 +78,9 @@ const Http = require('http');
               },
             },
             {
-              id: 2,
-              event: 'call',
-              thread_id: null,
-              http_server_request: {
+              index: null,
+              key: 'http_server_request',
+              value: {
                 request_method: 'PUT',
                 path_info: '/path?param=123#hash',
                 protocol: 'HTTP/1.1',
@@ -86,10 +93,9 @@ const Http = require('http');
               },
             },
             {
-              id: 3,
-              event: 'return',
-              parent_id: 2,
-              http_server_response: {
+              index: 1,
+              key: 'http_server_response',
+              value: {
                 status_code: 200,
                 status_message: 'OK',
                 mime_type: 'text/plain; charset=utf-8',
@@ -99,11 +105,9 @@ const Http = require('http');
               },
             },
             {
-              id: 4,
-              event: 'return',
-              thread_id: null,
-              parent_id: 1,
-              http_client_response: {
+              index: 0,
+              key: 'http_client_response',
+              value: {
                 status_code: 200,
                 status_message: 'OK',
                 mime_type: 'text/plain; charset=utf-8',
@@ -126,15 +130,8 @@ const Http = require('http');
     server.listen(0);
   });
   await new Promise((resolve, reject) => {
-    const events = [];
-    const unhook = hookHTTP({
-      ...getRuntime(),
-      record: (...args) => {
-        Assert.equal(args.length, 2);
-        Assert.equal(args[0], null);
-        events.push(args[1]);
-      },
-    });
+    const { events, recordCall } = makeRecord();
+    const unhook = hookHTTP(recordCall);
     const server = new Http.Server();
     server.on('close', resolve);
     server.on('request', (request, response) => {
@@ -174,10 +171,9 @@ const Http = require('http');
           }
           Assert.deepEqual(events, [
             {
-              id: 1,
-              event: 'call',
-              thread_id: null,
-              http_client_request: {
+              index: null,
+              key: 'http_client_request',
+              value: {
                 request_method: 'PUT',
                 url: 'http://localhost/path',
                 message: '',
@@ -185,10 +181,9 @@ const Http = require('http');
               },
             },
             {
-              id: 2,
-              event: 'call',
-              thread_id: null,
-              http_server_request: {
+              index: null,
+              key: 'http_server_request',
+              value: {
                 request_method: 'PUT',
                 path_info: '/path',
                 protocol: 'HTTP/1.1',
@@ -199,10 +194,9 @@ const Http = require('http');
               },
             },
             {
-              id: 3,
-              event: 'return',
-              parent_id: 2,
-              http_server_response: {
+              index: 1,
+              key: 'http_server_response',
+              value: {
                 status_code: 200,
                 status_message: 'OK',
                 mime_type: null,
@@ -210,11 +204,9 @@ const Http = require('http');
               },
             },
             {
-              id: 4,
-              event: 'return',
-              thread_id: null,
-              parent_id: 1,
-              http_client_response: {
+              index: 0,
+              key: 'http_client_response',
+              value: {
                 status_code: 200,
                 status_message: 'OK',
                 mime_type: null,

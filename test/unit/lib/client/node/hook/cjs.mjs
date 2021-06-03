@@ -14,7 +14,7 @@ delete require.cache[path];
 Assert.equal(require(path).foo, 'bar');
 
 const unhook = hookCJS((...args) => {
-  Assert.deepEqual(args, ['script', path, content, null]);
+  Assert.deepEqual(args, [path, content]);
   return 'exports.foo = "qux";';
 });
 

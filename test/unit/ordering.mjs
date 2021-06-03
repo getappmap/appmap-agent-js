@@ -47,6 +47,8 @@ export const client = [
   'node/hook/cjs',
   'node/hook/esm',
   'node/hook/http',
+  'node/hook/home',
+  'node/hook/mysql',
   'node/hook/index',
   'node/run',
   'node/runtime',

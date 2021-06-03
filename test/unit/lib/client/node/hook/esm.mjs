@@ -17,7 +17,7 @@ FileSystem.writeFileSync(
     ((async () => {
       Assert.equal((await import('${path1}')).foo, 'bar');
       const unhook = hookESM((...args) => {
-        Assert.deepEqual(args, ['module', '${path2}', \`export const foo = 'bar';\`]);
+        Assert.deepEqual(args, ['${path2}', \`export const foo = 'bar';\`]);
         return Promise.resolve('export const foo = "qux";');
       });
       Assert.equal((await import('${path2}')).foo, 'qux');

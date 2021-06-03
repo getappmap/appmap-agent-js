@@ -22,42 +22,6 @@ import { getDisabledRecording } from '../../../../../lib/client/node/recording.j
     const getRuntime = () => global.eval(`HIDDEN${String(counter)}`);
     /* eslint-enable no-eval */
 
-    const makeTrace = (file) => [
-      {
-        action: 'initialize',
-        session: null,
-        data: 'appmap-configuration',
-      },
-      {
-        action: 'start',
-        session: `HIDDEN${String(counter)}`,
-        data: 'configuration-recording',
-      },
-      {
-        action: 'instrument',
-        session: `HIDDEN${String(counter)}`,
-        data: file,
-      },
-      {
-        action: 'record',
-        session: `HIDDEN${String(counter)}`,
-        data: {
-          origin: 'origin',
-          event: 'event',
-        },
-      },
-      {
-        action: 'stop',
-        session: `HIDDEN${String(counter)}`,
-        data: 'recording',
-      },
-      {
-        action: 'terminate',
-        session: `HIDDEN${String(counter)}`,
-        data: 'reason',
-      },
-    ];
-
     let trace;
 
     const respond = (json) => {
@@ -66,7 +30,7 @@ import { getDisabledRecording } from '../../../../../lib/client/node/recording.j
         counter += 1;
         return {
           session: `HIDDEN${String(counter)}`,
-          hooking: { esm: true, cjs: true, http: true },
+          hooking: { esm: true, cjs: true, http: true, mysql: false },
         };
       }
       if (json.action === 'start') {
@@ -113,12 +77,8 @@ import { getDisabledRecording } from '../../../../../lib/client/node/recording.j
       Assert.equal(appmap.terminate('reason'), undefined);
       Assert.equal(getRuntime().record('origin', 'event'), undefined);
       Assert.deepEqual(
-        trace,
-        makeTrace({
-          source: 'script',
-          path: Path.resolve('tmp/test/yo.js'),
-          content: 'exports.yo = 123;',
-        }),
+        trace.map(({ action }) => action),
+        ['initialize', 'start', 'instrument', 'record', 'stop', 'terminate'],
       );
     }
 
@@ -144,16 +104,46 @@ import { getDisabledRecording } from '../../../../../lib/client/node/recording.j
         { source: 'export const yo = 456;' },
       );
       Assert.equal(await getRuntime().record('origin', 'event'), null);
+      const Http = await import('http');
+      await new Promise((resolve) => {
+        const server = new Http.createServer();
+        server.on('request', (request, response) => {
+          response.writeHead(200);
+          response.end();
+        });
+        server.listen(8080, () => {
+          const request = Http.get({
+            port: 8080,
+          });
+          request.on('response', (response) => {
+            Assert.equal(response.statusCode, 200);
+            response.on('data', () => {
+              Assert.fail();
+            });
+            response.on('end', () => {
+              server.on('close', resolve);
+              server.close();
+            });
+          });
+        });
+      });
       Assert.equal(await recording.stopAsync(), undefined);
       Assert.equal(await appmap.terminateAsync('reason'), undefined);
       Assert.equal(getRuntime().record('origin', 'event'), undefined);
       Assert.deepEqual(
-        trace,
-        makeTrace({
-          source: 'module',
-          path: Path.resolve('tmp/test/yo.mjs'),
-          content: 'export const yo = 123;',
-        }),
+        trace.map(({ action }) => action),
+        [
+          'initialize',
+          'start',
+          'instrument',
+          'record',
+          'record',
+          'record',
+          'record',
+          'record',
+          'stop',
+          'terminate',
+        ],
       );
     }
   }

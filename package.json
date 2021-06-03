@@ -65,6 +65,7 @@
     "eslint-plugin-import": "^2.22.1",
     "jasmine": "^3.7.0",
     "mocha": "^8.4.0",
+    "mysql": "^2.18.1",
     "prettier": "^2.2.1",
     "rollup": "^2.45.2",
     "tap": "^15.0.5",
