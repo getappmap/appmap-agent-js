@@ -1,11 +1,10 @@
 import * as Path from 'path';
+import * as Net from 'net';
+import * as FileSystem from 'fs';
 import * as ChildProcess from 'child_process';
 import { strict as Assert } from 'assert';
 import { fileURLToPath } from 'url';
-import { switchExpectToTestingMode } from '../../../../../../../lib/client/node/check.js';
 import { makeRequest } from '../../../../../../../lib/client/node/channel/request/messaging.js';
-
-switchExpectToTestingMode();
 
 const child = ChildProcess.fork(
   Path.join(
@@ -37,7 +36,21 @@ child.on('message', (port) => {
   child.kill('SIGINT');
 });
 
-Assert.throws(
-  () => makeRequest('foobar', './missing/ipc-socket.sock'),
-  /^Error: failed to connect socket/,
-);
+{
+  const server = Net.createServer();
+  try {
+    FileSystem.unlinkSync('tmp/test/unix-domain-socket.sock');
+  } catch (error) {
+    Assert.equal(error.code, 'ENOENT');
+  }
+  server.listen('tmp/test/unix-domain-socket.sock');
+  server.on('listening', () => {
+    server.on('connection', (socket) => {
+      socket.destroy();
+      socket.on('close', () => {
+        server.close();
+      });
+    });
+    makeRequest('foobar', 'tmp/test/unix-domain-socket.sock');
+  });
+}

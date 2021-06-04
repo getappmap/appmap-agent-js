@@ -1,5 +1,5 @@
-import { createConnection } from 'mysql';
 import * as ChildProcess from 'child_process';
+import * as MySQL from 'mysql';
 import { strict as Assert } from 'assert';
 import { hookMySQL } from '../../../../../../lib/client/node/hook/mysql.js';
 
@@ -11,7 +11,7 @@ const proceed = () =>
       return record;
     };
     const unhook = hookMySQL(record);
-    var connection = createConnection({
+    var connection = MySQL.createConnection({
       host: 'localhost',
       user: 'root',
     });
@@ -35,7 +35,8 @@ const proceed = () =>
                 'sql_query',
                 {
                   database_type: 'mysql',
-                  sql: 'SELECT 2 * 3 AS solution;',
+                  sql: 'SELECT ? * ? AS solution;',
+                  parameters: [2, 3],
                   explain_sql: null,
                   server_version: null,
                 },

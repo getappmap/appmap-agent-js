@@ -12,7 +12,7 @@ const {
   assert,
   expect,
   expectSuccess,
-  switchExpectToTestingMode,
+  check,
 } = require('../../../../../lib/client/node/check.js');
 
 Assert.equal(assert(true, 'foo'), undefined);
@@ -23,17 +23,24 @@ Assert.equal(
   expectSuccess(() => {}, 'foo'),
   undefined,
 );
-
-switchExpectToTestingMode();
-
 Assert.throws(
   () =>
-    expectSuccess(
-      () => {
-        throw new Error('BOUM');
-      },
-      'foo %j %s',
-      456,
-    ),
-  /^Error: foo 456 BOUM$/,
+    expectSuccess(() => {
+      throw new Error('boum');
+    }, 'foo %j'),
+  /^Error: exit$/u,
 );
+Assert.throws(() => check(false, 'foo'), /^Error: foo/u);
+
+//
+// Assert.throws(
+//   () =>
+//     expectSuccess(
+//       () => {
+//         throw new Error('BOUM');
+//       },
+//       'foo %j %s',
+//       456,
+//     ),
+//   /^Error: foo 456 BOUM$/,
+// );
