@@ -13,6 +13,7 @@ const {
   expect,
   expectSuccess,
   check,
+  checkError,
 } = require('../../../../../lib/client/node/check.js');
 
 Assert.equal(assert(true, 'foo'), undefined);
@@ -30,7 +31,9 @@ Assert.throws(
     }, 'foo %j'),
   /^Error: exit$/u,
 );
-Assert.throws(() => check(false, 'foo'), /^Error: foo/u);
+Assert.throws(() => check(false, Error, 'foo'), /^Error: foo/u);
+
+Assert.throws(() => checkError(false, new Error('foo')), /^Error: foo/u);
 
 //
 // Assert.throws(

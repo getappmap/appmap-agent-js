@@ -225,15 +225,26 @@ const forEither = (iterator, closure) => {
   return step();
 };
 
-const forEitherAsync = async (iterator, closure) => {
-  const step = async () => {
+const forEitherAsync = (iterator, closure) => {
+  const step = () => {
     const { done, value } = iterator.next();
     if (done) {
-      return new Right(null);
+      return Promise.resolve(new Right(null));
     }
-    return (await closure(value)).bind(step);
+    return closure(value).then((either) => either.bind(step));
   };
-  return await step();
+  return step();
+};
+
+const toEither = (callback, ...rest) => {
+  try {
+    return new Right(callback(...rest));
+    // c8 vs node12
+    /* c8 ignore start */
+  } catch (error) {
+    /* c8 ignore stop */
+    return new Left(error.message);
+  }
 };
 
 const ajv = new Ajv__default['default']();
@@ -278,7 +289,10 @@ const changeWorkingDirectory = (path, callback) => {
   cwd = path;
   try {
     return callback();
+    // c8 vs node12
+    /* c8 ignore start */
   } finally {
+    /* c8 ignore stop */
     cwd = save;
   }
 };
@@ -295,12 +309,12 @@ const options = {
   nocomment: true,
 };
 
-const escape = (char) => `\\${char}`;
+const escape$1 = (char) => `\\${char}`;
 
 const sanitizeForRegExp = (string) =>
-  string.replace(/[/\\+*?.^$()[\]{}|]/g, escape);
+  string.replace(/[/\\+*?.^$()[\]{}|]/g, escape$1);
 
-const sanitizeForGlob = (string) => string.replace(/[*?[\]]/g, escape);
+const sanitizeForGlob = (string) => string.replace(/[*?[\]]/g, escape$1);
 
 const cache = new Map();
 
@@ -388,38 +402,20 @@ const normalizeSpecifier = (specifier, data) => {
 
 let spawn = ChildProcess__namespace.spawn;
 
+const escape = (arg) =>
+  /^[a-zA-Z_0-9/.-]+$/.test(arg) ? arg : `'${arg.replace(/'/g, "\\'")}'`;
+
+const prependSpace = (string) => ` ${string}`;
+
 ///////////////
 // Normalize //
 ///////////////
 
-const mapping = {
-  __proto__: null,
-  '14.x': 'node12x',
-  '15.x': 'node12x',
-  '16.x': 'node12x',
-};
+const getLoaderPath = () =>
+  Path__namespace.join(home_1, 'lib', 'client', 'node', 'hook', 'esm.js');
 
-const getLoaderPath = (version) =>
-  Path__namespace.join(
-    home_1,
-    'lib',
-    'client',
-    'es2015',
-    mapping[version],
-    'hook',
-    'esm.js',
-  );
-
-const getRecorderPath = (version, name) =>
-  Path__namespace.join(
-    home_1,
-    'lib',
-    'client',
-    'es2015',
-    mapping[version],
-    'recorder',
-    `${name}-bin.js`,
-  );
+const getRecorderPath = (name) =>
+  Path__namespace.join(home_1, 'lib', 'client', 'node', 'recorder', `${name}-bin.js`);
 
 const normalizeChild = (child) => {
   if (typeof child === 'string') {
@@ -442,7 +438,6 @@ const normalizeChild = (child) => {
   if (child.type === 'spawn') {
     child = {
       type: undefined,
-      'node-version': '14.x',
       recorder: 'normal',
       configuration: { cwd },
       exec: undefined,
@@ -466,9 +461,7 @@ const normalizeChild = (child) => {
       NODE_OPTIONS: '',
       ...child.options.env,
     };
-    child.options.env.NODE_OPTIONS += ` --experimental-loader=${getLoaderPath(
-      child['node-version'],
-    )}`;
+    child.options.env.NODE_OPTIONS += ` --no-warnings --experimental-loader=${getLoaderPath()}`;
     if (child.recorder === 'mocha') {
       return [
         {
@@ -478,7 +471,7 @@ const normalizeChild = (child) => {
           argv: [
             ...child.exec.slice(1),
             '--require',
-            getRecorderPath(child['node-version'], 'mocha'),
+            getRecorderPath('mocha'),
             ...child.argv,
           ],
           configuration: child.configuration,
@@ -488,13 +481,16 @@ const normalizeChild = (child) => {
     }
     if (child.recorder === 'normal') {
       child.options.env.NODE_OPTIONS += ` --require=${getRecorderPath(
-        child['node-version'],
         'normal',
       )}`;
     }
     return [
       {
         type: 'cooked',
+        description: `spawn ${child.exec.map(escape).join(' ')}${child.argv
+          .map(escape)
+          .map(prependSpace)
+          .join('')}`,
         cwd,
         exec: child.exec[0],
         argv: [...child.exec.slice(1), ...child.argv],
@@ -507,7 +503,6 @@ const normalizeChild = (child) => {
     child = {
       type: undefined,
       recorder: 'normal',
-      'node-version': '14.x',
       configuration: { cwd },
       globbing: true,
       main: undefined,
@@ -538,17 +533,23 @@ const normalizeChild = (child) => {
     delete child.options.execArgv;
     const argv = [
       ...exec.argv,
+      '--no-warnings',
       '--experimental-loader',
-      getLoaderPath(child['node-version']),
+      getLoaderPath(),
     ];
     if (child.recorder === 'normal') {
-      argv.push('--require', getRecorderPath(child['node-version'], 'normal'));
+      argv.push('--require', getRecorderPath('normal'));
     }
-    return (child.globbing
-      ? Glob__namespace.default.sync(child.main, { cwd, nodir: true })
-      : [resolvePath(child.main)]
+    return (
+      child.globbing
+        ? Glob__namespace.default.sync(child.main, { cwd, nodir: true })
+        : [resolvePath(child.main)]
     ).map((main) => ({
       type: 'cooked',
+      description: `fork ${escape(main)}${child.argv
+        .map(escape)
+        .map(prependSpace)
+        .join('')}`,
       exec: exec.path,
       argv: [...argv, main, ...child.argv],
       cwd,
@@ -597,21 +598,23 @@ const spawnNormalizedChild = (child, configuration) => {
   }
   const save = process.cwd();
   process.chdir(child.cwd);
-  try {
-    return either.mapRight((env) =>
-      spawn(child.exec, child.argv, {
-        ...child.options,
-        env,
-      }),
-    );
-  } catch (error) {
-    return new Left(error.message);
-    // NB: No idea why we need to ignore the finally below; maybe a c8 bug?
-    /* c8 ignore start */
-  } finally {
-    /* c8 ignore stop */
-    process.chdir(save);
-  }
+  either = either.bind((env) =>
+    toEither(spawn, child.exec, child.argv, {
+      ...child.options,
+      env,
+    }),
+  );
+  process.chdir(save);
+  either = either.mapRight((sub) => {
+    if (sub.stdout !== null) {
+      sub.stdout.setEncoding(child.options.encoding);
+    }
+    if (sub.stderr !== null) {
+      sub.stdout.setEncoding(child.options.encoding);
+    }
+    return sub;
+  });
+  return either;
 };
 
 const trim = (string) => string.trim();
@@ -1161,12 +1164,15 @@ class Configuration {
     let filename = 'anonymous';
     if (this.data.output['file-name'] !== null) {
       filename = this.data.output['file-name'];
-    } else if (this.data.main.path !== null) {
-      filename = this.data.main.path.replace(/\//g, '-');
     } else if (this.data['map-name'] !== null) {
-      filename = this.data['map-name'].replace(/\//g, '-');
+      filename = this.data['map-name'];
+    } else if (this.data.main.path !== null) {
+      filename = this.data.main.path;
     }
-    return Path__namespace.join(this.data.output.directory, filename);
+    return Path__namespace.join(
+      this.data.output.directory,
+      filename.replace(/[/\t\n ]/g, '-'),
+    );
   }
   getMetaData() {
     return {
@@ -1273,28 +1279,9 @@ class EitherMap extends Map {
   }
 }
 
-const getPatternName = (node) => {
-  if (node === null) {
-    return '@#default';
-  }
-  if (node.type === 'Identifier') {
-    return `@${node.name}`;
-  }
-  return `@#pattern`;
-};
+const isBound = ({ name }) => name[0] !== '@';
 
-const getKeyName = (node) => {
-  if (
-    node.key.type === 'Literal' &&
-    Reflect.getOwnPropertyDescriptor(node, 'regex') === undefined
-  ) {
-    return `[${JSON.stringify(node.key.value)}]`;
-  }
-  if (!node.computed && node.key.type === 'Identifier') {
-    return `.${node.key.name}`;
-  }
-  return '[#dynamic]';
-};
+const isNotBound = ({ name }) => name[0] === '@';
 
 class Location {
   constructor(node, location, file) {
@@ -1308,75 +1295,36 @@ class Location {
   getFile() {
     return this.file;
   }
-  getKind() {
-    if (this.node.type !== 'VariableDeclaration') {
-      throw new Error(
-        `Expected node to be of type VariableDeclaration and got: ${this.node.type}`,
-      );
-    }
-    return this.node.kind;
-  }
-  getChildName(node) {
-    if (this.node.type === 'VariableDeclarator' && this.node.init === node) {
-      return `${getPatternName(this.node.id)}|${this.parent.getKind()}`;
-    }
-    if (this.node.type === 'AssignmentExpression' && this.node.right === node) {
-      return `${getPatternName(this.node.left)}|assignment`;
-    }
-    if (this.node.type === 'MethodDefinition' && this.node.value === node) {
-      return `${this.node.static ? 'constructor' : 'prototype'}${getKeyName(
-        this.node,
-      )}|${this.node.kind}`;
-    }
-    if (this.node.type === 'Property' && this.node.value === node) {
-      return `singleton${getKeyName(this.node)}|${
-        this.node.method ? 'method' : this.node.kind
-      }`;
-    }
-    return `§none`;
-  }
-  getName() {
-    if (this.node.type === 'FunctionDeclaration') {
-      return `${getPatternName(this.node.id)}|function`;
-    }
-    if (this.node.type === 'ClassDeclaration') {
-      return `${getPatternName(this.node.id)}|class`;
-    }
-    if (this.node.type === 'ClassBody') {
-      return this.parent.getName();
-    }
-    if (this.node.type === 'Program') {
-      return this.file.getPath();
-    }
-    return this.parent.getChildName(this.node);
-  }
-  getParentContainerName() {
-    return this.parent.getContainerName();
-  }
-  getContainerName() {
-    if (
-      this.node.type === 'Program' ||
-      this.node.type === 'ObjectExpression' ||
-      this.node.type === 'ClassExpression' ||
-      this.node.type === 'ClassDeclaration' ||
-      this.node.type === 'FunctionExpression' ||
-      this.node.type === 'FunctionDeclaration' ||
-      this.node.type === 'ArrowFunctionExpression'
-    ) {
-      return this.getName();
-    }
-    return this.parent.getContainerName();
-  }
-  isChildStaticMethod(node) {
+  isObjectProperty() {
     return (
-      node.type === 'FunctionExpression' &&
-      this.node.type === 'MethodDefinition' &&
-      this.node.value === node &&
-      this.node.static
+      this.parent.node.type === 'Property' &&
+      this.parent.node.value === this.node &&
+      this.parent.parent.node.type === 'ObjectExpression'
     );
   }
+  isClassMethod() {
+    return (
+      this.parent.node.type === 'MethodDefinition' &&
+      this.parent.node.value === this.node &&
+      this.parent.parent.node.type === 'ClassBody'
+    );
+  }
+  getContainerName() {
+    if (this.isObjectProperty()) {
+      return this.parent.parent.getName();
+    }
+    if (this.isClassMethod()) {
+      return this.parent.parent.parent.getName();
+    }
+    return null;
+  }
   isStaticMethod() {
-    return this.parent.isChildStaticMethod(this.node);
+    return (
+      this.node.type === 'FunctionExpression' &&
+      this.parent.node.type === 'MethodDefinition' &&
+      this.parent.node.value === this.node &&
+      this.parent.node.static
+    );
   }
   getStartLine() {
     return this.node.loc.start.line;
@@ -1384,79 +1332,173 @@ class Location {
   getStartColumn() {
     return this.node.loc.start.column;
   }
-  isChildNonScopingIdentifier(node) {
-    if (node.type !== 'Identifier') {
-      throw new Error(
-        `isChildScopingIdentifier should only be called on Identifier node, got: ${node.type}`,
+  isNonScopingIdentifier() {
+    assert(
+      this.node.type === 'Identifier',
+      'invalid node type %o',
+      this.node.type,
+    );
+    if (
+      this.parent.node.type === 'BreakStatement' ||
+      this.parent.node.type === 'ContinueStatement' ||
+      this.parent.node.type === 'LabeledStatement'
+    ) {
+      return this.parent.node.label === this.node;
+    }
+    if (this.parent.node.type === 'ExportSpecifier') {
+      return this.parent.node.exported === this.node;
+    }
+    if (this.parent.node.type === 'ImportSpecifier') {
+      return this.parent.node.imported === this.node;
+    }
+    if (this.parent.node.type === 'MemberExpression') {
+      return (
+        this.parent.node.property === this.node && !this.parent.node.computed
       );
     }
     if (
-      this.node.type === 'BreakStatement' ||
-      this.node.type === 'ContinueStatement' ||
-      this.node.type === 'LabeledStatement'
+      this.parent.node.type === 'MethodDefinition' ||
+      this.parent.node.type === 'Property'
     ) {
-      return this.node.label === node;
-    }
-    if (this.node.type === 'ExportSpecifier') {
-      return this.node.exported === node;
-    }
-    if (this.node.type === 'ImportSpecifier') {
-      return this.node.imported === node;
-    }
-    if (this.node.type === 'MemberExpression') {
-      return this.node.property === node && !this.node.computed;
-    }
-    if (
-      this.node.type === 'MethodDefinition' ||
-      this.node.type === 'Property'
-    ) {
-      return this.node.key === node && !this.node.computed;
+      return this.parent.node.key === this.node && !this.node.computed;
     }
     return false;
   }
-  isNonScopingIdentifier() {
-    return this.parent.isChildNonScopingIdentifier(this.node);
+  getKeyName() {
+    assert(
+      this.node.type === 'Property' || this.node.type === 'MethodDefinition',
+      'invalid node type %o',
+      this.node.type,
+    );
+    if (this.node.computed) {
+      return '[#computed]';
+    }
+    if (this.node.key.type === 'Identifier') {
+      return this.node.key.name;
+    }
+    assert(this.node.key.type === 'Literal', 'invalid non-computed key node');
+    assert(
+      typeof this.node.key.value === 'string',
+      'invalid non-computed key literal node',
+    );
+    return JSON.stringify(this.node.key.value);
   }
-  makeEntity(children) {
+  hasName() {
+    return (
+      this.node.type === 'ObjectExpression' ||
+      this.node.type === 'ClassExpression' ||
+      this.node.type === 'ClassDeclaration' ||
+      this.node.type === 'FunctionExpression' ||
+      this.node.type === 'FunctionDeclaration' ||
+      this.node.type === 'ArrowFunctionExpression'
+    );
+  }
+  getName() {
+    assert(this.hasName(), 'invalid node for name query');
+    if (this.isObjectProperty()) {
+      let name = '';
+      if (this.parent.node.kind !== 'init') {
+        name = `${name}${this.parent.node.kind} `;
+      }
+      name = `${name}${this.parent.getKeyName()}`;
+      return name;
+    }
+    if (this.isClassMethod()) {
+      if (this.parent.node.kind === 'constructor') {
+        return 'constructor';
+      }
+      let name = '';
+      if (this.parent.node.static) {
+        name = `${name}static `;
+      }
+      if (this.parent.node.kind !== 'method') {
+        name = `${name}${this.parent.node.kind} `;
+      }
+      name = `${name}${this.parent.getKeyName()}`;
+      return name;
+    }
+    if (
+      this.node.type === 'FunctionDeclaration' ||
+      this.node.type === 'ClassDeclaration'
+    ) {
+      if (this.node.id === null) {
+        return '@default';
+      }
+      return `@${this.node.id.name}`;
+    }
+    if (
+      (this.node.type === 'FunctionExpression' ||
+        this.node.type === 'ClassExpression') &&
+      this.node.id !== null
+    ) {
+      return `@${this.node.id.name}`;
+    }
+    if (
+      this.parent.node.type === 'AssignmentExpression' &&
+      this.parent.node.right === this.node &&
+      this.parent.node.operator === '=' &&
+      this.parent.node.left.type === 'Identifier'
+    ) {
+      return `@${this.parent.node.left.name}`;
+    }
+    if (
+      this.parent.node.type === 'VariableDeclarator' &&
+      this.parent.node.init === this.node &&
+      this.parent.node.id.type === 'Identifier'
+    ) {
+      return `@${this.parent.node.id.name}`;
+    }
+    return '@anonymous';
+  }
+  wrapEntityArray(entities) {
     if (
       this.node.type === 'ArrowFunctionExpression' ||
       this.node.type === 'FunctionExpression' ||
       this.node.type === 'FunctionDeclaration'
     ) {
-      return {
-        type: 'class',
-        name: this.getName(),
-        children: [
-          {
-            type: 'function',
-            name: '()',
-            source: this.file
-              .getContent()
-              .substring(this.node.start, this.node.end),
-            location: `${this.file.getPath()}:${this.node.loc.start.line}`,
-            labels: [],
-            comment: null,
-            static: this.isStaticMethod(),
-          },
-        ].concat(children),
-      };
+      return [
+        {
+          type: 'class',
+          name: this.getName(),
+          children: [
+            {
+              type: 'function',
+              name: '()',
+              source: this.file
+                .getContent()
+                .substring(this.node.start, this.node.end),
+              location: `${this.file.getPath()}:${this.node.loc.start.line}`,
+              labels: [],
+              comment: null,
+              static: this.isStaticMethod(),
+            },
+            ...entities,
+          ],
+        },
+      ];
     }
     if (
       this.node.type === 'ObjectExpression' ||
-      this.node.type === 'ClassBody'
+      this.node.type === 'ClassExpression' ||
+      this.node.type === 'ClassDeclaration'
     ) {
-      return {
-        type: 'class',
-        name: this.getName(),
-        children,
-      };
+      return [
+        {
+          type: 'class',
+          name: this.getName(),
+          children: entities.filter(isBound),
+        },
+        ...entities.filter(isNotBound),
+      ];
     }
-    return null;
+    return entities;
   }
 }
 
 class RootLocation {
   constructor(file) {
+    this.node = null;
+    this.parent = null;
     this.file = file;
   }
   extend(node) {
@@ -1492,7 +1534,7 @@ const visit = (node, { location, options }) => {
   location = location.extend(node);
   let entities = [];
   assert(node.type in visitors, 'invalid node type %o', node.type);
-  if (!options.exclude.has(location.getName())) {
+  if (!location.hasName() || !options.exclude.has(location.getName())) {
     const context = { location, options };
     const { split, join } = visitors[node.type];
     const parts = split(node, context);
@@ -1507,10 +1549,7 @@ const visit = (node, { location, options }) => {
       }
     }
     node = join(node, context, ...fields);
-    const entity = location.makeEntity(entities);
-    if (entity !== null) {
-      entities = [entity];
-    }
+    entities = location.wrapEntityArray(entities);
   }
   return {
     node,
@@ -1742,7 +1781,7 @@ setVisitor(
           ),
           buildRegularProperty(
             'defined_class',
-            buildLiteral(location.getParentContainerName()),
+            buildLiteral(location.getContainerName()),
           ),
           buildRegularProperty('method_id', buildLiteral(location.getName())),
           buildRegularProperty(
@@ -2653,7 +2692,10 @@ const instrument = (file, options) => {
         entities: getResultEntities(result),
       };
     });
+    // c8 vs node12
+    /* c8 ignore start */
   } catch (error) {
+    /* c8 ignore stop */
     if (error instanceof Collision) {
       return new Left(error.getMessage());
     }
@@ -2694,7 +2736,10 @@ class File {
           locations: true,
         }),
       );
+      // c8 vs node12
+      /* c8 ignore start */
     } catch (error) {
+      /* c8 ignore stop */
       return new Left(`failed to parse ${this.path} >> ${error.message}`);
     }
   }
@@ -2737,7 +2782,7 @@ const save = (recording, versioning) => {
     )
       .reduce(navigate, roots)
       .push({
-        type: 'class',
+        type: 'package',
         name: Path__namespace.basename(path),
         children: entities,
       });
@@ -2787,10 +2832,13 @@ class Recording {
       });
     });
   }
-  toggle() {
+  toggle(running) {
     assert(this.running !== null, 'terminated recording %o', this);
-    this.running = !this.running;
-    return this.running;
+    if (this.running === running) {
+      return new Left('the recording is already in the desired state');
+    }
+    this.running = running;
+    return new Right(null);
   }
   register(origin) {
     assert(this.running !== null, 'terminated recording %o', this);
@@ -2859,9 +2907,8 @@ class Appmap {
     if (!Path__namespace.isAbsolute(path)) {
       return new Left(`expected an absolute path and got: ${path}`);
     }
-    const { enabled, shallow, exclude } = this.configuration.getInstrumentation(
-      path,
-    );
+    const { enabled, shallow, exclude } =
+      this.configuration.getInstrumentation(path);
     if (!enabled) {
       return new Right(content);
     }
@@ -2906,13 +2953,23 @@ class Appmap {
   startAsync(data) {
     return Promise.resolve(this.start(data));
   }
-  toggle(key) {
+  play(key) {
     assert(this.session !== null, 'non-initialized appmap %o', this);
     assert(!this.terminated, 'terminated appmap %o', this);
-    return this.recordings.get(key).mapRight((recording) => recording.toggle());
+    return this.recordings.get(key).bind((recording) => recording.toggle(true));
   }
-  toggleAsync(key) {
-    return Promise.resolve(this.toggle(key));
+  playAsync(key) {
+    return Promise.resolve(this.play(key));
+  }
+  pause(key) {
+    assert(this.session !== null, 'non-initialized appmap %o', this);
+    assert(!this.terminated, 'terminated appmap %o', this);
+    return this.recordings
+      .get(key)
+      .bind((recording) => recording.toggle(false));
+  }
+  pauseAsync(key) {
+    return Promise.resolve(this.pause(key));
   }
   stop(key) {
     assert(this.session !== null, 'non-initialized appmap %o', this);

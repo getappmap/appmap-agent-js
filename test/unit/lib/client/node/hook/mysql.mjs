@@ -17,28 +17,32 @@ const proceed = () =>
     var connection = MySQL.createConnection({
       host: 'localhost',
       port: PORT,
-      user: "root",
+      user: 'root',
     });
     connection.connect();
     connection.query(
       'SELECT ? * ? AS solution;',
       [2, 3],
-      function (error1, results) {
+      function (error, results) {
+        if (error) {
+          throw error;
+        }
         Assert.equal(results[0].solution, 6);
-        connection.query(
-          'INVALID SQL;',
-          (error) => {}
-        );
-        unhook();
-        connection.end((error2) => {
-          try {
-            if (error1) {
-              throw error1;
+        connection.query('INVALID SQL;', (error) => {
+          Assert.ok(error instanceof Error);
+          connection.end((error) => {
+            if (error) {
+              throw error;
             }
-            if (error2) {
-              throw error2;
-            }
-            Assert.equal(results[0].solution, 6);
+            Assert.deepEqual(trace.length, 4);
+            Assert.ok(Array.isArray(trace[3]));
+            Assert.equal(trace[3].length, 2);
+            Assert.ok(
+              Reflect.getOwnPropertyDescriptor(trace[3][1], 'error') !==
+                undefined,
+            );
+            Assert.equal(typeof trace[3][1].error, 'string');
+            trace[3][1].error = 'foo';
             Assert.deepEqual(trace, [
               [
                 'sql_query',
@@ -50,12 +54,22 @@ const proceed = () =>
                   server_version: null,
                 },
               ],
-              ['sql_result', {error:null}],
+              ['sql_result', { error: null }],
+              [
+                'sql_query',
+                {
+                  database_type: 'mysql',
+                  sql: 'INVALID SQL;',
+                  parameters: null,
+                  explain_sql: null,
+                  server_version: null,
+                },
+              ],
+              ['sql_result', { error: 'foo' }],
             ]);
+            unhook();
             resolve();
-          } catch (error) {
-            reject(error);
-          }
+          });
         });
       },
     );
@@ -65,11 +79,9 @@ if (Reflect.getOwnPropertyDescriptor(process.env, 'TRAVIS')) {
   proceed();
 } else {
   {
-    const { signal, status } = ChildProcess.spawnSync(
-      'rm',
-      ['-rf',  PATH],
-      { stdio: 'inherit' },
-    );
+    const { signal, status } = ChildProcess.spawnSync('rm', ['-rf', PATH], {
+      stdio: 'inherit',
+    });
     Assert.equal(signal, null);
     Assert.equal(status, 0);
   }
@@ -80,7 +92,7 @@ if (Reflect.getOwnPropertyDescriptor(process.env, 'TRAVIS')) {
         '--initialize-insecure',
         '--default-authentication-plugin=mysql_native_password',
         '--datadir',
-        PATH
+        PATH,
       ],
       { stdio: 'inherit' },
     );
