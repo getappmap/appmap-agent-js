@@ -3,6 +3,9 @@ import * as MySQL from 'mysql';
 import { strict as Assert } from 'assert';
 import { hookMySQL } from '../../../../../../lib/client/node/hook/mysql.js';
 
+const PORT = 3307;
+const PATH = './tmp/test/data';
+
 const proceed = () =>
   new Promise((resolve, reject) => {
     const trace = [];
@@ -13,13 +16,19 @@ const proceed = () =>
     const unhook = hookMySQL(record);
     var connection = MySQL.createConnection({
       host: 'localhost',
-      user: 'root',
+      port: PORT,
+      user: "root",
     });
     connection.connect();
     connection.query(
       'SELECT ? * ? AS solution;',
       [2, 3],
-      function (error1, results, fields) {
+      function (error1, results) {
+        Assert.equal(results[0].solution, 6);
+        connection.query(
+          'INVALID SQL;',
+          (error) => {}
+        );
         unhook();
         connection.end((error2) => {
           try {
@@ -41,7 +50,7 @@ const proceed = () =>
                   server_version: null,
                 },
               ],
-              ['sql_result', null],
+              ['sql_result', {error:null}],
             ]);
             resolve();
           } catch (error) {
@@ -56,50 +65,50 @@ if (Reflect.getOwnPropertyDescriptor(process.env, 'TRAVIS')) {
   proceed();
 } else {
   {
-    const cmd1 = 'rm -rf ./tmp/test/data';
-    const cmd2 =
-      '/usr/local/mysql/bin/mysqld --initialize-insecure --default-authentication-plugin=mysql_native_password --datadir ./tmp/test/data';
     const { signal, status } = ChildProcess.spawnSync(
-      '/bin/sh',
-      ['-c', `${cmd1} && ${cmd2}`],
+      'rm',
+      ['-rf',  PATH],
+      { stdio: 'inherit' },
+    );
+    Assert.equal(signal, null);
+    Assert.equal(status, 0);
+  }
+  {
+    const { signal, status } = ChildProcess.spawnSync(
+      '/usr/local/mysql/bin/mysqld',
+      [
+        '--initialize-insecure',
+        '--default-authentication-plugin=mysql_native_password',
+        '--datadir',
+        PATH
+      ],
       { stdio: 'inherit' },
     );
     Assert.equal(signal, null);
     Assert.equal(status, 0);
   }
   const child = ChildProcess.spawn(
-    '/bin/sh',
-    ['-c', '/usr/local/mysql/bin/mysqld --datadir ./tmp/test/data'],
+    '/usr/local/mysql/bin/mysqld',
+    ['--port', String(PORT), '--datadir', PATH],
     { stdio: 'inherit' },
   );
-  child.on('exit', (status, signal) => {
-    Assert.fail();
+  process.on('exit', () => {
+    child.kill('SIGINT');
   });
   const probe = () => {
-    const { status } = ChildProcess.spawnSync(
-      '/bin/sh',
-      ['-c', '/usr/local/mysql/bin/mysqladmin --user root ping'],
+    const { status, signal } = ChildProcess.spawnSync(
+      '/usr/local/mysql/bin/mysqladmin',
+      ['--host', 'localhost', '--port', String(PORT), '--user', 'root', 'ping'],
       { stdio: 'inherit' },
     );
+    Assert.equal(signal, null);
     if (status === 0) {
-      const cleanup = (error) => {
-        child.removeAllListeners('exit');
-        child.on('exit', (status, signal) => {
-          Assert.equal(signal, 'SIGINT');
-          if (error !== null) {
-            throw error;
-          }
-        });
-        child.kill('SIGINT');
-      };
-      proceed()
-        .then(() => {
-          cleanup(null);
-        })
-        .catch(cleanup);
+      proceed().then(() => {
+        process.exit(0);
+      });
     } else {
       setTimeout(probe, 1000);
     }
   };
-  probe();
+  setTimeout(probe, 1000);
 }
