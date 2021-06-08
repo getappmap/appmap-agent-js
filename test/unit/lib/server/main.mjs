@@ -38,7 +38,7 @@ class Writable {
         child.stdout.setEncoding = () => {};
         child.stdout.readableEncoding = 'utf8';
         child.stderr = new Events.EventEmitter();
-        child.stdout.setEncoding = () => {};
+        child.stderr.setEncoding = () => {};
         child.stderr.readableEncoding = 'buffer';
         setImmediate(() => {
           child.emit('exit', 0, null);
