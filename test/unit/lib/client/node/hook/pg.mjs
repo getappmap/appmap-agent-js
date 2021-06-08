@@ -3,8 +3,8 @@ import PostgreSQL from 'pg';
 import { strict as Assert } from 'assert';
 import { hookPG } from '../../../../../../lib/client/node/hook/pg.js';
 
-const PORT = 5433;
-const USER = 'appmap';
+const PORT = 5432;
+const USER = 'postgres';
 const PATH = './tmp/test/postgres';
 
 const proceed = async () => {
