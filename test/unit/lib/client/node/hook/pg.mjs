@@ -11,7 +11,8 @@ const proceed = async () => {
   // setup //
   const trace = [];
   const record = (...args) => {
-    trace.push(args);
+    Assert.equal(args.length, 1);
+    trace.push(args[0]);
   };
   const unhook = hookPG({}, () => ({
     recordCall: record,
@@ -69,50 +70,46 @@ const proceed = async () => {
   );
   // teardown //
   Assert.deepEqual(trace, [
-    [
-      'sql_query',
-      {
+    {
+      sql_query: {
         database_type: 'postgres',
         sql: 'SELECT $1::integer * $2::integer AS solution;',
         parameters: [2, 3],
         explain_sql: null,
         server_version: null,
       },
-    ],
-    ['sql_result', { error: null }],
-    [
-      'sql_query',
-      {
+    },
+    { sql_result: { error: null } },
+    {
+      sql_query: {
         database_type: 'postgres',
         sql: 'INVALID SQL1;',
         parameters: null,
         explain_sql: null,
         server_version: null,
       },
-    ],
-    ['sql_result', { error: 'syntax error at or near "INVALID"' }],
-    [
-      'sql_query',
-      {
+    },
+    { sql_result: { error: 'syntax error at or near "INVALID"' } },
+    {
+      sql_query: {
         database_type: 'postgres',
         sql: 'INVALID SQL2;',
         parameters: null,
         explain_sql: null,
         server_version: null,
       },
-    ],
-    ['sql_result', { error: 'syntax error at or near "INVALID"' }],
-    [
-      'sql_query',
-      {
+    },
+    { sql_result: { error: 'syntax error at or near "INVALID"' } },
+    {
+      sql_query: {
         database_type: 'postgres',
         sql: 'SELECT 123::integer AS solution;',
         parameters: null,
         explain_sql: null,
         server_version: null,
       },
-    ],
-    ['sql_result', { error: null }],
+    },
+    { sql_result: { error: null } },
   ]);
   client.end();
   unhook();

@@ -5,8 +5,8 @@ import SQLite3 from 'sqlite3';
 const trace = [];
 
 const record = (...args) => {
-  trace.push(args);
-  return record;
+  Assert.equal(args.length, 1);
+  trace.push(args[0]);
 };
 
 const unhook = hookSQLite3({}, () => ({
@@ -138,21 +138,153 @@ const database = new SQLite3.Database(':memory:');
       })
       .finalize();
   });
+  Assert.deepEqual(trace, [
+    {
+      sql_query: {
+        database_type: 'sqlite3',
+        sql: 'syntax error;',
+        parameters: [],
+        explain_sql: null,
+        server_version: null,
+      },
+    },
+    {
+      sql_result: {
+        error: 'SQLITE_ERROR: near "syntax": syntax error',
+      },
+    },
+    {
+      sql_query: {
+        database_type: 'sqlite3',
+        sql: 'SELECT ? AS solution;',
+        parameters: ['foo'],
+        explain_sql: null,
+        server_version: null,
+      },
+    },
+    {
+      sql_result: {
+        error: null,
+      },
+    },
+    {
+      sql_query: {
+        database_type: 'sqlite3',
+        sql: 'SELECT ? AS solution;',
+        parameters: [123],
+        explain_sql: null,
+        server_version: null,
+      },
+    },
+    {
+      sql_result: {
+        error: null,
+      },
+    },
+    {
+      sql_query: {
+        database_type: 'sqlite3',
+        sql: 'SELECT $param AS solution;',
+        parameters: {
+          $param: 123,
+        },
+        explain_sql: null,
+        server_version: null,
+      },
+    },
+    {
+      sql_result: {
+        error: null,
+      },
+    },
+    {
+      sql_query: {
+        database_type: 'sqlite3',
+        sql: 'SELECT ? AS solution;',
+        parameters: [123],
+        explain_sql: null,
+        server_version: null,
+      },
+    },
+    {
+      sql_result: {
+        error: null,
+      },
+    },
+    {
+      sql_query: {
+        database_type: 'sqlite3',
+        sql: 'SELECT 123 AS solution;',
+        parameters: [],
+        explain_sql: null,
+        server_version: null,
+      },
+    },
+    {
+      sql_result: {
+        error: null,
+      },
+    },
+    {
+      sql_query: {
+        database_type: 'sqlite3',
+        sql: 'SELECT ? * ? AS solution;',
+        parameters: [2, 3],
+        explain_sql: null,
+        server_version: null,
+      },
+    },
+    {
+      sql_result: {
+        error: null,
+      },
+    },
+    {
+      sql_query: {
+        database_type: 'sqlite3',
+        sql: 'SELECT $param1 * $param2 AS solution;',
+        parameters: {
+          $param1: 2,
+          $param2: 3,
+        },
+        explain_sql: null,
+        server_version: null,
+      },
+    },
+    {
+      sql_result: {
+        error: null,
+      },
+    },
+    {
+      sql_query: {
+        database_type: 'sqlite3',
+        sql: 'SELECT ? * ? AS solution;',
+        parameters: [2, 3],
+        explain_sql: null,
+        server_version: null,
+      },
+    },
+    {
+      sql_query: {
+        database_type: 'sqlite3',
+        sql: 'SELECT ? * ? AS solution;',
+        parameters: [3, 4],
+        explain_sql: null,
+        server_version: null,
+      },
+    },
+    {
+      sql_result: {
+        error: null,
+      },
+    },
+    {
+      sql_result: {
+        error: null,
+      },
+    },
+  ]);
   database.close();
   unhook();
 })();
-
-// db.serialize(function() {
-//   db.run("CREATE TABLE lorem (info TEXT)");
-//
-//   var stmt = db.prepare("INSERT INTO lorem VALUES (?)");
-//   for (var i = 0; i < 10; i++) {
-//       stmt.run("Ipsum " + i);
-//   }
-//   stmt.finalize();
-//
-//   db.each("SELECT rowid AS id, info FROM lorem", function(err, row) {
-//     console.log(row);
-//     console.log(row.id + ": " + row.info);
-//   });
-// });

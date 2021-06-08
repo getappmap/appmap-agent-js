@@ -10,7 +10,8 @@ const proceed = () =>
   new Promise((resolve, reject) => {
     const trace = [];
     const record = (...args) => {
-      trace.push(args);
+      Assert.equal(args.length, 1);
+      trace.push(args[0]);
     };
     const unhook = hookMySQL(record, () => ({
       recordCall: record,
@@ -37,37 +38,29 @@ const proceed = () =>
               throw error;
             }
             Assert.deepEqual(trace.length, 4);
-            Assert.ok(Array.isArray(trace[3]));
-            Assert.equal(trace[3].length, 2);
-            Assert.ok(
-              Reflect.getOwnPropertyDescriptor(trace[3][1], 'error') !==
-                undefined,
-            );
-            Assert.equal(typeof trace[3][1].error, 'string');
-            trace[3][1].error = 'foo';
+            Assert.equal(typeof trace[3].sql_result.error, 'string');
+            trace[3].sql_result.error = 'foo';
             Assert.deepEqual(trace, [
-              [
-                'sql_query',
-                {
+              {
+                sql_query: {
                   database_type: 'mysql',
                   sql: 'SELECT ? * ? AS solution;',
                   parameters: [2, 3],
                   explain_sql: null,
                   server_version: null,
                 },
-              ],
-              ['sql_result', { error: null }],
-              [
-                'sql_query',
-                {
+              },
+              { sql_result: { error: null } },
+              {
+                sql_query: {
                   database_type: 'mysql',
                   sql: 'INVALID SQL;',
                   parameters: null,
                   explain_sql: null,
                   server_version: null,
                 },
-              ],
-              ['sql_result', { error: 'foo' }],
+              },
+              { sql_result: { error: 'foo' } },
             ]);
             unhook();
             resolve();
@@ -107,7 +100,7 @@ if (Reflect.getOwnPropertyDescriptor(process.env, 'TRAVIS')) {
     { stdio: 'inherit' },
   );
   process.on('exit', () => {
-    child.kill('SIGINT');
+    child.kill('SIGKILL');
   });
   const probe = () => {
     const { status, signal } = ChildProcess.spawnSync(

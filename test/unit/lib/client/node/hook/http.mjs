@@ -8,33 +8,16 @@ const Http = require('http');
 
 const makeRecord = () => {
   const events = [];
+  const record = (...args) => {
+    Assert.equal(args.length, 1);
+    events.push(args[0]);
+  };
   return {
     events,
-    makeCouple: () => {
-      const couple = {
-        parent: null,
-        recordCall(...args) {
-          Assert.equal(this, couple);
-          Assert.equal(args.length, 2);
-          this.parent = events.length;
-          events.push({
-            parent: null,
-            key: args[0],
-            value: args[1],
-          });
-        },
-        recordReturn(...args) {
-          Assert.equal(this, couple);
-          Assert.equal(args.length, 2);
-          events.push({
-            parent: this.parent,
-            key: args[0],
-            value: args[1],
-          });
-        },
-      };
-      return couple;
-    },
+    makeCouple: () => ({
+      recordCall: record,
+      recordReturn: record,
+    }),
   };
 };
 
@@ -74,9 +57,7 @@ const makeRecord = () => {
           Assert.equal(body, 'foo');
           Assert.deepEqual(events, [
             {
-              parent: null,
-              key: 'http_client_request',
-              value: {
+              http_client_request: {
                 request_method: 'PUT',
                 url: `http://localhost:${server.address().port}/path`,
                 message: 'param=123#hash',
@@ -87,13 +68,10 @@ const makeRecord = () => {
               },
             },
             {
-              parent: null,
-              key: 'http_server_request',
-              value: {
+              http_server_request: {
                 request_method: 'PUT',
                 path_info: '/path?param=123#hash',
                 normalized_path_info: null,
-                parameters: null,
                 protocol: 'HTTP/1.1',
                 headers: {
                   host: `localhost:${server.address().port}`,
@@ -102,11 +80,10 @@ const makeRecord = () => {
                   'content-length': '3',
                 },
               },
+              message: null,
             },
             {
-              parent: 1,
-              key: 'http_server_response',
-              value: {
+              http_server_response: {
                 status_code: 200,
                 status_message: 'OK',
                 mime_type: null,
@@ -114,9 +91,7 @@ const makeRecord = () => {
               },
             },
             {
-              parent: 0,
-              key: 'http_client_response',
-              value: {
+              http_client_response: {
                 status_code: 200,
                 status_message: 'OK',
                 mime_type: null,
@@ -165,23 +140,27 @@ const makeRecord = () => {
           Assert.equal(body, 'bar');
           for (let event of events) {
             if (
-              Reflect.getOwnPropertyDescriptor(event, 'elapsed') !== undefined
+              Reflect.getOwnPropertyDescriptor(
+                event,
+                'http_server_response',
+              ) !== undefined
             ) {
-              delete event.elapsed;
+              delete event.http_server_response.headers.date;
+              delete event.http_server_response.headers.etag;
             }
             if (
-              Reflect.getOwnPropertyDescriptor(event.value, 'headers') !==
-              undefined
+              Reflect.getOwnPropertyDescriptor(
+                event,
+                'http_client_response',
+              ) !== undefined
             ) {
-              delete event.value.headers.date;
-              delete event.value.headers.etag;
+              delete event.http_client_response.headers.date;
+              delete event.http_client_response.headers.etag;
             }
           }
           Assert.deepEqual(events, [
             {
-              parent: null,
-              key: 'http_client_request',
-              value: {
+              http_client_request: {
                 request_method: 'GET',
                 url: 'http://localhost/123',
                 message: '',
@@ -189,23 +168,19 @@ const makeRecord = () => {
               },
             },
             {
-              parent: null,
-              key: 'http_server_request',
-              value: {
+              http_server_request: {
                 request_method: 'GET',
                 path_info: '/123',
                 normalized_path_info: '/{foo}',
-                parameters: { foo: '123' },
                 protocol: 'HTTP/1.1',
                 headers: {
                   connection: 'close',
                 },
               },
+              message: { foo: '123' },
             },
             {
-              parent: 1,
-              key: 'http_server_response',
-              value: {
+              http_server_response: {
                 status_code: 200,
                 status_message: 'OK',
                 mime_type: 'text/html; charset=utf-8',
@@ -217,9 +192,7 @@ const makeRecord = () => {
               },
             },
             {
-              parent: 0,
-              key: 'http_client_response',
-              value: {
+              http_client_response: {
                 status_code: 200,
                 status_message: 'OK',
                 mime_type: 'text/html; charset=utf-8',
