@@ -25,8 +25,8 @@ deploy:
     on:
       branch: main
 
-env:
-  global:
-    - MYSQL_TCP_PORT=3307
-    # - PGPORT=5433
-    # - PGUSER=appmap
+# env:
+#   global:
+#     - MYSQL_TCP_PORT=3307
+#     - PGPORT=5433
+#     - PGUSER=appmap
