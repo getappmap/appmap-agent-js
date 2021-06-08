@@ -77,7 +77,9 @@ const proceed = () =>
     );
   });
 
-{
+if (Reflect.getOwnPropertyDescriptor(process.env, 'TRAVIS')) {
+  // noop;
+} else {
   {
     const { signal, status } = ChildProcess.spawnSync('rm', ['-rf', PATH], {
       stdio: 'inherit',
