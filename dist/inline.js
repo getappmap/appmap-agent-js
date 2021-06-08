@@ -763,6 +763,18 @@ const normalizeConcurrency = (concurrency) => {
   return concurrency;
 };
 
+const normalizeHooks = (hooks) => {
+  hooks = { ...hooks };
+  for (let key of Reflect.ownKeys(hooks)) {
+    if (hooks[key] === true) {
+      hooks[key] = {};
+    } else if (hooks[key] === false) {
+      hooks[key] = null;
+    }
+  }
+  return hooks;
+};
+
 const normalizeMain = (main) => {
   if (typeof main === 'string') {
     main = { path: main };
@@ -891,20 +903,17 @@ const infos = {
     normalize: identity,
     initial: 'normal',
   },
-  'hook-cjs': {
-    extend: overwrite,
-    normalize: identity,
-    initial: true,
-  },
-  'hook-esm': {
-    extend: overwrite,
-    normalize: identity,
-    initial: true,
-  },
-  'hook-http': {
-    extend: overwrite,
-    normalize: identity,
-    initial: true,
+  hooks: {
+    extend: assign,
+    normalize: normalizeHooks,
+    initial: {
+      esm: {},
+      cjs: {},
+      http: null,
+      mysql: null,
+      sqlite3: null,
+      pg: null,
+    },
   },
   enabled: {
     extend: prepend,
@@ -1202,12 +1211,8 @@ class Configuration {
       git: this.data.base.git,
     };
   }
-  getHooking() {
-    return {
-      esm: this.data['hook-esm'],
-      cjs: this.data['hook-cjs'],
-      http: this.data['hook-http'],
-    };
+  getHooks() {
+    return this.data.hooks;
   }
   getConcurrency() {
     return this.data.concurrency;
@@ -2879,7 +2884,7 @@ class Appmap {
     this.session = session;
     return new Right({
       session: session,
-      hooking: this.configuration.getHooking(),
+      hooks: this.configuration.getHooks(),
     });
   }
   initializeAsync(session) {
