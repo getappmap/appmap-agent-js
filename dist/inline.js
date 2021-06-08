@@ -610,7 +610,7 @@ const spawnNormalizedChild = (child, configuration) => {
       sub.stdout.setEncoding(child.options.encoding);
     }
     if (sub.stderr !== null) {
-      sub.stdout.setEncoding(child.options.encoding);
+      sub.stderr.setEncoding(child.options.encoding);
     }
     return sub;
   });
@@ -1226,7 +1226,7 @@ class Configuration {
   getPort() {
     return this.data.port;
   }
-  getChilderen() {
+  getChildren() {
     return this.data.children;
   }
   spawnChild(child) {

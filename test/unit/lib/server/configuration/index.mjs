@@ -196,7 +196,7 @@ Assert.equal(
     .fromRight();
   setSpawnForTesting(() => ({ stdout: null, stderr: null }));
   Assert.deepEqual(
-    configuration.spawnChild(configuration.getChilderen()[0]).fromRight(),
+    configuration.spawnChild(configuration.getChildren()[0]).fromRight(),
     { stdout: null, stderr: null },
   );
 }
@@ -223,7 +223,7 @@ Assert.equal(getInitialConfiguration().getHost(), 'localhost');
 
 Assert.equal(getInitialConfiguration().getPort(), 0);
 
-Assert.deepEqual(getInitialConfiguration().getChilderen(), []);
+Assert.deepEqual(getInitialConfiguration().getChildren(), []);
 
 Assert.deepEqual(getInitialConfiguration().getHooks(), {
   esm: {},

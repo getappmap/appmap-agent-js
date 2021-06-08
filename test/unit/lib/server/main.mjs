@@ -1,5 +1,6 @@
 import * as Events from 'events';
 import * as FileSystem from 'fs';
+import EventEmitter from 'events';
 import { strict as Assert } from 'assert';
 import { setSpawnForTesting } from '../../../../lib/server/configuration/child.mjs';
 import { main } from '../../../../lib/server/main.mjs';
@@ -23,6 +24,14 @@ class Writable {
     Assert.equal(args.length, 1);
     Assert.equal(typeof args[0], 'string');
     this.buffer.push(args[0]);
+  }
+}
+
+class Process extends EventEmitter {
+  constructor() {
+    super();
+    this.cwd = process.cwd;
+    this.stdout = new Writable();
   }
 }
 
@@ -113,9 +122,9 @@ class Writable {
       }
     };
     next();
-    const writable = new Writable();
+    const process = new Process();
     (
-      await main(process.cwd(), writable, {
+      await main(process, {
         extends: 'tmp/test/appmap.json',
         protocol: 'inline',
         children: [
@@ -134,7 +143,7 @@ class Writable {
           'there was some appmap-related errors on spawned children',
         );
         Assert.deepEqual(
-          writable.buffer.join(''),
+          process.stdout.buffer.join(''),
           [
             'Spawing 6 children (max 1 concurrent children) ...',
             '#0: spawn node success-pipe.js ...',
@@ -171,7 +180,7 @@ class Writable {
 
   // messaging with a single success children //
   {
-    const writable = new Writable();
+    const process = new Process();
     setSpawnForTesting((...args) => {
       Assert.deepEqual(args.slice(0, 2), ['/bin/sh', ['-c', 'node main.js']]);
       const child = new Events.EventEmitter();
@@ -183,7 +192,7 @@ class Writable {
       return child;
     });
     (
-      await main(process.cwd(), writable, {
+      await main(process, {
         extends: 'tmp/test/appmap.json',
         port: 0,
         children: 'node main.js',
@@ -194,7 +203,7 @@ class Writable {
         Assert.fail();
       },
       (code) => {
-        Assert.deepEqual(writable.buffer, [
+        Assert.deepEqual(process.stdout.buffer, [
           'Spawing 1 children (max 1 concurrent children) ...\n',
           "#0: spawn /bin/sh -c 'node main.js' ...\n",
           '#0 exit with: 0\n',
@@ -204,14 +213,53 @@ class Writable {
     );
   }
 
+  // messaging with a single success children //
+  {
+    const process = new Process();
+    setSpawnForTesting((...args) => {
+      Assert.deepEqual(args.slice(0, 2), ['/bin/sh', ['-c', 'node main.js']]);
+      const child = new Events.EventEmitter();
+      child.stdout = null;
+      child.stderr = null;
+      child.kill = (...args) => {
+        Assert.deepEqual(args, ['SIGINT']);
+        child.emit('exit', 0, 'SIGINT');
+      };
+      setTimeout(() => {
+        process.emit('SIGINT');
+      });
+      return child;
+    });
+    (
+      await main(process, {
+        extends: 'tmp/test/appmap.json',
+        port: 0,
+        children: 'node main.js',
+        _: [],
+      })
+    ).either(
+      (message) => {
+        Assert.fail();
+      },
+      (code) => {
+        Assert.deepEqual(process.stdout.buffer, [
+          'Spawing 1 children (max 1 concurrent children) ...\n',
+          "#0: spawn /bin/sh -c 'node main.js' ...\n",
+          '#0 killed with: SIGINT\n',
+        ]);
+        Assert.equal(code, 1);
+      },
+    );
+  }
+
   // messaging invalid port //
   {
-    const writable = new Writable();
+    const process = new Process();
     setSpawnForTesting(() => {
       Assert.fail();
     });
     (
-      await main(process.cwd(), writable, {
+      await main(process, {
         extends: 'tmp/test/appmap.json',
         port: 'missing/socket.sock',
         children: ['node main.js'],
@@ -220,7 +268,7 @@ class Writable {
     ).either(
       (message) => {
         Assert.match(message, /^failed to listening to port/);
-        Assert.deepEqual(writable.buffer, []);
+        Assert.deepEqual(process.stdout.buffer, []);
       },
       (code) => {
         Assert.fail();
