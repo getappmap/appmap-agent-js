@@ -3,7 +3,7 @@
 import minimist from 'minimist';
 import { main } from '../lib/server/main.mjs';
 
-main(process.cwd(), process.stdout, minimist(process.argv.slice(2))).then(
+main(process, minimist(process.argv.slice(2))).then(
   (either) => {
     either.either(
       (message) => {
