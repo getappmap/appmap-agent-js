@@ -3,7 +3,7 @@ import * as MySQL from 'mysql';
 import { strict as Assert } from 'assert';
 import { hookMySQL } from '../../../../../../lib/client/node/hook/mysql.js';
 
-const PORT = 3306;
+const PORT = 3307;
 const PATH = './tmp/test/data';
 
 const proceed = () =>
@@ -77,9 +77,7 @@ const proceed = () =>
     );
   });
 
-if (Reflect.getOwnPropertyDescriptor(process.env, 'TRAVIS')) {
-  proceed();
-} else {
+{
   {
     const { signal, status } = ChildProcess.spawnSync('rm', ['-rf', PATH], {
       stdio: 'inherit',
