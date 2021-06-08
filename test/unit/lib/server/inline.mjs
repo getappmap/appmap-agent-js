@@ -11,11 +11,14 @@ requestAsync({
     main: 'main.js',
     enabled: true,
   },
-}).then(({ session, hooking }) => {
-  Assert.deepEqual(hooking, {
-    esm: true,
-    cjs: true,
-    http: true,
+}).then(({ session, hooks }) => {
+  Assert.deepEqual(hooks, {
+    esm: {},
+    cjs: {},
+    http: null,
+    mysql: null,
+    pg: null,
+    sqlite3: null,
   });
   Assert.equal(
     typeof request({

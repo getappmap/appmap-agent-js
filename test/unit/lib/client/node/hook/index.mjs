@@ -3,10 +3,12 @@ import { hook } from '../../../../../../lib/client/node/hook/index.js';
 
 hook(
   {
-    esm: false,
-    cjs: true,
-    http: false,
-    mysql: false,
+    esm: null,
+    cjs: {},
+    http: null,
+    mysql: null,
+    pg: null,
+    sqlite3: null,
   },
   {
     instrumentScript: () => {
@@ -15,7 +17,7 @@ hook(
     instrumentModuleAsync: () => {
       Assert.fail();
     },
-    recordCall: () => {
+    makeCouple: () => {
       Assert.fail();
     },
   },

@@ -16,7 +16,7 @@ FileSystem.writeFileSync(
     import {hookESM, transformSource} from '${preload}';
     ((async () => {
       Assert.equal((await import('${path1}')).foo, 'bar');
-      const unhook = hookESM((...args) => {
+      const unhook = hookESM({}, (...args) => {
         Assert.deepEqual(args, ['${path2}', \`export const foo = 'bar';\`]);
         return Promise.resolve('export const foo = "qux";');
       });

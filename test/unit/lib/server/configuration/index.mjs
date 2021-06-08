@@ -225,10 +225,13 @@ Assert.equal(getInitialConfiguration().getPort(), 0);
 
 Assert.deepEqual(getInitialConfiguration().getChilderen(), []);
 
-Assert.deepEqual(getInitialConfiguration().getHooking(), {
-  esm: true,
-  cjs: true,
-  http: true,
+Assert.deepEqual(getInitialConfiguration().getHooks(), {
+  esm: {},
+  cjs: {},
+  http: null,
+  mysql: null,
+  pg: null,
+  sqlite3: null,
 });
 
 Assert.equal(typeof getInitialConfiguration().serialize(), 'string');

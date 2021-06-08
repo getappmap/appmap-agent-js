@@ -114,3 +114,13 @@ Assert.equal(
   extend('concurrency', '50%'),
   Math.floor(OperatingSystem.cpus().length / 2),
 );
+
+// hooks //
+Assert.deepEqual(extend('hooks', { cjs: false, esm: false, http: true }), {
+  cjs: null,
+  esm: null,
+  http: {},
+  mysql: null,
+  sqlite3: null,
+  pg: null,
+});

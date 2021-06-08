@@ -13,7 +13,7 @@ const require = Module.createRequire(import.meta.url);
 delete require.cache[path];
 Assert.equal(require(path).foo, 'bar');
 
-const unhook = hookCJS((...args) => {
+const unhook = hookCJS({}, (...args) => {
   Assert.deepEqual(args, [path, content]);
   return 'exports.foo = "qux";';
 });

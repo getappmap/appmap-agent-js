@@ -273,9 +273,16 @@
                   killSignal: {$ref: signal}
     # client
     recorder: {$ref: recorder}
-    hook-cjs: {type: boolean}
-    hook-esm: {type: boolean}
-    hook-http: {type: boolean}
+    hooks:
+      type: object
+      additionalProperties: false
+      properties:
+        cjs: {type: boolean}
+        esm: {type: boolean}
+        http: {type: boolean}
+        mysql: {type: boolean}
+        pg: {type: boolean}
+        sqlite3: {type: boolean}
     enabled:
       anyOf:
         - type: boolean

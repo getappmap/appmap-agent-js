@@ -30,10 +30,13 @@ const unlink = (path) => {
 
   Assert.deepEqual((await appmap.initializeAsync('$')).fromRight(), {
     session: '$',
-    hooking: {
-      cjs: true,
-      esm: true,
-      http: true,
+    hooks: {
+      cjs: {},
+      esm: {},
+      http: null,
+      mysql: null,
+      pg: null,
+      sqlite3: null,
     },
   });
 

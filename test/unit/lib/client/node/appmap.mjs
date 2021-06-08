@@ -30,7 +30,7 @@ import { getDisabledRecording } from '../../../../../lib/client/node/recording.j
         counter += 1;
         return {
           session: `HIDDEN${String(counter)}`,
-          hooking: { esm: true, cjs: true, http: true, mysql: false },
+          hooks: { esm: {}, cjs: {}, http: {} },
         };
       }
       if (json.action === 'start') {
@@ -161,7 +161,7 @@ import { getDisabledRecording } from '../../../../../lib/client/node/recording.j
             trace.push('request', args);
             return {
               session: 'foo',
-              hooking: { cjs: false, esm: false, http: false },
+              hooks: {},
             };
           },
           requestAsync: (...args) => {

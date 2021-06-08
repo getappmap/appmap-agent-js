@@ -12,9 +12,11 @@ const proceed = async () => {
   const trace = [];
   const record = (...args) => {
     trace.push(args);
-    return record;
   };
-  const unhook = hookPG(record);
+  const unhook = hookPG({}, () => ({
+    recordCall: record,
+    recordReturn: record,
+  }));
   const client = new PostgreSQL.Client({
     host: 'localhost',
     port: PORT,

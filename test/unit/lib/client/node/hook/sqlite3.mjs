@@ -9,7 +9,10 @@ const record = (...args) => {
   return record;
 };
 
-const unhook = hookSQLite3(record);
+const unhook = hookSQLite3({}, () => ({
+  recordCall: record,
+  recordReturn: record,
+}));
 
 const database = new SQLite3.Database(':memory:');
 

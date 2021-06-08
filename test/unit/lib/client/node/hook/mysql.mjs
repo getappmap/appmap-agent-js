@@ -11,9 +11,11 @@ const proceed = () =>
     const trace = [];
     const record = (...args) => {
       trace.push(args);
-      return record;
     };
-    const unhook = hookMySQL(record);
+    const unhook = hookMySQL(record, () => ({
+      recordCall: record,
+      recordReturn: record,
+    }));
     var connection = MySQL.createConnection({
       host: 'localhost',
       port: PORT,

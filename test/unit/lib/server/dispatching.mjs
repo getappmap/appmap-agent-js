@@ -47,7 +47,7 @@ Assert.equal(
       .extendWithData({ enabled: true, cwd: '/' })
       .fromRight(),
   );
-  const { session, hooking } = dispatching
+  const { session, hooks } = dispatching
     .dispatch({
       action: 'initialize',
       session: null,
@@ -58,10 +58,13 @@ Assert.equal(
     })
     .fromRight();
   Assert.equal(typeof session, 'string');
-  Assert.deepEqual(hooking, {
-    esm: true,
-    cjs: true,
-    http: true,
+  Assert.deepEqual(hooks, {
+    esm: {},
+    cjs: {},
+    http: null,
+    mysql: null,
+    pg: null,
+    sqlite3: null,
   });
   const data = {
     cwd: process.cwd(),

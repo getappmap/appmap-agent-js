@@ -12,7 +12,7 @@ emitter.env = {
       if (json.action === 'initialize') {
         return {
           session: `__HIDDEN__`,
-          hooking: { cjs: false, esm: false },
+          hooks: {},
         };
       }
       return null;
