@@ -31,6 +31,12 @@
 
 # other #
 
+- $id: hook
+  anyOf:
+    - type: boolean
+    - const: null
+    - type: object
+
 - $id: stdio
   anyOf:
     - $ref: stdio-stream
@@ -277,12 +283,12 @@
       type: object
       additionalProperties: false
       properties:
-        cjs: {type: boolean}
-        esm: {type: boolean}
-        http: {type: boolean}
-        mysql: {type: boolean}
-        pg: {type: boolean}
-        sqlite3: {type: boolean}
+        cjs: {$ref: hook}
+        esm: {$ref: hook}
+        http: {$ref: hook}
+        mysql: {$ref: hook}
+        pg: {$ref: hook}
+        sqlite3: {$ref: hook}
     enabled:
       anyOf:
         - type: boolean
