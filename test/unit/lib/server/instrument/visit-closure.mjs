@@ -21,7 +21,7 @@ test({
   session: '$',
   origin: 'origin',
   path: 'filename.js',
-  input: `const f = (x, y, ...z) => t;`,
+  input: `const f = (x, y = null, ...z) => t;`,
   output: `const f = ($_ARGUMENT_0, $_ARGUMENT_1, ...$_ARGUMENT_2) => {
     var
       $_TIMER = $.getNow(),
@@ -41,7 +41,7 @@ test({
         receiver: $.serializeParameter($.empty, 'this'),
         parameters: [
           $.serializeParameter($_ARGUMENT_0, 'x'),
-          $.serializeParameter($_ARGUMENT_1, 'y'),
+          $.serializeParameter($_ARGUMENT_1, 'y = null'),
           $.serializeParameter($_ARGUMENT_2, '...z')
         ],
         static: false
@@ -50,7 +50,7 @@ test({
     try {
       var
         x = $_ARGUMENT_0,
-        y = $_ARGUMENT_1,
+        y = $_ARGUMENT_1 === $.undefined ? null : $_ARGUMENT_1,
         z = $_ARGUMENT_2;
       return $_SUCCESS = t;
     } catch ($_ERROR) {

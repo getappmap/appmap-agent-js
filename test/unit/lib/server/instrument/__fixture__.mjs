@@ -12,6 +12,7 @@ import {
 [
   'Identifier',
   'FunctionExpression',
+  'AssignmentPattern',
   'Literal',
   'BlockStatement',
   'Property',
