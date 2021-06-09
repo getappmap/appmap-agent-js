@@ -504,7 +504,7 @@ const normalizeChild = (child) => {
       type: undefined,
       recorder: 'normal',
       configuration: { cwd },
-      globbing: true,
+      globbing: false,
       main: undefined,
       argv: [],
       options: {},
@@ -1306,6 +1306,9 @@ class Location {
   getFile() {
     return this.file;
   }
+  isProgram () {
+    return this.node.type === "Program";
+  }
   isObjectProperty() {
     return (
       this.parent.node.type === 'Property' &&
@@ -1393,6 +1396,7 @@ class Location {
   }
   hasName() {
     return (
+      this.node.type === 'Program' ||
       this.node.type === 'ObjectExpression' ||
       this.node.type === 'ClassExpression' ||
       this.node.type === 'ClassDeclaration' ||
@@ -1403,6 +1407,9 @@ class Location {
   }
   getName() {
     assert(this.hasName(), 'invalid node for name query');
+    if (this.isProgram()) {
+      return `#${this.file.getRelativePath()}`;
+    }
     if (this.isObjectProperty()) {
       let name = '';
       if (this.parent.node.kind !== 'init') {
@@ -1800,9 +1807,9 @@ setVisitor(
           ),
           buildRegularProperty(
             'defined_class',
-            buildLiteral(location.getContainerName()),
+            buildLiteral(location.getName()),
           ),
-          buildRegularProperty('method_id', buildLiteral(location.getName())),
+          buildRegularProperty('method_id', buildLiteral('()')),
           buildRegularProperty(
             'path',
             buildLiteral(location.getFile().getRelativePath()),
