@@ -1321,13 +1321,10 @@ class Location {
     );
   }
   getContainerName() {
-    if (this.isObjectProperty()) {
-      return this.parent.parent.getName();
+    if (this.parent.hasName()) {
+      return this.parent.getName();
     }
-    if (this.isClassMethod()) {
-      return this.parent.parent.parent.getName();
-    }
-    return null;
+    return this.parent.getContainerName();
   }
   isStaticMethod() {
     return (
@@ -1475,10 +1472,14 @@ class Location {
             {
               type: 'function',
               name: '()',
-              source: source ? this.file
-                .getContent()
-                .substring(this.node.start, this.node.end) : null,
-              location: `${this.file.getRelativePath()}:${this.node.loc.start.line}`,
+              source: source
+                ? this.file
+                    .getContent()
+                    .substring(this.node.start, this.node.end)
+                : null,
+              location: `${this.file.getRelativePath()}:${
+                this.node.loc.start.line
+              }`,
               labels: [],
               comment: null,
               static: this.isStaticMethod(),
@@ -1621,7 +1622,7 @@ const buildConditionalExpression = (node1, node2, node3) => ({
   type: 'ConditionalExpression',
   test: node1,
   consequent: node2,
-  alternate: node3
+  alternate: node3,
 });
 
 const buildCatchClause = (node1, node2) => ({
@@ -1921,18 +1922,18 @@ setVisitor(
               //   // does not work :(
               //   var x = {} = APPMAP_ARGUMENT_0;
               // }
-              if (child.type === "AssignmentPattern") {
+              if (child.type === 'AssignmentPattern') {
                 return buildVariableDeclarator(
                   child.left,
                   buildConditionalExpression(
                     buildBinaryExpression(
-                      "===",
+                      '===',
                       buildIdentifier(`${session}_ARGUMENT_${String(index)}`),
-                      buildRegularMemberExpression(session, 'undefined')
+                      buildRegularMemberExpression(session, 'undefined'),
                     ),
                     child.right,
                     buildIdentifier(`${session}_ARGUMENT_${String(index)}`),
-                  )
+                  ),
                 );
               }
               return buildVariableDeclarator(
@@ -2749,7 +2750,7 @@ class File {
     source,
     path,
     content = FileSystem__namespace.readFileSync(path, 'utf8'),
-    basedir = process.cwd()
+    basedir = process.cwd(),
   ) {
     this.absolute = Path__namespace.resolve(basedir, path);
     this.relative = Path__namespace.relative(basedir, this.absolute);
@@ -2952,8 +2953,7 @@ class Appmap {
     if (!Path__namespace.isAbsolute(path)) {
       return new Left(`expected an absolute path and got: ${path}`);
     }
-    const instrumentation =
-      this.configuration.getInstrumentation(path);
+    const instrumentation = this.configuration.getInstrumentation(path);
     if (!instrumentation.enabled) {
       return new Right(content);
     }
@@ -2963,13 +2963,19 @@ class Appmap {
     };
     const key = this.origins.push(origin);
     return instrument(
-      new File(this.configuration.getLanguageVersion(), source, path, content, this.configuration.getBaseDirectory()),
+      new File(
+        this.configuration.getLanguageVersion(),
+        source,
+        path,
+        content,
+        this.configuration.getBaseDirectory(),
+      ),
       {
         session: this.session,
         origin: key,
         exclude: new Set(instrumentation.exclude),
         shallow: instrumentation.shallow,
-        source: instrumentation.source
+        source: instrumentation.source,
       },
     )
       .mapLeft((message) => {

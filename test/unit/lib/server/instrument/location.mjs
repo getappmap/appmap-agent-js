@@ -89,7 +89,7 @@ Assert.deepEqual(location1.wrapEntityArray([{ name: 'child' }], false), [
     Assert.equal(location3.getFile(), file);
     Assert.equal(location3.hasName(), false);
     Assert.throws(() => location3.getKind());
-    Assert.equal(location3.getContainerName(), null);
+    Assert.equal(location3.getContainerName(), '#test/unit/env/target/location.js');
   }
 }
 
