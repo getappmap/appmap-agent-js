@@ -12,7 +12,11 @@ FileSystem.writeFileSync(
 
 {
   const file = new File(5, 'script', 'tmp/test/script-es5.js');
-  Assert.equal(file.getPath(), 'tmp/test/script-es5.js');
+  Assert.equal(file.getRelativePath(), 'tmp/test/script-es5.js');
+  Assert.equal(
+    file.getAbsolutePath(),
+    `${process.cwd()}/tmp/test/script-es5.js`,
+  );
   Assert.equal(file.getLanguageVersion(), 5);
   Assert.equal(file.getSourceType(), 'script');
   Assert.equal(file.getContent(), `var x = 123;`);

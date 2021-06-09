@@ -1,75 +1,77 @@
-import * as ChildProcess from 'child_process';
-import * as MySQL from 'mysql';
-import { strict as Assert } from 'assert';
-import { hookMySQL } from '../../../../../../lib/client/node/hook/mysql.js';
+import '../../../../../../lib/client/node/hook/mysql.js';
 
-const PORT = 3307;
-const PATH = './tmp/test/data';
-
-const proceed = () =>
-  new Promise((resolve, reject) => {
-    const trace = [];
-    const record = (...args) => {
-      Assert.equal(args.length, 1);
-      trace.push(args[0]);
-    };
-    const unhook = hookMySQL(record, () => ({
-      recordCall: record,
-      recordReturn: record,
-    }));
-    var connection = MySQL.createConnection({
-      host: 'localhost',
-      port: PORT,
-      user: 'root',
-    });
-    connection.connect();
-    connection.query(
-      'SELECT ? * ? AS solution;',
-      [2, 3],
-      function (error, results) {
-        if (error) {
-          throw error;
-        }
-        Assert.equal(results[0].solution, 6);
-        connection.query('INVALID SQL;', (error) => {
-          Assert.ok(error instanceof Error);
-          connection.end((error) => {
-            if (error) {
-              throw error;
-            }
-            Assert.deepEqual(trace.length, 4);
-            Assert.equal(typeof trace[3].sql_result.error, 'string');
-            trace[3].sql_result.error = 'foo';
-            Assert.deepEqual(trace, [
-              {
-                sql_query: {
-                  database_type: 'mysql',
-                  sql: 'SELECT ? * ? AS solution;',
-                  parameters: [2, 3],
-                  explain_sql: null,
-                  server_version: null,
-                },
-              },
-              { sql_result: { error: null } },
-              {
-                sql_query: {
-                  database_type: 'mysql',
-                  sql: 'INVALID SQL;',
-                  parameters: null,
-                  explain_sql: null,
-                  server_version: null,
-                },
-              },
-              { sql_result: { error: 'foo' } },
-            ]);
-            unhook();
-            resolve();
-          });
-        });
-      },
-    );
-  });
-
+// import * as ChildProcess from 'child_process';
+// import * as MySQL from 'mysql';
+// import { strict as Assert } from 'assert';
+// import { hookMySQL } from '../../../../../../lib/client/node/hook/mysql.js';
+//
+// const PORT = 3307;
+// const PATH = './tmp/test/data';
+//
+// const proceed = () =>
+//   new Promise((resolve, reject) => {
+//     const trace = [];
+//     const record = (...args) => {
+//       Assert.equal(args.length, 1);
+//       trace.push(args[0]);
+//     };
+//     const unhook = hookMySQL(record, () => ({
+//       recordCall: record,
+//       recordReturn: record,
+//     }));
+//     var connection = MySQL.createConnection({
+//       host: 'localhost',
+//       port: PORT,
+//       user: 'root',
+//     });
+//     connection.connect();
+//     connection.query(
+//       'SELECT ? * ? AS solution;',
+//       [2, 3],
+//       function (error, results) {
+//         if (error) {
+//           throw error;
+//         }
+//         Assert.equal(results[0].solution, 6);
+//         connection.query('INVALID SQL;', (error) => {
+//           Assert.ok(error instanceof Error);
+//           connection.end((error) => {
+//             if (error) {
+//               throw error;
+//             }
+//             Assert.deepEqual(trace.length, 4);
+//             Assert.equal(typeof trace[3].sql_result.error, 'string');
+//             trace[3].sql_result.error = 'foo';
+//             Assert.deepEqual(trace, [
+//               {
+//                 sql_query: {
+//                   database_type: 'mysql',
+//                   sql: 'SELECT ? * ? AS solution;',
+//                   parameters: [2, 3],
+//                   explain_sql: null,
+//                   server_version: null,
+//                 },
+//               },
+//               { sql_result: { error: null } },
+//               {
+//                 sql_query: {
+//                   database_type: 'mysql',
+//                   sql: 'INVALID SQL;',
+//                   parameters: null,
+//                   explain_sql: null,
+//                   server_version: null,
+//                 },
+//               },
+//               { sql_result: { error: 'foo' } },
+//             ]);
+//             unhook();
+//             resolve();
+//           });
+//         });
+//       },
+//     );
+//   });
+//
 // if (Reflect.getOwnPropertyDescriptor(process.env, 'TRAVIS')) {
 //   proceed();
 // } else {

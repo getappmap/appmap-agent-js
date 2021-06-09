@@ -1478,7 +1478,7 @@ class Location {
               source: source ? this.file
                 .getContent()
                 .substring(this.node.start, this.node.end) : null,
-              location: `${this.file.getPath()}:${this.node.loc.start.line}`,
+              location: `${this.file.getRelativePath()}:${this.node.loc.start.line}`,
               labels: [],
               comment: null,
               static: this.isStaticMethod(),
@@ -1804,7 +1804,7 @@ setVisitor(
           buildRegularProperty('method_id', buildLiteral(location.getName())),
           buildRegularProperty(
             'path',
-            buildLiteral(location.getFile().getPath()),
+            buildLiteral(location.getFile().getRelativePath()),
           ),
           buildRegularProperty('lineno', buildLiteral(location.getStartLine())),
           buildRegularProperty(
@@ -2307,7 +2307,7 @@ setVisitor(
         throw new Collision(
           `identifier collision detected at ${location
             .getFile()
-            .getPath()}@${location.getStartLine()}-${location.getStartColumn()}: ${
+            .getAbsolutePath()}@${location.getStartLine()}-${location.getStartColumn()}: ${
             node.name
           } should not start with ${session}`,
         );
@@ -2749,14 +2749,19 @@ class File {
     source,
     path,
     content = FileSystem__namespace.readFileSync(path, 'utf8'),
+    basedir = process.cwd()
   ) {
-    this.path = path;
+    this.absolute = Path__namespace.resolve(basedir, path);
+    this.relative = Path__namespace.relative(basedir, this.absolute);
     this.version = version;
     this.source = source;
     this.content = content;
   }
-  getPath() {
-    return this.path;
+  getAbsolutePath() {
+    return this.absolute;
+  }
+  getRelativePath() {
+    return this.relative;
   }
   getLanguageVersion() {
     return this.version;
@@ -2958,7 +2963,7 @@ class Appmap {
     };
     const key = this.origins.push(origin);
     return instrument(
-      new File(this.configuration.getLanguageVersion(), source, path, content),
+      new File(this.configuration.getLanguageVersion(), source, path, content, this.configuration.getBaseDirectory()),
       {
         session: this.session,
         origin: key,

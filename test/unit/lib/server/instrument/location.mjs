@@ -122,7 +122,10 @@ Assert.deepEqual(location1.wrapEntityArray([{ name: 'child' }], false), [
       },
     ],
   );
-  Assert.deepEqual(location2.wrapEntityArray([], false)[0].children[0].source, null);
+  Assert.deepEqual(
+    location2.wrapEntityArray([], false)[0].children[0].source,
+    null,
+  );
 }
 
 //////////////////////

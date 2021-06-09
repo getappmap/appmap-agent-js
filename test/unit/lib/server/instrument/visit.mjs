@@ -29,7 +29,7 @@ const output = {
 ].forEach(([excluded, entity], index) => {
   const options = {
     exclude: new Set(excluded ? ['???'] : []),
-    source: false
+    source: false,
   };
   const extended = {
     __proto__: null,
