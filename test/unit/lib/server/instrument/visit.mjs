@@ -29,6 +29,7 @@ const output = {
 ].forEach(([excluded, entity], index) => {
   const options = {
     exclude: new Set(excluded ? ['???'] : []),
+    source: false
   };
   const extended = {
     __proto__: null,
@@ -44,7 +45,7 @@ const output = {
     },
     wrapEntityArray(...args) {
       Assert.equal(this, extended);
-      Assert.deepEqual(args, [['entity1', 'entity2', 'entite3']]);
+      Assert.deepEqual(args, [['entity1', 'entity2', 'entity3'], false]);
       return [entity];
     },
   };
@@ -69,7 +70,7 @@ const output = {
         [
           {
             node: 'child2',
-            entities: ['entite3'],
+            entities: ['entity3'],
           },
         ],
       ];
@@ -96,7 +97,7 @@ const output = {
       : {
           node: output,
           entities:
-            entity === null ? ['entity1', 'entity2', 'entite3'] : [entity],
+            entity === null ? ['entity1', 'entity2', 'entity3'] : [entity],
         },
   );
 });

@@ -279,6 +279,7 @@
                   killSignal: {$ref: signal}
     # client
     recorder: {$ref: recorder}
+    source: {type: boolean}
     hooks:
       type: object
       additionalProperties: false

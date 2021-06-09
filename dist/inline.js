@@ -903,6 +903,11 @@ const infos = {
     normalize: identity,
     initial: 'normal',
   },
+  source: {
+    extend: overwrite,
+    normalize: identity,
+    initial: false,
+  },
   hooks: {
     extend: assign,
     normalize: normalizeHooks,
@@ -1161,6 +1166,7 @@ class Configuration {
       getInstrumentationDefault,
     );
     return {
+      source: this.data.source,
       enabled,
       shallow,
       exclude: [...exclude, ...this.data.exclude],
@@ -1455,7 +1461,7 @@ class Location {
     }
     return '@anonymous';
   }
-  wrapEntityArray(entities) {
+  wrapEntityArray(entities, source) {
     if (
       this.node.type === 'ArrowFunctionExpression' ||
       this.node.type === 'FunctionExpression' ||
@@ -1469,9 +1475,9 @@ class Location {
             {
               type: 'function',
               name: '()',
-              source: this.file
+              source: source ? this.file
                 .getContent()
-                .substring(this.node.start, this.node.end),
+                .substring(this.node.start, this.node.end) : null,
               location: `${this.file.getPath()}:${this.node.loc.start.line}`,
               labels: [],
               comment: null,
@@ -1554,7 +1560,7 @@ const visit = (node, { location, options }) => {
       }
     }
     node = join(node, context, ...fields);
-    entities = location.wrapEntityArray(entities);
+    entities = location.wrapEntityArray(entities, options.source);
   }
   return {
     node,
@@ -1609,6 +1615,13 @@ setVisitor(
 const buildBlockStatement = (nodes) => ({
   type: 'BlockStatement',
   body: nodes,
+});
+
+const buildConditionalExpression = (node1, node2, node3) => ({
+  type: 'ConditionalExpression',
+  test: node1,
+  consequent: node2,
+  alternate: node3
 });
 
 const buildCatchClause = (node1, node2) => ({
@@ -1899,12 +1912,34 @@ setVisitor(
       : [
           buildVariableDeclaration(
             'var',
-            children.map((child, index) =>
-              buildVariableDeclarator(
+            children.map((child, index) => {
+              // Special case for AssignmentPattern:
+              //
+              // function f (x = {}) {}
+              //
+              // function f (APPMAP_ARGUMENT_0) {
+              //   // does not work :(
+              //   var x = {} = APPMAP_ARGUMENT_0;
+              // }
+              if (child.type === "AssignmentPattern") {
+                return buildVariableDeclarator(
+                  child.left,
+                  buildConditionalExpression(
+                    buildBinaryExpression(
+                      "===",
+                      buildIdentifier(`${session}_ARGUMENT_${String(index)}`),
+                      buildRegularMemberExpression(session, 'undefined')
+                    ),
+                    child.right,
+                    buildIdentifier(`${session}_ARGUMENT_${String(index)}`),
+                  )
+                );
+              }
+              return buildVariableDeclarator(
                 child,
                 buildIdentifier(`${session}_ARGUMENT_${String(index)}`),
-              ),
-            ),
+              );
+            }),
           ),
         ];
 
@@ -2912,9 +2947,9 @@ class Appmap {
     if (!Path__namespace.isAbsolute(path)) {
       return new Left(`expected an absolute path and got: ${path}`);
     }
-    const { enabled, shallow, exclude } =
+    const instrumentation =
       this.configuration.getInstrumentation(path);
-    if (!enabled) {
+    if (!instrumentation.enabled) {
       return new Right(content);
     }
     const origin = {
@@ -2927,8 +2962,9 @@ class Appmap {
       {
         session: this.session,
         origin: key,
-        exclude: new Set(exclude),
-        shallow,
+        exclude: new Set(instrumentation.exclude),
+        shallow: instrumentation.shallow,
+        source: instrumentation.source
       },
     )
       .mapLeft((message) => {

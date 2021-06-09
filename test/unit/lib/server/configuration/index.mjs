@@ -119,6 +119,7 @@ Assert.deepEqual(
     .fromRight()
     .getInstrumentation('/base/qux.js'),
   {
+    source: false,
     enabled: true,
     shallow: true,
     exclude: ['bar', 'foo'],

@@ -102,7 +102,7 @@ const readEventArray = (path) =>
     unlink('tmp/test/mod-bar-1.appmap.json');
     Assert.equal(
       (
-        await main(process.cwd(), process.stdout, {
+        await main(process, {
           extends: 'tmp/test/appmap.json',
           protocol,
           _: [],

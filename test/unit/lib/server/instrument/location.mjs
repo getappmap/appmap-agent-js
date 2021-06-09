@@ -66,7 +66,7 @@ Assert.equal(location0.getFile(), file);
 
 const node1 = file.parse().fromRight();
 const location1 = location0.extend(node1);
-Assert.deepEqual(location1.wrapEntityArray([{ name: 'child' }]), [
+Assert.deepEqual(location1.wrapEntityArray([{ name: 'child' }], false), [
   { name: 'child' },
 ]);
 
@@ -79,7 +79,7 @@ Assert.deepEqual(location1.wrapEntityArray([{ name: 'child' }]), [
   {
     const node3 = node2.expression;
     const location3 = location2.extend(node3);
-    Assert.deepEqual(location3.wrapEntityArray([{ name: '@child' }]), [
+    Assert.deepEqual(location3.wrapEntityArray([{ name: '@child' }], false), [
       { name: '@child' },
     ]);
     Assert.equal(location3.isStaticMethod(), false);
@@ -101,7 +101,7 @@ Assert.deepEqual(location1.wrapEntityArray([{ name: 'child' }]), [
   const location2 = location1.extend(node2);
   Assert.equal(location2.getName(), '@f');
   Assert.deepEqual(
-    location2.wrapEntityArray([{ name: '@child' }, { name: '#child' }]),
+    location2.wrapEntityArray([{ name: '@child' }, { name: '#child' }], true),
     [
       {
         type: 'class',
@@ -122,6 +122,7 @@ Assert.deepEqual(location1.wrapEntityArray([{ name: 'child' }]), [
       },
     ],
   );
+  Assert.deepEqual(location2.wrapEntityArray([], false)[0].children[0].source, null);
 }
 
 //////////////////////
@@ -132,7 +133,7 @@ Assert.deepEqual(location1.wrapEntityArray([{ name: 'child' }]), [
   const location2 = location1.extend(node2);
   Assert.equal(location2.getName(), '@c');
   Assert.deepEqual(
-    location2.wrapEntityArray([{ name: '@child' }, { name: '#child' }]),
+    location2.wrapEntityArray([{ name: '@child' }, { name: '#child' }], false),
     [
       {
         type: 'class',
