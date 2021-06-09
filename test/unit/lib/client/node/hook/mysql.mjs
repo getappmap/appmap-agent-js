@@ -73,49 +73,49 @@ const proceed = () =>
 if (Reflect.getOwnPropertyDescriptor(process.env, 'TRAVIS')) {
   // noop;
 } else {
-  {
-    const { signal, status } = ChildProcess.spawnSync('rm', ['-rf', PATH], {
-      stdio: 'inherit',
-    });
-    Assert.equal(signal, null);
-    Assert.equal(status, 0);
-  }
-  {
-    const { signal, status } = ChildProcess.spawnSync(
-      '/usr/local/mysql/bin/mysqld',
-      [
-        '--initialize-insecure',
-        '--default-authentication-plugin=mysql_native_password',
-        '--datadir',
-        PATH,
-      ],
-      { stdio: 'inherit' },
-    );
-    Assert.equal(signal, null);
-    Assert.equal(status, 0);
-  }
-  const child = ChildProcess.spawn(
-    '/usr/local/mysql/bin/mysqld',
-    ['--port', String(PORT), '--datadir', PATH],
-    { stdio: 'inherit' },
-  );
-  process.on('exit', () => {
-    child.kill('SIGKILL');
-  });
-  const probe = () => {
-    const { status, signal } = ChildProcess.spawnSync(
-      '/usr/local/mysql/bin/mysqladmin',
-      ['--host', 'localhost', '--port', String(PORT), '--user', 'root', 'ping'],
-      { stdio: 'inherit' },
-    );
-    Assert.equal(signal, null);
-    if (status === 0) {
-      proceed().then(() => {
-        process.exit(0);
-      });
-    } else {
-      setTimeout(probe, 1000);
-    }
-  };
-  setTimeout(probe, 1000);
+  // {
+  //   const { signal, status } = ChildProcess.spawnSync('rm', ['-rf', PATH], {
+  //     stdio: 'inherit',
+  //   });
+  //   Assert.equal(signal, null);
+  //   Assert.equal(status, 0);
+  // }
+  // {
+  //   const { signal, status } = ChildProcess.spawnSync(
+  //     '/usr/local/mysql/bin/mysqld',
+  //     [
+  //       '--initialize-insecure',
+  //       '--default-authentication-plugin=mysql_native_password',
+  //       '--datadir',
+  //       PATH,
+  //     ],
+  //     { stdio: 'inherit' },
+  //   );
+  //   Assert.equal(signal, null);
+  //   Assert.equal(status, 0);
+  // }
+  // const child = ChildProcess.spawn(
+  //   '/usr/local/mysql/bin/mysqld',
+  //   ['--port', String(PORT), '--datadir', PATH],
+  //   { stdio: 'inherit' },
+  // );
+  // process.on('exit', () => {
+  //   child.kill('SIGKILL');
+  // });
+  // const probe = () => {
+  //   const { status, signal } = ChildProcess.spawnSync(
+  //     '/usr/local/mysql/bin/mysqladmin',
+  //     ['--host', 'localhost', '--port', String(PORT), '--user', 'root', 'ping'],
+  //     { stdio: 'inherit' },
+  //   );
+  //   Assert.equal(signal, null);
+  //   if (status === 0) {
+  //     proceed().then(() => {
+  //       process.exit(0);
+  //     });
+  //   } else {
+  //     setTimeout(probe, 1000);
+  //   }
+  // };
+  // setTimeout(probe, 1000);
 }

@@ -23,7 +23,7 @@ const database = new SQLite3.Database(':memory:');
   // invalid //
   await new Promise((resolve) => {
     database.run('syntax error;', (...args) => {
-      Assert.equal(args.length, 2);
+      Assert.equal(args.length, 1);
       Assert.ok(args[0] instanceof Error);
       Assert.equal(args[1], undefined);
       resolve();
@@ -32,7 +32,7 @@ const database = new SQLite3.Database(':memory:');
   // run //
   await new Promise((resolve) => {
     database.run('SELECT ? AS solution;', ['foo'], (...args) => {
-      Assert.deepEqual(args, [null, undefined]);
+      Assert.deepEqual(args, [null]);
       resolve();
     });
   });
@@ -81,7 +81,7 @@ const database = new SQLite3.Database(':memory:');
         Assert.deepEqual(args, [null]);
       })
       .run((...args) => {
-        Assert.deepEqual(args, [null, undefined]);
+        Assert.deepEqual(args, [null]);
         resolve();
       })
       .finalize();
