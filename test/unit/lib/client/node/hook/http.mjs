@@ -45,6 +45,11 @@ const makeRecord = () => {
         host: 'localhost',
         port: server.address().port,
         path: '/path?param=123#hash',
+        headers: {
+          'content-type': 'text/plain; charset=utf-8',
+          'authorization': 'username:password',
+          'host': `localhost:${server.address().port}`
+        }
       });
       request.on('response', (response) => {
         Assert.equal(response.statusCode, 200);
@@ -60,40 +65,43 @@ const makeRecord = () => {
               http_client_request: {
                 request_method: 'PUT',
                 url: `http://localhost:${server.address().port}/path`,
-                message: 'param=123#hash',
                 headers: {
                   host: `localhost:${server.address().port}`,
                   'content-type': 'text/plain; charset=utf-8',
+                  authorization: 'username:password'
                 },
               },
+              message: {param: '123'}
             },
             {
               http_server_request: {
                 request_method: 'PUT',
-                path_info: '/path?param=123#hash',
+                authorization: 'username:password',
+                mime_type: 'text/plain; charset=utf-8',
+                path_info: '/path',
                 normalized_path_info: null,
                 protocol: 'HTTP/1.1',
                 headers: {
                   host: `localhost:${server.address().port}`,
                   'content-type': 'text/plain; charset=utf-8',
+                  authorization: 'username:password',
                   connection: 'close',
                   'content-length': '3',
                 },
               },
-              message: null,
+              message: {
+                param: '123'
+              },
             },
             {
               http_server_response: {
                 status_code: 200,
-                status_message: 'OK',
                 mime_type: null,
-                headers: {},
               },
             },
             {
               http_client_response: {
                 status_code: 200,
-                status_message: 'OK',
                 mime_type: null,
                 headers: {
                   connection: 'close',
@@ -106,8 +114,6 @@ const makeRecord = () => {
           server.close();
         });
       });
-      request.setHeader('content-type', 'text/plain; charset=utf-8');
-      request.setHeader('host', `localhost:${server.address().port}`);
       request.end('foo', 'utf8');
     });
     server.listen(0);
@@ -142,15 +148,6 @@ const makeRecord = () => {
             if (
               Reflect.getOwnPropertyDescriptor(
                 event,
-                'http_server_response',
-              ) !== undefined
-            ) {
-              delete event.http_server_response.headers.date;
-              delete event.http_server_response.headers.etag;
-            }
-            if (
-              Reflect.getOwnPropertyDescriptor(
-                event,
                 'http_client_response',
               ) !== undefined
             ) {
@@ -163,12 +160,14 @@ const makeRecord = () => {
               http_client_request: {
                 request_method: 'GET',
                 url: 'http://localhost/123',
-                message: '',
                 headers: {},
               },
+              message: {}
             },
             {
               http_server_request: {
+                authorization: null,
+                mime_type: null,
                 request_method: 'GET',
                 path_info: '/123',
                 normalized_path_info: '/{foo}',
@@ -182,19 +181,12 @@ const makeRecord = () => {
             {
               http_server_response: {
                 status_code: 200,
-                status_message: 'OK',
                 mime_type: 'text/html; charset=utf-8',
-                headers: {
-                  'content-type': 'text/html; charset=utf-8',
-                  'content-length': '3',
-                  'x-powered-by': 'Express',
-                },
               },
             },
             {
               http_client_response: {
                 status_code: 200,
-                status_message: 'OK',
                 mime_type: 'text/html; charset=utf-8',
                 headers: {
                   connection: 'close',
