@@ -4,33 +4,50 @@ import { RootLocation } from '../../../../../lib/server/instrument/location.mjs'
 
 const path = 'test/unit/env/target/location.js';
 
+const designator = {
+  method_id: '()',
+  defined_class: null,
+  path,
+  lineno: null,
+  static: false,
+};
+
 const file = new File(
   2020,
   'module',
   path,
   `
-   x;
-  function f () {}
-  class c {
-    constructor () { "constructor"; }
-    m1 () { "m1"; }
-    static get m2 () { "m2"; }
-  }
-  var o = ({
-    k1: {k1},
-    "k2": {k2},
-    ["k3"]: {k3},
-    ["k" + "4"]: {k4},
-    k5 () { "k5"; },
-    get k6 () { "k6"; }
-  });
-  var o1 = {}, {o2, o3} = {};
-  o4 = {};
-  export default class {}
-  let g = function h () {}`,
+    x;
+    function f () {}
+    let g = function h () {}
+    export default function () {}
+    class c {
+      constructor () { "constructor"; }
+      m1 () { "m1"; }
+      static get m2 () { "m2"; }
+    }
+    ({
+      k1: () => "k1",
+      "k2": () => "k2",
+      ["k3"]: () => "k3",
+      ["k" + "4"]: () => "k4",
+      k5 () { "k5"; },
+      get k6 () { "k6"; }
+    });
+    var x1 = () => {};
+    (x2 = () => {});
+    (() => {});
+  `,
 );
 
-const location0 = new RootLocation(file);
+const location0 = new RootLocation({
+  file,
+  source: false,
+  origin: 'origin',
+  session: 'session',
+  counters: { arrow: 0 },
+  exclude: new Set(['f']),
+});
 Assert.equal(location0.getFile(), file);
 
 ///////////////////////
@@ -56,6 +73,9 @@ Assert.equal(location0.getFile(), file);
     },
   };
   const location1 = location0.extend(node1);
+  Assert.equal(location1.getFile(), file);
+  Assert.equal(location1.getOrigin(), 'origin');
+  Assert.equal(location1.getSession(), 'session');
   const location2 = location1.extend(node1[name]);
   Assert.equal(location2.isNonScopingIdentifier(), true);
 });
@@ -66,7 +86,7 @@ Assert.equal(location0.getFile(), file);
 
 const node1 = file.parse().fromRight();
 const location1 = location0.extend(node1);
-Assert.deepEqual(location1.wrapEntityArray([{ name: 'child' }], false), [
+Assert.deepEqual(location1.wrapEntityArray([{ name: 'child' }]), [
   { name: 'child' },
 ]);
 
@@ -79,17 +99,13 @@ Assert.deepEqual(location1.wrapEntityArray([{ name: 'child' }], false), [
   {
     const node3 = node2.expression;
     const location3 = location2.extend(node3);
-    Assert.deepEqual(location3.wrapEntityArray([{ name: '@child' }], false), [
-      { name: '@child' },
-    ]);
-    Assert.equal(location3.isStaticMethod(), false);
+    Assert.equal(location3.isExcluded(), false);
+    Assert.deepEqual(
+      location3.wrapEntityArray([{ name: 'child', bound: false }]),
+      [{ name: 'child', bound: false }],
+    );
     Assert.equal(location3.isNonScopingIdentifier(), false);
-    Assert.equal(location3.getStartLine(), 2);
-    Assert.equal(location3.getStartColumn(), 3);
     Assert.equal(location3.getFile(), file);
-    Assert.equal(location3.hasName(), false);
-    Assert.throws(() => location3.getKind());
-    Assert.equal(location3.getContainerName(), '#test/unit/env/target/location.js');
   }
 }
 
@@ -99,13 +115,15 @@ Assert.deepEqual(location1.wrapEntityArray([{ name: 'child' }], false), [
 {
   const node2 = node1.body[1];
   const location2 = location1.extend(node2);
-  Assert.equal(location2.getName(), '@f');
+  Assert.equal(location2.isExcluded(), true);
+  location2.common.source = true;
   Assert.deepEqual(
-    location2.wrapEntityArray([{ name: '@child' }, { name: '#child' }], true),
+    location2.wrapEntityArray([{ name: 'child', bound: false }]),
     [
       {
         type: 'class',
-        name: `@f`,
+        name: `f`,
+        bound: false,
         children: [
           {
             type: 'function',
@@ -116,34 +134,72 @@ Assert.deepEqual(location1.wrapEntityArray([{ name: 'child' }], false), [
             comment: null,
             static: false,
           },
-          { name: '@child' },
-          { name: '#child' },
+          { name: 'child', bound: false },
         ],
       },
     ],
   );
-  Assert.deepEqual(
-    location2.wrapEntityArray([], false)[0].children[0].source,
-    null,
-  );
+  location2.common.source = false;
+  Assert.deepEqual(location2.wrapEntityArray([])[0].children[0].source, null);
+}
+
+//////////////////////////////
+// Named FunctionExpression //
+//////////////////////////////
+{
+  const node2 = node1.body[2];
+  const location2 = location1.extend(node2);
+  {
+    const node3 = node2.declarations[0];
+    const location3 = location2.extend(node3);
+    {
+      const node4 = node3.init;
+      const location4 = location3.extend(node4);
+      Assert.deepEqual(location4.getClosureDesignator(), {
+        ...designator,
+        defined_class: 'h',
+        lineno: 4,
+      });
+    }
+  }
+}
+
+/////////////////////////////////
+// Default FunctionDeclaration //
+/////////////////////////////////
+{
+  const node2 = node1.body[3];
+  const location2 = location1.extend(node2);
+  {
+    const node3 = node2.declaration;
+    const location3 = location2.extend(node3);
+    Assert.deepEqual(location3.getClosureDesignator(), {
+      ...designator,
+      defined_class: 'default',
+      lineno: 5,
+    });
+  }
 }
 
 //////////////////////
 // ClassDeclaration //
 //////////////////////
 {
-  const node2 = node1.body[2];
+  const node2 = node1.body[4];
   const location2 = location1.extend(node2);
-  Assert.equal(location2.getName(), '@c');
   Assert.deepEqual(
-    location2.wrapEntityArray([{ name: '@child' }, { name: '#child' }], false),
+    location2.wrapEntityArray([
+      { name: 'child1', bound: false },
+      { name: 'child2', bound: true },
+    ]),
     [
       {
         type: 'class',
-        name: `@c`,
-        children: [{ name: '#child' }],
+        name: `c`,
+        bound: false,
+        children: [{ name: 'child2', bound: true }],
       },
-      { name: '@child' },
+      { name: 'child1', bound: false },
     ],
   );
   {
@@ -156,8 +212,11 @@ Assert.deepEqual(location1.wrapEntityArray([{ name: 'child' }], false), [
       {
         const node5 = node4.value;
         const location5 = location4.extend(node5);
-        Assert.equal(location5.getName(), 'constructor');
-        Assert.equal(location5.getContainerName(), '@c');
+        Assert.deepEqual(location5.getClosureDesignator(), {
+          ...designator,
+          defined_class: 'constructor',
+          lineno: 7,
+        });
       }
     }
     // method //
@@ -167,7 +226,11 @@ Assert.deepEqual(location1.wrapEntityArray([{ name: 'child' }], false), [
       {
         const node5 = node4.value;
         const location5 = location4.extend(node5);
-        Assert.equal(location5.getName(), 'm1');
+        Assert.deepEqual(location5.getClosureDesignator(), {
+          ...designator,
+          defined_class: 'm1',
+          lineno: 8,
+        });
       }
     }
     // static accessor //
@@ -177,8 +240,12 @@ Assert.deepEqual(location1.wrapEntityArray([{ name: 'child' }], false), [
       {
         const node5 = node4.value;
         const location5 = location4.extend(node5);
-        Assert.equal(location5.isStaticMethod(), true);
-        Assert.equal(location5.getName(), 'static get m2');
+        Assert.deepEqual(location5.getClosureDesignator(), {
+          ...designator,
+          defined_class: 'get m2',
+          lineno: 9,
+          static: true,
+        });
       }
     }
   }
@@ -188,14 +255,11 @@ Assert.deepEqual(location1.wrapEntityArray([{ name: 'child' }], false), [
 // ObjectExpression //
 //////////////////////
 {
-  const node2 = node1.body[3];
+  const node2 = node1.body[5];
   const location2 = location1.extend(node2);
   {
-    let node3 = node2.declarations[0];
+    let node3 = node2.expression;
     let location3 = location2.extend(node3);
-    node3 = node3.init;
-    location3 = location3.extend(node3);
-    Assert.equal(location3.getName(), '@o');
     // non-computed identifier key //
     {
       const node4 = node3.properties[0];
@@ -203,8 +267,11 @@ Assert.deepEqual(location1.wrapEntityArray([{ name: 'child' }], false), [
       {
         const node5 = node4.value;
         const location5 = location4.extend(node5);
-        Assert.equal(location5.getName(), 'k1');
-        Assert.equal(location5.getContainerName(), '@o');
+        Assert.deepEqual(location5.getClosureDesignator(), {
+          ...designator,
+          defined_class: 'k1',
+          lineno: 12,
+        });
       }
     }
     // non-computed literal key //
@@ -214,7 +281,11 @@ Assert.deepEqual(location1.wrapEntityArray([{ name: 'child' }], false), [
       {
         const node5 = node4.value;
         const location5 = location4.extend(node5);
-        Assert.equal(location5.getName(), '"k2"');
+        Assert.deepEqual(location5.getClosureDesignator(), {
+          ...designator,
+          defined_class: '"k2"',
+          lineno: 13,
+        });
       }
     }
     // computed literal key //
@@ -224,7 +295,11 @@ Assert.deepEqual(location1.wrapEntityArray([{ name: 'child' }], false), [
       {
         const node5 = node4.value;
         const location5 = location4.extend(node5);
-        Assert.equal(location5.getName(), '[#computed]');
+        Assert.deepEqual(location5.getClosureDesignator(), {
+          ...designator,
+          defined_class: '[#computed]',
+          lineno: 14,
+        });
       }
     }
     // computed key //
@@ -234,7 +309,11 @@ Assert.deepEqual(location1.wrapEntityArray([{ name: 'child' }], false), [
       {
         const node5 = node4.value;
         const location5 = location4.extend(node5);
-        Assert.equal(location5.getName(), '[#computed]');
+        Assert.deepEqual(location5.getClosureDesignator(), {
+          ...designator,
+          defined_class: '[#computed]',
+          lineno: 15,
+        });
       }
     }
     // method //
@@ -244,7 +323,11 @@ Assert.deepEqual(location1.wrapEntityArray([{ name: 'child' }], false), [
       {
         const node5 = node4.value;
         const location5 = location4.extend(node5);
-        Assert.equal(location5.getName(), 'k5');
+        Assert.deepEqual(location5.getClosureDesignator(), {
+          ...designator,
+          defined_class: 'k5',
+          lineno: 16,
+        });
       }
     }
     // accessor //
@@ -254,7 +337,11 @@ Assert.deepEqual(location1.wrapEntityArray([{ name: 'child' }], false), [
       {
         const node5 = node4.value;
         const location5 = location4.extend(node5);
-        Assert.equal(location5.getName(), 'get k6');
+        Assert.deepEqual(location5.getClosureDesignator(), {
+          ...designator,
+          defined_class: 'get k6',
+          lineno: 17,
+        });
       }
     }
   }
@@ -264,7 +351,7 @@ Assert.deepEqual(location1.wrapEntityArray([{ name: 'child' }], false), [
 // VariableDeclaration //
 /////////////////////////
 {
-  const node2 = node1.body[4];
+  const node2 = node1.body[6];
   const location2 = location1.extend(node2);
   // identifier pattern //
   {
@@ -273,17 +360,11 @@ Assert.deepEqual(location1.wrapEntityArray([{ name: 'child' }], false), [
     {
       const node4 = node3.init;
       const location4 = location3.extend(node4);
-      Assert.equal(location4.getName(), '@o1');
-    }
-  }
-  // non-identifier pattern //
-  {
-    const node3 = node2.declarations[1];
-    const location3 = location2.extend(node3);
-    {
-      const node4 = node3.init;
-      const location4 = location3.extend(node4);
-      Assert.equal(location4.getName(), '@anonymous');
+      Assert.deepEqual(location4.getClosureDesignator(), {
+        ...designator,
+        defined_class: 'x1',
+        lineno: 19,
+      });
     }
   }
 }
@@ -292,7 +373,7 @@ Assert.deepEqual(location1.wrapEntityArray([{ name: 'child' }], false), [
 // AssignmentExpression //
 //////////////////////////
 {
-  const node2 = node1.body[5];
+  const node2 = node1.body[7];
   const location2 = location1.extend(node2);
   {
     const node3 = node2.expression;
@@ -300,37 +381,29 @@ Assert.deepEqual(location1.wrapEntityArray([{ name: 'child' }], false), [
     {
       const node4 = node3.right;
       const location4 = location3.extend(node4);
-      Assert.equal(location4.getName(), '@o4');
+      Assert.deepEqual(location4.getClosureDesignator(), {
+        ...designator,
+        defined_class: 'x2',
+        lineno: 20,
+      });
     }
   }
 }
 
-//////////////////////////
-// AssignmentExpression //
-//////////////////////////
-{
-  const node2 = node1.body[6];
-  const location2 = location1.extend(node2);
-  {
-    const node3 = node2.declaration;
-    const location3 = location2.extend(node3);
-    Assert.deepEqual(location3.getName(), '@default');
-  }
-}
+///////////////
+// Anoynmous //
+///////////////
 
-//////////////////////////////
-// Named FunctionExpression //
-//////////////////////////////
 {
-  const node2 = node1.body[7];
+  const node2 = node1.body[8];
   const location2 = location1.extend(node2);
   {
-    const node3 = node2.declarations[0];
+    const node3 = node2.expression;
     const location3 = location2.extend(node3);
-    {
-      const node4 = node3.init;
-      const location4 = location3.extend(node4);
-      Assert.deepEqual(location4.getName(), '@h');
-    }
+    Assert.deepEqual(location3.getClosureDesignator(), {
+      ...designator,
+      defined_class: 'arrow#1',
+      lineno: 21,
+    });
   }
 }

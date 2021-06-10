@@ -15,7 +15,7 @@ FileSystem.writeFileSync(
       packages: [
         {
           path: 'main.js',
-        }
+        },
       ],
       children: [
         {
@@ -49,8 +49,5 @@ main(process, {
   extends: 'tmp/test/appmap.json',
   _: [],
 }).then((either) => {
-  Assert.equal(
-    either.fromRight(),
-    0,
-  );
+  Assert.equal(either.fromRight(), 0);
 });

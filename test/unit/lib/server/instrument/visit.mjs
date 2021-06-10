@@ -27,25 +27,16 @@ const output = {
   [false, 'entity0'],
   [true, null],
 ].forEach(([excluded, entity], index) => {
-  const options = {
-    exclude: new Set(excluded ? ['???'] : []),
-    source: false,
-  };
   const extended = {
     __proto__: null,
-    hasName(...args) {
+    isExcluded(...args) {
       Assert.equal(this, extended);
       Assert.deepEqual(args, []);
-      return true;
-    },
-    getName(...args) {
-      Assert.equal(this, extended);
-      Assert.deepEqual(args, []);
-      return '???';
+      return excluded;
     },
     wrapEntityArray(...args) {
       Assert.equal(this, extended);
-      Assert.deepEqual(args, [['entity1', 'entity2', 'entity3'], false]);
+      Assert.deepEqual(args, [['entity1', 'entity2', 'entity3']]);
       return [entity];
     },
   };
@@ -61,7 +52,7 @@ const output = {
     'Identifier',
     (...args) => {
       Assert.ok(!excluded);
-      Assert.deepEqual(args, [input, { location: extended, options }]);
+      Assert.deepEqual(args, [input, extended]);
       return [
         {
           node: 'child1',
@@ -77,18 +68,13 @@ const output = {
     },
     (...args) => {
       Assert.ok(!excluded);
-      Assert.deepEqual(args, [
-        input,
-        { location: extended, options },
-        'child1',
-        ['child2'],
-      ]);
+      Assert.deepEqual(args, [input, extended, 'child1', ['child2']]);
       return output;
     },
   );
 
   Assert.deepEqual(
-    visit(input, { location, options }),
+    visit(input, location),
     excluded
       ? {
           node: input,

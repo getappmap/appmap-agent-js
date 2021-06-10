@@ -1290,58 +1290,161 @@ class EitherMap extends Map {
   }
 }
 
-const isBound = ({ name }) => name[0] !== '@';
+const getBound = ({ bound }) => bound;
 
-const isNotBound = ({ name }) => name[0] === '@';
+const getNotBound = ({ bound }) => !bound;
+
+const getKeyName = (location) => {
+  assert(
+    location.node.type === 'Property' ||
+      location.node.type === 'MethodDefinition',
+    'invalid node type %o',
+    location.node.type,
+  );
+  if (location.node.computed) {
+    return '[#computed]';
+  }
+  if (location.node.key.type === 'Identifier') {
+    return location.node.key.name;
+  }
+  assert(location.node.key.type === 'Literal', 'invalid non-computed key node');
+  assert(
+    typeof location.node.key.value === 'string',
+    'invalid non-computed key literal node',
+  );
+  return JSON.stringify(location.node.key.value);
+};
+
+const getName = (location) => {
+  if (location.name === null) {
+    location.name = computeName(location);
+  }
+  return location.name;
+};
+
+const tags = {
+  __proto__: null,
+  ObjectExpression: 'object',
+  ArrowFunctionExpression: 'arrow',
+  FunctionExpression: 'function',
+  FunctionDeclaration: 'function',
+  ClassExpression: 'class',
+  ClassDeclaration: 'class',
+};
+
+const isObjectBound = (location) =>
+  location.parent.node.type === 'Property' &&
+  location.parent.node.value === location.node &&
+  location.parent.parent.node.type === 'ObjectExpression';
+
+const isClassBound = (location) =>
+  location.parent.node.type === 'MethodDefinition' &&
+  location.parent.node.value === location.node &&
+  location.parent.parent.node.type === 'ClassBody';
+
+const isBound = (location) => isObjectBound(location) || isClassBound(location);
+
+const computeName = (location) => {
+  // assert(location.hasName(), 'invalid node type %o for name query', location.node.type);
+  // if (location.node.type === "Program") {
+  //   return `#${location.common.file.getRelativePath()}`;
+  // }
+  assert(
+    location.node.type in tags,
+    'invalid node type %o for computing name',
+    location.node.type,
+  );
+  if (isObjectBound(location)) {
+    let name = '';
+    if (location.parent.node.kind !== 'init') {
+      name = `${name}${location.parent.node.kind} `;
+    }
+    name = `${name}${getKeyName(location.parent)}`;
+    return name;
+  }
+  if (isClassBound(location)) {
+    if (location.parent.node.kind === 'constructor') {
+      return 'constructor';
+    }
+    let name = getKeyName(location.parent);
+    if (location.parent.node.kind !== 'method') {
+      name = `${location.parent.node.kind} ${name}`;
+    }
+    return name;
+  }
+  if (
+    location.node.type === 'FunctionDeclaration' ||
+    location.node.type === 'ClassDeclaration'
+  ) {
+    return location.node.id === null ? 'default' : location.node.id.name;
+  }
+  if (
+    (location.node.type === 'FunctionExpression' ||
+      location.node.type === 'ClassExpression') &&
+    location.node.id !== null
+  ) {
+    return location.node.id.name;
+  }
+  if (
+    location.parent.node.type === 'AssignmentExpression' &&
+    location.parent.node.right === location.node &&
+    location.parent.node.operator === '=' &&
+    location.parent.node.left.type === 'Identifier'
+  ) {
+    return location.parent.node.left.name;
+  }
+  if (
+    location.parent.node.type === 'VariableDeclarator' &&
+    location.parent.node.init === location.node &&
+    location.parent.node.id.type === 'Identifier'
+  ) {
+    return location.parent.node.id.name;
+  }
+  const tag = tags[location.node.type];
+  return `${tag}#${(location.common.counters[tag] += 1)}`;
+};
 
 class Location {
-  constructor(node, location, file) {
+  constructor(node, location, common) {
     this.node = node;
     this.parent = location;
-    this.file = file;
+    this.common = common;
+    this.name = null;
   }
   extend(node) {
-    return new Location(node, this, this.file);
+    return new Location(node, this, this.common);
+  }
+  getOrigin(node) {
+    return this.common.origin;
+  }
+  getSession(node) {
+    return this.common.session;
   }
   getFile() {
-    return this.file;
+    return this.common.file;
   }
-  isProgram () {
-    return this.node.type === "Program";
-  }
-  isObjectProperty() {
-    return (
-      this.parent.node.type === 'Property' &&
-      this.parent.node.value === this.node &&
-      this.parent.parent.node.type === 'ObjectExpression'
+  getClosureDesignator() {
+    assert(
+      this.node.type === 'ArrowFunctionExpression' ||
+        this.node.type === 'FunctionExpression' ||
+        this.node.type === 'FunctionDeclaration',
+      'invalid node type %o for getClosureKey',
+      this.node.type,
     );
+    return {
+      path: this.common.file.getRelativePath(),
+      lineno: this.node.loc.start.line,
+      static:
+        this.node.type === 'FunctionExpression' &&
+        this.parent.node.type === 'MethodDefinition' &&
+        this.parent.node.value === this.node &&
+        this.parent.node.static,
+      defined_class: getName(this),
+      method_id: '()',
+    };
   }
-  isClassMethod() {
-    return (
-      this.parent.node.type === 'MethodDefinition' &&
-      this.parent.node.value === this.node &&
-      this.parent.parent.node.type === 'ClassBody'
-    );
-  }
-  getContainerName() {
-    if (this.parent.hasName()) {
-      return this.parent.getName();
-    }
-    return this.parent.getContainerName();
-  }
-  isStaticMethod() {
-    return (
-      this.node.type === 'FunctionExpression' &&
-      this.parent.node.type === 'MethodDefinition' &&
-      this.parent.node.value === this.node &&
-      this.parent.node.static
-    );
-  }
-  getStartLine() {
-    return this.node.loc.start.line;
-  }
-  getStartColumn() {
-    return this.node.loc.start.column;
+  isExcluded() {
+    return this.node.type in tags && this.common.exclude.has(getName(this));
   }
   isNonScopingIdentifier() {
     assert(
@@ -1375,121 +1478,35 @@ class Location {
     }
     return false;
   }
-  getKeyName() {
-    assert(
-      this.node.type === 'Property' || this.node.type === 'MethodDefinition',
-      'invalid node type %o',
-      this.node.type,
-    );
-    if (this.node.computed) {
-      return '[#computed]';
-    }
-    if (this.node.key.type === 'Identifier') {
-      return this.node.key.name;
-    }
-    assert(this.node.key.type === 'Literal', 'invalid non-computed key node');
-    assert(
-      typeof this.node.key.value === 'string',
-      'invalid non-computed key literal node',
-    );
-    return JSON.stringify(this.node.key.value);
-  }
-  hasName() {
-    return (
-      this.node.type === 'Program' ||
-      this.node.type === 'ObjectExpression' ||
-      this.node.type === 'ClassExpression' ||
-      this.node.type === 'ClassDeclaration' ||
-      this.node.type === 'FunctionExpression' ||
-      this.node.type === 'FunctionDeclaration' ||
-      this.node.type === 'ArrowFunctionExpression'
-    );
-  }
-  getName() {
-    assert(this.hasName(), 'invalid node for name query');
-    if (this.isProgram()) {
-      return `#${this.file.getRelativePath()}`;
-    }
-    if (this.isObjectProperty()) {
-      let name = '';
-      if (this.parent.node.kind !== 'init') {
-        name = `${name}${this.parent.node.kind} `;
-      }
-      name = `${name}${this.parent.getKeyName()}`;
-      return name;
-    }
-    if (this.isClassMethod()) {
-      if (this.parent.node.kind === 'constructor') {
-        return 'constructor';
-      }
-      let name = '';
-      if (this.parent.node.static) {
-        name = `${name}static `;
-      }
-      if (this.parent.node.kind !== 'method') {
-        name = `${name}${this.parent.node.kind} `;
-      }
-      name = `${name}${this.parent.getKeyName()}`;
-      return name;
-    }
-    if (
-      this.node.type === 'FunctionDeclaration' ||
-      this.node.type === 'ClassDeclaration'
-    ) {
-      if (this.node.id === null) {
-        return '@default';
-      }
-      return `@${this.node.id.name}`;
-    }
-    if (
-      (this.node.type === 'FunctionExpression' ||
-        this.node.type === 'ClassExpression') &&
-      this.node.id !== null
-    ) {
-      return `@${this.node.id.name}`;
-    }
-    if (
-      this.parent.node.type === 'AssignmentExpression' &&
-      this.parent.node.right === this.node &&
-      this.parent.node.operator === '=' &&
-      this.parent.node.left.type === 'Identifier'
-    ) {
-      return `@${this.parent.node.left.name}`;
-    }
-    if (
-      this.parent.node.type === 'VariableDeclarator' &&
-      this.parent.node.init === this.node &&
-      this.parent.node.id.type === 'Identifier'
-    ) {
-      return `@${this.parent.node.id.name}`;
-    }
-    return '@anonymous';
-  }
-  wrapEntityArray(entities, source) {
+  wrapEntityArray(entities) {
     if (
       this.node.type === 'ArrowFunctionExpression' ||
       this.node.type === 'FunctionExpression' ||
       this.node.type === 'FunctionDeclaration'
     ) {
+      assert(
+        entities.every(getNotBound),
+        'unbound code entity escaped to closure',
+      );
+      const designator = this.getClosureDesignator();
       return [
         {
           type: 'class',
-          name: this.getName(),
+          name: designator.defined_class,
+          bound: isBound(this),
           children: [
             {
               type: 'function',
-              name: '()',
-              source: source
-                ? this.file
+              source: this.common.source
+                ? this.common.file
                     .getContent()
                     .substring(this.node.start, this.node.end)
                 : null,
-              location: `${this.file.getRelativePath()}:${
-                this.node.loc.start.line
-              }`,
               labels: [],
               comment: null,
-              static: this.isStaticMethod(),
+              name: designator.method_id,
+              location: `${designator.path}:${designator.lineno}`,
+              static: designator.static,
             },
             ...entities,
           ],
@@ -1504,10 +1521,11 @@ class Location {
       return [
         {
           type: 'class',
-          name: this.getName(),
-          children: entities.filter(isBound),
+          name: getName(this),
+          bound: isBound(this),
+          children: entities.filter(getBound),
         },
-        ...entities.filter(isNotBound),
+        ...entities.filter(getNotBound),
       ];
     }
     return entities;
@@ -1515,16 +1533,16 @@ class Location {
 }
 
 class RootLocation {
-  constructor(file) {
+  constructor(common) {
     this.node = null;
     this.parent = null;
-    this.file = file;
+    this.common = common;
   }
   extend(node) {
-    return new Location(node, this, this.file);
+    return new Location(node, this, this.common);
   }
-  getFile(node) {
-    return this.file;
+  getFile() {
+    return this.common.file;
   }
 }
 
@@ -1549,14 +1567,13 @@ const getResultEntities = ({ entities }) => entities;
 
 const getResultNode = ({ node }) => node;
 
-const visit = (node, { location, options }) => {
+const visit = (node, location) => {
   location = location.extend(node);
   let entities = [];
   assert(node.type in visitors, 'invalid node type %o', node.type);
-  if (!location.hasName() || !options.exclude.has(location.getName())) {
-    const context = { location, options };
+  if (!location.isExcluded()) {
     const { split, join } = visitors[node.type];
-    const parts = split(node, context);
+    const parts = split(node, location);
     const fields = [];
     for (let index = 0; index < parts.length; index += 1) {
       if (Array.isArray(parts[index])) {
@@ -1567,8 +1584,8 @@ const visit = (node, { location, options }) => {
         fields[index] = parts[index].node;
       }
     }
-    node = join(node, context, ...fields);
-    entities = location.wrapEntityArray(entities, options.source);
+    node = join(node, location, ...fields);
+    entities = location.wrapEntityArray(entities);
   }
   return {
     node,
@@ -1578,8 +1595,8 @@ const visit = (node, { location, options }) => {
 
 setVisitor(
   'MethodDefinition',
-  (node, context) => [visit(node.key, context), visit(node.value, context)],
-  (node, context, child1, child2) => ({
+  (node, location) => [visit(node.key, location), visit(node.value, location)],
+  (node, location, child1, child2) => ({
     type: 'MethodDefinition',
     kind: node.kind,
     computed: node.computed,
@@ -1591,20 +1608,20 @@ setVisitor(
 
 setVisitor(
   'ClassBody',
-  (node, context) => [node.body.map((child) => visit(child, context))],
-  (node, context, children) => ({
+  (node, location) => [node.body.map((child) => visit(child, location))],
+  (node, location, children) => ({
     type: 'ClassBody',
     body: children,
   }),
 );
 
 {
-  const split = (node, context) => [
-    node.id === null ? getEmptyResult() : visit(node.id, context),
+  const split = (node, location) => [
+    node.id === null ? getEmptyResult() : visit(node.id, location),
     node.superClass === null
       ? getEmptyResult()
-      : visit(node.superClass, context),
-    visit(node.body, context),
+      : visit(node.superClass, location),
+    visit(node.body, location),
   ];
   const join = (node, location, child1, child2, child3) => ({
     type: node.type,
@@ -1742,19 +1759,21 @@ const buildRegularMemberExpression = (name1, name2) => ({
 // ReturnStatement //
 /////////////////////
 
-const joinReturnStatement = (node, { options: { session } }, child) => ({
+const joinReturnStatement = (node, location, child) => ({
   type: 'ReturnStatement',
   argument: buildAssignmentExpression(
     '=',
-    buildIdentifier(`${session}_SUCCESS`),
-    child === null ? buildRegularMemberExpression(session, 'undefined') : child,
+    buildIdentifier(`${location.getSession()}_SUCCESS`),
+    child === null
+      ? buildRegularMemberExpression(location.getSession(), 'undefined')
+      : child,
   ),
 });
 
 setVisitor(
   'ReturnStatement',
-  (node, context) => [
-    node.argument === null ? getEmptyResult() : visit(node.argument, context),
+  (node, location) => [
+    node.argument === null ? getEmptyResult() : visit(node.argument, location),
   ],
   joinReturnStatement,
 );
@@ -1764,157 +1783,182 @@ setVisitor(
 /////////////
 
 {
-  const makeSetupStatement = (node, { options: { session } }) =>
+  const makeSetupStatement = (node, location) =>
     buildVariableDeclaration('var', [
       buildVariableDeclarator(
-        buildIdentifier(`${session}_TIMER`),
+        buildIdentifier(`${location.getSession()}_TIMER`),
         buildCallExpression(
-          buildRegularMemberExpression(session, 'getNow'),
+          buildRegularMemberExpression(location.getSession(), 'getNow'),
           [],
         ),
       ),
       buildVariableDeclarator(
-        buildIdentifier(`${session}_EVENT_ID`),
+        buildIdentifier(`${location.getSession()}_EVENT_ID`),
         buildAssignmentExpression(
           '+=',
-          buildRegularMemberExpression(session, 'event'),
+          buildRegularMemberExpression(location.getSession(), 'event'),
           buildLiteral(1),
         ),
       ),
       buildVariableDeclarator(
-        buildIdentifier(`${session}_SUCCESS`),
-        buildRegularMemberExpression(session, 'empty'),
+        buildIdentifier(`${location.getSession()}_SUCCESS`),
+        buildRegularMemberExpression(location.getSession(), 'empty'),
       ),
       buildVariableDeclarator(
-        buildIdentifier(`${session}_FAILURE`),
-        buildRegularMemberExpression(session, 'empty'),
+        buildIdentifier(`${location.getSession()}_FAILURE`),
+        buildRegularMemberExpression(location.getSession(), 'empty'),
       ),
     ]);
 
-  const makeEnterStatement = (
-    node,
-    { location, options: { origin, session } },
-  ) =>
-    buildExpressionStatement(
-      buildCallExpression(buildRegularMemberExpression(session, 'record'), [
-        buildLiteral(origin),
-        buildObjectExpression([
-          buildRegularProperty('id', buildIdentifier(`${session}_EVENT_ID`)),
-          buildRegularProperty('event', buildLiteral('call')),
-          buildRegularProperty(
-            'thread_id',
-            buildRegularMemberExpression(session, 'pid'),
-          ),
-          buildRegularProperty(
-            'defined_class',
-            buildLiteral(location.getName()),
-          ),
-          buildRegularProperty('method_id', buildLiteral('()')),
-          buildRegularProperty(
-            'path',
-            buildLiteral(location.getFile().getRelativePath()),
-          ),
-          buildRegularProperty('lineno', buildLiteral(location.getStartLine())),
-          buildRegularProperty(
-            'receiver',
-            buildCallExpression(
-              buildRegularMemberExpression(session, 'serializeParameter'),
-              [
-                node.type === 'ArrowFunctionExpression'
-                  ? buildRegularMemberExpression(session, 'empty')
-                  : buildThisExpression(),
-                buildLiteral('this'),
-              ],
+  const makeEnterStatement = (node, location) => {
+    const designator = location.getClosureDesignator();
+    return buildExpressionStatement(
+      buildCallExpression(
+        buildRegularMemberExpression(location.getSession(), 'record'),
+        [
+          buildLiteral(location.getOrigin()),
+          buildObjectExpression([
+            buildRegularProperty(
+              'id',
+              buildIdentifier(`${location.getSession()}_EVENT_ID`),
             ),
-          ),
-          buildRegularProperty(
-            'parameters',
-            buildArrayExpression(
-              node.params.map((child, index) =>
-                buildCallExpression(
-                  buildRegularMemberExpression(session, 'serializeParameter'),
-                  [
-                    buildIdentifier(`${session}_ARGUMENT_${String(index)}`),
-                    buildLiteral(
-                      location
-                        .getFile()
-                        .getContent()
-                        .substring(child.start, child.end),
+            buildRegularProperty('event', buildLiteral('call')),
+            buildRegularProperty(
+              'thread_id',
+              buildRegularMemberExpression(location.getSession(), 'pid'),
+            ),
+            buildRegularProperty(
+              'defined_class',
+              buildLiteral(designator.defined_class),
+            ),
+            buildRegularProperty(
+              'method_id',
+              buildLiteral(designator.method_id),
+            ),
+            buildRegularProperty('path', buildLiteral(designator.path)),
+            buildRegularProperty('lineno', buildLiteral(designator.lineno)),
+            buildRegularProperty(
+              'receiver',
+              buildCallExpression(
+                buildRegularMemberExpression(
+                  location.getSession(),
+                  'serializeParameter',
+                ),
+                [
+                  node.type === 'ArrowFunctionExpression'
+                    ? buildRegularMemberExpression(
+                        location.getSession(),
+                        'empty',
+                      )
+                    : buildThisExpression(),
+                  buildLiteral('this'),
+                ],
+              ),
+            ),
+            buildRegularProperty(
+              'parameters',
+              buildArrayExpression(
+                node.params.map((child, index) =>
+                  buildCallExpression(
+                    buildRegularMemberExpression(
+                      location.getSession(),
+                      'serializeParameter',
                     ),
-                  ],
+                    [
+                      buildIdentifier(
+                        `${location.getSession()}_ARGUMENT_${String(index)}`,
+                      ),
+                      buildLiteral(
+                        location
+                          .getFile()
+                          .getContent()
+                          .substring(child.start, child.end),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-          buildRegularProperty(
-            'static',
-            buildLiteral(location.isStaticMethod()),
-          ),
-        ]),
-      ]),
+            buildRegularProperty('static', buildLiteral(designator.static)),
+          ]),
+        ],
+      ),
     );
+  };
 
-  const makeLeaveStatement = (node, { options: { session, origin } }) =>
+  const makeLeaveStatement = (node, location) =>
     buildExpressionStatement(
-      buildCallExpression(buildRegularMemberExpression(session, 'record'), [
-        buildLiteral(origin),
-        buildObjectExpression([
-          buildRegularProperty(
-            'id',
-            buildAssignmentExpression(
-              '+=',
-              buildRegularMemberExpression(session, 'event'),
-              buildLiteral(1),
-            ),
-          ),
-          buildRegularProperty('event', buildLiteral('return')),
-          buildRegularProperty(
-            'thread_id',
-            buildRegularMemberExpression(session, 'pid'),
-          ),
-          buildRegularProperty(
-            'parent_id',
-            buildIdentifier(`${session}_EVENT_ID`),
-          ),
-          buildRegularProperty(
-            'ellapsed',
-            buildBinaryExpression(
-              '-',
-              buildCallExpression(
-                buildRegularMemberExpression(session, 'getNow'),
-                [],
+      buildCallExpression(
+        buildRegularMemberExpression(location.getSession(), 'record'),
+        [
+          buildLiteral(location.getOrigin()),
+          buildObjectExpression([
+            buildRegularProperty(
+              'id',
+              buildAssignmentExpression(
+                '+=',
+                buildRegularMemberExpression(location.getSession(), 'event'),
+                buildLiteral(1),
               ),
-              buildIdentifier(`${session}_TIMER`),
             ),
-          ),
-          buildRegularProperty(
-            'return_value',
-            buildCallExpression(
-              buildRegularMemberExpression(session, 'serializeParameter'),
-              [buildIdentifier(`${session}_SUCCESS`), buildLiteral('return')],
+            buildRegularProperty('event', buildLiteral('return')),
+            buildRegularProperty(
+              'thread_id',
+              buildRegularMemberExpression(location.getSession(), 'pid'),
             ),
-          ),
-          buildRegularProperty(
-            'exceptions',
-            buildCallExpression(
-              buildRegularMemberExpression(session, 'serializeException'),
-              [buildIdentifier(`${session}_FAILURE`)],
+            buildRegularProperty(
+              'parent_id',
+              buildIdentifier(`${location.getSession()}_EVENT_ID`),
             ),
-          ),
-        ]),
-      ]),
-    );
-
-  const makeFailureStatement = (node, { options: { session } }) =>
-    buildThrowStatement(
-      buildAssignmentExpression(
-        '=',
-        buildIdentifier(`${session}_FAILURE`),
-        buildIdentifier(`${session}_ERROR`),
+            buildRegularProperty(
+              'ellapsed',
+              buildBinaryExpression(
+                '-',
+                buildCallExpression(
+                  buildRegularMemberExpression(location.getSession(), 'getNow'),
+                  [],
+                ),
+                buildIdentifier(`${location.getSession()}_TIMER`),
+              ),
+            ),
+            buildRegularProperty(
+              'return_value',
+              buildCallExpression(
+                buildRegularMemberExpression(
+                  location.getSession(),
+                  'serializeParameter',
+                ),
+                [
+                  buildIdentifier(`${location.getSession()}_SUCCESS`),
+                  buildLiteral('return'),
+                ],
+              ),
+            ),
+            buildRegularProperty(
+              'exceptions',
+              buildCallExpression(
+                buildRegularMemberExpression(
+                  location.getSession(),
+                  'serializeException',
+                ),
+                [buildIdentifier(`${location.getSession()}_FAILURE`)],
+              ),
+            ),
+          ]),
+        ],
       ),
     );
 
-  const makeHeadStatementArray = (node, { options: { session } }, children) =>
+  const makeFailureStatement = (node, location) =>
+    buildThrowStatement(
+      buildAssignmentExpression(
+        '=',
+        buildIdentifier(`${location.getSession()}_FAILURE`),
+        buildIdentifier(`${location.getSession()}_ERROR`),
+      ),
+    );
+
+  const makeHeadStatementArray = (node, location, children) =>
     children.length === 0
       ? []
       : [
@@ -1935,28 +1979,37 @@ setVisitor(
                   buildConditionalExpression(
                     buildBinaryExpression(
                       '===',
-                      buildIdentifier(`${session}_ARGUMENT_${String(index)}`),
-                      buildRegularMemberExpression(session, 'undefined'),
+                      buildIdentifier(
+                        `${location.getSession()}_ARGUMENT_${String(index)}`,
+                      ),
+                      buildRegularMemberExpression(
+                        location.getSession(),
+                        'undefined',
+                      ),
                     ),
                     child.right,
-                    buildIdentifier(`${session}_ARGUMENT_${String(index)}`),
+                    buildIdentifier(
+                      `${location.getSession()}_ARGUMENT_${String(index)}`,
+                    ),
                   ),
                 );
               }
               return buildVariableDeclarator(
                 child,
-                buildIdentifier(`${session}_ARGUMENT_${String(index)}`),
+                buildIdentifier(
+                  `${location.getSession()}_ARGUMENT_${String(index)}`,
+                ),
               );
             }),
           ),
         ];
 
-  const makeBodyStatementArray = (node, context, child) =>
+  const makeBodyStatementArray = (node, location, child) =>
     child.type === 'BlockStatement'
       ? child.body
-      : [joinReturnStatement(node, context, child)];
+      : [joinReturnStatement(node, location, child)];
 
-  const joinClosure = (node, context, child1, children, child2) => ({
+  const joinClosure = (node, location, child1, children, child2) => ({
     type: node.type,
     id: child1,
     expression: false,
@@ -1964,7 +2017,7 @@ setVisitor(
     generator: node.generator,
     params: node.params.map((child, index) => {
       let pattern = buildIdentifier(
-        `${context.options.session}_ARGUMENT_${String(index)}`,
+        `${location.getSession()}_ARGUMENT_${String(index)}`,
       );
       if (child.type === 'RestElement') {
         pattern = buildRestElement(pattern);
@@ -1972,30 +2025,30 @@ setVisitor(
       return pattern;
     }),
     body: buildBlockStatement([
-      makeSetupStatement(node, context),
-      makeEnterStatement(node, context),
+      makeSetupStatement(node, location),
+      makeEnterStatement(node, location),
       buildTryStatement(
         buildBlockStatement([
-          ...makeHeadStatementArray(node, context, children),
-          ...makeBodyStatementArray(node, context, child2),
+          ...makeHeadStatementArray(node, location, children),
+          ...makeBodyStatementArray(node, location, child2),
         ]),
         buildCatchClause(
-          buildIdentifier(`${context.options.session}_ERROR`),
-          buildBlockStatement([makeFailureStatement(node, context)]),
+          buildIdentifier(`${location.getSession()}_ERROR`),
+          buildBlockStatement([makeFailureStatement(node, location)]),
         ),
-        buildBlockStatement([makeLeaveStatement(node, context)]),
+        buildBlockStatement([makeLeaveStatement(node, location)]),
       ),
     ]),
   });
 
-  const splitClosure = (node, context) => [
+  const splitClosure = (node, location) => [
     node.type === 'ArrowFunctionExpression' || node.id === null
       ? getEmptyResult()
-      : visit(node.id, context),
+      : visit(node.id, location),
     node.params.map((child) =>
-      visit(child.type === 'RestElement' ? child.argument : child, context),
+      visit(child.type === 'RestElement' ? child.argument : child, location),
     ),
-    visit(node.body, context),
+    visit(node.body, location),
   ];
 
   setVisitor('ArrowFunctionExpression', splitClosure, joinClosure);
@@ -2015,7 +2068,7 @@ setVisitor(
 
 // ClassExpression cf visit-common-class.mjs
 
-setVisitor('Literal', getEmptyArray, (node, context) => {
+setVisitor('Literal', getEmptyArray, (node, location) => {
   if (Reflect.getOwnPropertyDescriptor(node, 'regex') !== undefined) {
     return {
       type: 'Literal',
@@ -2039,7 +2092,7 @@ setVisitor('Literal', getEmptyArray, (node, context) => {
   };
 });
 
-setVisitor('TemplateElement', getEmptyArray, (node, context) => ({
+setVisitor('TemplateElement', getEmptyArray, (node, location) => ({
   type: 'TemplateElement',
   tail: node.tail,
   value: {
@@ -2050,11 +2103,11 @@ setVisitor('TemplateElement', getEmptyArray, (node, context) => ({
 
 setVisitor(
   'TemplateLiteral',
-  (node, context) => [
-    node.quasis.map((child) => visit(child, context)),
-    node.expressions.map((child) => visit(child, context)),
+  (node, location) => [
+    node.quasis.map((child) => visit(child, location)),
+    node.expressions.map((child) => visit(child, location)),
   ],
-  (node, context, children1, children2) => ({
+  (node, location, children1, children2) => ({
     type: 'TemplateLiteral',
     quasis: children1,
     expressions: children2,
@@ -2063,8 +2116,8 @@ setVisitor(
 
 setVisitor(
   'TaggedTemplateExpression',
-  (node, context) => [visit(node.tag, context), visit(node.quasi, context)],
-  (node, context, child1, child2) => ({
+  (node, location) => [visit(node.tag, location), visit(node.quasi, location)],
+  (node, location, child1, child2) => ({
     type: 'TaggedTemplateExpression',
     tag: child1,
     quasi: child2,
@@ -2073,8 +2126,8 @@ setVisitor(
 
 setVisitor(
   'SpreadElement',
-  (node, context) => [visit(node.argument, context)],
-  (node, context, child) => ({
+  (node, location) => [visit(node.argument, location)],
+  (node, location, child) => ({
     type: 'SpreadElement',
     argument: child,
   }),
@@ -2082,12 +2135,12 @@ setVisitor(
 
 setVisitor(
   'ArrayExpression',
-  (node, context) => [
+  (node, location) => [
     node.elements.map((child) =>
-      child == null ? getEmptyResult() : visit(child, context),
+      child == null ? getEmptyResult() : visit(child, location),
     ),
   ],
-  (node, context, children) => ({
+  (node, location, children) => ({
     type: 'ArrayExpression',
     elements: children,
   }),
@@ -2095,8 +2148,8 @@ setVisitor(
 
 setVisitor(
   'Property',
-  (node, context) => [visit(node.key, context), visit(node.value, context)],
-  (node, context, child1, child2) => ({
+  (node, location) => [visit(node.key, location), visit(node.value, location)],
+  (node, location, child1, child2) => ({
     type: 'Property',
     kind: node.kind,
     method: node.method,
@@ -2109,8 +2162,8 @@ setVisitor(
 
 setVisitor(
   'ObjectExpression',
-  (node, context) => [node.properties.map((child) => visit(child, context))],
-  (node, context, children) => ({
+  (node, location) => [node.properties.map((child) => visit(child, location))],
+  (node, location, children) => ({
     type: 'ObjectExpression',
     properties: children,
   }),
@@ -2122,18 +2175,18 @@ setVisitor(
 
 // Identifier cf visit-common-other.mjs
 
-setVisitor('Super', getEmptyArray, (node, context) => ({
+setVisitor('Super', getEmptyArray, (node, location) => ({
   type: 'Super',
 }));
 
-setVisitor('ThisExpression', getEmptyArray, (node, context) => ({
+setVisitor('ThisExpression', getEmptyArray, (node, location) => ({
   type: 'ThisExpression',
 }));
 
 setVisitor(
   'AssignmentExpression',
-  (node, context) => [visit(node.left, context), visit(node.right, context)],
-  (node, context, child1, child2) => ({
+  (node, location) => [visit(node.left, location), visit(node.right, location)],
+  (node, location, child1, child2) => ({
     type: 'AssignmentExpression',
     operator: node.operator,
     left: child1,
@@ -2143,8 +2196,8 @@ setVisitor(
 
 setVisitor(
   'UpdateExpression',
-  (node, context) => [visit(node.argument, context)],
-  (node, context, child) => ({
+  (node, location) => [visit(node.argument, location)],
+  (node, location, child) => ({
     type: 'UpdateExpression',
     prefix: node.prefix,
     operator: node.operator,
@@ -2158,8 +2211,8 @@ setVisitor(
 
 setVisitor(
   'ImportExpression',
-  (node, context) => [visit(node.source, context)],
-  (node, context, child) => ({
+  (node, location) => [visit(node.source, location)],
+  (node, location, child) => ({
     type: 'ImportExpression',
     source: child,
   }),
@@ -2167,8 +2220,8 @@ setVisitor(
 
 setVisitor(
   'ChainExpression',
-  (node, context) => [visit(node.expression, context)],
-  (node, context, child) => ({
+  (node, location) => [visit(node.expression, location)],
+  (node, location, child) => ({
     type: 'ChainExpression',
     expression: child,
   }),
@@ -2176,8 +2229,8 @@ setVisitor(
 
 setVisitor(
   'AwaitExpression',
-  (node, context) => [visit(node.argument, context)],
-  (node, context, child) => ({
+  (node, location) => [visit(node.argument, location)],
+  (node, location, child) => ({
     type: 'AwaitExpression',
     argument: child,
   }),
@@ -2185,8 +2238,8 @@ setVisitor(
 
 setVisitor(
   'YieldExpression',
-  (node, context) => [visit(node.argument, context)],
-  (node, context, child) => ({
+  (node, location) => [visit(node.argument, location)],
+  (node, location, child) => ({
     type: 'YieldExpression',
     delegate: node.delegate,
     argument: child,
@@ -2195,12 +2248,12 @@ setVisitor(
 
 setVisitor(
   'ConditionalExpression',
-  (node, context) => [
-    visit(node.test, context),
-    visit(node.consequent, context),
-    visit(node.alternate, context),
+  (node, location) => [
+    visit(node.test, location),
+    visit(node.consequent, location),
+    visit(node.alternate, location),
   ],
-  (node, context, child1, child2, child3) => ({
+  (node, location, child1, child2, child3) => ({
     type: 'ConditionalExpression',
     test: child1,
     consequent: child2,
@@ -2210,8 +2263,8 @@ setVisitor(
 
 setVisitor(
   'LogicalExpression',
-  (node, context) => [visit(node.left, context), visit(node.right, context)],
-  (node, context, child1, child2) => ({
+  (node, location) => [visit(node.left, location), visit(node.right, location)],
+  (node, location, child1, child2) => ({
     type: 'LogicalExpression',
     operator: node.operator,
     left: child1,
@@ -2221,8 +2274,8 @@ setVisitor(
 
 setVisitor(
   'SequenceExpression',
-  (node, context) => [node.expressions.map((child) => visit(child, context))],
-  (node, context, children) => ({
+  (node, location) => [node.expressions.map((child) => visit(child, location))],
+  (node, location, children) => ({
     type: 'SequenceExpression',
     expressions: children,
   }),
@@ -2234,11 +2287,11 @@ setVisitor(
 
 setVisitor(
   'MemberExpression',
-  (node, context) => [
-    visit(node.object, context),
-    visit(node.property, context),
+  (node, location) => [
+    visit(node.object, location),
+    visit(node.property, location),
   ],
-  (node, context, child1, child2) => ({
+  (node, location, child1, child2) => ({
     type: 'MemberExpression',
     computed: node.computed,
     optional: node.optional,
@@ -2249,8 +2302,8 @@ setVisitor(
 
 setVisitor(
   'BinaryExpression',
-  (node, context) => [visit(node.left, context), visit(node.right, context)],
-  (node, context, child1, child2) => ({
+  (node, location) => [visit(node.left, location), visit(node.right, location)],
+  (node, location, child1, child2) => ({
     type: 'BinaryExpression',
     operator: node.operator,
     left: child1,
@@ -2260,8 +2313,8 @@ setVisitor(
 
 setVisitor(
   'UnaryExpression',
-  (node, context) => [visit(node.argument, context)],
-  (node, context, child) => ({
+  (node, location) => [visit(node.argument, location)],
+  (node, location, child) => ({
     type: 'UnaryExpression',
     operator: node.operator,
     prefix: node.prefix, // always true
@@ -2271,11 +2324,11 @@ setVisitor(
 
 setVisitor(
   'CallExpression',
-  (node, context) => [
-    visit(node.callee, context),
-    node.arguments.map((child) => visit(child, context)),
+  (node, location) => [
+    visit(node.callee, location),
+    node.arguments.map((child) => visit(child, location)),
   ],
-  (node, context, child, children) => ({
+  (node, location, child, children) => ({
     type: 'CallExpression',
     optional: node.optional,
     callee: child,
@@ -2285,11 +2338,11 @@ setVisitor(
 
 setVisitor(
   'NewExpression',
-  (node, context) => [
-    visit(node.callee, context),
-    node.arguments.map((child) => visit(child, context)),
+  (node, location) => [
+    visit(node.callee, location),
+    node.arguments.map((child) => visit(child, location)),
   ],
-  (node, context, child, children) => ({
+  (node, location, child, children) => ({
     type: 'NewExpression',
     callee: child,
     arguments: children,
@@ -2305,35 +2358,32 @@ class Collision {
   }
 }
 
-setVisitor(
-  'Identifier',
-  getEmptyArray,
-  (node, { location, options: { session } }) => {
-    if (!location.isNonScopingIdentifier()) {
-      if (node.name.startsWith(session)) {
-        // Would be cleaner to use either because this is not a bug
-        throw new Collision(
-          `identifier collision detected at ${location
-            .getFile()
-            .getAbsolutePath()}@${location.getStartLine()}-${location.getStartColumn()}: ${
-            node.name
-          } should not start with ${session}`,
-        );
-      }
-    }
-    return {
-      type: 'Identifier',
-      name: node.name,
-    };
-  },
-);
+setVisitor('Identifier', getEmptyArray, (node, location) => {
+  if (
+    node.name.startsWith(location.getSession()) &&
+    !location.isNonScopingIdentifier()
+  ) {
+    // Would be cleaner to use either because this is not a bug
+    throw new Collision(
+      `identifier collision detected at ${location
+        .getFile()
+        .getAbsolutePath()}@${node.loc.start.line}-${node.loc.start.column}: ${
+        node.name
+      } should not start with ${location.getSession()}`,
+    );
+  }
+  return {
+    type: 'Identifier',
+    name: node.name,
+  };
+});
 
 // Identifier cf visit-common-other.mjs
 
 setVisitor(
   'AssignmentPattern',
-  (node, context) => [visit(node.left, context), visit(node.right, context)],
-  (node, context, child1, chidl2) => ({
+  (node, location) => [visit(node.left, location), visit(node.right, location)],
+  (node, location, child1, chidl2) => ({
     type: 'AssignmentPattern',
     left: child1,
     right: chidl2,
@@ -2343,8 +2393,8 @@ setVisitor(
 // Property cf visit-common-other.mjs
 setVisitor(
   'ObjectPattern',
-  (node, context) => [node.properties.map((child) => visit(child, context))],
-  (node, context, children) => ({
+  (node, location) => [node.properties.map((child) => visit(child, location))],
+  (node, location, children) => ({
     type: 'ObjectPattern',
     properties: children,
   }),
@@ -2352,12 +2402,12 @@ setVisitor(
 
 setVisitor(
   'ArrayPattern',
-  (node, context) => [
+  (node, location) => [
     node.elements.map((child) =>
-      child === null ? getEmptyResult() : visit(child, context),
+      child === null ? getEmptyResult() : visit(child, location),
     ),
   ],
-  (node, context, children) => ({
+  (node, location, children) => ({
     type: 'ArrayPattern',
     elements: children,
   }),
@@ -2365,8 +2415,8 @@ setVisitor(
 
 setVisitor(
   'RestElement',
-  (node, context) => [visit(node.argument, context)],
-  (ndoe, context, child) => ({
+  (node, location) => [visit(node.argument, location)],
+  (ndoe, location, child) => ({
     type: 'RestElement',
     argument: child,
   }),
@@ -2374,8 +2424,8 @@ setVisitor(
 
 setVisitor(
   'Program',
-  (node, context) => [node.body.map((child) => visit(child, context))],
-  (node, context, children) => ({
+  (node, location) => [node.body.map((child) => visit(child, location))],
+  (node, location, children) => ({
     type: 'Program',
     sourceType: node.sourceType,
     body: children,
@@ -2388,14 +2438,14 @@ setVisitor(
 
 // ReturnStatement cf visit-common-closure.mjs
 
-setVisitor('EmptyStatement', getEmptyArray, (node, context) => ({
+setVisitor('EmptyStatement', getEmptyArray, (node, location) => ({
   type: 'EmptyStatement',
 }));
 
 setVisitor(
   'ThrowStatement',
-  (node, context) => [visit(node.argument, context)],
-  (node, context, child) => ({
+  (node, location) => [visit(node.argument, location)],
+  (node, location, child) => ({
     type: 'ThrowStatement',
     argument: child,
   }),
@@ -2403,23 +2453,23 @@ setVisitor(
 
 setVisitor(
   'ExpressionStatement',
-  (node, context) => [visit(node.expression, context)],
-  (node, context, child) => ({
+  (node, location) => [visit(node.expression, location)],
+  (node, location, child) => ({
     type: 'ExpressionStatement',
     expression: child,
   }),
 );
 
-setVisitor('DebuggerStatement', getEmptyArray, (node, context) => ({
+setVisitor('DebuggerStatement', getEmptyArray, (node, location) => ({
   type: 'DebuggerStatement',
 }));
 
 setVisitor(
   'BreakStatement',
-  (node, context) => [
-    node.label === null ? getEmptyResult() : visit(node.label, context),
+  (node, location) => [
+    node.label === null ? getEmptyResult() : visit(node.label, location),
   ],
-  (node, context, child) => ({
+  (node, location, child) => ({
     type: 'BreakStatement',
     label: child,
   }),
@@ -2427,10 +2477,10 @@ setVisitor(
 
 setVisitor(
   'ContinueStatement',
-  (node, context) => [
-    node.label === null ? getEmptyResult() : visit(node.label, context),
+  (node, location) => [
+    node.label === null ? getEmptyResult() : visit(node.label, location),
   ],
-  (node, context, child) => ({
+  (node, location, child) => ({
     type: 'ContinueStatement',
     label: child,
   }),
@@ -2445,11 +2495,11 @@ setVisitor(
 
 setVisitor(
   'VariableDeclarator',
-  (node, context) => [
-    visit(node.id, context),
-    node.init === null ? getEmptyResult() : visit(node.init, context),
+  (node, location) => [
+    visit(node.id, location),
+    node.init === null ? getEmptyResult() : visit(node.init, location),
   ],
-  (node, context, child1, child2) => ({
+  (node, location, child1, child2) => ({
     type: 'VariableDeclarator',
     id: child1,
     init: child2,
@@ -2458,8 +2508,10 @@ setVisitor(
 
 setVisitor(
   'VariableDeclaration',
-  (node, context) => [node.declarations.map((child) => visit(child, context))],
-  (node, context, children) => ({
+  (node, location) => [
+    node.declarations.map((child) => visit(child, location)),
+  ],
+  (node, location, children) => ({
     type: 'VariableDeclaration',
     kind: node.kind,
     declarations: children,
@@ -2468,11 +2520,11 @@ setVisitor(
 
 setVisitor(
   'ImportSpecifier',
-  (node, context) => [
-    visit(node.local, context),
-    visit(node.imported, context),
+  (node, location) => [
+    visit(node.local, location),
+    visit(node.imported, location),
   ],
-  (node, context, child1, child2) => ({
+  (node, location, child1, child2) => ({
     type: 'ImportSpecifier',
     local: child1,
     imported: child2,
@@ -2481,8 +2533,8 @@ setVisitor(
 
 setVisitor(
   'ImportDefaultSpecifier',
-  (node, context) => [visit(node.local, context)],
-  (node, context, child) => ({
+  (node, location) => [visit(node.local, location)],
+  (node, location, child) => ({
     type: 'ImportDefaultSpecifier',
     local: child,
   }),
@@ -2490,8 +2542,8 @@ setVisitor(
 
 setVisitor(
   'ImportNamespaceSpecifier',
-  (node, context) => [visit(node.local, context)],
-  (node, context, child) => ({
+  (node, location) => [visit(node.local, location)],
+  (node, location, child) => ({
     type: 'ImportNamespaceSpecifier',
     local: child,
   }),
@@ -2499,11 +2551,11 @@ setVisitor(
 
 setVisitor(
   'ImportDeclaration',
-  (node, context) => [
-    node.specifiers.map((child) => visit(child, context)),
-    visit(node.source, context),
+  (node, location) => [
+    node.specifiers.map((child) => visit(child, location)),
+    visit(node.source, location),
   ],
-  (node, context, children, child) => ({
+  (node, location, children, child) => ({
     type: 'ImportDeclaration',
     specifiers: children,
     source: child,
@@ -2512,11 +2564,11 @@ setVisitor(
 
 setVisitor(
   'ExportSpecifier',
-  (node, context) => [
-    visit(node.local, context),
-    visit(node.exported, context),
+  (node, location) => [
+    visit(node.local, location),
+    visit(node.exported, location),
   ],
-  (node, context, child1, child2) => ({
+  (node, location, child1, child2) => ({
     type: 'ExportSpecifier',
     local: child1,
     exported: child2,
@@ -2525,14 +2577,14 @@ setVisitor(
 
 setVisitor(
   'ExportNamedDeclaration',
-  (node, context) => [
+  (node, location) => [
     node.declaration === null
       ? getEmptyResult()
-      : visit(node.declaration, context),
-    node.specifiers.map((child) => visit(child, context)),
-    node.source === null ? getEmptyResult() : visit(node.source, context),
+      : visit(node.declaration, location),
+    node.specifiers.map((child) => visit(child, location)),
+    node.source === null ? getEmptyResult() : visit(node.source, location),
   ],
-  (node, context, child1, children, child2) => ({
+  (node, location, child1, children, child2) => ({
     type: 'ExportNamedDeclaration',
     declaration: child1,
     specifiers: children,
@@ -2542,8 +2594,8 @@ setVisitor(
 
 setVisitor(
   'ExportDefaultDeclaration',
-  (node, context) => [visit(node.declaration, context)],
-  (node, context, child) => ({
+  (node, location) => [visit(node.declaration, location)],
+  (node, location, child) => ({
     type: 'ExportDefaultDeclaration',
     declaration: child,
   }),
@@ -2551,8 +2603,8 @@ setVisitor(
 
 setVisitor(
   'ExportAllDeclaration',
-  (node, context) => [visit(node.source, context)],
-  (node, context, child) => ({
+  (node, location) => [visit(node.source, location)],
+  (node, location, child) => ({
     type: 'ExportAllDeclaration',
     source: child,
   }),
@@ -2564,8 +2616,8 @@ setVisitor(
 
 setVisitor(
   'BlockStatement',
-  (node, context) => [node.body.map((child) => visit(child, context))],
-  (node, context, children) => ({
+  (node, location) => [node.body.map((child) => visit(child, location))],
+  (node, location, children) => ({
     type: 'BlockStatement',
     body: children,
   }),
@@ -2573,8 +2625,11 @@ setVisitor(
 
 setVisitor(
   'WithStatement',
-  (node, context) => [visit(node.object, context), visit(node.body, context)],
-  (node, context, child1, child2) => ({
+  (node, location) => [
+    visit(node.object, location),
+    visit(node.body, location),
+  ],
+  (node, location, child1, child2) => ({
     type: 'WithStatement',
     object: child1,
     body: child2,
@@ -2583,8 +2638,8 @@ setVisitor(
 
 setVisitor(
   'LabeledStatement',
-  (node, context) => [visit(node.label, context), visit(node.body, context)],
-  (node, context, child1, child2) => ({
+  (node, location) => [visit(node.label, location), visit(node.body, location)],
+  (node, location, child1, child2) => ({
     type: 'LabeledStatement',
     label: child1,
     body: child2,
@@ -2593,12 +2648,14 @@ setVisitor(
 
 setVisitor(
   'IfStatement',
-  (node, context) => [
-    visit(node.test, context),
-    visit(node.consequent, context),
-    node.alternate === null ? getEmptyResult() : visit(node.alternate, context),
+  (node, location) => [
+    visit(node.test, location),
+    visit(node.consequent, location),
+    node.alternate === null
+      ? getEmptyResult()
+      : visit(node.alternate, location),
   ],
-  (node, context, child1, child2, child3) => ({
+  (node, location, child1, child2, child3) => ({
     type: 'IfStatement',
     test: child1,
     consequent: child2,
@@ -2608,11 +2665,11 @@ setVisitor(
 
 setVisitor(
   'CatchClause',
-  (node, context) => [
-    node.param === null ? getEmptyResult() : visit(node.param, context),
-    visit(node.body, context),
+  (node, location) => [
+    node.param === null ? getEmptyResult() : visit(node.param, location),
+    visit(node.body, location),
   ],
-  (node, context, child1, child2) => ({
+  (node, location, child1, child2) => ({
     type: 'CatchClause',
     param: child1,
     body: child2,
@@ -2621,12 +2678,14 @@ setVisitor(
 
 setVisitor(
   'TryStatement',
-  (node, context) => [
-    visit(node.block, context),
-    node.handler === null ? getEmptyResult() : visit(node.handler, context),
-    node.finalizer === null ? getEmptyResult() : visit(node.finalizer, context),
+  (node, location) => [
+    visit(node.block, location),
+    node.handler === null ? getEmptyResult() : visit(node.handler, location),
+    node.finalizer === null
+      ? getEmptyResult()
+      : visit(node.finalizer, location),
   ],
-  (node, context, child1, child2, child3) => ({
+  (node, location, child1, child2, child3) => ({
     type: 'TryStatement',
     block: child1,
     handler: child2,
@@ -2636,8 +2695,8 @@ setVisitor(
 
 setVisitor(
   'WhileStatement',
-  (node, context) => [visit(node.test, context), visit(node.body, context)],
-  (node, context, child1, child2) => ({
+  (node, location) => [visit(node.test, location), visit(node.body, location)],
+  (node, location, child1, child2) => ({
     type: 'WhileStatement',
     test: child1,
     body: child2,
@@ -2646,8 +2705,8 @@ setVisitor(
 
 setVisitor(
   'DoWhileStatement',
-  (node, context) => [visit(node.test, context), visit(node.body, context)],
-  (node, context, child1, child2) => ({
+  (node, location) => [visit(node.test, location), visit(node.body, location)],
+  (node, location, child1, child2) => ({
     type: 'DoWhileStatement',
     test: child1,
     body: child2,
@@ -2656,13 +2715,13 @@ setVisitor(
 
 setVisitor(
   'ForStatement',
-  (node, context) => [
-    node.init === null ? getEmptyResult() : visit(node.init, context),
-    node.test === null ? getEmptyResult() : visit(node.test, context),
-    node.update === null ? getEmptyResult() : visit(node.update, context),
-    visit(node.body, context),
+  (node, location) => [
+    node.init === null ? getEmptyResult() : visit(node.init, location),
+    node.test === null ? getEmptyResult() : visit(node.test, location),
+    node.update === null ? getEmptyResult() : visit(node.update, location),
+    visit(node.body, location),
   ],
-  (node, context, child1, child2, child3, child4) => ({
+  (node, location, child1, child2, child3, child4) => ({
     type: 'ForStatement',
     init: child1,
     test: child2,
@@ -2673,12 +2732,12 @@ setVisitor(
 
 setVisitor(
   'ForOfStatement',
-  (node, context) => [
-    visit(node.left, context),
-    visit(node.right, context),
-    visit(node.body, context),
+  (node, location) => [
+    visit(node.left, location),
+    visit(node.right, location),
+    visit(node.body, location),
   ],
-  (node, context, child1, child2, child3) => ({
+  (node, location, child1, child2, child3) => ({
     type: 'ForOfStatement',
     await: node.await,
     left: child1,
@@ -2689,12 +2748,12 @@ setVisitor(
 
 setVisitor(
   'ForInStatement',
-  (node, context) => [
-    visit(node.left, context),
-    visit(node.right, context),
-    visit(node.body, context),
+  (node, location) => [
+    visit(node.left, location),
+    visit(node.right, location),
+    visit(node.body, location),
   ],
-  (node, context, child1, child2, child3) => ({
+  (node, location, child1, child2, child3) => ({
     type: 'ForInStatement',
     left: child1,
     right: child2,
@@ -2704,11 +2763,11 @@ setVisitor(
 
 setVisitor(
   'SwitchCase',
-  (node, context) => [
-    node.test === null ? getEmptyResult() : visit(node.test, context),
-    node.consequent.map((child) => visit(child, context)),
+  (node, location) => [
+    node.test === null ? getEmptyResult() : visit(node.test, location),
+    node.consequent.map((child) => visit(child, location)),
   ],
-  (node, context, child, children) => ({
+  (node, location, child, children) => ({
     type: 'SwitchCase',
     test: child,
     consequent: children,
@@ -2717,29 +2776,30 @@ setVisitor(
 
 setVisitor(
   'SwitchStatement',
-  (node, context) => [
-    visit(node.discriminant, context),
-    node.cases.map((child) => visit(child, context)),
+  (node, location) => [
+    visit(node.discriminant, location),
+    node.cases.map((child) => visit(child, location)),
   ],
-  (node, context, child, children) => ({
+  (node, location, child, children) => ({
     type: 'SwitchStatement',
     discriminant: child,
     cases: children,
   }),
 );
 
-const instrument = (file, options) => {
+const instrument = (options) => {
   try {
-    return file.parse().mapRight((node) => {
-      const result = visit(node, {
-        location: new RootLocation(file),
-        options,
+    const location = new RootLocation(options);
+    return location
+      .getFile()
+      .parse()
+      .mapRight((node) => {
+        const result = visit(node, location);
+        return {
+          content: escodegen.generate(getResultNode(result)),
+          entities: getResultEntities(result),
+        };
       });
-      return {
-        content: escodegen.generate(getResultNode(result)),
-        entities: getResultEntities(result),
-      };
-    });
     // c8 vs node12
     /* c8 ignore start */
   } catch (error) {
@@ -2926,6 +2986,12 @@ class Appmap {
     this.origins = new EitherMap();
     this.recordings = new EitherMap();
     this.terminated = false;
+    this.counters = {
+      object: 0,
+      arrow: 0,
+      class: 0,
+      function: 0,
+    };
   }
   initialize(session) {
     assert(this.session === null, 'already initialized appmap %o', this);
@@ -2969,22 +3035,21 @@ class Appmap {
       entities: null,
     };
     const key = this.origins.push(origin);
-    return instrument(
-      new File(
+    return instrument({
+      file: new File(
         this.configuration.getLanguageVersion(),
         source,
         path,
         content,
         this.configuration.getBaseDirectory(),
       ),
-      {
-        session: this.session,
-        origin: key,
-        exclude: new Set(instrumentation.exclude),
-        shallow: instrumentation.shallow,
-        source: instrumentation.source,
-      },
-    )
+      session: this.session,
+      origin: key,
+      exclude: new Set(instrumentation.exclude),
+      shallow: instrumentation.shallow,
+      source: instrumentation.source,
+      counters: this.counters,
+    })
       .mapLeft((message) => {
         this.origins.delete(key).fromRight();
         return message;

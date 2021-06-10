@@ -21,25 +21,39 @@ import {
 ].forEach((type) => {
   setVisitor(
     type,
-    (node, context) => [],
-    (node, context, child) => node,
+    (node, location) => [],
+    (node, location, child) => node,
   );
 });
 
 export const test = (options) => {
-  const { path, ecma, source, input, output, session, origin, keys } = {
-    path: 'filname.js',
-    ecma: 2020,
-    source: 'script',
-    input: null,
-    output: null,
-    session: '$',
-    origin: 'origin',
-    keys: null,
-    ...options,
-  };
+  const { path, ecma, source, input, output, session, origin, keys, exclude } =
+    {
+      path: 'filname.js',
+      ecma: 2020,
+      source: 'script',
+      input: null,
+      output: null,
+      session: '$',
+      origin: 'origin',
+      exclude: new Set(),
+      keys: null,
+      ...options,
+    };
   const file = new File(ecma, source, path, input);
-  let location = new RootLocation(file);
+  let location = new RootLocation({
+    file,
+    origin,
+    session,
+    exclude,
+    source: false,
+    counters: {
+      object: 0,
+      class: 0,
+      arrow: 0,
+      function: 0,
+    },
+  });
   let node1 = file.parse().fromRight();
   let node2 = node1;
   if (output !== null) {
@@ -57,13 +71,6 @@ export const test = (options) => {
       step(key);
     }
   });
-  const result = visit(node1, {
-    location,
-    options: {
-      session,
-      origin,
-      exclude: new Set(),
-    },
-  });
+  const result = visit(node1, location);
   Assert.equal(escodegen(getResultNode(result)), escodegen(node2));
 };
