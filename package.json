@@ -1,6 +1,6 @@
 {
   "name": "@appland/appmap-agent-js",
-  "version": "3.3.10",
+  "version": "3.3.11",
   "os": [
     "linux",
     "darwin"
@@ -21,7 +21,7 @@
   "scripts": {
     "coverage": "npx c8 --reporter=html --require $TARGET node test/unit/$TARGET",
     "build": "node build/index.mjs",
-    "prettify": "npx prettier --write 'lib/server/**/*.mjs' 'lib/client/**/*.js' 'test/**/*.mjs' 'bin/*.mjs' 'build/*.mjs'",
+    "prettier": "npx prettier --write 'lib/server/**/*.mjs' 'lib/client/**/*.js' 'test/**/*.mjs' 'bin/*.mjs' 'build/*.mjs'",
     "commit": "npx cz",
     "lint": "npx eslint 'lib/client/**/*.js' 'lib/server/**/*.mjs' 'test/**/*.mjs' 'bin/*.mjs' 'build/*.mjs'",
     "test": "node test/unit/index.mjs",

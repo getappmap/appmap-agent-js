@@ -47,9 +47,9 @@ const makeRecord = () => {
         path: '/path?param=123#hash',
         headers: {
           'content-type': 'text/plain; charset=utf-8',
-          'authorization': 'username:password',
-          'host': `localhost:${server.address().port}`
-        }
+          authorization: 'username:password',
+          host: `localhost:${server.address().port}`,
+        },
       });
       request.on('response', (response) => {
         Assert.equal(response.statusCode, 200);
@@ -68,19 +68,20 @@ const makeRecord = () => {
                 headers: {
                   host: `localhost:${server.address().port}`,
                   'content-type': 'text/plain; charset=utf-8',
-                  authorization: 'username:password'
+                  authorization: 'username:password',
                 },
               },
-              message: {param: '123'}
+              message: [
+                {
+                  name: 'param',
+                  object_id: null,
+                  class: 'string',
+                  value: '123',
+                },
+              ],
             },
             {
               http_server_request: {
-                request_method: 'PUT',
-                authorization: 'username:password',
-                mime_type: 'text/plain; charset=utf-8',
-                path_info: '/path',
-                normalized_path_info: null,
-                protocol: 'HTTP/1.1',
                 headers: {
                   host: `localhost:${server.address().port}`,
                   'content-type': 'text/plain; charset=utf-8',
@@ -88,10 +89,21 @@ const makeRecord = () => {
                   connection: 'close',
                   'content-length': '3',
                 },
+                authorization: 'username:password',
+                mime_type: 'text/plain; charset=utf-8',
+                request_method: 'PUT',
+                path_info: '/path',
+                normalized_path_info: null,
+                protocol: 'HTTP/1.1',
               },
-              message: {
-                param: '123'
-              },
+              message: [
+                {
+                  name: 'param',
+                  object_id: null,
+                  class: 'string',
+                  value: '123',
+                },
+              ],
             },
             {
               http_server_response: {
@@ -101,12 +113,12 @@ const makeRecord = () => {
             },
             {
               http_client_response: {
-                status_code: 200,
-                mime_type: null,
                 headers: {
                   connection: 'close',
                   'content-length': '3',
                 },
+                status_code: 200,
+                mime_type: null,
               },
             },
           ]);
@@ -162,21 +174,28 @@ const makeRecord = () => {
                 url: 'http://localhost/123',
                 headers: {},
               },
-              message: {}
+              message: [],
             },
             {
               http_server_request: {
+                headers: {
+                  connection: 'close',
+                },
                 authorization: null,
                 mime_type: null,
                 request_method: 'GET',
                 path_info: '/123',
                 normalized_path_info: '/{foo}',
                 protocol: 'HTTP/1.1',
-                headers: {
-                  connection: 'close',
-                },
               },
-              message: { foo: '123' },
+              message: [
+                {
+                  name: 'foo',
+                  object_id: null,
+                  class: 'string',
+                  value: '123',
+                },
+              ],
             },
             {
               http_server_response: {
@@ -186,14 +205,14 @@ const makeRecord = () => {
             },
             {
               http_client_response: {
-                status_code: 200,
-                mime_type: 'text/html; charset=utf-8',
                 headers: {
                   connection: 'close',
                   'content-type': 'text/html; charset=utf-8',
                   'content-length': '3',
                   'x-powered-by': 'Express',
                 },
+                status_code: 200,
+                mime_type: 'text/html; charset=utf-8',
               },
             },
           ]);
