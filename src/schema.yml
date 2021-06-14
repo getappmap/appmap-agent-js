@@ -320,6 +320,7 @@
     # recording
     recording:
       anyOf:
+        - const: null
         - type: string
           pattern: "^[^.]+.[^.]+$"
         - type: object
@@ -327,13 +328,9 @@
           required: [defined-class, method-id]
           properties:
             defined-class:
-              anyOf:
-                - const: null
-                - type: string
+              type: string
             method-id:
-              anyOf:
-                - const: null
-                - type: string
+              type: string
     class-map-pruning: {type: boolean} # the code entities of a file are only included if the file fired a recorded event
     event-pruning: {type: boolean} # events are only recorded if they originated from an included file
     output:
