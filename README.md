@@ -50,7 +50,7 @@ For instance using the fork format:
 ```yaml
 # appmap.yml
 enabled: true
-childeren:
+children:
   - type: fork
     recorder: normal # superfluous
     main: lib/main.js
@@ -62,7 +62,7 @@ Globbing is also supported:
 ```yaml
 # appmap.yml
 enabled: true
-childeren:
+children:
   - type: fork
     recorder: normal # Superfluous
     globbing: true   # False by default
@@ -76,7 +76,7 @@ There exists another format called "spawn" which provides more flexibility but d
 ```yaml
 # appmap.yml
 enabled: true
-childeren:
+children:
   - type: spawn
     recorder: normal # superfluous
     exec: node
@@ -97,8 +97,8 @@ Spawning children can also be done via CLI arguments:
 npx appmap-agent-js
   --enabled true
   # Multiple children can be provided with the string format
-  --childeren 'node main1.js argv0 argv1'
-  --childeren 'node main2.js argv0 argv2'
+  --children 'node main1.js argv0 argv1'
+  --children 'node main2.js argv0 argv2'
   # The array format can be provided as positional arguments:
   -- node main3.js argv0 argv2
 ```
@@ -114,7 +114,7 @@ enabled:
   # in the current directory).
   - path: .
     recursive: true
-childeren:
+children:
   - type: spawn
     recorder: normal # superfluous
     exec: npx
@@ -129,7 +129,7 @@ enabled:
   # but only its child processes.
   - path: test/
     recursive: true
-childeren:
+children:
   - type: spawn
     recorder: normal # superfluous
     exec: npx tap
@@ -143,7 +143,7 @@ It is also possible to directly use the agent's runner:
 
 ```yaml
 enabled: true
-childeren:
+children:
   - type: fork
     globbing: true
     main: test/**/*.js
@@ -185,7 +185,7 @@ packages:
   # Instrument all files (recursively) located in lib
   - path: lib/
     recursive: true
-childeren:
+children:
   # Use the globally installed mocha package
   - type: spawn
     recorder: mocha
@@ -219,7 +219,7 @@ More information [here](api-manual-recording).
 ```yaml
 # appmap.yml
 enabled: true
-childeren:
+children:
   - type: spawn
     recorder: null
     exec: node
