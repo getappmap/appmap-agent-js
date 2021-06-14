@@ -65,16 +65,6 @@ Assert.equal(
   Assert.equal(runtime.getIdentity(symbol2), 4);
 }
 
-Assert.equal(runtime.serialize(runtime.empty), 'empty');
-Assert.equal(runtime.serialize(null), 'null');
-Assert.equal(runtime.serialize(undefined), 'undefined');
-Assert.equal(runtime.serialize(true), 'true');
-Assert.equal(runtime.serialize(false), 'false');
-Assert.equal(runtime.serialize(123), '123');
-Assert.equal(runtime.serialize(123n), '123n');
-Assert.equal(runtime.serialize([]), '[object Array]');
-Assert.equal(runtime.serialize(`"'foo'"`), JSON.stringify(`"'foo'"`));
-
 Assert.deepEqual(runtime.serializeParameter(Symbol('foo'), 'pattern'), {
   class: 'symbol',
   name: 'pattern',
@@ -103,4 +93,18 @@ Assert.deepEqual(runtime.serializeParameter(Symbol('foo'), 'pattern'), {
       lineno: null,
     },
   ]);
+}
+
+{
+  const serialize = (any) => runtime.serializeParameter(any, "foo").value;
+  Assert.equal(serialize(runtime.empty), 'empty');
+  Assert.equal(serialize(null), 'null');
+  Assert.equal(serialize(undefined), 'undefined');
+  Assert.equal(serialize(true), 'true');
+  Assert.equal(serialize(false), 'false');
+  Assert.equal(serialize(123), '123');
+  Assert.equal(serialize(123n), '123n');
+  Assert.equal(serialize([]), '[object Array]');
+  Assert.equal(serialize(`"'foo'"`), JSON.stringify(`"'foo'"`));
+  Assert.equal(serialize("x".repeat(200)).length, 100);
 }
