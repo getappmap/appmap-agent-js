@@ -96,7 +96,7 @@ Assert.deepEqual(runtime.serializeParameter(Symbol('foo'), 'pattern'), {
 }
 
 {
-  const serialize = (any) => runtime.serializeParameter(any, "foo").value;
+  const serialize = (any) => runtime.serializeParameter(any, 'foo').value;
   Assert.equal(serialize(runtime.empty), 'empty');
   Assert.equal(serialize(null), 'null');
   Assert.equal(serialize(undefined), 'undefined');
@@ -106,5 +106,5 @@ Assert.deepEqual(runtime.serializeParameter(Symbol('foo'), 'pattern'), {
   Assert.equal(serialize(123n), '123n');
   Assert.equal(serialize([]), '[object Array]');
   Assert.equal(serialize(`"'foo'"`), JSON.stringify(`"'foo'"`));
-  Assert.equal(serialize("x".repeat(200)).length, 100);
+  Assert.equal(serialize('x'.repeat(200)).length, 100);
 }

@@ -7,6 +7,8 @@ var FileSystem = require('fs');
 var Path = require('path');
 var YAML = require('yaml');
 var Ajv = require('ajv');
+var Treeify = require('treeify');
+var AjvErrorTree = require('ajv-error-tree');
 var Minimatch = require('minimatch');
 var ChildProcess = require('child_process');
 var Glob = require('glob');
@@ -42,6 +44,8 @@ var Path__default = /*#__PURE__*/_interopDefaultLegacy(Path);
 var Path__namespace = /*#__PURE__*/_interopNamespace(Path);
 var YAML__default = /*#__PURE__*/_interopDefaultLegacy(YAML);
 var Ajv__default = /*#__PURE__*/_interopDefaultLegacy(Ajv);
+var Treeify__default = /*#__PURE__*/_interopDefaultLegacy(Treeify);
+var AjvErrorTree__default = /*#__PURE__*/_interopDefaultLegacy(AjvErrorTree);
 var Minimatch__namespace = /*#__PURE__*/_interopNamespace(Minimatch);
 var ChildProcess__namespace = /*#__PURE__*/_interopNamespace(ChildProcess);
 var Glob__namespace = /*#__PURE__*/_interopNamespace(Glob);
@@ -247,7 +251,7 @@ const toEither = (callback, ...rest) => {
   }
 };
 
-const ajv = new Ajv__default['default']();
+const ajv = new Ajv__default['default']({verbose:true});
 ajv.addSchema(
   YAML__default['default'].parse(
     FileSystem__namespace.readFileSync(Path__namespace.resolve(home_1, 'src', 'schema.yml'), 'utf8'),
@@ -260,11 +264,15 @@ const makeValidate = (name, callback) => (json) => {
   if (!callback(json)) {
     logger.warning(`invalid json for schema %s: %j`, name, callback.errors);
     assert(callback.errors.length > 0, `unexpected empty error array`);
-    const error = callback.errors[0];
     return new Left(
-      `invalid ${name} at ${error.schemaPath}, it ${
-        error.message
-      } (${JSON.stringify(error.params)})`,
+      Treeify__default['default'].asTree(
+        AjvErrorTree__default['default'].summarizeAJVErrorTree(
+          AjvErrorTree__default['default'].structureAJVErrorArray(
+            callback.errors
+          )
+        ),
+        true,
+      )
     );
   }
   return new Right(json);
@@ -965,10 +973,7 @@ const infos = {
   recording: {
     extend: overwrite,
     normalize: normalizeRecording,
-    initial: {
-      'defined-class': null,
-      'method-id': null,
-    },
+    initial: null,
   },
   output: {
     extend: assign,
@@ -1401,7 +1406,7 @@ const computeName = (location) => {
     return location.parent.node.id.name;
   }
   const tag = tags[location.node.type];
-  return `${tag}#${(location.common.counters[tag] += 1)}`;
+  return `${tag}-${(location.common.counters[tag] += 1)}`;
 };
 
 class Location {
@@ -1440,7 +1445,7 @@ class Location {
         this.parent.node.value === this.node &&
         this.parent.node.static,
       defined_class: getName(this),
-      method_id: '()',
+      method_id: getName(this),
     };
   }
   isExcluded() {
@@ -2858,7 +2863,7 @@ class File {
   }
 }
 
-const VERSION = '1.5.0';
+const VERSION = '1.6.0';
 
 const navigate = (children, name) => {
   for (const child of children) {
