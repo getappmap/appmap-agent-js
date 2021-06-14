@@ -20,7 +20,7 @@ cat tmp/appmap/main.appmap.json
 
 * unix-like os
 * git
-* node (>= 12.0.0 && <= 13.0.0) || >= 14.0.0 (ie any major node version that is still maintained)
+* node 12.x || >= 14.0.0 (ie any major node version that is still maintained)
 * curl >= 7.55.0 (because of `--data @-` CLI option)
 * mocha >= 8.0.0 (because of root hooks)
 

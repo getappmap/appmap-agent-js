@@ -4,9 +4,7 @@ import {
   validateConfiguration,
 } from '../../../../lib/server/validate.mjs';
 
-Assert.ok(
-  validateRequest({ name: 'foo' }).fromLeft().startsWith('invalid request'),
-);
+validateRequest({ name: 'foo' }).fromLeft();
 
 Assert.deepEqual(
   validateConfiguration({ cwd: '/', 'app-name': 'foo' }).fromRight(),
@@ -15,5 +13,3 @@ Assert.deepEqual(
     'app-name': 'foo',
   },
 );
-
-// Assert.deepEqual(validateCLIOptions({ port: 0 }).fromRight(), {port:0});
