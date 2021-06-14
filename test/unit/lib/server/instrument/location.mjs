@@ -122,7 +122,7 @@ Assert.deepEqual(location1.wrapEntityArray([{ name: 'child' }]), [
     [
       {
         type: 'class',
-        name: ``,
+        name: '',
         bound: false,
         children: [
           {
