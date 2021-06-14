@@ -251,7 +251,7 @@ const toEither = (callback, ...rest) => {
   }
 };
 
-const ajv = new Ajv__default['default']({verbose:true});
+const ajv = new Ajv__default['default']({ verbose: true });
 ajv.addSchema(
   YAML__default['default'].parse(
     FileSystem__namespace.readFileSync(Path__namespace.resolve(home_1, 'src', 'schema.yml'), 'utf8'),
@@ -267,12 +267,10 @@ const makeValidate = (name, callback) => (json) => {
     return new Left(
       Treeify__default['default'].asTree(
         AjvErrorTree__default['default'].summarizeAJVErrorTree(
-          AjvErrorTree__default['default'].structureAJVErrorArray(
-            callback.errors
-          )
+          AjvErrorTree__default['default'].structureAJVErrorArray(callback.errors),
         ),
         true,
-      )
+      ),
     );
   }
   return new Right(json);
@@ -2865,6 +2863,8 @@ class File {
 
 const VERSION = '1.6.0';
 
+const compareId = (event1, event2) => event1.id - event2.id;
+
 const navigate = (children, name) => {
   for (const child of children) {
     if (child.type === 'package' && child.name === name) {
@@ -2905,6 +2905,7 @@ const save = (recording, versioning) => {
         children: entities,
       });
   }
+  recording.events.sort(compareId);
   return {
     content: JSON.stringify({
       version: VERSION,
