@@ -6,7 +6,7 @@ const path = 'test/unit/env/target/location.js';
 
 const designator = {
   method_id: null,
-  defined_class: null,
+  defined_class: "",
   path,
   lineno: null,
   static: false,
@@ -122,7 +122,7 @@ Assert.deepEqual(location1.wrapEntityArray([{ name: 'child' }]), [
     [
       {
         type: 'class',
-        name: `f`,
+        name: ``,
         bound: false,
         children: [
           {
@@ -158,7 +158,6 @@ Assert.deepEqual(location1.wrapEntityArray([{ name: 'child' }]), [
       Assert.deepEqual(location4.getClosureDesignator(), {
         ...designator,
         method_id: 'h',
-        defined_class: 'h',
         lineno: 4,
       });
     }
@@ -177,7 +176,6 @@ Assert.deepEqual(location1.wrapEntityArray([{ name: 'child' }]), [
     Assert.deepEqual(location3.getClosureDesignator(), {
       ...designator,
       method_id: 'default',
-      defined_class: 'default',
       lineno: 5,
     });
   }
@@ -217,7 +215,6 @@ Assert.deepEqual(location1.wrapEntityArray([{ name: 'child' }]), [
         Assert.deepEqual(location5.getClosureDesignator(), {
           ...designator,
           method_id: 'constructor',
-          defined_class: 'constructor',
           lineno: 7,
         });
       }
@@ -232,7 +229,6 @@ Assert.deepEqual(location1.wrapEntityArray([{ name: 'child' }]), [
         Assert.deepEqual(location5.getClosureDesignator(), {
           ...designator,
           method_id: 'm1',
-          defined_class: 'm1',
           lineno: 8,
         });
       }
@@ -247,7 +243,6 @@ Assert.deepEqual(location1.wrapEntityArray([{ name: 'child' }]), [
         Assert.deepEqual(location5.getClosureDesignator(), {
           ...designator,
           method_id: 'get m2',
-          defined_class: 'get m2',
           lineno: 9,
           static: true,
         });
@@ -275,7 +270,6 @@ Assert.deepEqual(location1.wrapEntityArray([{ name: 'child' }]), [
         Assert.deepEqual(location5.getClosureDesignator(), {
           ...designator,
           method_id: 'k1',
-          defined_class: 'k1',
           lineno: 12,
         });
       }
@@ -290,7 +284,6 @@ Assert.deepEqual(location1.wrapEntityArray([{ name: 'child' }]), [
         Assert.deepEqual(location5.getClosureDesignator(), {
           ...designator,
           method_id: '"k2"',
-          defined_class: '"k2"',
           lineno: 13,
         });
       }
@@ -305,7 +298,6 @@ Assert.deepEqual(location1.wrapEntityArray([{ name: 'child' }]), [
         Assert.deepEqual(location5.getClosureDesignator(), {
           ...designator,
           method_id: '[#computed]',
-          defined_class: '[#computed]',
           lineno: 14,
         });
       }
@@ -320,7 +312,6 @@ Assert.deepEqual(location1.wrapEntityArray([{ name: 'child' }]), [
         Assert.deepEqual(location5.getClosureDesignator(), {
           ...designator,
           method_id: '[#computed]',
-          defined_class: '[#computed]',
           lineno: 15,
         });
       }
@@ -335,7 +326,6 @@ Assert.deepEqual(location1.wrapEntityArray([{ name: 'child' }]), [
         Assert.deepEqual(location5.getClosureDesignator(), {
           ...designator,
           method_id: 'k5',
-          defined_class: 'k5',
           lineno: 16,
         });
       }
@@ -350,7 +340,6 @@ Assert.deepEqual(location1.wrapEntityArray([{ name: 'child' }]), [
         Assert.deepEqual(location5.getClosureDesignator(), {
           ...designator,
           method_id: 'get k6',
-          defined_class: 'get k6',
           lineno: 17,
         });
       }
@@ -374,7 +363,6 @@ Assert.deepEqual(location1.wrapEntityArray([{ name: 'child' }]), [
       Assert.deepEqual(location4.getClosureDesignator(), {
         ...designator,
         method_id: 'x1',
-        defined_class: 'x1',
         lineno: 19,
       });
     }
@@ -396,7 +384,6 @@ Assert.deepEqual(location1.wrapEntityArray([{ name: 'child' }]), [
       Assert.deepEqual(location4.getClosureDesignator(), {
         ...designator,
         method_id: 'x2',
-        defined_class: 'x2',
         lineno: 20,
       });
     }
@@ -415,8 +402,7 @@ Assert.deepEqual(location1.wrapEntityArray([{ name: 'child' }]), [
     const location3 = location2.extend(node3);
     Assert.deepEqual(location3.getClosureDesignator(), {
       ...designator,
-      method_id: 'arrow#1',
-      defined_class: 'arrow#1',
+      method_id: 'arrow-1',
       lineno: 21,
     });
   }
