@@ -1,4 +1,0 @@
-query1
-query2
-result2 20
-result1 6
