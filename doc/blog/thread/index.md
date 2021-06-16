@@ -231,9 +231,8 @@ The second fifo should contain the `main` function call, the second sql query, a
 Note that to obtain a fifo we had to "cheat" and move the return of the `main` function call to the last position.
 Rearranging call stack lines is dangerous and can lead to logical inconsistencies.
 For instance we could end up displaying `DROP TABLE user` before `SELECT * from user`.
-Even if it resembles the closest the ruby trace, I really don't like this option.
 
-### Second Option: One Fifo per Event 
+### Second Option: One Fifo per Event
 
 The second option consists in embracing the event-based nature of JavaScript and creating one fifo for every event processing.
 
@@ -266,25 +265,46 @@ return #5 log undefined
 return #3 resolve
 ```
 
-This option reflects best the reality of the execution of the program.
+This option reflects better the reality of the execution of the program.
 And more importantly we do not have to cheat.
 The drawback of this option is that the causality link between the first fifo and two others is lost.
 Indeed, the appmap framework being language-agnostic it cannot use promise ids to recover that causality link.
 
-### Third Options: Linear Model
+### Third Options: Bundling Events
 
-We can attempt to step closer to the ruby trace and bundle the first two fifos together and that would still make a fifo.
-Technically this might be achievable by using (asynchronous hooks)[https://nodejs.org/api/async_hooks.html] and register the first promise made during each event handling.
+A nice property of fifos is that concatenating them together still result in a fifo.
+So we are free to bundle them at our liking to indicate to the appmap framework that they are somehow linked.
+Note that to respect the timeline, the bundling should conserve the order between fifos.
+Else we would be at risk of introducing logical inconsistencies as for our "cheating" option.
 
-### Fourth Options: Tree Model
+First lets note that the handling of an event can be causally linked to the handling of another event.
+Indeed, each time an event is processed, it is done so by executing a callback function.
+By tracking callback registering, we can book keep which event caused which callback to be registered.
+Hence we can improve our understanding of event handling not as sequence but as a causal tree.
 
-Similarly to the third option, we could bundle the three fifos togethers.
-Again, we would have to use (asynchronous hooks)[https://nodejs.org/api/async_hooks.html] but we would register every promises made during each event handling.
-This solution would have to additional difficulty of deciding when to cut off a fifo.
-Indeed if we leave this unchecked, we might end up with a single fifo for the entire run of a server.
+```js
+import {createServer} from "http";
+const server = createServer();
+server.listen(0, function onListening () {
+  console.log(`listening to port ${server.address().port}`);
+  server.on("request", function onRequest (req, res) {
+    setTimeout(function onTimeout1() {
+      res.writeHead(200);
+    }, 1000);
+    setTimeout(function onTimeout2() {
+      res.end("foobar");
+    }, 2000);
+  });
+});
 
-The criteria could be based on the nature of the event being handled.
-For instance, handling an http server request should definitely be represented by a dedicated fifo.
-And handling the result of reading from a file should be bundled with the fifo of the parent event.
+```
 
-I think this fourth option is the best.
+![event-seq-tree](event-seq-tree.png)
+
+If we want to simulate the ruby trace we can recursively bound each event their first (in time) causally linked child event.
+Each bundle would then represent a linear sequence of event handling where nothing appears concurrently.
+This would effectively mimic threading.
+
+However I argue that the better solution would be to bundle event based on their kinds.
+For servers, the `root` event should be bundled with setup operations (eg `onListening` in the example above) and each `onRequest` event should be bundled with their entire causal tree.
+Note that the limit may not be always as clear cut and some user tweaking would probably be required to find the appropriate granularity for a given application.

@@ -8,9 +8,10 @@ const Util = require("util");
 
 const STDOUT = 1;
 
-let counter = 0;
+let buffer = "";
 
 const log = (...args) => {
+  // buffer += `${Util.format(...args)}${"\n"}`;
   FileSystem.writeSync(STDOUT, `${Util.format(...args)}${"\n"}`);
   // FileSystem.fsyncSync(STDOUT);
 };
@@ -25,9 +26,11 @@ const trace = (name) => (asyncId) => {
   );
 };
 
+let counter = 0;
+let current = counter
+
 const hook = AsyncHooks.createHook({
   init: (asyncId, type, triggerAsyncId, resource) => {
-    counter += 1;
     log(
       "init >> executionAsyncId()=%i triggerAsyncId()=%i asyncId=%i type=%s triggerAsyncId=%i resource=%o",
       AsyncHooks.executionAsyncId(),
@@ -38,21 +41,33 @@ const hook = AsyncHooks.createHook({
       resource
     );
   },
+  before: () => {
+    counter += 1;
+    current = counter;
+  }
   // before: trace("before"),
   // after: trace("after"),
   // destroy: trace("destroy"),
   // promiseResolve: trace("promiseResolve")
 });
 
-log(
-  "executionAsyncId()=%i triggerAsyncId()=%i",
+const loc = () => log(
+  "eid=%i tid=%i, loc=%i",
   AsyncHooks.executionAsyncId(),
-  AsyncHooks.triggerAsyncId()
+  AsyncHooks.triggerAsyncId(),
+  current
 );
 
 hook.enable();
 
-FileSystem.writeFile("yo.txt", "foo", "utf8", (error) => {
-  log("done");
-  throw counter;
-});
+loc();
+
+console.log(process);
+
+setInterval(loc, 1000);
+
+// FileSystem.writeFile("yo.txt", "foo", "utf8", (error) => {
+//   // log("done");
+//   // throw buffer;
+//   // throw counter;
+// });
