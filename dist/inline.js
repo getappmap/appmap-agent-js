@@ -1799,7 +1799,7 @@ setVisitor(
         buildIdentifier(`${location.getSession()}_EVENT_ID`),
         buildAssignmentExpression(
           '+=',
-          buildRegularMemberExpression(location.getSession(), 'event'),
+          buildRegularMemberExpression(location.getSession(), 'event_counter'),
           buildLiteral(1),
         ),
       ),
@@ -1828,7 +1828,7 @@ setVisitor(
             buildRegularProperty('event', buildLiteral('call')),
             buildRegularProperty(
               'thread_id',
-              buildRegularMemberExpression(location.getSession(), 'pid'),
+              buildRegularMemberExpression(location.getSession(), 'thread_id'),
             ),
             buildRegularProperty(
               'defined_class',
@@ -1900,14 +1900,17 @@ setVisitor(
               'id',
               buildAssignmentExpression(
                 '+=',
-                buildRegularMemberExpression(location.getSession(), 'event'),
+                buildRegularMemberExpression(
+                  location.getSession(),
+                  'event_counter',
+                ),
                 buildLiteral(1),
               ),
             ),
             buildRegularProperty('event', buildLiteral('return')),
             buildRegularProperty(
               'thread_id',
-              buildRegularMemberExpression(location.getSession(), 'pid'),
+              buildRegularMemberExpression(location.getSession(), 'thread_id'),
             ),
             buildRegularProperty(
               'parent_id',

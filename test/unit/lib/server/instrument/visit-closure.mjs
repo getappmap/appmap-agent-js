@@ -25,7 +25,7 @@ test({
   output: `const f = ($_ARGUMENT_0, $_ARGUMENT_1, ...$_ARGUMENT_2) => {
     var
       $_TIMER = $.getNow(),
-      $_EVENT_ID = $.event += 1,
+      $_EVENT_ID = $.event_counter += 1,
       $_SUCCESS = $.empty,
       $_FAILURE = $.empty;
     $.record(
@@ -33,7 +33,7 @@ test({
       {
         id: $_EVENT_ID,
         event: 'call',
-        thread_id: $.pid,
+        thread_id: $.thread_id,
         defined_class: 'f',
         method_id: 'f',
         path: 'filename.js',
@@ -59,9 +59,9 @@ test({
       $.record(
         'origin',
         {
-          id: $.event += 1,
+          id: $.event_counter += 1,
           event: 'return',
-          thread_id: $.pid,
+          thread_id: $.thread_id,
           parent_id: $_EVENT_ID,
           ellapsed: $.getNow() - $_TIMER,
           return_value: $.serializeParameter($_SUCCESS, 'return'),
@@ -80,7 +80,7 @@ test({
   output: `async function * f () {
     var
       $_TIMER = $.getNow(),
-      $_EVENT_ID = $.event += 1,
+      $_EVENT_ID = $.event_counter += 1,
       $_SUCCESS = $.empty,
       $_FAILURE = $.empty;
     $.record(
@@ -88,7 +88,7 @@ test({
       {
         id: $_EVENT_ID,
         event: 'call',
-        thread_id: $.pid,
+        thread_id: $.thread_id,
         defined_class: 'f',
         method_id: 'f',
         path: 'filename.js',
@@ -106,9 +106,9 @@ test({
       $.record(
         'origin',
         {
-          id: $.event += 1,
+          id: $.event_counter += 1,
           event: 'return',
-          thread_id: $.pid,
+          thread_id: $.thread_id,
           parent_id: $_EVENT_ID,
           ellapsed: $.getNow() - $_TIMER,
           return_value: $.serializeParameter($_SUCCESS, 'return'),

@@ -11,7 +11,7 @@ Assert.equal(typeof runtime.getNow(), 'number');
 
 Assert.equal(runtime.record, null);
 
-Assert.equal(typeof runtime.event, 'number');
+Assert.equal(typeof runtime.event_counter, 'number');
 
 Assert.equal(runtime.getClassName(null), 'null');
 Assert.equal(runtime.getClassName(123), 'number');
