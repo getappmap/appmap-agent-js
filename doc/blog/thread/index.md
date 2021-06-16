@@ -115,23 +115,11 @@ TLDR: the appmap framework relies on each thread-specific trace to exhibit a fif
 In JavaScript the same requirements could have been implemented as a such:
 
 ```js
-// db.mjs
+// sql.mjs
+import util from 'util';
 import sqlite3 from 'sqlite3';
 const db = new sqlite3.Database(':memory:');
-export const execute = (sql) => new Promise((resolve, reject) => {
-  db.all(sql, (error, result) => {
-    if (error) {
-      reject(error);
-    } else {
-      resolve(result);
-    }
-  });
-});
-```
-
-```js
-// sql.mjs
-import {execute} from './db.mjs';
+const execute = util.promisify(db.all.bind(db));
 const main = () => {
   execute('SELECT 2 * 3 as x').then(([{x}]) => {
     console.log(x);
@@ -173,8 +161,11 @@ We can now instrument the original program to trace it:
 
 ```js
 // sql-trace.mjs
-import {execute} from './db.mjs'
+import util from 'util';
+import sqlite3 from 'sqlite3';
 import {trace, traceAsync} from './trace.mjs'
+const db = new sqlite3.Database(':memory:');
+const execute = util.promisify(db.all.bind(db));
 const logTrace = (x) => trace(log, x);
 const main = () => {
   traceAsync(execute, 'SELECT 2 * 3 as x').then(([{x}]) => {
