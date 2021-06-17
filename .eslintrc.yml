@@ -6,9 +6,7 @@ extends:
   - prettier
 rules:
   lines-between-class-members: off
-  camelcase:
-    - error
-    - properties: never
+  camelcase: off
   no-param-reassign: off
   valid-typeof: off
   spaced-comment: off

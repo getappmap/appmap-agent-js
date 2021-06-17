@@ -185,16 +185,16 @@ const makeRecord = () => {
                 mime_type: null,
                 request_method: 'GET',
                 path_info: '/123',
-                normalized_path_info: '/{foo}',
+                normalized_path_info: null,
                 protocol: 'HTTP/1.1',
               },
               message: [
-                {
-                  name: 'foo',
-                  object_id: null,
-                  class: 'string',
-                  value: '123',
-                },
+                // {
+                //   name: 'foo',
+                //   object_id: null,
+                //   class: 'string',
+                //   value: '123',
+                // },
               ],
             },
             {

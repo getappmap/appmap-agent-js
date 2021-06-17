@@ -57,19 +57,29 @@ child.on('message', async (port) => {
     callback();
   });
   // discarded //
-  await new Promise((resolve, reject) => {
-    callback = resolve;
-    Assert.equal(
-      requestAsync(
-        {
-          type: 'right',
-          body: null,
-        },
-        true,
-      ),
-      undefined,
-    );
-  });
+  Assert.equal(
+    requestAsync(
+      {
+        type: 'right',
+        body: null,
+      },
+      true,
+    ),
+    undefined,
+  );
+  // await new Promise((resolve, reject) => {
+  //   callback = resolve;
+  //   Assert.equal(
+  //     requestAsync(
+  //       {
+  //         type: 'right',
+  //         body: null,
+  //       },
+  //       true,
+  //     ),
+  //     undefined,
+  //   );
+  // });
   // await new Promise((resolve, reject) => {
   //   callback = (error) => {
   //     Assert.match(error.message, /foo$/);

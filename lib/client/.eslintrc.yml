@@ -9,9 +9,5 @@ rules:
   eslint-disable prefer-object-spread: off
   prefer-object-spread: off
   new-cap: off
-  camelcase:
-    - error
-    - allow: ["^global_"]
-      properties: never
 parserOptions:
   ecmaVersion: 2015

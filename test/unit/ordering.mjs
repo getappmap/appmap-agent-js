@@ -55,6 +55,7 @@ export const client = [
   'node/run',
   'node/runtime',
   'node/recording',
+  'node/thread',
   'node/appmap',
   'node/recorder/options',
   'node/recorder/normal-main',

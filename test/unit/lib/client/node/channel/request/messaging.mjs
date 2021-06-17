@@ -26,6 +26,16 @@ child.on('message', (port) => {
   for (let host of ['localhost', '127.0.0.1']) {
     const request = makeRequest(host, port);
     Assert.equal(
+      request(
+        {
+          type: 'right',
+          body: null,
+        },
+        true,
+      ),
+      null,
+    );
+    Assert.equal(
       request({
         type: 'right',
         body: 123,

@@ -53,7 +53,7 @@ import {
             Assert.fail();
           },
           request: (...args) => {
-            Assert.equal(args.length, 1);
+            Assert.equal(args.length, 2);
             return respond(args[0]);
           },
         },

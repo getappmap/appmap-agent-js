@@ -33,7 +33,7 @@ test({
       {
         id: $_EVENT_ID,
         event: 'call',
-        thread_id: $.thread_id,
+        thread_id: $.getCurrentThreadId(),
         defined_class: 'f',
         method_id: 'f',
         path: 'filename.js',
@@ -61,7 +61,7 @@ test({
         {
           id: $.event_counter += 1,
           event: 'return',
-          thread_id: $.thread_id,
+          thread_id: $.getCurrentThreadId(),
           parent_id: $_EVENT_ID,
           ellapsed: $.getNow() - $_TIMER,
           return_value: $.serializeParameter($_SUCCESS, 'return'),
@@ -88,7 +88,7 @@ test({
       {
         id: $_EVENT_ID,
         event: 'call',
-        thread_id: $.thread_id,
+        thread_id: $.getCurrentThreadId(),
         defined_class: 'f',
         method_id: 'f',
         path: 'filename.js',
@@ -108,7 +108,7 @@ test({
         {
           id: $.event_counter += 1,
           event: 'return',
-          thread_id: $.thread_id,
+          thread_id: $.getCurrentThreadId(),
           parent_id: $_EVENT_ID,
           ellapsed: $.getNow() - $_TIMER,
           return_value: $.serializeParameter($_SUCCESS, 'return'),

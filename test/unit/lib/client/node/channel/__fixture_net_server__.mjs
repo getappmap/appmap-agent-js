@@ -9,13 +9,15 @@ server.on('connection', (socket) => {
   patch(socket);
   socket.on('message', (message) => {
     const json = JSON.parse(message);
-    socket.send(
-      JSON.stringify({
-        head: json.head,
-        type: json.body.type,
-        body: json.body.body,
-      }),
-    );
+    if (json.head !== null) {
+      socket.send(
+        JSON.stringify({
+          head: json.head,
+          type: json.body.type,
+          body: json.body.body,
+        }),
+      );
+    }
   });
 });
 
