@@ -19,12 +19,13 @@
     "testing"
   ],
   "scripts": {
+    "cov": "npx c8 --reporter html --include $COV.js node $COV.test.js && open coverage/index.html",
+    "test": "node test/run.js",
     "coverage": "npx c8 --reporter=html --require $TARGET node test/unit/$TARGET",
     "build": "node build/index.mjs",
     "prettier": "npx prettier --write 'lib/server/**/*.mjs' 'lib/client/**/*.js' 'test/**/*.mjs' 'bin/*.mjs' 'build/*.mjs'",
     "commit": "npx cz",
     "lint": "npx eslint 'lib/client/**/*.js' 'lib/server/**/*.mjs' 'test/**/*.mjs' 'bin/*.mjs' 'build/*.mjs'",
-    "test": "node test/unit/index.mjs",
     "test-integration": "node test/integration/index.mjs",
     "deploy": "npm i -D @semantic-release/changelog @semantic-release/git && npx semantic-release"
   },

@@ -3,7 +3,7 @@ tagFormat: v${version}
 dryRun: false
 ci: true
 branches:
-  - name: alpha
+  - name: main
 plugins:
   - '@semantic-release/commit-analyzer'
   - '@semantic-release/release-notes-generator'
