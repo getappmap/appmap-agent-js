@@ -1,49 +1,11 @@
 
 const Crypto = require("crypto");
 const FileSystem = require("fs");
-const FileSystemPromise = require("fs/promise");
 const ChildProcess = require("child_process");
 
-const progress = new Map(FileSystem.readFileSync(".progress.json"));
+class TestFailureError extends Error {}
 
-const runAsync = async (path) => {
-  let dir = null;
-  try {
-    dir = await FileSystemPromise.opendir(path);
-  } catch (error) {
-    // noop
-  }
-  for await (const dirent of dir) {
-    await runAsync
-  }
-
-  try {
-    await FileSystemPromise.access(path, FileSystem.R_OK);
-  } catch
-  const stat = await FileSystemPromise.stat(path);
-
-
-  const hash = Crypto.createHash("md5");
-
-};
-
-
-
-
-const input = createReadStream(filename);
-input.on('readable', () => {
-  // Only one element is going to be produced by the
-  // hash stream.
-  const data = input.read();
-  if (data)
-    hash.update(data);
-  else {
-    console.log(`${hash.digest('hex')} ${filename}`);
-  }
-});
-
-
-const fs =
+class TestCoverageError extends Error {}
 
 const check = [
   '--check-coverage',
@@ -53,17 +15,70 @@ const check = [
   '--statements=100'
 ].join(" ");
 
+const isNotEmpty = (string) => string !== "";
 
-const command = [
-  "shared/util/print",
-  "shared/util/format",
-  "shared/util/check",
-  "shared/util/assert",
-  "shared/util/expect",
-  "shared/util/noop",
-  "shared/util/path",
-].map(
-  (path) => `npx c8 ${check} --include=lib/${path}.js node lib/${path}.test.js`
-).join(" && ");
+const parseLine = (line) => {
+  const parts = /^([^:]*:([:^]+)$/u.exec(line);
+  if (parts === null) {
+    throw new Error(`cannot parse line: ${JSON.stringify(line)}`);
+  }
+  return [`${path}/${parts[1].trim()}`, parts[2].trim()];
+};
 
-ChildProcess.spawnSync("/bin/sh", ["-c", command], {stdio:"inherit"});
+const stringifyLine = ([key, value]) => `${key}: ${value}`;
+
+const loop = (path, key, value, ext) => {
+  path = `${path}/${name}`;
+  if (value === "dir") {
+    FileSystem.writeFileSync(
+      `${path}.test.yml`,
+      FileSystem.readFileSync(`${path}.test.yml`, "utf8")
+        .split("\n")
+        .filter(isNotEmpty)
+        .map(parseLine)
+        .map(([key, value]) => loop(path, key, value)),
+        .map(stringifyLine)
+        .join("\n"),
+      "utf8"
+    );
+  } else {
+    const hash = createHash("md5");
+    hash.update(FileSystem.readFileSync(`${path}.test.js`));
+    hash.update(FileSystem.readFileSync(`${path}.js`));
+    const digest = hash.digest("hex");
+    if (digest !== key) {
+      {
+        const {signal, status} = ChildProcess.spawnSync("node", [`${path}.test.js`], {stdio:"inherit"});
+        if (signal !== null) {
+          throw new Error(`test killed with: ${signal}`);
+        }
+        if (status !== 0) {
+          throw new TestFailureError(`text exited with: ${status}`);
+        }
+      }
+      {
+        const {signal, status} = ChildProcess.spawnSync("/bin/sh", ["-c", `npx c8 ${check} --include=${path}.js node ${path}.test.js`], {stdio:"inherit"});
+        if (signal !== null) {
+          throw new Error(`c8 test killed with: ${signal}`);
+        }
+        if (status !== 0) {
+          ChildProcess.spawnSync("/bin/sh", ["-c", `npx c8 --reporter=html --include=lib/${path}.js node lib/${path}.test.js && open coverage/index.html`], {stdio:"inherit"});
+          throw new TestCoverageError(`c8 test exited with: ${status}`);
+        }
+      }
+      key = digest;
+    }
+  }
+  return [key, value];
+};
+
+try {
+  loop(process.argv[2], process.argv[3], "dir", process.argv.length > 3);
+} catch (error) {
+  if (error instanceof TestFailureError || error instanceof TestCoverageError) {
+    process.stderr.write(`${error.message}${"\n"}`);
+    process.exitCode = 1;
+  } else {
+    throw error;
+  }
+}
