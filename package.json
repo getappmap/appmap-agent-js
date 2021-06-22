@@ -19,6 +19,7 @@
     "testing"
   ],
   "scripts": {
+    "tt": "npx tt --no-memo --ext mjs lib --each 'npx eslint $1 $2' --each 'npx prettier -w $1 $2' --each 'node $2' --each 'npx c8 --include $1 --check-coverage --branches 100 --functions 100 -- node $2'",
     "cov": "npx c8 --reporter html --include $COV.js node $COV.test.js && open coverage/index.html",
     "test": "node test/run.js",
     "coverage": "npx c8 --reporter=html --require $TARGET node test/unit/$TARGET",
@@ -51,7 +52,7 @@
     "npm": "^6.14.12",
     "posix-socket": "^1.1.0",
     "posix-socket-messaging": "^0.0.1",
-    "test-turtle": "0.0.2",
+    "test-turtle": "^1.0.1",
     "treeify": "^1.1.0",
     "yaml": "^1.10.0"
   },
