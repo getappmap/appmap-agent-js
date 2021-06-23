@@ -9,7 +9,7 @@
     - latin1
 
 - $id: event
-  enum: [call, return]
+  enum: [call, return, link]
 
 - $id: source
   enum: [script, module]
@@ -443,9 +443,8 @@
             event:
               type: object
               additionalProperties: true
-              required: [id, event]
+              required: [event]
               properties:
-                id: {type: integer}
                 event: {$ref: event}
     - type: object
       additionalProperties: false
