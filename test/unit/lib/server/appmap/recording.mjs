@@ -230,11 +230,13 @@ new Recording(
     {
       thread_id: 0,
       event: 'call',
+      sql_query: null,
       id: 1,
     },
     {
       thread_id: 0,
       event: 'call',
+      sql_query: null,
       id: 2,
     },
     {
@@ -272,11 +274,13 @@ new Recording(
     {
       thread_id: 0,
       event: 'call',
+      sql_query: null,
       id: 1,
     },
     {
       thread_id: 0,
       event: 'call',
+      sql_query: null,
       id: 2,
     },
     {
@@ -305,138 +309,138 @@ new Recording(
   ]);
 }
 
-// automatic jump //
-
-{
-  const recording = new Recording(
-    getInitialConfiguration()
-      .extendWithData({
-        cwd: process.cwd(),
-        output: {
-          directory: 'tmp/test/',
-          'file-name': 'foo',
-        },
-      })
-      .fromRight(),
-  );
-  [
-    {
-      thread_id: 0,
-      event: 'call',
-      id: 1,
-    },
-    {
-      thread_id: 0,
-      event: 'call',
-      id: 2,
-      child_thread_id: 1,
-    },
-    {
-      thread_id: 0,
-      event: 'return',
-      id: 3,
-      parent_id: 2,
-    },
-    {
-      thread_id: 0,
-      event: 'return',
-      id: 4,
-      parent_id: 1,
-    },
-    {
-      thread_id: 1,
-      event: 'call',
-      id: 5,
-    },
-    {
-      thread_id: 1,
-      event: 'return',
-      id: 6,
-      parent_id: 5,
-    },
-  ].forEach((event) => {
-    recording.record(null, event);
-  });
-  unlink('tmp/test/foo.appmap.json');
-  recording.terminate(identity);
-  const appmap = JSON.parse(
-    FileSystem.readFileSync('tmp/test/foo.appmap.json', 'utf8'),
-  );
-  Assert.deepEqual(appmap.events, [
-    {
-      thread_id: 0,
-      event: 'call',
-      id: 1,
-    },
-    {
-      thread_id: 0,
-      event: 'call',
-      id: 2,
-      child_thread_id: 1,
-    },
-    {
-      thread_id: 0,
-      event: 'call',
-      id: 5,
-    },
-    {
-      thread_id: 0,
-      event: 'return',
-      id: 6,
-      parent_id: 5,
-    },
-    {
-      thread_id: 0,
-      event: 'return',
-      id: 3,
-      parent_id: 2,
-    },
-    {
-      thread_id: 0,
-      event: 'return',
-      id: 4,
-      parent_id: 1,
-    },
-  ]);
-}
-
-// empty automatic jump //
-
-{
-  const recording = new Recording(
-    getInitialConfiguration()
-      .extendWithData({
-        cwd: process.cwd(),
-        output: {
-          directory: 'tmp/test/',
-          'file-name': 'foo',
-        },
-      })
-      .fromRight(),
-  );
-  [
-    {
-      thread_id: 0,
-      event: 'call',
-      id: 1,
-      child_thread_id: 1,
-    },
-    {
-      thread_id: 0,
-      event: 'return',
-      id: 2,
-      parent_id: 1,
-    },
-  ].forEach((event) => {
-    recording.record(null, event);
-  });
-  unlink('tmp/test/foo.appmap.json');
-  recording.terminate(identity);
-  const appmap = JSON.parse(
-    FileSystem.readFileSync('tmp/test/foo.appmap.json', 'utf8'),
-  );
-  Assert.deepEqual(appmap.events, []);
-}
+// // automatic jump //
+//
+// {
+//   const recording = new Recording(
+//     getInitialConfiguration()
+//       .extendWithData({
+//         cwd: process.cwd(),
+//         output: {
+//           directory: 'tmp/test/',
+//           'file-name': 'foo',
+//         },
+//       })
+//       .fromRight(),
+//   );
+//   [
+//     {
+//       thread_id: 0,
+//       event: 'call',
+//       id: 1,
+//     },
+//     {
+//       thread_id: 0,
+//       event: 'call',
+//       id: 2,
+//       child_thread_id: 1,
+//     },
+//     {
+//       thread_id: 0,
+//       event: 'return',
+//       id: 3,
+//       parent_id: 2,
+//     },
+//     {
+//       thread_id: 0,
+//       event: 'return',
+//       id: 4,
+//       parent_id: 1,
+//     },
+//     {
+//       thread_id: 1,
+//       event: 'call',
+//       id: 5,
+//     },
+//     {
+//       thread_id: 1,
+//       event: 'return',
+//       id: 6,
+//       parent_id: 5,
+//     },
+//   ].forEach((event) => {
+//     recording.record(null, event);
+//   });
+//   unlink('tmp/test/foo.appmap.json');
+//   recording.terminate(identity);
+//   const appmap = JSON.parse(
+//     FileSystem.readFileSync('tmp/test/foo.appmap.json', 'utf8'),
+//   );
+//   Assert.deepEqual(appmap.events, [
+//     {
+//       thread_id: 0,
+//       event: 'call',
+//       id: 1,
+//     },
+//     {
+//       thread_id: 0,
+//       event: 'call',
+//       id: 2,
+//       child_thread_id: 1,
+//     },
+//     {
+//       thread_id: 0,
+//       event: 'call',
+//       id: 5,
+//     },
+//     {
+//       thread_id: 0,
+//       event: 'return',
+//       id: 6,
+//       parent_id: 5,
+//     },
+//     {
+//       thread_id: 0,
+//       event: 'return',
+//       id: 3,
+//       parent_id: 2,
+//     },
+//     {
+//       thread_id: 0,
+//       event: 'return',
+//       id: 4,
+//       parent_id: 1,
+//     },
+//   ]);
+// }
+//
+// // empty automatic jump //
+//
+// {
+//   const recording = new Recording(
+//     getInitialConfiguration()
+//       .extendWithData({
+//         cwd: process.cwd(),
+//         output: {
+//           directory: 'tmp/test/',
+//           'file-name': 'foo',
+//         },
+//       })
+//       .fromRight(),
+//   );
+//   [
+//     {
+//       thread_id: 0,
+//       event: 'call',
+//       id: 1,
+//       child_thread_id: 1,
+//     },
+//     {
+//       thread_id: 0,
+//       event: 'return',
+//       id: 2,
+//       parent_id: 1,
+//     },
+//   ].forEach((event) => {
+//     recording.record(null, event);
+//   });
+//   unlink('tmp/test/foo.appmap.json');
+//   recording.terminate(identity);
+//   const appmap = JSON.parse(
+//     FileSystem.readFileSync('tmp/test/foo.appmap.json', 'utf8'),
+//   );
+//   Assert.deepEqual(appmap.events, []);
+// }
 
 // missing manual return jump //
 
@@ -461,6 +465,7 @@ new Recording(
     {
       thread_id: 0,
       event: 'call',
+      sql_query: null,
       id: 2,
     },
     {
@@ -486,6 +491,7 @@ new Recording(
     {
       thread_id: 0,
       event: 'call',
+      sql_query: null,
       id: 2,
     },
     {
@@ -521,7 +527,14 @@ new Recording(
     {
       thread_id: 0,
       event: 'call',
+      http_server_request: null,
       id: 1,
+    },
+    {
+      thread_id: 0,
+      event: 'call',
+      http_client_request: null,
+      id: 2,
     },
   ].forEach((event) => {
     recording.record(null, event);
@@ -535,12 +548,27 @@ new Recording(
     {
       thread_id: 0,
       event: 'call',
+      http_server_request: null,
       id: 1,
     },
     {
       thread_id: 0,
-      event: 'return',
+      event: 'call',
+      http_client_request: null,
       id: 2,
+    },
+    {
+      thread_id: 0,
+      event: 'return',
+      http_client_response: { status_code: 100 },
+      id: 3,
+      parent_id: 2,
+    },
+    {
+      thread_id: 0,
+      event: 'return',
+      http_server_response: { status_code: 100 },
+      id: 4,
       parent_id: 1,
     },
   ]);
