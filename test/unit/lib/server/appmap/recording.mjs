@@ -239,38 +239,21 @@ new Recording(
       child_thread_id: 1,
     },
     {
-      event: 'link',
-      thread_id: 1,
-      child_thread_id: 2,
-    },
-    {
       event: 'call',
-      thread_id: 0,
-      sql_query: null,
+      thread_id: 1,
       id: 2,
     },
     {
       event: 'return',
-      thread_id: 0,
+      thread_id: 1,
       id: 3,
-      parent_id: 2,
-    },
-    {
-      event: 'call',
-      thread_id: 2,
-      id: 4,
-    },
-    {
-      event: 'return',
-      thread_id: 2,
-      id: 5,
       parent_id: 1,
     },
     {
       event: 'return',
-      thread_id: 2,
-      id: 6,
-      parent_id: 4,
+      thread_id: 1,
+      id: 4,
+      parent_id: 2,
     },
   ].forEach((event) => {
     recording.record(null, event);
@@ -290,31 +273,19 @@ new Recording(
     {
       event: 'call',
       thread_id: 0,
-      id: 4,
-    },
-    {
-      event: 'return',
-      thread_id: 0,
-      id: 6,
-      parent_id: 4,
-    },
-    {
-      event: 'return',
-      thread_id: 0,
-      id: 5,
-      parent_id: 1,
-    },
-    {
-      event: 'call',
-      thread_id: 0,
-      sql_query: null,
       id: 2,
     },
     {
       event: 'return',
       thread_id: 0,
-      id: 3,
+      id: 4,
       parent_id: 2,
+    },
+    {
+      event: 'return',
+      thread_id: 0,
+      id: 3,
+      parent_id: 1,
     },
   ]);
 }
