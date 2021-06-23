@@ -228,39 +228,49 @@ new Recording(
   );
   [
     {
-      thread_id: 0,
       event: 'call',
-      sql_query: null,
+      thread_id: 0,
       id: 1,
+      sql_query: null,
     },
     {
+      event: 'link',
       thread_id: 0,
+      child_thread_id: 1,
+    },
+    {
+      event: 'link',
+      thread_id: 1,
+      child_thread_id: 2,
+    },
+    {
       event: 'call',
+      thread_id: 0,
       sql_query: null,
       id: 2,
     },
     {
+      event: 'return',
       thread_id: 0,
-      event: 'return',
       id: 3,
-      parent_id: 1,
-    },
-    {
-      thread_id: 1,
-      event: 'return',
-      id: 4,
       parent_id: 2,
     },
     {
-      thread_id: 1,
       event: 'call',
-      id: 5,
+      thread_id: 2,
+      id: 4,
     },
     {
-      thread_id: 1,
       event: 'return',
+      thread_id: 2,
+      id: 5,
+      parent_id: 1,
+    },
+    {
+      event: 'return',
+      thread_id: 2,
       id: 6,
-      parent_id: 5,
+      parent_id: 4,
     },
   ].forEach((event) => {
     recording.record(null, event);
@@ -272,39 +282,39 @@ new Recording(
   );
   Assert.deepEqual(appmap.events, [
     {
-      thread_id: 0,
       event: 'call',
-      sql_query: null,
+      thread_id: 0,
       id: 1,
+      sql_query: null,
     },
     {
-      thread_id: 0,
       event: 'call',
+      thread_id: 0,
+      id: 4,
+    },
+    {
+      event: 'return',
+      thread_id: 0,
+      id: 6,
+      parent_id: 4,
+    },
+    {
+      event: 'return',
+      thread_id: 0,
+      id: 5,
+      parent_id: 1,
+    },
+    {
+      event: 'call',
+      thread_id: 0,
       sql_query: null,
       id: 2,
     },
     {
-      thread_id: 0,
       event: 'return',
-      id: 4,
-      parent_id: 2,
-    },
-    {
       thread_id: 0,
-      event: 'call',
-      id: 5,
-    },
-    {
-      thread_id: 0,
-      event: 'return',
-      id: 6,
-      parent_id: 5,
-    },
-    {
-      thread_id: 0,
-      event: 'return',
       id: 3,
-      parent_id: 1,
+      parent_id: 2,
     },
   ]);
 }
@@ -458,19 +468,19 @@ new Recording(
   );
   [
     {
-      thread_id: 0,
       event: 'call',
+      thread_id: 0,
       id: 1,
     },
     {
-      thread_id: 0,
       event: 'call',
+      thread_id: 0,
       sql_query: null,
       id: 2,
     },
     {
-      thread_id: 0,
       event: 'return',
+      thread_id: 0,
       id: 3,
       parent_id: 1,
     },
@@ -553,13 +563,6 @@ new Recording(
     },
     {
       thread_id: 0,
-      event: 'return',
-      http_server_response: { status_code: 100 },
-      id: 3,
-      parent_id: 1,
-    },
-    {
-      thread_id: 0,
       event: 'call',
       http_client_request: null,
       id: 2,
@@ -568,8 +571,15 @@ new Recording(
       thread_id: 0,
       event: 'return',
       http_client_response: { status_code: 100 },
-      id: 4,
+      id: 3,
       parent_id: 2,
+    },
+    {
+      thread_id: 0,
+      event: 'return',
+      http_server_response: { status_code: 100 },
+      id: 4,
+      parent_id: 1,
     },
   ]);
 }
