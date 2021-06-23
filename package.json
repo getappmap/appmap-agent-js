@@ -1,6 +1,6 @@
 {
   "name": "@appland/appmap-agent-js",
-  "version": "3.3.22",
+  "version": "3.3.23",
   "os": [
     "linux",
     "darwin"

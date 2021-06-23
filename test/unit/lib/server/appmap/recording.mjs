@@ -553,6 +553,13 @@ new Recording(
     },
     {
       thread_id: 0,
+      event: 'return',
+      http_server_response: { status_code: 100 },
+      id: 3,
+      parent_id: 1,
+    },
+    {
+      thread_id: 0,
       event: 'call',
       http_client_request: null,
       id: 2,
@@ -561,15 +568,8 @@ new Recording(
       thread_id: 0,
       event: 'return',
       http_client_response: { status_code: 100 },
-      id: 3,
-      parent_id: 2,
-    },
-    {
-      thread_id: 0,
-      event: 'return',
-      http_server_response: { status_code: 100 },
       id: 4,
-      parent_id: 1,
+      parent_id: 2,
     },
   ]);
 }
