@@ -4,6 +4,7 @@ export const server = [
   'either',
   'either-map',
   'validate',
+  'regexp-cache',
   'configuration/cwd',
   'configuration/git',
   'configuration/specifier',

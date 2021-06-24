@@ -84,7 +84,7 @@ const unlink = (path) => {
   const origin = appmap.origins.keys().next().value;
 
   Assert.equal(
-    (await appmap.recordAsync({ origin, event: 'event1' })).fromRight(),
+    (await appmap.recordAsync({ origin, event: {event:"call", id:1, thread_id:123}})).fromRight(),
     null,
   );
   Assert.equal((await appmap.pauseAsync(key)).fromRight(), null);
@@ -92,13 +92,13 @@ const unlink = (path) => {
     (await appmap.recordAsync({ origin, event: 'event2' })).fromRight(),
     null,
   );
-  Assert.equal((await appmap.playAsync(key)).fromRight(), null);
   Assert.equal(
     (await appmap.recordAsync({ origin, event: 'event3' })).fromRight(),
     null,
   );
+  Assert.equal((await appmap.playAsync(key)).fromRight(), null);
   Assert.equal(
-    (await appmap.recordAsync({ origin: null, event: 'event4' })).fromRight(),
+    (await appmap.recordAsync({ origin: null, event: {event:"return", parent_id: 1, id:2, thread_id:123} })).fromRight(),
     null,
   );
 
@@ -112,7 +112,7 @@ const unlink = (path) => {
   Assert.equal(json.classMap.length, 1);
   Assert.equal(json.classMap[0].type, 'package');
   Assert.equal(json.classMap[0].name, 'qux');
-  Assert.deepEqual(json.events, ['event1', 'event3', 'event4']);
+  Assert.deepEqual(json.events, [{event:"call", id:1, thread_id:0}, {event:"return", id:2, parent_id: 1, thread_id:0}]);
 })();
 
 {

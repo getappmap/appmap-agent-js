@@ -46,7 +46,7 @@ const location0 = new RootLocation({
   origin: 'origin',
   session: 'session',
   counters: { arrow: 0 },
-  exclude: new Set(['f']),
+  exclude: (name) => name === 'f',
 });
 Assert.equal(location0.getFile(), file);
 

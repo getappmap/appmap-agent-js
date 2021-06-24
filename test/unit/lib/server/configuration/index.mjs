@@ -102,13 +102,13 @@ Assert.equal(
 // getInstrumentation //
 ////////////////////////
 
-Assert.deepEqual(
-  getInitialConfiguration()
+{
+  const instrumentation = getInitialConfiguration()
     .extendWithData({
       exclude: ['foo'],
       packages: [
         {
-          exclude: ['bar'],
+          exclude: ['/^f[0-9][0-9]$/u'],
           path: 'qux.js',
           shallow: true,
           enabled: true,
@@ -117,14 +117,21 @@ Assert.deepEqual(
       cwd: '/base',
     })
     .fromRight()
-    .getInstrumentation('/base/qux.js'),
-  {
-    source: false,
-    enabled: true,
-    shallow: true,
-    exclude: ['bar', 'foo'],
-  },
-);
+    .getInstrumentation('/base/qux.js');
+  Assert.notEqual(Reflect.getOwnPropertyDescriptor(instrumentation, "exclude"), undefined);
+  Assert.equal(instrumentation.exclude("buz"), false);
+  Assert.equal(instrumentation.exclude("foo"), true);
+  Assert.equal(instrumentation.exclude("f01"), true);
+  delete instrumentation.exclude;
+  Assert.deepEqual(
+    instrumentation,
+    {
+      source: false,
+      enabled: true,
+      shallow: true,
+    },
+  );
+}
 
 ///////////////////
 // getOutputPath //

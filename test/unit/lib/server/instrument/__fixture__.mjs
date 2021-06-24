@@ -36,7 +36,7 @@ export const test = (options) => {
       output: null,
       session: '$',
       origin: 'origin',
-      exclude: new Set(),
+      exclude: () => false,
       keys: null,
       ...options,
     };
