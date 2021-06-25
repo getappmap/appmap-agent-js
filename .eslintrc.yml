@@ -1,10 +1,15 @@
 root: true
 extends:
   - eslint:recommended
+  - plugin:import/recommended
 env:
   commonjs: true
   es6: true
   es2017: true
+rules:
+  no-unused-vars:
+    - error
+    - { args: none }
 parserOptions:
   ecmaVersion: 2019
   sourceType: module
