@@ -1,0 +1,17 @@
+data:
+  file: []
+backend:
+  common: ["data"]
+server:
+  tcp: ["backend"]
+  http1: ["backend"]
+platform:
+  node: []
+instrumenter:
+  common: []
+client:
+  inline: ["backend"]
+  tcp: []
+  http1: []
+frontend:
+  common: ["platform", "instrumenter", "client"]
