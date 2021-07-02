@@ -3,11 +3,11 @@
 - * visit.mjs
   * entity.mjs
 - __fixture__.mjs
-- * visit-program.mjs
-  * visit-statement.mjs
+- visit-program.mjs
+- * visit-statement.mjs
   * visit-expression.mjs
+- * visit-class.mjs
   * visit-identifier.mjs
   * visit-pattern.mjs
-  * visit-class.mjs
-  * visit-closure.mjs
+- visit-closure.mjs
 - index.mjs
