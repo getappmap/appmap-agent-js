@@ -1,7 +1,7 @@
-data:
+persistency:
   file: []
 backend:
-  common: ["data"]
+  common: ["storage"]
 server:
   tcp: ["backend"]
   http1: ["backend"]
