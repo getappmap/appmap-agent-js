@@ -1,4 +1,4 @@
-persistency:
+storage:
   file: []
 backend:
   common: ["storage"]
