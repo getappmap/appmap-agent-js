@@ -1,4 +1,5 @@
-- * session.mjs
+- session.mjs
+- * - serializer.mjs
+    - recorder.mjs
   * track.mjs
-  * serializer.mjs
 - index.mjs
