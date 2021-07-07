@@ -5,13 +5,15 @@ backend:
 server:
   tcp: ["backend"]
   http1: ["backend"]
-platform:
-  node: []
-instrumenter:
-  common: []
+  http2: ["backend"]
 client:
   inline: ["backend"]
   tcp: []
   http1: []
+  http2: []
+platform:
+  node: []
+instrumenter:
+  common: []
 frontend:
-  common: ["platform", "instrumenter", "client"]
+  common: ["client", "platform", "instrumenter"]

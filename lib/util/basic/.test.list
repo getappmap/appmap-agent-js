@@ -2,6 +2,7 @@
   * bind.mjs
   * catch.mjs
   * constant.mjs
+  * deadcode.mjs
   * identity.mjs
   * noop.mjs
   * throw.mjs
