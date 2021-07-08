@@ -1,25 +1,9 @@
 - basic/
 - * - print.mjs
     - format.mjs
-    - * log
+    - * log.mjs
       * expect.mjs
   * increment.mjs
   * unique.mjs
   * path.mjs
-  
-
-
-- 
-- 
-- * increment.mjs
-  * unique.mjs
-  * - * noop.mjs
-      * identity.mjs
-      * constant.mjs
-    - print.mjs
-    - format.mjs
-    - check.mjs
-    - expect.mjs
-    - assert.mjs
-    - path.mjs
 - index.mjs
