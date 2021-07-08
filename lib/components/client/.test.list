@@ -1,5 +1,4 @@
 * inline/
-* - check-options.mjs
-  - * node-tcp/
-    * node-http1/
-    * node-http2/
+* node-tcp/
+* node-http1/
+* node-http2/
