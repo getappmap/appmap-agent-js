@@ -69,6 +69,7 @@
     "eslint-plugin-import": "^2.22.1",
     "express": "^4.17.1",
     "jasmine": "^3.7.0",
+    "jsdom": "^16.6.0",
     "mocha": "^8.4.0",
     "mysql": "^2.18.1",
     "pg": "^8.6.0",
