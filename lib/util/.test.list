@@ -1,11 +1,11 @@
 - basic/
-- * - print.mjs
+- * - object.mjs
+    - print.mjs
     - format.mjs
-    - * log.mjs
-      * expect.mjs
+    - expect.mjs
+    - log.mjs
   * increment.mjs
   * unique.mjs
   * path.mjs
   * specifier.mjs
-  * object.mjs
 - index.mjs
