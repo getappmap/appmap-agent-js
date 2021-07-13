@@ -4,7 +4,8 @@
     - format.mjs
     - expect.mjs
     - log.mjs
-  * increment.mjs
+  * counter.mjs
+  * toggle.mjs
   * unique.mjs
   * path.mjs
   * specifier.mjs
