@@ -1,5 +1,6 @@
 - * assert.mjs
-  * catch.mjs
+- * catch.mjs
+  * bind.mjs
   * compose.mjs
   * constant.mjs
   * deadcode.mjs

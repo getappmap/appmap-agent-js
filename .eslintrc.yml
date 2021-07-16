@@ -9,6 +9,7 @@ env:
   es6: true
   es2017: true
 rules:
+  no-empty-pattern: off
   no-console:
     - warn
   no-unused-vars:
