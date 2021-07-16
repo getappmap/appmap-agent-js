@@ -1,19 +1,29 @@
-storage:
-  file: []
-backend:
-  common: ["storage"]
-server:
-  tcp: ["backend"]
-  http1: ["backend"]
-  http2: ["backend"]
-client:
-  inline: ["backend"]
-  tcp: []
-  http1: []
-  http2: []
-platform:
-  node: []
-instrumenter:
+util:
   common: []
-frontend:
-  common: ["client", "platform", "instrumenter"]
+expect:
+  error: [util]
+  alert: [util]
+  exit: [util]
+log:
+  node: [util, expect]
+storage:
+  file: [util, expect]
+instrumentation:
+  common: [util, expect]
+# backend:
+#   common: [util, storage]
+# server:
+#   tcp: [backend]
+#   http1: [backend]
+#   http2: [backend]
+# client:
+#   inline: ["backend"]
+#   tcp: []
+#   http1: []
+#   http2: []
+# platform:
+#   node: []
+# instrumenter:
+#   common: []
+# frontend:
+#   common: ["client", "platform", "instrumenter"]
