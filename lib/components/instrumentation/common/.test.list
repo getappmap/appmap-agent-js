@@ -1,13 +1,12 @@
-- node.mjs
 - caption.mjs
-- * visit.mjs
-  * entity.mjs
-- __fixture__.mjs
-- visit-program.mjs
-- * visit-statement.mjs
-  * visit-expression.mjs
+- entity.mjs
 - * visit-class.mjs
+  * visit-closure.mjs
+  * visit-program.mjs
+  * visit-expression.mjs
   * visit-identifier.mjs
   * visit-pattern.mjs
-- visit-closure.mjs
+  * visit-program.mjs
+  * visit-statement.mjs
+- visit.mjs
 - index.mjs
