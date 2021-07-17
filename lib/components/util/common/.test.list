@@ -1,18 +1,15 @@
 - assert.mjs
-- * bind.mjs
+- * box.mjs
   * catch.mjs
-  * compose.mjs
-  * constant.mjs
   * counter.mjs
   * deadcode.mjs
-  * identity.mjs
-  * noop.mjs
+  * function.mjs
   * object.mjs
   * path.mjs
   * promise.mjs
   * specifier.mjs
   * throw.mjs
-  * toggle.mjs
   * unique.mjs
   * - print.mjs
     - format.mjs
+- index.mjs

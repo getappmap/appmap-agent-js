@@ -10,6 +10,8 @@ env:
   es2017: true
 rules:
   no-empty-pattern: off
+  no-debugger:
+    - warn
   no-console:
     - warn
   no-unused-vars:
