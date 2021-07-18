@@ -1,9 +1,10 @@
 - caption.mjs
 - entity.mjs
+- __fixture__.mjs
 - * visit-class.mjs
-  * visit-closure.mjs
   * visit-program.mjs
   * visit-expression.mjs
+  * visit-function.mjs
   * visit-identifier.mjs
   * visit-pattern.mjs
   * visit-program.mjs

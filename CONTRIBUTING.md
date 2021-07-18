@@ -1,4 +1,4 @@
-# Style
+# Programming Style
 
 This project use functional style rather than object-oriented style.
 As a rule of thumb use arrows (`=>`) instead of the `function` or `class` keyword.
@@ -7,43 +7,152 @@ There is two kinds of side effects: *external* and *internal*.
 External side effects are made of input/output operations.
 Due to the nature of the project, these are unavoidable.
 Ideally, they should append at the boundary of the system but currently they are bit all over the place.
-Internal side effects are *always* avoidable and are made of variables assignments and builtin data structure mutation -- eg: `obj[key] = val`, `arr[idx] = val`, and `weakmap.set(key, val)`.
-Variable assignments should never append, always use *const* instead of *let* and *var*.
-For performance reasons, memory mutation is tolerated.
-Memory mutation should be applied on the smallest possible data structure.
-For instance:
+Internal side effects are *always* avoidable and can be categorized in two .are made of variables assignments and builtin data structure mutation.
+
+First, environment mutations through variable assignments -- eg: `x = 123;`.
+Variable mutations are tolerated locally.
+That is that after the function returns, its free variables should not longer change.
 
 ```js
-// Bad
-const state1 = {
-  constant1: "foo",
-  constant2: "bar",
-  counter: 0,
-  toggle: false,
-};
-
-// Good
-const state2 = {
-  constant1: "foo",
-  constant2: "bar",
-  counter: {value:0},
-  toggle: {value: false},
-};
+// Tolerated Environment Mutation //
+{
+  const aggregateFooBar = (options) => {
+    let result = "";
+    if (options.foo) {
+      result += "foo";
+    }
+    if (options.bar) {
+      result += "bar";
+    }
+    return result;
+  };
+  console.assert(aggregateFooBar({foo:true, bar:false}), "foo");
+}
+// Forbidden Environment Mutation //
+{
+  const createIncrement = () => {
+    let value = 0;
+    return  () => value += 1;
+  };
+  const increment = createIncrement();
+  console.assert(increment(), 1);
+  console.assert(increment(), 2);
+}
 ```
 
-# Naming Convention
+Second, memory/store/heap mutations through property assignments and builtin calls -- eg: `obj[key] = val`, `arr[idx] = val`, and `weakmap.set(key, val)`.
+Memory mutation should happen on the smallest possible scale.
+For instance, a data object should not mix (meant to be) immutable properties with (meant to be) mutable one.
+Instead, all its properties should be (mean to be) immutables while the mutations are encapsulated in smaller objects.
 
-* `make`: make something that is not meant to be mutated.
-* `create`: create something that is meant to be mutated either directly or via one of its properties.
-* `initialize` and `terminate`: initialize something that is meant to be terminated.
+```js
+// Forbidden Memory Mutation //
+{
+  const createBigState = () => ({
+    constant_property_field: "foo",
+    counter: 0,
+  });
+  const incrementBigState = (big_state) => big_state.counter += 1;
+  const big_state = createBigState();
+  console.assert(incrementBigState(big_state), 1);
+}
+// Tolerated Memory Mutation //
+{
+  const createCounter = () => ({value:0});
+  const incrementCounter = (counter) => counter.value += 1;
+  const createBigState = () => ({
+    constant_property_field: "foo",
+    counter: createCounter(),
+  });
+  const big_state = createBigState();
+  const incrementBigState = ({counter}) => incrementCounter(counter);
+  console.assert(incrementBigState(big_state), 1);
+}
+```
+
+# Variable Casing
+
+<!-- https://www.youtube.com/watch?v=US8QG9I1XW0&t=2660s -->
+
+We use different casing for variable throughout the project.
+The casing is primarily based on the type of value that the variable is holding and secondary based on its initialization context.
+First, we define the terminology for categorizing values:
+
+* Primitive: anything that is either `null` or not of type `"object"` nor of type `"function"`.
+* Function: anything that is of type `"function"`.
+  * Arrow: function that does not access the `this` argument -- eg: `() => 123`.
+  * Constructor: function that expects to be called with the `new` keyword -- eg: `function Foo () { this.bar = "qux"; }`.
+  * Method: function that are affected
+* Object: anything of type `"object"` that is not `null`.
+  * Library: object whose prototype is either `null` or `Object.prototype` and whose own property values can be anything but methods. The idea of a library is that its identity does not matter, only its content does.
+
+We can now introduce our casing rules:
+
+* `global_`: Constant being initialized by a property access of the global object.
+* `UPPER_SNAKE_CASE`: Constant variables being initialized by a primitive literal or by operations on other upper snake case variables and primitive literals.
+* `lower_snake_case`: Variables holding anything that is not a function nor a library.
+* `CamelCase`: Variables holding constructors, libraries, or arrow functions that return a library (aka library factories).
+* `lowerCamelCase`: Variables holding arrow functions. The first word should be a verb.
+
+Note that our casing rules are overlapping.
+If multiple casing applies, the casing that appears the higher in the list should be picked.
+For instance, when applicable, `UPPER_SNAKE_CASE` should preferred over `lower_snake_case`.
+So `const EULER_NUMBER = 2.718;` should be preferred over `const euler_number = 2.718;`
+
+Examples:
+
+```js
+// global_
+const global_Refect_ownKeys = Reflect.ownKeys;
+const {parse:global_JSON_parse} = global.JSON;
+const global_JSON_stringify = JSON.stringify;
+
+// UPPER_SNAKE_CASE
+const EULER_NUMBER = 2.718;
+const PI = 3.1516;
+const DOUBLE_PI = 2 * PI;
+
+// lower_snake_case
+const content = readFileSync("file.txt");
+const content1 = readFileSync("file1.txt");
+const foo_content = readFileSync("foo.txt");
+
+// CamelCase
+class AppmapError extends Error;
+import * as FileSystem from "fs";
+import Util from "lib/components/common/util.mjs";
+
+// lowerCamelCase
+const {readFileSync} = FileSystem;
+const {assert, print} = Util({});
+const add = (x, y) => x + y;
+const addOne = (x) => add(x, 1);
+```
+
+## Factory
+
+Because of the functional style of this project, factory functions are preferred over contructors.
+The verb used for the factory functions is based on the stuff it creates.
+
+* Can be simply garbage-collected:
+  * Function: use `generate` prefix -- eg: `fooBar = generateFooBar(...)`
+  * Data:
+    * Immutable: use `make` prefix -- eg: `foo = makeFoo(...)` and `foo = await makeFooAsync(...)`
+    * Mutable: use `create` prefix -- eg: `foo = createFoo(...)` and `foo = await createFooAsync(...)`
+  * Library: use `CamelCase` -- eg: `{foo, bar} = FooBar()`
+* Requires manual cleanup:
+  * Opening: use `open` prefix -- eg: `foo = openFoo(...)` or `foo = openFooAsync(...)`
+  * Closing:
+    * Absence of internal termination source: `await closeFooAsync(foo)`
+    * Presence of internal termination source: `closeFoo(foo)` and `await awaitFoo(foo)`
 
 # Component System
 
 Because the project should support many different use cases its components should be composable with flexibility.
-This is provided through dependency injection.
+This is provided through dependency injection -- aka partial function applications -- cf: https://blog.ploeh.dk/2017/01/27/from-dependency-injection-to-dependency-rejection/ and https://www.youtube.com/watch?v=cxs7oLGrxQ4.
 Each component should export a default function that accept the other components upon which it depends.
 Internally to a component, the modules should directly import themselves and *not* use dependency injection.
-However the dependencies should still be manually passed around between the modules of a component.
+Note that the dependencies should still be manually passed around between the modules of a component.
 For instance:
 
 ```js
@@ -106,7 +215,7 @@ For instance:
 # Unit Testing
 
 Each test files should be placed in the same directory than the file it tests.
-And it should be named with the `.test.mjs` conventation.
+And it should be named with the `.test.mjs` convention.
 For instance `foo.test.mjs` for a test file that tests `foo.mjs`.
 Test files should be standalone and directly runnable by node.
 The exit code of the node process is used to determine whether the unit test passed or failed.
