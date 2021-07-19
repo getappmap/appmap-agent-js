@@ -43,7 +43,7 @@ That is that after the function returns, its free variables should not longer ch
 Second, memory/store/heap mutations through property assignments and builtin calls -- eg: `obj[key] = val`, `arr[idx] = val`, and `weakmap.set(key, val)`.
 Memory mutation should happen on the smallest possible scale.
 For instance, a data object should not mix (meant to be) immutable properties with (meant to be) mutable one.
-Instead, all its properties should be (mean to be) immutables while the mutations are encapsulated in smaller objects.
+Instead, all its properties should be (meant to be) immutables while mutations are encapsulated in smaller objects.
 
 ```js
 // Forbidden Memory Mutation //
@@ -108,8 +108,8 @@ const {parse:global_JSON_parse} = global.JSON;
 const global_JSON_stringify = JSON.stringify;
 
 // UPPER_SNAKE_CASE
-const EULER_NUMBER = 2.718;
-const PI = 3.1516;
+const EULER_NUMBER = 2.7183;
+const PI = 3.1416;
 const DOUBLE_PI = 2 * PI;
 
 // lower_snake_case
@@ -131,8 +131,8 @@ const addOne = (x) => add(x, 1);
 
 ## Factory
 
-Because of the functional style of this project, factory functions are preferred over contructors.
-The verb used for the factory functions is based on the stuff it creates.
+Because this project encourage functional style, factory functions should be preferred over constructors.
+The verb used for a factory function should be based on the stuff it creates.
 
 * Can be simply garbage-collected:
   * Function: use `generate` prefix -- eg: `fooBar = generateFooBar(...)`
