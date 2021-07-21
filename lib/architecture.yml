@@ -8,22 +8,32 @@ log:
   node: [util, expect]
 storage:
   file: [util, expect]
+interpretation:
+  common: []
 instrumentation:
   common: [util, expect]
+client:
+  mock: []
+  inline: [backend]
+  tcp: []
+  http1: [util]
+  http2: [util]
+time:
+  mock: []
+  date: []
+  performance-node: []
+  performance-browser: []
+grouping:
+  lone: [util]
+  node-async-hooks: []
+frontend:
+  common: [util, expect, client, time, grouping, instrumentation]
+
 # backend:
 #   common: [util, storage]
 # server:
 #   tcp: [backend]
 #   http1: [backend]
 #   http2: [backend]
-# client:
-#   inline: ["backend"]
-#   tcp: []
-#   http1: []
-#   http2: []
 # platform:
 #   node: []
-# instrumenter:
-#   common: []
-# frontend:
-#   common: ["client", "platform", "instrumenter"]

@@ -1,9 +1,6 @@
-- * serialization
-  * - session.mjs
+- * - session.mjs
     - messaging.mjs
-    - recording.mjs
-- 
-- * - serializer.mjs
-    - recorder.mjs
-  * track.mjs
+    - * track.mjs
+      * recording.mjs
+  * serialization.mjs
 - index.mjs
