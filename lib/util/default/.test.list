@@ -6,7 +6,8 @@
   * function.mjs
   * object.mjs
   * path.mjs
-  * promise.mjs
+  * - promise.mjs
+    - stream.mjs
   * specifier.mjs
   * throw.mjs
   * - print.mjs

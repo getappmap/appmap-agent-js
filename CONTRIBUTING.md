@@ -7,13 +7,24 @@ There is two kinds of side effects: *external* and *internal*.
 External side effects are made of input/output operations.
 Due to the nature of the project, these are unavoidable.
 Ideally, they should append at the boundary of the system but currently they are bit all over the place.
-Internal side effects are *always* avoidable and can be categorized in two .are made of variables assignments and builtin data structure mutation.
+Internal side effects are *always* avoidable and can be categorized in two.
 
 First, environment mutations through variable assignments -- eg: `x = 123;`.
-Variable mutations are tolerated locally.
-That is that after the function returns, its free variables should not longer change.
+Variable mutations are forbidden on free variables.
+That is that only local variables may be re-assigned.
+This rule aim at making side effects more explicit.
 
 ```js
+// Forbidden Environment Mutation //
+{
+  const createIncrement = () => {
+    let value = 0;
+    return () => value += 1;
+  };
+  const increment = createIncrement();
+  console.assert(increment(), 1);
+  console.assert(increment(), 2);
+}
 // Tolerated Environment Mutation //
 {
   const aggregateFooBar = (options) => {
@@ -28,22 +39,14 @@ That is that after the function returns, its free variables should not longer ch
   };
   console.assert(aggregateFooBar({foo:true, bar:false}), "foo");
 }
-// Forbidden Environment Mutation //
-{
-  const createIncrement = () => {
-    let value = 0;
-    return  () => value += 1;
-  };
-  const increment = createIncrement();
-  console.assert(increment(), 1);
-  console.assert(increment(), 2);
-}
 ```
 
 Second, memory/store/heap mutations through property assignments and builtin calls -- eg: `obj[key] = val`, `arr[idx] = val`, and `weakmap.set(key, val)`.
-Memory mutation should happen on the smallest possible scale.
+There is two rules 
+
+The first rule mandates that memory mutations must happen on the smallest possible scale.
 For instance, a data object should not mix (meant to be) immutable properties with (meant to be) mutable one.
-Instead, all its properties should be (meant to be) immutables while mutations are encapsulated in smaller objects.
+Instead, all its properties should be (meant to be) immutable while mutations are encapsulated in smaller objects.
 
 ```js
 // Forbidden Memory Mutation //
@@ -69,6 +72,19 @@ Instead, all its properties should be (meant to be) immutables while mutations a
   console.assert(incrementBigState(big_state), 1);
 }
 ```
+
+The second rule forbids memory mutations on free variables.
+This rule also aim at making side effects more explicit.
+
+```js
+// Forbidden Memory Mutation //
+const createCounter = () => ({value:0});
+const incrementCounter = (counter) => counter.value += 1;
+const counter = createCounter()
+const increment = () => incrementCounter(counter);
+```
+
+# Side
 
 # Variable Casing
 
