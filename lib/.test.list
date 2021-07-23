@@ -1,13 +1,14 @@
+- violation/
+- assert/
 - util/
-- expect/
 - log/
 - uuid/
+- time/
 - instrumentation/
 - interpretation/
 - client/
 - storage/
 - server/
-- time/
 - serialization
 - state/
 - hook-apply/
