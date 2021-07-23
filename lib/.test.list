@@ -1,9 +1,11 @@
 - violation/
 - assert/
 - util/
-- log/
-- uuid/
-- time/
+- * log/
+  * uuid/
+  * time/
+- git/
+- config/
 - instrumentation/
 - interpretation/
 - client/

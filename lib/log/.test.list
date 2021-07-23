@@ -1,0 +1,6 @@
+- log.mjs
+- * trace/
+  * info/
+  * warning/
+  * error/
+  * off/
