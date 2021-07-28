@@ -1,17 +1,57 @@
 import { readFile } from "fs/promises";
+import { relative } from "path";
+import { fileURLToPath } from "url";
 import YAML from "yaml";
-import { home } from "./home.mjs";
 import { assert } from "./assert.mjs";
 
+const { cwd } = process;
 const _Map = Map;
-const { ownKeys } = Reflect;
+const { isArray } = Array;
+const _undefined = undefined;
+const { getOwnPropertyDescriptor } = Reflect;
 const { entries, fromEntries } = Object;
 const { parse: parseYAML } = YAML;
 
+const extractName = (type, tag, blueprint, _default) => {
+  if (blueprint.has(type)) {
+    return blueprint.get(type);
+  }
+  assert(
+    getOwnPropertyDescriptor(_default, tag) !== _undefined,
+    "component %s is missing a default name for tag %s",
+    type,
+    tag,
+  );
+  const name = _default[tag];
+  assert(
+    name !== null,
+    "component %s is explicitely missing a default name for tag %s",
+  );
+  return name;
+};
+
+const extractTypes = (type, name, dependencies) => {
+  if (isArray(dependencies)) {
+    return dependencies;
+  }
+  assert(
+    getOwnPropertyDescriptor(dependencies, name) !== _undefined,
+    "component %s has not dependencies for %s",
+    type,
+    name,
+  );
+  return dependencies[name];
+};
+
 const buildComponentAsync = async (type, context) => {
-  const { blueprint, cache, root, main, deps } = context;
-  assert(blueprint.has(type), "missing component name for %s", type);
-  const name = blueprint.get(type);
+  const { blueprint, tag, cache, root, main, conf } = context;
+  if (cache.has(type)) {
+    return cache.get(type);
+  }
+  const { default: _default, dependencies } = parseYAML(
+    await readFile(`${root}/${type}/${conf}`, "utf8"),
+  );
+  const name = extractName(type, tag, blueprint, _default);
   if (typeof name !== "string") {
     cache.set(type, name);
     return name;
@@ -22,9 +62,10 @@ const buildComponentAsync = async (type, context) => {
   const component = Component(
     fromEntries(
       await Promise.all(
-        parseYAML(
-          await readFile(`${root}/${type}/${name}/${deps}`, "utf8"),
-        ).map(async (type) => [type, await buildComponentAsync(type, context)]),
+        extractTypes(type, name, dependencies).map(async (type) => [
+          type,
+          await buildComponentAsync(type, context),
+        ]),
       ),
     ),
   );
@@ -32,21 +73,21 @@ const buildComponentAsync = async (type, context) => {
   return component;
 };
 
-const createContextAsync = async (blueprint, options) => {
-  const { root } = { root: `${home}/lib`, ...options };
-  return {
-    deps: ".deps.yml",
-    main: "index.mjs",
-    ...options,
-    root,
-    blueprint: new _Map(entries(blueprint)),
-    cache: new _Map(),
-  };
-};
+const createContext = (blueprint, options) => ({
+  conf: ".build.yml",
+  main: "index.mjs",
+  root: `${cwd()}/lib`,
+  tag: "prod",
+  ...options,
+  blueprint: new _Map(blueprint ? entries(blueprint) : []),
+  cache: new _Map(),
+});
 
-export const buildAllAsync = async (types, blueprint, options) => {
-  const context = await createContextAsync(blueprint, options);
-  return fromEntries(
+// export const buildOneAsync = async (type, blueprint, options) =>
+//   await buildComponentAsync(type, createContext(blueprint, options));
+
+const buildAsync = async (types, context) =>
+  fromEntries(
     await Promise.all(
       types.map(async (type) => [
         type,
@@ -54,10 +95,24 @@ export const buildAllAsync = async (types, blueprint, options) => {
       ]),
     ),
   );
+
+export const buildProdAsync = async (types, blueprint, options) =>
+  buildAsync(types, createContext(blueprint, { ...options, tag: "prod" }));
+
+export const buildTestAsync = async (input, blueprint, options) => {
+  const { url, deps } = {
+    deps: [],
+    ...input,
+  };
+  const path = fileURLToPath(url);
+  const context = createContext(blueprint, { tag: "test", ...options });
+  const { root, conf } = context;
+  const [type, name] = relative(root, path).split("/");
+  const { dependencies } = parseYAML(
+    await readFile(`${root}/${type}/${conf}`, "utf8"),
+  );
+  return buildAsync(
+    [...deps, ...extractTypes(type, name, dependencies)],
+    context,
+  );
 };
-
-export const buildOneAsync = async (type, blueprint, options) =>
-  buildComponentAsync(type, await createContextAsync(blueprint, options));
-
-export const buildAsync = async (blueprint, options) =>
-  buildAllAsync(ownKeys(blueprint), blueprint, options);

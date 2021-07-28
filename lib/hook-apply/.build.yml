@@ -1,0 +1,8 @@
+default:
+  test: default
+  prod: default
+dependencies:
+  - util
+  - interpretation
+  - state
+  - client

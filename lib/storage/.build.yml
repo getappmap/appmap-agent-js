@@ -1,0 +1,6 @@
+default:
+  test: spy
+  prod: file
+dependencies:
+  file:
+    - assert

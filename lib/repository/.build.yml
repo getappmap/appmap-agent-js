@@ -1,0 +1,12 @@
+default:
+  test: stub
+  prod: node
+dependencies:
+  dead:
+    - assert
+  stub:
+    - util
+  node:
+    - assert
+    - util
+    - log

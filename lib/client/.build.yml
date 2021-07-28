@@ -1,0 +1,14 @@
+default:
+  test: spy
+  prod: null
+dependencies:
+  spy:
+    - util
+  node-tcp: []
+  node-http1:
+    - util
+    - uuid
+  node-http2:
+    - util
+  inline:
+    - backend

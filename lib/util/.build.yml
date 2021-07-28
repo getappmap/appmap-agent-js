@@ -1,0 +1,6 @@
+default:
+  test: default
+  prod: default
+dependencies:
+  - violation
+  - assert

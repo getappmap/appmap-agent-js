@@ -1,0 +1,10 @@
+default:
+  test: default
+  prod: null
+dependencies:
+  default:
+    - util
+    - assert
+    - uuid
+    - specifier
+  transparent: []

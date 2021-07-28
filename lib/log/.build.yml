@@ -1,0 +1,6 @@
+default:
+  test: off
+  prod: warning
+dependencies:
+  - assert
+  - util

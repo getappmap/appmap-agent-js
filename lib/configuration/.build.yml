@@ -1,0 +1,7 @@
+default:
+  test: default
+  prod: default
+dependencies:
+  - util
+  - specifier
+  - repository
