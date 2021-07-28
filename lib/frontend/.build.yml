@@ -1,0 +1,9 @@
+default:
+  test: default
+  prod: default
+dependencies:
+  - state
+  - client
+  - hook-apply
+  - hook-group
+  - hook-module
