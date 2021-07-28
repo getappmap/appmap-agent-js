@@ -1,16 +1,15 @@
-- violation/
-- assert/
-- util/
-- * log/
-  * uuid/
-  * time/
-- git/
-- config/
-- instrumentation/
-- interpretation/
-- client/
-- storage/
-- server/
+- violation
+- assert
+- util
+- * log
+  * uuid
+  * time
+- specifier
+- repository
+- configuration
+- instrumentation
+- interpretation
+- client
+- storage
 - serialization
-- state/
-- hook-apply/
+- state

@@ -19,7 +19,7 @@
     "testing"
   ],
   "scripts": {
-    "tt": "npx test-turtle 'npx eslint $1 $2 && npx prettier -w $1 $2 && node --unhandled-rejections=strict $2 && npx c8 --include $1 --check-coverage --branches 100 --functions 100 -- node --unhandled-rejections=strict $2'",
+    "tt": "npx test-turtle --layout alongside 'npx eslint $1 $2 && npx prettier -w $1 $2 && node --unhandled-rejections=strict $2 && npx c8 --include $1 --check-coverage --branches 100 --functions 100 -- node --unhandled-rejections=strict $2'",
     "cov": "npx c8 --reporter html --include $COV.mjs node $COV.test.mjs && open coverage/index.html",
     "test": "node test/run.js",
     "coverage": "npx c8 --reporter=html --require $TARGET node test/unit/$TARGET",
@@ -78,7 +78,7 @@
     "sqlite3": "^5.0.2",
     "tap": "^15.0.5",
     "tape": "^5.2.2",
-    "test-turtle": "^2.0.0"
+    "test-turtle": "^4.0.2"
   },
   "repository": {
     "type": "git",
