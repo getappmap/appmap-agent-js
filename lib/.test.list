@@ -7,10 +7,12 @@
 - specifier
 - repository
 - configuration
-- instrumentation
-- interpretation
-- serialization
-- state
-- client
-- hook-apply
+- * - * instrumentation
+      * interpretation
+      * serialization
+    - state
+  * client
+  * - hook
+    - * hook-apply
+      * hook-group
 - storage

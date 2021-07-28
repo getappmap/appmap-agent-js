@@ -1,0 +1,10 @@
+default:
+  test: void
+  prod: null
+dependencies:
+  void:
+    - assert
+  node-async:
+    - util
+    - state
+    - client

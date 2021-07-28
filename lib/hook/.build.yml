@@ -1,0 +1,8 @@
+default:
+  test: fixture
+  prod: null
+dependencies:
+  - util
+  - configuration
+  - state
+  - client
