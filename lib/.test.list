@@ -16,4 +16,5 @@
     - * hook-apply
       * hook-group
       * hook-module
+- frontend
 - storage

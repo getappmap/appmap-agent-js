@@ -5,4 +5,5 @@ dependencies:
   default:
     - util
   stub:
+    - util
     - assert

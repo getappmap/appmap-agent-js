@@ -2,6 +2,9 @@ default:
   test: void
   prod: null
 dependencies:
-  - util
-  - state
-  - client
+  void:
+    - assert
+  node:
+    - util
+    - state
+    - client

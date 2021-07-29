@@ -2,6 +2,7 @@ default:
   test: default
   prod: default
 dependencies:
+  - util
   - state
   - client
   - hook-apply
