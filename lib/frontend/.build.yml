@@ -3,8 +3,8 @@ default:
   prod: default
 dependencies:
   - util
-  - state
-  - client
-  - hook-apply
-  - hook-group
-  - hook-module
+  - assert
+  - time
+  - uuid
+  - instrumentation
+  - serialization

@@ -4,5 +4,5 @@ default:
 dependencies:
   - util
   - configuration
-  - state
+  - frontend
   - client

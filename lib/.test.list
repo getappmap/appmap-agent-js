@@ -7,14 +7,14 @@
 - specifier
 - repository
 - configuration
-- * - * instrumentation
-      * interpretation
-      * serialization
-    - state
-  * client
-  * - hook
+- * instrumentation
+  * interpretation
+  * serialization
+- frontend
+- * - hook
     - * hook-apply
       * hook-group
       * hook-module
-- frontend
+  * client
+- agent
 - storage
