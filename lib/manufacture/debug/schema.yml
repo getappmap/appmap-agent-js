@@ -2,10 +2,7 @@
 - $id: trace
   type: object
   properties:
-    modules:
-      type: array
-      items:
-        $ref: module
+    files:
     groups:
       type: array
       items:
