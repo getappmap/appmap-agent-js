@@ -7,4 +7,5 @@ dependencies:
     - assert
     - uuid
     - specifier
+    - naming
   transparent: []

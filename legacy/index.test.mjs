@@ -27,17 +27,27 @@ const testAsync = async () => {
       {
         "hidden-identifier": "$",
         language: { version: 2020 },
+        source: false,
         exclude: [],
         packages: [
           {
             path: "foo.js",
             enabled: true,
+            source: true,
             exclude: [],
             shallow: true,
           },
           {
             path: "bar.js",
+            enabled: true,
+            source: null,
+            exclude: [],
+            shallow: true,
+          },
+          {
+            path: "qux.js",
             enabled: false,
+            source: null,
             exclude: [],
             shallow: true,
           },
@@ -52,7 +62,12 @@ const testAsync = async () => {
     instrument(instrumentation, "script", "/cwd/foo.js", "123;"),
     {
       code: "123;",
-      file: { index: 0, type: "script", path: "/cwd/foo.js", code: "123;" },
+      module: {
+        kind: "script",
+        path: "/cwd/foo.js",
+        code: "123;",
+        children: [],
+      },
     },
   );
 
@@ -60,7 +75,20 @@ const testAsync = async () => {
     instrument(instrumentation, "script", "/cwd/bar.js", "456;"),
     {
       code: "456;",
-      file: null,
+      module: {
+        kind: "script",
+        path: "/cwd/bar.js",
+        code: null,
+        children: [],
+      },
+    },
+  );
+
+  assertDeepEqual(
+    instrument(instrumentation, "script", "/cwd/qux.js", "789;"),
+    {
+      code: "789;",
+      module: null,
     },
   );
 };

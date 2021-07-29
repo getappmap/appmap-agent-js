@@ -7,7 +7,8 @@
 - specifier
 - repository
 - configuration
-- * instrumentation
+- * - naming
+    - instrumentation
   * interpretation
   * serialization
 - frontend

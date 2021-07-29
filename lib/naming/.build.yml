@@ -1,5 +1,5 @@
 default:
-  test: debug
-  prod: appmap
+  test: default
+  prod: default
 dependencies:
   - util
