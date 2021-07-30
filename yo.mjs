@@ -1,12 +1,27 @@
-import {createServer} from "net";
+// import {createServer} from "net";
 
-const server = createServer();
-server.listen(8000);
-server.on("connection", (socket) => {
-  socket.on("data", (data) => {
-    process.stdout.write(data);
-  });
+import {writeSync} from "fs";
+import {createHook} from "async_hooks";
+
+const hook = createHook({
+  init: (arg0, arg1, arg2) => {
+    writeSync(1, `${JSON.stringify([arg0, arg1, arg2])}${"\n"}`);
+  }
 });
+
+hook.enable();
+
+writeSync(1, "foo\n");
+setTimeout(() => { writeSync(1, "bar\n") });
+writeSync(1, "qux\n");
+
+// const server = createServer();
+// server.listen(8000);
+// server.on("connection", (socket) => {
+//   socket.on("data", (data) => {
+//     process.stdout.write(data);
+//   });
+// });
 
 // console.log(this);
 //
