@@ -6,6 +6,7 @@ dependencies:
     - util
   node-tcp: []
   node-http1:
+    - assert
     - util
     - uuid
   node-http2:

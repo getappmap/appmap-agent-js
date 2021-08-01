@@ -1,4 +1,5 @@
-- * box.mjs
+- * array.mjs
+  * box.mjs
   * counter.mjs
   * function.mjs
   * object.mjs

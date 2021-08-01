@@ -3,6 +3,8 @@ default:
   prod: default
 dependencies:
   default:
+    - assert
+    - log
     - util
   stub:
     - util
