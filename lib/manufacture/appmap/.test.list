@@ -1,4 +1,5 @@
 - * - classmap.mjs
+    - event-data.mjs
     - event.mjs
   * metadata.mjs
   * track.mjs
