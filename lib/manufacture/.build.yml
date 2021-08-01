@@ -3,5 +3,6 @@ default:
   prod: appmap
 dependencies:
   - assert
+  - log
   - util
   - naming
