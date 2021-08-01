@@ -6,3 +6,4 @@ dependencies:
   - log
   - util
   - naming
+  - configuration
