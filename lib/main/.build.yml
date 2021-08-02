@@ -1,0 +1,7 @@
+default:
+  test: null
+  prod: null
+dependencies:
+  node:
+    - configuration
+    - agent
