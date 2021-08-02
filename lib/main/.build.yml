@@ -3,5 +3,8 @@ default:
   prod: null
 dependencies:
   node:
+    - assert
+    - log
+    - specifier
     - configuration
     - agent
