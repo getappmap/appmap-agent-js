@@ -5,6 +5,5 @@ dependencies:
   - util
   - assert
   - time
-  - uuid
   - instrumentation
   - serialization

@@ -7,6 +7,10 @@
 - specifier
 - repository
 - configuration
+- storage
+- trace
+- backend
+- server
 - * - naming
     - instrumentation
   * interpretation
@@ -18,5 +22,3 @@
       * hook-module
   * client
 - agent
-- storage
-- compile

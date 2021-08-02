@@ -3,6 +3,7 @@ default:
   prod: null
 dependencies:
   spy:
+    - assert
     - util
   node-tcp: []
   node-http1:
@@ -12,4 +13,6 @@ dependencies:
   node-http2:
     - util
   inline:
+    - assert
+    - util
     - backend

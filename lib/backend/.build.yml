@@ -2,5 +2,7 @@ default:
   test: default
   prod: default
 dependencies:
+  - assert
   - util
-  - manufacture
+  - storage
+  - trace
