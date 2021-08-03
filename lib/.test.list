@@ -20,6 +20,7 @@
     - * hook-apply
       * hook-group
       * hook-module
+      * hook-query
   * client
 - agent
 - main

@@ -1,0 +1,9 @@
+default:
+  test: void
+  prod: null
+dependencies:
+  void:
+    - assert
+  node:
+    - frontend
+    - client
