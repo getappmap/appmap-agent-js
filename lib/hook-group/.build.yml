@@ -4,6 +4,7 @@ default:
 dependencies:
   void:
     - assert
+    - util
   node:
     - util
     - frontend
