@@ -8,3 +8,6 @@ dependencies:
     - specifier
     - configuration
     - agent
+  batch:
+    - util
+    - server
