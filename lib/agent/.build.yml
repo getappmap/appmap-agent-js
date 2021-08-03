@@ -2,7 +2,6 @@ default:
   test: default
   prod: default
 dependencies:
-  - util
   - frontend
   - client
   - hook-apply

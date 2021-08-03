@@ -6,6 +6,6 @@ dependencies:
     - assert
     - util
   node:
-    - util
+    - assert
     - frontend
     - client

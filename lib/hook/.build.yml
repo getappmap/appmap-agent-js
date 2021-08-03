@@ -2,7 +2,6 @@ default:
   test: fixture
   prod: null
 dependencies:
-  - util
   - configuration
   - frontend
   - client

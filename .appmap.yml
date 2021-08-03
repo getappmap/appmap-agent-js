@@ -1,8 +1,0 @@
-enabled: true
-port: 0
-protocol: tcp
-packages:
-  - glob: sample/sandbox/*.js
-children:
-  - node sample/sandbox/foo.js
-  - node sample/sandbox/bar.js
