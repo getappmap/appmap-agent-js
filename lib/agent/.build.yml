@@ -8,3 +8,4 @@ dependencies:
   - hook-apply
   - hook-group
   - hook-module
+  - hook-query
