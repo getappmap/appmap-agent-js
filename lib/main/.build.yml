@@ -4,6 +4,7 @@ default:
 dependencies:
   node:
     - assert
+    - util
     - log
     - specifier
     - configuration
