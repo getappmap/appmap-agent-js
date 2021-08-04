@@ -3,7 +3,7 @@ import {buildProdAsync} from "../build/index.mjs";
 
 const {main:{mainAsync}} = await buildProdAsync(["main"], {
   violation: "error",
-  log: "info",
+  log: "debug",
   server: "tcp",
   main: "batch",
 });

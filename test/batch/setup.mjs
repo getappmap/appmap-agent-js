@@ -1,7 +1,7 @@
 // import * as Path from 'path';
 import * as FileSystem from 'fs';
 import {tmpdir} from "os";
-import {mkdir, symlink, writeFile} from "fs/promises";
+import {mkdir, symlink, writeFile, realpath} from "fs/promises";
 import { strict as Assert } from 'assert';
 import YAML from "yaml";
 import {spawnAsync} from "../spawn.mjs";
@@ -10,7 +10,7 @@ const {stringify:stringifyYAML} = YAML;
 const {stringify:stringifyJSON} = JSON;
 
 export const setupAsync = async (name, version, config, beforeAsync, afterAsync) => {
-  const directory = `${tmpdir()}/${Math.random().toString(36).substring(2)}`;
+  const directory = `${await realpath(tmpdir())}/${Math.random().toString(36).substring(2)}`;
   await mkdir(directory);
   await mkdir(`${directory}/node_modules`);
   await mkdir(`${directory}/node_modules/@appland`);
