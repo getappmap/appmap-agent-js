@@ -10,7 +10,7 @@
   "bin": {
     "appmap-agent-js": "bin/index.mjs"
   },
-  "main": "/main/node-inline.mjs",
+  "main": "main/node-inline.mjs",
   "os": [
     "linux",
     "darwin"

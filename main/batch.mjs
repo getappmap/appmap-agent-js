@@ -1,11 +1,11 @@
 
-import minimist from "minimist"
 import {buildProdAsync} from "../build/index.mjs";
 
-const {main:{main}} = await buildProdAsync(["main"], {
+const {main:{mainAsync}} = await buildProdAsync(["main"], {
   violation: "error",
+  log: "debug",
   server: "tcp",
   main: "batch",
 });
 
-main(process);
+mainAsync(process);
