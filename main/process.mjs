@@ -11,7 +11,7 @@ export const transformSource = (content, context, transformSource) => {
   return transformSource(content, context, transformSource);
 };
 
-export const mainAsync = async (blueprint) => {
+export const generateMainAsync = async (blueprint) => {
   const {main:{mainAsync}} = await buildProdAsync(["main"], {
     violation: "exit",
     "interpretation": "node",
@@ -22,5 +22,5 @@ export const mainAsync = async (blueprint) => {
     main: "process",
     ... blueprint,
   });
-  await mainAsync(process);
+  return mainAsync;
 };

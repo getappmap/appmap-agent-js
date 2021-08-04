@@ -1,5 +1,7 @@
 export {transformSource} from "./process.mjs";
 
-import {mainAsync} from "./process.mjs";
+import {generateMainAsync} from "./process.mjs";
 
-mainAsync({client:"inline"});
+const mainAsync = await generateMainAsync({client:"inline"});
+
+mainAsync(process);

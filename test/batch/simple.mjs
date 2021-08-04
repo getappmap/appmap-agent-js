@@ -9,7 +9,7 @@ const testAsync = async () => {
     {
       enabled: true,
       protocol: "inline",
-      children: [["node", "main.mjs"]],
+      children: [["node", "./foo.js"]],
       packages: [{regexp:"^"}],
       output: {
         postfix: ".postfix",
@@ -18,7 +18,8 @@ const testAsync = async () => {
       },
     },
     async (repository) => {
-      await writeFile(`${repository}/main.mjs`, "function f () {}; f(123);");
+      await writeFile(`${repository}/foo.js`, `function foo (arg) { console.log('foo', arg); require('./bar.js'); } foo(123);`, "utf8");
+      await writeFile(`${repository}/bar.js`, "function bar (arg) { console.log('bar', arg);                      } bar(456);", "utf8");
       await mkdir(`${repository}/output-directory`);
     },
     async (repository) => {

@@ -1,6 +1,8 @@
 
 export {transformSource} from "./process.mjs";
 
-import {mainAsync} from "./process.mjs";
+import {generateMainAsync} from "./process.mjs";
 
-mainAsync({client:"node-tcp"});
+const mainAsync = await generateMainAsync({client:"node-tcp"});
+
+mainAsync(process);

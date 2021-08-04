@@ -1,0 +1,7 @@
+enabled: true
+packages:
+  - regexp: "^"
+children:
+  - ["node", "./main.js"]
+output:
+  indent: 2
