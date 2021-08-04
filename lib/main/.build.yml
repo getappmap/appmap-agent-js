@@ -11,6 +11,8 @@ dependencies:
     - agent
   batch:
     - assert
+    - log
     - util
+    - spawn
     - configuration
     - server
