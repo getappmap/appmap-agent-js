@@ -1,15 +1,6 @@
 
-import {buildProdAsync} from "../build/index.mjs";
+export {transformSource} from "./process.mjs";
 
-const {main:{mainAsync}} = await buildProdAsync(["main"], {
-  violation: "exit",
-  client: "node-tcp",
-  "interpretation": "node",
-  "instrumentation": "default",
-  "hook-module": "node",
-  "hook-group": "node",
-  "hook-query": "node",
-  main: "process",
-});
+import {mainAsync} from "./process.mjs";
 
-mainAsync(process);
+mainAsync({client:"node-tcp"});

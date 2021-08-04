@@ -1,4 +1,5 @@
 /* globals APPMAP_TRANSFORM_SOURCE */
+console.log("LOASDER\n\n");
 import {runInThisContext} from "vm";
 
 runInThisContext("let APPMAP_TRANSFORM_SOURCE = null;");
