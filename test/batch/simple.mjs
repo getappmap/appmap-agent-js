@@ -2,7 +2,7 @@
 import {writeFile} from "fs/promises";
 import {setupAsync} from "./setup.mjs";
 
-const testAsync = () => {
+const testAsync = async () => {
   await setupAsync(
     "simple",
     "0.0.0",

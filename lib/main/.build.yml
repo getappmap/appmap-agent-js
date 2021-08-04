@@ -2,7 +2,7 @@ default:
   test: null
   prod: null
 dependencies:
-  node:
+  process:
     - assert
     - util
     - log

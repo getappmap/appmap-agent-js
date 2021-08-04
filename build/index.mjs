@@ -1,10 +1,11 @@
 import { readFile } from "fs/promises";
-import { relative } from "path";
+import { relative, dirname } from "path";
 import { fileURLToPath } from "url";
 import YAML from "yaml";
 import { assert } from "./assert.mjs";
 
-const { cwd } = process;
+const __filname = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filname);
 const _Map = Map;
 const { isArray } = Array;
 const _undefined = undefined;
@@ -78,7 +79,7 @@ const buildComponentAsync = async (type, context) => {
 const createContext = (blueprint, options) => ({
   conf: ".build.yml",
   main: "index.mjs",
-  root: `${cwd()}/lib`,
+  root: `${dirname(__dirname)}/lib`,
   tag: "prod",
   ...options,
   blueprint: new _Map(blueprint ? entries(blueprint) : []),
