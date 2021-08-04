@@ -26,6 +26,8 @@ const extractName = (type, tag, blueprint, _default) => {
   assert(
     name !== null,
     "component %s is explicitely missing a default name for tag %s",
+    type,
+    tag,
   );
   return name;
 };

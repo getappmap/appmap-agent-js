@@ -10,5 +10,7 @@ dependencies:
     - configuration
     - agent
   batch:
+    - assert
     - util
+    - configuration
     - server
