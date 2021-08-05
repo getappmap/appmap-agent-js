@@ -1,2 +1,2 @@
-/sample/
-/doc/
+/lib/**/*.test.mjs
+/src/**/*.test.mjs

@@ -1,3 +1,5 @@
+#!/bin/env node
+
 export {transformSource} from "./process.mjs";
 
 import {generateMainAsync} from "./process.mjs";

@@ -1,5 +1,6 @@
+#!/bin/env node
 
-import {buildProdAsync} from "../build/index.mjs";
+import {buildProdAsync} from "../src/build.mjs";
 
 const {main:{main}} = await buildProdAsync(["main"], {
   violation: "exit",

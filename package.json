@@ -2,15 +2,14 @@
   "name": "@appland/appmap-agent-js",
   "version": "3.3.20",
   "files": [
-    "/dist/*.{js,mjs}",
-    "/lib/**/*.{js,mjs}",
-    "/bin/*.{js,mjs}",
-    "/src/*.yml"
+    "/lib/**/*.mjs",
+    "/bin/*.mjs",
+    "/dist/*.mjs"
   ],
   "bin": {
-    "appmap-agent-js": "bin/index.mjs"
+    "appmap-agent-js": "bin/batch.mjs"
   },
-  "main": "main/process-inline.mjs",
+  "main": "dist/manual-inline.mjs",
   "os": [
     "linux",
     "darwin"
@@ -28,16 +27,18 @@
     "recording",
     "testing"
   ],
+  "homepage": "https://github.com/applandinc/appmap-agent-js.git/#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/applandinc/appmap-agent-js.git"
+  },
   "scripts": {
     "tt": "npx test-turtle --layout alongside 'npx eslint $1 $2 && npx prettier -w $1 $2 && node --unhandled-rejections=strict $2 && npx c8 --include $1 --check-coverage --branches 100 --functions 100 -- node --unhandled-rejections=strict $2'",
-    "cov": "npx c8 --reporter html --include $COV.mjs node $COV.test.mjs && open coverage/index.html",
-    "test": "node test/run.js",
-    "coverage": "npx c8 --reporter=html --require $TARGET node test/unit/$TARGET",
-    "build": "node build/index.mjs",
-    "prettier": "npx prettier --write 'lib/server/**/*.mjs' 'lib/client/**/*.js' 'test/**/*.mjs' 'bin/*.mjs' 'build/*.mjs'",
-    "commit": "npx cz",
-    "lint": "npx eslint 'lib/client/**/*.js' 'lib/server/**/*.mjs' 'test/**/*.mjs' 'bin/*.mjs' 'build/*.mjs'",
-    "test-integration": "node test/integration/index.mjs",
+    "lint": "npx eslint 'src/**/*.mjs' 'lib/**/*.mjs'",
+    "format": "npx prettier -w 'src/**/*.mjs' 'lib/**/*.mjs'",
+    "unit": "for test in $(find src lib -name '*.test.mjs'); do echo \"$test ...\" && (node \"$test\" || echo \"> Failure $?\"); done",
+    "integration": "node test/batch/simple.mjs",
+    "commit": "npm run lint && npm run format && npx cz",
     "deploy": "npm i -D @semantic-release/changelog @semantic-release/git && npx semantic-release"
   },
   "dependencies": {
@@ -50,8 +51,6 @@
     "minimist": "^1.2.5",
     "net-socket-messaging": "^0.1.5",
     "npm": "^6.14.12",
-    "posix-socket": "^1.1.0",
-    "posix-socket-messaging": "^0.0.1",
     "treeify": "^1.1.0",
     "yaml": "^1.10.0"
   },
@@ -60,30 +59,20 @@
     "@semantic-release/changelog": "^5.0.1",
     "@semantic-release/git": "^9.0.0",
     "c8": "^7.6.0",
-    "chalk": "^4.1.0",
     "commitizen": "^4.2.3",
     "cz-conventional-changelog": "^3.3.0",
     "eslint": "^7.21.0",
-    "eslint-config-airbnb-base": "^14.2.1",
-    "eslint-config-prettier": "^8.1.0",
     "eslint-plugin-import": "^2.22.1",
     "express": "^4.17.1",
-    "jasmine": "^3.7.0",
     "jsdom": "^16.6.0",
     "mocha": "^8.4.0",
     "mysql": "^2.18.1",
     "pg": "^8.6.0",
     "prettier": "^2.2.1",
-    "rollup": "^2.45.2",
     "sqlite3": "^5.0.2",
     "tap": "^15.0.5",
     "tape": "^5.2.2",
     "test-turtle": "^4.0.2"
-  },
-  "homepage": "https://github.com/applandinc/appmap-agent-js.git/#readme",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/applandinc/appmap-agent-js.git"
   },
   "publishConfig": {
     "cache": "~/.npm",

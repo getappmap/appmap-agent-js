@@ -1,5 +1,7 @@
+#!/bin/env node
+
 /* globals APPMAP_TRANSFORM_SOURCE */
-import {buildProdAsync} from "../build/index.mjs";
+import {buildProdAsync} from "../src/build.mjs";
 import {runInThisContext} from "vm";
 
 runInThisContext("let APPMAP_TRANSFORM_SOURCE = null;");

@@ -21,7 +21,7 @@ export const setupAsync = async (name, version, config, beforeAsync, afterAsync)
   await spawnAsync(
     "node",
     [
-      `${process.cwd()}/main/batch.mjs`,
+      `${process.cwd()}/bin/batch.mjs`,
       "--repository",
       directory,
       "--configuration",

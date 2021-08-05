@@ -1,3 +1,5 @@
+#!/bin/env node
+
 import Violation from "../lib/violation/alert";
 import Assert from "../lib/assert/default";
 import Util from "../lib/util/default";

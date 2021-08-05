@@ -79,7 +79,7 @@ const buildComponentAsync = async (type, context) => {
 const createContext = (blueprint, options) => ({
   conf: ".build.yml",
   main: "index.mjs",
-  root: `${dirname(__dirname)}/lib`,
+  root: `${__dirname}/../../lib`,
   tag: "prod",
   ...options,
   blueprint: new _Map(blueprint ? entries(blueprint) : []),

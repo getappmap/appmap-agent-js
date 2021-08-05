@@ -1,3 +1,4 @@
+#!/bin/env node
 
 export {transformSource} from "./process.mjs";
 
