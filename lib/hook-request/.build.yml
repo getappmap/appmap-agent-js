@@ -2,5 +2,6 @@ default:
   test: node
   prod: null
 dependencies:
+  - util
   - frontend
   - client
