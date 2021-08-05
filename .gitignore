@@ -1,4 +1,5 @@
 .DS_Store
 /node_modules/
-/yo.{js,mjs,json,yml}
+/yo.js
+/yo.mjs
 /coverage

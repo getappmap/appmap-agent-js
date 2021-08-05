@@ -1,0 +1,6 @@
+default:
+  test: node
+  prod: null
+dependencies:
+  - frontend
+  - client

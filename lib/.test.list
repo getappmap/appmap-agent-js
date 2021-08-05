@@ -21,6 +21,8 @@
     - * hook-apply
       * hook-group
       * hook-module
+      * hook-request
+      * hook-response
       * hook-query
   * client
 - agent
