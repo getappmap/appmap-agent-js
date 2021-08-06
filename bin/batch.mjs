@@ -1,10 +1,10 @@
 #!/bin/env node
 
-import {buildProdAsync} from "../src/build.mjs";
+import {buildProdAsync} from "../build/index.mjs";
 
 const {main:{mainAsync}} = await buildProdAsync(["main"], {
   violation: "error",
-  log: "debug",
+  log: "node",
   server: "tcp",
   main: "batch",
 });

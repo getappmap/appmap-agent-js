@@ -2,7 +2,7 @@
   "name": "@appland/appmap-agent-js",
   "version": "3.3.20",
   "files": [
-    "/lib/**/*.mjs",
+    "/components/**/*.mjs",
     "/bin/*.mjs",
     "/dist/*.mjs"
   ],
@@ -34,9 +34,9 @@
   },
   "scripts": {
     "tt": "npx test-turtle --layout alongside 'npx eslint $1 $2 && npx prettier -w $1 $2 && node --unhandled-rejections=strict $2 && npx c8 --include $1 --check-coverage --branches 100 --functions 100 -- node --unhandled-rejections=strict $2'",
-    "lint": "npx eslint 'src/**/*.mjs' 'lib/**/*.mjs'",
-    "format": "npx prettier -w 'src/**/*.mjs' 'lib/**/*.mjs'",
-    "unit": "for test in $(find src lib -name '*.test.mjs'); do echo \"$test ...\" && (node \"$test\" || echo \"> Failure $?\"); done",
+    "lint": "npx eslint 'src/**/*.mjs' 'components/**/*.mjs'",
+    "format": "npx prettier -w 'src/**/*.mjs' 'components/**/*.mjs'",
+    "unit": "for test in $(find src components -name '*.test.mjs'); do echo \"$test ...\" && (node \"$test\" || echo \"> Failure $?\"); done",
     "integration": "node test/batch/index.mjs",
     "commit": "npm run lint && npm run format && npx cz",
     "deploy": "npm i -D @semantic-release/changelog @semantic-release/git && npx semantic-release"
