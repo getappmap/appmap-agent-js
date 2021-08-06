@@ -37,7 +37,7 @@
     "lint": "npx eslint 'src/**/*.mjs' 'lib/**/*.mjs'",
     "format": "npx prettier -w 'src/**/*.mjs' 'lib/**/*.mjs'",
     "unit": "for test in $(find src lib -name '*.test.mjs'); do echo \"$test ...\" && (node \"$test\" || echo \"> Failure $?\"); done",
-    "integration": "node test/batch/simple.mjs",
+    "integration": "node test/batch/index.mjs",
     "commit": "npm run lint && npm run format && npx cz",
     "deploy": "npm i -D @semantic-release/changelog @semantic-release/git && npx semantic-release"
   },
