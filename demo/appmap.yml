@@ -1,7 +1,7 @@
 enabled: true
+hooks:
+  group: true
 packages:
-  - regexp: "^"
-children:
-  - ["node", "./main.js"]
+  - glob: "*"
 output:
   indent: 2
