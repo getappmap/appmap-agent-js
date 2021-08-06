@@ -3,6 +3,7 @@ default:
   prod: default
 dependencies:
   - util
+  - log
   - assert
   - time
   - instrumentation

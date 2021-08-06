@@ -15,8 +15,8 @@ export const transformSource = (content, context, transformSource) => {
 
 export const generateMainAsync = async (blueprint) => {
   const {main:{mainAsync}} = await buildProdAsync(["main"], {
-    violation: "exit",
-    log: "debug",
+    violation: "error",
+    log: "node",
     "interpretation": "node",
     "instrumentation": "default",
     "hook-module": "node",
