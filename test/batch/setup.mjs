@@ -43,7 +43,7 @@ export const setupAsync = async (name, version, config, beforeAsync, afterAsync)
     try {
       validate({data:appmap});
     } catch (error) {
-      console.log(stringify(appmap, null, 2));
+      console.log(stringifyJSON(appmap, null, 2));
       throw error;
     }
     return [filename, appmap];
