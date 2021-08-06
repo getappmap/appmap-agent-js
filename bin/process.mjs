@@ -21,6 +21,8 @@ export const generateMainAsync = async (blueprint) => {
     "instrumentation": "default",
     "hook-module": "node",
     "hook-group": "node",
+    "hook-request": "node",
+    "hook-response": "node",
     "hook-query": "node",
     main: "process",
     ... blueprint,

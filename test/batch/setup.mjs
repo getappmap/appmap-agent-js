@@ -1,27 +1,32 @@
 // import * as Path from 'path';
 import * as FileSystem from 'fs';
 import {tmpdir} from "os";
-import {mkdir, symlink, writeFile, realpath} from "fs/promises";
+import {mkdir, symlink, writeFile, realpath, readdir, readFile} from "fs/promises";
 import { strict as Assert } from 'assert';
 import YAML from "yaml";
+import {validate} from "@appland/appmap-validate";
 import {spawnAsync} from "../spawn.mjs";
 
+const {cwd} = process;
+const {fromEntries} = Object;
 const {stringify:stringifyYAML} = YAML;
-const {stringify:stringifyJSON} = JSON;
+const {stringify:stringifyJSON, parse:parseJSON} = JSON;
 
 export const setupAsync = async (name, version, config, beforeAsync, afterAsync) => {
   const directory = `${await realpath(tmpdir())}/${Math.random().toString(36).substring(2)}`;
   await mkdir(directory);
   await mkdir(`${directory}/node_modules`);
   await mkdir(`${directory}/node_modules/@appland`);
-  await symlink(process.cwd(), `${directory}/node_modules/@appland/appmap-agent-js`);
+  await symlink(cwd(), `${directory}/node_modules/@appland/appmap-agent-js`);
   await writeFile(`${directory}/package.json`, stringifyJSON({name, version}));
   await writeFile(`${directory}/configuration.yml`, stringifyYAML(config));
+  await mkdir(`${directory}/tmp`);
+  await mkdir(`${directory}/tmp/appmap`);
   await beforeAsync(directory);
   await spawnAsync(
     "node",
     [
-      `${process.cwd()}/bin/batch.mjs`,
+      `${cwd()}/bin/batch.mjs`,
       "--repository",
       directory,
       "--configuration",
@@ -32,6 +37,17 @@ export const setupAsync = async (name, version, config, beforeAsync, afterAsync)
       stdio: "inherit",
     }
   );
-  await afterAsync(directory);
-  // await spawnAsync("/bin/sh", ["rm", "-rf", directory], {});
+  const appmaps = [];
+  for (let filename of await readdir(`${directory}/tmp/appmap`)) {
+    const appmap = parseJSON(await readFile(`${directory}/tmp/appmap/${filename}`));
+    try {
+      validate({data:appmap});
+    } catch (error) {
+      console.log(stringify(appmap, null, 2));
+      throw error;
+    }
+    return [filename, appmap];
+  }
+  await afterAsync(fromEntries(appmaps));
+  await spawnAsync("/bin/sh", ["rm", "-rf", directory], {});
 };

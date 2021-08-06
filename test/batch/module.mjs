@@ -9,13 +9,11 @@ const testAsync = async () => {
     {
       enabled: true,
       protocol: "inline",
-      children: [["node", "./foo.js"]],
+      children: [["node", "./main.mjs"]],
       packages: [{regexp:"^"}],
       hooks: {
         cjs: true,
         esm: true,
-        apply: true,
-        group: true,
       },
       output: {
         postfix: ".postfix",
@@ -26,29 +24,15 @@ const testAsync = async () => {
     },
     async (repository) => {
       await writeFile(
-        `${repository}/foo.js`,
-        `
-          function g (arg) {
-            console.log(arg);
-          }
-          function f (arg) {
-            console.log(arg)
-            setTimeout(g, 456);
-          }
-          f(123);
-        `,
+        `${repository}/main.mjs`,
+        `import "./module.js"`,
         "utf8"
       );
-      // await writeFile(
-      //   `${repository}/bar.js`,
-      //   `
-      //     function bar (arg) {
-      //       console.log('bar', arg);
-      //     }
-      //     bar(456);
-      //   `,
-      //   "utf8"
-      // );
+      await writeFile(
+        `${repository}/module.js`,
+        ``,
+        "utf8"
+      );
       await mkdir(`${repository}/output-directory`);
     },
     async (repository) => {
