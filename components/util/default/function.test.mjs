@@ -1,5 +1,5 @@
 import { strict as Assert } from "assert";
-import { buildTestAsync } from "../../build.mjs";
+import { buildDependenciesAsync } from "../../build.mjs";
 import Function from "./function.mjs";
 
 const { equal: assertEqual } = Assert;
@@ -15,7 +15,7 @@ const testAsync = async () => {
     memoize,
     compose,
     bind,
-  } = Function(await buildTestAsync(import.meta));
+  } = Function(await buildDependenciesAsync(import.meta.url, "test"));
 
   // noop //
 

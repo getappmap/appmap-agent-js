@@ -1,5 +1,5 @@
 import { strict as Assert } from "assert";
-import { buildTestAsync } from "../../build.mjs";
+import { buildDependenciesAsync } from "../../build.mjs";
 import Array from "./array.mjs";
 
 const {
@@ -9,7 +9,9 @@ const {
 } = Assert;
 
 const testAsync = async () => {
-  const { zip } = await Array(await buildTestAsync(import.meta));
+  const { zip } = await Array(
+    await buildDependenciesAsync(import.meta.url, "test"),
+  );
 
   // zip //
 

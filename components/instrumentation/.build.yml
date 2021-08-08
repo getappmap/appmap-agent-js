@@ -1,6 +1,7 @@
 default:
   test: default
-  prod: null
+  node: default
+  browser: default
 dependencies:
   default:
     - util

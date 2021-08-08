@@ -1,6 +1,7 @@
 default:
   test: default
-  prod: default
+  node: default
+  browser: default
 dependencies:
   - violation
   - assert

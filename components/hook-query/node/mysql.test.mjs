@@ -2,7 +2,7 @@ import { strict as Assert } from "assert";
 import { spawn } from "child_process";
 import { tmpdir } from "os";
 import Mysql from "mysql";
-import { buildTestAsync } from "../../build.mjs";
+import { buildDependenciesAsync, buildOneAsync } from "../../build.mjs";
 import HookMysql from "./mysql.mjs";
 
 const { equal: assertEqual, deepEqual: assertDeepEqual } = Assert;
@@ -17,13 +17,8 @@ const port = 3307;
 const path = `${tmpdir()}/${Math.random().toString(36).substring(2)}`;
 
 const proceedAsync = async () => {
-  const dependencies = await buildTestAsync({
-    ...import.meta,
-    deps: ["hook"],
-  });
-  const {
-    hook: { testHookAsync },
-  } = dependencies;
+  const dependencies = await buildDependenciesAsync(import.meta.url, "test");
+  const { testHookAsync } = await buildOneAsync("hook", "test");
   const { hookMysql, unhookMysql } = HookMysql(dependencies);
   assertDeepEqual(
     await testHookAsync(

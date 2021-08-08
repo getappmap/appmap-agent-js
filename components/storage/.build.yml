@@ -1,4 +1,5 @@
 default:
   test: file
-  prod: file
+  node: file
+  browser: null
 dependencies: []

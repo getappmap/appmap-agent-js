@@ -1,4 +1,5 @@
 default:
   test: error
-  prod: null
+  node: exit
+  browser: alert
 dependencies: []

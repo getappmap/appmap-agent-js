@@ -1,6 +1,7 @@
 default:
   test: fixture
-  prod: null
+  node: null
+  browser: null
 dependencies:
   - util
   - configuration

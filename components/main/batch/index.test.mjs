@@ -1,7 +1,7 @@
 import { strict as Assert } from "assert";
 import { tmpdir } from "os";
 import { writeFile } from "fs/promises";
-import { buildTestAsync } from "../../build.mjs";
+import { buildDependenciesAsync } from "../../build.mjs";
 import Batch from "./index.mjs";
 
 const {
@@ -13,13 +13,9 @@ const {
 const { cwd } = process;
 
 const testAsync = async () => {
-  const dependencies = await buildTestAsync(
-    {
-      ...import.meta,
-      deps: ["configuration"],
-    },
-    { server: "tcp" },
-  );
+  const dependencies = await buildDependenciesAsync(import.meta.url, "test", {
+    server: "tcp",
+  });
 
   const { mainAsync } = Batch(dependencies);
   global.GLOBAL_SPY_SPAWN_ASYNC = global.GLOBAL_SPY_SPAWN_ASYNC = async (

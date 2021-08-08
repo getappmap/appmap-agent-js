@@ -1,5 +1,5 @@
 import { strict as Assert } from "assert";
-import { buildTestAsync } from "../../build.mjs";
+import { buildDependenciesAsync } from "../../build.mjs";
 import Spawn from "./index.mjs";
 
 const {
@@ -9,7 +9,7 @@ const {
 } = Assert;
 
 const testAsync = async () => {
-  const dependencies = await buildTestAsync(import.meta);
+  const dependencies = await buildDependenciesAsync(import.meta.url, "test");
   const { spawnAsync } = Spawn(dependencies);
   assertDeepEqual(await spawnAsync("/bin/sh", ["-c", "exit 0"], {}), {
     status: 0,

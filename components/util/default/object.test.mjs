@@ -1,5 +1,5 @@
 import { strict as Assert } from "assert";
-import { buildTestAsync } from "../../build.mjs";
+import { buildDependenciesAsync } from "../../build.mjs";
 import Object from "./object.mjs";
 
 const {
@@ -16,7 +16,7 @@ const testAsync = async () => {
     coalesceCaseInsensitive,
     mapMaybe,
     assignProperty,
-  } = await Object(await buildTestAsync(import.meta));
+  } = await Object(await buildDependenciesAsync(import.meta.url, "test"));
 
   // mapMaybe //
 

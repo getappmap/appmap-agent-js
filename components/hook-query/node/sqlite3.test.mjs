@@ -1,6 +1,6 @@
 import { strict as Assert } from "assert";
 import Sqlite3 from "sqlite3";
-import { buildTestAsync } from "../../build.mjs";
+import { buildDependenciesAsync, buildOneAsync } from "../../build.mjs";
 import HookSqlite3 from "./sqlite3.mjs";
 
 const { Database, Statement } = Sqlite3;
@@ -34,13 +34,8 @@ const {
 const testAsync = async () => {
   const database = new Database(":memory:");
 
-  const dependencies = await buildTestAsync({
-    ...import.meta,
-    deps: ["hook"],
-  });
-  const {
-    hook: { testHookAsync },
-  } = dependencies;
+  const dependencies = await buildDependenciesAsync(import.meta.url, "test");
+  const { testHookAsync } = await buildOneAsync("hook", "test");
   const { hookSqlite3, unhookSqlite3 } = HookSqlite3(dependencies);
 
   const testCaseAsync = (enabled, runAsync) =>

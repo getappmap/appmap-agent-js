@@ -1,12 +1,12 @@
 import { strict as Assert } from "assert";
-import { buildTestAsync } from "../../build.mjs";
+import { buildDependenciesAsync } from "../../build.mjs";
 import Path from "./path.mjs";
 
 const { equal: assertEqual } = Assert;
 
 const testAsync = async () => {
   const { toRelativePath, toAbsolutePath, getFilename, getDirectory } = Path(
-    await buildTestAsync(import.meta),
+    await buildDependenciesAsync(import.meta.url, "test"),
   );
   // toRelativePath //
   assertEqual(toRelativePath("/foo", "/foo/bar"), "bar");

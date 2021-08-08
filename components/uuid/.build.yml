@@ -1,4 +1,5 @@
 default:
   test: stub
-  prod: default
+  node: random
+  browser: random
 dependencies: []

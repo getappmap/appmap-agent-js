@@ -1,18 +1,13 @@
 import { strict as Assert } from "assert";
-import { buildTestAsync } from "../../build.mjs";
+import { buildDependenciesAsync, buildOneAsync } from "../../build.mjs";
 import Session from "./session.mjs";
 import Track from "./track.mjs";
 
 const { deepEqual: assertDeepEqual, throws: assertThrows } = Assert;
 
 const testAsync = async () => {
-  const dependencies = await buildTestAsync({
-    ...import.meta,
-    deps: ["configuration"],
-  });
-  const {
-    configuration: { createConfiguration },
-  } = dependencies;
+  const dependencies = await buildDependenciesAsync(import.meta.url, "test");
+  const { createConfiguration } = await buildOneAsync("configuration", "test");
   const { createSession, initializeSession } = Session(dependencies);
   const { createTrack, controlTrack } = Track(dependencies);
   const session = createSession(createConfiguration("/"));

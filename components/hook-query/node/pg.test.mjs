@@ -2,7 +2,7 @@ import { spawn } from "child_process";
 import { tmpdir } from "os";
 import Pg from "pg";
 import { strict as Assert } from "assert";
-import { buildTestAsync } from "../../build.mjs";
+import { buildDependenciesAsync, buildOneAsync } from "../../build.mjs";
 import HookPg from "./pg.mjs";
 
 const { Client, Query } = Pg;
@@ -25,13 +25,9 @@ const user = "postgres";
 const path = `${tmpdir()}/${Math.random().toString(36).substring(2)}`;
 
 const proceedAsync = async () => {
-  const dependencies = await buildTestAsync({
-    ...import.meta,
-    deps: ["hook"],
-  });
-  const {
-    hook: { testHookAsync },
-  } = dependencies;
+  const dependencies = await buildDependenciesAsync(import.meta.url, "test");
+  const { testHookAsync } = await buildOneAsync("hook", "test");
+
   const { hookPg, unhookPg } = HookPg(dependencies);
 
   const testCaseAsync = (enabled, runAsync) =>

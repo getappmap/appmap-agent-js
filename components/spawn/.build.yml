@@ -1,4 +1,5 @@
 default:
   test: spy
-  prod: node
+  node: node
+  browser: null
 dependencies: []

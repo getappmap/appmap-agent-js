@@ -1,6 +1,7 @@
 default:
   test: null
-  prod: null
+  node: null
+  browser: dead
 dependencies:
   tcp:
     - log

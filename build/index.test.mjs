@@ -2,7 +2,11 @@ import { strict as Assert } from "assert";
 import { writeFile, mkdir, rm } from "fs/promises";
 import { pathToFileURL } from "url";
 import { tmpdir } from "os";
-import { buildTestAsync, buildProdAsync } from "./index.mjs";
+import {
+  buildDependenciesAsync,
+  buildOneAsync,
+  buildAllAsync,
+} from "./index.mjs";
 
 const { random } = Math;
 const { deepEqual: assertDeepEqual } = Assert;
@@ -82,8 +86,9 @@ const mainAsync = async () => {
       "utf8",
     );
     assertDeepEqual(
-      await buildProdAsync(
+      await buildAllAsync(
         ["qux"],
+        "test",
         {
           qux: "default",
           foo: "fooA",
@@ -94,19 +99,21 @@ const mainAsync = async () => {
       { qux: "QUX" },
     );
     assertDeepEqual(
-      await buildProdAsync(
-        ["qux"],
+      await buildOneAsync(
+        "qux",
+        "test",
         {
           qux: 123,
         },
         { root },
       ),
-      { qux: 123 },
+      123,
     );
     assertDeepEqual(
-      await buildTestAsync(
-        { url: pathToFileURL(`${root}/qux/default/index.mjs`) },
-        null,
+      await buildDependenciesAsync(
+        pathToFileURL(`${root}/qux/default/index.mjs`),
+        "test",
+        {},
         { root },
       ),
       {

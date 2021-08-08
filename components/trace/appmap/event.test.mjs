@@ -1,5 +1,5 @@
 import { strict as Assert } from "assert";
-import { buildTestAsync } from "../../build.mjs";
+import { buildDependenciesAsync, buildOneAsync } from "../../build.mjs";
 import Classmap from "./classmap.mjs";
 import Event from "./event.mjs";
 
@@ -12,13 +12,8 @@ const {
 } = Assert;
 
 const testAsync = async () => {
-  const dependencies = await buildTestAsync({
-    ...import.meta,
-    deps: ["configuration"],
-  });
-  const {
-    configuration: { createConfiguration },
-  } = dependencies;
+  const dependencies = await buildDependenciesAsync(import.meta.url, "test");
+  const { createConfiguration } = await buildOneAsync("configuration", "test");
   const { createClassmap } = Classmap(dependencies);
   const { compileEventTrace } = Event(dependencies);
   const classmap = createClassmap(createConfiguration("/cwd"));

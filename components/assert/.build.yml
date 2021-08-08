@@ -1,5 +1,6 @@
 default:
   test: debug
-  prod: default
+  node: default
+  browser: default
 dependencies:
   - violation

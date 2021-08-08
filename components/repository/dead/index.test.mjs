@@ -1,12 +1,12 @@
 import { strict as Assert } from "assert";
-import { buildTestAsync } from "../../build.mjs";
+import { buildDependenciesAsync } from "../../build.mjs";
 import Repository from "./index.mjs";
 
 const { throws: assertThrows } = Assert;
 
 const testAsync = async () => {
   const { extractRepositoryHistory } = Repository(
-    await buildTestAsync(import.meta),
+    await buildDependenciesAsync(import.meta.url, "test"),
   );
   assertThrows(
     () => extractRepositoryHistory("/foo"),

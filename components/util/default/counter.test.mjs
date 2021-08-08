@@ -1,12 +1,12 @@
 import { strict as Assert } from "assert";
-import { buildTestAsync } from "../../build.mjs";
+import { buildDependenciesAsync } from "../../build.mjs";
 import Counter from "./counter.mjs";
 
 const { equal: assertEqual } = Assert;
 
 const testAsync = async () => {
   const { createCounter, incrementCounter, decrementCounter, getCounterValue } =
-    Counter(await buildTestAsync(import.meta));
+    Counter(await buildDependenciesAsync(import.meta.url, "test"));
   const counter = createCounter(0);
   assertEqual(getCounterValue(counter), 0);
   assertEqual(incrementCounter(counter), 1);

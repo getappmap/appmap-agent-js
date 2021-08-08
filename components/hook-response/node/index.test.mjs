@@ -1,7 +1,7 @@
 import { strict as Assert } from "assert";
 import createApp from "express";
 import Http from "http";
-import { buildTestAsync } from "../../build.mjs";
+import { buildDependenciesAsync, buildOneAsync } from "../../build.mjs";
 import HookResponse from "./index.mjs";
 
 const { get } = Http;
@@ -9,10 +9,8 @@ const { get } = Http;
 const { equal: assertEqual, deepEqual: assertDeepEqual } = Assert;
 
 const testAsync = async () => {
-  const dependencies = await buildTestAsync({ ...import.meta, deps: ["hook"] });
-  const {
-    hook: { testHookAsync },
-  } = dependencies;
+  const dependencies = await buildDependenciesAsync(import.meta.url, "test");
+  const { testHookAsync } = await buildOneAsync("hook", "test");
   const { hookResponse, unhookResponse } = HookResponse(dependencies);
 
   const scenarioAsync = async (server) => {

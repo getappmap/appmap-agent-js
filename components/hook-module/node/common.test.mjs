@@ -2,7 +2,7 @@ import { strict as Assert } from "assert";
 import { createRequire } from "module";
 import { writeFile } from "fs/promises";
 import { tmpdir } from "os";
-import { buildTestAsync } from "../../build.mjs";
+import { buildDependenciesAsync, buildOneAsync } from "../../build.mjs";
 import Common from "./common.mjs";
 
 Error.stackTraceLimit = Infinity;
@@ -17,13 +17,8 @@ const {
 } = Assert;
 
 const testAsync = async () => {
-  const dependencies = await buildTestAsync({
-    ...import.meta,
-    deps: ["hook"],
-  });
-  const {
-    hook: { testHookAsync },
-  } = dependencies;
+  const dependencies = await buildDependenciesAsync(import.meta.url, "test");
+  const { testHookAsync } = await buildOneAsync("hook", "test");
   const { hookCommonModule, unhookCommonModule } = Common(dependencies);
   const require = createRequire(`${cwd()}/dummy.js`);
   const { resolve } = require;

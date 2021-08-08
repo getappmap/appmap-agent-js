@@ -2,7 +2,7 @@ import { strict as Assert } from "assert";
 import { connect } from "net";
 import { tmpdir } from "os";
 import { patch } from "net-socket-messaging";
-import { buildTestAsync } from "../../build.mjs";
+import { buildDependenciesAsync } from "../../build.mjs";
 import Server from "./index.mjs";
 
 const {
@@ -14,7 +14,7 @@ const {
 const testAsync = async () => {
   let resolve_open, resolve_close;
   const dependencies = {
-    ...(await buildTestAsync(import.meta)),
+    ...(await buildDependenciesAsync(import.meta.url, "test")),
     backend: {
       openBackend: () => {
         resolve_open();

@@ -1,6 +1,6 @@
 import { strict as Assert } from "assert";
 import { executionAsyncId } from "async_hooks";
-import { buildTestAsync } from "../../build.mjs";
+import { buildDependenciesAsync, buildAllAsync } from "../../build.mjs";
 import HookGroup from "./index.mjs";
 
 const {
@@ -11,14 +11,11 @@ const {
 } = Assert;
 
 const testAsync = async () => {
-  const dependencies = await buildTestAsync({
-    ...import.meta,
-    deps: ["hook", "frontend"],
-  });
+  const dependencies = await buildDependenciesAsync(import.meta.url, "test");
   const {
-    frontend: { recordAfterQuery },
     hook: { testHookAsync },
-  } = dependencies;
+    frontend: { recordAfterQuery },
+  } = await buildAllAsync(["hook", "frontend"], "test");
   const { hookGroup, unhookGroup } = HookGroup(dependencies);
   assertDeepEqual(
     await testHookAsync(

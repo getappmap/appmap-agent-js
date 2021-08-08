@@ -1,12 +1,12 @@
 import { strict as Assert } from "assert";
-import { buildTestAsync } from "../../build.mjs";
+import { buildDependenciesAsync } from "../../build.mjs";
 import Specifier from "./index.mjs";
 
 const { equal: assertEqual, throws: assertThrows } = Assert;
 
 const testAsync = async () => {
   const { createSpecifier, matchSpecifier } = Specifier(
-    await buildTestAsync(import.meta),
+    await buildDependenciesAsync(import.meta.url, "test"),
   );
 
   assertThrows(

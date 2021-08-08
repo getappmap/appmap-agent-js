@@ -1,7 +1,7 @@
 import { strict as Assert } from "assert";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
-import { buildTestAsync } from "../../build.mjs";
+import { buildDependenciesAsync } from "../../build.mjs";
 import Repository from "./index.mjs";
 
 const { deepEqual: assertDeepEqual, equal: assertEqual } = Assert;
@@ -10,7 +10,7 @@ const { url } = import.meta;
 
 const testAsync = async () => {
   const { extractRepositoryPackage, extractRepositoryDependency } = Repository(
-    await buildTestAsync(import.meta),
+    await buildDependenciesAsync(import.meta.url, "test"),
   );
   let path = fileURLToPath(url);
   while (!path.endsWith("appmap-agent-js")) {

@@ -1,5 +1,5 @@
 import { strict as Assert } from "assert";
-import { buildTestAsync } from "../../build.mjs";
+import { buildDependenciesAsync, buildOneAsync } from "../../build.mjs";
 import Classmap from "./classmap.mjs";
 
 Error.stackTraceLimit = Infinity;
@@ -10,13 +10,11 @@ const {
 } = Assert;
 
 const testAsync = async () => {
-  const dependencies = await buildTestAsync({
-    ...import.meta,
-    deps: ["configuration"],
-  });
-  const {
-    configuration: { createConfiguration, extendConfiguration },
-  } = dependencies;
+  const dependencies = await buildDependenciesAsync(import.meta.url, "test");
+  const { createConfiguration, extendConfiguration } = await buildOneAsync(
+    "configuration",
+    "test",
+  );
   const { createClassmap, addClassmapFile, compileClassmap, getClassmapInfo } =
     Classmap(dependencies);
 

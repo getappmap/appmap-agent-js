@@ -1,6 +1,7 @@
 default:
   test: stub
-  prod: node
+  node: node
+  browser: dead
 dependencies:
   dead:
     - assert

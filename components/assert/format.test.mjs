@@ -1,11 +1,13 @@
 import { strict as Assert } from "assert";
-import { buildTestAsync } from "../build.mjs";
+import { buildDependenciesAsync } from "../build.mjs";
 import Format from "./format.mjs";
 
 const { equal: assertEqual, throws: assertThrows } = Assert;
 
 const testAsync = async () => {
-  const { format } = Format(await buildTestAsync(import.meta));
+  const { format } = Format(
+    await buildDependenciesAsync(import.meta.url, "test"),
+  );
 
   assertThrows(
     () => format("%x", [123]),

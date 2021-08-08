@@ -1,6 +1,7 @@
 default:
-  test: node
-  prod: null
+  test: write-sync
+  node: write-sync
+  browser: console
 dependencies:
   - assert
   - util

@@ -1,14 +1,14 @@
 /* eslint-env node */
 
 import { strict as Assert } from "assert";
-import { buildTestAsync } from "../../build.mjs";
+import { buildDependenciesAsync } from "../../build.mjs";
 import Client from "./index.mjs";
 
 const { deepEqual: assertDeepEqual } = Assert;
 
 const testAsync = async () => {
   const { createClient, executeClientAsync, interruptClient, sendClient } =
-    Client(await buildTestAsync(import.meta));
+    Client(await buildDependenciesAsync(import.meta.url, "test"));
   const client = createClient({});
   setTimeout(() => {
     sendClient(client, "data");

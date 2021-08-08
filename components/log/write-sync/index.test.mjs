@@ -1,4 +1,4 @@
-import { buildTestAsync } from "../../build.mjs";
+import { buildDependenciesAsync } from "../../build.mjs";
 
 const { env } = process;
 
@@ -11,7 +11,9 @@ const testAsync = async () => {
     writable: true,
   });
   const { default: Log } = await import("./index.mjs");
-  const { logInfo, logError } = Log(await buildTestAsync(import.meta));
+  const { logInfo, logError } = Log(
+    await buildDependenciesAsync(import.meta.url, "test"),
+  );
   logInfo("foo");
   logError("bar");
 };

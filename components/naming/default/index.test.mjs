@@ -1,6 +1,6 @@
 import { strict as Assert } from "assert";
 import { parse } from "acorn";
-import { buildTestAsync } from "../../build.mjs";
+import { buildDependenciesAsync, buildOneAsync } from "../../build.mjs";
 import Naming from "./index.mjs";
 
 Error.stackTraceLimit = Infinity;
@@ -8,11 +8,8 @@ Error.stackTraceLimit = Infinity;
 const { equal: assertEqual, deepEqual: assertDeepEqual } = Assert;
 
 const testAsync = async () => {
-  const dependencies = await buildTestAsync({ ...import.meta, deps: ["util"] });
-
-  const {
-    util: { createCounter },
-  } = dependencies;
+  const dependencies = await buildDependenciesAsync(import.meta.url, "test");
+  const { createCounter } = await buildOneAsync("util", "test");
 
   const { getQualifiedName, getLineage, parseQualifiedName } =
     Naming(dependencies);

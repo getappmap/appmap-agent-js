@@ -1,4 +1,5 @@
 default:
-  test: node
-  prod: null
+  test: vm
+  node: vm
+  browser: dom
 dependencies: []

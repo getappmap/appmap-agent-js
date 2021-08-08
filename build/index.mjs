@@ -10,7 +10,7 @@ const _Map = Map;
 const { isArray } = Array;
 const _undefined = undefined;
 const { getOwnPropertyDescriptor } = Reflect;
-const { entries, fromEntries } = Object;
+const { entries: toEntries, fromEntries } = Object;
 const { parse: parseYAML } = YAML;
 
 const extractName = (type, tag, blueprint, _default) => {
@@ -82,14 +82,14 @@ const createContext = (blueprint, options) => ({
   root: `${__dirname}/../components`,
   tag: "prod",
   ...options,
-  blueprint: new _Map(blueprint ? entries(blueprint) : []),
+  blueprint: new _Map(toEntries(blueprint)),
   cache: new _Map(),
 });
 
 // export const buildOneAsync = async (type, blueprint, options) =>
 //   await buildComponentAsync(type, createContext(blueprint, options));
 
-const buildAsync = async (types, context) =>
+const buildComponentsAsync = async (types, context) =>
   fromEntries(
     await Promise.all(
       types.map(async (type) => [
@@ -99,23 +99,27 @@ const buildAsync = async (types, context) =>
     ),
   );
 
-export const buildProdAsync = async (types, blueprint, options) =>
-  buildAsync(types, createContext(blueprint, { ...options, tag: "prod" }));
+export const buildAllAsync = (types, tag, blueprint = {}, options = {}) =>
+  buildComponentsAsync(types, createContext(blueprint, { tag, ...options }));
 
-export const buildTestAsync = async (input, blueprint, options) => {
-  const { url, deps } = {
-    deps: [],
-    ...input,
-  };
+export const buildOneAsync = (type, tag, blueprint = {}, options = {}) =>
+  buildComponentAsync(type, createContext(blueprint, { tag, ...options }));
+
+export const buildDependenciesAsync = async (
+  url,
+  tag,
+  blueprint = {},
+  options = {},
+) => {
   const path = fileURLToPath(url);
-  const context = createContext(blueprint, { tag: "test", ...options });
+  const context = createContext(blueprint, { tag, ...options });
   const { root, conf } = context;
   const [type, name] = relative(root, path).split("/");
   const { dependencies } = parseYAML(
     await readFile(`${root}/${type}/${conf}`, "utf8"),
   );
-  return buildAsync(
-    [...deps, ...extractTypes(type, name, dependencies)],
+  return await buildComponentsAsync(
+    extractTypes(type, name, dependencies),
     context,
   );
 };

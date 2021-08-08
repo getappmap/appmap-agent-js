@@ -1,6 +1,7 @@
 default:
   test: appmap
-  prod: appmap
+  node: appmap
+  browser: appmap
 dependencies:
   - assert
   - log

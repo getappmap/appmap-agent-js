@@ -5,7 +5,7 @@ import { EventEmitter } from "events";
 import { pathToFileURL } from "url";
 import { tmpdir } from "os";
 import { readFile, writeFile, mkdir } from "fs/promises";
-import { buildTestAsync } from "../../build.mjs";
+import { buildDependenciesAsync, buildOneAsync } from "../../build.mjs";
 import Main from "./index.mjs";
 
 const _eval = eval;
@@ -13,16 +13,14 @@ const _eval = eval;
 const { equal: assertEqual, deepEqual: assertDeepEqual } = Assert;
 
 const testAsync = async () => {
-  const dependencies = await buildTestAsync(
-    { ...import.meta, deps: ["configuration"] },
-    {
-      client: "inline",
-      "hook-module": "node",
-    },
+  const dependencies = await buildDependenciesAsync(import.meta.url, "test", {
+    client: "inline",
+    "hook-module": "node",
+  });
+  const { createConfiguration, extendConfiguration } = await buildOneAsync(
+    "configuration",
+    "test",
   );
-  const {
-    configuration: { createConfiguration, extendConfiguration },
-  } = dependencies;
   const { mainAsync } = Main(dependencies);
   const directory = `${tmpdir()}/${Math.random().toString(36).substring(2)}`;
   await mkdir(directory);

@@ -1,14 +1,14 @@
 import { readFileSync } from "fs";
 import { tmpdir } from "os";
 import { strict as Assert } from "assert";
-import { buildTestAsync } from "../../build.mjs";
+import { buildDependenciesAsync } from "../../build.mjs";
 import Storage from "./index.mjs";
 
 const { equal: assertEqual } = Assert;
 
 const testAsync = async () => {
   const { createStorage, store, storeAsync } = Storage(
-    await buildTestAsync(import.meta),
+    await buildDependenciesAsync(import.meta.url, "test"),
   );
 
   const storage = createStorage({

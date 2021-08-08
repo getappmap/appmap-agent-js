@@ -1,6 +1,7 @@
 default:
-  test: void
-  prod: null
+  test: node
+  prod: node
+  browser: void
 dependencies:
   void:
     - assert

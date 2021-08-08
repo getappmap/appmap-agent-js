@@ -1,22 +1,19 @@
 import { strict as Assert } from "assert";
 import { tmpdir } from "os";
 import { mkdir, writeFile } from "fs/promises";
-import { buildTestAsync } from "../../build.mjs";
+import { buildDependenciesAsync, buildOneAsync } from "../../build.mjs";
 import Child from "./child.mjs";
 
 const { equal: assertEqual, deepEqual: assertDeepEqual } = Assert;
 
 const testAsync = async () => {
-  const dependencies = await buildTestAsync(
-    {
-      ...import.meta,
-      deps: ["configuration"],
-    },
-    { server: "tcp" },
+  const dependencies = await buildDependenciesAsync(import.meta.url, "test", {
+    server: "tcp",
+  });
+  const { createConfiguration, extendConfiguration } = await buildOneAsync(
+    "configuration",
+    "test",
   );
-  const {
-    configuration: { createConfiguration, extendConfiguration },
-  } = dependencies;
   const { compileChild } = Child(dependencies);
   const configuration = extendConfiguration(
     createConfiguration("/repository"),
