@@ -1,6 +1,12 @@
 import { strict as Assert } from "assert";
-import { buildDependenciesAsync } from "../../build.mjs";
-import Object from "./object.mjs";
+import {
+  hasOwnProperty,
+  getOwnPropertyValue,
+  coalesce,
+  coalesceCaseInsensitive,
+  mapMaybe,
+  assignProperty,
+} from "./object.mjs";
 
 const {
   equal: assertEqual,
@@ -8,83 +14,70 @@ const {
   deepEqual: assertDeepEqual,
 } = Assert;
 
-const testAsync = async () => {
-  const {
-    hasOwnProperty,
-    getOwnPropertyValue,
-    coalesce,
-    coalesceCaseInsensitive,
-    mapMaybe,
-    assignProperty,
-  } = await Object(await buildDependenciesAsync(import.meta.url, "test"));
+// mapMaybe //
 
-  // mapMaybe //
+assertEqual(
+  mapMaybe(null, () => assertFail()),
+  null,
+);
 
+assertEqual(
+  mapMaybe("foo", (x) => x + x),
+  "foofoo",
+);
+
+// assignProperty //
+{
+  const object = { __proto__: null };
   assertEqual(
-    mapMaybe(null, () => assertFail()),
-    null,
+    assignProperty({ object, key: "key", value: "value" }),
+    undefined,
   );
+  assertDeepEqual(object, { __proto__: null, key: "value" });
+}
 
-  assertEqual(
-    mapMaybe("foo", (x) => x + x),
-    "foofoo",
-  );
+// hasOwnProperty //
 
-  // assignProperty //
-  {
-    const object = { __proto__: null };
-    assertEqual(
-      assignProperty({ object, key: "key", value: "value" }),
-      undefined,
-    );
-    assertDeepEqual(object, { __proto__: null, key: "value" });
-  }
+assertEqual(hasOwnProperty({ key: "bar" }, "key"), true);
 
-  // hasOwnProperty //
+assertEqual(hasOwnProperty({ __proto__: { key: "bar" } }, "key"), false);
 
-  assertEqual(hasOwnProperty({ key: "bar" }, "key"), true);
+// getOwnPropertyValue //
 
-  assertEqual(hasOwnProperty({ __proto__: { key: "bar" } }, "key"), false);
+assertEqual(getOwnPropertyValue({ key: "value" }, "key", "default"), "value");
 
-  // getOwnPropertyValue //
+assertEqual(
+  getOwnPropertyValue({ key: "value" }, "missing", "default"),
+  "default",
+);
 
-  assertEqual(getOwnPropertyValue({ key: "value" }, "key", "default"), "value");
-
-  assertEqual(
-    getOwnPropertyValue({ key: "value" }, "missing", "default"),
-    "default",
-  );
-
-  assertEqual(
-    getOwnPropertyValue(
-      {
-        get key() {
-          return "value";
-        },
+assertEqual(
+  getOwnPropertyValue(
+    {
+      get key() {
+        return "value";
       },
-      "key",
-      "default",
-    ),
+    },
+    "key",
     "default",
-  );
+  ),
+  "default",
+);
 
-  // coalesce //
+// coalesce //
 
-  assertEqual(coalesce({ key: "value" }, "key", "default"), "value");
+assertEqual(coalesce({ key: "value" }, "key", "default"), "value");
 
-  assertEqual(coalesce(null, "key", "default"), "default");
+assertEqual(coalesce(null, "key", "default"), "default");
 
-  // coalesceCaseInsensitive
+// coalesceCaseInsensitive
 
-  assertEqual(
-    coalesceCaseInsensitive({ Key: "value" }, "key", "default"),
-    "value",
-  );
+assertEqual(
+  coalesceCaseInsensitive({ Key: "value" }, "key", "default"),
+  "value",
+);
 
-  assertEqual(
-    coalesceCaseInsensitive({ Key: "value" }, "missing", "default"),
-    "default",
-  );
-};
-
-testAsync();
+assertEqual(
+  coalesceCaseInsensitive({ Key: "value" }, "missing", "default"),
+  "default",
+);

@@ -1,6 +1,7 @@
 export default (dependencies) => {
   const {
-    assert: { assert },
+    expect: { expect },
+    util: { assert },
   } = dependencies;
 
   const isNonScopingIdentifier = (node, parent) => {
@@ -44,7 +45,7 @@ export default (dependencies) => {
           lineage.tail !== null,
           "identifier node should always have a parent",
         );
-        assert(
+        expect(
           isNonScopingIdentifier(lineage.head, lineage.tail.head),
           "identifier collision detected in file %j, the identifier %j should not start with %j",
           path,

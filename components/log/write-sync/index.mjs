@@ -20,15 +20,15 @@ const levels = new _Map([
 
 export default (dependencies) => {
   const {
-    assert: { assert, format },
-    util: { noop, coalesce },
+    expect: { expect },
+    util: { noop, format, coalesce },
   } = dependencies;
   const min_level_name = coalesce(
     env,
     "APPMAP_LOG_LEVEL",
     "WARNING",
   ).toUpperCase();
-  assert(levels.has(min_level_name), "invalid log level: %s", min_level_name);
+  expect(levels.has(min_level_name), "invalid log level: %s", min_level_name);
   const min_level = levels.get(min_level_name);
   const generateLog = (level_name) => {
     const level = levels.get(level_name);

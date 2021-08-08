@@ -3,4 +3,5 @@ default:
   node: default
   browser: default
 dependencies:
+  - util
   - violation

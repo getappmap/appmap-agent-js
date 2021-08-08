@@ -9,7 +9,7 @@ export default (dependencies) => {
   const {
     log: { logDebug, logInfo, logWarning },
     util: { getDirectory, toAbsolutePath },
-    assert: { assert, assertSuccess, assertSuccessAsync },
+    expect: { expect, expectSuccess, expectSuccessAsync },
     spawn: { spawnAsync },
     server: { openServerAsync, closeServer, promiseServerTermination },
     configuration: { createConfiguration, extendConfiguration },
@@ -23,7 +23,7 @@ export default (dependencies) => {
       argv,
       options,
     );
-    const { signal, status } = await assertSuccessAsync(
+    const { signal, status } = await expectSuccessAsync(
       spawnAsync(exec, argv, options),
       "child error %s >> %e",
       description,
@@ -77,10 +77,10 @@ export default (dependencies) => {
         content = await readFile(configuration_path, "utf8");
       } catch (error) {
         const { code } = { code: null, ...error };
-        assert(code === "ENOENT", "failed to load configuration >> %e", error);
+        expect(code === "ENOENT", "failed to load configuration >> %e", error);
         logWarning("Missing configuration file: %s", configuration_path);
       }
-      content = assertSuccess(
+      content = expectSuccess(
         () => parseYAML(content),
         "failed to parse configuration file: %s >> %e",
         configuration_path,

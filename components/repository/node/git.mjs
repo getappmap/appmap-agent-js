@@ -5,7 +5,7 @@ const _parseInt = parseInt;
 
 export default (dependencies) => {
   const {
-    assert: { assert, assertSuccess },
+    expect: { expect, expectSuccess },
     log: { logWarning },
     util: { mapMaybe, coalesce },
   } = dependencies;
@@ -24,7 +24,7 @@ export default (dependencies) => {
       },
     );
     const error = coalesce(result, "error", null);
-    assert(
+    expect(
       error === null,
       `command %j on cwd %j threw an error >> %e`,
       command,
@@ -32,7 +32,7 @@ export default (dependencies) => {
       error || { message: "dummy" },
     );
     const { signal, status, stdout, stderr } = result;
-    assert(
+    expect(
       signal === null,
       `command %j on cwd %j was killed with %j`,
       command,
@@ -58,14 +58,14 @@ export default (dependencies) => {
 
   const parseDescription = (stdout) => {
     const parts = /^([^-]*)-([0-9]+)-/u.exec(stdout);
-    assert(parts !== null, `failed to parse git description >> %s`, stdout);
+    expect(parts !== null, `failed to parse git description >> %s`, stdout);
     return _parseInt(parts[2], 10);
   };
 
   return {
     extractGitInformation: (directory) => {
       if (
-        !assertSuccess(
+        !expectSuccess(
           () => readdirSync(directory),
           "could not read repository directory %j >> %e",
           directory,

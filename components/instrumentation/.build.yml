@@ -5,7 +5,7 @@ default:
 dependencies:
   default:
     - util
-    - assert
+    - expect
     - uuid
     - specifier
     - naming

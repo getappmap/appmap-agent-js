@@ -4,8 +4,8 @@ default:
   browser: default
 dependencies:
   - util
+  - expect
   - log
-  - assert
   - time
   - instrumentation
   - serialization

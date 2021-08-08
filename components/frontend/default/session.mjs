@@ -6,14 +6,14 @@ const _Error = Error;
 
 export default (dependencies) => {
   const {
+    util: { assert, createBox, getBox, setBox },
+    expect: { expect },
     log: { logWarning },
-    assert: { assert },
-    util: { createBox, getBox, setBox },
   } = dependencies;
   const serializeError = (error) => {
-    assert(
+    expect(
       error instanceof _Error,
-      "expected an instance of Error but gort %o",
+      "expected an instance of Error but got %o",
       error,
     );
     const { name, message } = error;

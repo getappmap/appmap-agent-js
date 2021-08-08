@@ -39,7 +39,7 @@ const testAsync = async () => {
     });
     assertThrows(
       () => sendBackend(backend, { type: "invalid" }),
-      /^AppmapError: invalid message type/,
+      /^AssertionError: invalid message type/,
     );
     sendBackend(backend, {
       type: "terminate",

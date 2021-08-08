@@ -1,13 +1,13 @@
 export default (dependencies) => {
   const {
-    assert: { assert },
     util: { noop },
+    expect: { expect },
   } = dependencies;
   return {
     transformSourceDefault: (content, context, transformSource) =>
       transformSource(content, context, transformSource),
     hookModule: (client, frontend, { hooks: { esm, cjs } }) => {
-      assert(
+      expect(
         !esm && !cjs,
         "expected configuration to disable module hooks (cjs && esm)",
       );

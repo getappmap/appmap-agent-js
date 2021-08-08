@@ -2,6 +2,4 @@ default:
   test: default
   node: default
   browser: default
-dependencies:
-  - violation
-  - assert
+dependencies: []

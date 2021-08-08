@@ -3,5 +3,8 @@ default:
   node: write-sync
   browser: console
 dependencies:
-  - assert
-  - util
+  console:
+    - util
+  write-sync:
+    - util
+    - expect

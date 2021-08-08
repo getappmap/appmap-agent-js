@@ -6,14 +6,14 @@ const { parse } = JSON;
 
 export default (dependencies) => {
   const {
-    assert: { assertSuccess, assert },
     util: { getDirectory },
+    expect: { expectSuccess, expect },
     log: { logWarning },
   } = dependencies;
   const { extractGitInformation } = Git(dependencies);
   const createPackage = (directory) => {
     if (
-      !assertSuccess(
+      !expectSuccess(
         () => readdirSync(directory),
         "could not read repository directory %j >> %e",
         directory,
@@ -29,10 +29,10 @@ export default (dependencies) => {
       name: null,
       version: null,
       homepage: null,
-      ...assertSuccess(
+      ...expectSuccess(
         () =>
           parse(
-            assertSuccess(
+            expectSuccess(
               () => readFileSync(`${directory}/package.json`, "utf8"),
               "could not read 'package.json' file from %j >> %e",
               directory,
@@ -42,12 +42,12 @@ export default (dependencies) => {
         directory,
       ),
     };
-    assert(
+    expect(
       name !== null,
       "missing name property in 'package.json' file from %j",
       directory,
     );
-    assert(
+    expect(
       version !== null,
       "missing version property in 'package.json' file from %j",
       directory,
@@ -59,7 +59,7 @@ export default (dependencies) => {
     extractRepositoryPackage: createPackage,
     extractRepositoryDependency: (repository, name) => {
       const { resolve } = createRequire(`${repository}/dummy.js`);
-      let path = assertSuccess(
+      let path = expectSuccess(
         () => resolve(name),
         "could not resolve %j from %j >> %e",
         name,
@@ -72,7 +72,7 @@ export default (dependencies) => {
           break;
         } catch (error) {
           const { code } = { code: null, ...error };
-          assert(
+          expect(
             code === "ENOENT",
             "failed to attempt reading package.json >> %e",
             error,
@@ -80,7 +80,7 @@ export default (dependencies) => {
         }
         path = getDirectory(path);
       }
-      assert(
+      expect(
         path !== "/",
         "failed to find package.json file from module %j in repository %j",
         name,

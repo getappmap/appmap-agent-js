@@ -7,8 +7,7 @@ const { Minimatch: MinimatchClass } = Minimatch;
 
 export default (dependencies) => {
   const {
-    assert: { assert },
-    util: { toRelativePath },
+    util: { assert, toRelativePath },
   } = dependencies;
 
   const regexps = new _Map();
@@ -51,8 +50,7 @@ export default (dependencies) => {
       if (path !== null) {
         assert(
           path[path.length - 1] !== "/",
-          "directory path should not end with '/', got: %j",
-          path,
+          "directory path should not end with '/'",
         );
         return {
           basedir,
@@ -65,8 +63,7 @@ export default (dependencies) => {
       if (dist !== null) {
         assert(
           dist[dist.length - 1] !== "/",
-          "package path should not end with '/', got: %j",
-          path,
+          "package path should not end with '/'",
         );
         let source = `node_modules/${sanitizeForRegExp(dist)}/`;
         if (!external) {
@@ -81,7 +78,7 @@ export default (dependencies) => {
           flags: "",
         };
       }
-      assert(false, "invalid specifier options: %j", options);
+      assert(false, "invalid specifier options");
     },
     matchSpecifier: ({ basedir, source, flags }, path) => {
       const key = `/${source}/${flags}`;

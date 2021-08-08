@@ -2,8 +2,7 @@ const _Promise = Promise;
 
 export default (dependencies) => {
   const {
-    assert: { assert },
-    util: { createBox, getBox, setBox },
+    util: { assert, createBox, getBox, setBox },
   } = dependencies;
   return {
     createClient: ({}) => ({

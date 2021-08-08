@@ -3,7 +3,7 @@ default:
   node: default
   browser: default
 dependencies:
-  - assert
   - util
+  - expect
   - storage
   - trace

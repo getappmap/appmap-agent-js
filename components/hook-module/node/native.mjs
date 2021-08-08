@@ -12,7 +12,7 @@ const { from } = Buffer;
 
 export default (dependencies) => {
   const {
-    assert: { assert },
+    util: { assert },
     frontend: { instrument },
     client: { sendClient },
   } = dependencies;

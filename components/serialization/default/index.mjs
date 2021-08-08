@@ -14,8 +14,7 @@ const { toString } = prototype;
 
 export default (dependencies) => {
   const {
-    assert: { assert },
-    util: { hasOwnProperty, coalesce, incrementCounter, createCounter },
+    util: { assert, hasOwnProperty, coalesce, incrementCounter, createCounter },
     log: { logWarning },
   } = dependencies;
   const empty = symbolFor("APPMAP_EMPTY_MARKER");
@@ -106,11 +105,7 @@ export default (dependencies) => {
         serial.index = getIndex(symbols, counter, value);
         serial.print = `${prefix}${_String(value)}`;
       } else {
-        assert(
-          type === "function" || type === "object",
-          "invalid type %s",
-          type,
-        );
+        assert(type === "function" || type === "object", "invalid type");
         if (value instanceof _Error) {
           const { stack, message } = value;
           serial.specific = { type: "error", stack, message };
@@ -126,8 +121,7 @@ export default (dependencies) => {
         } else {
           assert(
             method === "Object.prototype.toString",
-            "invalid serialization method: %o",
-            method,
+            "invalid serialization method",
           );
           serial.print = apply(toString, value, []);
         }

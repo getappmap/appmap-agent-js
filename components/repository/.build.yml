@@ -4,10 +4,10 @@ default:
   browser: dead
 dependencies:
   dead:
-    - assert
+    - util
   stub:
     - util
   node:
-    - assert
     - util
+    - expect
     - log

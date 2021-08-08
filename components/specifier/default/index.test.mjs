@@ -11,7 +11,7 @@ const testAsync = async () => {
 
   assertThrows(
     () => createSpecifier("/foo", {}),
-    /^AppmapError: invalid specifier options/,
+    /^AssertionError: invalid specifier options/,
   );
 
   ////////////

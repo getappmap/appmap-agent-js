@@ -1,7 +1,6 @@
 const _Promise = Promise;
 export default ({
-  assert: { assert },
-  util: { createBox, setBox, getBox },
+  util: { assert, createBox, setBox, getBox },
   backend: { openBackend, sendBackend, closeBackend },
 }) => ({
   createClient: (configuration) => ({

@@ -9,8 +9,7 @@ const { from: arrayFrom } = Array;
 
 export default (dependencies) => {
   const {
-    assert: { assert },
-    util: { coalesceCaseInsensitive, zip },
+    util: { assert, coalesceCaseInsensitive, zip },
   } = dependencies;
   const { getClassmapInfo } = Classmap(dependencies);
 
@@ -105,7 +104,7 @@ export default (dependencies) => {
     if (type === "test") {
       return {};
     }
-    assert(false, "invalid (before) event type %o", data);
+    assert(false, "invalid (before) event type");
   };
 
   const compileAfterEventData = (data, classmap) => {
@@ -143,7 +142,7 @@ export default (dependencies) => {
     if (type === "test") {
       return {};
     }
-    assert(false, "invalid (after) event type %o", data);
+    assert(false, "invalid (after) event type");
   };
 
   const compileParameterPrimitive = ([name, primitive]) => ({

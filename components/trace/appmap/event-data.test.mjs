@@ -122,7 +122,7 @@ const testAsync = async () => {
   // invalid //
   assertThrows(
     () => compileBeforeEventData({ type: "invalid" }),
-    /^AppmapError: invalid \(before\) event type/,
+    /^AssertionError: invalid \(before\) event type/,
   );
 
   // test //
@@ -333,7 +333,7 @@ const testAsync = async () => {
   // invalid //
   assertThrows(
     () => compileAfterEventData({ type: "invalid" }),
-    /^AppmapError: invalid \(after\) event type/,
+    /^AssertionError: invalid \(after\) event type/,
   );
 
   // test //

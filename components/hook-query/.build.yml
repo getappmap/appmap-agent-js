@@ -4,8 +4,8 @@ default:
   browser: void
 dependencies:
   void:
-    - assert
     - util
+    - expect
   node:
     - util
     - frontend

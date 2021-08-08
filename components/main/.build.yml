@@ -3,16 +3,16 @@ default:
   prod: null
 dependencies:
   process:
-    - assert
     - util
+    - expect
     - log
     - specifier
     - configuration
     - agent
   batch:
-    - assert
-    - log
     - util
+    - expect
+    - log
     - spawn
     - configuration
     - server
