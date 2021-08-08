@@ -11,7 +11,7 @@ export default (dependencies) => {
     util: { createCounter, incrementCounter },
     specifier: { matchSpecifier },
     uuid: { getUUID },
-    assert: { assertSuccess },
+    expect: { expectSuccess },
   } = dependencies;
   const { visit } = Visit(dependencies);
   return {
@@ -51,7 +51,7 @@ export default (dependencies) => {
             file: { index, exclude, type, path, code },
             code: generate(
               visit(
-                assertSuccess(
+                expectSuccess(
                   () =>
                     parse(code, {
                       sourceType: type,

@@ -1,0 +1,10 @@
+default:
+  test: write-sync
+  node: write-sync
+  browser: console
+dependencies:
+  console:
+    - util
+  write-sync:
+    - util
+    - expect

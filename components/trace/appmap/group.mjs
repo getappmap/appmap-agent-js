@@ -3,7 +3,7 @@ const _Map = Map;
 
 export default (dependencies) => {
   const {
-    assert: { assert },
+    util: { assert },
   } = dependencies;
   // const flaten = (node) => isArray(node) ? node.flatMap(flaten) : [node];
   const flatenFast = (nodes) => {
@@ -26,7 +26,7 @@ export default (dependencies) => {
         if (type === "group") {
           const { group, origin } = data;
           const buffer = [];
-          assert(!map.has(group), "duplicate group %j", group);
+          assert(!map.has(group), "duplicate group");
           map.set(group, buffer);
           (map.has(origin) ? map.get(origin) : root).push(buffer);
         } else if (type === "event") {

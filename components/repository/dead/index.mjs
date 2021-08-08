@@ -1,16 +1,16 @@
 export default (dependencies) => {
   const {
-    assert: { assertDeadcode },
+    util: { generateDeadcode },
   } = dependencies;
   return {
-    extractRepositoryHistory: assertDeadcode(
-      "cannot extract repository history from %j (disabled functionality)",
+    extractRepositoryHistory: generateDeadcode(
+      "cannot extract repository history (disabled functionality)",
     ),
-    extractRepositoryPackage: assertDeadcode(
-      "cannot extract repository package from %j (disabled functionality)",
+    extractRepositoryPackage: generateDeadcode(
+      "cannot extract repository package (disabled functionality)",
     ),
-    extractRepositoryDependencyPackage: assertDeadcode(
-      "cannot extract repository dependency package from %j (disabled functionality)",
+    extractRepositoryDependencyPackage: generateDeadcode(
+      "cannot extract repository dependency package (disabled functionality)",
     ),
   };
 };

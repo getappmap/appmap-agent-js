@@ -3,4 +3,5 @@ default:
   node: default
   browser: default
 dependencies:
-  - violation
+  - util
+  - expect-inner

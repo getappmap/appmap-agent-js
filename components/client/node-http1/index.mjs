@@ -8,8 +8,8 @@ const { stringify } = JSON;
 
 export default (dependencies) => {
   const {
-    assert: { assert },
     util: {
+      assert,
       createCounter,
       createBox,
       getBox,

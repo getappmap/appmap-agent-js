@@ -7,8 +7,7 @@ const END_STATE = 3;
 
 export default (dependencies) => {
   const {
-    assert: { assert },
-    util: { createBox, setBox, getBox },
+    util: { assert, createBox, setBox, getBox },
   } = dependencies;
   const { messageTrack } = Message(dependencies);
   return {
@@ -21,23 +20,14 @@ export default (dependencies) => {
       if (type === "start") {
         assert(
           getBox(state) === BEGIN_STATE,
-          "track %j has already been initialized",
-          index,
+          "track has already been initialized",
         );
         setBox(state, ENABLED_STATE);
         return messageTrack(session, { type, index, options });
       }
       if (type === "stop") {
-        assert(
-          getBox(state) !== BEGIN_STATE,
-          "track %j has not yet been started",
-          index,
-        );
-        assert(
-          getBox(state) !== END_STATE,
-          "track %j has already been stopped",
-          index,
-        );
+        assert(getBox(state) !== BEGIN_STATE, "track has not yet been started");
+        assert(getBox(state) !== END_STATE, "track has already been stopped");
         setBox(state, END_STATE);
         return messageTrack(session, {
           type,
@@ -45,20 +35,12 @@ export default (dependencies) => {
         });
       }
       if (type === "play") {
-        assert(
-          getBox(state) === DISABLED_STATE,
-          "track %j is not paused",
-          index,
-        );
+        assert(getBox(state) === DISABLED_STATE, "track is not paused");
         setBox(state, ENABLED_STATE);
         return messageTrack(session, { type, index });
       }
       if (type === "pause") {
-        assert(
-          getBox(state) === ENABLED_STATE,
-          "track %j is not running",
-          index,
-        );
+        assert(getBox(state) === ENABLED_STATE, "track is not running");
         setBox(state, DISABLED_STATE);
         return messageTrack(session, { type, index });
       }

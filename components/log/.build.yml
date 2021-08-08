@@ -1,7 +1,6 @@
 default:
-  test: write-sync
-  node: write-sync
-  browser: console
+  test: off
+  node: warning
+  browser: warning
 dependencies:
-  - assert
-  - util
+  - log-inner

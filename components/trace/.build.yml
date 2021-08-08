@@ -3,8 +3,8 @@ default:
   node: appmap
   browser: appmap
 dependencies:
-  - assert
-  - log
   - util
+  - expect
+  - log
   - naming
   - configuration

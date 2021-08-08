@@ -1,11 +1,11 @@
 export default (dependencies) => {
   const {
-    assert: { assert },
     util: { noop },
+    expect: { expect },
   } = dependencies;
   return {
     hookQuery: (client, frontend, { hooks: { mysql, pg, sqlite3 } }) => {
-      assert(
+      expect(
         !mysql && !pg && !sqlite3,
         "expected configuration to disable query hooks (mysql && pg && sqlite3)",
       );

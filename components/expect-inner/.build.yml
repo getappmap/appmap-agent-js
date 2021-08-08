@@ -1,0 +1,7 @@
+default:
+  test: default
+  node: default
+  browser: default
+dependencies:
+  - util
+  - violation

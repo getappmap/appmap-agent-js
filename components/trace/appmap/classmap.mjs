@@ -9,8 +9,7 @@ const { isArray } = Array;
 
 export default (dependencies) => {
   const {
-    assert: { assert },
-    util: { createCounter, toRelativePath, hasOwnProperty },
+    util: { assert, createCounter, toRelativePath, hasOwnProperty },
     naming: { parseQualifiedName, getQualifiedName },
   } = dependencies;
 
@@ -56,7 +55,7 @@ export default (dependencies) => {
       /* eslint-enable no-unused-vars */
       return rest;
     }
-    assert(type === "class", "invalid entity type %o", type);
+    assert(type === "class", "invalid entity type");
     const { name, children } = entity;
     return {
       type,

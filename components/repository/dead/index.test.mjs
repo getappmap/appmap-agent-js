@@ -10,7 +10,7 @@ const testAsync = async () => {
   );
   assertThrows(
     () => extractRepositoryHistory("/foo"),
-    /^AppmapError: cannot extract/,
+    /^AssertionError: cannot extract/,
   );
 };
 

@@ -4,9 +4,5 @@ default:
   browser: default
 dependencies:
   default:
-    - assert
+    - util
     - log
-    - util
-  stub:
-    - util
-    - assert

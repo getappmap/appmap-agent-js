@@ -1,14 +1,14 @@
 export default (dependencies) => {
   const {
-    util: { createBox, setBox, getBox },
-    assert: { assert, assertSuccess },
+    util: { assert, createBox, setBox, getBox },
+    expect: { expectSuccess },
     storage: { createStorage, store },
     trace: { compileTrace },
   } = dependencies;
   const persist = (trace, configuration, reason) => {
     const storage = createStorage(configuration);
     for (const { name, data } of compileTrace(configuration, trace, reason)) {
-      assertSuccess(
+      expectSuccess(
         () => store(storage, name, data),
         "failed to store appmap >> %e",
       );
@@ -31,7 +31,7 @@ export default (dependencies) => {
         setBox(box, null);
         persist(trace, configuration, data);
       } else {
-        assert(false, "invalid message type: %o", type);
+        assert(false, "invalid message type", type);
       }
     },
     closeBackend: ({ trace, box }) => {

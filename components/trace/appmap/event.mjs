@@ -4,7 +4,7 @@ const _Map = Map;
 
 export default (dependencies) => {
   const {
-    assert: { assert },
+    util: { assert },
     log: { logWarning },
   } = dependencies;
 
@@ -102,7 +102,7 @@ export default (dependencies) => {
       const { type, index } = event;
       if (map.has(index)) {
         const frame = map.get(index);
-        assert(frame[type] === null, "duplicate event: %j", event);
+        assert(frame[type] === null, "duplicate event");
         frame[type] = event;
         if (frame === current) {
           current = current.parent;

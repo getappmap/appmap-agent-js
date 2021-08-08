@@ -1,8 +1,10 @@
-- violation
-- assert
 - util
-- * log
-  * uuid
+- violation
+- expect-inner
+- expect
+- log-inner
+- log
+- * uuid
   * time
   * spawn
 - specifier

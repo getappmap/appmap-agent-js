@@ -1,7 +1,6 @@
 export default (dependencies) => {
   const {
-    assert: { format },
-    util: { noop },
+    util: { format, noop },
   } = dependencies;
   const generateLog =
     (name) =>

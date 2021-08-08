@@ -1,39 +1,34 @@
-import { print } from "./print.mjs";
-import Format from "./format.mjs";
-
 export default (dependencies) => {
   const {
+    util: { format },
     violation: { throwViolation, throwViolationAsync },
   } = dependencies;
-  const { format } = Format(dependencies);
   return {
-    print,
-    format,
-    assert: (boolean, template, ...rest) => {
+    expect: (boolean, template, ...rest) => {
       if (!boolean) {
         throwViolation(format(template, rest));
       }
     },
-    assertSuccess: (closure, template, ...rest) => {
+    expectSuccess: (closure, template, ...rest) => {
       try {
         return closure();
       } catch (error) {
         throwViolation(format(template, [...rest, error]));
       }
     },
-    assertSuccessAsync: async (promise, template, ...rest) => {
+    expectSuccessAsync: async (promise, template, ...rest) => {
       try {
         return await promise;
       } catch (error) {
         return throwViolationAsync(format(template, [...rest, error]));
       }
     },
-    assertDeadcode:
+    expectDeadcode:
       (template, ...rest1) =>
       (...rest2) => {
         throwViolation(format(template, [...rest1, ...rest2]));
       },
-    assertDeadcodeAsync:
+    expectDeadcodeAsync:
       (reject, template, ...rest1) =>
       (...rest2) =>
         throwViolationAsync(format(template, [...rest1, ...rest2])).catch(

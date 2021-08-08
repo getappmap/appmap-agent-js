@@ -8,8 +8,8 @@ const _Promise = Promise;
 
 export default (dependencies) => {
   const {
-    assert: { assert, assertSuccess },
     util: { toAbsolutePath },
+    expect: { expect, expectSuccess },
     log: { logInfo },
     specifier: { matchSpecifier },
     configuration: { createConfiguration, extendConfiguration },
@@ -24,7 +24,7 @@ export default (dependencies) => {
   return {
     mainAsync: async (process) => {
       const { cwd, env, argv } = process;
-      assert(argv.length > 1, "too few argv: %j", argv);
+      expect(argv.length > 1, "too few argv: %j", argv);
       const { [1]: argv1 } = argv;
       const {
         APPMAP_CONFIGURATION: configuration_string,
@@ -39,7 +39,7 @@ export default (dependencies) => {
       let configuration;
       if (configuration_string === null) {
         configuration = createConfiguration(preliminary_repository_directory);
-        const configuration_data = assertSuccess(
+        const configuration_data = expectSuccess(
           () => parseYAML(readFileSync(preliminary_configuration_path, "utf8")),
           "failed to load configuration file %j >> %e",
           preliminary_configuration_path,

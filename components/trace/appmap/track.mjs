@@ -3,7 +3,7 @@ const { from } = Array;
 
 export default (dependencies) => {
   const {
-    assert: { assert },
+    util: { assert },
   } = dependencies;
   const cleanupTrack = ({ options, messages }) => ({
     options,
@@ -17,7 +17,7 @@ export default (dependencies) => {
         if (type === "track") {
           const { type, index } = data;
           if (type === "start") {
-            assert(!tracks.has(index), "duplicate track index: %j", index);
+            assert(!tracks.has(index), "duplicate track index");
             const { options } = data;
             tracks.set(index, {
               options,
@@ -25,7 +25,7 @@ export default (dependencies) => {
               messages: [],
             });
           } else {
-            assert(tracks.has(index), "missing track index: %j", index);
+            assert(tracks.has(index), "missing track index");
             const track = tracks.get(index);
             track.enabled = type === "play";
           }

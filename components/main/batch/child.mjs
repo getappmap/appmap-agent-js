@@ -9,7 +9,7 @@ const escape = (arg) =>
 
 export default (dependencies) => {
   const {
-    assert: { assert },
+    expect: { expect },
     util: { toAbsolutePath },
     configuration: { extendConfiguration },
   } = dependencies;
@@ -75,12 +75,12 @@ export default (dependencies) => {
           if (exec === "mocha") {
             argv = ["--require", hook, ...argv];
           } else {
-            assert(
+            expect(
               exec === "npx",
               "mocha recorder expected either 'npx' or 'mocha' as executable, got: %j",
               exec,
             );
-            assert(
+            expect(
               argv[0] === "mocha",
               "mocha recorder expected 'mocha' to be the first argument passed to npx, got: %j",
               argv,
@@ -133,7 +133,7 @@ export default (dependencies) => {
         }));
       }
       /* c8 ignore start */
-      assert(false, "invalid child type: %j", child);
+      expect(false, "invalid child type: %j", child);
       /* c8 ignore stop */
     },
   };
