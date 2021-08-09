@@ -1,10 +1,16 @@
 - util
 - violation
+<<<<<<< HEAD
 - expect-inner
 - expect
 - log-inner
 - log
 - * uuid
+=======
+- expect
+- * log
+  * uuid
+>>>>>>> dccffdd00efd62624d438940f4333fbe0c7bedc0
   * time
   * spawn
 - specifier

@@ -3,4 +3,12 @@ default:
   node: warning
   browser: warning
 dependencies:
+<<<<<<< HEAD
   - log-inner
+=======
+  console:
+    - util
+  write-sync:
+    - util
+    - expect
+>>>>>>> dccffdd00efd62624d438940f4333fbe0c7bedc0
