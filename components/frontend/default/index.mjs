@@ -1,5 +1,5 @@
 import Session from "./session.mjs";
-import Message from "./message.mjs";
+import Trace from "./trace.mjs";
 import Recording from "./recording.mjs";
 import Track from "./track.mjs";
 
@@ -14,7 +14,7 @@ export default (dependencies) => {
   } = dependencies;
   const { createSession, initializeSession, terminateSession } =
     Session(dependencies);
-  const { messageFile, messageGroup } = Message(dependencies);
+  const { traceFile, traceGroup } = Trace(dependencies);
   const { createTrack, controlTrack } = Track(dependencies);
   const { createRecording, ...RecordingLibrary } = Recording(dependencies);
   return {
@@ -29,7 +29,7 @@ export default (dependencies) => {
       terminateSession(session, termination),
     createTrack: ({ track_counter }, options) =>
       createTrack(incrementCounter(track_counter), options),
-    declareGroup: ({ session }, group) => messageGroup(session, group),
+    declareGroup: ({ session }, group) => traceGroup(session, group),
     getInstrumentationIdentifier: ({ instrumentation }) =>
       getInstrumentationIdentifier(instrumentation),
     instrument: ({ instrumentation, session }, kind, path, code1) => {
@@ -41,7 +41,7 @@ export default (dependencies) => {
       );
       let message = null;
       if (file !== null) {
-        message = messageFile(session, file);
+        message = traceFile(session, file);
       }
       return {
         message,

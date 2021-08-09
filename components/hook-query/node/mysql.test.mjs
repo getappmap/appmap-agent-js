@@ -24,7 +24,7 @@ const proceedAsync = async () => {
     await testHookAsync(
       hookMysql,
       unhookMysql,
-      { conf: { hooks: { mysql: false } } },
+      { hooks: { mysql: false } },
       async () => {},
     ),
     [],
@@ -71,7 +71,7 @@ const proceedAsync = async () => {
     ),
     [
       {
-        type: "send",
+        type: "trace",
         data: {
           type: "event",
           data: {
@@ -93,7 +93,7 @@ const proceedAsync = async () => {
         },
       },
       {
-        type: "send",
+        type: "trace",
         data: {
           type: "event",
           data: {

@@ -1,4 +1,0 @@
-default:
-  test: enabled
-  prod: disabled
-dependencies: []

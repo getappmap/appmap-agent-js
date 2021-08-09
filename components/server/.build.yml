@@ -4,5 +4,7 @@ default:
   browser: dead
 dependencies:
   tcp:
+    - expect
     - log
+    - validate
     - backend

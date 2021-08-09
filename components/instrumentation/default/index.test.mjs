@@ -18,7 +18,7 @@ const testAsync = async () => {
       createConfiguration("/"),
       {
         "hidden-identifier": "$",
-        language: { version: 2020 },
+        language: { name: "ecmascript", version: "2020" },
         exclude: [],
         packages: [
           {

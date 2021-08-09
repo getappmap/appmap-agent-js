@@ -46,7 +46,7 @@ const testAsync = async () => {
     ),
     [
       {
-        type: "send",
+        type: "trace",
         data: {
           type: "file",
           data: {

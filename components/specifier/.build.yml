@@ -4,3 +4,4 @@ default:
   browser: default
 dependencies:
   - util
+  - expect

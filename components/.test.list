@@ -4,6 +4,7 @@
 - expect
 - log-inner
 - log
+- validate
 - * uuid
   * time
   * spawn

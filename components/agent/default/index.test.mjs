@@ -44,7 +44,7 @@ const testAsync = async () => {
   });
   assertDeepEqual(
     (await executeAgentAsync(agent)).map(({ type }) => type),
-    ["initialize", "send", "terminate"],
+    ["initialize", "trace", "terminate"],
   );
 };
 

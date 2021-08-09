@@ -41,7 +41,19 @@ const testAsync = async () => {
     setTimeout(() => {
       const socket = connect(getServerPort(server));
       patch(socket);
-      socket.send("123");
+      socket.send(
+        JSON.stringify({
+          type: "trace",
+          data: {
+            type: "group",
+            data: {
+              group: 123,
+              origin: 456,
+              description: "description",
+            },
+          },
+        }),
+      );
     });
     await new Promise((resolve) => {
       resolve_open = resolve;

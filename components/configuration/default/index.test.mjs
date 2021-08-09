@@ -43,25 +43,18 @@ const testAsync = async () => {
 
   assertDeepEqual(extend("main", "foo.js"), resolve("foo.js"));
 
-  // log-level //
+  // port //
 
-  assertDeepEqual(extend("log-level", "Warning"), "warning");
+  assertDeepEqual(
+    extend("port", "unix-domain-socket"),
+    `${cwd()}/unix-domain-socket`,
+  );
 
   // language //
 
   assertDeepEqual(extend("language", "foo@bar"), {
     name: "foo",
     version: "bar",
-  });
-
-  assertDeepEqual(extend("language", "foo"), {
-    name: "foo",
-    version: null,
-  });
-
-  assertDeepEqual(extend("language", "foo@bar@qux"), {
-    name: "foo",
-    version: "bar@qux",
   });
 
   assertDeepEqual(extend("language", { name: "foo", version: "bar" }), {
@@ -130,18 +123,6 @@ const testAsync = async () => {
       { shallow: false, enabled: true, exclude: [], source: null },
     ],
   ]);
-
-  // hooks //
-
-  assertDeepEqual(extend("hooks", ["pg", "mysql", "sqlite3"]), {
-    apply: true,
-    cjs: true,
-    esm: true,
-    http: true,
-    mysql: true,
-    sqlite3: true,
-    pg: true,
-  });
 };
 
 testAsync();

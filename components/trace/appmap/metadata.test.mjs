@@ -118,12 +118,12 @@ const testAsync = async () => {
   );
 
   assertDeepEqual(
-    test({ engine: { name: "engine-name", version: null } }, "/cwd"),
+    test({ engine: { name: "engine-name", version: "1.2.3" } }, "/cwd"),
     {
       ...default_meta_data,
       language: {
         ...default_meta_data.language,
-        engine: "engine-name",
+        engine: "engine-name@1.2.3",
       },
     },
   );

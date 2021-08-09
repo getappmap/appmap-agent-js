@@ -41,7 +41,7 @@ const testAsync = async () => {
           setTimeout(() => {
             group1 = executionAsyncId();
             assertDeepEqual(recordAfterQuery(frontend, 123, { error: null }), {
-              type: "send",
+              type: "trace",
               data: {
                 type: "event",
                 data: {
@@ -65,7 +65,7 @@ const testAsync = async () => {
     );
     assert(
       buffer.some(({ type, ...rest1 }) => {
-        if (type === "send") {
+        if (type === "trace") {
           const {
             data: { type, ...rest2 },
           } = rest1;

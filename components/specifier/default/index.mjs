@@ -8,6 +8,7 @@ const { Minimatch: MinimatchClass } = Minimatch;
 export default (dependencies) => {
   const {
     util: { assert, toRelativePath },
+    expect: { expectSuccess },
   } = dependencies;
 
   const regexps = new _Map();
@@ -80,11 +81,16 @@ export default (dependencies) => {
       }
       assert(false, "invalid specifier options");
     },
-    matchSpecifier: ({ basedir, source, flags }, path) => {
+    matchSpecifier: (specifier, path) => {
+      const { basedir, source, flags } = specifier;
       const key = `/${source}/${flags}`;
       let regexp = regexps.get(key);
       if (regexp === _undefined) {
-        regexp = new _RegExp(source, flags);
+        regexp = expectSuccess(
+          () => new _RegExp(source, flags),
+          "failed to compile specifier %j >> %e",
+          specifier,
+        );
         regexps.set(key, regexp);
       }
       return regexp.test(toRelativePath(basedir, path));

@@ -20,7 +20,7 @@ export default (dependencies) => {
       box: createBox(null),
     }),
     sendBackend: ({ trace, box }, { type, data }) => {
-      if (type === "send") {
+      if (type === "trace") {
         trace.push(data);
       } else if (type === "initialize") {
         assert(getBox(box) === null, "backend has already been initialized");

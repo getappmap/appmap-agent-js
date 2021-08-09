@@ -4,5 +4,6 @@ default:
   browser: default
 dependencies:
   - util
+  - validate
   - specifier
   - repository

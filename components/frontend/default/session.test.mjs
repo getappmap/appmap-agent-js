@@ -16,16 +16,20 @@ const testAsync = async () => {
     data: configuration,
   });
   assertDeepEqual(sendSession(session, "message"), {
-    type: "send",
+    type: "trace",
     data: "message",
   });
-  assertDeepEqual(
-    terminateSession(session, { errors: [new TypeError("BOUM")], status: 0 }),
-    {
+  {
+    const message = terminateSession(session, {
+      errors: [new TypeError("BOUM")],
+      status: 0,
+    });
+    delete message.data.errors[0].stack;
+    assertDeepEqual(message, {
       type: "terminate",
       data: { errors: [{ name: "TypeError", message: "BOUM" }], status: 0 },
-    },
-  );
+    });
+  }
   assertDeepEqual(sendSession(session, "message"), null);
 };
 

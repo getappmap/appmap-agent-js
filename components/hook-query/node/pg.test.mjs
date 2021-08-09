@@ -48,7 +48,7 @@ const proceedAsync = async () => {
 
   const trace = [
     {
-      type: "send",
+      type: "trace",
       data: {
         type: "event",
         data: {
@@ -70,7 +70,7 @@ const proceedAsync = async () => {
       },
     },
     {
-      type: "send",
+      type: "trace",
       data: {
         type: "event",
         data: {

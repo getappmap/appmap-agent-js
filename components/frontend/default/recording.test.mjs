@@ -28,7 +28,7 @@ const testAsync = async () => {
   assertEqual(typeof incrementEventCounter({ recording }), "number");
   assertEqual(typeof getSerializationEmptyValue({ recording }), "symbol");
   const createMessage = (type, index, data) => ({
-    type: "send",
+    type: "trace",
     data: {
       type: "event",
       data: {

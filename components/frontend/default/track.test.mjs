@@ -14,7 +14,7 @@ const testAsync = async () => {
   initializeSession(session);
   const track = createTrack("index", { foo: "bar" });
   assertDeepEqual(controlTrack(session, track, "start"), {
-    type: "send",
+    type: "trace",
     data: {
       type: "track",
       data: {
@@ -25,7 +25,7 @@ const testAsync = async () => {
     },
   });
   assertDeepEqual(controlTrack(session, track, "pause"), {
-    type: "send",
+    type: "trace",
     data: {
       type: "track",
       data: {
@@ -35,7 +35,7 @@ const testAsync = async () => {
     },
   });
   assertDeepEqual(controlTrack(session, track, "play"), {
-    type: "send",
+    type: "trace",
     data: {
       type: "track",
       data: {
@@ -45,7 +45,7 @@ const testAsync = async () => {
     },
   });
   assertDeepEqual(controlTrack(session, track, "stop"), {
-    type: "send",
+    type: "trace",
     data: {
       type: "track",
       data: {

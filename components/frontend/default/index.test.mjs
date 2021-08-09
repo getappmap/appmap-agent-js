@@ -40,7 +40,7 @@ const testAsync = async () => {
   {
     const track = createTrack(frontend, "options");
     assertDeepEqual(controlTrack(frontend, track, "start"), {
-      type: "send",
+      type: "trace",
       data: {
         type: "track",
         data: { type: "start", index: 1, options: "options" },
@@ -54,7 +54,7 @@ const testAsync = async () => {
       description: "description",
     }),
     {
-      type: "send",
+      type: "trace",
       data: {
         type: "group",
         data: { group: 123, origin: 456, description: "description" },
@@ -67,7 +67,7 @@ const testAsync = async () => {
   );
   assertDeepEqual(instrument(frontend, "script", "/filename.js", "123;"), {
     message: {
-      type: "send",
+      type: "trace",
       data: {
         type: "file",
         data: {

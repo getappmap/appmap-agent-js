@@ -31,7 +31,7 @@ const testAsync = async () => {
     const backend = openBackend();
     sendBackend(backend, { type: "initialize", data: configuration });
     sendBackend(backend, {
-      type: "send",
+      type: "trace",
       data: {
         type: "track",
         data: { type: "start", index: 123, options: { output: { filename } } },

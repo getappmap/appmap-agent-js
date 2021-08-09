@@ -1,4 +1,4 @@
-import Message from "./message.mjs";
+import Trace from "./trace.mjs";
 
 const { isArray, from: toArray } = Array;
 const { fromEntries, entries: toEntries } = Object;
@@ -20,11 +20,11 @@ export default (dependencies) => {
       getSerializationEmptyValue,
     },
   } = dependencies;
-  const { messageEvent } = Message(dependencies);
+  const { traceEvent } = Trace(dependencies);
   const generateRecord =
     (type1, type2, serializeData) =>
     ({ session, recording: { serialization, current_group } }, index, data) =>
-      messageEvent(session, {
+      traceEvent(session, {
         type: type1,
         index,
         data: {

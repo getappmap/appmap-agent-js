@@ -16,8 +16,8 @@ export default (dependencies) => {
       "expected an instance of Error but got %o",
       error,
     );
-    const { name, message } = error;
-    return { name, message };
+    const { name, message, stack } = error;
+    return { name, message, stack };
   };
   return {
     createSession: (configuration) => ({
@@ -49,7 +49,7 @@ export default (dependencies) => {
     sendSession: ({ state }, message) => {
       if (getBox(state) === RUN_STATE) {
         return {
-          type: "send",
+          type: "trace",
           data: message,
         };
       }

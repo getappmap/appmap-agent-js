@@ -3,11 +3,13 @@ import { patch } from "net-socket-messaging";
 
 const _Promise = Promise;
 const _Set = Set;
-const { parse } = JSON;
+const { parse: parseJSON } = JSON;
 
 export default (dependencies) => {
   const {
     backend: { openBackend, sendBackend, closeBackend },
+    expect: { expectSuccess },
+    validate: { validateMessage },
     log: { logError },
   } = dependencies;
   return {
@@ -38,8 +40,14 @@ export default (dependencies) => {
           socket.destroy();
         });
         /* c8 ignore stop */
-        socket.on("message", (message) => {
-          sendBackend(backend, parse(message));
+        socket.on("message", (data) => {
+          const message = expectSuccess(
+            () => parseJSON(data),
+            "failed to parse JSON message %j >> %e",
+            data,
+          );
+          validateMessage(message);
+          sendBackend(backend, message);
         });
       });
       return new Promise((resolve, reject) => {

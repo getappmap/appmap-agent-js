@@ -20,7 +20,7 @@ const testAsync = async () => {
 
   const default_conf = {
     pruning: false,
-    language: { version: 2020 },
+    language: { name: "ecmascript", version: "2020" },
     "function-name-placeholder": "$",
   };
 

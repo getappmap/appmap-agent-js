@@ -1,4 +1,4 @@
-import Message from "./message.mjs";
+import Trace from "./trace.mjs";
 
 const BEGIN_STATE = 0;
 const ENABLED_STATE = 1;
@@ -9,7 +9,7 @@ export default (dependencies) => {
   const {
     util: { assert, createBox, setBox, getBox },
   } = dependencies;
-  const { messageTrack } = Message(dependencies);
+  const { traceTrack } = Trace(dependencies);
   return {
     createTrack: (index, options) => ({
       index,
@@ -23,13 +23,13 @@ export default (dependencies) => {
           "track has already been initialized",
         );
         setBox(state, ENABLED_STATE);
-        return messageTrack(session, { type, index, options });
+        return traceTrack(session, { type, index, options });
       }
       if (type === "stop") {
         assert(getBox(state) !== BEGIN_STATE, "track has not yet been started");
         assert(getBox(state) !== END_STATE, "track has already been stopped");
         setBox(state, END_STATE);
-        return messageTrack(session, {
+        return traceTrack(session, {
           type,
           index,
         });
@@ -37,12 +37,12 @@ export default (dependencies) => {
       if (type === "play") {
         assert(getBox(state) === DISABLED_STATE, "track is not paused");
         setBox(state, ENABLED_STATE);
-        return messageTrack(session, { type, index });
+        return traceTrack(session, { type, index });
       }
       if (type === "pause") {
         assert(getBox(state) === ENABLED_STATE, "track is not running");
         setBox(state, DISABLED_STATE);
-        return messageTrack(session, { type, index });
+        return traceTrack(session, { type, index });
       }
       assert(false, "invalid track control: %s", type);
     },

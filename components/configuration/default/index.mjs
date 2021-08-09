@@ -1,10 +1,11 @@
-const { isArray, from: toArray } = Array;
+const { from: toArray } = Array;
 const { fromEntries, entries } = Object;
 const { ownKeys } = Reflect;
 
 export default (dependencies) => {
   const {
     util: { identity, toAbsolutePath, hasOwnProperty },
+    validate: { validateConfiguration },
     repository: {
       extractRepositoryHistory,
       extractRepositoryPackage,
@@ -32,15 +33,19 @@ export default (dependencies) => {
   // Normalize //
   ///////////////
 
-  const toLowerCase = (string) => string.toLowerCase();
+  const normalizePort = (port, cwd) => {
+    if (typeof port === "string") {
+      port = toAbsolutePath(cwd, port);
+    }
+    return port;
+  };
 
   const generateNormalizeSplit = (separator, key1, key2) => (value) => {
     if (typeof value === "string") {
-      const [head, ...tail] = value.split(separator);
-      const { length } = tail;
+      const [value1, value2] = value.split(separator);
       return {
-        [key1]: head,
-        [key2]: length === 0 ? null : tail.join(separator),
+        [key1]: value1,
+        [key2]: value2,
       };
     }
     return value;
@@ -60,22 +65,6 @@ export default (dependencies) => {
 
   const normalizeFrameworkArray = (frameworks) =>
     frameworks.map(normalizeFramework);
-
-  // const normalizeConcurrency = (concurrency) => {
-  //   if (typeof concurrency === 'string') {
-  //     concurrency = parseInt(concurrency.substring(0, concurrency.length - 1));
-  //     concurrency = floor((cpus * concurrency) / 100);
-  //     concurrency = max(1, concurrency);
-  //   }
-  //   return concurrency;
-  // };
-
-  const normalizeHooks = (hooks, cwd) => {
-    if (isArray(hooks)) {
-      hooks = fromEntries(hooks.map((name) => [name, true]));
-    }
-    return hooks;
-  };
 
   const normalizeOutput = (output, cwd) => {
     if (typeof output === "string") {
@@ -137,7 +126,7 @@ export default (dependencies) => {
   const fields = {
     "log-level": {
       extend: overwrite,
-      normalize: toLowerCase,
+      normalize: identity,
     },
     protocol: {
       extend: overwrite,
@@ -149,7 +138,7 @@ export default (dependencies) => {
     },
     port: {
       extend: overwrite,
-      normalize: identity,
+      normalize: normalizePort,
     },
     enabled: {
       extend: prepend,
@@ -165,7 +154,7 @@ export default (dependencies) => {
     },
     hooks: {
       extend: assign,
-      normalize: normalizeHooks,
+      normalize: identity,
     },
     "function-name-placeholder": {
       extend: overwrite,
@@ -312,14 +301,13 @@ export default (dependencies) => {
       ),
     extendConfiguration: (configuration, data, cwd) => {
       configuration = { ...configuration };
+      validateConfiguration(data);
       for (let key of ownKeys(data)) {
-        if (hasOwnProperty(fields, key)) {
-          const { normalize, extend } = fields[key];
-          configuration[key] = extend(
-            configuration[key],
-            normalize(data[key], cwd),
-          );
-        }
+        const { normalize, extend } = fields[key];
+        configuration[key] = extend(
+          configuration[key],
+          normalize(data[key], cwd),
+        );
       }
       return configuration;
     },

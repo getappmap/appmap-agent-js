@@ -25,8 +25,7 @@ export default (dependencies) => {
 
   const makeRecording = (recording) => mapMaybe(recording, makeJustRecording);
 
-  const makeJustEngine = ({ name, version }) =>
-    version === null ? name : `${name}@${version}`;
+  const makeJustEngine = ({ name, version }) => `${name}@${version}`;
 
   const makeEngine = (engine) => mapMaybe(engine, makeJustEngine);
 

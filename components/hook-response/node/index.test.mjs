@@ -78,7 +78,7 @@ const testAsync = async () => {
 
   const trace = [
     {
-      type: "send",
+      type: "trace",
       data: {
         type: "event",
         data: {
@@ -98,7 +98,7 @@ const testAsync = async () => {
       },
     },
     {
-      type: "send",
+      type: "trace",
       data: {
         type: "event",
         data: {

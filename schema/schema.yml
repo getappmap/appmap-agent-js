@@ -1,4 +1,8 @@
 
+############
+## Helper ##
+############
+
 # enumeration #
 
 - $id: encoding
@@ -8,34 +12,139 @@
     - utf16le
     - latin1
 
-- $id: event
-  enum: [call, return]
+- $id: log-level
+  enum:
+    - debug
+    - info
+    - warning
+    - error
+    - off
 
-- $id: source
-  enum: [script, module]
+- $id: file-type
+  enum:
+    - script
+    - module
 
 - $id: recorder
   enum:
-    - null
-    - normal
+    - process
     - mocha
 
 - $id: protocol
-  enum: [inline, messaging, http1, http2]
+  enum:
+    - inline
+    - tcp
+    - http1
+    - http2
+
+- $id: serialization-method
+  enum:
+    - toString
+    - Object.prototype.toString
 
 - $id: stdio-stream
-  enum: [ignore, pipe, inherit]
+  enum:
+    - ignore
+    - pipe
+    - inherit
 
 - $id: signal
-  enum: [SIGINT, SIGTERM, SIGKILL]
+  enum:
+    - SIGINT
+    - SIGTERM
+    - SIGKILL
+
+- $id: indent
+  enum:
+    - 0
+    - 2
+    - 4
+    - 8
+
+# primitive #
+
+- $id: exclusion
+  type: string
+
+- $id: regular-identifier
+  type: string
+  pattern: "^[a-zA-Z_$][a-zA-Z_$-9]*$"
+
+- $id: path
+  type: string
+
+- $id: absolute-path
+  type: string
+  pattern: "^/"
+
+- $id: filename
+  type: string
+  pattern: "^[^\/]+$"
+
+- $id: index
+  type: integer
+  minimum: 0
+  maximum: 9007199254740991
+
+- $id: port-number
+  type: integer
+  minimum: 0
+  maximum: 65535
+
+# name-version #
+
+- $id: name-version-string
+  type: string
+  pattern: "^[^@]+@[^@]+$"
+
+- $id: name-version-object
+  type: object
+  additionalProperties: false
+  required: [name, version]
+  properties:
+    name: {type: string}
+    version: {type: string}
+
+- $id: name-version
+  anyOf:
+    - $ref: name-version-string
+    - $ref: name-version-object
+
+# recording #
+
+- $id: recording-string
+  type: string
+  pattern: "^[^.]+.[^.]+$"
+
+- $id: recording-object
+  type: object
+  additionalProperties: false
+  required: [defined-class, method-id]
+  properties:
+    defined-class: {type: string}
+    method-id: {type: string}
+
+- $id: recording
+  anyOf:
+    - $ref: recording-string
+    - $ref: recording-object
 
 # other #
 
-- $id: hook
-  anyOf:
-    - type: boolean
-    - const: null
-    - type: object
+- $id: package
+  type: object
+  additionalProperties: false
+  required: [name, version, homepage]
+  properties:
+    name: {type: string}
+    version: {type: string}
+    homepage:
+      type: string
+      nullable: true
+
+- $id: exclude
+  type: array
+  items: {$ref: exclusion}
 
 - $id: stdio
   anyOf:
@@ -43,71 +152,34 @@
     - type: array
       minItems: 3
       maxItems: 3
-      items: {$ref: stdio-stream}
-
-- $id: cwd
-  type: string
-  pattern: "^/"
-
-# - $id: recorder
-#   anyOf:
-#     -
-#     - $ref: recorder-name
-#     - type: object
-#       additionalProperties: false
-#       required: [name]
-#       properties:
-#         name: {$ref: recorder-name}
+      items:
+        - {$ref: stdio-stream}
+        - {$ref: stdio-stream}
+        - {$ref: stdio-stream}
 
 - $id: env
   type: object
   additionalProperties: false
   patternProperties:
-    "^[^=]+$": {type: string}
+    "^": {type: string}
 
-- $id: name-version
-  anyOf:
-    - type: string
-      pattern: "^[^@]+@[^@]+$"
-    - type: object
-      additionalProperties: false
-      required: [name, version]
-      properties:
-        name:
-          anyOf:
-            - const: null
-            - type: string
-        version:
-          anyOf:
-            - const: null
-            - type: string
+###############
+## Specifier ##
+###############
 
-- $id: cooked-specifier
-  type: object
-  additionalProperties: false
-  required: [pattern, flags, data]
-  properties:
-    pattern:
-      type: string
-    flags:
-      type: string
-    data: {type: object}
-
-- $id: raw-specifier
+- $id: specifier
   anyOf:
     - type: object
       additionalProperties: false
-      required: [pattern]
+      required: [regexp]
       properties:
-        pattern:
+        regexp:
           type: string
         flags:
           type: string
         enabled: {type: boolean}
         shallow: {type: boolean}
-        exclude:
-          type: array
-          items: {type: string}
+        exclude: {$ref: exclude}
     - type: object
       additionalProperties: false
       required: [glob]
@@ -115,9 +187,7 @@
         glob: {type: string}
         enabled: {type: boolean}
         shallow: {type: boolean}
-        exclude:
-          type: array
-          items: {type: string}
+        exclude: {$ref: exclude}
     - type: object
       additionalProperties: false
       required: [path]
@@ -126,9 +196,7 @@
         recursive: {type: boolean}
         enabled: {type: boolean}
         shallow: {type: boolean}
-        exclude:
-          type: array
-          items: {type: string}
+        exclude: {$ref: exclude}
     - type: object
       additionalProperties: false
       required: [dist]
@@ -138,22 +206,18 @@
         external: {type: boolean}
         enabled: {type: boolean}
         shallow: {type: boolean}
-        exclude:
-          type: array
-          items: {type: string}
+        exclude: {$ref: exclude}
 
 - $id: package-specifier
   anyOf:
     - type: string
-    - $ref: cooked-specifier
-    - $ref: raw-specifier
+    - $ref: specifier
 
 - $id: enabled-specifier
   anyOf:
     - type: string
-    - $ref: cooked-specifier
     - allOf:
-      - $ref: raw-specifier
+      - $ref: specifier
       - not:
           anyOf:
             - type: object
@@ -161,122 +225,112 @@
             - type: object
               required: [exclude]
 
-# configuration #
+- $id: cooked-specifier
+  type: object
+  additionalProperties: false
+  required: [basedir, source, flags]
+  properties:
+    basedir: {$ref: absolute-path}
+    source: {type: string}
+    flags: {type: string}
+
+##############
+## Children ##
+##############
+
+- $id: child-options
+  type: object
+  additionalProperties: false
+  properties:
+    execPath: {type: string}
+    execArgv: {type: string}
+    encoding: {$ref: encoding}
+    cwd: {$ref: path}
+    env: {$ref: env}
+    stdio: {$ref: stdio}
+    timeout: {type: integer}
+    killSignal: {$ref: signal}
+
+- $id: child
+  anyOf:
+    - type: string
+    - type: array
+      minItems: 1
+      items: {type: string}
+    - type: object
+      additionalProperties: false
+      required: [type, exec]
+      properties:
+        type: {const: spawn}
+        configuration: {$ref: configuration}
+        exec: {type: string}
+        argv:
+          type: array
+          items: {type: string}
+        options:
+          allOf:
+            - $ref: child-options
+            - not:
+                anyOf:
+                  - type: object
+                    required: [execPath]
+                  - type: object
+                    required: [execArgv]
+    - type: object
+      additionalProperties: false
+      required: [type, main]
+      properties:
+        type: {const: fork}
+        configuration: {$ref: configuration}
+        globbing: {type: boolean}
+        main: {type: string}
+        argv:
+          type: array
+          items: {type: string}
+        options: {$ref: child-options}
+
+- $id: cooked-child
+  type: object
+  additionalProperties: false
+  required: [description, exec, argv, options]
+  properties:
+    description: {type: string}
+    exec: {type: string}
+    argv:
+      type: array
+      items: {type: string}
+    options:
+      allOf:
+        - $ref: child-options
+        - type: object
+          properties:
+            cwd: {$ref: absolute-path}
+        - not:
+            anyOf:
+              - type: object
+                required: [execPath]
+              - type: object
+                required: [execArgv]
+
+#################
+# Configuration #
+#################
 
 - $id: configuration
   type: object
   additionalProperties: false
-  required: [cwd]
   properties:
-    cwd: {$ref: cwd}
-    extends:
-      anyOf:
-        - $ref: configuration
-        - type: string
     # server
     protocol: {$ref: protocol}
+    log-level: {$ref: log-level}
     host: {const: localhost}
     port:
       anyOf:
-        - type: string
-        - type: integer
-          minimum: 0
-          maximum: 65535
-    concurrency:
-      anyOf:
-        - type: integer
-          minimum: 1
-        - type: string
-          pattern: "^[0-9]+%$"
+        - $ref: path
+        - $ref: port-number
     children:
       type: array
-      items:
-        anyOf:
-          - type: string
-          - type: array
-            minItems: 1
-            items: {type: string}
-          - type: object
-            additionalProperties: false
-            required: [type, cwd, exec, argv, configuration, options]
-            properties:
-              type: {const: cooked}
-              description: {type: string}
-              cwd: {$ref: cwd}
-              exec: {type: string}
-              argv:
-                type: array
-                items: {type: string}
-              configuration: {$ref: configuration}
-              options:
-                type: object
-                additionalProperties: false
-                required: [encoding, cwd, env, stdio, timeout, killSignal]
-                properties:
-                  encoding: {$ref: encoding}
-                  cwd: {type: string}
-                  env: {$ref: env}
-                  stdio: {$ref: stdio}
-                  timeout: {type: integer}
-                  killSignal: {$ref: signal}
-          - type: object
-            additionalProperties: false
-            required: [type, exec]
-            properties:
-              type: {const: spawn}
-              recorder:
-                enum:
-                  - null
-                  - normal
-                  - mocha
-              configuration: {$ref: configuration}
-              exec:
-                anyOf:
-                  - type: string
-                  - type: array
-                    items: {type: string}
-              argv:
-                type: array
-                items: {type: string}
-              options:
-                type: object
-                additionalProperties: false
-                properties:
-                  encoding: {$ref: encoding}
-                  cwd: {type: string}
-                  env: {$ref: env}
-                  stdio: {$ref: stdio}
-                  timeout: {type: integer}
-                  killSignal: {$ref: signal}
-          - type: object
-            additionalProperties: false
-            required: [type, main]
-            properties:
-              type: {const: fork}
-              recorder:
-                enum:
-                  - null
-                  - normal
-              configuration: {$ref: configuration}
-              globbing: {type: boolean}
-              main: {type: string}
-              argv:
-                type: array
-                items: {type: string}
-              options:
-                type: object
-                additionalProperties: false
-                properties:
-                  execPath: {type: string}
-                  execArgv:
-                    type: array
-                    items: {type: string}
-                  encoding: {$ref: encoding}
-                  cwd: {type: string}
-                  env: {$ref: env}
-                  stdio: {$ref: stdio}
-                  timeout: {type: integer}
-                  killSignal: {$ref: signal}
+      items: {$ref: child}
     # client
     recorder: {$ref: recorder}
     source: {type: boolean}
@@ -284,194 +338,309 @@
       type: object
       additionalProperties: false
       properties:
-        cjs: {$ref: hook}
-        esm: {$ref: hook}
-        http: {$ref: hook}
-        mysql: {$ref: hook}
-        pg: {$ref: hook}
-        sqlite3: {$ref: hook}
+        cjs: {type: boolean}
+        esm: {type: boolean}
+        group: {type: boolean}
+        apply: {type: boolean}
+        http: {type: boolean}
+        mysql: {type: boolean}
+        pg: {type: boolean}
+        sqlite3: {type: boolean}
     enabled:
       anyOf:
         - type: boolean
         - type: array
           items: {$ref: enabled-specifier}
-    escape-prefix:
-      type: string
-      pattern: "^[a-zA-Z_$][a-zA-Z_$-9]*$"
-    main:
-      anyOf:
-        - type: string
-        - type: object
-          additionalProperties: false
-          required: [path]
-          properties:
-            path:
-              anyOf:
-                - const: null
-                - type: string
+    hidden-identifier: {$ref: regular-identifier}
+    main: {$ref: path}
     engine: {$ref: name-version}
     language: {$ref: name-version}
     packages:
       type: array
       items: {$ref: package-specifier}
-    exclude:
-      type: array
-      items: {type: string}
+    exclude: {$ref: exclude}
     # recording
-    recording:
-      anyOf:
-        - const: null
-        - type: string
-          pattern: "^[^.]+.[^.]+$"
-        - type: object
-          additionalProperties: false
-          required: [defined-class, method-id]
-          properties:
-            defined-class:
-              type: string
-            method-id:
-              type: string
-    class-map-pruning: {type: boolean} # the code entities of a file are only included if the file fired a recorded event
-    event-pruning: {type: boolean} # events are only recorded if they originated from an included file
+    function-name-placeholder: {type: string}
+    recording: {$ref: recording}
+    serialization:
+      type: object
+      additionalProperties: false
+      properties:
+        maximum-length:
+          type: integer
+          minimum: 0
+          nullable: true
+        include-constructor-name: {type: boolean}
+        method: {$ref: serialization-method}
+    pruning: {type: boolean}
     output:
       anyOf:
         - type: string
         - type: object
           additionalProperties: false
+          minProperties: 1
           properties:
             directory: {type: string}
-            file-name:
-              anyOf:
-                - const: null
-                - type: string
-                  pattern: "^[^\/]+$"
-    base:
-      anyOf:
-        - type: string
-        - type: object
-          additionalProperties: false
-          required: [directory]
-          properties:
-            directory: {type: string}
-            git:
-              anyOf:
-                - const: null
-                - type: object
-    app-name:
-      anyOf:
-        - const: null
-        - type: string
-    map-name:
-      anyOf:
-        - const: null
-        - type: string
-    name: # synonym for map-name
-      anyOf:
-        - const: null
-        - type: string
-    feature:
-      anyOf:
-        - const: null
-        - type: string
-    feature-group:
-      anyOf:
-        - const: null
-        - type: string
+            filename: {$ref: filename}
+            postfix: {$ref: filename}
+            indent: {$ref: indent}
+    app: {type: string}
+    name: {type: string}
+    feature: {type: string}
+    feature-group: {type: string}
     labels:
-      anyOf:
-        - type: string
-        - type: array
-          items: {type: string}
+      type: array
+      items: {type: string}
     frameworks:
+      type: array
+      items: {$ref: name-version}
+
+- $id: cooked-configuration
+  type: object
+  additionalProperties: false
+  minProperties: 10
+  properties:
+    repository:
+      type: object
+      additionalProperties: false
+      required: [directory, history, package]
+      properties:
+        directory: {$ref: absolute-path}
+        package: {$ref: package}
+    agent:
+      type: object
+      additionalProperties: false
+      required: [directory, package]
+      properties:
+        directory: {$ref: absolute-path}
+        package: {$ref: package}
+    children:
+      type: array
+      items: {$ref: cooked-child}
+    protocol: {$ref: protocol}
+    log-level: {$ref: log-level}
+    host: {const: localhost}
+    port:
       anyOf:
-        - type: string
-        - type: array
-          items: {$ref: name-version}
+        - {$ref: absolute-path}
+        - {$ref: port-number}
+    recorder: {$ref: recorder}
+    source: {type: boolean}
+    hooks:
+      type: object
+      additionalProperties: false
+      required: [cjs, esm, apply, http, mysql, pg, sqlite3]
+      properties:
+        cjs: {type: boolean}
+        esm: {type: boolean}
+        group: {type: boolean}
+        apply: {type: boolean}
+        http: {type: boolean}
+        mysql: {type: boolean}
+        pg: {type: boolean}
+        sqlite3: {type: boolean}
+    enabled:
+      type: array
+      items:
+        type: array
+        minItems: 2
+        maxItems: 2
+        items:
+          - $ref: cooked-specifier
+          - type: boolean
+    hidden-identifier: {$ref: regular-identifier}
+    main:
+      anyOf:
+        - const: null
+        - $ref: absolute-path
+    engine:
+      anyOf:
+        - const: null
+        - $ref: name-version-object
+    language:
+      $ref: name-version-object
+    packages:
+      type: array
+      items:
+        type: array
+        minItems: 2
+        maxItems: 2
+        items:
+          - $ref: cooked-specifier
+          - type: object
+            properties:
+              enabled: {type: boolean}
+              shallow: {type: boolean}
+              source:
+                type: boolean
+                nullable: true
+              exclude: {$ref: exclude}
+    exclude: {$ref: exclude}
+    # recording
+    function-name-placeholder: {type: string}
+    recording:
+      anyOf:
+        - const: null
+        - $ref: recording-object
+    serialization:
+      type: object
+      additionalProperties: false
+      required: [maximum-length, include-constructor-name, method]
+      properties:
+        maximum-length:
+          type: integer
+          minimum: 0
+          nullable: true
+        include-constructor-name: {type: boolean}
+        method: {$ref: serialization-method}
+    pruning: {type: boolean}
+    output:
+      type: object
+      additionalProperties: false
+      required: [directory, filename, postfix, indent]
+      properties:
+        directory: {$ref: absolute-path}
+        filename:
+          anyOf:
+            - const: null
+            - $ref: filename
+        postfix: {$ref: filename}
+        indent: {$ref: indent}
+    app: {type: string}
+    name: {type: string}
+    feature: {type: string}
+    feature-group: {type: string}
+    labels:
+      type: array
+      items: {type: string}
+    frameworks:
+      type: array
+      items: {$ref: name-version}
 
-# request #
+###########
+# message #
+###########
 
-- $id: request
+- $id: message
   anyOf:
     - type: object
       additionalProperties: false
-      required: [action, session, data]
+      required: [type, data]
       properties:
-        action: {const: initialize}
-        session: {const: null}
-        data: {}
+        type: {const: initialize}
+        data: {$ref: cooked-configuration}
     - type: object
       additionalProperties: false
-      required: [action, session, data]
+      required: [type, data]
       properties:
-        action: {const: terminate}
-        session: {type: string}
-        data:
-          type: object
-          additionalProperties: true
-          required: [type]
-          properties:
-            type: {type: string}
-    - type: object
-      additionalProperties: false
-      required: [action, session, data]
-      properties:
-        action: {const: instrument}
-        session: {type: string}
+        type: {const: terminate}
         data:
           type: object
           additionalProperties: false
-          required: [source, path, content]
+          required: [status, error]
           properties:
-            source: {$ref: source}
-            path: {type: string}
-            content: {type: string}
+            status:
+              type: integer
+              minimum: 0
+              maximum: 255
+            errors:
+              type: array
+              items:
+                type: object
+                additionalProperties: false
+                required: [name, message, stack]
+                properties:
+                  name: {type: string}
+                  message: {type: string}
+                  stack: {type: string}
     - type: object
       additionalProperties: false
-      required: [action, session, data]
+      required: [type, data]
       properties:
-        action: {const: record}
-        session: {type: string}
+        type: {const: trace}
         data:
-          type: object
-          additionalProperties: false
-          required: [origin, event]
-          properties:
-            origin:
-              anyOf:
-                - const: null
-                - type: string
-            event:
-              type: object
-              additionalProperties: true
-              required: [id, event]
+          anyOf:
+            # group
+            - type: object
+              additionalProperties: false
+              required: [type, data]
               properties:
-                id: {type: integer}
-                event: {$ref: event}
-    - type: object
-      additionalProperties: false
-      required: [action, session, data]
-      properties:
-        action: {const: start}
-        session: {type: string}
-        data: {}
-    - type: object
-      additionalProperties: false
-      required: [action, session, data]
-      properties:
-        action: {const: stop}
-        session: {type: string}
-        data: {type: string}
-    - type: object
-      additionalProperties: false
-      required: [action, session, data]
-      properties:
-        action: {const: play}
-        session: {type: string}
-        data: {type: string}
-    - type: object
-      additionalProperties: false
-      required: [action, session, data]
-      properties:
-        action: {const: pause}
-        session: {type: string}
-        data: {type: string}
+                type: {const: group}
+                data:
+                  type: object
+                  additionalProperties: false
+                  required: [group, origin, description]
+                  properties:
+                    group: {$ref: index}
+                    origin: {$ref: index}
+                    description: {type: string}
+            # module
+            - type: object
+              additionalProperties: false
+              required: [type, data]
+              properties:
+                type: {const: module}
+                data:
+                  type: object
+                  additionalProperties: false
+                  required: [index, exclude, type, path, content]
+                  properties:
+                    index: {$ref: index}
+                    exclude:
+                      type: array
+                      items: {type: string}
+                    type: {$ref: file-type}
+                    path: {$ref: absolute-path}
+                    content: {type: string}
+            # track
+            - type: object
+              additionalProperties: false
+              required: [type, data]
+              properties:
+                type: {const: track}
+                data:
+                  anyOf:
+                    - type: object
+                      additionalProperties: false
+                      required: [type, index, options]
+                      properties:
+                        type: {const: start}
+                        index: {$ref: index}
+                        options:
+                          type: object
+                          nullable: true
+                          additionalProperties: false
+                          properties:
+                            main: {$ref: absolute-path}
+                            name: {type: string}
+                            filename: {$ref: filename}
+                            recording: {$ref: recording}
+                    - type: object
+                      additionalProperties: false
+                      required: [type, index]
+                      properties:
+                        type:
+                          enum:
+                            - stop
+                            - pause
+                            - play
+                        index: {$ref: index}
+            # event
+            - type: object
+              additionalProperties: false
+              required: [type, data]
+              properties:
+                type: {const: event}
+                data:
+                  type: object
+                  additionalProperties: false
+                  required: [type, time, group, index, data]
+                  properties:
+                    type:
+                      enum:
+                        - before
+                        - after
+                    time: {type: number}
+                    group: {$ref: index}
+                    index: {$ref: index}
+                    data: {type: object}

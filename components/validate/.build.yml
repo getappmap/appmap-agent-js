@@ -1,0 +1,7 @@
+default:
+  test: ajv
+  node: ajv
+  browser: ajv
+dependencies:
+  - util
+  - expect
