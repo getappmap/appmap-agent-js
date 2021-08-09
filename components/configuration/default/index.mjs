@@ -32,6 +32,8 @@ export default (dependencies) => {
   // Normalize //
   ///////////////
 
+  const toLowerCase = (string) => string.toLowerCase();
+
   const generateNormalizeSplit = (separator, key1, key2) => (value) => {
     if (typeof value === "string") {
       const [head, ...tail] = value.split(separator);
@@ -133,6 +135,10 @@ export default (dependencies) => {
   ////////////
 
   const fields = {
+    "log-level": {
+      extend: overwrite,
+      normalize: toLowerCase,
+    },
     protocol: {
       extend: overwrite,
       normalize: identity,
@@ -251,6 +257,7 @@ export default (dependencies) => {
         history: extractRepositoryHistory(directory),
         package: extractRepositoryPackage(directory),
       },
+      "log-level": "warning",
       agent: extractRepositoryDependency(directory, "@appland/appmap-agent-js"),
       output: {
         directory: `${directory}/tmp/appmap`,

@@ -43,6 +43,10 @@ const testAsync = async () => {
 
   assertDeepEqual(extend("main", "foo.js"), resolve("foo.js"));
 
+  // log-level //
+
+  assertDeepEqual(extend("log-level", "Warning"), "warning");
+
   // language //
 
   assertDeepEqual(extend("language", "foo@bar"), {
