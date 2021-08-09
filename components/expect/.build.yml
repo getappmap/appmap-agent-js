@@ -1,15 +1,7 @@
 default:
-<<<<<<< HEAD
   test: debug
-=======
-  test: default
->>>>>>> dccffdd00efd62624d438940f4333fbe0c7bedc0
   node: default
   browser: default
 dependencies:
   - util
-<<<<<<< HEAD
   - expect-inner
-=======
-  - violation
->>>>>>> dccffdd00efd62624d438940f4333fbe0c7bedc0

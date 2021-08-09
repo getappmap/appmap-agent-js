@@ -1,11 +1,6 @@
 import { strict as Assert } from "assert";
-<<<<<<< HEAD:components/expect-inner/default/index.test.mjs
 import { buildDependenciesAsync } from "../../build.mjs";
 import Expect from "./index.mjs";
-=======
-import { buildDependenciesAsync } from "../build.mjs";
-import Expect from "./expect.mjs";
->>>>>>> dccffdd00efd62624d438940f4333fbe0c7bedc0:components/expect/expect.test.mjs
 
 const { equal: assertEqual, throws: assertThrows, fail: assertFail } = Assert;
 
