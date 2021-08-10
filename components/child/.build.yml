@@ -1,10 +1,11 @@
 default:
   test: default
   node: default
-  browser: default
+  browser: null
 dependencies:
   - util
+  - expect
+  - spawn
   - validate
   - specifier
-  - child
   - repository

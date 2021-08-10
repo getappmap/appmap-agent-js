@@ -10,6 +10,7 @@
   * spawn
 - specifier
 - repository
+- child
 - configuration
 - storage
 - trace
@@ -29,4 +30,3 @@
       * hook-query
   * client
 - agent
-- main

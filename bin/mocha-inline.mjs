@@ -1,4 +1,4 @@
-#!/bin/env node
+#!/usr/bin/env node
 
 import {buildProdAsync} from "../src/build.mjs";
 

@@ -78,6 +78,28 @@ const testAsync = async () => {
     },
   ]);
 
+  // children //
+
+  assertDeepEqual(extend("children", [["exec", "argv0"]]), [
+    {
+      fork: null,
+      exec: "exec",
+      argv: ["argv0"],
+      configuration: {
+        data: {},
+        directory: cwd(),
+      },
+      options: {
+        encoding: "utf8",
+        cwd: cwd(),
+        env: {},
+        stdio: "inherit",
+        timeout: 0,
+        killSignal: "SIGTERM",
+      },
+    },
+  ]);
+
   // output //
 
   assertDeepEqual(extend("output", "foo"), {

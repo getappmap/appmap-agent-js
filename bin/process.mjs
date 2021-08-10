@@ -1,4 +1,4 @@
-#!/bin/env node
+#!/usr/bin/env node
 
 /* globals APPMAP_TRANSFORM_SOURCE */
 import {buildProdAsync} from "../build/index.mjs";

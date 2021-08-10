@@ -248,7 +248,9 @@
     cwd: {$ref: path}
     env: {$ref: env}
     stdio: {$ref: stdio}
-    timeout: {type: integer}
+    timeout:
+      type: integer
+      minimum: 0
     killSignal: {$ref: signal}
 
 - $id: child
@@ -283,7 +285,7 @@
         type: {const: fork}
         configuration: {$ref: configuration}
         globbing: {type: boolean}
-        main: {type: string}
+        exec: {type: string}
         argv:
           type: array
           items: {type: string}
@@ -292,9 +294,16 @@
 - $id: cooked-child
   type: object
   additionalProperties: false
-  required: [description, exec, argv, options]
+  required: [fork, exec, argv, configuration, options]
   properties:
-    description: {type: string}
+    fork:
+      type: object
+      nullable: true
+      required: [directory, data]
+      additionalProperties: false
+      properties:
+        directory: {$ref: absolute-path}
+        data: {$ref: configuration}
     exec: {type: string}
     argv:
       type: array
@@ -303,14 +312,10 @@
       allOf:
         - $ref: child-options
         - type: object
+          required: [encoding, cwd, env, stdio, timeout, killSignal]
+          maxProperties: 6
           properties:
             cwd: {$ref: absolute-path}
-        - not:
-            anyOf:
-              - type: object
-                required: [execPath]
-              - type: object
-                required: [execArgv]
 
 #################
 # Configuration #

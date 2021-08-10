@@ -12,6 +12,7 @@ export default (dependencies) => {
       extractRepositoryDependency,
     },
     specifier: { createSpecifier },
+    child: { createChildren },
   } = dependencies;
 
   ////////////
@@ -97,7 +98,8 @@ export default (dependencies) => {
   const normalizePackages = (specifiers, cwd) =>
     specifiers.map((specifier) => normalizePackageSpecifier(specifier, cwd));
 
-  // const normalizeChilderen = (children) => children.flatMap(normalizeChild);
+  const normalizeChilderen = (children, cwd) =>
+    children.flatMap((child) => createChildren(child, cwd));
 
   const normalizeEnabledSpecifier = (specifier, cwd) => {
     if (typeof specifier === "string") {
@@ -124,6 +126,10 @@ export default (dependencies) => {
   ////////////
 
   const fields = {
+    children: {
+      extend: prepend,
+      normalize: normalizeChilderen,
+    },
     "log-level": {
       extend: overwrite,
       normalize: identity,
@@ -246,6 +252,7 @@ export default (dependencies) => {
         history: extractRepositoryHistory(directory),
         package: extractRepositoryPackage(directory),
       },
+      children: [],
       "log-level": "warning",
       agent: extractRepositoryDependency(directory, "@appland/appmap-agent-js"),
       output: {
