@@ -41,16 +41,8 @@ export default (dependencies) => {
         recorder,
         agent: { directory: agent_directory },
       } = configuration2;
-      const hook = `${agent_directory}/bin/${recorder}.mjs`;
+      let hook = `${agent_directory}/lib/${recorder}.mjs`;
       if (fork === null) {
-        env3 = {
-          ...env3,
-          NODE_OPTIONS: `${coalesce(
-            env3,
-            "NODE_OPTIONS",
-            "",
-          )} --experimental-loader=${hook}`,
-        };
         if (recorder === "mocha") {
           if (exec === "mocha") {
             argv = ["--require", hook, ...argv];
@@ -67,7 +59,16 @@ export default (dependencies) => {
             );
             argv = ["mocha", "--require", hook, ...argv.slice(1)];
           }
+          hook = `${agent_directory}/lib/loader.mjs`;
         }
+        env3 = {
+          ...env3,
+          NODE_OPTIONS: `${coalesce(
+            env3,
+            "NODE_OPTIONS",
+            "",
+          )} --experimental-loader=${hook}`,
+        };
       } else {
         const { exec: fork_exec, argv: fork_argv } = fork;
         argv = [...fork_argv, "--experimental-loader", hook, exec, ...argv];

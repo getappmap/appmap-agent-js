@@ -411,6 +411,9 @@
       required: [directory, history, package]
       properties:
         directory: {$ref: absolute-path}
+        history:
+          type: object
+          nullable: true
         package: {$ref: package}
     agent:
       type: object
@@ -511,10 +514,18 @@
             - $ref: filename
         postfix: {$ref: filename}
         indent: {$ref: indent}
-    app: {type: string}
-    name: {type: string}
-    feature: {type: string}
-    feature-group: {type: string}
+    app:
+      type: string
+      nullable: true
+    name:
+      type: string
+      nullable: true
+    feature:
+      type: string
+      nullable: true
+    feature-group:
+      type: string
+      nullable: true
     labels:
       type: array
       items: {type: string}

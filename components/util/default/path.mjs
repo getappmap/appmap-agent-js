@@ -1,7 +1,7 @@
 import { assert } from "./assert.mjs";
 
 const assertAbsolutePath = (path) => {
-  assert(path[0] === "/", "expected an absolute path but got: %s", path);
+  assert(path[0] === "/", "expected an absolute path");
 };
 
 const getNormalizedParts = (path) => {

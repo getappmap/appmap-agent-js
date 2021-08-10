@@ -258,7 +258,7 @@ export default (dependencies) => {
       output: {
         directory: `${directory}/tmp/appmap`,
         filename: null,
-        indent: null,
+        indent: 0,
         postfix: ".appmap",
       },
       protocol: "inline",
@@ -286,7 +286,7 @@ export default (dependencies) => {
       main: null,
       language: {
         name: "ecmascript",
-        version: 2020,
+        version: "2020",
       },
       engine: null,
       packages: [],

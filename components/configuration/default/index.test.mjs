@@ -106,14 +106,14 @@ const testAsync = async () => {
     directory: resolve("foo"),
     filename: null,
     postfix: ".appmap",
-    indent: null,
+    indent: 0,
   });
 
   assertDeepEqual(extend("output", { filename: "foo" }), {
     directory: resolve("tmp", "appmap"),
     filename: "foo",
     postfix: ".appmap",
-    indent: null,
+    indent: 0,
   });
 
   // enabled //

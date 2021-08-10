@@ -427,7 +427,8 @@ export const schema = [
         "$ref": "stdio"
       },
       "timeout": {
-        "type": "integer"
+        "type": "integer",
+        "minimum": 0
       },
       "killSignal": {
         "$ref": "signal"
@@ -514,7 +515,7 @@ export const schema = [
           "globbing": {
             "type": "boolean"
           },
-          "main": {
+          "exec": {
             "type": "string"
           },
           "argv": {
@@ -535,14 +536,29 @@ export const schema = [
     "type": "object",
     "additionalProperties": false,
     "required": [
-      "description",
+      "fork",
       "exec",
       "argv",
+      "configuration",
       "options"
     ],
     "properties": {
-      "description": {
-        "type": "string"
+      "fork": {
+        "type": "object",
+        "nullable": true,
+        "required": [
+          "directory",
+          "data"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "directory": {
+            "$ref": "absolute-path"
+          },
+          "data": {
+            "$ref": "configuration"
+          }
+        }
       },
       "exec": {
         "type": "string"
@@ -560,28 +576,19 @@ export const schema = [
           },
           {
             "type": "object",
+            "required": [
+              "encoding",
+              "cwd",
+              "env",
+              "stdio",
+              "timeout",
+              "killSignal"
+            ],
+            "maxProperties": 6,
             "properties": {
               "cwd": {
                 "$ref": "absolute-path"
               }
-            }
-          },
-          {
-            "not": {
-              "anyOf": [
-                {
-                  "type": "object",
-                  "required": [
-                    "execPath"
-                  ]
-                },
-                {
-                  "type": "object",
-                  "required": [
-                    "execArgv"
-                  ]
-                }
-              ]
             }
           }
         ]
@@ -783,6 +790,10 @@ export const schema = [
         "properties": {
           "directory": {
             "$ref": "absolute-path"
+          },
+          "history": {
+            "type": "object",
+            "nullable": true
           },
           "package": {
             "$ref": "package"
@@ -1021,16 +1032,20 @@ export const schema = [
         }
       },
       "app": {
-        "type": "string"
+        "type": "string",
+        "nullable": true
       },
       "name": {
-        "type": "string"
+        "type": "string",
+        "nullable": true
       },
       "feature": {
-        "type": "string"
+        "type": "string",
+        "nullable": true
       },
       "feature-group": {
-        "type": "string"
+        "type": "string",
+        "nullable": true
       },
       "labels": {
         "type": "array",
