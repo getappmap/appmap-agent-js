@@ -1,4 +1,4 @@
-import {writeEntryPointAsync} from "./static.mjs";
+import { writeEntryPointAsync } from "./static.mjs";
 
 writeEntryPointAsync("node", "configuration-boot");
 writeEntryPointAsync("node", "recorder-process");

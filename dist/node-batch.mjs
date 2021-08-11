@@ -23,13 +23,26 @@ import server$tcp from "./../components/server/tcp/index.mjs";
 import batch$default from "./../components/batch/default/index.mjs";
 
 export default (blueprint) => {
-  const dependencies = {__proto__:null};
+  const dependencies = { __proto__: null };
   dependencies["util"] = util$default(dependencies);
   dependencies["violation"] = violation$exit(dependencies);
   dependencies["expect-inner"] = expect_inner$default(dependencies);
   dependencies["expect"] = expect$default(dependencies);
   dependencies["log-inner"] = log_inner$write_sync(dependencies);
-  dependencies["log"] = (blueprint["log"] === "warning" ? log$warning(dependencies) : (blueprint["log"] === "off" ? log$off(dependencies) : (blueprint["log"] === "info" ? log$info(dependencies) : (blueprint["log"] === "error" ? log$error(dependencies) : (blueprint["log"] === "debug" ? log$debug(dependencies) : ((() => { throw new Error("invalid instance for component log"); }) ()))))));
+  dependencies["log"] =
+    blueprint["log"] === "warning"
+      ? log$warning(dependencies)
+      : blueprint["log"] === "off"
+      ? log$off(dependencies)
+      : blueprint["log"] === "info"
+      ? log$info(dependencies)
+      : blueprint["log"] === "error"
+      ? log$error(dependencies)
+      : blueprint["log"] === "debug"
+      ? log$debug(dependencies)
+      : (() => {
+          throw new Error("invalid instance for component log");
+        })();
   dependencies["spawn"] = spawn$node(dependencies);
   dependencies["validate"] = validate$ajv(dependencies);
   dependencies["specifier"] = specifier$default(dependencies);
@@ -40,7 +53,14 @@ export default (blueprint) => {
   dependencies["naming"] = naming$default(dependencies);
   dependencies["trace"] = trace$appmap(dependencies);
   dependencies["backend"] = backend$default(dependencies);
-  dependencies["server"] = (blueprint["server"] === "tcp" ? server$tcp(dependencies) : (blueprint["server"] === "stub" ? server$stub(dependencies) : ((() => { throw new Error("invalid instance for component server"); }) ())));
+  dependencies["server"] =
+    blueprint["server"] === "tcp"
+      ? server$tcp(dependencies)
+      : blueprint["server"] === "stub"
+      ? server$stub(dependencies)
+      : (() => {
+          throw new Error("invalid instance for component server");
+        })();
   dependencies["batch"] = batch$default(dependencies);
   return dependencies["batch"];
 };

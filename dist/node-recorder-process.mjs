@@ -39,15 +39,35 @@ import agent$default from "./../components/agent/default/index.mjs";
 import recorder_process$default from "./../components/recorder-process/default/index.mjs";
 
 export default (blueprint) => {
-  const dependencies = {__proto__:null};
+  const dependencies = { __proto__: null };
   dependencies["util"] = util$default(dependencies);
   dependencies["violation"] = violation$exit(dependencies);
   dependencies["expect-inner"] = expect_inner$default(dependencies);
   dependencies["expect"] = expect$default(dependencies);
   dependencies["log-inner"] = log_inner$write_sync(dependencies);
-  dependencies["log"] = (blueprint["log"] === "warning" ? log$warning(dependencies) : (blueprint["log"] === "off" ? log$off(dependencies) : (blueprint["log"] === "info" ? log$info(dependencies) : (blueprint["log"] === "error" ? log$error(dependencies) : (blueprint["log"] === "debug" ? log$debug(dependencies) : ((() => { throw new Error("invalid instance for component log"); }) ()))))));
+  dependencies["log"] =
+    blueprint["log"] === "warning"
+      ? log$warning(dependencies)
+      : blueprint["log"] === "off"
+      ? log$off(dependencies)
+      : blueprint["log"] === "info"
+      ? log$info(dependencies)
+      : blueprint["log"] === "error"
+      ? log$error(dependencies)
+      : blueprint["log"] === "debug"
+      ? log$debug(dependencies)
+      : (() => {
+          throw new Error("invalid instance for component log");
+        })();
   dependencies["specifier"] = specifier$default(dependencies);
-  dependencies["time"] = (blueprint["time"] === "performance-node" ? time$performance_node(dependencies) : (blueprint["time"] === "date" ? time$date(dependencies) : ((() => { throw new Error("invalid instance for component time"); }) ())));
+  dependencies["time"] =
+    blueprint["time"] === "performance-node"
+      ? time$performance_node(dependencies)
+      : blueprint["time"] === "date"
+      ? time$date(dependencies)
+      : (() => {
+          throw new Error("invalid instance for component time");
+        })();
   dependencies["uuid"] = uuid$random(dependencies);
   dependencies["naming"] = naming$default(dependencies);
   dependencies["instrumentation"] = instrumentation$default(dependencies);
@@ -61,7 +81,18 @@ export default (blueprint) => {
   dependencies["configuration"] = configuration$default(dependencies);
   dependencies["trace"] = trace$appmap(dependencies);
   dependencies["backend"] = backend$default(dependencies);
-  dependencies["client"] = (blueprint["client"] === "node-tcp" ? client$node_tcp(dependencies) : (blueprint["client"] === "node-http2" ? client$node_http2(dependencies) : (blueprint["client"] === "node-http1" ? client$node_http1(dependencies) : (blueprint["client"] === "inline" ? client$inline(dependencies) : ((() => { throw new Error("invalid instance for component client"); }) ())))));
+  dependencies["client"] =
+    blueprint["client"] === "node-tcp"
+      ? client$node_tcp(dependencies)
+      : blueprint["client"] === "node-http2"
+      ? client$node_http2(dependencies)
+      : blueprint["client"] === "node-http1"
+      ? client$node_http1(dependencies)
+      : blueprint["client"] === "inline"
+      ? client$inline(dependencies)
+      : (() => {
+          throw new Error("invalid instance for component client");
+        })();
   dependencies["interpretation"] = interpretation$vm(dependencies);
   dependencies["hook-apply"] = hook_apply$default(dependencies);
   dependencies["hook-group"] = hook_group$node(dependencies);
