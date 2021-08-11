@@ -61,19 +61,24 @@ const visitComponentAsync = async (component, context) => {
     ],
     body: [
       ...body,
-      length === 1
-        ? `dependencies["${component}"] = ${getIdentifier(
-            component,
-            instances[0],
-          )}(dependencies);`
-        : `dependencies["${component}"] = ${instances.reduce(
-            (code, instance) =>
-              `(blueprint["${component}"] === "${instance}" ? ${getIdentifier(
-                component,
-                instance,
-              )}(dependencies) : ${code})`,
-            `((() => { throw new Error("invalid instance for component ${component}"); }) ())`,
-          )};`,
+      ...(length === 1
+        ? [
+            `dependencies["${component}"] = ${getIdentifier(
+              component,
+              instances[0],
+            )}(dependencies);`,
+          ]
+        : [
+            `if (!("${component}" in blueprint)) { throw new Error("missing instance for component ${component}"); }`,
+            `dependencies["${component}"] = ${instances.reduce(
+              (code, instance) =>
+                `(blueprint["${component}"] === "${instance}" ? ${getIdentifier(
+                  component,
+                  instance,
+                )}(dependencies) : ${code})`,
+              `((() => { throw new Error("invalid instance for component ${component}"); }) ())`,
+            )};`,
+          ]),
     ],
   };
 };

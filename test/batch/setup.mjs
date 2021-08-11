@@ -35,24 +35,14 @@ export const setupAsync = async (
     `${directory}/package.json`,
     stringifyJSON({ name, version }),
   );
-  await writeFile(`${directory}/configuration.yml`, stringifyYAML(config));
+  await writeFile(`${directory}/appmap.yml`, stringifyYAML(config));
   await mkdir(`${directory}/tmp`);
   await mkdir(`${directory}/tmp/appmap`);
   await beforeAsync(directory);
-  await spawnAsync(
-    "node",
-    [
-      `${cwd()}/bin/batch.mjs`,
-      "--repository",
-      directory,
-      "--configuration",
-      `${directory}/configuration.yml`,
-    ],
-    {
-      // cwd does not matters because we don't have any relative path
-      stdio: "inherit",
-    },
-  );
+  await spawnAsync("node", [`${cwd()}/bin/batch.mjs`], {
+    cwd: directory,
+    stdio: "inherit",
+  });
   const appmaps = [];
   for (let filename of await readdir(`${directory}/tmp/appmap`)) {
     const appmap = parseJSON(

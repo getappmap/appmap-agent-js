@@ -556,7 +556,7 @@
         data:
           type: object
           additionalProperties: false
-          required: [status, error]
+          required: [status, errors]
           properties:
             status:
               type: integer
@@ -593,16 +593,16 @@
                     group: {$ref: index}
                     origin: {$ref: index}
                     description: {type: string}
-            # module
+            # file
             - type: object
               additionalProperties: false
               required: [type, data]
               properties:
-                type: {const: module}
+                type: {const: file}
                 data:
                   type: object
                   additionalProperties: false
-                  required: [index, exclude, type, path, content]
+                  required: [index, exclude, type, path, code]
                   properties:
                     index: {$ref: index}
                     exclude:
@@ -610,7 +610,7 @@
                       items: {type: string}
                     type: {$ref: file-type}
                     path: {$ref: absolute-path}
-                    content: {type: string}
+                    code: {type: string}
             # track
             - type: object
               additionalProperties: false

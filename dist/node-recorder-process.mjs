@@ -9,7 +9,6 @@ import log$info from "./../components/log/info/index.mjs";
 import log$off from "./../components/log/off/index.mjs";
 import log$warning from "./../components/log/warning/index.mjs";
 import specifier$default from "./../components/specifier/default/index.mjs";
-import time$date from "./../components/time/date/index.mjs";
 import time$performance_node from "./../components/time/performance-node/index.mjs";
 import uuid$random from "./../components/uuid/random/index.mjs";
 import naming$default from "./../components/naming/default/index.mjs";
@@ -45,6 +44,9 @@ export default (blueprint) => {
   dependencies["expect-inner"] = expect_inner$default(dependencies);
   dependencies["expect"] = expect$default(dependencies);
   dependencies["log-inner"] = log_inner$write_sync(dependencies);
+  if (!("log" in blueprint)) {
+    throw new Error("missing instance for component log");
+  }
   dependencies["log"] =
     blueprint["log"] === "warning"
       ? log$warning(dependencies)
@@ -60,14 +62,7 @@ export default (blueprint) => {
           throw new Error("invalid instance for component log");
         })();
   dependencies["specifier"] = specifier$default(dependencies);
-  dependencies["time"] =
-    blueprint["time"] === "performance-node"
-      ? time$performance_node(dependencies)
-      : blueprint["time"] === "date"
-      ? time$date(dependencies)
-      : (() => {
-          throw new Error("invalid instance for component time");
-        })();
+  dependencies["time"] = time$performance_node(dependencies);
   dependencies["uuid"] = uuid$random(dependencies);
   dependencies["naming"] = naming$default(dependencies);
   dependencies["instrumentation"] = instrumentation$default(dependencies);
@@ -81,6 +76,9 @@ export default (blueprint) => {
   dependencies["configuration"] = configuration$default(dependencies);
   dependencies["trace"] = trace$appmap(dependencies);
   dependencies["backend"] = backend$default(dependencies);
+  if (!("client" in blueprint)) {
+    throw new Error("missing instance for component client");
+  }
   dependencies["client"] =
     blueprint["client"] === "node-tcp"
       ? client$node_tcp(dependencies)

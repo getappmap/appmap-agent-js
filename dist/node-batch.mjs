@@ -29,6 +29,9 @@ export default (blueprint) => {
   dependencies["expect-inner"] = expect_inner$default(dependencies);
   dependencies["expect"] = expect$default(dependencies);
   dependencies["log-inner"] = log_inner$write_sync(dependencies);
+  if (!("log" in blueprint)) {
+    throw new Error("missing instance for component log");
+  }
   dependencies["log"] =
     blueprint["log"] === "warning"
       ? log$warning(dependencies)
@@ -53,6 +56,9 @@ export default (blueprint) => {
   dependencies["naming"] = naming$default(dependencies);
   dependencies["trace"] = trace$appmap(dependencies);
   dependencies["backend"] = backend$default(dependencies);
+  if (!("server" in blueprint)) {
+    throw new Error("missing instance for component server");
+  }
   dependencies["server"] =
     blueprint["server"] === "tcp"
       ? server$tcp(dependencies)

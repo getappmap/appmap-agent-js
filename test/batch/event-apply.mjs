@@ -4,14 +4,14 @@ import { setupAsync } from "./setup.mjs";
 
 const { deepEqual: assertDeepEqual } = Assert;
 
-export default async () => {
+export default async (protocol) => {
   await setupAsync(
     "app",
     "1.2.3",
     {
       enabled: true,
       name: "name",
-      protocol: "inline",
+      protocol,
       "function-name-placeholder": "$",
       children: [["node", "./main.mjs"]],
       packages: [{ glob: "*" }],

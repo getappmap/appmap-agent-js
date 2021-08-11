@@ -26,6 +26,9 @@ export default (blueprint) => {
   dependencies["specifier"] = specifier$default(dependencies);
   dependencies["spawn"] = spawn$node(dependencies);
   dependencies["log-inner"] = log_inner$write_sync(dependencies);
+  if (!("log" in blueprint)) {
+    throw new Error("missing instance for component log");
+  }
   dependencies["log"] =
     blueprint["log"] === "warning"
       ? log$warning(dependencies)

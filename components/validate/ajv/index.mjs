@@ -22,9 +22,9 @@ export default (dependencies) => {
         const tree1 = AjvErrorTree.structureAJVErrorArray(errors);
         const tree2 = AjvErrorTree.summarizeAJVErrorTree(tree1);
         if (typeof tree2 === "string") {
-          expect(false, "invalid %s >> %s", name, tree2);
+          expect(false, "invalid %s >> %s\n%j", name, tree2, json);
         } else {
-          expect(false, "invalid %s\n%s", name, asTree(tree2, true));
+          expect(false, "invalid %s\n%s\n%j", name, asTree(tree2, true), json);
         }
       }
     };

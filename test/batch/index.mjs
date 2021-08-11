@@ -4,12 +4,13 @@ import testEventApplyAsync from "./event-apply.mjs";
 import testEventHttpAsync from "./event-http.mjs";
 import testEventQueryAsync from "./event-query.mjs";
 
-const testAsync = async () => {
-  await testMetadataAsync();
-  await testClassmapAsync();
-  await testEventApplyAsync();
-  await testEventHttpAsync();
-  await testEventQueryAsync();
+const testAsync = async (protocol) => {
+  await testMetadataAsync(protocol);
+  await testClassmapAsync(protocol);
+  await testEventApplyAsync(protocol);
+  await testEventHttpAsync(protocol);
+  await testEventQueryAsync(protocol);
 };
 
-testAsync();
+await testAsync("tcp");
+await testAsync("inline");

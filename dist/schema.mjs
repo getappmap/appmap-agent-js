@@ -988,7 +988,7 @@ export const schema = [
           data: {
             type: "object",
             additionalProperties: false,
-            required: ["status", "error"],
+            required: ["status", "errors"],
             properties: {
               status: {
                 type: "integer",
@@ -1060,12 +1060,12 @@ export const schema = [
                 required: ["type", "data"],
                 properties: {
                   type: {
-                    const: "module",
+                    const: "file",
                   },
                   data: {
                     type: "object",
                     additionalProperties: false,
-                    required: ["index", "exclude", "type", "path", "content"],
+                    required: ["index", "exclude", "type", "path", "code"],
                     properties: {
                       index: {
                         $ref: "index",
@@ -1082,7 +1082,7 @@ export const schema = [
                       path: {
                         $ref: "absolute-path",
                       },
-                      content: {
+                      code: {
                         type: "string",
                       },
                     },
