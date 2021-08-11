@@ -1,5 +1,0 @@
-default:
-  test: stub
-  node: performance-node
-  browser: performance-browser
-dependencies: []

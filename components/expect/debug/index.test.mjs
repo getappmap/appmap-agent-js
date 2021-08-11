@@ -1,12 +1,12 @@
 import { strict as Assert } from "assert";
-import { buildDependenciesAsync } from "../../build.mjs";
+import { buildTestDependenciesAsync } from "../../build.mjs";
 import _Assert from "./index.mjs";
 
 const { equal: assertEqual } = Assert;
 
 const testAsync = async () => {
   const { expect, expectSuccess, expectSuccessAsync } = _Assert(
-    await buildDependenciesAsync(import.meta.url, "test"),
+    await buildTestDependenciesAsync(import.meta.url),
   );
   assertEqual(expect(true, "%s", "foo"), undefined);
   assertEqual(

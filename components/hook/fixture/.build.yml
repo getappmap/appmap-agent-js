@@ -1,0 +1,6 @@
+branches: [test]
+dependencies:
+  - util
+  - configuration
+  - frontend
+  - client

@@ -1,13 +1,13 @@
 /* eslint-env node */
 import { strict as Assert } from "assert";
-import { buildDependenciesAsync } from "../../build.mjs";
+import { buildTestDependenciesAsync } from "../../build.mjs";
 import Repository from "./index.mjs";
 
 const { deepEqual: assertDeepEqual } = Assert;
 
 const testAsync = async () => {
   const { extractRepositoryDependency } = Repository(
-    await buildDependenciesAsync(import.meta.url, "test"),
+    await buildTestDependenciesAsync(import.meta.url),
   );
   assertDeepEqual(extractRepositoryDependency("/foo", "bar"), {
     directory: "/foo/node_modules/bar",

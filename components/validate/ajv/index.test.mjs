@@ -1,12 +1,12 @@
 import { strict as Assert } from "assert";
-import { buildDependenciesAsync } from "../../build.mjs";
+import { buildTestDependenciesAsync } from "../../build.mjs";
 import Validation from "./index.mjs";
 
 const { throws: assertThrows } = Assert;
 
 const testAsync = async () => {
   const { validateConfiguration } = Validation(
-    await buildDependenciesAsync(import.meta.url, "test"),
+    await buildTestDependenciesAsync(import.meta.url),
   );
   assertThrows(() => {
     validateConfiguration({ protocol: "invalid-protocol" });

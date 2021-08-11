@@ -1,5 +1,5 @@
 import { strict as Assert } from "assert";
-import { buildDependenciesAsync } from "../../build.mjs";
+import { buildTestDependenciesAsync } from "../../build.mjs";
 import Track from "./track.mjs";
 
 Error.stackTraceLimit = Infinity;
@@ -10,7 +10,7 @@ const {
 } = Assert;
 
 const testAsync = async () => {
-  const dependencies = await buildDependenciesAsync(import.meta.url, "test");
+  const dependencies = await buildTestDependenciesAsync(import.meta.url);
 
   const { splitByTrack } = Track(dependencies);
 

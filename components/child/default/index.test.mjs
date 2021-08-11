@@ -3,7 +3,7 @@
 import { strict as Assert } from "assert";
 import { tmpdir } from "os";
 import { mkdir, writeFile } from "fs/promises";
-import { buildDependenciesAsync } from "../../build.mjs";
+import { buildTestDependenciesAsync } from "../../build.mjs";
 import Child from "./index.mjs";
 
 const { equal: assertEqual, deepEqual: assertDeepEqual } = Assert;
@@ -11,7 +11,7 @@ const { equal: assertEqual, deepEqual: assertDeepEqual } = Assert;
 const testAsync = async () => {
   global.GLOBAL_SPY_SPAWN_ASYNC = (exec, argv, options) =>
     Promise.resolve({ exec, argv, options });
-  const dependencies = await buildDependenciesAsync(import.meta.url, "test", {
+  const dependencies = await buildTestDependenciesAsync(import.meta.url, {
     spawn: "spy",
   });
   const extendConfiguration = (data1, data2, directory) => ({

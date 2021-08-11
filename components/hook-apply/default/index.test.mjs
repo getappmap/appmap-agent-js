@@ -1,7 +1,10 @@
 /* globals $uuid */
 
 import { strict as Assert } from "assert";
-import { buildDependenciesAsync, buildOneAsync } from "../../build.mjs";
+import {
+  buildTestDependenciesAsync,
+  buildTestComponentAsync,
+} from "../../build.mjs";
 import HookApply from "./index.mjs";
 
 const {
@@ -10,8 +13,8 @@ const {
 } = Assert;
 
 const testAsync = async () => {
-  const dependencies = await buildDependenciesAsync(import.meta.url, "test");
-  const { testHookAsync } = await buildOneAsync("hook", "test");
+  const dependencies = await buildTestDependenciesAsync(import.meta.url);
+  const { testHookAsync } = await buildTestComponentAsync("hook");
   const { hookApply, unhookApply } = HookApply(dependencies);
   assertDeepEqual(
     await testHookAsync(

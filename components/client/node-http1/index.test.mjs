@@ -1,7 +1,7 @@
 import { createServer } from "http";
 import { tmpdir } from "os";
 import { strict as Assert } from "assert";
-import { buildDependenciesAsync } from "../../build.mjs";
+import { buildTestDependenciesAsync } from "../../build.mjs";
 import Client from "./index.mjs";
 
 const {
@@ -34,7 +34,7 @@ const testCaseAsync = async (port, respond, runAsync) => {
 
 const testAsync = async () => {
   const { createClient, executeClientAsync, interruptClient, sendClient } =
-    Client(await buildDependenciesAsync(import.meta.url, "test"));
+    Client(await buildTestDependenciesAsync(import.meta.url));
   // happy path (unix-domain-socket) //
   {
     let buffer = [];

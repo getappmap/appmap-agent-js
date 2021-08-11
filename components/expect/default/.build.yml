@@ -1,0 +1,4 @@
+branches: [node, browser]
+dependencies:
+  - util
+  - expect-inner

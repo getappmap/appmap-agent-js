@@ -1,7 +1,10 @@
 import { strict as Assert } from "assert";
 import { parse } from "acorn";
 import { generate } from "escodegen";
-import { buildDependenciesAsync, buildOneAsync } from "../../build.mjs";
+import {
+  buildTestDependenciesAsync,
+  buildTestComponentAsync,
+} from "../../build.mjs";
 import Visit from "./visit.mjs";
 
 Error.stackTraceLimit = Infinity;
@@ -9,8 +12,8 @@ Error.stackTraceLimit = Infinity;
 const { equal: assertEqual } = Assert;
 
 const testAsync = async () => {
-  const dependencies = await buildDependenciesAsync(import.meta.url, "test");
-  const { createCounter } = await buildOneAsync("util", "test");
+  const dependencies = await buildTestDependenciesAsync(import.meta.url);
+  const { createCounter } = await buildTestComponentAsync("util");
 
   const { visit } = Visit(dependencies);
 

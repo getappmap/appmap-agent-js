@@ -1,5 +1,0 @@
-default:
-  test: spy
-  node: node
-  browser: null
-dependencies: []

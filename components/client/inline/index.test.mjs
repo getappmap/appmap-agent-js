@@ -1,10 +1,15 @@
 /* eslint-env node */
-import { buildDependenciesAsync, buildOneAsync } from "../../build.mjs";
+import {
+  buildTestDependenciesAsync,
+  buildTestComponentAsync,
+} from "../../build.mjs";
 import Client from "./index.mjs";
 
 const testAsync = async () => {
-  const dependencies = await buildDependenciesAsync(import.meta.url, "test");
-  const { createConfiguration } = await buildOneAsync("configuration", "test");
+  const dependencies = await buildTestDependenciesAsync(import.meta.url);
+  const { createConfiguration } = await buildTestComponentAsync(
+    "configuration",
+  );
   const { createClient, executeClientAsync, interruptClient, sendClient } =
     Client(dependencies);
   const client = createClient({});

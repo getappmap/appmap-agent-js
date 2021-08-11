@@ -2,7 +2,7 @@ import { mkdir } from "fs/promises";
 import { execSync } from "child_process";
 import { strict as Assert } from "assert";
 import { tmpdir } from "os";
-import { buildDependenciesAsync } from "../../build.mjs";
+import { buildTestDependenciesAsync } from "../../build.mjs";
 import Git from "./git.mjs";
 
 const { equal: assertEqual, throws: assertThrows } = Assert;
@@ -11,7 +11,7 @@ const { random } = Math;
 
 const testAsync = async () => {
   const { extractGitInformation } = Git(
-    await buildDependenciesAsync(import.meta.url, "test"),
+    await buildTestDependenciesAsync(import.meta.url),
   );
 
   const url = "https://github.com/lachrist/sample.git";

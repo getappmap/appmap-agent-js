@@ -2,7 +2,7 @@
 
 import { resolve } from "path";
 import { strict as Assert } from "assert";
-import { buildDependenciesAsync } from "../../build.mjs";
+import { buildTestDependenciesAsync } from "../../build.mjs";
 import Configuration from "./index.mjs";
 
 const { cwd } = process;
@@ -16,7 +16,7 @@ const testAsync = async () => {
     createConfiguration,
     extendConfiguration,
     extractEnvironmentConfiguration,
-  } = Configuration(await buildDependenciesAsync(import.meta.url, "test"));
+  } = Configuration(await buildTestDependenciesAsync(import.meta.url));
 
   const configuration = createConfiguration(cwd());
 

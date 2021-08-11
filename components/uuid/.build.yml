@@ -1,5 +1,0 @@
-default:
-  test: stub
-  node: random
-  browser: random
-dependencies: []

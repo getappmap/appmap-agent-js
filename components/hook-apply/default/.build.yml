@@ -1,0 +1,6 @@
+branches: [test, node, browser]
+dependencies:
+  - util
+  - interpretation
+  - frontend
+  - client

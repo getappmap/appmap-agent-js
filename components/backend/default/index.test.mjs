@@ -1,17 +1,18 @@
 import { strict as Assert } from "assert";
 import { readFile } from "fs/promises";
 import { tmpdir } from "os";
-import { buildDependenciesAsync, buildOneAsync } from "../../build.mjs";
+import {
+  buildTestDependenciesAsync,
+  buildTestComponentAsync,
+} from "../../build.mjs";
 import Backend from "./index.mjs";
 
 const { deepEqual: assertDeepEqual, throws: assertThrows } = Assert;
 
 const testAsync = async () => {
-  const dependencies = await buildDependenciesAsync(import.meta.url, "test");
-  const { createConfiguration, extendConfiguration } = await buildOneAsync(
-    "configuration",
-    "test",
-  );
+  const dependencies = await buildTestDependenciesAsync(import.meta.url);
+  const { createConfiguration, extendConfiguration } =
+    await buildTestComponentAsync("configuration", "test");
   const { openBackend, sendBackend, closeBackend } = Backend(dependencies);
 
   const filename = Math.random().toString(36).substring(2);

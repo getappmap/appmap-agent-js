@@ -16,7 +16,6 @@ export default (dependencies) => {
     const validateSchema = ajv.getSchema(name);
     return (json) => {
       if (!validateSchema(json)) {
-        console.log(json);
         const { errors } = validateSchema;
         const { length } = errors;
         assert(length > 0, "unexpected empty error array");

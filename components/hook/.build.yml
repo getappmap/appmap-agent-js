@@ -1,9 +1,0 @@
-default:
-  test: fixture
-  node: null
-  browser: null
-dependencies:
-  - util
-  - configuration
-  - frontend
-  - client

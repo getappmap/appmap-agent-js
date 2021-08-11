@@ -1,6 +1,0 @@
-default:
-  test: off
-  node: warning
-  browser: warning
-dependencies:
-  - log-inner

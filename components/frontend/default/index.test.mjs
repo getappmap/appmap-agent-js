@@ -1,15 +1,16 @@
 import { strict as Assert } from "assert";
-import { buildDependenciesAsync, buildOneAsync } from "../../build.mjs";
+import {
+  buildTestDependenciesAsync,
+  buildTestComponentAsync,
+} from "../../build.mjs";
 import Frontend from "./index.mjs";
 
 const { equal: assertEqual, deepEqual: assertDeepEqual } = Assert;
 
 const testAsync = async () => {
-  const dependencies = await buildDependenciesAsync(import.meta.url, "test");
-  const { createConfiguration, extendConfiguration } = await buildOneAsync(
-    "configuration",
-    "test",
-  );
+  const dependencies = await buildTestDependenciesAsync(import.meta.url);
+  const { createConfiguration, extendConfiguration } =
+    await buildTestComponentAsync("configuration", "test");
   const {
     createFrontend,
     initializeFrontend,

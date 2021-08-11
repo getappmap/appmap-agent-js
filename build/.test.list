@@ -1,3 +1,6 @@
 - assert.mjs
-- home.mjs
-- index.mjs
+- expect.mjs
+- conf.mjs
+- __fixture__.mjs
+- static.mjs
+- dynamic.mjs

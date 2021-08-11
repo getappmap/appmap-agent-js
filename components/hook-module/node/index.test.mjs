@@ -1,5 +1,8 @@
 import { strict as Assert } from "assert";
-import { buildDependenciesAsync, buildOneAsync } from "../../build.mjs";
+import {
+  buildTestDependenciesAsync,
+  buildTestComponentAsync,
+} from "../../build.mjs";
 import HookNativeModule from "./index.mjs";
 
 const {
@@ -10,8 +13,8 @@ const {
 } = Assert;
 
 const testAsync = async () => {
-  const dependencies = await buildDependenciesAsync(import.meta.url, "test");
-  const { testHookAsync } = await buildOneAsync("hook", "test");
+  const dependencies = await buildTestDependenciesAsync(import.meta.url);
+  const { testHookAsync } = await buildTestComponentAsync("hook");
   const { hookModule, unhookModule } = HookNativeModule(dependencies);
   assertDeepEqual(
     await testHookAsync(

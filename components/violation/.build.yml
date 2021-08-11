@@ -1,5 +1,0 @@
-default:
-  test: error
-  node: exit
-  browser: alert
-dependencies: []

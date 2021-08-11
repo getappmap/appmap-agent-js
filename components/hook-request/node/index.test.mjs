@@ -1,6 +1,9 @@
 import { strict as Assert } from "assert";
 import Http from "http";
-import { buildDependenciesAsync, buildOneAsync } from "../../build.mjs";
+import {
+  buildTestDependenciesAsync,
+  buildTestComponentAsync,
+} from "../../build.mjs";
 import HookRequest from "./index.mjs";
 
 const { createServer } = Http;
@@ -11,8 +14,8 @@ const {
 } = Assert;
 
 const testAsync = async () => {
-  const dependencies = await buildDependenciesAsync(import.meta.url, "test");
-  const { testHookAsync } = await buildOneAsync("hook", "test");
+  const dependencies = await buildTestDependenciesAsync(import.meta.url);
+  const { testHookAsync } = await buildTestComponentAsync("hook");
   const { hookRequest, unhookRequest } = HookRequest(dependencies);
 
   const server = createServer();

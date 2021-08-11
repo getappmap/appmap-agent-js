@@ -1,9 +1,9 @@
-import { buildDependenciesAsync } from "../../build.mjs";
+import { buildTestDependenciesAsync } from "../../build.mjs";
 import LogInner from "./index.mjs";
 
 const testAsync = async () => {
   const { logInfo } = LogInner(
-    await buildDependenciesAsync(import.meta.url, "test"),
+    await buildTestDependenciesAsync(import.meta.url),
   );
   logInfo("foo %s", "bar");
 };

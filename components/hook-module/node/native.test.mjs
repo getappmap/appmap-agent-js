@@ -1,6 +1,9 @@
 import { strict as Assert } from "assert";
 import { fileURLToPath } from "url";
-import { buildDependenciesAsync, buildOneAsync } from "../../build.mjs";
+import {
+  buildTestDependenciesAsync,
+  buildTestComponentAsync,
+} from "../../build.mjs";
 import Native from "./native.mjs";
 
 const { from } = Buffer;
@@ -13,8 +16,8 @@ const {
 } = Assert;
 
 const testAsync = async () => {
-  const dependencies = await buildDependenciesAsync(import.meta.url, "test");
-  const { testHookAsync } = await buildOneAsync("hook", "test");
+  const dependencies = await buildTestDependenciesAsync(import.meta.url);
+  const { testHookAsync } = await buildTestComponentAsync("hook");
   const { hookNativeModule, unhookNativeModule } = Native(dependencies);
   global.APPMAP_TRANSFORM_SOURCE = null;
   assertDeepEqual(

@@ -1,13 +1,16 @@
 import { strict as Assert } from "assert";
 import { parse } from "acorn";
-import { buildDependenciesAsync, buildOneAsync } from "../../build.mjs";
+import {
+  buildTestDependenciesAsync,
+  buildTestComponentAsync,
+} from "../../build.mjs";
 import Clash from "./clash.mjs";
 
 const { throws: assertThrows } = Assert;
 
 const testAsync = async () => {
-  const dependencies = await buildDependenciesAsync(import.meta.url, "test");
-  const { getLineage } = await buildOneAsync("naming", "test");
+  const dependencies = await buildTestDependenciesAsync(import.meta.url);
+  const { getLineage } = await buildTestComponentAsync("naming");
 
   const { checkIdentifierClash } = Clash(dependencies);
 

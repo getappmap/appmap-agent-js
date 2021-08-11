@@ -1,8 +1,0 @@
-default:
-  test: node
-  node: node
-  browser: null
-dependencies:
-  - util
-  - frontend
-  - client
