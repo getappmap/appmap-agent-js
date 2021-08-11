@@ -1,5 +1,5 @@
-const { from: toArray } = Array;
-const { fromEntries, entries } = Object;
+const { from: toArray, isArray } = Array;
+const { fromEntries, entries: toEntries } = Object;
 const { ownKeys } = Reflect;
 
 export default (dependencies) => {
@@ -26,6 +26,8 @@ export default (dependencies) => {
   // const append = (value1, value2) => [...value1, ...value2];
 
   const prepend = (value1, value2) => [...value2, ...value1];
+
+  const isString = (any) => typeof any === "string";
 
   const toAbsolutePathFlip = (relative, absolute) =>
     toAbsolutePath(absolute, relative);
@@ -98,8 +100,15 @@ export default (dependencies) => {
   const normalizePackages = (specifiers, cwd) =>
     specifiers.map((specifier) => normalizePackageSpecifier(specifier, cwd));
 
-  const normalizeChilderen = (children, cwd) =>
-    children.flatMap((child) => createChildren(child, cwd));
+  const normalizeScenarios = (scenarios, cwd) =>
+    fromEntries(
+      toArray(toEntries(scenarios)).map(([name, children]) => {
+        if (!isArray(children) || children.every(isString)) {
+          children = [children];
+        }
+        return [name, children.flatMap((child) => createChildren(child, cwd))];
+      }),
+    );
 
   const normalizeEnabledSpecifier = (specifier, cwd) => {
     if (typeof specifier === "string") {
@@ -126,9 +135,13 @@ export default (dependencies) => {
   ////////////
 
   const fields = {
-    children: {
-      extend: prepend,
-      normalize: normalizeChilderen,
+    scenario: {
+      extend: overwrite,
+      normalize: identity,
+    },
+    scenarios: {
+      extend: assign,
+      normalize: normalizeScenarios,
     },
     "log-level": {
       extend: overwrite,
@@ -252,7 +265,8 @@ export default (dependencies) => {
         history: extractRepositoryHistory(directory),
         package: extractRepositoryPackage(directory),
       },
-      children: [],
+      scenario: "anonymous",
+      scenarios: {},
       "log-level": "warning",
       agent: extractRepositoryDependency(directory, "@appland/appmap-agent-js"),
       output: {
@@ -302,7 +316,7 @@ export default (dependencies) => {
     }),
     extractEnvironmentConfiguration: (env) =>
       fromEntries(
-        toArray(entries(env))
+        toArray(toEntries(env))
           .filter(filterEnvironmentPair)
           .map(mapEnvironmentPair),
       ),

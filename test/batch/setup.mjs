@@ -21,6 +21,7 @@ export const setupAsync = async (
   name,
   version,
   config,
+  argv,
   beforeAsync,
   afterAsync,
 ) => {
@@ -39,7 +40,7 @@ export const setupAsync = async (
   await mkdir(`${directory}/tmp`);
   await mkdir(`${directory}/tmp/appmap`);
   await beforeAsync(directory);
-  await spawnAsync("node", [`${cwd()}/bin/batch.mjs`], {
+  await spawnAsync("node", [`${cwd()}/bin/batch.mjs`, ...argv], {
     cwd: directory,
     stdio: "inherit",
   });

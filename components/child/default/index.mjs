@@ -28,10 +28,11 @@ export default (dependencies) => {
       configuration1,
       extendConfiguration,
     ) => {
-      const configuration2 = {
-        ...extendConfiguration(configuration1, data, directory),
-        children: [],
-      };
+      const configuration2 = extendConfiguration(
+        configuration1,
+        data,
+        directory,
+      );
       let env3 = {
         ...env2,
         ...env1,

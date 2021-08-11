@@ -38,11 +38,11 @@ assertDeepEqual(
 
 // extendConfigurationArgv
 {
-  const { app, children } = extendConfigurationArgv(
+  const { app, scenarios } = extendConfigurationArgv(
     configuration,
     "/directory",
     ["node", "main.js", "--app", "foo", "--", "exec", "argv0"],
   );
   assertEqual(app, "foo");
-  assertEqual(children.length, 1);
+  assertEqual(scenarios.anonymous.length, 1);
 }

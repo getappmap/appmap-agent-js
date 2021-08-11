@@ -486,6 +486,19 @@ export const schema = [
           type: "string",
         },
       },
+      configuration: {
+        type: "object",
+        additionalProperties: false,
+        required: ["directory", "data"],
+        properties: {
+          directory: {
+            $ref: "absolute-path",
+          },
+          data: {
+            $ref: "configuration",
+          },
+        },
+      },
       options: {
         allOf: [
           {
@@ -536,10 +549,26 @@ export const schema = [
           },
         ],
       },
-      children: {
-        type: "array",
-        items: {
-          $ref: "child",
+      scenario: {
+        type: "string",
+      },
+      scenarios: {
+        type: "object",
+        additionalProperties: false,
+        patternProperties: {
+          "^": {
+            anyOf: [
+              {
+                type: "array",
+                items: {
+                  $ref: "child",
+                },
+              },
+              {
+                $ref: "child",
+              },
+            ],
+          },
         },
       },
       recorder: {
@@ -733,10 +762,19 @@ export const schema = [
           },
         },
       },
-      children: {
-        type: "array",
-        items: {
-          $ref: "cooked-child",
+      scenario: {
+        type: "string",
+      },
+      scenarios: {
+        type: "object",
+        additionalProperties: false,
+        patternProperties: {
+          "^": {
+            type: "array",
+            items: {
+              $ref: "cooked-child",
+            },
+          },
         },
       },
       protocol: {

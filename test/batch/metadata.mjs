@@ -12,7 +12,6 @@ export default async (protocol) => {
       enabled: true,
       name: "name",
       protocol,
-      children: [["node", "./main.mjs"]],
       packages: [{ regexp: "^" }],
       hooks: {
         esm: true,
@@ -20,6 +19,7 @@ export default async (protocol) => {
       },
       output: { filename: "filename" },
     },
+    ["node", "./main.mjs"],
     async (repository) => {
       await writeFile(`${repository}/main.mjs`, ``, "utf8");
     },

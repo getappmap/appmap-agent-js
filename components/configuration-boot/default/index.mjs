@@ -52,7 +52,7 @@ export default (dependencies) => {
       if (child.length > 0) {
         configuration = extendConfiguration(
           configuration,
-          { children: [child] },
+          { scenarios: { anonymous: child } },
           directory,
         );
       }

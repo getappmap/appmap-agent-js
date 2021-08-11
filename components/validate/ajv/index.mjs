@@ -20,6 +20,7 @@ export default (dependencies) => {
         const { length } = errors;
         assert(length > 0, "unexpected empty error array");
         const tree1 = AjvErrorTree.structureAJVErrorArray(errors);
+        // console.log(tree1);
         const tree2 = AjvErrorTree.summarizeAJVErrorTree(tree1);
         if (typeof tree2 === "string") {
           expect(false, "invalid %s >> %s\n%j", name, tree2, json);

@@ -308,6 +308,13 @@
     argv:
       type: array
       items: {type: string}
+    configuration:
+      type: object
+      additionalProperties: false
+      required: [directory, data]
+      properties:
+        directory: {$ref: absolute-path}
+        data: {$ref: configuration}
     options:
       allOf:
         - $ref: child-options
@@ -333,9 +340,16 @@
       anyOf:
         - $ref: path
         - $ref: port-number
-    children:
-      type: array
-      items: {$ref: child}
+    scenario: {type: string}
+    scenarios:
+      type: object
+      additionalProperties: false
+      patternProperties:
+        "^":
+          anyOf:
+            - type: array
+              items: {$ref: child}
+            - $ref: child
     # client
     recorder: {$ref: recorder}
     source: {type: boolean}
@@ -425,9 +439,14 @@
       properties:
         directory: {$ref: absolute-path}
         package: {$ref: package}
-    children:
-      type: array
-      items: {$ref: cooked-child}
+    scenario: {type: string}
+    scenarios:
+      type: object
+      additionalProperties: false
+      patternProperties:
+        "^":
+          type: array
+          items: {$ref: cooked-child}
     protocol: {$ref: protocol}
     log-level: {$ref: log-level}
     host: {const: localhost}

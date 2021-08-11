@@ -13,7 +13,6 @@ export default async (protocol) => {
       name: "name",
       protocol,
       "function-name-placeholder": "$",
-      children: [["node", "./main.mjs"]],
       packages: [{ glob: "*" }],
       hooks: {
         esm: true,
@@ -22,6 +21,7 @@ export default async (protocol) => {
       },
       output: { filename: "filename" },
     },
+    ["node", "./main.mjs"],
     async (repository) => {
       await writeFile(
         `${repository}/main.mjs`,

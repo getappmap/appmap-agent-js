@@ -39,7 +39,14 @@ await mainAsync({ env: {} }, configuration);
 // single success child
 await mainAsync(
   { env: {} },
-  extendConfiguration(configuration, { children: [["success"]] }, "/directory"),
+  extendConfiguration(
+    configuration,
+    {
+      scenario: "foo",
+      scenarios: { foo: ["success"], bar: ["failure"] },
+    },
+    "/directory",
+  ),
 );
 
 // multiple child
@@ -48,7 +55,10 @@ await mainAsync(
   extendConfiguration(
     configuration,
     {
-      children: [["failure"], ["SIGKILL"]],
+      scenario: "^",
+      scenarios: {
+        name: [["failure"], ["SIGKILL"]],
+      },
     },
     "/directory",
   ),
