@@ -2,6 +2,7 @@ branches: [node]
 dependencies:
   - util
   - expect
+  - spawn
   - log
   - child
   - configuration

@@ -2,6 +2,7 @@ export default (dependencies) => {
   const {
     util: { assert, createBox, setBox, getBox },
     expect: { expectSuccess },
+    log: { logDebug },
     storage: { createStorage, store },
     trace: { compileTrace },
   } = dependencies;
@@ -20,6 +21,7 @@ export default (dependencies) => {
       box: createBox(null),
     }),
     sendBackend: ({ trace, box }, { type, data }) => {
+      logDebug("backend received: type = %j data = %j", type, data);
       if (type === "trace") {
         trace.push(data);
       } else if (type === "initialize") {

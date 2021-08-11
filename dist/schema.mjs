@@ -430,7 +430,7 @@ export const schema = [
       {
         type: "object",
         additionalProperties: false,
-        required: ["type", "main"],
+        required: ["type", "exec"],
         properties: {
           type: {
             const: "fork",

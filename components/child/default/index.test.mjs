@@ -9,17 +9,13 @@ import Child from "./index.mjs";
 const { equal: assertEqual, deepEqual: assertDeepEqual } = Assert;
 
 const testAsync = async () => {
-  global.GLOBAL_SPY_SPAWN_ASYNC = (exec, argv, options) =>
-    Promise.resolve({ exec, argv, options });
-  const dependencies = await buildTestDependenciesAsync(import.meta.url, {
-    spawn: "spy",
-  });
+  const dependencies = await buildTestDependenciesAsync(import.meta.url);
   const extendConfiguration = (data1, data2, directory) => ({
     directory,
     ...data1,
     ...data2,
   });
-  const { createChildren, spawnChildAsync, getChildDescription } =
+  const { createChildren, compileChild, getChildDescription } =
     Child(dependencies);
   const default_options = {
     encoding: "utf8",
@@ -44,7 +40,7 @@ const testAsync = async () => {
     );
     assertEqual(children.length, 1);
     assertDeepEqual(
-      await spawnChildAsync(
+      compileChild(
         children[0],
         { key2: "value2", NODE_OPTIONS: "node-options-2" },
         {
@@ -87,7 +83,7 @@ const testAsync = async () => {
         },
         "/configuration-directory",
       );
-      const { exec, argv } = await spawnChildAsync(
+      const { exec, argv } = compileChild(
         child,
         {},
         {
@@ -144,7 +140,7 @@ const testAsync = async () => {
     assertEqual(children.length, 1);
     const [child] = children;
     assertDeepEqual(
-      await spawnChildAsync(
+      compileChild(
         child,
         {},
         {

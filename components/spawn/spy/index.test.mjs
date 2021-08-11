@@ -6,15 +6,19 @@ import Spawn from "./index.mjs";
 
 const {
   // fail: assertFail,
-  // deepEqual: assertDeepEqual,
-  equal: assertEqual,
+  deepEqual: assertDeepEqual,
+  // equal: assertEqual,
 } = Assert;
 
 const testAsync = async () => {
-  global.GLOBAL_SPY_SPAWN_ASYNC = () => Promise.resolve(null);
+  global.GLOBAL_SPY_SPAWN = (exec, argv, options) => ({ exec, argv, options });
   const dependencies = await buildTestDependenciesAsync(import.meta.url);
-  const { spawnAsync } = Spawn(dependencies);
-  assertEqual(await spawnAsync("exec", ["argv0"], {}), null);
+  const { spawn } = Spawn(dependencies);
+  assertDeepEqual(spawn("exec", ["argv0"], {}), {
+    exec: "exec",
+    argv: ["argv0"],
+    options: {},
+  });
 };
 
 testAsync();

@@ -7,16 +7,17 @@ const { isArray } = Array;
 const escape = (arg) =>
   /^[a-zA-Z0-9_-]+$/u.test(arg) ? arg : `'${arg.replace(/'/gu, "\\'")}'`;
 
+const prependSpace = (string) => ` ${string}`;
+
 export default (dependencies) => {
   const {
     util: { assert, hasOwnProperty, coalesce },
     expect: { expect },
-    spawn: { spawnAsync },
   } = dependencies;
   return {
     getChildDescription: ({ exec, argv }) =>
-      `${exec} ${argv.map(escape).join(" ")}`,
-    spawnChildAsync: (
+      `${exec}${argv.map(escape).map(prependSpace).join("")}`,
+    compileChild: (
       {
         exec,
         argv,
@@ -75,7 +76,7 @@ export default (dependencies) => {
         argv = [...fork_argv, "--experimental-loader", hook, exec, ...argv];
         exec = fork_exec;
       }
-      return spawnAsync(exec, argv, { env: env3, ...options });
+      return { exec, argv, options: { env: env3, ...options } };
     },
     createChildren: (child, directory) => {
       if (typeof child === "string") {

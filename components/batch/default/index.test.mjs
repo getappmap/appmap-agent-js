@@ -1,4 +1,5 @@
 import { strict as Assert } from "assert";
+import { EventEmitter } from "events";
 import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
@@ -11,14 +12,21 @@ const {
   // deepEqual: assertDeepEqual
 } = Assert;
 
-global.GLOBAL_SPY_SPAWN_ASYNC = (exec, argv, options) => {
+global.GLOBAL_SPY_SPAWN = (exec, argv, options) => {
+  const emitter = new EventEmitter();
+  emitter.kill = (signal) => {
+    emitter.emit("close", null, signal);
+  };
   if (exec === "success") {
-    return { status: 0, signal: null };
+    setTimeout(() => {
+      emitter.emit("close", 0, null);
+    }, 0);
+  } else if (exec === "failure") {
+    setTimeout(() => {
+      emitter.emit("close", 1, null);
+    }, 0);
   }
-  if (exec === "failure") {
-    return { status: 1, signal: null };
-  }
-  return { status: null, signal: exec };
+  return emitter;
 };
 
 const { mainAsync } = Batch(
@@ -34,32 +42,64 @@ const { createConfiguration, extendConfiguration } =
 const configuration = createConfiguration("/repository");
 
 // no child
-await mainAsync({ env: {} }, configuration);
+{
+  const emitter = new EventEmitter();
+  emitter.env = {};
+  await mainAsync(emitter, configuration);
+}
 
-// single success child
-await mainAsync(
-  { env: {} },
-  extendConfiguration(
-    configuration,
-    {
-      scenario: "foo",
-      scenarios: { foo: ["success"], bar: ["failure"] },
-    },
-    "/directory",
-  ),
-);
+// // single success child
+// {
+//   const emitter = new EventEmitter();
+//   emitter.env = {};
+//   await mainAsync(
+//     emitter,
+//     extendConfiguration(
+//       configuration,
+//       {
+//         scenario: "foo",
+//         scenarios: { foo: ["success"], bar: ["failure"] },
+//       },
+//       "/directory",
+//     ),
+//   );
+// }
+
+// single killed child
+{
+  const emitter = new EventEmitter();
+  emitter.env = {};
+  setTimeout(() => {
+    emitter.emit("SIGINT");
+  }, 0);
+  await mainAsync(
+    emitter,
+    extendConfiguration(
+      configuration,
+      {
+        scenario: "foo",
+        scenarios: { foo: ["sleep"], bar: ["sleep"] },
+      },
+      "/directory",
+    ),
+  );
+}
 
 // multiple child
-await mainAsync(
-  { env: {} },
-  extendConfiguration(
-    configuration,
-    {
-      scenario: "^",
-      scenarios: {
-        name: [["failure"], ["SIGKILL"]],
+{
+  const emitter = new EventEmitter();
+  emitter.env = {};
+  await mainAsync(
+    emitter,
+    extendConfiguration(
+      configuration,
+      {
+        scenario: "^",
+        scenarios: {
+          name: [["success"], ["failure"]],
+        },
       },
-    },
-    "/directory",
-  ),
-);
+      "/directory",
+    ),
+  );
+}

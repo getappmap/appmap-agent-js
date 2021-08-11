@@ -4,9 +4,11 @@ const { entries: toEntries } = Object;
 
 export default (dependencies) => {
   const {
+    util: { assert },
     expect: { expectSuccessAsync, expectSuccess },
     log: { logDebug, logInfo, logWarning },
-    child: { spawnChildAsync, getChildDescription },
+    spawn: { spawn },
+    child: { compileChild, getChildDescription },
     configuration: { extendConfiguration },
     server: {
       openServerAsync,
@@ -15,24 +17,29 @@ export default (dependencies) => {
       getServerPort,
     },
   } = dependencies;
-  const runChildAsync = async (child, env, configuration) => {
-    const description = getChildDescription(child);
-    logInfo("%s ...", description);
-    logDebug("spawn child %j", child);
-    const { signal, status } = await expectSuccessAsync(
-      spawnChildAsync(child, env, configuration, extendConfiguration),
-      "child error %s >> %e",
-      description,
-    );
-    if (signal !== null) {
-      logInfo("> Killed with: %s", signal);
-    } else {
-      logInfo("> Exited with: %j", status);
-    }
-    return { description, signal, status };
-  };
   return {
-    mainAsync: async ({ env }, configuration) => {
+    mainAsync: async (process, configuration) => {
+      const { env } = process;
+      let interrupted = false;
+      let subprocess = null;
+      process.on("SIGINT", () => {
+        interrupted = true;
+        if (subprocess !== null) {
+          const timeout = setTimeout(() => {
+            /* c8 ignore start */
+            assert(
+              subprocess !== null,
+              "the timer should have been cleared if the process closed itself",
+            );
+            subprocess.kill("SIGKILL");
+            /* c8 ignore stop */
+          }, 1000);
+          subprocess.on("close", () => {
+            clearTimeout(timeout);
+          });
+          subprocess.kill("SIGINT");
+        }
+      });
       const { scenario, scenarios, port } = configuration;
       const server = await openServerAsync({ host: "localhost", port });
       configuration = {
@@ -42,6 +49,40 @@ export default (dependencies) => {
           "/",
         ),
         scenarios: {},
+      };
+      const runChildAsync = async (child) => {
+        const description = getChildDescription(child);
+        logInfo("%s ...", description);
+        const { exec, argv, options } = compileChild(
+          child,
+          env,
+          configuration,
+          extendConfiguration,
+        );
+        logDebug(
+          "spawn child: exec = %j, argv = %j, options = %j",
+          exec,
+          argv,
+          options,
+        );
+        subprocess = spawn(exec, argv, options);
+        const { signal, status } = await expectSuccessAsync(
+          new Promise((resolve, reject) => {
+            subprocess.on("error", reject);
+            subprocess.on("close", (status, signal) => {
+              resolve({ signal, status });
+            });
+          }),
+          "child error %s >> %e",
+          description,
+        );
+        subprocess = null;
+        if (signal !== null) {
+          logInfo("> Killed with: %s", signal);
+        } else {
+          logInfo("> Exited with: %j", status);
+        }
+        return { description, signal, status };
       };
       const regexp = expectSuccess(
         () => new _RegExp(scenario, "u"),
@@ -65,14 +106,18 @@ export default (dependencies) => {
           logInfo("Spawning %j processes sequentially", length);
           const summary = [];
           for (let index = 0; index < length; index += 1) {
-            logInfo("%j/%j", index, length);
-            summary.push(
-              await runChildAsync(children[index], env, configuration),
-            );
+            if (!interrupted) {
+              logInfo("%j/%j", index + 1, length);
+              summary.push(
+                await runChildAsync(children[index], env, configuration),
+              );
+            }
           }
           logInfo("Summary:");
           for (const { description, signal, status } of summary) {
+            /* c8 ignore start */
             logInfo("%s >> %j", description, signal === null ? status : signal);
+            /* c8 ignore stop */
           }
         }
       } finally {

@@ -6,6 +6,9 @@ const _Map = Map;
 const _String = String;
 
 export default (dependencies) => {
+  const {
+    log: { logInfo },
+  } = dependencies;
   const getName = (versioning, name, postfix) => {
     if (versioning.has(name)) {
       const counter = versioning.get(name);
@@ -23,17 +26,19 @@ export default (dependencies) => {
       postfix,
       versioning: new _Map(),
     }),
-    store: ({ directory, indent, postfix, versioning }, name, data) =>
-      writeFileSync(
-        `${directory}/${getName(versioning, name, postfix)}`,
-        stringify(data, null, indent),
-        "utf8",
-      ),
-    storeAsync: ({ directory, indent, postfix, versioning }, name, data) =>
-      writeFile(
-        `${directory}/${getName(versioning, name, postfix)}`,
-        stringify(data, null, indent),
-        "utf8",
-      ),
+    store: ({ directory, indent, postfix, versioning }, name, data) => {
+      const path = `${directory}/${getName(versioning, name, postfix)}`;
+      writeFileSync(path, stringify(data, null, indent), "utf8");
+      logInfo("trace file (synchronously) written at: %j", path);
+    },
+    storeAsync: async (
+      { directory, indent, postfix, versioning },
+      name,
+      data,
+    ) => {
+      const path = `${directory}/${getName(versioning, name, postfix)}`;
+      await writeFile(path, stringify(data, null, indent), "utf8");
+      logInfo("trace file (asynchronously) written at: %j", path);
+    },
   };
 };

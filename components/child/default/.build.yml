@@ -2,7 +2,6 @@ branches: [test, node]
 dependencies:
   - util
   - expect
-  - spawn
   - validate
   - specifier
   - repository

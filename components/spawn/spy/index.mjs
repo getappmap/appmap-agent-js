@@ -1,8 +1,7 @@
-/* globals GLOBAL_SPY_SPAWN_ASYNC */
+/* globals GLOBAL_SPY_SPAWN */
 
 export default (dependencies) => {
   return {
-    spawnAsync: (exec, argv, options) =>
-      GLOBAL_SPY_SPAWN_ASYNC(exec, argv, options),
+    spawn: (exec, argv, options) => GLOBAL_SPY_SPAWN(exec, argv, options),
   };
 };

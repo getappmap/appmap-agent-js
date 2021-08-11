@@ -20,7 +20,7 @@ export default (dependencies) => {
       };
       const server = createServer();
       const sockets = new _Set();
-      server.on("error", () => {
+      server.on("error", (error) => {
         server.close();
         for (const socket of sockets) {
           socket.destroy();

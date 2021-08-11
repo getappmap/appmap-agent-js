@@ -280,7 +280,7 @@
                     required: [execArgv]
     - type: object
       additionalProperties: false
-      required: [type, main]
+      required: [type, exec]
       properties:
         type: {const: fork}
         configuration: {$ref: configuration}
