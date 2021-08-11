@@ -30,3 +30,6 @@
       * hook-query
   * client
 - agent
+- configuration-boot
+- recorder-process
+- batch

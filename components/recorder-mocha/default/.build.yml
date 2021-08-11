@@ -1,0 +1,5 @@
+branches: [node]
+dependencies:
+  - expect
+  - log
+  - agent

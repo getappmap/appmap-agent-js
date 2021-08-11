@@ -34,8 +34,8 @@
   },
   "scripts": {
     "tt": "npx test-turtle --layout alongside 'npx eslint $1 $2 && npx prettier -w $1 $2 && node --unhandled-rejections=strict $2 && npx c8 --include $1 --check-coverage --branches 100 --functions 100 -- node --unhandled-rejections=strict $2'",
-    "lint": "npx eslint 'src/**/*.mjs' 'components/**/*.mjs'",
-    "format": "npx prettier -w 'src/**/*.mjs' 'components/**/*.mjs'",
+    "lint": "npx eslint '**/*.mjs'",
+    "format": "npx prettier -w '**/*.mjs'",
     "unit": "for test in $(find src components -name '*.test.mjs'); do echo \"$test ...\" && (node \"$test\" || echo \"> Failure $?\"); done",
     "integration": "node test/batch/index.mjs",
     "commit": "npm run lint && npm run format && npx cz",

@@ -58,12 +58,13 @@ export const setupAsync = async (
     const appmap = parseJSON(
       await readFile(`${directory}/tmp/appmap/${filename}`),
     );
-    try {
-      validate({ data: appmap });
-    } catch (error) {
-      console.log(stringifyJSON(appmap, null, 2));
-      throw error;
-    }
+    validate({ data: appmap });
+    // try {
+    //   validate({ data: appmap });
+    // } catch (error) {
+    //   console.log(stringifyJSON(appmap, null, 2));
+    //   throw error;
+    // }
     appmaps.push([filename, appmap]);
   }
   await afterAsync(fromEntries(appmaps));

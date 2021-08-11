@@ -3,7 +3,7 @@ import {
   buildDependenciesAsync,
   buildComponentAsync,
   buildComponentsAsync,
-} from "../build/dynamic.mjs"
+} from "../build/component/dynamic.mjs"
 
 const generate = (buildAsync) => (specifier, blueprint) => buildAsync(
   "test",

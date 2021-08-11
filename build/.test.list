@@ -1,6 +1,1 @@
-- assert.mjs
-- expect.mjs
-- conf.mjs
-- __fixture__.mjs
-- static.mjs
-- dynamic.mjs
+component

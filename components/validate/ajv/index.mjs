@@ -1,7 +1,7 @@
 import Ajv from "ajv";
 import Treeify from "treeify";
 import AjvErrorTree from "ajv-error-tree";
-import { schema } from "../../../schema/index.mjs";
+import { schema } from "../../../dist/schema.mjs";
 
 const { asTree } = Treeify;
 

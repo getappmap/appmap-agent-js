@@ -1,12 +1,13 @@
 #!/usr/bin/env node
 
-import {buildProdAsync} from "../build/index.mjs";
+import ConfigurationBoot from "../dist/node-configuration-boot.mjs";
+import Batch from "../dist/node-batch.mjs";
 
-const {main:{mainAsync}} = await buildProdAsync(["main"], {
-  violation: "error",
-  log: "node",
-  server: "tcp",
-  main: "batch",
-});
-
-mainAsync(process);
+const {env, cwd, argv} = process;
+const {createRootConfiguration, extendConfigurationFile, extendConfigurationArgv} = ConfigurationBoot({log:"info"});
+let configuration = createRootConfiguration(cwd(), env);
+configuration = extendConfigurationFile(configuration, cwd(), env);
+configuration = extendConfigurationArgv(configuration, cwd(), argv);
+const {protocol, "log-level":log_level} = configuration;
+const {main} = Batch({log:log_level, server:protocol === "inline" ? "stub" : protocol});
+main(process, configuration);
