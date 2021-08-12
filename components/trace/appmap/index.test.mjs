@@ -170,11 +170,11 @@ const testAsync = async () => {
               children: [
                 {
                   type: "class",
-                  name: "$",
+                  name: "f",
                   children: [
                     {
                       type: "function",
-                      name: "f",
+                      name: "$",
                       location: "filename.js:1",
                       static: false,
                       labels: [],
@@ -191,8 +191,8 @@ const testAsync = async () => {
               id: 2 * indexes.event1,
               event: "call",
               thread_id: 0,
-              defined_class: "$",
-              method_id: "f",
+              defined_class: "f",
+              method_id: "$",
               path: "filename.js",
               lineno: 1,
               static: false,

@@ -159,6 +159,21 @@ const testAsync = async () => {
       print: "[object Object]",
     },
   );
+  // function (toString)
+  assertDeepEqual(
+    testSerialize(
+      {
+        method: "toString",
+        "include-constructor-name": false,
+      },
+      () => {},
+    ),
+    {
+      type: "function",
+      index: 1,
+      print: "[object Function]",
+    },
+  );
   // specific: error //
   {
     const error = new TypeError("message");

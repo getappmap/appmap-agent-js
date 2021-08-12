@@ -52,11 +52,11 @@ export default async (protocol) => {
           children: [
             {
               type: "class",
-              name: "$",
+              name: "main",
               children: [
                 {
                   type: "function",
-                  name: "main",
+                  name: "$",
                   location: "main.mjs:4",
                   static: false,
                   source: null,
@@ -73,11 +73,11 @@ export default async (protocol) => {
           children: [
             {
               type: "class",
-              name: "$",
+              name: "common",
               children: [
                 {
                   type: "function",
-                  name: "common",
+                  name: "$",
                   location: "common.js:1",
                   static: false,
                   source: null,
@@ -94,11 +94,11 @@ export default async (protocol) => {
           children: [
             {
               type: "class",
-              name: "$",
+              name: "native",
               children: [
                 {
                   type: "function",
-                  name: "native",
+                  name: "$",
                   location: "native.mjs:1",
                   static: false,
                   source: null,

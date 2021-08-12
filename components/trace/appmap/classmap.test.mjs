@@ -107,11 +107,11 @@ const testAsync = async () => {
               children: [
                 {
                   type: "class",
-                  name: "$",
+                  name: "k",
                   children: [
                     {
                       type: "function",
-                      name: "k",
+                      name: "$",
                       location: "filename.js:1",
                       static: false,
                       labels: [],
@@ -181,11 +181,11 @@ const testAsync = async () => {
             children: [
               {
                 type: "class",
-                name: "$",
+                name: "k1",
                 children: [
                   {
                     type: "function",
-                    name: "k1",
+                    name: "$",
                     location: "filename.js:1",
                     static: false,
                     labels: [],
@@ -218,8 +218,8 @@ const testAsync = async () => {
     ),
     {
       link: {
-        defined_class: "$",
-        method_id: "f",
+        defined_class: "f",
+        method_id: "$",
         path: "filename.js",
         lineno: 1,
         static: false,

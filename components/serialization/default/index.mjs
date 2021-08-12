@@ -12,6 +12,8 @@ const { prototype } = Object;
 const { toString } = prototype;
 // const { isArray } = Array;
 
+const noargs = [];
+
 export default (dependencies) => {
   const {
     util: { assert, hasOwnProperty, coalesce, incrementCounter, createCounter },
@@ -112,18 +114,22 @@ export default (dependencies) => {
         }
         serial.index = getIndex(references, counter, value);
         if (method === "toString") {
-          try {
-            serial.print = value.toString();
-          } catch (error) {
-            logWarning("%o.toString() failed with %e", value, error);
-            serial.print = apply(toString, value, []);
+          if (typeof value === "function") {
+            serial.print = apply(toString, value, noargs);
+          } else {
+            try {
+              serial.print = value.toString();
+            } catch (error) {
+              logWarning("%o.toString() failed with %e", value, error);
+              serial.print = apply(toString, value, noargs);
+            }
           }
         } else {
           assert(
             method === "Object.prototype.toString",
             "invalid serialization method",
           );
-          serial.print = apply(toString, value, []);
+          serial.print = apply(toString, value, noargs);
         }
         if (include_constructor_name) {
           serial.constructor = getConstructorName(value);

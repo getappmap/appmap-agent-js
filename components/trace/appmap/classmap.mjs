@@ -141,8 +141,8 @@ export default (dependencies) => {
         } = parseQualifiedName(qualified_name);
         hash.set(route, {
           link: {
-            defined_class: placeholder,
-            method_id: name,
+            defined_class: name,
+            method_id: placeholder,
             path,
             lineno: line,
             static: _static,
@@ -152,12 +152,12 @@ export default (dependencies) => {
         return [
           {
             type: "class",
-            name: placeholder,
+            name,
             bound: qualifier !== null,
             children: [
               {
                 type: "function",
-                name,
+                name: placeholder,
                 location: `${path}:${line}`,
                 static: _static,
                 labels: [],

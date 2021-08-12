@@ -141,9 +141,9 @@ const testAsync = async () => {
       classmap,
     ),
     {
-      defined_class: "$",
+      defined_class: "f",
       lineno: 1,
-      method_id: "f",
+      method_id: "$",
       static: false,
       path: "filename.js",
       parameters: [
