@@ -4,7 +4,6 @@ import { parse } from "acorn";
 import Visit from "./visit.mjs";
 
 const _String = String;
-const _Set = Set;
 
 export default (dependencies) => {
   const {
@@ -12,6 +11,7 @@ export default (dependencies) => {
     specifier: { matchSpecifier },
     uuid: { getUUID },
     expect: { expectSuccess },
+    naming: { createExclusion },
   } = dependencies;
   const { visit } = Visit(dependencies);
   return {
@@ -67,7 +67,7 @@ export default (dependencies) => {
                   naming,
                   runtime,
                   shallow,
-                  exclude: new _Set(),
+                  exclusion: createExclusion(exclude),
                 },
               ),
             ),

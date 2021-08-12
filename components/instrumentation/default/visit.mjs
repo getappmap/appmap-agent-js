@@ -121,7 +121,7 @@ const makeReturnStatement = (argument) => ({
 
 export default (dependencies) => {
   const {
-    naming: { getQualifiedName },
+    naming: { getQualifiedName, isExcluded },
     util: { hasOwnProperty, coalesce },
   } = dependencies;
 
@@ -273,8 +273,8 @@ export default (dependencies) => {
       lineage = { head: node, tail: lineage };
       checkIdentifierClash(lineage, context);
       const { type } = node;
-      const { runtime, exclude, naming } = context;
-      if (exclude.has(getQualifiedName(naming, lineage))) {
+      const { runtime, exclusion, naming } = context;
+      if (isExcluded(exclusion, getQualifiedName(naming, lineage))) {
         return node;
       }
       if (type === "ReturnStatement") {

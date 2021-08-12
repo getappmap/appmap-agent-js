@@ -1,3 +1,2 @@
 branches: [test, node, browser]
-dependencies:
-  - util
+dependencies: [util]

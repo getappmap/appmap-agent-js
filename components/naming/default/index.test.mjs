@@ -8,26 +8,16 @@ import Naming from "./index.mjs";
 
 Error.stackTraceLimit = Infinity;
 
-const { equal: assertEqual, deepEqual: assertDeepEqual } = Assert;
+const {
+  equal: assertEqual,
+  // deepEqual: assertDeepEqual
+} = Assert;
 
 const testAsync = async () => {
   const dependencies = await buildTestDependenciesAsync(import.meta.url);
   const { createCounter } = await buildTestComponentAsync("util");
 
-  const { getQualifiedName, getLineage, parseQualifiedName } =
-    Naming(dependencies);
-
-  assertDeepEqual(parseQualifiedName("foo#bar"), {
-    qualifier: "foo",
-    static: true,
-    name: "bar",
-  });
-
-  assertDeepEqual(parseQualifiedName("foo"), {
-    qualifier: null,
-    static: false,
-    name: "foo",
-  });
+  const { getQualifiedName, getLineage } = Naming(dependencies);
 
   const test = (code, path) =>
     getQualifiedName(

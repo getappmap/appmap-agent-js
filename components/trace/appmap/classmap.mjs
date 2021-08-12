@@ -10,7 +10,12 @@ const { isArray } = Array;
 export default (dependencies) => {
   const {
     util: { assert, createCounter, toRelativePath, hasOwnProperty },
-    naming: { parseQualifiedName, getQualifiedName },
+    naming: {
+      parseQualifiedName,
+      getQualifiedName,
+      createExclusion,
+      isExcluded,
+    },
   } = dependencies;
 
   const populate = (children, path, entities) => {
@@ -79,9 +84,9 @@ export default (dependencies) => {
       hasOwnProperty(node, "type")
     ) {
       lineage = { head: node, tail: lineage };
-      const { hash, path, naming, exclude, placeholder } = context;
+      const { hash, path, naming, exclusion, placeholder } = context;
       const qualified_name = getQualifiedName(naming, lineage);
-      if (qualified_name !== null && exclude.has(qualified_name)) {
+      if (qualified_name !== null && isExcluded(exclusion, qualified_name)) {
         return [];
       }
       const { type } = node;
@@ -147,7 +152,7 @@ export default (dependencies) => {
             method_id: placeholder,
             path,
             lineno: line,
-            static: _static,
+            static: _static === true,
           },
           parameters: node.params.map(generate),
         });
@@ -161,7 +166,7 @@ export default (dependencies) => {
                 type: "function",
                 name: placeholder,
                 location: `${path}:${line}`,
-                static: _static,
+                static: _static === true,
                 labels: [],
                 comment: null,
                 source: null,
@@ -213,7 +218,13 @@ export default (dependencies) => {
           }),
           _String(index),
           null,
-          { hash, exclude: new Set(exclude), naming, path, placeholder },
+          {
+            hash,
+            exclusion: createExclusion(exclude),
+            naming,
+            path,
+            placeholder,
+          },
         ),
       );
     },

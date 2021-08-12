@@ -1,9 +1,9 @@
 export default (dependencies) => {
   const {
-    util: { toAbsolutePath },
     expect: { expect },
     log: { logInfo },
     specifier: { matchSpecifier },
+    configuration: { extendConfiguration },
     agent: {
       createAgent,
       executeAgentAsync,
@@ -12,7 +12,7 @@ export default (dependencies) => {
       interruptAgent,
     },
   } = dependencies;
-  const isEnabled = ({ enabled }, main) => {
+  const isEnabled = ({ enabled, main }) => {
     for (const [specifier, boolean] of enabled) {
       if (matchSpecifier(specifier, main)) {
         return boolean;
@@ -31,16 +31,16 @@ export default (dependencies) => {
       const { cwd, argv } = process;
       const { length } = argv;
       expect(length > 1, "cannot extract main file from argv: %j", argv);
-      const { [1]: argv1 } = argv;
-      const main = toAbsolutePath(cwd(), argv1);
-      if (!isEnabled(configuration, main)) {
-        logInfo("bypassing %j", argv1);
+      const { [1]: main } = argv;
+      configuration = extendConfiguration(configuration, { main }, cwd());
+      if (!isEnabled(configuration)) {
+        logInfo("bypassing %j", main);
         return Promise.resolve(null);
       }
-      logInfo("intercepting %s", argv1);
+      logInfo("intercepting %s", main);
       const agent = createAgent(configuration);
       const promise = executeAgentAsync(agent);
-      const track = createTrack(agent, { main });
+      const track = createTrack(agent, {});
       controlTrack(agent, track, "start");
       const errors = [];
       process.on("uncaughtExceptionMonitor", (error) => {

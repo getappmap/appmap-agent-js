@@ -35,6 +35,7 @@ const testAsync = async () => {
     path: "/cwd/filename.js",
     type: "script",
     code: "function f (x) {}",
+    exclude: [],
   });
 
   ////////////

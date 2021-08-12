@@ -14,6 +14,7 @@ const { equal: assertEqual } = Assert;
 const testAsync = async () => {
   const dependencies = await buildTestDependenciesAsync(import.meta.url);
   const { createCounter } = await buildTestComponentAsync("util");
+  const { createExclusion } = await buildTestComponentAsync("naming");
 
   const { visit } = Visit(dependencies);
 
@@ -23,7 +24,7 @@ const testAsync = async () => {
     generate(
       visit(parse(code, { ecmaVersion: 2020 }), "root", null, {
         runtime: "$",
-        exclude: new Set("g"),
+        exclusion: createExclusion(["g"]),
         naming: createCounter,
       }),
     );
