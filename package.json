@@ -1,6 +1,6 @@
 {
   "name": "@appland/appmap-agent-js",
-  "version": "4.1.0",
+  "version": "4.1.1",
   "files": [
     "/components/**/*.mjs",
     "/lib/*.mjs",
@@ -44,6 +44,7 @@
     "deploy": "npm i -D @semantic-release/changelog @semantic-release/git && npx semantic-release"
   },
   "dependencies": {
+    "@appland/appmap-validate": "^2.0.0",
     "acorn": "^8.1.1",
     "ajv": "^8.1.0",
     "ajv-error-tree": "^0.0.4",
@@ -57,7 +58,6 @@
     "yaml": "^1.10.0"
   },
   "devDependencies": {
-    "@appland/appmap-validate": "^2.0.0",
     "@babel/eslint-parser": "^7.15.0",
     "@babel/plugin-syntax-top-level-await": "^7.14.5",
     "@rollup/plugin-commonjs": "^18.0.0",
