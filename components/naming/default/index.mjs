@@ -53,10 +53,11 @@ export default (dependencies) => {
         return lineage.tail.head.id.name;
       }
       if (
-        lineage.head.type === "FunctionExpression" ||
-        lineage.head.type === "ClassExpression"
+        (lineage.head.type === "FunctionExpression" ||
+          lineage.head.type === "ClassExpression") &&
+        lineage.head.id !== null
       ) {
-        return coalesce(lineage.head.id, "name", null);
+        return lineage.head.id.name;
       }
     }
     assert(

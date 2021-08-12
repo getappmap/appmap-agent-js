@@ -8,7 +8,8 @@ export default (dependencies) => {
     validateAppmap: (data) => {
       expectSuccess(
         () => validateAppmap({ data, version: "1.6.0" }),
-        "failed to validate appmap >> %e",
+        "failed to validate appmap\n%j\n%e",
+        data,
       );
     },
   };

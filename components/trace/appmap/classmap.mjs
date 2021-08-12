@@ -81,7 +81,7 @@ export default (dependencies) => {
       lineage = { head: node, tail: lineage };
       const { hash, path, naming, exclude, placeholder } = context;
       const qualified_name = getQualifiedName(naming, lineage);
-      if (exclude.has(qualified_name)) {
+      if (qualified_name !== null && exclude.has(qualified_name)) {
         return [];
       }
       const { type } = node;
@@ -90,6 +90,7 @@ export default (dependencies) => {
         type === "ClassExpression" ||
         type === "ClassDeclaration"
       ) {
+        assert(qualified_name !== null, "missing name for object/class node");
         let entities;
         if (node.type === "ObjectExpression") {
           entities = node.properties.flatMap((node, index) =>
@@ -129,6 +130,7 @@ export default (dependencies) => {
         type === "FunctionExpression" ||
         type === "FunctionDeclaration"
       ) {
+        assert(qualified_name !== null, "missing name for function/arrow node");
         const {
           loc: {
             start: { line },

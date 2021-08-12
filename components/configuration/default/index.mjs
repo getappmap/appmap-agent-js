@@ -300,7 +300,7 @@ export default (dependencies) => {
       },
       "function-name-placeholder": "()",
       serialization: {
-        "maximum-length": 100,
+        "maximum-length": 96,
         "include-constructor-name": true,
         method: "toString",
       },
