@@ -1,20 +1,20 @@
 const { stringify } = JSON;
 const _String = String;
 const { isArray } = Array;
-const _Set = Set;
+const _Map = Map;
 
-const nameable = new _Set([
-  "ObjectExpression",
-  "ClassExpression",
-  "ClassDeclaration",
-  "FunctionExpression",
-  "FunctionDeclaration",
-  "ArrowFunctionExpression",
+const nameable = new _Map([
+  ["ObjectExpression", "object"],
+  ["ClassExpression", "class"],
+  ["ClassDeclaration", "class"],
+  ["FunctionExpression", "function"],
+  ["FunctionDeclaration", "function"],
+  ["ArrowFunctionExpression", "arrow"],
 ]);
 
 export default (dependencies) => {
   const {
-    util: { incrementCounter, coalesce },
+    util: { assert, incrementCounter, coalesce },
   } = dependencies;
 
   const getKeyName = (node) => {
@@ -59,7 +59,8 @@ export default (dependencies) => {
         return coalesce(lineage.head.id, "name", null);
       }
     }
-    return _String(incrementCounter(counter));
+    assert(nameable.has(lineage.head.type), "expected a nameable estree node as head from lineage");
+    return `${nameable.get(lineage.head.type)}-${_String(incrementCounter(counter))}`;
   };
 
   const isObjectBound = (lineage) =>
@@ -107,12 +108,12 @@ export default (dependencies) => {
         return null;
       }
       if (isObjectBound(lineage)) {
-        return `${getEnvironmentName(counter, lineage.tail)}.${getKeyName(
+        return `${getEnvironmentName(counter, lineage.tail.tail)}.${getKeyName(
           lineage.tail.head,
         )}`;
       }
       if (isClassBound(lineage)) {
-        return `${getEnvironmentName(counter, lineage.tail)}${
+        return `${getEnvironmentName(counter, lineage.tail.tail.tail)}${
           lineage.tail.head.static ? "#" : "."
         }${getKeyName(lineage.tail.head)}`;
       }

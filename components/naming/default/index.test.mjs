@@ -41,7 +41,7 @@ const testAsync = async () => {
   // environment //
   /////////////////
 
-  assertEqual(test(`({});`, "body/0/expression"), "1");
+  assertEqual(test(`({});`, "body/0/expression"), "object-1");
 
   assertEqual(test("var x = {};", "body/0/declarations/0/init"), "x");
 
@@ -61,33 +61,33 @@ const testAsync = async () => {
 
   assertEqual(
     test("({k: {}});", "body/0/expression/properties/0/value"),
-    "1.k",
+    "object-1.k",
   );
 
   assertEqual(
     test("({[k]: {}});", "body/0/expression/properties/0/value"),
-    "1.<computed>",
+    "object-1.<computed>",
   );
 
   assertEqual(
     test("({'k': {}});", "body/0/expression/properties/0/value"),
-    '1."k"',
+    'object-1."k"',
   );
 
   assertEqual(
     test("({123.456: {}});", "body/0/expression/properties/0/value"),
-    '1."123.456"',
+    'object-1."123.456"',
   );
 
   ////////////
   // method //
   ////////////
 
-  assertEqual(test("class c { k () {} }", "body/0/body/body/0/value"), "1.k");
+  assertEqual(test("class c { k () {} }", "body/0/body/body/0/value"), "c.k");
 
   assertEqual(
     test("class c { static k () {} }", "body/0/body/body/0/value"),
-    "1#k",
+    "c#k",
   );
 };
 
