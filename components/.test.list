@@ -5,6 +5,8 @@
 - log-inner
 - log
 - validate
+- validate-message
+- validate-appmap
 - * uuid
   * time
   * spawn

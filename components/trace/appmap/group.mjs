@@ -19,10 +19,10 @@ export default (dependencies) => {
     return output;
   };
   return {
-    orderByGroup: (messages) => {
+    orderByGroup: (marks) => {
       const root = [];
       const map = new _Map();
-      for (const { type, data } of messages) {
+      for (const { type, data } of marks) {
         if (type === "group") {
           const { group, origin } = data;
           const buffer = [];

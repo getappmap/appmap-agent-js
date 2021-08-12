@@ -21,7 +21,7 @@ const testAsync = async () => {
         data: {
           type: "start",
           index: 123,
-          options: "options",
+          options: { filename: "filename" },
         },
       },
       {
@@ -53,8 +53,8 @@ const testAsync = async () => {
     ]),
     [
       {
-        options: "options",
-        messages: [
+        options: { output: { filename: "filename" } },
+        marks: [
           {
             type: "event",
             data: "event1",

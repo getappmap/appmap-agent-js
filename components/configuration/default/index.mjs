@@ -135,6 +135,10 @@ export default (dependencies) => {
   ////////////
 
   const fields = {
+    validate: {
+      extend: assign,
+      normalize: identity,
+    },
     scenario: {
       extend: overwrite,
       normalize: identity,
@@ -260,6 +264,10 @@ export default (dependencies) => {
 
   return {
     createConfiguration: (directory) => ({
+      validate: {
+        appmap: false,
+        message: false,
+      },
       repository: {
         directory,
         history: extractRepositoryHistory(directory),

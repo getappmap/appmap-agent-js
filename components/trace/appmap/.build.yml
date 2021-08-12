@@ -2,6 +2,7 @@ branches: [test, node, browser]
 dependencies:
   - util
   - expect
+  - validate-appmap
   - log
   - naming
   - configuration

@@ -11,6 +11,7 @@ export default (dependencies) => {
   const {
     util: { getFilename, mapMaybe },
     log: { logDebug },
+    "validate-appmap": { validateAppmap },
     configuration: { extendConfiguration },
   } = dependencies;
   const { compileMetadata } = Metadata(dependencies);
@@ -23,26 +24,26 @@ export default (dependencies) => {
   const getName = ({ name }) => name;
   /* c8 ignore start */
   return {
-    compileTrace: (configuration1, messages, termination) => {
+    compileTrace: (configuration1, marks, termination) => {
       logDebug(
-        "Trace:\n  configuration = %j\n  messages = %j\n  termination = %j",
+        "Trace:\n  configuration = %j\n  marks = %j\n  termination = %j",
         configuration1,
-        messages,
+        marks,
         termination,
       );
       const classmap = createClassmap(configuration1);
-      for (const { type, data } of messages) {
+      for (const { type, data } of marks) {
         if (type === "file") {
           addClassmapFile(classmap, data);
         }
       }
-      return splitByTrack(messages).map(({ options, messages }) => {
+      return splitByTrack(marks).map(({ options, marks }) => {
         const configuration2 = extendConfiguration(
           configuration1,
           options,
           "/",
         );
-        const events = orderByGroup(messages);
+        const events = orderByGroup(marks);
         const routes = new _Set();
         for (const { data } of events) {
           const { type } = data;
@@ -58,6 +59,13 @@ export default (dependencies) => {
           app,
           repository: { package: _package },
         } = configuration2;
+        const appmap = {
+          version: VERSION,
+          metadata: compileMetadata(configuration2, termination),
+          classMap: compileClassmap(classmap, routes),
+          events: compileEventTrace(events, classmap),
+        };
+        validateAppmap(appmap);
         return {
           name:
             filename ||
@@ -66,12 +74,7 @@ export default (dependencies) => {
             app ||
             mapMaybe(_package, getName) ||
             null,
-          data: {
-            version: VERSION,
-            metadata: compileMetadata(configuration2, termination),
-            classMap: compileClassmap(classmap, routes),
-            events: compileEventTrace(events, classmap),
-          },
+          data: appmap,
         };
       });
     },

@@ -12,7 +12,7 @@ const testAsync = async () => {
   const { createConfiguration } = await buildTestComponentAsync(
     "configuration",
   );
-  const { createSession, initializeSession, terminateSession, sendSession } =
+  const { createSession, initializeSession, terminateSession, traceSession } =
     Session(dependencies);
   const configuration = createConfiguration("/");
   const session = createSession(configuration);
@@ -20,7 +20,7 @@ const testAsync = async () => {
     type: "initialize",
     data: configuration,
   });
-  assertDeepEqual(sendSession(session, "message"), {
+  assertDeepEqual(traceSession(session, "message"), {
     type: "trace",
     data: "message",
   });
@@ -35,7 +35,7 @@ const testAsync = async () => {
       data: { errors: [{ name: "TypeError", message: "BOUM" }], status: 0 },
     });
   }
-  assertDeepEqual(sendSession(session, "message"), null);
+  assertDeepEqual(traceSession(session, "message"), null);
 };
 
 testAsync();

@@ -151,7 +151,7 @@ const testAsync = async () => {
             frameworks: [],
             client: {
               name: "@appland/appmap-agent-js",
-              url: null,
+              url: "https://github.com/applandinc/appmap-agent-js",
               version: "0.0.0",
             },
             recorder: { name: "process" },

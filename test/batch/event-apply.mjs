@@ -20,6 +20,10 @@ export default async (protocol) => {
         apply: true,
       },
       output: { filename: "filename" },
+      validate: {
+        message: true,
+        appmap: true,
+      },
     },
     ["node", "./main.mjs"],
     async (repository) => {

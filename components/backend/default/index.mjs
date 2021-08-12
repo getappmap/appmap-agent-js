@@ -3,10 +3,13 @@ export default (dependencies) => {
     util: { assert, createBox, setBox, getBox },
     expect: { expectSuccess },
     log: { logDebug },
+    "validate-message": { validateMessage },
     storage: { createStorage, store },
     trace: { compileTrace },
   } = dependencies;
-  const persist = (trace, configuration, reason) => {
+  const persist = ({ trace, box }, reason) => {
+    const configuration = getBox(box);
+    setBox(box, null);
     const storage = createStorage(configuration);
     for (const { name, data } of compileTrace(configuration, trace, reason)) {
       expectSuccess(
@@ -15,32 +18,33 @@ export default (dependencies) => {
       );
     }
   };
+
   return {
     openBackend: () => ({
       trace: [],
       box: createBox(null),
     }),
-    sendBackend: ({ trace, box }, { type, data }) => {
-      logDebug("backend received: type = %j data = %j", type, data);
+    sendBackend: (backend, message) => {
+      logDebug("backend received: %j", message);
+      validateMessage(message);
+      const { type, data } = message;
       if (type === "trace") {
+        const { trace } = backend;
         trace.push(data);
       } else if (type === "initialize") {
-        assert(getBox(box) === null, "backend has already been initialized");
+        const { box } = backend;
         setBox(box, data);
-      } else if (type === "terminate") {
-        const configuration = getBox(box);
-        assert(configuration !== null, "backend is not currently running");
-        setBox(box, null);
-        persist(trace, configuration, data);
       } else {
-        assert(false, "invalid message type", type);
+        assert(type === "terminate", "invalid message type");
+        const { box } = backend;
+        assert(getBox(box) !== null, "backend has already been terminated");
+        persist(backend, data);
       }
     },
-    closeBackend: ({ trace, box }) => {
-      const configuration = getBox(box);
-      if (configuration !== null) {
-        setBox(box, null);
-        persist(trace, configuration, {
+    closeBackend: (backend) => {
+      const { box } = backend;
+      if (getBox(box) !== null) {
+        persist(backend, {
           errors: [{ name: "AppmapError", message: "client disconnection" }],
           status: 1,
         });

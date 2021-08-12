@@ -7,7 +7,12 @@ import {
 } from "../../build.mjs";
 import Backend from "./index.mjs";
 
-const { deepEqual: assertDeepEqual, throws: assertThrows } = Assert;
+Error.stackTraceLimit = Infinity;
+
+const {
+  deepEqual: assertDeepEqual,
+  // throws: assertThrows
+} = Assert;
 
 const testAsync = async () => {
   const dependencies = await buildTestDependenciesAsync(import.meta.url);
@@ -35,17 +40,19 @@ const testAsync = async () => {
       type: "trace",
       data: {
         type: "track",
-        data: { type: "start", index: 123, options: { output: { filename } } },
+        data: { type: "start", index: 123, options: { filename } },
       },
     });
-    assertThrows(
-      () => sendBackend(backend, { type: "invalid" }),
-      /^AssertionError: invalid message type/,
-    );
     sendBackend(backend, {
       type: "terminate",
       data: {
-        errors: [{ name: "error-name", message: "error-message" }],
+        errors: [
+          {
+            name: "error-name",
+            message: "error-message",
+            stack: "error-stack",
+          },
+        ],
         status: 1,
       },
     });

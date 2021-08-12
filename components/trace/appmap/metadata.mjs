@@ -7,13 +7,17 @@ export default (dependencies) => {
 
   /* c8 ignore start */
   const getName = ({ name }) => name;
-  /* c8 ignore stop */
 
   const makeClient = ({ package: { name, version, homepage } }) => ({
     name,
     version,
-    url: homepage,
+    url:
+      homepage === null
+        ? "https://github.com/applandinc/appmap-agent-js"
+        : homepage,
   });
+
+  /* c8 ignore stop */
 
   const makeJustRecording = ({
     "defined-class": defined_class,

@@ -333,6 +333,12 @@
   additionalProperties: false
   properties:
     # server
+    validate:
+      type: object
+      additionalProperties: false
+      properties:
+        message: {type: boolean}
+        appmap: {type: boolean}
     protocol: {$ref: protocol}
     log-level: {$ref: log-level}
     host: {const: localhost}
@@ -417,8 +423,15 @@
 - $id: cooked-configuration
   type: object
   additionalProperties: false
-  minProperties: 10
+  minProperties: 30
   properties:
+    validate:
+      type: object
+      additionalProperties: false
+      required: [message, appmap]
+      properties:
+        message: {type: boolean}
+        appmap: {type: boolean}
     repository:
       type: object
       additionalProperties: false
@@ -649,10 +662,8 @@
                           nullable: true
                           additionalProperties: false
                           properties:
-                            main: {$ref: absolute-path}
                             name: {type: string}
                             filename: {$ref: filename}
-                            recording: {$ref: recording}
                     - type: object
                       additionalProperties: false
                       required: [type, index]
@@ -681,4 +692,5 @@
                     time: {type: number}
                     group: {$ref: index}
                     index: {$ref: index}
+                    # TODO
                     data: {type: object}

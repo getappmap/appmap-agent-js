@@ -9,15 +9,11 @@ export default (dependencies) => {
   const {
     backend: { openBackend, sendBackend, closeBackend },
     expect: { expectSuccess },
-    validate: { validateMessage },
     log: { logError },
   } = dependencies;
   return {
     openServerAsync: (options) => {
-      const { port } = {
-        port: 0,
-        ...options,
-      };
+      const { port } = { port: 0, ...options };
       const server = createServer();
       const sockets = new _Set();
       server.on("error", (error) => {
@@ -46,7 +42,6 @@ export default (dependencies) => {
             "failed to parse JSON message %j >> %e",
             data,
           );
-          validateMessage(message);
           sendBackend(backend, message);
         });
       });

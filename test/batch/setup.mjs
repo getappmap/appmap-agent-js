@@ -9,7 +9,6 @@ import {
   readFile,
 } from "fs/promises";
 import YAML from "yaml";
-import { validate } from "@appland/appmap-validate";
 import { spawnAsync } from "../spawn.mjs";
 
 const { cwd } = process;
@@ -49,13 +48,6 @@ export const setupAsync = async (
     const appmap = parseJSON(
       await readFile(`${directory}/tmp/appmap/${filename}`),
     );
-    validate({ data: appmap });
-    // try {
-    //   validate({ data: appmap });
-    // } catch (error) {
-    //   console.log(stringifyJSON(appmap, null, 2));
-    //   throw error;
-    // }
     appmaps.push([filename, appmap]);
   }
   await afterAsync(fromEntries(appmaps));

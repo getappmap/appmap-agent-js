@@ -5,24 +5,31 @@ export default (dependencies) => {
   const {
     util: { assert },
   } = dependencies;
-  const cleanupTrack = ({ options, messages }) => ({
+  const cleanupTrack = ({ options, marks }) => ({
     options,
-    messages,
+    marks,
   });
   return {
-    splitByTrack: (messages) => {
+    splitByTrack: (marks) => {
       const tracks = new _Map();
-      for (let message of messages) {
-        const { type, data } = message;
+      for (let mark of marks) {
+        const { type, data } = mark;
         if (type === "track") {
           const { type, index } = data;
           if (type === "start") {
             assert(!tracks.has(index), "duplicate track index");
-            const { options } = data;
+            let { options } = data;
+            let filename;
+            ({ filename, ...options } = { filename: null, ...options });
+            if (filename !== null) {
+              options = {
+                output: { filename },
+              };
+            }
             tracks.set(index, {
               options,
               enabled: true,
-              messages: [],
+              marks: [],
             });
           } else {
             assert(tracks.has(index), "missing track index");
@@ -30,9 +37,9 @@ export default (dependencies) => {
             track.enabled = type === "play";
           }
         } else {
-          for (const { enabled, messages } of tracks.values()) {
+          for (const { enabled, marks } of tracks.values()) {
             if (enabled) {
-              messages.push(message);
+              marks.push(mark);
             }
           }
         }

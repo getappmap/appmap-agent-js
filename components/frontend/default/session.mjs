@@ -46,14 +46,14 @@ export default (dependencies) => {
         data: { errors: errors.map(serializeError), status },
       };
     },
-    sendSession: ({ state }, message) => {
+    traceSession: ({ state }, mark) => {
       if (getBox(state) === RUN_STATE) {
         return {
           type: "trace",
-          data: message,
+          data: mark,
         };
       }
-      logWarning("message lost: %j", message);
+      logWarning("mark lost: %j", mark);
       return null;
     },
   };

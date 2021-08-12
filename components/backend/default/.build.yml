@@ -3,5 +3,6 @@ dependencies:
   - util
   - log
   - expect
+  - validate-message
   - storage
   - trace

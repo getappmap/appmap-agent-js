@@ -2,5 +2,4 @@ branches: [test, node, browser]
 dependencies:
   - expect
   - log
-  - validate
   - backend

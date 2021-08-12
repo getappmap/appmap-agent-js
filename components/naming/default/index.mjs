@@ -59,8 +59,13 @@ export default (dependencies) => {
         return coalesce(lineage.head.id, "name", null);
       }
     }
-    assert(nameable.has(lineage.head.type), "expected a nameable estree node as head from lineage");
-    return `${nameable.get(lineage.head.type)}-${_String(incrementCounter(counter))}`;
+    assert(
+      nameable.has(lineage.head.type),
+      "expected a nameable estree node as head from lineage",
+    );
+    return `${nameable.get(lineage.head.type)}-${_String(
+      incrementCounter(counter),
+    )}`;
   };
 
   const isObjectBound = (lineage) =>

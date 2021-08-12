@@ -31,7 +31,11 @@ const testAsync = async () => {
     labels: [],
     language: { name: "ecmascript", version: "2020", engine: null },
     frameworks: [],
-    client: { name: "@appland/appmap-agent-js", version: "0.0.0", url: null },
+    client: {
+      name: "@appland/appmap-agent-js",
+      version: "0.0.0",
+      url: "https://github.com/applandinc/appmap-agent-js",
+    },
     recorder: { name: "process" },
     recording: null,
     git: null,

@@ -1,9 +1,9 @@
 import Session from "./session.mjs";
 
 export default (dependencies) => {
-  const { sendSession } = Session(dependencies);
+  const { traceSession } = Session(dependencies);
   const generateTrace = (type) => (session, data) =>
-    sendSession(session, { type, data });
+    traceSession(session, { type, data });
   return {
     traceEvent: generateTrace("event"),
     traceFile: generateTrace("file"),
