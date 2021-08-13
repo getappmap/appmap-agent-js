@@ -1,4 +1,5 @@
 /* eslint-env node */
+import { tmpdir } from "os";
 import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
@@ -16,7 +17,9 @@ const testAsync = async () => {
   setTimeout(() => {
     sendClient(client, {
       type: "initialize",
-      data: createConfiguration("/cwd"),
+      data: createConfiguration(
+        `${tmpdir()}/${Math.random().toString(36).substring(2)}`,
+      ),
     });
     interruptClient(client);
   });

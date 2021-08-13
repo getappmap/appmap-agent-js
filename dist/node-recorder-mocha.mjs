@@ -38,7 +38,7 @@ import hook_request$node from "./../components/hook-request/node/index.mjs";
 import hook_response$node from "./../components/hook-response/node/index.mjs";
 import hook_query$node from "./../components/hook-query/node/index.mjs";
 import agent$default from "./../components/agent/default/index.mjs";
-import recorder_process$default from "./../components/recorder-process/default/index.mjs";
+import recorder_mocha$default from "./../components/recorder-mocha/default/index.mjs";
 
 export default (blueprint) => {
   const dependencies = {__proto__:null};
@@ -77,6 +77,6 @@ export default (blueprint) => {
   dependencies["hook-response"] = hook_response$node(dependencies);
   dependencies["hook-query"] = hook_query$node(dependencies);
   dependencies["agent"] = agent$default(dependencies);
-  dependencies["recorder-process"] = recorder_process$default(dependencies);
-  return dependencies["recorder-process"];
+  dependencies["recorder-mocha"] = recorder_mocha$default(dependencies);
+  return dependencies["recorder-mocha"];
 };

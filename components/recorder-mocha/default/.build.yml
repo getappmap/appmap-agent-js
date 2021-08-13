@@ -1,5 +1,5 @@
 branches: [node]
 dependencies:
+  - util
   - expect
-  - log
   - agent

@@ -1,0 +1,8 @@
+branches: [node]
+dependencies:
+  - util
+  - log
+  - expect
+  - validate
+  - specifier
+  - configuration

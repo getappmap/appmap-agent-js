@@ -30,9 +30,13 @@
     - process
     - mocha
 
+- $id: mode
+  enum:
+    - local
+    - remote
+
 - $id: protocol
   enum:
-    - inline
     - tcp
     - http1
     - http2
@@ -333,6 +337,7 @@
   additionalProperties: false
   properties:
     # server
+    mode: {$ref: mode}
     validate:
       type: object
       additionalProperties: false
@@ -390,15 +395,17 @@
     function-name-placeholder: {type: string}
     recording: {$ref: recording}
     serialization:
-      type: object
-      additionalProperties: false
-      properties:
-        maximum-length:
-          type: integer
-          minimum: 0
-          nullable: true
-        include-constructor-name: {type: boolean}
-        method: {$ref: serialization-method}
+      anyOf:
+        - type: string
+        - type: object
+          additionalProperties: false
+          properties:
+            method: {$ref: serialization-method}
+            include-constructor-name: {type: boolean}
+            maximum-length:
+              type: integer
+              minimum: 0
+              nullable: true
     pruning: {type: boolean}
     output:
       anyOf:
@@ -425,8 +432,9 @@
 - $id: cooked-configuration
   type: object
   additionalProperties: false
-  minProperties: 30
+  minProperties: 31
   properties:
+    mode: {$ref: mode}
     validate:
       type: object
       additionalProperties: false

@@ -17,7 +17,7 @@ cat tmp/appmap/main.appmap.json
 Table of contents:
 1. [Requirements](#requirements)
 2. [Automated Recording](#automated-recording)
-    1. [Scenario](#scneario)
+    1. [Scenario](#scenario)
     2. [CLI](#cli)
     3. [Recorder](#recorder)
     4. [Mode](#mode)
@@ -236,9 +236,7 @@ A specifier can be any of:
 * `recorder: "process" | "mocha"` Defines the main algorithm used for recording. *Default* `"process"`.
     * `"process"` Generate a single appmap which spans over the entire lifetime of the process.
     * `"mocha"` Generate an appmap for each test case (ie `it` calls) of the entire test suite (ie every `describe` calls on every test file).
-* `scenario <string> | <string[]>` Whitelist scenarios for execution. *Default*: `[]` (no scenarios are executed by default).
-    * `<string>` Shorthand, `"my-scenario"` is the same as `["my-scenario"]`.
-    * `<string[]>` Name of the scenarios to execute sequentially.
+* `scenario <string>` A regular expression to select scenarios for execution. *Default*: `"anonymous"` (the name of the scenario provided by command line argument).
 * `scenarios <object>`
   An object whose values are either a single scenario or a list of scenarios. A scenario can be any of:
     * `<string>` Command which gets converted in the `spawn` format. For instance: `"exec argv0"` is the same as `{type: "spawn", exec: "/bin/sh", argv: ["-c", "exec argv0"]}`.

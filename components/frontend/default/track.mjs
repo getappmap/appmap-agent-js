@@ -44,7 +44,7 @@ export default (dependencies) => {
         setBox(state, DISABLED_STATE);
         return traceTrack(session, { type, index });
       }
-      assert(false, "invalid track control: %s", type);
+      assert(false, "invalid track control");
     },
   };
 };

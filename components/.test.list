@@ -32,6 +32,8 @@
       * hook-query
   * client
 - agent
-- configuration-boot
+- recorder-boot
 - recorder-process
+- recorder-mocha
+- batch-boot
 - batch

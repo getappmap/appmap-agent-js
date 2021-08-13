@@ -1,6 +1,6 @@
 {
   "name": "@appland/appmap-agent-js",
-  "version": "4.1.1",
+  "version": "4.2.0",
   "files": [
     "/components/**/*.mjs",
     "/lib/*.mjs",

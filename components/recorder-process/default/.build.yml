@@ -1,7 +1,2 @@
 branches: [node]
-dependencies:
-  - expect
-  - log
-  - specifier
-  - configuration
-  - agent
+dependencies: [agent]

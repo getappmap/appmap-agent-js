@@ -4,14 +4,14 @@ import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
 } from "../../build.mjs";
-import RecorderProcess from "./index.mjs";
+import RecorderMocha from "./index.mjs";
 
 const {
   // equal: assertEqual,
   deepEqual: assertDeepEqual,
 } = Assert;
 
-const { mainAsync } = RecorderProcess(
+const { createMochaHooks } = RecorderMocha(
   await buildTestDependenciesAsync(import.meta.url),
 );
 
@@ -24,7 +24,7 @@ const configuration = createConfiguration("/repository");
   const emitter = new EventEmitter();
   emitter.cwd = () => "/cwd";
   emitter.argv = ["node", "main.mjs"];
-  const promise = mainAsync(
+  const { promise, beforeEach, afterEach } = createMochaHooks(
     emitter,
     extendConfiguration(
       configuration,
@@ -32,10 +32,25 @@ const configuration = createConfiguration("/repository");
       "/directory",
     ),
   );
+  beforeEach.call({
+    currentTest: {
+      parent: {
+        fullTitle: () => "full-title-1",
+      },
+    },
+  });
+  afterEach();
+  beforeEach.call({
+    currentTest: {
+      parent: {
+        fullTitle: () => "full-title-2",
+      },
+    },
+  });
   emitter.emit("uncaughtExceptionMonitor", new Error("BOUM"));
   emitter.emit("exit", 123, "SIGINT");
   assertDeepEqual(
     (await promise).map(({ type }) => type),
-    ["initialize", "trace", "trace", "terminate"],
+    ["initialize", "trace", "trace", "trace", "trace", "terminate"],
   );
 }
