@@ -6,28 +6,24 @@ import Storage from "./index.mjs";
 
 const { equal: assertEqual } = Assert;
 
-const testAsync = async () => {
-  const { createStorage, store, storeAsync } = Storage(
-    await buildTestDependenciesAsync(import.meta.url),
-  );
+const { createStorage, store, storeAsync } = Storage(
+  await buildTestDependenciesAsync(import.meta.url),
+);
 
-  const storage = createStorage({
-    output: { directory: tmpdir(), postfix: ".foo", indent: null },
-  });
+const directory = `${tmpdir()}/${Math.random().toString(36).substring(2)}`;
 
-  const name = `appmap-storage-file-${Math.random().toString(36).substring(2)}`;
+const storage = createStorage({
+  output: { directory, postfix: ".foo", indent: null },
+});
 
-  store(storage, name, 123);
-  assertEqual(
-    JSON.parse(readFileSync(`${tmpdir()}/${name}.foo.json`, "utf8")),
-    123,
-  );
+store(storage, "filename", 123);
+assertEqual(
+  JSON.parse(readFileSync(`${directory}/filename.foo.json`, "utf8")),
+  123,
+);
 
-  await storeAsync(storage, name, 456);
-  assertEqual(
-    JSON.parse(readFileSync(`${tmpdir()}/${name}-1.foo.json`, "utf8")),
-    456,
-  );
-};
-
-testAsync();
+await storeAsync(storage, "filename", 456);
+assertEqual(
+  JSON.parse(readFileSync(`${directory}/filename-1.foo.json`, "utf8")),
+  456,
+);

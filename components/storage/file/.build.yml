@@ -1,2 +1,2 @@
 branches: [test, node]
-dependencies: [log]
+dependencies: [util, expect, log]
