@@ -14,6 +14,22 @@ npx appmap-agent-js -- main.mjs argv0 argv1
 cat tmp/appmap/main.appmap.json
 ```
 
+Table of contents:
+1. [Requirements](#requirements)
+2. [Automated Recording](#automated-recording)
+  1. [Scenario](#scneario)
+  2. [CLI](#cli)
+  3. [Recorder](#recorder)
+  4. [Mode](#mode)
+3. [Manual Recording](#manual-recording)
+4. [Configuration](#configuration)
+  1. [Prelude: Specifier Format](#prelude-specifier-format)
+  2. [Automated Recording Options](#automated-recording-options)
+  3. [Common Options](#common-options)
+5. [Application Representation](#application-representation)
+  1. [Classmap](#classmap)
+  2. [Qualified Name](#qualified-name)
+
 ## Requirements
 
 * unix-like os
@@ -70,13 +86,14 @@ scenarios:
   # Fork without globbing
   fork:
     type: fork
+    globbing: false
     exec: main.mjs
     argv: [argv0, argv1]
   # Fork with globbing
   fork-globbing:
     type: fork
-    globbing: true
     exec: test/**/*.mjs
+    argv: [argv0, argv1]
 ```
 
 Note that scenarios can also provide their own configuration options:
@@ -95,20 +112,20 @@ scenarios:
 
 ### CLI
 
-* Positional arguments: the parsed elements of a command
-* Named arguments: any configuration option.
+* *Positional arguments* The parsed elements of a command.
+* *Named arguments* Any configuration option.
   This takes precedence over the options from the configuration file.
   For instance:
   ```sh
   npx appmap-agent-js --package 'lib/*.mjs' --package 'dist/*.mjs'
   ```
-* Environment variables:
+* *Environment variables*
   * `APPMAP_CONFIGURATION_PATH`: path to the configuration file, default: `./appmap.yml`.
   * `APPMAP_REPOSITORY_DIRECTORY`: directory to the project's home directory, default: `.`.
     Requirements:
-    * *mandatory*: access to the `@appland/appmap-agent-js` npm module.
-    * *preferred*: be a git repository.
-    * *preferred*: contain a valid `package.json` file.
+    * *[mandatory]* Access to the `@appland/appmap-agent-js` npm module.
+    * *[preferred]* Be a git repository.
+    * *[preferred]* Contain a valid `package.json` file.
 
 ### Recorder
 
@@ -276,9 +293,9 @@ A specifier can be any of:
   * `<object>`
     * `enabled <boolean>` Indicates whether the whitelisted file should be instrumented or not. *Default*: `true`.
     <!-- * `shallow <boolean>` -->
-    * `exclude <string[]>` List of qualified name to exclude from instrumentation.
+    * `exclude <string[]>` List of [qualified name](#qualified-name) to exclude from instrumentation. Regular expression are supported.
     * `... <Specifier>` Extends from any specifier format.
-* `exclude <string[]>` A list of qualified name to always exclude from instrumentation.
+* `exclude <string[]>` List of [qualified name](#qualified-name) to always exclude from instrumentation. Regular expression are supported.
 * `source <boolean>` Indicates whether to include source code in the appmap file. *Default* `false`. 
 * `hooks <object>` Flags controlling what the agent intercepts.
   * `cjs <boolean>` Indicates whether commonjs modules should be instrumented to record function applications. *Default*: `true`.
@@ -312,30 +329,57 @@ A specifier can be any of:
     * `include-constructor-name <boolean>`: indicates whether or not to fetch the constructor name of runtime values. Fetching constructor name for every intercepted runtime value can add up to some performance overhead. Also, fetching constructor name can trigger code from the application being recorded if it uses [proxies](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy). *Default* `true`.
     * `maximum-length <number>` the maximum length of the string representation of runtime values. *Default* `96`.
 
+## Application Representation
 
-    
-<!-- ## Application Representation
+*Warning bumpy road ahead*
+
+### Classmap
 
 The appmap framework represent an application as a tree structure called *classmap*.
-The base of classmap trees mirrors the file structure with `package` node.
-Within a file, the following [estree](https://github.com/estree/estree) nodes are susceptible to be represented in the classmap.
+The base of a classmap tree mirrors the file structure of the recorded application with nested `package` classmap nodes.
+Within a file, some [estree](https://github.com/estree/estree) nodes are selected to be represented as `class` classmap nodes based on their type.
+The name of these classmap nodes are based on an algorithm that resembles the [naming algorithm of functions](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/name). If a node has no such name, a unique indexed name will be provided. Estree nodes of type `ObjectExpression`, `ClassExpression`, or `ClassDeclaration` are qualified as *class-like* and are directly represented by a `class` node. Estree node of type: `ArrowFunctionExpression`, `FunctionExpresssion`, and `FunctionDeclaration` are qualified as *function-like* and are represented by a `class` classmap node which contains a `function` classmap node as first child. This circumvoluted representation is required because the [appmap specification](https://github.com/applandinc/appmap) does not allow `function` node to contain children. Other estree nodes are not represented in the classmap.
 
-* `ObjectExpression`, `ClassExpression`, and `ClassDeclaration` are represented by a `class` node.
-* `ArrowFunctionExpression`, `FunctionExpresssion`, and `FunctionDeclaration` are represented by a `class` node which contains a `function` node as first element. This circumvoluted representation is required because the [appmap specfication](https://github.com/applandinc/appmap) does not allow `function` node to contain children.
+Example:
+
+```js
+// main.js
+function main () {
+  class Class {}
+}
+```
+
+```yaml
+- type: package
+  name: main.js
+  children:
+  - type: class
+    name: main
+    children:
+    - type: function
+      name: "()" 
+    - type: class
+      name: Class
+      children: []
+```
 
 ### Qualified Name
 
-`const object = ({method () {} })` `object.method`
-`const class `
+Excluding some parts of the files for instrumentation is based on *qualified name*.
+A qualified name is based on whether an estree node resides at the `value` field of a `Property` or a `MethodDefinition`.
+If it is the case the node is said to be *bound*, else it is said to be *free*.
+The qualified name of a *bound* estree node is the combination of the name of its parent classmap node and the name if its classmap node.
+The qualified name of a free estree node is the same as the name of its classmap name.
+
+Examples:
+
+* `function f () {}` is `f`
+* `const o = { f () {} }` is `o.f`
+* `class c { f () {} }` is `c.f`
+* `class c { static () {} }` is `c#f`
 
 
-
-*Bounded* The node is the `value` property of `Property` or `MethodDefinition` node.
-*Free*
-
-
-
-### Class-like Nodes
+<!-- ### Class-like Nodes
 
 These nodes are the JavaScript (most common) means to implement classes.
 As expected, they are each represented by a `class` code object.
