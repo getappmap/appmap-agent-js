@@ -137,7 +137,7 @@ const testAsync = async () => {
 
   // packages //
 
-  assertDeepEqual(extend("packages", ["/foo"]), [
+  assertDeepEqual(extend("packages", "/foo"), [
     [
       {
         source: "^\\/foo($|/[^/]*$)",

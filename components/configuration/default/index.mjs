@@ -85,7 +85,7 @@ export default (dependencies) => {
 
   const normalizePackageSpecifier = (specifier, cwd) => {
     if (typeof specifier === "string") {
-      specifier = { path: specifier };
+      specifier = { glob: specifier };
     }
     const { enabled, shallow, source, exclude, ...rest } = {
       enabled: true,
@@ -97,8 +97,12 @@ export default (dependencies) => {
     return [createSpecifier(cwd, rest), { enabled, source, shallow, exclude }];
   };
 
-  const normalizePackages = (specifiers, cwd) =>
-    specifiers.map((specifier) => normalizePackageSpecifier(specifier, cwd));
+  const normalizePackages = (specifiers, cwd) => {
+    if (!isArray(specifiers)) {
+      specifiers = [specifiers];
+    }
+    return specifiers.map((specifier) => normalizePackageSpecifier(specifier, cwd));
+  }
 
   const normalizeScenarios = (scenarios, cwd) =>
     fromEntries(

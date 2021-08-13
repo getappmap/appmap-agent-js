@@ -381,8 +381,10 @@
     engine: {$ref: name-version}
     language: {$ref: name-version}
     packages:
-      type: array
-      items: {$ref: package-specifier}
+      anyOf:
+        - $ref: package-specifier
+        - type: array
+          items: {$ref: package-specifier}
     exclude: {$ref: exclude}
     # recording
     function-name-placeholder: {type: string}
