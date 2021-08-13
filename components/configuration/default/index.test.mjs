@@ -135,12 +135,20 @@ const testAsync = async () => {
     ],
   ]);
 
+  // serialization //
+
+  assertDeepEqual(extend("serialization", "toString"), {
+    method: "toString",
+    "maximum-length": 96,
+    "include-constructor-name": true,
+  });
+
   // packages //
 
-  assertDeepEqual(extend("packages", "/foo"), [
+  assertDeepEqual(extend("packages", "foo"), [
     [
       {
-        source: "^\\/foo($|/[^/]*$)",
+        source: "^(?:foo)$",
         flags: "",
         basedir: cwd(),
       },

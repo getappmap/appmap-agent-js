@@ -69,6 +69,13 @@ export default (dependencies) => {
   const normalizeFrameworkArray = (frameworks) =>
     frameworks.map(normalizeFramework);
 
+  const normalizeSerialization = (serialization) => {
+    if (typeof serialization === "string") {
+      serialization = { method: serialization };
+    }
+    return serialization;
+  };
+
   const normalizeOutput = (output, cwd) => {
     if (typeof output === "string") {
       output = { directory: output };
@@ -101,8 +108,10 @@ export default (dependencies) => {
     if (!isArray(specifiers)) {
       specifiers = [specifiers];
     }
-    return specifiers.map((specifier) => normalizePackageSpecifier(specifier, cwd));
-  }
+    return specifiers.map((specifier) =>
+      normalizePackageSpecifier(specifier, cwd),
+    );
+  };
 
   const normalizeScenarios = (scenarios, cwd) =>
     fromEntries(
@@ -141,6 +150,10 @@ export default (dependencies) => {
   const fields = {
     validate: {
       extend: assign,
+      normalize: identity,
+    },
+    mode: {
+      extend: overwrite,
       normalize: identity,
     },
     scenario: {
@@ -189,7 +202,7 @@ export default (dependencies) => {
     },
     serialization: {
       extend: assign,
-      normalize: identity,
+      normalize: normalizeSerialization,
     },
     "hidden-identifier": {
       extend: overwrite,
@@ -287,7 +300,8 @@ export default (dependencies) => {
         indent: 0,
         postfix: ".appmap",
       },
-      protocol: "inline",
+      mode: "local",
+      protocol: "tcp",
       host: "localhost",
       port: 0,
       enabled: [],
