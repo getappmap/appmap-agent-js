@@ -3,7 +3,7 @@
 import BatchBoot from "../dist/node-batch-boot.mjs";
 import Batch from "../dist/node-batch.mjs";
 
-const { loadConfiguration } = BatchBoot({log:"info"});
+const { loadConfiguration } = BatchBoot({ log: "info" });
 const configuration = loadConfiguration(process);
 const {
   mode,

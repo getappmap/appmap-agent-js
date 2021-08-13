@@ -2,7 +2,7 @@ import { writeFile, symlink } from "fs/promises";
 import { strict as Assert } from "assert";
 import { setupAsync } from "./setup.mjs";
 
-const {cwd} = process;
+const { cwd } = process;
 
 const {
   // deepEqual: assertDeepEqual
