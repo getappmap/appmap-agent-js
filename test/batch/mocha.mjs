@@ -21,6 +21,7 @@ await runAsync(
       esm: false,
       cjs: true,
       apply: true,
+      http: false,
     },
     output: { filename: "filename" },
     scenario: "scenario",

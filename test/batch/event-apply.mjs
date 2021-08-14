@@ -10,7 +10,7 @@ await runAsync(
     enabled: true,
     mode: "remote",
     protocol: "tcp",
-    "function-name-placeholder": "$",
+    "function-name-placeholder": "placeholder",
     packages: { glob: "*" },
     hooks: {
       esm: true,
@@ -44,7 +44,7 @@ await runAsync(
           event: "call",
           thread_id: 0,
           defined_class: "main",
-          method_id: "$",
+          method_id: "placeholder",
           path: "main.mjs",
           lineno: 1,
           static: false,
