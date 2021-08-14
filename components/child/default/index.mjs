@@ -43,7 +43,7 @@ export default (dependencies) => {
         recorder,
         agent: { directory: agent_directory },
       } = configuration2;
-      const hook = `${agent_directory}/lib/${recorder}.mjs`;
+      let hook = `${agent_directory}/lib/${recorder}.mjs`;
       if (fork === null) {
         if (recorder === "mocha") {
           let part1;
@@ -71,20 +71,18 @@ export default (dependencies) => {
             ...part1,
             "--require",
             hook,
-            // "--experimental-loader",
-            // `${agent_directory}/lib/loader.mjs`,
             ...part2,
           ];
-        } else {
-          env3 = {
-            ...env3,
-            NODE_OPTIONS: `${coalesce(
-              env3,
-              "NODE_OPTIONS",
-              "",
-            )} --experimental-loader=${hook}`,
-          };
+          hook = `${agent_directory}/lib/loader.mjs`;
         }
+        env3 = {
+          ...env3,
+          NODE_OPTIONS: `${coalesce(
+            env3,
+            "NODE_OPTIONS",
+            "",
+          )} --require=${agent_directory}/lib/abomination.js --experimental-loader=${hook}`,
+        };
       } else {
         expect(
           recorder === "process",
