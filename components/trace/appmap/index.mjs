@@ -9,7 +9,7 @@ const VERSION = "1.6.0";
 
 export default (dependencies) => {
   const {
-    util: { getFilename, mapMaybe },
+    util: { getBasename, mapMaybe },
     log: { logDebug },
     "validate-appmap": { validateAppmap },
     configuration: { extendConfiguration },
@@ -70,7 +70,7 @@ export default (dependencies) => {
           name:
             filename ||
             name ||
-            mapMaybe(main, getFilename) ||
+            mapMaybe(main, getBasename) ||
             app ||
             mapMaybe(_package, getName) ||
             null,

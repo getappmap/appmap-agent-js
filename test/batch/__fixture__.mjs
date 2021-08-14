@@ -16,11 +16,9 @@ const { fromEntries } = Object;
 const { stringify: stringifyYAML } = YAML;
 const { stringify: stringifyJSON, parse: parseJSON } = JSON;
 
-export const setupAsync = async (
-  name,
-  version,
+export const runAsync = async (
+  _package,
   config,
-  argv,
   beforeAsync,
   afterAsync,
 ) => {
@@ -29,17 +27,28 @@ export const setupAsync = async (
     .substring(2)}`;
   await mkdir(directory);
   await mkdir(`${directory}/node_modules`);
+  await mkdir(`${directory}/node_modules/.bin`);
   await mkdir(`${directory}/node_modules/@appland`);
   await symlink(cwd(), `${directory}/node_modules/@appland/appmap-agent-js`);
   await writeFile(
     `${directory}/package.json`,
-    stringifyJSON({ name, version }),
+    stringifyJSON({
+      name: "package",
+      version: "1.2.3",
+      ... _package,
+    }),
   );
-  await writeFile(`${directory}/appmap.yml`, stringifyYAML(config));
+  await writeFile(`${directory}/appmap.yml`, stringifyYAML({
+    validate: {
+      message: true,
+      appmap: true,
+    },
+    ... config
+  }));
   await mkdir(`${directory}/tmp`);
   await mkdir(`${directory}/tmp/appmap`);
   await beforeAsync(directory);
-  await spawnAsync("node", [`${cwd()}/bin/batch.mjs`, ...argv], {
+  await spawnAsync("node", [`${cwd()}/bin/batch.mjs`], {
     cwd: directory,
     stdio: "inherit",
   });

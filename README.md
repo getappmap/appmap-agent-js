@@ -270,7 +270,7 @@ A specifier can be any of:
 
 * `log-level "debug" | "info" | "warning" | "error" | "off"` Usual log levels.
 * `enabled <EnabledSpecifier> | <EnabledSpecifier[]>` Whitelist files to decide whether a node process should be instrumented based on the path of its main module. An `EnabledSpecifier` can be any of:
-    * `<string>` Shorthand, `"test/**/*.mjs"` is the same as `{glob: "test/**/*.mjs"}`.
+    * `<string>` Shorthand, `"test/**/*.mjs"` is the same as `{glob:"test/**/*.mjs", enabled:true}`.
     * `<boolean>` Shorthand, `true` is the same as `{regexp:"^", enabled:true}` and `false` is the same as `{regexp:"^", enabled:false}`.
     * `<object>`
         * `enabled <boolean>` Indicates whether whitelisted files are enabled or not. *Default*: `true`.

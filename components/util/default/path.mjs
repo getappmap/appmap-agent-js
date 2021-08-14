@@ -52,6 +52,11 @@ export const getFilename = (path) => {
   return segments[segments.length - 1];
 };
 
+export const getBasename = (path) => getFilename(path).split(".")[0];
+
+export const getExtension = (path) =>
+  getFilename(path).split(".").slice(1).join(".");
+
 export const getDirectory = (path) => {
   const segments = path.split("/");
   segments.pop();

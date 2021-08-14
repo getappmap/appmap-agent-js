@@ -43,11 +43,14 @@ export default (dependencies) => {
         recorder,
         agent: { directory: agent_directory },
       } = configuration2;
-      let hook = `${agent_directory}/lib/${recorder}.mjs`;
+      const hook = `${agent_directory}/lib/${recorder}.mjs`;
       if (fork === null) {
         if (recorder === "mocha") {
+          let part1;
+          let part2;
           if (exec === "mocha") {
-            argv = ["--require", hook, ...argv];
+            part1 = [];
+            part2 = argv;
           } else {
             expect(
               exec === "npx",
@@ -59,19 +62,34 @@ export default (dependencies) => {
               "mocha recorder expected 'mocha' to be the first argument passed to npx, got: %j",
               argv,
             );
-            argv = ["mocha", "--require", hook, ...argv.slice(1)];
+            part1 = ["mocha"];
+            part2 = argv.slice(1);
           }
-          hook = `${agent_directory}/lib/loader.mjs`;
+          // Why use --loader instead of NODE_OPTIONS='--experimental-loader'?
+          // Checkout: https://github.com/mochajs/mocha/issues/4720
+          argv = [
+            ...part1,
+            "--require",
+            hook,
+            // "--experimental-loader",
+            // `${agent_directory}/lib/loader.mjs`,
+            ...part2,
+          ];
+        } else {
+          env3 = {
+            ...env3,
+            NODE_OPTIONS: `${coalesce(
+              env3,
+              "NODE_OPTIONS",
+              "",
+            )} --experimental-loader=${hook}`,
+          };
         }
-        env3 = {
-          ...env3,
-          NODE_OPTIONS: `${coalesce(
-            env3,
-            "NODE_OPTIONS",
-            "",
-          )} --experimental-loader=${hook}`,
-        };
       } else {
+        expect(
+          recorder === "process",
+          "only the process recorder is supported for the fork format",
+        );
         const { exec: fork_exec, argv: fork_argv } = fork;
         argv = [...fork_argv, "--experimental-loader", hook, exec, ...argv];
         exec = fork_exec;

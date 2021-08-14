@@ -4,6 +4,8 @@ import {
   toAbsolutePath,
   getFilename,
   getDirectory,
+  getBasename,
+  getExtension,
 } from "./path.mjs";
 
 const { equal: assertEqual } = Assert;
@@ -24,6 +26,16 @@ assertEqual(toAbsolutePath("/foo", "bar"), "/foo/bar");
 // getFilename //
 assertEqual(getFilename("/foo/bar"), "bar");
 assertEqual(getFilename("/"), "");
+
+// getBasename //
+assertEqual(getBasename("/foo/bar.qux"), "bar");
+assertEqual(getBasename("/foo/bar"), "bar");
+assertEqual(getBasename("/foo/.bar"), "");
+
+// getExtension //
+assertEqual(getExtension("/foo/bar.qux"), "qux");
+assertEqual(getExtension("/foo/bar"), "");
+assertEqual(getExtension("/foo/.bar"), "bar");
 
 // getDirectory //
 assertEqual(getDirectory("/foo/bar"), "/foo");

@@ -15,11 +15,11 @@
 - child
 - configuration
 - storage
+- naming
 - trace
 - backend
 - server
-- * - naming
-    - instrumentation
+- * instrumentation
   * interpretation
   * serialization
 - frontend

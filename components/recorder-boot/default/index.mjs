@@ -37,7 +37,11 @@ export default (dependencies) => {
           return boolean;
         }
       }
-      logInfo("bypassing %j because it did not match any specifier in %j", main, enabled);
+      logInfo(
+        "bypassing %j because it did not match any specifier in %j",
+        main,
+        enabled,
+      );
       return false;
     },
   };

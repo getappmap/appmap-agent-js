@@ -127,7 +127,7 @@ export default (dependencies) => {
     if (typeof specifier === "string") {
       specifier = { glob: specifier };
     } else if (typeof specifier === "boolean") {
-      specifier = { regexp: "^" };
+      specifier = { regexp: "^", enabled: specifier };
     }
     const { enabled, ...rest } = {
       enabled: true,
