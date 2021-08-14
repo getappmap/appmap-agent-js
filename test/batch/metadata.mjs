@@ -5,7 +5,7 @@ import { runAsync } from "./__fixture__.mjs";
 const { equal: assertEqual, deepEqual: assertDeepEqual } = Assert;
 
 await runAsync(
-  {name:"app", version:"1.2.3"},
+  { name: "app", version: "1.2.3" },
   {
     enabled: true,
     name: "name",

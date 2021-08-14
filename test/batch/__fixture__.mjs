@@ -16,12 +16,7 @@ const { fromEntries } = Object;
 const { stringify: stringifyYAML } = YAML;
 const { stringify: stringifyJSON, parse: parseJSON } = JSON;
 
-export const runAsync = async (
-  _package,
-  config,
-  beforeAsync,
-  afterAsync,
-) => {
+export const runAsync = async (_package, config, beforeAsync, afterAsync) => {
   const directory = `${await realpath(tmpdir())}/${Math.random()
     .toString(36)
     .substring(2)}`;
@@ -35,16 +30,19 @@ export const runAsync = async (
     stringifyJSON({
       name: "package",
       version: "1.2.3",
-      ... _package,
+      ..._package,
     }),
   );
-  await writeFile(`${directory}/appmap.yml`, stringifyYAML({
-    validate: {
-      message: true,
-      appmap: true,
-    },
-    ... config
-  }));
+  await writeFile(
+    `${directory}/appmap.yml`,
+    stringifyYAML({
+      validate: {
+        message: true,
+        appmap: true,
+      },
+      ...config,
+    }),
+  );
   await mkdir(`${directory}/tmp`);
   await mkdir(`${directory}/tmp/appmap`);
   await beforeAsync(directory);

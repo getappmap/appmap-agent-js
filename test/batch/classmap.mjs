@@ -33,11 +33,7 @@ await runAsync(
       `,
       "utf8",
     );
-    await writeFile(
-      `${repository}/common.js`,
-      `function common () {}`,
-      "utf8",
-    );
+    await writeFile(`${repository}/common.js`, `function common () {}`, "utf8");
     await writeFile(
       `${repository}/native.mjs`,
       `function native () {}`,

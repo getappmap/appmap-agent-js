@@ -20,11 +20,7 @@ await runAsync(
     },
   },
   async (repository) => {
-    await writeFile(
-      `${repository}/main.mjs`,
-      "class c {}",
-      "utf8",
-    );
+    await writeFile(`${repository}/main.mjs`, "class c {}", "utf8");
   },
   async (appmaps) => {
     const { "main.appmap.json": appmap } = appmaps;

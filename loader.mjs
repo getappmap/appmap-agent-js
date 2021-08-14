@@ -5,4 +5,4 @@ export const transformSource = (content, context, transformSource) => {
   return transformSource(content, context, transformSource);
 };
 
-exports
+exports;
