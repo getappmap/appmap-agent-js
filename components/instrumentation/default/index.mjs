@@ -54,6 +54,7 @@ export default (dependencies) => {
                 expectSuccess(
                   () =>
                     parse(code, {
+                      allowHashBang: true,
                       sourceType: type,
                       ecmaVersion: version,
                     }),

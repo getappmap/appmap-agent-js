@@ -213,8 +213,9 @@ export default (dependencies) => {
         visit(
           parse(code, {
             sourceType: type,
-            locations: true,
             ecmaVersion: version,
+            allowHashBang: true,
+            locations: true,
           }),
           _String(index),
           null,
