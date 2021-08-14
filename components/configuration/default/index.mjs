@@ -125,7 +125,9 @@ export default (dependencies) => {
 
   const normalizeEnabledSpecifier = (specifier, cwd) => {
     if (typeof specifier === "string") {
-      specifier = { path: specifier };
+      specifier = { glob: specifier };
+    } else if (typeof specifier === "boolean") {
+      specifier = { regexp: "^" };
     }
     const { enabled, ...rest } = {
       enabled: true,
@@ -135,8 +137,8 @@ export default (dependencies) => {
   };
 
   const normalizeEnabled = (specifiers, cwd) => {
-    if (typeof specifiers === "boolean") {
-      return [[createSpecifier(cwd, { regexp: "^" }), specifiers]];
+    if (!isArray(specifiers)) {
+      specifiers = [specifiers];
     }
     return specifiers.map((specifier) =>
       normalizeEnabledSpecifier(specifier, cwd),

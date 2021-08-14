@@ -127,7 +127,7 @@ const testAsync = async () => {
   assertDeepEqual(extend("enabled", ["/foo"]), [
     [
       {
-        source: "^\\/foo($|/[^/]*$)",
+        source: "^(?:\\/foo)$",
         flags: "",
         basedir: cwd(),
       },
