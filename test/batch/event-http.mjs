@@ -1,8 +1,7 @@
-import { writeFile, symlink } from "fs/promises";
+import { writeFile } from "fs/promises";
 import { strict as Assert } from "assert";
 import { runAsync } from "./__fixture__.mjs";
 
-const { cwd } = process;
 const { deepEqual: assertDeepEqual } = Assert;
 
 await runAsync(

@@ -25,7 +25,7 @@ await runAsync(
     output: { filename: "filename" },
     scenario: "scenario",
     scenarios: {
-      scenario: ["node", "./main.mjs"],
+      scenario: ["npx", "mocha", "./main.test.js"],
     },
   },
   async (repository) => {
@@ -34,7 +34,7 @@ await runAsync(
       `${repository}/node_modules/.bin/mocha`,
     );
     await writeFile(
-      `${repository}/index.js`,
+      `${repository}/main.js`,
       `
         exports.main = () => "main";
         exports.mainAsync = async () => "main";
@@ -42,10 +42,10 @@ await runAsync(
       "utf8",
     );
     await writeFile(
-      `${repository}/index.test.js`,
+      `${repository}/main.test.js`,
       `
         const {strict : Assert} = require("assert");
-        const {main, mainAsync} = require("./index.js");
+        const {main, mainAsync} = require("./main.js");
         const {equal:assertEqual} = Assert;
         describe("suite", function() {
           it("main", function() {
