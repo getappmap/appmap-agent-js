@@ -61,7 +61,9 @@ export default (dependencies) => {
               "mocha recorder expected 'mocha' to be the first argument passed to npx, got: %j",
               argv,
             );
-            part1 = ["mocha"];
+            // Sometimes, npx will choose to fake-spawn a command.
+            // This prevents the abomination to work on the command.
+            part1 = ["--always-spawn", "mocha"];
             part2 = argv.slice(1);
           }
           argv = [

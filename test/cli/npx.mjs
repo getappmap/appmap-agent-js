@@ -14,7 +14,7 @@ await runAsync(
     hooks: { esm: false, cjs: true, apply: false, http: false },
     scenario: "scenario",
     scenarios: {
-      scenario: ["npx", "bin"],
+      scenario: ["npx", "--always-spawn", "bin"],
     },
   },
   async (repository) => {

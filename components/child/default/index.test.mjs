@@ -98,7 +98,7 @@ const testAsync = async () => {
         {
           exec: npx ? "npx" : "mocha",
           argv: [
-            ...(npx ? ["mocha"] : []),
+            ...(npx ? ["--always-spawn", "mocha"] : []),
             "--require",
             "/agent-directory/lib/mocha.mjs",
             "argv0",

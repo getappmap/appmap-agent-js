@@ -183,12 +183,22 @@ The agent also provides an API to manually record the node process in which it i
 import {createAppmap} from "@appland/appmap-agent-js";
 // Prepare the process for recording
 // NB: Only a single concurrent appmap is allowed per process
-const appmap = createAppmap(configuration);
+const appmap = createAppmap(
+  repository_directory,    // default: process.cwd()
+  configuration,           // default: {}
+  configuration_directory, // default: null
+);
 // Start recording events
 // NB: An appmap can create multiple (concurrent) recordings
 const recording = appmap.start({
-  name, // name if the appmap
-  filename, // filename to write the appmap
+  name,
+  output: {
+    filname,
+  },
+  recording: {
+    "defined-class": defined_class, 
+    "method-id": method_id,
+  },
 });
 // Stop recording events
 recording.pause();
