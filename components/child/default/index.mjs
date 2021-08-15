@@ -43,7 +43,6 @@ export default (dependencies) => {
         recorder,
         agent: { directory: agent_directory },
       } = configuration2;
-      let hook = `${agent_directory}/lib/${recorder}.mjs`;
       if (fork === null) {
         if (recorder === "mocha") {
           let part1;
@@ -65,31 +64,37 @@ export default (dependencies) => {
             part1 = ["mocha"];
             part2 = argv.slice(1);
           }
-          // Why use --loader instead of NODE_OPTIONS='--experimental-loader'?
-          // Checkout: https://github.com/mochajs/mocha/issues/4720
           argv = [
             ...part1,
             "--require",
-            hook,
+            `${agent_directory}/lib/mocha.mjs`,
             ...part2,
           ];
-          hook = `${agent_directory}/lib/loader.mjs`;
         }
         env3 = {
           ...env3,
-          NODE_OPTIONS: `${coalesce(
-            env3,
-            "NODE_OPTIONS",
-            "",
-          )} --require=${agent_directory}/lib/abomination.js --experimental-loader=${hook}`,
+          NODE_OPTIONS: [
+            coalesce(env3, "NODE_OPTIONS", ""),
+            // abomination: https://github.com/mochajs/mocha/issues/4720
+            `--require=${agent_directory}/lib/abomination.js`,
+            `--experimental-loader=${agent_directory}/lib/${
+              recorder === "mocha" ? "loader" : recorder
+            }.mjs`,
+          ].join(" "),
         };
       } else {
         expect(
           recorder === "process",
-          "only the process recorder is supported for the fork format",
+          "only process recorder is supported by scenario fork format",
         );
         const { exec: fork_exec, argv: fork_argv } = fork;
-        argv = [...fork_argv, "--experimental-loader", hook, exec, ...argv];
+        argv = [
+          ...fork_argv,
+          "--experimental-loader",
+          `${agent_directory}/lib/${recorder}.mjs`,
+          exec,
+          ...argv,
+        ];
         exec = fork_exec;
       }
       return { exec, argv, options: { env: env3, ...options } };

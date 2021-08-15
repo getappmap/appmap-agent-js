@@ -5,8 +5,8 @@ export default (dependencies) => {
   const {
     util: { assert },
   } = dependencies;
-  const cleanupTrack = ({ options, marks }) => ({
-    options,
+  const cleanupTrack = ({ configuration, marks }) => ({
+    configuration,
     marks,
   });
   return {
@@ -18,16 +18,9 @@ export default (dependencies) => {
           const { type, index } = data;
           if (type === "start") {
             assert(!tracks.has(index), "duplicate track index");
-            let { options } = data;
-            let filename;
-            ({ filename, ...options } = { filename: null, ...options });
-            if (filename !== null) {
-              options = {
-                output: { filename },
-              };
-            }
+            let { configuration } = data;
             tracks.set(index, {
-              options,
+              configuration,
               enabled: true,
               marks: [],
             });

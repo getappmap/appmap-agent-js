@@ -28,6 +28,8 @@ export default (dependencies) => {
   );
   return {
     createMochaHooks: (process, configuration) => {
+      const { recorder } = configuration;
+      assert(recorder === "mocha", "expected mocha recorder");
       const agent = createAgent(configuration);
       const promise = executeAgentAsync(agent);
       const errors = [];

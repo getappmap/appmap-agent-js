@@ -8,11 +8,11 @@ const configuration = loadConfiguration(process);
 const {
   mode,
   protocol,
-  "log-level": log_level,
+  log,
   validate: { appmap: validate_appmap, message: validate_message },
 } = configuration;
 const { mainAsync } = Batch({
-  log: log_level,
+  log,
   server: mode === "local" ? "stub" : protocol,
   "validate-appmap": validate_appmap ? "on" : "off",
   "validate-message": validate_message ? "on" : "off",

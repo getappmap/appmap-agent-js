@@ -9,7 +9,7 @@ export default (dependencies) => {
   const generateLog = (name) => {
     const fd = name === "WARNING" || name === "ERROR" ? 2 : 1;
     return (template, ...values) => {
-      writeSync(fd, `${name} ${format(template, values)}\n`);
+      writeSync(fd, `APPMAP-${name} ${format(template, values)}\n`);
     };
   };
   return {

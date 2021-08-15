@@ -13,6 +13,7 @@ import validate$ajv from "./../components/validate/ajv/index.mjs";
 import specifier$default from "./../components/specifier/default/index.mjs";
 import repository$node from "./../components/repository/node/index.mjs";
 import child$default from "./../components/child/default/index.mjs";
+import engine$node from "./../components/engine/node/index.mjs";
 import configuration$default from "./../components/configuration/default/index.mjs";
 import validate_message$off from "./../components/validate-message/off/index.mjs";
 import validate_message$on from "./../components/validate-message/on/index.mjs";
@@ -27,72 +28,31 @@ import server$tcp from "./../components/server/tcp/index.mjs";
 import batch$default from "./../components/batch/default/index.mjs";
 
 export default (blueprint) => {
-  const dependencies = { __proto__: null };
+  const dependencies = {__proto__:null};
   dependencies["util"] = util$default(dependencies);
   dependencies["violation"] = violation$exit(dependencies);
   dependencies["expect-inner"] = expect_inner$default(dependencies);
   dependencies["expect"] = expect$default(dependencies);
   dependencies["spawn"] = spawn$node(dependencies);
   dependencies["log-inner"] = log_inner$write_sync(dependencies);
-  if (!("log" in blueprint)) {
-    throw new Error("missing instance for component log");
-  }
-  dependencies["log"] =
-    blueprint["log"] === "warning"
-      ? log$warning(dependencies)
-      : blueprint["log"] === "off"
-      ? log$off(dependencies)
-      : blueprint["log"] === "info"
-      ? log$info(dependencies)
-      : blueprint["log"] === "error"
-      ? log$error(dependencies)
-      : blueprint["log"] === "debug"
-      ? log$debug(dependencies)
-      : (() => {
-          throw new Error("invalid instance for component log");
-        })();
+  if (!("log" in blueprint)) { throw new Error("missing instance for component log"); }
+  dependencies["log"] = (blueprint["log"] === "warning" ? log$warning(dependencies) : (blueprint["log"] === "off" ? log$off(dependencies) : (blueprint["log"] === "info" ? log$info(dependencies) : (blueprint["log"] === "error" ? log$error(dependencies) : (blueprint["log"] === "debug" ? log$debug(dependencies) : ((() => { throw new Error("invalid instance for component log"); }) ()))))));
   dependencies["validate"] = validate$ajv(dependencies);
   dependencies["specifier"] = specifier$default(dependencies);
   dependencies["repository"] = repository$node(dependencies);
   dependencies["child"] = child$default(dependencies);
+  dependencies["engine"] = engine$node(dependencies);
   dependencies["configuration"] = configuration$default(dependencies);
-  if (!("validate-message" in blueprint)) {
-    throw new Error("missing instance for component validate-message");
-  }
-  dependencies["validate-message"] =
-    blueprint["validate-message"] === "on"
-      ? validate_message$on(dependencies)
-      : blueprint["validate-message"] === "off"
-      ? validate_message$off(dependencies)
-      : (() => {
-          throw new Error("invalid instance for component validate-message");
-        })();
+  if (!("validate-message" in blueprint)) { throw new Error("missing instance for component validate-message"); }
+  dependencies["validate-message"] = (blueprint["validate-message"] === "on" ? validate_message$on(dependencies) : (blueprint["validate-message"] === "off" ? validate_message$off(dependencies) : ((() => { throw new Error("invalid instance for component validate-message"); }) ())));
   dependencies["storage"] = storage$file(dependencies);
-  if (!("validate-appmap" in blueprint)) {
-    throw new Error("missing instance for component validate-appmap");
-  }
-  dependencies["validate-appmap"] =
-    blueprint["validate-appmap"] === "on"
-      ? validate_appmap$on(dependencies)
-      : blueprint["validate-appmap"] === "off"
-      ? validate_appmap$off(dependencies)
-      : (() => {
-          throw new Error("invalid instance for component validate-appmap");
-        })();
+  if (!("validate-appmap" in blueprint)) { throw new Error("missing instance for component validate-appmap"); }
+  dependencies["validate-appmap"] = (blueprint["validate-appmap"] === "on" ? validate_appmap$on(dependencies) : (blueprint["validate-appmap"] === "off" ? validate_appmap$off(dependencies) : ((() => { throw new Error("invalid instance for component validate-appmap"); }) ())));
   dependencies["naming"] = naming$default(dependencies);
   dependencies["trace"] = trace$appmap(dependencies);
   dependencies["backend"] = backend$default(dependencies);
-  if (!("server" in blueprint)) {
-    throw new Error("missing instance for component server");
-  }
-  dependencies["server"] =
-    blueprint["server"] === "tcp"
-      ? server$tcp(dependencies)
-      : blueprint["server"] === "stub"
-      ? server$stub(dependencies)
-      : (() => {
-          throw new Error("invalid instance for component server");
-        })();
+  if (!("server" in blueprint)) { throw new Error("missing instance for component server"); }
+  dependencies["server"] = (blueprint["server"] === "tcp" ? server$tcp(dependencies) : (blueprint["server"] === "stub" ? server$stub(dependencies) : ((() => { throw new Error("invalid instance for component server"); }) ())));
   dependencies["batch"] = batch$default(dependencies);
   return dependencies["batch"];
 };

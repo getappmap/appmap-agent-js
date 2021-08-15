@@ -52,7 +52,7 @@ const testAsync = async () => {
           data: {
             type: "start",
             index: indexes.track,
-            options: {
+            configuration: {
               recording: {
                 "method-id": "method-id",
                 "defined-class": "defined-class",
@@ -147,7 +147,7 @@ const testAsync = async () => {
             language: {
               name: "ecmascript",
               version: "2020",
-              engine: null,
+              engine: "engine@0.0.0",
             },
             frameworks: [],
             client: {

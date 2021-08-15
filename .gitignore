@@ -1,6 +1,5 @@
 .DS_Store
 /.turtle.json
 /node_modules/
-/yo.js
-/yo.mjs
 /coverage
+/yo*

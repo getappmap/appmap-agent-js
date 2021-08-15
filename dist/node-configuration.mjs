@@ -14,7 +14,6 @@ import repository$node from "./../components/repository/node/index.mjs";
 import child$default from "./../components/child/default/index.mjs";
 import engine$node from "./../components/engine/node/index.mjs";
 import configuration$default from "./../components/configuration/default/index.mjs";
-import batch_boot$default from "./../components/batch-boot/default/index.mjs";
 
 export default (blueprint) => {
   const dependencies = {__proto__:null};
@@ -31,6 +30,5 @@ export default (blueprint) => {
   dependencies["child"] = child$default(dependencies);
   dependencies["engine"] = engine$node(dependencies);
   dependencies["configuration"] = configuration$default(dependencies);
-  dependencies["batch-boot"] = batch_boot$default(dependencies);
-  return dependencies["batch-boot"];
+  return dependencies["configuration"];
 };

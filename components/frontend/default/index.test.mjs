@@ -39,12 +39,12 @@ const testAsync = async () => {
     data: configuration,
   });
   {
-    const track = createTrack(frontend, "options");
+    const track = createTrack(frontend, "configuration");
     assertDeepEqual(controlTrack(frontend, track, "start"), {
       type: "trace",
       data: {
         type: "track",
-        data: { type: "start", index: 1, options: "options" },
+        data: { type: "start", index: 1, configuration: "configuration" },
       },
     });
   }

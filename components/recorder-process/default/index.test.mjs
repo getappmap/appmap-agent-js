@@ -28,7 +28,10 @@ const configuration = createConfiguration("/repository");
     emitter,
     extendConfiguration(
       configuration,
-      { hooks: { cjs: false, esm: false, http: false } },
+      {
+        recorder: "process",
+        hooks: { cjs: false, esm: false, apply: false, http: false },
+      },
       "/directory",
     ),
   );

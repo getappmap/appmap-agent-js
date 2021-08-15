@@ -29,7 +29,7 @@ const testAsync = async () => {
     name: null,
     app: null,
     labels: [],
-    language: { name: "ecmascript", version: "2020", engine: null },
+    language: { name: "ecmascript", version: "2020", engine: "engine@0.0.0" },
     frameworks: [],
     client: {
       name: "@appland/appmap-agent-js",

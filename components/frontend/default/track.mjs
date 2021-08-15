@@ -11,19 +11,19 @@ export default (dependencies) => {
   } = dependencies;
   const { traceTrack } = Trace(dependencies);
   return {
-    createTrack: (index, options) => ({
+    createTrack: (index, configuration) => ({
       index,
       state: createBox(BEGIN_STATE),
-      options,
+      configuration,
     }),
-    controlTrack: (session, { index, state, options }, type) => {
+    controlTrack: (session, { index, state, configuration }, type) => {
       if (type === "start") {
         assert(
           getBox(state) === BEGIN_STATE,
           "track has already been initialized",
         );
         setBox(state, ENABLED_STATE);
-        return traceTrack(session, { type, index, options });
+        return traceTrack(session, { type, index, configuration });
       }
       if (type === "stop") {
         assert(getBox(state) !== BEGIN_STATE, "track has not yet been started");

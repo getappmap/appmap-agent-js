@@ -1,5 +1,6 @@
 export default (dependencies) => {
   const {
+    util: { assert },
     agent: {
       createAgent,
       executeAgentAsync,
@@ -10,6 +11,8 @@ export default (dependencies) => {
   } = dependencies;
   return {
     mainAsync: (process, configuration) => {
+      const { recorder } = configuration;
+      assert(recorder === "process", "expected process recorder");
       const agent = createAgent(configuration);
       const promise = executeAgentAsync(agent);
       const track = createTrack(agent, {});

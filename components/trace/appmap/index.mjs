@@ -37,11 +37,11 @@ export default (dependencies) => {
           addClassmapFile(classmap, data);
         }
       }
-      return splitByTrack(marks).map(({ options, marks }) => {
+      return splitByTrack(marks).map(({ configuration, marks }) => {
         const configuration2 = extendConfiguration(
           configuration1,
-          options,
-          "/",
+          configuration,
+          null,
         );
         const events = orderByGroup(marks);
         const routes = new _Set();

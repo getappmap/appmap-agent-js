@@ -25,7 +25,7 @@ const testAsync = async () => {
       data: {
         type: "start",
         index: "index",
-        options: { foo: "bar" },
+        configuration: { foo: "bar" },
       },
     },
   });

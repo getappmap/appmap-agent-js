@@ -11,6 +11,7 @@
   * time
   * spawn
 - specifier
+- engine
 - repository
 - child
 - configuration
@@ -33,6 +34,7 @@
   * client
 - agent
 - recorder-boot
+- recorder-manual
 - recorder-process
 - recorder-mocha
 - batch-boot

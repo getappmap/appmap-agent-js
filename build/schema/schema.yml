@@ -29,6 +29,7 @@
   enum:
     - process
     - mocha
+    - manual
 
 - $id: mode
   enum:
@@ -346,7 +347,7 @@
         message: {type: boolean}
         appmap: {type: boolean}
     protocol: {$ref: protocol}
-    log-level: {$ref: log-level}
+    log: {$ref: log-level}
     host: {const: localhost}
     port:
       anyOf:
@@ -472,7 +473,7 @@
           type: array
           items: {$ref: cooked-child}
     protocol: {$ref: protocol}
-    log-level: {$ref: log-level}
+    log: {$ref: log-level}
     host: {const: localhost}
     port:
       anyOf:
@@ -664,17 +665,21 @@
                   anyOf:
                     - type: object
                       additionalProperties: false
-                      required: [type, index, options]
+                      required: [type, index, configuration]
                       properties:
                         type: {const: start}
                         index: {$ref: index}
-                        options:
+                        configuration:
                           type: object
-                          nullable: true
                           additionalProperties: false
                           properties:
                             name: {type: string}
-                            filename: {$ref: filename}
+                            recording: {$ref: recording}
+                            output:
+                              type: object
+                              additionalProperties: false
+                              properties:
+                                filename: {$ref: filename}
                     - type: object
                       additionalProperties: false
                       required: [type, index]

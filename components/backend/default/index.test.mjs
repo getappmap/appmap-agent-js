@@ -40,7 +40,11 @@ const testAsync = async () => {
       type: "trace",
       data: {
         type: "track",
-        data: { type: "start", index: 123, options: { filename } },
+        data: {
+          type: "start",
+          index: 123,
+          configuration: { output: { filename } },
+        },
       },
     });
     sendBackend(backend, {

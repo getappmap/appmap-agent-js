@@ -59,7 +59,7 @@ const testAsync = async () => {
             key1: "value1",
             key2: "value2",
             NODE_OPTIONS:
-              "node-options-1 --experimental-loader=/agent-directory/lib/process.mjs",
+              "node-options-1 --require=/agent-directory/lib/abomination.js --experimental-loader=/agent-directory/lib/process.mjs",
             APPMAP_CONFIGURATION: JSON.stringify({
               directory: "/configuration-directory",
               agent: { directory: "/agent-directory" },
