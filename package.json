@@ -1,6 +1,6 @@
 {
   "name": "@appland/appmap-agent-js",
-  "version": "4.2.0",
+  "version": "4.3.0",
   "files": [
     "/components/**/*.mjs",
     "/lib/*.mjs",
@@ -39,7 +39,7 @@
     "format": "npx prettier -w '**/*.mjs'",
     "build": "node build/index.mjs",
     "unit": "for test in $(find build components -name '*.test.mjs'); do echo \"$test ...\" && (node \"$test\" || echo \"> Failure $?\"); done",
-    "integration": "node test/cli/index.mjs",
+    "integration": "node test/cli/index.mjs && node test/api/index.mjs && echo 'DONE'",
     "commit": "npm run lint && npm run format && npx cz",
     "deploy": "npm i -D @semantic-release/changelog @semantic-release/git && npx semantic-release"
   },

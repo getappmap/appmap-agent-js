@@ -7,7 +7,7 @@ import { createAppmap } from "../../lib/manual.mjs";
 Error.stackTraceLimit = Infinity;
 
 const { cwd } = process;
-const { equal: assertEqual } = Assert;
+const { equal: assertEqual, deepEqual: assertDeepEqual } = Assert;
 const { stringify: stringifyJSON, parse: parseJSON } = JSON;
 
 const directory = `${await realpath(tmpdir())}/${Math.random()
@@ -32,9 +32,10 @@ const appmap = createAppmap(
   directory,
   {
     output: {
-      directory,
+      directory: ".",
       filename: "filename",
     },
+    packages: "*",
     hooks: {
       esm: false,
       cjs: true,
@@ -46,13 +47,17 @@ const appmap = createAppmap(
       appmap: true,
     },
   },
-  null,
+  directory,
 );
 
 const recorder = appmap.start();
 
 const require = createRequire(`${directory}/dummy.mjs`);
-await writeFile(`${directory}/main.js`, `exports.main = () => "MAIN";`, "utf8");
+await writeFile(
+  `${directory}/main.js`,
+  `exports.main = function main () { return "MAIN"; }`,
+  "utf8",
+);
 
 const { main } = require("./main.js");
 assertEqual(main(), "MAIN");
@@ -60,6 +65,11 @@ assertEqual(main(), "MAIN");
 recorder.stop();
 appmap.terminate();
 
-console.log(
-  parseJSON(await readFile(`${directory}/filename.appmap.json`, "utf8")),
+const { events } = parseJSON(
+  await readFile(`${directory}/filename.appmap.json`, "utf8"),
+);
+
+assertDeepEqual(
+  events.map(({ event }) => event),
+  ["call", "return"],
 );
