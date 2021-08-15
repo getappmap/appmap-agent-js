@@ -39,7 +39,7 @@ export default (dependencies) => {
   }
   class Recorder {
     constructor(agent, options) {
-      const track = createTrack(agent, {...options});
+      const track = createTrack(agent, { ...options });
       controlTrack(agent, track, "start");
       this.agent = agent;
       this.track = track;

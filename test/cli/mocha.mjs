@@ -3,12 +3,10 @@ import { strict as Assert } from "assert";
 import { runAsync } from "./__fixture__.mjs";
 
 const { cwd } = process;
-const {entries:toEntries} = Object;
-const {from:toArray} = Array;
+const { entries: toEntries } = Object;
+const { from: toArray } = Array;
 
-const {
-  deepEqual: assertDeepEqual
-} = Assert;
+const { deepEqual: assertDeepEqual } = Assert;
 
 await runAsync(
   null,
@@ -67,7 +65,14 @@ await runAsync(
   },
   async (appmaps) => {
     assertDeepEqual(
-      toArray(toEntries(appmaps)).map(([key, {metadata:{name}}]) => name),
+      toArray(toEntries(appmaps)).map(
+        ([
+          key,
+          {
+            metadata: { name },
+          },
+        ]) => name,
+      ),
       ["suite", "suite", "suite"],
     );
   },

@@ -11,7 +11,7 @@ await runAsync(
     enabled: { path: "node_modules/.bin/bin" },
     packages: "bin.cjs",
     recorder: "process",
-    hooks: { esm: false, cjs: true, apply:false, http:false },
+    hooks: { esm: false, cjs: true, apply: false, http: false },
     scenario: "scenario",
     scenarios: {
       scenario: ["npx", "bin"],
