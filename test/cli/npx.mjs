@@ -8,27 +8,27 @@ await runAsync(
   null,
   {
     mode: "remote",
-    enabled: { path: "node_modules/.bin/main" },
-    packages: "main.js",
+    enabled: { path: "node_modules/.bin/bin" },
+    packages: "bin.cjs",
     recorder: "process",
-    hooks: { cjs: true },
+    hooks: { esm: false, cjs: true, apply:false, http:false },
     scenario: "scenario",
     scenarios: {
-      scenario: ["npx", "main"],
+      scenario: ["npx", "bin"],
     },
   },
   async (repository) => {
-    await writeFile(`${repository}/main.js`, "#!/usr/bin/env node\n123;", {
+    await writeFile(`${repository}/bin`, "#!/usr/bin/env node\n123;", {
       encoding: "utf8",
       mode: 0o777,
     });
-    await symlink("../../main.js", `${repository}/node_modules/.bin/main`);
+    await symlink("../../bin", `${repository}/node_modules/.bin/bin`);
   },
   async (appmaps) => {
-    const { "main.appmap.json": appmap } = appmaps;
+    const { "bin.appmap.json": appmap } = appmaps;
     const { classMap: classmap } = appmap;
     assertDeepEqual(classmap, [
-      { type: "package", name: "main.js", children: [] },
+      { type: "package", name: "bin.cjs", children: [] },
     ]);
   },
 );

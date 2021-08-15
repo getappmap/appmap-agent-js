@@ -3,16 +3,18 @@ import { strict as Assert } from "assert";
 import { runAsync } from "./__fixture__.mjs";
 
 const { cwd } = process;
+const {entries:toEntries} = Object;
+const {from:toArray} = Array;
 
 const {
-  // deepEqual: assertDeepEqual
+  deepEqual: assertDeepEqual
 } = Assert;
 
 await runAsync(
   null,
   {
     enabled: true,
-    "log-level": "debug",
+    log: "debug",
     name: "name",
     mode: "remote",
     recorder: "mocha",
@@ -64,6 +66,9 @@ await runAsync(
     );
   },
   async (appmaps) => {
-    console.log(appmaps);
+    assertDeepEqual(
+      toArray(toEntries(appmaps)).map(([key, {metadata:{name}}]) => name),
+      ["suite", "suite", "suite"],
+    );
   },
 );

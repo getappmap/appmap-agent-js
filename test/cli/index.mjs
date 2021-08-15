@@ -11,3 +11,4 @@ for (const name of [
   process.stdout.write(`${"\n"}${name}${"\n"}`);
   await import(`./${name}.mjs`);
 }
+process.stdout("\nCLI TEST DONE\n");
