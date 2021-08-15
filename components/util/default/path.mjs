@@ -37,13 +37,17 @@ export const toRelativePath = (path1, path2) => {
   return parts.join("/");
 };
 
-export const toAbsolutePath = (path1, path2) => {
-  assertAbsolutePath(path1);
-  if (path2[0] === "/") {
-    return `/${getNormalizedParts(path2).join("/")}`;
+export const toAbsolutePath = (nullable_directory, path) => {
+  if (path[0] === "/") {
+    return `/${getNormalizedParts(path).join("/")}`;
   }
-  const parts1 = getNormalizedParts(path1);
-  const parts2 = getNormalizedParts(path2);
+  assert(
+    nullable_directory !== null,
+    "the base directory was required to create absolute path because the target path was relative",
+  );
+  assertAbsolutePath(nullable_directory);
+  const parts1 = getNormalizedParts(nullable_directory);
+  const parts2 = getNormalizedParts(path);
   return ["", ...parts1, ...parts2].join("/");
 };
 

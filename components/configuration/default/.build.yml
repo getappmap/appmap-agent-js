@@ -4,4 +4,5 @@ dependencies:
   - validate
   - specifier
   - child
+  - engine
   - repository

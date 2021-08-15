@@ -4,8 +4,9 @@ const { ownKeys } = Reflect;
 
 export default (dependencies) => {
   const {
-    util: { identity, toAbsolutePath, hasOwnProperty },
+    util: { assert, identity, toAbsolutePath, hasOwnProperty },
     validate: { validateConfiguration },
+    engine: { getEngine },
     repository: {
       extractRepositoryHistory,
       extractRepositoryPackage,
@@ -36,9 +37,9 @@ export default (dependencies) => {
   // Normalize //
   ///////////////
 
-  const normalizePort = (port, cwd) => {
+  const normalizePort = (port, nullable_directory) => {
     if (typeof port === "string") {
-      port = toAbsolutePath(cwd, port);
+      port = toAbsolutePath(nullable_directory, port);
     }
     return port;
   };
@@ -76,21 +77,25 @@ export default (dependencies) => {
     return serialization;
   };
 
-  const normalizeOutput = (output, cwd) => {
+  const normalizeOutput = (output, nullable_directory) => {
     if (typeof output === "string") {
       output = { directory: output };
     }
     if (hasOwnProperty(output, "directory")) {
       const { directory } = output;
-      return {
+      output = {
         ...output,
-        directory: toAbsolutePath(cwd, directory),
+        directory: toAbsolutePath(nullable_directory, directory),
       };
     }
     return output;
   };
 
-  const normalizePackageSpecifier = (specifier, cwd) => {
+  const normalizePackageSpecifier = (specifier, nullable_directory) => {
+    assert(
+      nullable_directory !== null,
+      "extending packages configuration requires directory",
+    );
     if (typeof specifier === "string") {
       specifier = { glob: specifier };
     }
@@ -101,29 +106,45 @@ export default (dependencies) => {
       exclude: [],
       ...specifier,
     };
-    return [createSpecifier(cwd, rest), { enabled, source, shallow, exclude }];
+    return [
+      createSpecifier(nullable_directory, rest),
+      { enabled, source, shallow, exclude },
+    ];
   };
 
-  const normalizePackages = (specifiers, cwd) => {
+  const normalizePackages = (specifiers, nullable_directory) => {
     if (!isArray(specifiers)) {
       specifiers = [specifiers];
     }
     return specifiers.map((specifier) =>
-      normalizePackageSpecifier(specifier, cwd),
+      normalizePackageSpecifier(specifier, nullable_directory),
     );
   };
 
-  const normalizeScenarios = (scenarios, cwd) =>
+  const normalizeScenarios = (scenarios, nullable_directory) =>
     fromEntries(
       toArray(toEntries(scenarios)).map(([name, children]) => {
+        assert(
+          nullable_directory !== null,
+          "normalizing scenarios elements requires a directory",
+        );
         if (!isArray(children) || children.every(isString)) {
           children = [children];
         }
-        return [name, children.flatMap((child) => createChildren(child, cwd))];
+        return [
+          name,
+          children.flatMap((child) =>
+            createChildren(child, nullable_directory),
+          ),
+        ];
       }),
     );
 
-  const normalizeEnabledSpecifier = (specifier, cwd) => {
+  const normalizeEnabledSpecifier = (specifier, nullable_directory) => {
+    assert(
+      nullable_directory !== null,
+      "normalizing enabled elements requires a directory",
+    );
     if (typeof specifier === "string") {
       specifier = { glob: specifier };
     } else if (typeof specifier === "boolean") {
@@ -133,15 +154,15 @@ export default (dependencies) => {
       enabled: true,
       ...specifier,
     };
-    return [createSpecifier(cwd, rest), enabled];
+    return [createSpecifier(nullable_directory, rest), enabled];
   };
 
-  const normalizeEnabled = (specifiers, cwd) => {
+  const normalizeEnabled = (specifiers, nullable_directory) => {
     if (!isArray(specifiers)) {
       specifiers = [specifiers];
     }
     return specifiers.map((specifier) =>
-      normalizeEnabledSpecifier(specifier, cwd),
+      normalizeEnabledSpecifier(specifier, nullable_directory),
     );
   };
 
@@ -166,7 +187,7 @@ export default (dependencies) => {
       extend: assign,
       normalize: normalizeScenarios,
     },
-    "log-level": {
+    log: {
       extend: overwrite,
       normalize: identity,
     },
@@ -283,29 +304,39 @@ export default (dependencies) => {
 
   return {
     createConfiguration: (directory) => ({
-      validate: {
-        appmap: false,
-        message: false,
-      },
+      // defined at initialization (cannot be overwritten)
+      agent: extractRepositoryDependency(directory, "@appland/appmap-agent-js"),
       repository: {
         directory,
         history: extractRepositoryHistory(directory),
         package: extractRepositoryPackage(directory),
       },
+      engine: getEngine(),
+      // overwritten by the agent
+      labels: [],
+      feature: null,
+      "feature-group": null,
+      frameworks: [],
+      main: null,
+      recording: null,
+      // provided by the user
+      mode: "local",
+      protocol: "tcp",
+      host: "localhost",
+      port: 0, // possibly overwritten by the agent
+      validate: {
+        appmap: false,
+        message: false,
+      },
       scenario: "anonymous",
       scenarios: {},
-      "log-level": "warning",
-      agent: extractRepositoryDependency(directory, "@appland/appmap-agent-js"),
+      log: "info",
       output: {
         directory: `${directory}/tmp/appmap`,
         filename: null,
         indent: 0,
         postfix: ".appmap",
       },
-      mode: "local",
-      protocol: "tcp",
-      host: "localhost",
-      port: 0,
       enabled: [],
       recorder: "process",
       source: false,
@@ -325,22 +356,15 @@ export default (dependencies) => {
         method: "toString",
       },
       "hidden-identifier": "APPMAP",
-      main: null,
       language: {
         name: "ecmascript",
         version: "2020",
       },
-      engine: null,
       packages: [],
       exclude: [],
-      recording: null,
       pruning: false,
       app: null,
       name: null,
-      labels: [],
-      feature: null,
-      "feature-group": null,
-      frameworks: [],
     }),
     extractEnvironmentConfiguration: (env) =>
       fromEntries(
@@ -348,14 +372,14 @@ export default (dependencies) => {
           .filter(filterEnvironmentPair)
           .map(mapEnvironmentPair),
       ),
-    extendConfiguration: (configuration, data, cwd) => {
+    extendConfiguration: (configuration, data, nullable_directory) => {
       configuration = { ...configuration };
       validateConfiguration(data);
       for (let key of ownKeys(data)) {
         const { normalize, extend } = fields[key];
         configuration[key] = extend(
           configuration[key],
-          normalize(data[key], cwd),
+          normalize(data[key], nullable_directory),
         );
       }
       return configuration;
