@@ -74,6 +74,7 @@ const testAsync = async () => {
         data: {
           index: 0,
           exclude: [],
+          shallow: false,
           type: "script",
           path: "/filename.js",
           code: "123;",

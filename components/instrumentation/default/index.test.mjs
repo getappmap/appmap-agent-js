@@ -32,7 +32,7 @@ const testAsync = async () => {
             path: "bar.js",
             enabled: false,
             exclude: [],
-            shallow: true,
+            shallow: false,
           },
         ],
       },
@@ -49,6 +49,7 @@ const testAsync = async () => {
       file: {
         index: 0,
         exclude: [],
+        shallow: true,
         type: "script",
         path: "/cwd/foo.js",
         code: "123;",

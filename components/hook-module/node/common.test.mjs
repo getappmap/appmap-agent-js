@@ -56,6 +56,7 @@ const testAsync = async () => {
         packages: [
           {
             regexp: "^",
+            shallow: true,
           },
         ],
       },
@@ -74,6 +75,7 @@ const testAsync = async () => {
             type: "script",
             path: resolved_path,
             code: "module.exports = 123;",
+            shallow: true,
           },
         },
       },

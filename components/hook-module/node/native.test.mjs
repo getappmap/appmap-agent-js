@@ -29,6 +29,7 @@ const testAsync = async () => {
         packages: [
           {
             regexp: "^",
+            shallow: true,
           },
         ],
       },
@@ -58,6 +59,7 @@ const testAsync = async () => {
             type: "module",
             path: fileURLToPath(import.meta.url),
             code: "123;",
+            shallow: true,
           },
         },
       },

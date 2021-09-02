@@ -48,7 +48,7 @@ export default (dependencies) => {
           const index = incrementCounter(indexing);
           const exclude = [...exclude1, ...exclude2];
           return {
-            file: { index, exclude, type, path, code },
+            file: { index, exclude, shallow, type, path, code },
             code: generate(
               visit(
                 expectSuccess(
@@ -67,7 +67,6 @@ export default (dependencies) => {
                   path,
                   naming,
                   runtime,
-                  shallow,
                   exclusion: createExclusion(exclude),
                 },
               ),
