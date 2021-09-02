@@ -1,4 +1,3 @@
-/* c8 ignore start */
 import { createRequire } from "module";
 
 const { apply } = Reflect;
@@ -58,4 +57,3 @@ export default (dependencies) => {
     },
   };
 };
-/* c8 ignore stop */
