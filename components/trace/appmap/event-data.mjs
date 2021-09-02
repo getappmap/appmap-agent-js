@@ -11,7 +11,7 @@ export default (dependencies) => {
   const {
     util: { assert, coalesceCaseInsensitive, zip },
   } = dependencies;
-  const { getClassmapInfo } = Classmap(dependencies);
+  const { getClassmapClosure } = Classmap(dependencies);
 
   const parseURL = (url, headers) =>
     new _URL(
@@ -43,9 +43,9 @@ export default (dependencies) => {
   const compileBeforeEventData = (data, classmap) => {
     const { type } = data;
     if (type === "apply") {
-      const { function: _function, this: _this, arguments: _arguments } = data;
+      const { function: route, this: _this, arguments: _arguments } = data;
       const { link, parameters } =
-        _function === null ? placeholder : getClassmapInfo(classmap, _function);
+        route === null ? placeholder : getClassmapClosure(classmap, route);
       return {
         ...link,
         receiver: compileParameterSerial(["this", _this]),

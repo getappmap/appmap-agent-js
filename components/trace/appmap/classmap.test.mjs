@@ -16,8 +16,12 @@ const testAsync = async () => {
   const dependencies = await buildTestDependenciesAsync(import.meta.url);
   const { createConfiguration, extendConfiguration } =
     await buildTestComponentAsync("configuration", "test");
-  const { createClassmap, addClassmapFile, compileClassmap, getClassmapInfo } =
-    Classmap(dependencies);
+  const {
+    createClassmap,
+    addClassmapFile,
+    compileClassmap,
+    getClassmapClosure,
+  } = Classmap(dependencies);
 
   const default_conf = {
     pruning: false,
@@ -45,6 +49,7 @@ const testAsync = async () => {
       {
         index: 0,
         exclude: [],
+        shallow: true,
         type: "script",
         path: "/cwd/foo/bar",
         code: "123;",
@@ -52,6 +57,7 @@ const testAsync = async () => {
       {
         index: 1,
         exclude: [],
+        shallow: true,
         type: "script",
         path: "/cwd/foo/bar/qux",
         code: "123;",
@@ -91,6 +97,7 @@ const testAsync = async () => {
         {
           index: 123,
           exclude: [],
+          shallow: true,
           type: "script",
           path: "/cwd/filename.js",
           code: `x = ${snippet};`,
@@ -139,6 +146,7 @@ const testAsync = async () => {
       {
         index: 0,
         exclude: ["f"],
+        shallow: true,
         type: "script",
         path: "/cwd/filename.js",
         code: "function f () {}",
@@ -163,6 +171,7 @@ const testAsync = async () => {
         {
           index: 123,
           exclude: [],
+          shallow: true,
           type: "script",
           path: "/cwd/filename.js",
           code: "o1 = {k1 () {}}; o2 = {k2 () {} }",
@@ -201,14 +210,15 @@ const testAsync = async () => {
     ],
   );
 
-  // getClassmapLink //
+  // getClassmapClosure //
 
   assertDeepEqual(
-    getClassmapInfo(
+    getClassmapClosure(
       setup("/cwd", default_conf, [
         {
           index: 123,
           exclude: [],
+          shallow: true,
           type: "script",
           path: "/cwd/filename.js",
           code: "function f (x, ... xs) {}",
@@ -217,6 +227,11 @@ const testAsync = async () => {
       "123/body/0",
     ),
     {
+      file: {
+        type: "script",
+        path: "filename.js",
+        shallow: true,
+      },
       link: {
         defined_class: "f",
         method_id: "$",

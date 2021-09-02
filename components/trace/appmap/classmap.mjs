@@ -84,7 +84,7 @@ export default (dependencies) => {
       hasOwnProperty(node, "type")
     ) {
       lineage = { head: node, tail: lineage };
-      const { hash, path, naming, exclusion, placeholder } = context;
+      const { closures, path, naming, exclusion, placeholder } = context;
       const qualified_name = getQualifiedName(naming, lineage);
       if (qualified_name !== null && isExcluded(exclusion, qualified_name)) {
         return [];
@@ -135,6 +135,7 @@ export default (dependencies) => {
         type === "FunctionExpression" ||
         type === "FunctionDeclaration"
       ) {
+        const { file } = context;
         assert(qualified_name !== null, "missing name for function/arrow node");
         const {
           loc: {
@@ -146,7 +147,8 @@ export default (dependencies) => {
           name,
           static: _static,
         } = parseQualifiedName(qualified_name);
-        hash.set(route, {
+        closures.set(route, {
+          file,
           link: {
             defined_class: name,
             method_id: placeholder,
@@ -195,7 +197,7 @@ export default (dependencies) => {
       pruning,
     }) => ({
       placeholder,
-      hash: new _Map(),
+      closures: new _Map(),
       naming: createCounter(0),
       version,
       directory,
@@ -203,8 +205,8 @@ export default (dependencies) => {
       root: [],
     }),
     addClassmapFile: (
-      { hash, naming, version, directory, root, placeholder },
-      { index, exclude, type, path, code },
+      { closures, naming, version, directory, root, placeholder },
+      { index, exclude, shallow, type, path, code },
     ) => {
       path = toRelativePath(directory, path);
       populate(
@@ -220,7 +222,12 @@ export default (dependencies) => {
           _String(index),
           null,
           {
-            hash,
+            closures,
+            file: {
+              type,
+              path,
+              shallow,
+            },
             exclusion: createExclusion(exclude),
             naming,
             path,
@@ -229,7 +236,7 @@ export default (dependencies) => {
         ),
       );
     },
-    getClassmapInfo: ({ hash }, route) => hash.get(route),
+    getClassmapClosure: ({ closures }, route) => closures.get(route),
     compileClassmap: ({ root, pruning }, keys) => {
       if (!pruning) {
         return root.map(cleanupPackage);

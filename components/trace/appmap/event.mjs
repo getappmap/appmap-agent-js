@@ -1,3 +1,4 @@
+import Classmap from "./classmap.mjs";
 import EventData from "./event-data.mjs";
 
 const _Map = Map;
@@ -7,6 +8,8 @@ export default (dependencies) => {
     util: { assert },
     log: { logWarning },
   } = dependencies;
+
+  const { getClassmapClosure } = Classmap(dependencies);
 
   const { compileBeforeEventData, compileAfterEventData } =
     EventData(dependencies);
@@ -94,6 +97,31 @@ export default (dependencies) => {
     ["after/test", { type: "test" }],
   ]);
 
+  const collapseShallow = (frames, shallow1, classmap) =>
+    frames.flatMap(({ before, between, after }) => {
+      let shallow2 = false;
+      if (before !== null) {
+        const { data } = before;
+        const { type } = data;
+        if (type === "apply") {
+          const { function: route } = data;
+          ({
+            file: { shallow: shallow2 },
+          } = getClassmapClosure(classmap, route));
+        }
+      }
+      if (shallow1 && shallow2) {
+        return collapseShallow(between, true, classmap);
+      }
+      return [
+        {
+          before,
+          between: collapseShallow(between, shallow2, classmap),
+          after,
+        },
+      ];
+    });
+
   const orderByFrame = (events) => {
     const root = { before: null, between: [], after: null };
     let current = root;
@@ -173,6 +201,9 @@ export default (dependencies) => {
 
   return {
     compileEventTrace: (events, classmap) =>
-      compileFrameTrace(orderByFrame(events), classmap),
+      compileFrameTrace(
+        collapseShallow(orderByFrame(events), false, classmap),
+        classmap,
+      ),
   };
 };
