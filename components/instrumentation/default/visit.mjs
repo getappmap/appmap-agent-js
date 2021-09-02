@@ -151,7 +151,7 @@ export default (dependencies) => {
     return [compileReturn(node, runtime)];
   };
 
-  const compileFunction = (node, params, body, path, { runtime }) => ({
+  const compileFunction = (node, params, body, route, { runtime }) => ({
     type: node.type,
     id: coalesce(node, "id", null),
     expression: false,
@@ -165,7 +165,7 @@ export default (dependencies) => {
           makeCallExpression(
             makeRegularMemberExpression(runtime, "recordBeforeApply"),
             [
-              makeLiteral(path),
+              makeLiteral(route),
               makeThisExpression(),
               makeArrayExpression(
                 params.map((param, index) =>
@@ -259,10 +259,10 @@ export default (dependencies) => {
     ]),
   });
 
-  const visit = (node, path, lineage, context) => {
+  const visit = (node, route, lineage, context) => {
     if (isArray(node)) {
       return node.map((element, index) =>
-        visit(element, `${path}/${index}`, lineage, context),
+        visit(element, `${route}/${_String(index)}`, lineage, context),
       );
     }
     if (
@@ -280,7 +280,7 @@ export default (dependencies) => {
       if (type === "ReturnStatement") {
         const { argument } = node;
         return compileReturn(
-          visit(argument, `${path}/argument`, lineage, context),
+          visit(argument, `${route}/argument`, lineage, context),
           runtime,
         );
       }
@@ -293,17 +293,17 @@ export default (dependencies) => {
         return compileFunction(
           node,
           params.map((node, index) =>
-            visit(node, `${path}/params/${index}`, lineage, context),
+            visit(node, `${route}/params/${index}`, lineage, context),
           ),
-          visit(body, `${path}/body`, lineage, context),
-          path,
+          visit(body, `${route}/body`, lineage, context),
+          route,
           context,
         );
       }
       return fromEntries(
         entries(node).map(([key, node]) => [
           key,
-          visit(node, `${path}/${key}`, lineage, context),
+          visit(node, `${route}/${key}`, lineage, context),
         ]),
       );
     }
