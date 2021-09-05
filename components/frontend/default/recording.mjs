@@ -8,6 +8,7 @@ export default (dependencies) => {
     time: { now },
     util: {
       returnSecond,
+      constant,
       getBox,
       setBox,
       createBox,
@@ -21,6 +22,7 @@ export default (dependencies) => {
     },
   } = dependencies;
   const { traceEvent } = Trace(dependencies);
+  const returnNull = constant(null);
   const generateRecord =
     (type1, type2, serializeData) =>
     ({ session, recording: { serialization, current_group } }, index, data) =>
@@ -86,5 +88,9 @@ export default (dependencies) => {
     recordAfterResponse: generateRecord("after", "response", returnSecond),
     recordBeforeQuery: generateRecord("before", "query", serializeBeforeQuery),
     recordAfterQuery: generateRecord("after", "query", serializeAfterQuery),
+    recordBeforeJump: generateRecord("before", "jump", returnNull),
+    recordAfterJump: generateRecord("before", "jump", returnNull),
+    recordBeforeBundle: generateRecord("before", "bundle", returnNull),
+    recordAfterBundle: generateRecord("before", "bundle", returnNull),
   };
 };
