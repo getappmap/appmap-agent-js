@@ -89,8 +89,8 @@ export default (dependencies) => {
     recordBeforeQuery: generateRecord("before", "query", serializeBeforeQuery),
     recordAfterQuery: generateRecord("after", "query", serializeAfterQuery),
     recordBeforeJump: generateRecord("before", "jump", returnNull),
-    recordAfterJump: generateRecord("before", "jump", returnNull),
+    recordAfterJump: generateRecord("after", "jump", returnNull),
     recordBeforeBundle: generateRecord("before", "bundle", returnNull),
-    recordAfterBundle: generateRecord("before", "bundle", returnNull),
+    recordAfterBundle: generateRecord("after", "bundle", returnNull),
   };
 };
