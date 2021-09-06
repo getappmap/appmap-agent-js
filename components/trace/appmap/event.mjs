@@ -6,7 +6,6 @@ const _Map = Map;
 export default (dependencies) => {
   const {
     util: { assert },
-    log: { logWarning },
   } = dependencies;
 
   const { getClassmapClosure } = Classmap(dependencies);
@@ -15,8 +14,11 @@ export default (dependencies) => {
     EventData(dependencies);
 
   const placeholders = new _Map([
+    // bundle //
+    ["begin/bundle", { type: "bundle" }],
+    ["after/bundle", { type: "bundle" }],
     [
-      "before/apply",
+      "begin/apply",
       {
         type: "apply",
         function: null,
@@ -28,7 +30,7 @@ export default (dependencies) => {
       },
     ],
     [
-      "after/apply",
+      "end/apply",
       {
         type: "apply",
         error: null,
@@ -38,6 +40,28 @@ export default (dependencies) => {
         },
       },
     ],
+    [
+      "begin/response",
+      {
+        type: "response",
+        protocol: "HTTP/1.1",
+        method: "GET",
+        path: "/MANUFACTURED/APPMAP/REQUEST",
+        headers: {},
+      },
+    ],
+    [
+      "end/response",
+      {
+        type: "response",
+        status: 200,
+        message: "MANUFACTURED-APPMAP-RESPONSE",
+        headers: {},
+      },
+    ],
+    // jump //
+    ["before/jump", { type: "jump" }],
+    ["after/jump", { type: "jump" }],
     [
       "before/query",
       {
@@ -74,136 +98,150 @@ export default (dependencies) => {
         headers: {},
       },
     ],
-    [
-      "before/response",
-      {
-        type: "response",
-        protocol: "HTTP/1.1",
-        method: "GET",
-        path: "/MANUFACTURED/APPMAP/REQUEST",
-        headers: {},
-      },
-    ],
-    [
-      "before/response",
-      {
-        type: "response",
-        status: 200,
-        message: "MANUFACTURED-APPMAP-RESPONSE",
-        headers: {},
-      },
-    ],
-    ["before/test", { type: "test" }],
-    ["after/test", { type: "test" }],
   ]);
 
-  const collapseShallow = (frames, shallow1, classmap) =>
-    frames.flatMap(({ before, between, after }) => {
-      let shallow2 = false;
-      if (before !== null) {
-        const { data } = before;
-        const { type } = data;
-        if (type === "apply") {
-          const { function: route } = data;
-          ({
-            file: { shallow: shallow2 },
-          } = getClassmapClosure(classmap, route));
-        }
-      }
-      if (shallow1 && shallow2) {
-        return collapseShallow(between, true, classmap);
-      }
-      return [
-        {
-          before,
-          between: collapseShallow(between, shallow2, classmap),
-          after,
-        },
-      ];
-    });
+  const checkFinish = (frame) => {
+    const {type} = frame;
+    if (type === "jump") {
+      const {after} = frame;
+      assert(after !== null, "unfinished jump");
+    } else {
+      assert(type === "bundle", "invalid frame");
+      const {end} = frame;
+      assert(end !== null, "unfinished bundle");
+    }
+  };
 
   const orderByFrame = (events) => {
-    const root = { before: null, between: [], after: null };
+    const root = { type:"bundle", begin: null, between: [], end: null };
+    const stack = [];
     let current = root;
     const map = new _Map();
     for (const event of events) {
       const { type, index } = event;
-      if (map.has(index)) {
-        const frame = map.get(index);
-        assert(frame[type] === null, "duplicate event");
-        frame[type] = event;
-        if (frame === current) {
-          current = current.parent;
-        }
-      } else {
+      if (type === "begin") {
         const frame = {
-          before: null,
+          type: "bundle",
+          begin: event,
           between: [],
-          parent: current,
-          after: null,
+          end: null,
         };
         map.set(index, frame);
-        frame[type] = event;
-        current.between.push(frame);
+        stack.push(current);
         current = frame;
+      } else if (type === "end" || type === "before") {
+        const {begin, end, between} = current;
+        const {index:begin_index} = begin;
+        assert(begin_index === index, "bundle index mismatch");
+        assert(end === null, "bundle frame has already ended");
+        if (type === "end") {
+          const {data:{type:begin_type}} = begin;
+          assert(type === begin_type, "bundle type mismatch");
+          between.map(checkFinish);
+          current.end = event;
+        } else {
+          between.push({
+            type: "jump",
+            before: event,
+            after: null
+          });
+        }
+        const {length} = stack;
+        assert(length > 0, "empty stack");
+        current = stack.pop();
+      } else if (type === "after") {
+        assert(map.has(index), "missing frame for after event");
+        stack.push(current);
+        current = map.get(index);
+        const {between} = current;
+        const {length} = between;
+        assert(length > 0, "after event expected something in between");
+        const last = between[length - 1];
+        const {type:last_type} = last;
+        assert(last_type === "jump", "expected a jump");
+        const {before, after} = last;
+        const {data:{type:before_type}} = before;
+        assert(type === before_type, "jump type mismatch");
+        assert(after === null, "jump has already been used");
+        last.after = event;
+      } else {
+        assert(false, "invalid event type");
       }
     }
     return root.between;
   };
 
-  const manufactureEvent = (
-    type1,
-    { index, group, time, data: { type: type2 } },
-  ) => ({
-    type: type1,
-    index,
-    group,
-    time,
-    data: placeholders.get(`${type1}/${type2}`),
+  const createCallEvent = ({index, data}, event2, classmap) => ({
+    id: 2 * index,
+    event: "call",
+    thread_id: 0,
+    ...compileBeforeEventData(data, classmap),
   });
 
-  const compileFrameTrace = (frames, classmap) => {
-    const output = [];
-    const loop = ({ before, between, after }) => {
-      assert(
-        before !== null || after !== null,
-        "both before and after event should not be null",
-      );
-      if (before === null) {
-        logWarning("missing before event for %j", after);
-        before = manufactureEvent("before", after);
-      }
-      const { time: time1, index: index1, data: data1 } = before;
-      output.push({
-        id: 2 * index1,
-        event: "call",
-        thread_id: 0,
-        ...compileBeforeEventData(data1, classmap),
-      });
-      between.forEach(loop);
-      if (after === null) {
-        logWarning("mising after event for %j", before);
-        after = manufactureEvent("after", before);
-      }
-      const { time: time2, index: index2, data: data2 } = after;
-      output.push({
-        id: 2 * index2 + 1,
-        event: "return",
-        thread_id: 0,
-        parent_id: 2 * index2,
-        elapsed: time2 - time1,
-        ...compileAfterEventData(data2, classmap),
-      });
-    };
-    frames.forEach(loop);
-    return output;
+  const createReturnEvent = ({type:type1, index, time, data:{type:type2}}, event2, classmap) => ({
+    id: 2 * index + 1,
+    event: "return",
+    thread_id: 0,
+    parent_id: 2 * index,
+    elapsed: event2 === null ? 0 : event2.time - time,
+    ...compileAfterEventData(
+      event2 === null ? placeholders.get(`${type1}/${type2}`) : event2.data,
+      classmap
+    ),
+  });
+
+  const isEmptyBundle = ({data:{type}}) => type === "bundle";
+
+  const isEmptyJump = ({data:{type}}) => type === "jump";
+
+  const isShallow = ({data}, classmap) => {
+    const {type} = data;
+    if (type === "apply") {
+      const {route} = data;
+      const {
+        file: { shallow },
+      } = getClassmapClosure(classmap, route);
+      return shallow;
+    }
+    return false;
   };
 
+  const compileTrace = (frames, classmap) => {
+    const generateCompileFrame = (shallow) => (frame) => {
+      const {type} = frame;
+      if (type === "jump") {
+        const {before, after} = frame;
+        if (isEmptyJump(before)) {
+          return [];
+        }
+        return [
+          createCallEvent(before, after, classmap),
+          createReturnEvent(before, after, classmap),
+        ];
+      }
+      assert(type === "bundle", "invalid frame");
+      const {begin, between, end} = frame;
+      const next_shallow = isShallow(begin, classmap);
+      const trace = between.flatMap(next_shallow ? compileShallowFrame : compileRegularFrame);
+      if ((shallow && next_shallow) || isEmptyBundle(begin)) {
+        return trace;
+      }
+      return [
+        createCallEvent(begin, end, classmap),
+        ... trace,
+        createReturnEvent(begin, end, classmap),
+      ];
+    };
+    const compileShallowFrame = generateCompileFrame(true);
+    const compileRegularFrame = generateCompileFrame(false);
+    return frames.flatMap(compileRegularFrame);
+  }
+
   return {
-    compileEventTrace: (events, classmap) =>
-      compileFrameTrace(
-        collapseShallow(orderByFrame(events), false, classmap),
-        classmap,
-      ),
+    compileEventTrace: (events, classmap) => compileTrace(
+      orderByFrame(events),
+      classmap,
+    ),
   };
+
 };
