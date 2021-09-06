@@ -58,6 +58,21 @@ const testAsync = async () => {
           type: "before",
           index: 1,
           data: {
+            type: "bundle",
+          },
+          group: 0,
+          time: 0,
+        },
+      },
+    },
+    {
+      type: "trace",
+      data: {
+        type: "event",
+        data: {
+          type: "before",
+          index: 1,
+          data: {
             type: "query",
             database: "sqlite3",
             version: null,
@@ -77,6 +92,21 @@ const testAsync = async () => {
           type: "after",
           index: 1,
           data: { type: "query", error },
+          group: 0,
+          time: 0,
+        },
+      },
+    },
+    {
+      type: "trace",
+      data: {
+        type: "event",
+        data: {
+          type: "after",
+          index: 1,
+          data: {
+            type: "bundle",
+          },
           group: 0,
           time: 0,
         },
