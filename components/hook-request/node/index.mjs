@@ -2,6 +2,7 @@ import Http from "http";
 import Https from "https";
 
 const { apply, construct } = Reflect;
+const { nextTick } = process;
 const _Proxy = Proxy;
 
 export default (dependencies) => {
@@ -9,6 +10,8 @@ export default (dependencies) => {
     util: { assignProperty },
     frontend: {
       incrementEventCounter,
+      recordBeginBundle,
+      recordEndBundle,
       recordBeforeRequest,
       recordAfterRequest,
     },
@@ -32,6 +35,7 @@ export default (dependencies) => {
         request.on("finish", () => {
           const { method, path: url } = request;
           const headers = request.getHeaders();
+          sendClient(client, recordBeginBundle(frontend, index, null));
           sendClient(
             client,
             recordBeforeRequest(frontend, index, {
@@ -48,6 +52,8 @@ export default (dependencies) => {
             statusCode: status,
             statusMessage: message,
           } = response;
+          // Hoopfully, this is triggered before user 'end' handlers.
+          // Use of removeAllListeners or prependListener will break this assumption.
           response.on("end", () => {
             sendClient(
               client,
@@ -57,6 +63,13 @@ export default (dependencies) => {
                 headers,
               }),
             );
+          });
+          nextTick(() => {
+            // Hoopfully, this is triggered after user 'end' handlers.
+            // Since emit is synchronous the groups will still match!
+            response.on("end", () => {
+              sendClient(client, recordEndBundle(frontend, index, null));
+            });
           });
         });
       };

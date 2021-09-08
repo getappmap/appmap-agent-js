@@ -8,6 +8,8 @@ export default (dependencies) => {
     frontend: {
       getSerializationEmptyValue,
       incrementEventCounter,
+      recordBeginBundle,
+      recordEndBundle,
       recordBeforeQuery,
       recordAfterQuery,
     },
@@ -35,6 +37,7 @@ export default (dependencies) => {
         const query = createQuery(sql, values, callback);
         ({ sql, values, _callback: callback } = { values: [], ...query });
         const index = incrementEventCounter(frontend);
+        sendClient(client, recordBeginBundle(frontend, index, null));
         sendClient(
           client,
           recordBeforeQuery(frontend, index, {
@@ -50,6 +53,7 @@ export default (dependencies) => {
             recordAfterQuery(frontend, index, { error: error || empty }),
           );
           callback(error, result, fields);
+          sendClient(client, recordEndBundle(frontend, index, null));
         };
         return apply(original, this, [query]);
       };

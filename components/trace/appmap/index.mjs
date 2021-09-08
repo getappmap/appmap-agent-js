@@ -59,15 +59,16 @@ export default (dependencies) => {
           events: digestTrace(frame, slice, classmap),
         };
         validateAppmap(appmap);
-        return [
-          filename ||
+        return {
+          name:
+            filename ||
             name ||
             mapMaybe(main, getBasename) ||
             app ||
             mapMaybe(_package, getName) ||
             null,
-          appmap,
-        ];
+          data: appmap,
+        };
       });
     },
   };

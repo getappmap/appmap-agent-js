@@ -42,7 +42,7 @@ export default (dependencies) => {
             if (payload.type === "apply") {
               for (const [index, enabled] of states) {
                 if (enabled) {
-                  tracks.get(index).routes.add(payload.route);
+                  tracks.get(index).routes.add(payload.function);
                 }
               }
             }

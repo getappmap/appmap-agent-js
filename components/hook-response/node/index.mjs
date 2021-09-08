@@ -11,8 +11,10 @@ export default (dependencies) => {
     util: { coalesce, assignProperty },
     frontend: {
       incrementEventCounter,
-      recordBeforeResponse,
-      recordAfterResponse,
+      recordBeginResponse,
+      recordEndResponse,
+      recordBeforeJump,
+      recordAfterJump,
     },
     client: { sendClient },
   } = dependencies;
@@ -45,7 +47,7 @@ export default (dependencies) => {
             const { httpVersion: version, method, url, headers } = request;
             sendClient(
               client,
-              recordBeforeResponse(frontend, index, {
+              recordBeginResponse(frontend, index, {
                 protocol: `HTTP/${version}`,
                 method,
                 headers,
@@ -53,13 +55,15 @@ export default (dependencies) => {
                 route,
               }),
             );
+            sendClient(client, recordBeforeJump(frontend, index, null));
           });
           response.on("finish", () => {
             const { statusCode: status, statusMessage: message } = response;
             const headers = response.getHeaders();
+            sendClient(client, recordAfterJump(frontend, index, null));
             sendClient(
               client,
-              recordAfterResponse(frontend, index, {
+              recordEndResponse(frontend, index, {
                 status,
                 message,
                 headers,

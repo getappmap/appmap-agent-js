@@ -32,7 +32,7 @@ assertDeepEqual(
         group: 0,
         data: {
           type: "apply",
-          route: "/route",
+          function: "/route",
         },
       },
     },

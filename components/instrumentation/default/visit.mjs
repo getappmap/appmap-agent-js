@@ -13,6 +13,17 @@ const makeBlockStatement = (nodes) => ({
   body: nodes,
 });
 
+const makeAwaitExpression = (node) => ({
+  type: "AwaitExpression",
+  argument: node,
+});
+
+const makeYieldExpression = (delegate, node) => ({
+  type: "YieldExpression",
+  delegate,
+  argument: node,
+});
+
 const makeConditionalExpression = (node1, node2, node3) => ({
   type: "ConditionalExpression",
   test: node1,
@@ -161,9 +172,9 @@ export default (dependencies) => {
     body: makeBlockStatement([
       makeVariableDeclaration("var", [
         makeVariableDeclarator(
-          makeIdentifier(`${runtime}_AFTER_ID`),
+          makeIdentifier(`${runtime}_APPLY_ID`),
           makeCallExpression(
-            makeRegularMemberExpression(runtime, "recordBeforeApply"),
+            makeRegularMemberExpression(runtime, "recordBeginApply"),
             [
               makeLiteral(route),
               makeThisExpression(),
@@ -246,9 +257,9 @@ export default (dependencies) => {
         makeBlockStatement([
           makeExpressionStatement(
             makeCallExpression(
-              makeRegularMemberExpression(runtime, "recordAfterApply"),
+              makeRegularMemberExpression(runtime, "recordEndApply"),
               [
-                makeIdentifier(`${runtime}_AFTER_ID`),
+                makeIdentifier(`${runtime}_APPLY_ID`),
                 makeIdentifier(`${runtime}_FAILURE`),
                 makeIdentifier(`${runtime}_SUCCESS`),
               ],
@@ -276,6 +287,34 @@ export default (dependencies) => {
       const { runtime, exclusion, naming } = context;
       if (isExcluded(exclusion, getQualifiedName(naming, lineage))) {
         return node;
+      }
+      if (type === "AwaitExpression") {
+        const { argument } = node;
+        return makeAwaitExpression(
+          makeCallExpression(
+            makeRegularMemberExpression(runtime, "recordAwait"),
+            [
+              makeIdentifier(`${runtime}_APPLY_ID`),
+              visit(argument, `${route}/argument`, lineage, context),
+            ],
+          ),
+        );
+      }
+      if (type === "YieldExpression") {
+        const { argument, delegate } = node;
+        return makeYieldExpression(
+          true,
+          makeCallExpression(
+            makeRegularMemberExpression(
+              runtime,
+              delegate ? "recordYieldAll" : "recordYield",
+            ),
+            [
+              makeIdentifier(`${runtime}_APPLY_ID`),
+              visit(argument, `${route}/argument`, lineage, context),
+            ],
+          ),
+        );
       }
       if (type === "ReturnStatement") {
         const { argument } = node;

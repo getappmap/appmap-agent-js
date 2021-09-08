@@ -9,8 +9,10 @@ export default (dependencies) => {
       getSerializationEmptyValue,
       getInstrumentationIdentifier,
       incrementEventCounter,
-      recordBeforeApply,
-      recordAfterApply,
+      recordBeginApply,
+      recordEndApply,
+      recordBeforeJump,
+      recordAfterJump,
     },
     util: { noop },
   } = dependencies;
@@ -24,15 +26,25 @@ export default (dependencies) => {
       }
       const identifier = getInstrumentationIdentifier(frontend);
       runScript(
-        `const ${identifier} = {recordBeforeApply:null, recordAfterApply:null, empty:null};`,
+        `
+          const ${identifier}_APPLY_ID = 0;
+          const ${identifier} = {
+            recordBeforeApply: null,
+            recordAfterApply: null,
+            recordAwait: null,
+            recordYield: null,
+            recordYieldAll: null,
+            empty: null
+          };
+        `,
       );
       const runtime = _eval(identifier);
       runtime.empty = getSerializationEmptyValue(frontend);
-      runtime.recordBeforeApply = (_function, _this, _arguments) => {
+      runtime.recordBeginApply = (_function, _this, _arguments) => {
         const index = incrementEventCounter(frontend);
         sendClient(
           client,
-          recordBeforeApply(frontend, index, {
+          recordBeginApply(frontend, index, {
             function: _function,
             this: _this,
             arguments: _arguments,
@@ -40,16 +52,38 @@ export default (dependencies) => {
         );
         return index;
       };
-      runtime.recordAfterApply = (index, error, result) => {
-        sendClient(
-          client,
-          recordAfterApply(frontend, index, { error, result }),
-        );
+      runtime.recordEndApply = (index, error, result) => {
+        sendClient(client, recordEndApply(frontend, index, { error, result }));
+      };
+      runtime.recordAwait = async (index, promise) => {
+        sendClient(client, recordBeforeJump(frontend, index, null));
+        try {
+          return await promise;
+        } finally {
+          sendClient(client, recordAfterJump(frontend, index, null));
+        }
+      };
+      runtime.recordYield = function* (index, element) {
+        sendClient(client, recordBeforeJump(frontend, index, null));
+        yield element;
+        sendClient(client, recordAfterJump(frontend, index, null));
+      };
+      runtime.recordYieldAll = function* (index, generator) {
+        sendClient(client, recordBeforeJump(frontend, index, null));
+        yield* generator;
+        sendClient(client, recordAfterJump(frontend, index, null));
       };
       return [
-        { object: runtime, key: "recordBeforeApply", value: noop },
-        { object: runtime, key: "recordBeforeApply", value: noop },
-      ];
+        "recordBeforeApply",
+        "recordAfterApply",
+        "recordAwait",
+        "recordYield",
+        "recordYieldAll",
+      ].map((key) => ({
+        object: runtime,
+        key,
+        value: noop,
+      }));
     },
   };
 };

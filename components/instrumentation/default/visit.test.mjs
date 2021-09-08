@@ -32,11 +32,11 @@ const testAsync = async () => {
   // ArrowFunctionExpression //
 
   assertEqual(
-    instrument("((x, y = null, ...z) => 123);"),
+    instrument("(async (x, y = null, ...z) => await 123);"),
     normalize(`
-      (($_ARGUMENT_0, $_ARGUMENT_1, ...$_ARGUMENT_2) => {
+      (async ($_ARGUMENT_0, $_ARGUMENT_1, ...$_ARGUMENT_2) => {
         var
-          $_AFTER_ID = $.recordBeforeApply('root/body/0/expression', this, [$_ARGUMENT_0, $_ARGUMENT_1, $_ARGUMENT_2]),
+          $_APPLY_ID = $.recordBeginApply('root/body/0/expression', this, [$_ARGUMENT_0, $_ARGUMENT_1, $_ARGUMENT_2]),
           $_FAILURE = $.empty,
           $_SUCCESS = $.empty;
         try {
@@ -44,11 +44,11 @@ const testAsync = async () => {
             x = $_ARGUMENT_0,
             y = $_ARGUMENT_1 === void 0 ? null : $_ARGUMENT_1,
             z = $_ARGUMENT_2;
-          return $_SUCCESS = 123;
+          return $_SUCCESS = await $.recordAwait($_APPLY_ID, 123);
         } catch ($_ERROR) {
           throw $_FAILURE = $_ERROR;
         } finally {
-          $.recordAfterApply($_AFTER_ID, $_FAILURE, $_SUCCESS);
+          $.recordEndApply($_APPLY_ID, $_FAILURE, $_SUCCESS);
         }
       });
     `),
@@ -59,19 +59,21 @@ const testAsync = async () => {
     ["123", "123"],
   ]) {
     assertEqual(
-      instrument(`function f () { return ${code1}; };`),
+      instrument(`function* f () { yield 456; yield* 789; return ${code1}; };`),
       normalize(`
-        function f () {
+        function* f () {
           var
-            $_AFTER_ID = $.recordBeforeApply('root/body/0', this, []),
+            $_APPLY_ID = $.recordBeginApply('root/body/0', this, []),
             $_FAILURE = $.empty,
             $_SUCCESS = $.empty;
           try {
+            yield* $.recordYield($_APPLY_ID, 456);
+            yield* $.recordYieldAll($_APPLY_ID, 789);
             return $_SUCCESS = ${code2};
           } catch ($_ERROR) {
             throw $_FAILURE = $_ERROR;
           } finally {
-            $.recordAfterApply($_AFTER_ID, $_FAILURE, $_SUCCESS);
+            $.recordEndApply($_APPLY_ID, $_FAILURE, $_SUCCESS);
           }
         };
       `),

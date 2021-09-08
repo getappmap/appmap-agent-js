@@ -87,8 +87,8 @@ export default (dependencies) => {
       incrementEventCounter,
       recordBeforeQuery,
       recordAfterQuery,
-      recordBeforeBundle,
-      recordAfterBundle,
+      recordBeginBundle,
+      recordEndBundle,
     },
     client: { sendClient },
   } = dependencies;
@@ -116,7 +116,7 @@ export default (dependencies) => {
       const copy = { ...database_prototype };
       const recordQuery = (sql, parameters, callback) => {
         const index = incrementEventCounter(frontend);
-        sendClient(client, recordBeforeBundle(frontend, index));
+        sendClient(client, recordBeginBundle(frontend, index));
         sendClient(
           client,
           recordBeforeQuery(frontend, index, {
@@ -136,7 +136,7 @@ export default (dependencies) => {
           try {
             return apply(callback, this, args);
           } finally {
-            sendClient(client, recordAfterBundle(frontend, index));
+            sendClient(client, recordEndBundle(frontend, index));
           }
         };
       };

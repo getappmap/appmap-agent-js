@@ -37,16 +37,6 @@ assertDeepEqual(
     configuration,
     [
       {
-        type: "file",
-        data: {
-          index: indexes.file,
-          path: "/cwd/filename.js",
-          type: "script",
-          code: "function f (x) {}",
-          exclude: [],
-        },
-      },
-      {
         type: "track",
         data: {
           type: "start",
@@ -60,11 +50,21 @@ assertDeepEqual(
         },
       },
       {
+        type: "file",
+        data: {
+          index: indexes.file,
+          path: "/cwd/filename.js",
+          type: "script",
+          code: "function f (x) {}",
+          exclude: [],
+        },
+      },
+      {
         type: "event",
         data: {
           type: "begin",
           index: indexes.event1,
-          group: indexes.group1,
+          group: 0,
           time: 0,
           data: {
             type: "apply",
@@ -79,7 +79,7 @@ assertDeepEqual(
         data: {
           type: "end",
           index: indexes.event1,
-          group: indexes.group1,
+          group: 0,
           time: 0,
           data: {
             type: "apply",
@@ -91,115 +91,6 @@ assertDeepEqual(
           },
         },
       },
-      // {
-      //   type: "group",
-      //   data: { group: indexes.group2, origin: indexes.group1 },
-      // },
-      // {
-      //   type: "event",
-      //   data: {
-      //     type: "before",
-      //     index: indexes.event1,
-      //     group: indexes.group1,
-      //     time: 0,
-      //     data: {
-      //       type: "query",
-      //       database: "database",
-      //       version: "version",
-      //       sql: "sql1",
-      //       parameters: [],
-      //     },
-      //   },
-      // },
-      // {
-      //   type: "track",
-      //   data: { type: "pause", index: indexes.track },
-      // },
-      // {
-      //   type: "event",
-      //   data: {
-      //     type: "end",
-      //     index: indexes.event1,
-      //     group: indexes.group1,
-      //     time: 0,
-      //     data: {
-      //       type: "apply",
-      //       error: null,
-      //       result: {
-      //         type: "string",
-      //         print: "result-print",
-      //       },
-      //     },
-      //   },
-      // },
-      // {
-      //   type: "track",
-      //   data: { type: "play", index: indexes.track },
-      // },
-      // {
-      //   type: "event",
-      //   data: {
-      //     type: "after",
-      //     index: indexes.event1,
-      //     group: indexes.group1,
-      //     time: 0,
-      //     data: {
-      //       type: "query",
-      //     },
-      //   },
-      // },
-      // {
-      //   type: "event",
-      //   data: {
-      //     type: "begin",
-      //     index: indexes.event2,
-      //     group: indexes.group2,
-      //     time: 0,
-      //     data: {
-      //       type: "bundle",
-      //     }
-      //   }
-      // },
-      // {
-      //   type: "event",
-      //   data: {
-      //     type: "before",
-      //     index: indexes.event2,
-      //     group: indexes.group2,
-      //     time: 0,
-      //     data: {
-      //       type: "query",
-      //       database: "database",
-      //       version: "version",
-      //       sql: "sql2",
-      //       parameters: [],
-      //     },
-      //   },
-      // },
-      // {
-      //   type: "event",
-      //   data: {
-      //     type: "after",
-      //     index: indexes.event2,
-      //     group: indexes.group2,
-      //     time: 0,
-      //     data: {
-      //       type: "query",
-      //     },
-      //   },
-      // },
-      // {
-      //   type: "event",
-      //   data: {
-      //     type: "end",
-      //     index: indexes.event2,
-      //     group: indexes.group2,
-      //     time: 0,
-      //     data: {
-      //       type: "bundle",
-      //     },
-      //   },
-      // },
     ],
     { errors: [], status: 0 },
   ),
@@ -257,7 +148,7 @@ assertDeepEqual(
         ],
         events: [
           {
-            id: 2 * indexes.event1,
+            id: 1,
             event: "call",
             thread_id: 0,
             defined_class: "f",
@@ -281,29 +172,10 @@ assertDeepEqual(
             ],
           },
           {
-            id: 2 * indexes.event2,
-            event: "call",
-            thread_id: 0,
-            sql_query: {
-              database_type: "MANUFACTURED_APPMAP_DATABASE",
-              server_version: null,
-              sql: "SELECT * FROM MANUFACTURED_APPMAP_TABLE;",
-              explain_sql: null,
-            },
-            message: [],
-          },
-          {
-            id: 2 * indexes.event2 + 1,
+            id: 2,
             event: "return",
             thread_id: 0,
-            parent_id: 2 * indexes.event2,
-            elapsed: 0,
-          },
-          {
-            id: 2 * indexes.event1 + 1,
-            event: "return",
-            thread_id: 0,
-            parent_id: 2 * indexes.event1,
+            parent_id: 1,
             elapsed: 0,
             return_value: {
               name: "return",

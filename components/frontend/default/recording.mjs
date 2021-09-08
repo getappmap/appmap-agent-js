@@ -80,17 +80,19 @@ export default (dependencies) => {
       incrementCounter(event_counter),
     getSerializationEmptyValue: ({ recording: { serialization } }) =>
       getSerializationEmptyValue(serialization),
-    recordBeforeApply: generateRecord("before", "apply", serializeBeforeApply),
-    recordAfterApply: generateRecord("after", "apply", serializeAfterApply),
-    recordBeforeRequest: generateRecord("before", "request", returnSecond),
-    recordAfterRequest: generateRecord("after", "request", returnSecond),
-    recordBeforeResponse: generateRecord("before", "response", returnSecond),
-    recordAfterResponse: generateRecord("after", "response", returnSecond),
-    recordBeforeQuery: generateRecord("before", "query", serializeBeforeQuery),
-    recordAfterQuery: generateRecord("after", "query", serializeAfterQuery),
+    // bundle //
+    recordBeginBundle: generateRecord("begin", "bundle", returnNull),
+    recordEndBundle: generateRecord("end", "bundle", returnNull),
+    recordBeginApply: generateRecord("begin", "apply", serializeBeforeApply),
+    recordEndApply: generateRecord("end", "apply", serializeAfterApply),
+    recordBeginResponse: generateRecord("begin", "response", returnSecond),
+    recordEndResponse: generateRecord("end", "response", returnSecond),
+    // jump //
     recordBeforeJump: generateRecord("before", "jump", returnNull),
     recordAfterJump: generateRecord("after", "jump", returnNull),
-    recordBeforeBundle: generateRecord("before", "bundle", returnNull),
-    recordAfterBundle: generateRecord("after", "bundle", returnNull),
+    recordBeforeRequest: generateRecord("before", "request", returnSecond),
+    recordAfterRequest: generateRecord("after", "request", returnSecond),
+    recordBeforeQuery: generateRecord("before", "query", serializeBeforeQuery),
+    recordAfterQuery: generateRecord("after", "query", serializeAfterQuery),
   };
 };

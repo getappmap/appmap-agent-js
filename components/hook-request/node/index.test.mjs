@@ -63,6 +63,19 @@ const testAsync = async () => {
       data: {
         type: "event",
         data: {
+          type: "begin",
+          index: 1,
+          group: 0,
+          time: 0,
+          data: { type: "bundle" },
+        },
+      },
+    },
+    {
+      type: "trace",
+      data: {
+        type: "event",
+        data: {
           type: "before",
           index: 1,
           data: {
@@ -95,6 +108,19 @@ const testAsync = async () => {
           },
           group: 0,
           time: 0,
+        },
+      },
+    },
+    {
+      type: "trace",
+      data: {
+        type: "event",
+        data: {
+          type: "end",
+          index: 1,
+          group: 0,
+          time: 0,
+          data: { type: "bundle" },
         },
       },
     },

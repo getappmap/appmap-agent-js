@@ -25,14 +25,54 @@ const testAsync = async () => {
     ),
     [],
   );
+  const jump = [
+    {
+      type: "trace",
+      data: {
+        type: "event",
+        data: {
+          type: "before",
+          index: 1,
+          group: 0,
+          time: 0,
+          data: { type: "jump" },
+        },
+      },
+    },
+    {
+      type: "trace",
+      data: {
+        type: "event",
+        data: {
+          type: "after",
+          index: 1,
+          group: 0,
+          time: 0,
+          data: { type: "jump" },
+        },
+      },
+    },
+  ];
   assertDeepEqual(
     await testHookAsync(
       hookApply,
       unhookApply,
       { hooks: { apply: true }, "hidden-identifier": "$" },
       async () => {
-        const index = $uuid.recordBeforeApply("function", 123, [456]);
-        $uuid.recordAfterApply(index, null, 789);
+        const index = $uuid.recordBeginApply("function", 123, [456]);
+        await $uuid.recordAwait(index, Promise.resolve("await"));
+        const yields = [];
+        for (const element of $uuid.recordYield(index, "yield")) {
+          yields.push(element);
+        }
+        for (const element of $uuid.recordYieldAll(index, [
+          "yield1",
+          "yield2",
+        ])) {
+          yields.push(element);
+        }
+        assertDeepEqual(yields, ["yield", "yield1", "yield2"]);
+        $uuid.recordEndApply(index, null, 789);
       },
     ),
     [
@@ -41,7 +81,7 @@ const testAsync = async () => {
         data: {
           type: "event",
           data: {
-            type: "before",
+            type: "begin",
             index: 1,
             data: {
               type: "apply",
@@ -54,12 +94,15 @@ const testAsync = async () => {
           },
         },
       },
+      ...jump,
+      ...jump,
+      ...jump,
       {
         type: "trace",
         data: {
           type: "event",
           data: {
-            type: "after",
+            type: "end",
             index: 1,
             data: {
               type: "apply",

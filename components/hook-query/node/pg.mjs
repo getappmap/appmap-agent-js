@@ -11,6 +11,8 @@ export default (dependencies) => {
     frontend: {
       getSerializationEmptyValue,
       incrementEventCounter,
+      recordBeginBundle,
+      recordEndBundle,
       recordBeforeQuery,
       recordAfterQuery,
     },
@@ -63,6 +65,7 @@ export default (dependencies) => {
             }
           }
           const index = incrementEventCounter(frontend);
+          sendClient(client, recordBeginBundle(frontend, index, null));
           sendClient(
             client,
             recordBeforeQuery(frontend, index, {
@@ -79,6 +82,7 @@ export default (dependencies) => {
               recordAfterQuery(frontend, index, { error: error || empty }),
             );
             callback(error, result);
+            sendClient(client, recordEndBundle(frontend, index, null));
           };
           apply(original, this, [query]);
           return result;

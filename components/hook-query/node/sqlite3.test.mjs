@@ -55,7 +55,7 @@ const testAsync = async () => {
       data: {
         type: "event",
         data: {
-          type: "before",
+          type: "begin",
           index: 1,
           data: {
             type: "bundle",
@@ -102,7 +102,7 @@ const testAsync = async () => {
       data: {
         type: "event",
         data: {
-          type: "after",
+          type: "end",
           index: 1,
           data: {
             type: "bundle",

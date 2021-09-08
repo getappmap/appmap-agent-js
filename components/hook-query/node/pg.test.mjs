@@ -55,6 +55,19 @@ const proceedAsync = async () => {
       data: {
         type: "event",
         data: {
+          type: "begin",
+          index: 1,
+          group: 0,
+          time: 0,
+          data: { type: "bundle" },
+        },
+      },
+    },
+    {
+      type: "trace",
+      data: {
+        type: "event",
+        data: {
           type: "before",
           index: 1,
           data: {
@@ -82,6 +95,19 @@ const proceedAsync = async () => {
           data: { type: "query", error: null },
           group: 0,
           time: 0,
+        },
+      },
+    },
+    {
+      type: "trace",
+      data: {
+        type: "event",
+        data: {
+          type: "end",
+          index: 1,
+          group: 0,
+          time: 0,
+          data: { type: "bundle" },
         },
       },
     },
@@ -139,6 +165,7 @@ const proceedAsync = async () => {
   // invalid sql //
   {
     const extract = ([
+      ,
       {
         data: {
           data: {
@@ -155,6 +182,7 @@ const proceedAsync = async () => {
           },
         },
       },
+      ,
     ]) => ({ sql, constructor: _constructor });
     assertDeepEqual(
       extract(

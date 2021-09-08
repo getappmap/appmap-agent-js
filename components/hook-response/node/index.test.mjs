@@ -53,7 +53,11 @@ const testAsync = async () => {
   };
 
   const cleanupHeaders = (trace) =>
-    trace.map(({ data: data1, ...rest1 }) => {
+    trace.map((mark, index) => {
+      if (index === 1 || index === 2) {
+        return mark;
+      }
+      const { data: data1, ...rest1 } = mark;
       const { data: data2, ...rest2 } = data1;
       const { data: data3, ...rest3 } = data2;
       const { headers, ...rest4 } = data3;
@@ -85,7 +89,7 @@ const testAsync = async () => {
       data: {
         type: "event",
         data: {
-          type: "before",
+          type: "begin",
           index: 1,
           data: {
             type: "response",
@@ -105,7 +109,33 @@ const testAsync = async () => {
       data: {
         type: "event",
         data: {
+          type: "before",
+          index: 1,
+          group: 0,
+          time: 0,
+          data: { type: "jump" },
+        },
+      },
+    },
+    {
+      type: "trace",
+      data: {
+        type: "event",
+        data: {
           type: "after",
+          index: 1,
+          group: 0,
+          time: 0,
+          data: { type: "jump" },
+        },
+      },
+    },
+    {
+      type: "trace",
+      data: {
+        type: "event",
+        data: {
+          type: "end",
           index: 1,
           data: {
             type: "response",
