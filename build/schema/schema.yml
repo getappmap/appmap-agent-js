@@ -705,6 +705,8 @@
                       enum:
                         - before
                         - after
+                        - begin
+                        - end
                     time: {type: number}
                     group: {$ref: index}
                     index: {$ref: index}
