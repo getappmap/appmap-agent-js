@@ -157,31 +157,31 @@ assertDeepEqual(
 );
 
 // apply >> missing routing //
-assertDeepEqual(
-  compileBeginEventData(
-    {
-      type: "apply",
-      function: null,
-      this: { type: "string", print: "print-this" },
-      arguments: [{ type: "string", print: "print-arg" }],
-    },
-    classmap,
-  ),
-  {
-    defined_class: "MANUFACTURED_APPMAP_CLASS",
-    lineno: 0,
-    method_id: "MANUFACTURED_APPMAP_METHOD",
-    static: false,
-    path: "MANUFACTURED_APPMAP_FILE.js",
-    parameters: [],
-    receiver: {
-      class: "string",
-      name: "this",
-      object_id: null,
-      value: "print-this",
-    },
-  },
-);
+// assertDeepEqual(
+//   compileBeginEventData(
+//     {
+//       type: "apply",
+//       function: null,
+//       this: { type: "string", print: "print-this" },
+//       arguments: [{ type: "string", print: "print-arg" }],
+//     },
+//     classmap,
+//   ),
+//   {
+//     defined_class: "MANUFACTURED_APPMAP_CLASS",
+//     lineno: 0,
+//     method_id: "MANUFACTURED_APPMAP_METHOD",
+//     static: false,
+//     path: "MANUFACTURED_APPMAP_FILE.js",
+//     parameters: [],
+//     receiver: {
+//       class: "string",
+//       name: "this",
+//       object_id: null,
+//       value: "print-this",
+//     },
+//   },
+// );
 
 // response >> message //
 assertDeepEqual(

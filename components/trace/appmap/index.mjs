@@ -2,9 +2,9 @@ import Metadata from "./metadata.mjs";
 import Track from "./track.mjs";
 import Group from "./group.mjs";
 import Classmap from "./classmap.mjs";
-import Event from "./event.mjs";
+import Digest from "./digest.mjs";
+import Callstack from "./callstack.mjs";
 
-const _Set = Set;
 const VERSION = "1.6.0";
 
 export default (dependencies) => {
@@ -18,8 +18,9 @@ export default (dependencies) => {
   const { createClassmap, addClassmapFile, compileClassmap } =
     Classmap(dependencies);
   const { orderByGroup } = Group(dependencies);
-  const { splitByTrack } = Track(dependencies);
-  const { compileEventTrace } = Event(dependencies);
+  const { collectTracks } = Track(dependencies);
+  const { digestTrace } = Digest(dependencies);
+  const { frameCallstack } = Callstack(dependencies);
   /* c8 ignore start */
   const getName = ({ name }) => name;
   /* c8 ignore start */
@@ -37,21 +38,13 @@ export default (dependencies) => {
           addClassmapFile(classmap, data);
         }
       }
-      return splitByTrack(marks).map(({ configuration, marks }) => {
+      const frame = frameCallstack(orderByGroup(marks));
+      return collectTracks(marks).map(({ configuration, slice, routes }) => {
         const configuration2 = extendConfiguration(
           configuration1,
           configuration,
           null,
         );
-        const events = orderByGroup(marks);
-        const routes = new _Set();
-        for (const { data } of events) {
-          const { type } = data;
-          if (type === "apply") {
-            const { function: route } = data;
-            routes.add(route);
-          }
-        }
         const {
           output: { filename },
           main,
@@ -63,19 +56,18 @@ export default (dependencies) => {
           version: VERSION,
           metadata: compileMetadata(configuration2, termination),
           classMap: compileClassmap(classmap, routes),
-          events: compileEventTrace(events, classmap),
+          events: digestTrace(frame, slice, classmap),
         };
         validateAppmap(appmap);
-        return {
-          name:
-            filename ||
+        return [
+          filename ||
             name ||
             mapMaybe(main, getBasename) ||
             app ||
             mapMaybe(_package, getName) ||
             null,
-          data: appmap,
-        };
+          appmap,
+        ];
       });
     },
   };

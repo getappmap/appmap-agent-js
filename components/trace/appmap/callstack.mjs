@@ -32,6 +32,7 @@ export default (dependencies) => {
         stack.push(current);
         current = frame;
       } else if (event.type === "end" || event.type === "before") {
+        console.log(current, event);
         assert(current.begin.index === event.index, "bundle index mismatch");
         assert(current.end === null, "bundle frame has already ended");
         if (event.type === "end") {

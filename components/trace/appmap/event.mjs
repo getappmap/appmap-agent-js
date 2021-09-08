@@ -24,16 +24,16 @@ export default (dependencies) => {
         : url,
     );
 
-  const placeholder = {
-    link: {
-      defined_class: "MANUFACTURED_APPMAP_CLASS",
-      lineno: 0,
-      method_id: "MANUFACTURED_APPMAP_METHOD",
-      static: false,
-      path: "MANUFACTURED_APPMAP_FILE.js",
-    },
-    parameters: [],
-  };
+  // const placeholder = {
+  //   link: {
+  //     defined_class: "MANUFACTURED_APPMAP_CLASS",
+  //     lineno: 0,
+  //     method_id: "MANUFACTURED_APPMAP_METHOD",
+  //     static: false,
+  //     path: "MANUFACTURED_APPMAP_FILE.js",
+  //   },
+  //   parameters: [],
+  // };
 
   const isFirstColon = ([string]) => string.startsWith(":");
 
@@ -44,8 +44,8 @@ export default (dependencies) => {
     const { type } = data;
     if (type === "apply") {
       const { function: route, this: _this, arguments: _arguments } = data;
-      const { link, parameters } =
-        route === null ? placeholder : getClassmapClosure(classmap, route);
+      const { link, parameters } = getClassmapClosure(classmap, route);
+      // route === null ? placeholder : getClassmapClosure(classmap, route);
       return {
         ...link,
         receiver: compileParameterSerial(["this", _this]),
