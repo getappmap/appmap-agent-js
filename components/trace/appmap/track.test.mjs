@@ -9,64 +9,65 @@ const {
   // equal: assertEqual,
 } = Assert;
 
-const testAsync = async () => {
-  const dependencies = await buildTestDependenciesAsync(import.meta.url);
+const dependencies = await buildTestDependenciesAsync(import.meta.url);
 
-  const { splitByTrack } = Track(dependencies);
+const { collectTracks } = Track(dependencies);
 
-  assertDeepEqual(
-    splitByTrack([
-      {
-        type: "track",
-        data: {
-          type: "start",
-          index: 123,
-          configuration: { output: { filename: "filename" } },
-        },
-      },
-      {
-        type: "event",
-        data: "event1",
-      },
-      {
-        type: "track",
-        data: {
-          type: "pause",
-          index: 123,
-        },
-      },
-      {
-        type: "event",
-        data: "event2",
-      },
-      {
-        type: "track",
-        data: {
-          type: "play",
-          index: 123,
-        },
-      },
-      {
-        type: "event",
-        data: "event3",
-      },
-    ]),
-    [
-      {
+assertDeepEqual(
+  collectTracks([
+    {
+      type: "track",
+      data: {
+        type: "start",
+        index: 123,
         configuration: { output: { filename: "filename" } },
-        marks: [
-          {
-            type: "event",
-            data: "event1",
-          },
-          {
-            type: "event",
-            data: "event3",
-          },
-        ],
       },
-    ],
-  );
-};
-
-testAsync();
+    },
+    {
+      type: "event",
+      data: {
+        type: "begin",
+        time: 0,
+        index: 1,
+        group: 0,
+        data: {
+          type: "apply",
+          route: "/route",
+        },
+      },
+    },
+    {
+      type: "track",
+      data: {
+        type: "pause",
+        index: 123,
+      },
+    },
+    {
+      type: "event",
+      data: {
+        type: "begin",
+        time: 0,
+        index: 2,
+        group: 0,
+        data: {
+          type: "bundle",
+        },
+      },
+    },
+    {
+      type: "track",
+      data: {
+        type: "stop",
+        index: 123,
+      },
+    },
+  ]),
+  [
+    {
+      configuration: { output: { filename: "filename" } },
+      slice: new Set([1]),
+      routes: new Set(["/route"]),
+    },
+  ],
+);

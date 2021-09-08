@@ -1,43 +1,60 @@
 const _Map = Map;
-const { from } = Array;
+const _Set = Set;
+
+const { from: toArray } = Array;
 
 export default (dependencies) => {
   const {
     util: { assert },
   } = dependencies;
-  const cleanupTrack = ({ configuration, marks }) => ({
-    configuration,
-    marks,
-  });
   return {
-    splitByTrack: (marks) => {
+    collectTracks: (marks) => {
       const tracks = new _Map();
+      const states = new _Map();
       for (let mark of marks) {
-        const { type, data } = mark;
-        if (type === "track") {
-          const { type, index } = data;
-          if (type === "start") {
-            assert(!tracks.has(index), "duplicate track index");
-            let { configuration } = data;
-            tracks.set(index, {
-              configuration,
-              enabled: true,
-              marks: [],
+        if (mark.type === "track") {
+          const { data: command } = mark;
+          if (command.type === "start") {
+            assert(!tracks.has(command.index), "duplicate track");
+            tracks.set(command.index, {
+              configuration: command.configuration,
+              routes: new _Set(),
+              slice: new _Set(),
             });
+            states.set(command.index, true);
           } else {
-            assert(tracks.has(index), "missing track index");
-            const track = tracks.get(index);
-            track.enabled = type === "play";
+            assert(states.has(command.index), "missing track");
+            if (command.type === "stop") {
+              states.delete(command.index);
+            } else {
+              const enabled = states.get(command.index);
+              assert(
+                enabled === (command.type === "pause"),
+                "invalid command for current track state",
+              );
+              states.set(command.index, !enabled);
+            }
           }
-        } else {
-          for (const { enabled, marks } of tracks.values()) {
-            if (enabled) {
-              marks.push(mark);
+        } else if (mark.type === "event") {
+          const { data: event } = mark;
+          if (event.type === "begin") {
+            const { data: payload } = event;
+            if (payload.type === "apply") {
+              for (const [index, enabled] of states) {
+                if (enabled) {
+                  tracks.get(index).routes.add(payload.route);
+                }
+              }
+            }
+            for (const [index, enabled] of states) {
+              if (enabled) {
+                tracks.get(index).slice.add(event.index);
+              }
             }
           }
         }
       }
-      return from(tracks.values()).map(cleanupTrack);
+      return toArray(tracks.values());
     },
   };
 };
