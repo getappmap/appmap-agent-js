@@ -58,18 +58,19 @@ export default (dependencies) => {
         if (frame.before.data.type === "jump") {
           return [];
         }
+        const id = (counter += 1);
         return [
           {
             event: "call",
             thread_id: 0,
-            id: (counter += 1),
+            id,
             ...compileBeforeEventData(frame.before.data, classmap),
           },
           {
             event: "return",
             thread_id: 0,
             id: (counter += 1),
-            parent_id: counter - 1,
+            parent_id: id,
             elapsed:
               frame.after === null ? 0 : frame.after.time - frame.before.time,
             ...compileAfterEventData(
@@ -82,10 +83,17 @@ export default (dependencies) => {
         ];
       }
       if (isBundleFrame(frame)) {
-        if (
-          frame.begin.data.type === "bundle" ||
-          !slice.has(frame.begin.index)
-        ) {
+        let skip = false;
+        if (!slice.has(frame.begin.index)) {
+          skip = true;
+        } else if (frame.begin.data.type === "apply") {
+          const {
+            file: { shallow: next_shallow },
+          } = getClassmapClosure(classmap, frame.begin.data.function);
+          skip = shallow && next_shallow;
+          shallow = next_shallow;
+        }
+        if (skip) {
           return frame.between
             .filter(isBundleFrame)
             .flatMap(
@@ -94,21 +102,19 @@ export default (dependencies) => {
                 : loopRegular /* c8 ignore stop */,
             );
         }
-        if (frame.begin.data.type === "apply") {
-          const {
-            file: { shallow: next_shallow },
-          } = getClassmapClosure(classmap, frame.begin.data.function);
-          if (shallow && next_shallow) {
-            return frame.between.flatMap(loopShallow);
-          }
-          shallow = next_shallow;
+        if (frame.begin.data.type === "bundle") {
+          return frame.between.flatMap(
+            /* c8 ignore start */ shallow
+              ? loopShallow
+              : loopRegular /* c8 ignore stop */,
+          );
         }
-        const index = (counter += 1);
+        const id = (counter += 1);
         return [
           {
             event: "call",
             thread_id: 0,
-            id: index,
+            id,
             ...compileBeginEventData(frame.begin.data, classmap),
           },
           ...frame.between.flatMap(shallow ? loopShallow : loopRegular),
@@ -116,7 +122,7 @@ export default (dependencies) => {
             event: "return",
             thread_id: 0,
             id: (counter += 1),
-            parent_id: index,
+            parent_id: id,
             elapsed: frame.end === null ? 0 : frame.end.time - frame.begin.time,
             ...compileEndEventData(
               frame.end === null

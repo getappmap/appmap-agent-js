@@ -250,6 +250,33 @@ assertDeepEqual(
   ],
 );
 
+// Skip Bundle //
+assertDeepEqual(
+  digestTrace(
+    {
+      type: "bundle",
+      begin: {
+        type: "begin",
+        index: 1,
+        time: 10,
+        data: {
+          type: "response",
+          protocol: "HTTP/1.1",
+          method: "GET",
+          url: "/path",
+          headers: {},
+          route: null,
+        },
+      },
+      between: [],
+      end: null,
+    },
+    new Set([]),
+    createClassmap(createConfiguration("/cwd")),
+  ),
+  [],
+);
+
 // Jump //
 for (const completion of [true, false]) {
   assertDeepEqual(

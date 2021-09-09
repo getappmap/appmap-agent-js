@@ -9,6 +9,7 @@ await runAsync(
   {
     enabled: true,
     mode: "remote",
+    log: "debug",
     protocol: "tcp",
     hooks: {
       esm: false,
@@ -58,7 +59,7 @@ await runAsync(
     /* eslint-enable no-unused-vars */
     assertDeepEqual(events, [
       {
-        id: 2,
+        id: 1,
         event: "call",
         thread_id: 0,
         http_client_request: {
@@ -71,7 +72,21 @@ await runAsync(
         message: [],
       },
       {
-        id: 4,
+        id: 2,
+        event: "return",
+        thread_id: 0,
+        parent_id: 1,
+        http_client_response: {
+          status_code: 200,
+          mime_type: null,
+          headers: {
+            connection: "close",
+            "transfer-encoding": "chunked",
+          },
+        },
+      },
+      {
+        id: 3,
         event: "call",
         thread_id: 0,
         http_server_request: {
@@ -89,27 +104,13 @@ await runAsync(
         message: [],
       },
       {
-        id: 5,
+        id: 4,
         event: "return",
         thread_id: 0,
-        parent_id: 4,
+        parent_id: 3,
         http_server_response: {
           status_code: 200,
           mime_type: null,
-        },
-      },
-      {
-        id: 3,
-        event: "return",
-        thread_id: 0,
-        parent_id: 2,
-        http_client_response: {
-          status_code: 200,
-          mime_type: null,
-          headers: {
-            connection: "close",
-            "transfer-encoding": "chunked",
-          },
         },
       },
     ]);
