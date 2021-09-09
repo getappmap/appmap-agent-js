@@ -646,9 +646,10 @@
                 data:
                   type: object
                   additionalProperties: false
-                  required: [index, exclude, type, path, code]
+                  required: [index, shallow, exclude, type, path, code]
                   properties:
                     index: {$ref: index}
+                    shallow: {type: boolean}
                     exclude:
                       type: array
                       items: {type: string}
