@@ -64,11 +64,12 @@ export default (dependencies) => {
               });
             }
           }
-          const index = incrementEventCounter(frontend);
-          sendClient(client, recordBeginBundle(frontend, index, null));
+          const index1 = incrementEventCounter(frontend);
+          const index2 = incrementEventCounter(frontend);
+          sendClient(client, recordBeginBundle(frontend, index1, null));
           sendClient(
             client,
-            recordBeforeQuery(frontend, index, {
+            recordBeforeQuery(frontend, index2, {
               database: "postgres",
               version: null,
               sql: query.text,
@@ -79,10 +80,10 @@ export default (dependencies) => {
           query.callback = (error, result) => {
             sendClient(
               client,
-              recordAfterQuery(frontend, index, { error: error || empty }),
+              recordAfterQuery(frontend, index2, { error: error || empty }),
             );
             callback(error, result);
-            sendClient(client, recordEndBundle(frontend, index, null));
+            sendClient(client, recordEndBundle(frontend, index1, null));
           };
           apply(original, this, [query]);
           return result;

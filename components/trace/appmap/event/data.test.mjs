@@ -2,9 +2,9 @@ import { strict as Assert } from "assert";
 import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
-} from "../../build.mjs";
-import Classmap from "./classmap.mjs";
-import Event from "./event.mjs";
+} from "../../../build.mjs";
+import Classmap from "../classmap.mjs";
+import Data from "./data.mjs";
 
 Error.stackTraceLimit = Infinity;
 
@@ -19,14 +19,12 @@ const { createConfiguration, extendConfiguration } =
   await buildTestComponentAsync("configuration", "test");
 const { createClassmap, addClassmapFile } = Classmap(dependencies);
 const {
-  compileBeginEventData,
-  compileEndEventData,
-  compileBeforeEventData,
-  compileAfterEventData,
+  compileCallData,
+  compileReturnData,
   compileParameterPrimitive,
   compileExceptionSerial,
   compileParameterSerial,
-} = Event(dependencies);
+} = Data(dependencies);
 const configuration = extendConfiguration(createConfiguration("/cwd"), {
   "function-name-placeholder": "$",
 });
@@ -119,12 +117,12 @@ assertDeepEqual(
 );
 
 ///////////////////////////
-// compileBeginEventData //
+// compileCallData //
 ///////////////////////////
 
 // apply >> routing //
 assertDeepEqual(
-  compileBeginEventData(
+  compileCallData(
     {
       type: "apply",
       function: "123/body/0",
@@ -158,7 +156,7 @@ assertDeepEqual(
 
 // apply >> missing routing //
 // assertDeepEqual(
-//   compileBeginEventData(
+//   compileCallData(
 //     {
 //       type: "apply",
 //       function: null,
@@ -185,7 +183,7 @@ assertDeepEqual(
 
 // response >> message //
 assertDeepEqual(
-  compileBeginEventData({
+  compileCallData({
     type: "response",
     method: "GET",
     protocol: "HTTP/1.1",
@@ -222,7 +220,7 @@ assertDeepEqual(
 
 // response >> headers //
 assertDeepEqual(
-  compileBeginEventData({
+  compileCallData({
     type: "response",
     method: "GET",
     protocol: "HTTP/1.1",
@@ -251,12 +249,12 @@ assertDeepEqual(
 );
 
 ////////////////////////////
-// compileBeforeEventData //
+// compileCallData //
 ////////////////////////////
 
 // query //
 assertDeepEqual(
-  compileBeforeEventData({
+  compileCallData({
     type: "query",
     database: "database",
     version: "version",
@@ -283,7 +281,7 @@ assertDeepEqual(
 
 // request >> message //
 assertDeepEqual(
-  compileBeforeEventData({
+  compileCallData({
     type: "request",
     method: "GET",
     protocol: "HTTP/1.1",
@@ -309,7 +307,7 @@ assertDeepEqual(
 
 // request >> headers //
 assertDeepEqual(
-  compileBeforeEventData({
+  compileCallData({
     type: "request",
     method: "GET",
     protocol: "HTTP/1.1",
@@ -327,12 +325,12 @@ assertDeepEqual(
 );
 
 /////////////////////
-// compileEndEvent //
+// compileCallData //
 /////////////////////
 
 // apply >> success //
 assertDeepEqual(
-  compileEndEventData(
+  compileReturnData(
     {
       type: "apply",
       error: null,
@@ -353,7 +351,7 @@ assertDeepEqual(
 
 // apply >> failure //
 assertDeepEqual(
-  compileEndEventData(
+  compileReturnData(
     {
       type: "apply",
       error: {
@@ -382,7 +380,7 @@ assertDeepEqual(
 
 // response //
 assertDeepEqual(
-  compileEndEventData(
+  compileReturnData(
     {
       type: "response",
       status: 200,
@@ -398,13 +396,13 @@ assertDeepEqual(
   },
 );
 
-///////////////////////////
-// compileAfterEventData //
-///////////////////////////
+/////////////////////
+// compileCallData //
+/////////////////////
 
 // query //
 assertDeepEqual(
-  compileAfterEventData(
+  compileReturnData(
     {
       type: "query",
     },
@@ -415,7 +413,7 @@ assertDeepEqual(
 
 // request //
 assertDeepEqual(
-  compileAfterEventData(
+  compileReturnData(
     {
       type: "request",
       status: 200,

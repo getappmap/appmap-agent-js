@@ -31,14 +31,15 @@ export default (dependencies) => {
         ...["request", "get"].map((key) => ({ object: Https, key })),
       ].map(({ object, key }) => ({ object, key, value: object[key] }));
       const spyRequest = (request) => {
-        const index = incrementEventCounter(frontend);
+        const index1 = incrementEventCounter(frontend);
+        const index2 = incrementEventCounter(frontend);
         request.on("finish", () => {
           const { method, path: url } = request;
           const headers = request.getHeaders();
-          sendClient(client, recordBeginBundle(frontend, index, null));
+          sendClient(client, recordBeginBundle(frontend, index1, null));
           sendClient(
             client,
-            recordBeforeRequest(frontend, index, {
+            recordBeforeRequest(frontend, index2, {
               protocol: "HTTP/1.1",
               method,
               url,
@@ -57,7 +58,7 @@ export default (dependencies) => {
           response.on("end", () => {
             sendClient(
               client,
-              recordAfterRequest(frontend, index, {
+              recordAfterRequest(frontend, index2, {
                 status,
                 message,
                 headers,
@@ -68,7 +69,7 @@ export default (dependencies) => {
             // Hoopfully, this is triggered after user 'end' handlers.
             // Since emit is synchronous the groups will still match!
             response.on("end", () => {
-              sendClient(client, recordEndBundle(frontend, index, null));
+              sendClient(client, recordEndBundle(frontend, index1, null));
             });
           });
         });

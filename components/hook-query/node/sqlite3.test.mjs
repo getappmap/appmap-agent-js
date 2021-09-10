@@ -71,7 +71,7 @@ const testAsync = async () => {
         type: "event",
         data: {
           type: "before",
-          index: 1,
+          index: 2,
           data: {
             type: "query",
             database: "sqlite3",
@@ -90,7 +90,7 @@ const testAsync = async () => {
         type: "event",
         data: {
           type: "after",
-          index: 1,
+          index: 2,
           data: { type: "query", error },
           group: 0,
           time: 0,

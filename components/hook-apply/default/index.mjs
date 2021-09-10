@@ -55,7 +55,8 @@ export default (dependencies) => {
       runtime.recordEndApply = (index, error, result) => {
         sendClient(client, recordEndApply(frontend, index, { error, result }));
       };
-      runtime.recordAwait = async (index, promise) => {
+      runtime.recordAwait = async (promise) => {
+        const index = incrementEventCounter(frontend);
         sendClient(client, recordBeforeJump(frontend, index, null));
         try {
           return await promise;
@@ -63,12 +64,14 @@ export default (dependencies) => {
           sendClient(client, recordAfterJump(frontend, index, null));
         }
       };
-      runtime.recordYield = function* (index, element) {
+      runtime.recordYield = function* (element) {
+        const index = incrementEventCounter(frontend);
         sendClient(client, recordBeforeJump(frontend, index, null));
         yield element;
         sendClient(client, recordAfterJump(frontend, index, null));
       };
-      runtime.recordYieldAll = function* (index, generator) {
+      runtime.recordYieldAll = function* (generator) {
+        const index = incrementEventCounter(frontend);
         sendClient(client, recordBeforeJump(frontend, index, null));
         yield* generator;
         sendClient(client, recordAfterJump(frontend, index, null));

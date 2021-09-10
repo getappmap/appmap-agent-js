@@ -44,7 +44,7 @@ const testAsync = async () => {
             x = $_ARGUMENT_0,
             y = $_ARGUMENT_1 === void 0 ? null : $_ARGUMENT_1,
             z = $_ARGUMENT_2;
-          return $_SUCCESS = await $.recordAwait($_APPLY_ID, 123);
+          return $_SUCCESS = await $.recordAwait(123);
         } catch ($_ERROR) {
           throw $_FAILURE = $_ERROR;
         } finally {
@@ -67,8 +67,8 @@ const testAsync = async () => {
             $_FAILURE = $.empty,
             $_SUCCESS = $.empty;
           try {
-            yield* $.recordYield($_APPLY_ID, 456);
-            yield* $.recordYieldAll($_APPLY_ID, 789);
+            yield* $.recordYield(456);
+            yield* $.recordYieldAll(789);
             return $_SUCCESS = ${code2};
           } catch ($_ERROR) {
             throw $_FAILURE = $_ERROR;

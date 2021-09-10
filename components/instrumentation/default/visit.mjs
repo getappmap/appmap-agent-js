@@ -293,10 +293,7 @@ export default (dependencies) => {
         return makeAwaitExpression(
           makeCallExpression(
             makeRegularMemberExpression(runtime, "recordAwait"),
-            [
-              makeIdentifier(`${runtime}_APPLY_ID`),
-              visit(argument, `${route}/argument`, lineage, context),
-            ],
+            [visit(argument, `${route}/argument`, lineage, context)],
           ),
         );
       }
@@ -309,10 +306,7 @@ export default (dependencies) => {
               runtime,
               delegate ? "recordYieldAll" : "recordYield",
             ),
-            [
-              makeIdentifier(`${runtime}_APPLY_ID`),
-              visit(argument, `${route}/argument`, lineage, context),
-            ],
+            [visit(argument, `${route}/argument`, lineage, context)],
           ),
         );
       }

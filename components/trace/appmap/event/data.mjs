@@ -2,7 +2,7 @@
 const _URL = URL;
 const _URLSearchParams = URLSearchParams;
 const _String = String;
-import Classmap from "./classmap.mjs";
+import Classmap from "../classmap.mjs";
 
 const { entries: toEntries } = Object;
 const { from: arrayFrom } = Array;
@@ -40,7 +40,7 @@ export default (dependencies) => {
   const compileSearchMessage = (search) =>
     arrayFrom(new _URLSearchParams(search).entries());
 
-  const compileBeginEventData = (data, classmap) => {
+  const compileCallData = (data, classmap) => {
     const { type } = data;
     if (type === "apply") {
       const { function: route, this: _this, arguments: _arguments } = data;
@@ -77,13 +77,6 @@ export default (dependencies) => {
         ].map(compileParameterPrimitive),
       };
     }
-    /* c8 ignore start */
-    assert(false, "invalid begin event type");
-    /* c8 ignore stop */
-  };
-
-  const compileBeforeEventData = (data, classmap) => {
-    const { type } = data;
     if (type === "query") {
       const { database, version, sql, parameters } = data;
       return {
@@ -109,11 +102,11 @@ export default (dependencies) => {
       };
     }
     /* c8 ignore start */
-    assert(false, "invalid before event type");
+    assert(false, "invalid call event type");
     /* c8 ignore stop */
   };
 
-  const compileEndEventData = (data, classmap) => {
+  const compileReturnData = (data, classmap) => {
     const { type } = data;
     if (type === "apply") {
       const { result, error } = data;
@@ -132,13 +125,6 @@ export default (dependencies) => {
         },
       };
     }
-    /* c8 ignore start */
-    assert(false, "invalid end event type");
-    /* c8 ignore stop */
-  };
-
-  const compileAfterEventData = (data, classmap) => {
-    const { type } = data;
     if (type === "query") {
       return {};
     }
@@ -153,7 +139,7 @@ export default (dependencies) => {
       };
     }
     /* c8 ignore start */
-    assert(false, "invalid after event type");
+    assert(false, "invalid return event type");
     /* c8 ignore stop */
   };
 
@@ -223,9 +209,7 @@ export default (dependencies) => {
     compileParameterPrimitive, // export for testing
     compileParameterSerial, // export for testing
     compileExceptionSerial, // export for testing
-    compileBeginEventData,
-    compileEndEventData,
-    compileBeforeEventData,
-    compileAfterEventData,
+    compileCallData,
+    compileReturnData,
   };
 };

@@ -36,11 +36,12 @@ export default (dependencies) => {
       prototype.query = function query(sql, values, callback) {
         const query = createQuery(sql, values, callback);
         ({ sql, values, _callback: callback } = { values: [], ...query });
-        const index = incrementEventCounter(frontend);
-        sendClient(client, recordBeginBundle(frontend, index, null));
+        const index1 = incrementEventCounter(frontend);
+        const index2 = incrementEventCounter(frontend);
+        sendClient(client, recordBeginBundle(frontend, index1, null));
         sendClient(
           client,
-          recordBeforeQuery(frontend, index, {
+          recordBeforeQuery(frontend, index2, {
             database: "mysql",
             version: null,
             sql,
@@ -50,10 +51,10 @@ export default (dependencies) => {
         query._callback = (error, result, fields) => {
           sendClient(
             client,
-            recordAfterQuery(frontend, index, { error: error || empty }),
+            recordAfterQuery(frontend, index2, { error: error || empty }),
           );
           callback(error, result, fields);
-          sendClient(client, recordEndBundle(frontend, index, null));
+          sendClient(client, recordEndBundle(frontend, index1, null));
         };
         return apply(original, this, [query]);
       };

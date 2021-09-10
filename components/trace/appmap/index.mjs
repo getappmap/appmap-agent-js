@@ -2,8 +2,9 @@ import Metadata from "./metadata.mjs";
 import Track from "./track.mjs";
 import Group from "./group.mjs";
 import Classmap from "./classmap.mjs";
-import Digest from "./digest.mjs";
-import Callstack from "./callstack.mjs";
+import Event from "./event/index.mjs";
+import Completion from "./completion.mjs";
+import Stack from "./stack.mjs";
 
 const VERSION = "1.6.0";
 
@@ -17,10 +18,11 @@ export default (dependencies) => {
   const { compileMetadata } = Metadata(dependencies);
   const { createClassmap, addClassmapFile, compileClassmap } =
     Classmap(dependencies);
+  const { ensureCompletion } = Completion(dependencies);
   const { orderByGroup } = Group(dependencies);
+  const { orderByStack } = Stack(dependencies);
   const { collectTracks } = Track(dependencies);
-  const { digestTrace } = Digest(dependencies);
-  const { frameCallstack } = Callstack(dependencies);
+  const { compileEventTrace } = Event(dependencies);
   /* c8 ignore start */
   const getName = ({ name }) => name;
   /* c8 ignore start */
@@ -38,7 +40,8 @@ export default (dependencies) => {
           addClassmapFile(classmap, data);
         }
       }
-      const frame = frameCallstack(orderByGroup(marks));
+      ensureCompletion(marks);
+      const events = orderByStack(orderByGroup(marks));
       return collectTracks(marks).map(({ configuration, slice, routes }) => {
         const configuration2 = extendConfiguration(
           configuration1,
@@ -56,7 +59,7 @@ export default (dependencies) => {
           version: VERSION,
           metadata: compileMetadata(configuration2, termination),
           classMap: compileClassmap(classmap, routes),
-          events: digestTrace(frame, slice, classmap),
+          events: compileEventTrace(events, slice, classmap),
         };
         validateAppmap(appmap);
         return {

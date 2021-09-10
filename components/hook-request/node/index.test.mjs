@@ -77,7 +77,7 @@ const testAsync = async () => {
         type: "event",
         data: {
           type: "before",
-          index: 1,
+          index: 2,
           data: {
             type: "request",
             protocol: "HTTP/1.1",
@@ -96,7 +96,7 @@ const testAsync = async () => {
         type: "event",
         data: {
           type: "after",
-          index: 1,
+          index: 2,
           data: {
             type: "request",
             status: 200,

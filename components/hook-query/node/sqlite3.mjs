@@ -115,11 +115,12 @@ export default (dependencies) => {
       }));
       const copy = { ...database_prototype };
       const recordQuery = (sql, parameters, callback) => {
-        const index = incrementEventCounter(frontend);
-        sendClient(client, recordBeginBundle(frontend, index));
+        const index1 = incrementEventCounter(frontend);
+        const index2 = incrementEventCounter(frontend);
+        sendClient(client, recordBeginBundle(frontend, index1));
         sendClient(
           client,
-          recordBeforeQuery(frontend, index, {
+          recordBeforeQuery(frontend, index2, {
             database: "sqlite3",
             version: null,
             sql,
@@ -129,14 +130,14 @@ export default (dependencies) => {
         return function (...args) {
           sendClient(
             client,
-            recordAfterQuery(frontend, index, {
+            recordAfterQuery(frontend, index2, {
               error: coalesce(args, 0, null) || empty,
             }),
           );
           try {
             return apply(callback, this, args);
           } finally {
-            sendClient(client, recordEndBundle(frontend, index));
+            sendClient(client, recordEndBundle(frontend, index1));
           }
         };
       };

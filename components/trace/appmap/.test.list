@@ -1,8 +1,8 @@
-- frame.mjs
-- * classmap.mjs
+- * - classmap.mjs
+    - event
   * metadata.mjs
-- * event.mjs
+  * completion.mjs
   * group.mjs
+  * stack.mjs
   * track.mjs
-- digest.mjs
 - index.mjs

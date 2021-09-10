@@ -94,7 +94,7 @@ const proceedAsync = async () => {
           type: "event",
           data: {
             type: "before",
-            index: 1,
+            index: 2,
             data: {
               type: "query",
               database: "mysql",
@@ -116,7 +116,7 @@ const proceedAsync = async () => {
           type: "event",
           data: {
             type: "after",
-            index: 1,
+            index: 2,
             data: {
               type: "query",
               error: null,

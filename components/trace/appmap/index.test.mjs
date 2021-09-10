@@ -148,7 +148,7 @@ assertDeepEqual(
         ],
         events: [
           {
-            id: 1,
+            id: 10,
             event: "call",
             thread_id: 0,
             defined_class: "f",
@@ -172,10 +172,10 @@ assertDeepEqual(
             ],
           },
           {
-            id: 2,
+            id: 11,
             event: "return",
             thread_id: 0,
-            parent_id: 1,
+            parent_id: 10,
             elapsed: 0,
             return_value: {
               name: "return",

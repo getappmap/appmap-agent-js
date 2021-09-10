@@ -9,6 +9,7 @@ await runAsync(
   {
     enabled: true,
     mode: "remote",
+    log: "debug",
     protocol: "tcp",
     "function-name-placeholder": "placeholder",
     packages: { glob: "*" },
@@ -16,6 +17,7 @@ await runAsync(
       esm: true,
       cjs: true,
       apply: true,
+      group: true,
       http: false,
     },
     scenario: "scenario",
@@ -26,7 +28,14 @@ await runAsync(
   async (repository) => {
     await writeFile(
       `${repository}/main.mjs`,
-      `function main() { return 456; }; main(123);`,
+      `
+        const main = async (x) => {
+          return await new Promise((resolve, reject) => {
+            setTimeout(resolve, 1000, 456);
+          });
+        };
+        main(123);
+      `,
       "utf8",
     );
   },
@@ -37,7 +46,7 @@ await runAsync(
     const [event1, { elapsed, ...event2 }] = events;
     /* eslint-enable no-unused-vars */
     assertDeepEqual(
-      [event1, event2],
+      events.map(({elapsed, ...rest}) => rest),
       [
         {
           id: 1,
