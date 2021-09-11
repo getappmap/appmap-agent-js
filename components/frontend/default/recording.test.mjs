@@ -14,6 +14,7 @@ const { createConfiguration } = await buildTestComponentAsync("configuration");
 const {
   createRecording,
   setCurrentGroup,
+  getCurrentGroup,
   getSerializationEmptyValue,
   incrementEventCounter,
   recordBeginApply,
@@ -26,6 +27,7 @@ const configuration = createConfiguration("/");
 const recording = createRecording(configuration);
 const session = createSession(configuration);
 setCurrentGroup({ recording }, "group");
+assertEqual(getCurrentGroup({ recording }), "group");
 initializeSession(session);
 assertEqual(typeof incrementEventCounter({ recording }), "number");
 assertEqual(typeof getSerializationEmptyValue({ recording }), "symbol");

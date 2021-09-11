@@ -73,6 +73,8 @@ export default (dependencies) => {
       event_counter: createCounter(0),
       serialization: createSerialization(configuration),
     }),
+    getCurrentGroup: ({ recording: { current_group } }) =>
+      getBox(current_group),
     setCurrentGroup: ({ recording: { current_group } }, group) => {
       setBox(current_group, group);
     },

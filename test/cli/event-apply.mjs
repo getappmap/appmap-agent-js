@@ -29,12 +29,21 @@ await runAsync(
     await writeFile(
       `${repository}/main.mjs`,
       `
-        const main = async (x) => {
-          return await new Promise((resolve, reject) => {
-            setTimeout(resolve, 1000, 456);
+        async function* generateAsync (x) {
+          yield 1 * x;
+          await new Promise((resolve, reject) => {
+            setTimeout(resolve, 0);
           });
+          yield* [2 * x, 3  * x];
+        }
+        const mainAsync = async () => {
+          const iterateAsync = generateAsync(2);
+          console.log(await iterateAsync.next());
+          console.log(await iterateAsync.next());
+          console.log(await iterateAsync.next());
+          console.log(await iterateAsync.next());
         };
-        main(123);
+        mainAsync();
       `,
       "utf8",
     );
@@ -42,9 +51,6 @@ await runAsync(
   async (appmaps) => {
     const { "main.appmap.json": appmap } = appmaps;
     const { events } = appmap;
-    /* eslint-disable no-unused-vars */
-    const [event1, { elapsed, ...event2 }] = events;
-    /* eslint-enable no-unused-vars */
     assertDeepEqual(
       events.map(({elapsed, ...rest}) => rest),
       [

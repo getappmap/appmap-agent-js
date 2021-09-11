@@ -25,7 +25,7 @@ const testAsync = async () => {
     ),
     [],
   );
-  const makeJump = (index) => [
+  const makeJump = (index, isAwait) => [
     {
       type: "trace",
       data: {
@@ -46,7 +46,7 @@ const testAsync = async () => {
         data: {
           type: "after",
           index,
-          group: 0,
+          group: isAwait ? null : 0,
           time: 0,
           data: { type: "jump" },
         },
@@ -91,9 +91,9 @@ const testAsync = async () => {
           },
         },
       },
-      ...makeJump(2),
-      ...makeJump(3),
-      ...makeJump(4),
+      ...makeJump(2, true),
+      ...makeJump(3, false),
+      ...makeJump(4, false),
       {
         type: "trace",
         data: {

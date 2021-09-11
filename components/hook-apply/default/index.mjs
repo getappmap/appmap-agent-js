@@ -6,6 +6,8 @@ export default (dependencies) => {
     interpretation: { runScript },
     client: { sendClient },
     frontend: {
+      getCurrentGroup,
+      setCurrentGroup,
       getSerializationEmptyValue,
       getInstrumentationIdentifier,
       incrementEventCounter,
@@ -61,7 +63,36 @@ export default (dependencies) => {
         try {
           return await promise;
         } finally {
+          // This group is different from the group after the asynchronous function has returned...
+          //
+          // import {createHook, executionAsyncId} from "async_hooks";
+          // createHook({}).enable();
+          // import {writeFileSync} from "fs";
+          // const {stdout:{fd}} = process;
+          // const log = (string) => writeFileSync(fd, `[${executionAsyncId()}] ${string}\n`);
+          // const logAwait = async (promise) => {
+          //   log("before");
+          //   try {
+          //     await promise;
+          //   } finally {
+          //     log("after");
+          //   }
+          // };
+          // const mainAsync = async () => {
+          //   log("begin");
+          //   try {
+          //     await logAwait(new Promise((resolve) => {
+          //       setTimeout(resolve, 1000, 123);
+          //     }));
+          //   } finally {
+          //     log("end");
+          //   }
+          // };
+          // await mainAsync();
+          const group = getCurrentGroup(frontend);
+          setCurrentGroup(frontend, null);
           sendClient(client, recordAfterJump(frontend, index, null));
+          setCurrentGroup(frontend, group);
         }
       };
       runtime.recordYield = function* (element) {

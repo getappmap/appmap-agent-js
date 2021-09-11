@@ -709,7 +709,10 @@
                         - begin
                         - end
                     time: {type: number}
-                    group: {$ref: index}
+                    group:
+                      anyOf:
+                        - const: null
+                        - $ref: index
                     index: {$ref: index}
                     # TODO
                     data: {type: object}

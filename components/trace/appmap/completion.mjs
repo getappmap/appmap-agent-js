@@ -1,3 +1,5 @@
+const { MAX_SAFE_INTEGER } = Number;
+
 export default (dependencies) => {
   const {
     util: { assert },
@@ -6,49 +8,64 @@ export default (dependencies) => {
   return {
     ensureCompletion: (trace) => {
       const stack = [];
-      let max_index = 0;
+      let stack_group = null;
       for (const { type, data } of trace) {
         if (type === "event") {
           const event = data;
-          const { type, index, group } = event;
-          if (index > max_index) {
-            max_index = index;
-          }
-          if (stack.length > 0) {
-            const { group: stack_group } = stack[stack.length - 1];
-            if (group !== stack_group) {
-              console.log("GRUNT", event, stack[stack.length - 1]);
-            }
-            assert(
-              group === stack_group,
-              "group mismatch within the same stack",
-            );
-          }
+          const { type, group } = event;
+          // For await jumps, the after event is unfortunately not in the correct group.
+          assert(
+            type === "after" || group !== null,
+            "only after event can be groupless",
+          );
           if (type === "begin" || type === "after") {
+            assert(
+              group === null || stack_group === null || stack_group === group,
+              "group mismatch for being/after event",
+            );
+            if (stack_group === null) {
+              stack_group = group;
+            }
             stack.push(event);
           } else {
             assert(type === "before" || type === "end", "invalid event type");
+            assert(
+              stack_group === null || group === stack_group,
+              "group mismatch for before/end event",
+            );
             assert(stack.length > 0, "missing event on the stack");
-            stack.pop();
+            const other_event = stack.pop();
+            const { group: other_group } = other_event;
+            if (other_group === null) {
+              other_event.group = group;
+            }
+            if (stack.length === 0) {
+              stack_group = null;
+            }
           }
         }
       }
+      // Because process.exit synchronously exit the process, the final stack may be incomplete.
       if (stack.length > 0) {
         logInfo(
-          "manufacturting callstack completion of %j events",
+          "manufacturing callstack completion of %j events",
           stack.length,
         );
       }
-      // Because process.exit synchronously exit the process, the final stack may be incomplete.
+      let index = MAX_SAFE_INTEGER;
       while (stack.length > 0) {
-        const { group, time } = stack.pop();
+        const event = stack.pop();
+        event.time = 0;
+        if (event.group === null) {
+          event.group = MAX_SAFE_INTEGER;
+        }
         trace.push({
           type: "event",
           data: {
             type: "before",
-            index: (max_index += 1),
-            time,
-            group,
+            index: (index -= 1),
+            time: 0,
+            group: event.group,
             data: {
               type: "jump",
             },

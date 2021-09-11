@@ -1440,7 +1440,14 @@ export const schema = [
                         "type": "number"
                       },
                       "group": {
-                        "$ref": "index"
+                        "anyOf": [
+                          {
+                            "const": null
+                          },
+                          {
+                            "$ref": "index"
+                          }
+                        ]
                       },
                       "index": {
                         "$ref": "index"
