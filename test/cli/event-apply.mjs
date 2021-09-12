@@ -9,7 +9,6 @@ await runAsync(
   {
     enabled: true,
     mode: "remote",
-    log: "debug",
     protocol: "tcp",
     "function-name-placeholder": "placeholder",
     packages: { glob: "*" },

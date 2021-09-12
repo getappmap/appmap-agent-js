@@ -37,7 +37,7 @@ export default (dependencies) => {
           }
         } else if (mark.type === "event") {
           const { data: event } = mark;
-          if (event.type === "begin") {
+          if (event.type === "before" || event.type === "begin") {
             const { data: payload } = event;
             if (payload.type === "apply") {
               for (const [index, enabled] of states) {
