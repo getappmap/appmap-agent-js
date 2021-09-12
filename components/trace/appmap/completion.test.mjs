@@ -27,67 +27,34 @@ const default_event = {
     ...default_event,
     type: "begin",
     index: 1,
+    group: 1,
     data: { type: "bundle" },
   });
   const mark2 = makeMark({
     ...default_event,
-    type: "begin",
-    index: 2,
+    type: "end",
+    index: 1,
+    group: 1,
     data: { type: "bundle" },
   });
   const mark3 = makeMark({
     ...default_event,
     type: "after",
-    group: null,
-    index: 3,
-    data: { type: "bundle" },
-  });
-  const mark4 = makeMark({
-    ...default_event,
-    type: "before",
-    index: 4,
-    data: { type: "bundle" },
-  });
-  const mark5 = makeMark({
-    ...default_event,
-    type: "end",
+    group: 2,
     index: 2,
     data: { type: "bundle" },
   });
-  const mark6 = makeMark({
-    ...default_event,
-    type: "end",
-    index: 1,
-    data: { type: "bundle" },
-  });
-  const mark7 = makeMark({
-    ...default_event,
-    type: "after",
-    index: 4,
-    group: null,
-    data: { type: "jump" },
-  });
-  const trace = [mark1, mark2, mark3, mark4, mark5, mark6, mark7];
+  const trace = [mark1, mark2, mark3];
   ensureCompletion(trace);
   assertDeepEqual(trace, [
     mark1,
     mark2,
     mark3,
-    mark4,
-    mark5,
-    mark6,
-    {
-      type: "event",
-      data: {
-        ...mark7.data,
-        group: Number.MAX_SAFE_INTEGER,
-      },
-    },
     makeMark({
       ...default_event,
       type: "before",
+      group: 2,
       index: Number.MAX_SAFE_INTEGER - 1,
-      group: Number.MAX_SAFE_INTEGER,
       data: { type: "jump" },
     }),
   ]);

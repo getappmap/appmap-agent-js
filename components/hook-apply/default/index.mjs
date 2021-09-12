@@ -6,8 +6,6 @@ export default (dependencies) => {
     interpretation: { runScript },
     client: { sendClient },
     frontend: {
-      getCurrentGroup,
-      setCurrentGroup,
       getSerializationEmptyValue,
       getInstrumentationIdentifier,
       incrementEventCounter,
@@ -31,11 +29,10 @@ export default (dependencies) => {
         `
           const ${identifier}_APPLY_ID = 0;
           const ${identifier} = {
-            recordBeforeApply: null,
-            recordAfterApply: null,
-            recordAwait: null,
-            recordYield: null,
-            recordYieldAll: null,
+            recordBeginApply: null,
+            recordEndApply: null,
+            recordBeforeJump: null,
+            recordAfterJump: null,
             empty: null
           };
         `,
@@ -57,62 +54,19 @@ export default (dependencies) => {
       runtime.recordEndApply = (index, error, result) => {
         sendClient(client, recordEndApply(frontend, index, { error, result }));
       };
-      runtime.recordAwait = async (promise) => {
+      runtime.recordBeforeJump = () => {
         const index = incrementEventCounter(frontend);
         sendClient(client, recordBeforeJump(frontend, index, null));
-        try {
-          return await promise;
-        } finally {
-          // This group is different from the group after the asynchronous function has returned...
-          //
-          // import {createHook, executionAsyncId} from "async_hooks";
-          // createHook({}).enable();
-          // import {writeFileSync} from "fs";
-          // const {stdout:{fd}} = process;
-          // const log = (string) => writeFileSync(fd, `[${executionAsyncId()}] ${string}\n`);
-          // const logAwait = async (promise) => {
-          //   log("before");
-          //   try {
-          //     await promise;
-          //   } finally {
-          //     log("after");
-          //   }
-          // };
-          // const mainAsync = async () => {
-          //   log("begin");
-          //   try {
-          //     await logAwait(new Promise((resolve) => {
-          //       setTimeout(resolve, 1000, 123);
-          //     }));
-          //   } finally {
-          //     log("end");
-          //   }
-          // };
-          // await mainAsync();
-          const group = getCurrentGroup(frontend);
-          setCurrentGroup(frontend, null);
-          sendClient(client, recordAfterJump(frontend, index, null));
-          setCurrentGroup(frontend, group);
-        }
+        return index;
       };
-      runtime.recordYield = function* (element) {
-        const index = incrementEventCounter(frontend);
-        sendClient(client, recordBeforeJump(frontend, index, null));
-        yield element;
-        sendClient(client, recordAfterJump(frontend, index, null));
-      };
-      runtime.recordYieldAll = function* (generator) {
-        const index = incrementEventCounter(frontend);
-        sendClient(client, recordBeforeJump(frontend, index, null));
-        yield* generator;
+      runtime.recordAfterJump = (index) => {
         sendClient(client, recordAfterJump(frontend, index, null));
       };
       return [
-        "recordBeforeApply",
-        "recordAfterApply",
-        "recordAwait",
-        "recordYield",
-        "recordYieldAll",
+        "recordBeginApply",
+        "recordEndApply",
+        "recordBeforeJump",
+        "recordAfterJump",
       ].map((key) => ({
         object: runtime,
         key,

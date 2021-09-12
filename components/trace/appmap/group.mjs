@@ -26,7 +26,7 @@ export default (dependencies) => {
         if (type === "group") {
           const { group, origin } = data;
           const buffer = [];
-          assert(!map.has(group), "duplicate group");
+          assert(!map.has(group), "duplicate group " + group);
           map.set(group, buffer);
           (map.has(origin) ? map.get(origin) : root).push(buffer);
         } else if (type === "event") {

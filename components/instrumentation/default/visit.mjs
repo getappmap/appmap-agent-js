@@ -4,9 +4,74 @@ const _String = String;
 const { isArray } = Array;
 const { fromEntries, entries } = Object;
 
+//////////////////////////////
+// Difficulties with groups //
+//////////////////////////////
+
+// import {createHook, executionAsyncId} from "async_hooks";
+// createHook({}).enable();
+// import {writeFileSync} from "fs";
+// const {stdout:{fd}} = process;
+// const log = (string) => writeFileSync(fd, `[${executionAsyncId()}] ${string}\n`);
+// const logAwait = async (promise) => {
+//   log("before");
+//   try {
+//     await promise;
+//   } finally {
+//     log("after");
+//   }
+// };
+// const mainAsync = async () => {
+//   log("begin");
+//   try {
+//     await logAwait(new Promise((resolve) => {
+//       setTimeout(resolve, 1000, 123);
+//     }));
+//   } finally {
+//     log("end");
+//   }
+// };
+// await mainAsync();
+
+// import {createHook, executionAsyncId} from "async_hooks";
+// createHook({}).enable();
+// import {writeFileSync} from "fs";
+// const {stdout:{fd}} = process;
+// const log = (string) => writeFileSync(fd, `[${executionAsyncId()}] ${string}\n`);
+// function* logYield (result) {
+//   log("before");
+//   yield result;
+//   log("after");
+// };
+// async function* main () {
+//   log("begin");
+//   yield* logYield(123);
+//   log("end");
+// }
+// const iterator = main();
+// iterator.next();
+// iterator.next();
+
 /////////////
 // Builder //
 /////////////
+
+const makeSequenceExpression = (nodes) => ({
+  type: "SequenceExpression",
+  expressions: nodes,
+});
+
+const makeStatement = (node) => ({
+  type: "ExpressionStatement",
+  expression: node,
+});
+
+const makeIfStatement = (node1, node2, node3) => ({
+  type: "IfStatement",
+  test: node1,
+  consequent: node2,
+  alternate: node3,
+});
 
 const makeBlockStatement = (nodes) => ({
   type: "BlockStatement",
@@ -62,9 +127,9 @@ const makeBinaryExpression = (operator, node1, node2) => ({
   right: node2,
 });
 
-const makeAssignmentExpression = (operator, node1, node2) => ({
+const makeAssignmentExpression = (node1, node2) => ({
   type: "AssignmentExpression",
-  operator,
+  operator: "=",
   left: node1,
   right: node2,
 });
@@ -138,11 +203,59 @@ export default (dependencies) => {
 
   const { checkIdentifierClash } = Clash(dependencies);
 
+  const makeCatchJumpStatement = (runtime) =>
+    makeIfStatement(
+      makeBinaryExpression(
+        "!==",
+        makeIdentifier(`${runtime}_JUMP_ID`),
+        makeLiteral(null),
+      ),
+      makeBlockStatement([
+        makeStatement(
+          makeCallExpression(
+            makeRegularMemberExpression(runtime, "recordAfterJump"),
+            [makeIdentifier(`${runtime}_JUMP_ID`)],
+          ),
+        ),
+        makeStatement(
+          makeAssignmentExpression(
+            makeIdentifier(`${runtime}_JUMP_ID`),
+            makeLiteral(null),
+          ),
+        ),
+      ]),
+      null,
+    );
+
+  const makeJumpExpression = (expression, makeExpression, runtime) =>
+    makeSequenceExpression([
+      makeAssignmentExpression(makeIdentifier(`${runtime}_JUMP`), expression),
+      makeAssignmentExpression(
+        makeIdentifier(`${runtime}_JUMP_ID`),
+        makeCallExpression(
+          makeRegularMemberExpression(runtime, "recordBeforeJump"),
+          [],
+        ),
+      ),
+      makeAssignmentExpression(
+        makeIdentifier(`${runtime}_JUMP`),
+        makeExpression(makeIdentifier(`${runtime}_JUMP`)),
+      ),
+      makeCallExpression(
+        makeRegularMemberExpression(runtime, "recordAfterJump"),
+        [makeIdentifier(`${runtime}_JUMP_ID`)],
+      ),
+      makeAssignmentExpression(
+        makeIdentifier(`${runtime}_JUMP_ID`),
+        makeLiteral(null),
+      ),
+      makeIdentifier(`${runtime}_JUMP`),
+    ]);
+
   // *NB*: This supposes that the surrounding function has been compiled!
   const compileReturn = (node, runtime) =>
     makeReturnStatement(
       makeAssignmentExpression(
-        "=",
         makeIdentifier(`${runtime}_SUCCESS`),
         node === null ? makeUnaryExpression("void", makeLiteral(0)) : node,
       ),
@@ -161,6 +274,46 @@ export default (dependencies) => {
     }
     return [compileReturn(node, runtime)];
   };
+
+  const compileTryStatement = (node1, node2, node3, runtime) =>
+    makeTryStatement(
+      node1,
+      makeCatchClause(
+        makeIdentifier(`${runtime}_ERROR`),
+        makeBlockStatement([
+          makeCatchJumpStatement(runtime),
+          ...(node2 === null || node2.param === null
+            ? []
+            : [
+                makeVariableDeclaration("let", [
+                  makeVariableDeclarator(
+                    node2.param,
+                    makeIdentifier(`${runtime}_ERROR`),
+                  ),
+                ]),
+              ]),
+          ...(node2 === null ? [] : [node2.body]),
+        ]),
+      ),
+      node3,
+    );
+
+  const compileProgram = (source, nodes, runtime) => ({
+    type: "Program",
+    sourceType: source,
+    body:
+      source === "module"
+        ? [
+            makeVariableDeclaration("let", [
+              makeVariableDeclarator(
+                makeIdentifier(`${runtime}_JUMP_ID`),
+                makeLiteral(null),
+              ),
+            ]),
+            ...nodes,
+          ]
+        : nodes,
+  });
 
   const compileFunction = (node, params, body, route, { runtime }) => ({
     type: node.type,
@@ -193,6 +346,14 @@ export default (dependencies) => {
         makeVariableDeclarator(
           makeIdentifier(`${runtime}_SUCCESS`),
           makeRegularMemberExpression(runtime, "empty"),
+        ),
+        makeVariableDeclarator(
+          makeIdentifier(`${runtime}_JUMP`),
+          makeLiteral(null),
+        ),
+        makeVariableDeclarator(
+          makeIdentifier(`${runtime}_JUMP_ID`),
+          makeLiteral(null),
         ),
       ]),
       makeTryStatement(
@@ -245,9 +406,9 @@ export default (dependencies) => {
         makeCatchClause(
           makeIdentifier(`${runtime}_ERROR`),
           makeBlockStatement([
+            makeCatchJumpStatement(runtime),
             makeThrowStatement(
               makeAssignmentExpression(
-                "=",
                 makeIdentifier(`${runtime}_FAILURE`),
                 makeIdentifier(`${runtime}_ERROR`),
               ),
@@ -288,32 +449,38 @@ export default (dependencies) => {
       if (isExcluded(exclusion, getQualifiedName(naming, lineage))) {
         return node;
       }
+      if (type === "Program") {
+        return compileProgram(
+          node.sourceType,
+          visit(node.body, `${route}/body`, lineage, context),
+          runtime,
+        );
+      }
+      if (type === "TryStatement") {
+        return compileTryStatement(
+          visit(node.block, `${route}/block`, lineage, context),
+          visit(node.handler, `${route}/handler`, lineage, context),
+          visit(node.finalizer, `${route}/finalizer`, lineage, context),
+          runtime,
+        );
+      }
       if (type === "AwaitExpression") {
-        const { argument } = node;
-        return makeAwaitExpression(
-          makeCallExpression(
-            makeRegularMemberExpression(runtime, "recordAwait"),
-            [visit(argument, `${route}/argument`, lineage, context)],
-          ),
+        return makeJumpExpression(
+          visit(node.argument, `${route}/argument`, lineage, context),
+          makeAwaitExpression,
+          runtime,
         );
       }
       if (type === "YieldExpression") {
-        const { argument, delegate } = node;
-        return makeYieldExpression(
-          true,
-          makeCallExpression(
-            makeRegularMemberExpression(
-              runtime,
-              delegate ? "recordYieldAll" : "recordYield",
-            ),
-            [visit(argument, `${route}/argument`, lineage, context)],
-          ),
+        return makeJumpExpression(
+          visit(node.argument, `${route}/argument`, lineage, context),
+          (expression) => makeYieldExpression(node.delegate, expression),
+          runtime,
         );
       }
       if (type === "ReturnStatement") {
-        const { argument } = node;
         return compileReturn(
-          visit(argument, `${route}/argument`, lineage, context),
+          visit(node.argument, `${route}/argument`, lineage, context),
           runtime,
         );
       }

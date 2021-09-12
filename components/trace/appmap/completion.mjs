@@ -8,40 +8,23 @@ export default (dependencies) => {
   return {
     ensureCompletion: (trace) => {
       const stack = [];
-      let stack_group = null;
       for (const { type, data } of trace) {
         if (type === "event") {
           const event = data;
-          const { type, group } = event;
-          // For await jumps, the after event is unfortunately not in the correct group.
+          const { type, group, index } = event;
           assert(
-            type === "after" || group !== null,
-            "only after event can be groupless",
+            stack.length === 0 || stack[0].group === group,
+            "group mismatch within the same stack",
           );
           if (type === "begin" || type === "after") {
-            assert(
-              group === null || stack_group === null || stack_group === group,
-              "group mismatch for being/after event",
-            );
-            if (stack_group === null) {
-              stack_group = group;
-            }
             stack.push(event);
           } else {
             assert(type === "before" || type === "end", "invalid event type");
+            const { type: other_type, index: other_index } = stack.pop();
             assert(
-              stack_group === null || group === stack_group,
-              "group mismatch for before/end event",
+              other_type !== "begin" || type !== "end" || index === other_index,
+              "begin/end index mismatch",
             );
-            assert(stack.length > 0, "missing event on the stack");
-            const other_event = stack.pop();
-            const { group: other_group } = other_event;
-            if (other_group === null) {
-              other_event.group = group;
-            }
-            if (stack.length === 0) {
-              stack_group = null;
-            }
           }
         }
       }
@@ -56,9 +39,6 @@ export default (dependencies) => {
       while (stack.length > 0) {
         const event = stack.pop();
         event.time = 0;
-        if (event.group === null) {
-          event.group = MAX_SAFE_INTEGER;
-        }
         trace.push({
           type: "event",
           data: {

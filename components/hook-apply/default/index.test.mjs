@@ -25,51 +25,16 @@ const testAsync = async () => {
     ),
     [],
   );
-  const makeJump = (index, isAwait) => [
-    {
-      type: "trace",
-      data: {
-        type: "event",
-        data: {
-          type: "before",
-          index,
-          group: 0,
-          time: 0,
-          data: { type: "jump" },
-        },
-      },
-    },
-    {
-      type: "trace",
-      data: {
-        type: "event",
-        data: {
-          type: "after",
-          index,
-          group: isAwait ? null : 0,
-          time: 0,
-          data: { type: "jump" },
-        },
-      },
-    },
-  ];
   assertDeepEqual(
     await testHookAsync(
       hookApply,
       unhookApply,
       { hooks: { apply: true }, "hidden-identifier": "$" },
       async () => {
-        const index = $uuid.recordBeginApply("function", 123, [456]);
-        await $uuid.recordAwait(Promise.resolve("await"));
-        const yields = [];
-        for (const element of $uuid.recordYield("yield")) {
-          yields.push(element);
-        }
-        for (const element of $uuid.recordYieldAll(["yield1", "yield2"])) {
-          yields.push(element);
-        }
-        assertDeepEqual(yields, ["yield", "yield1", "yield2"]);
-        $uuid.recordEndApply(index, null, 789);
+        const index1 = $uuid.recordBeginApply("function", 123, [456]);
+        const index2 = $uuid.recordBeforeJump();
+        $uuid.recordAfterJump(index2);
+        $uuid.recordEndApply(index1, null, 789);
       },
     ),
     [
@@ -91,9 +56,32 @@ const testAsync = async () => {
           },
         },
       },
-      ...makeJump(2, true),
-      ...makeJump(3, false),
-      ...makeJump(4, false),
+      {
+        type: "trace",
+        data: {
+          type: "event",
+          data: {
+            type: "before",
+            index: 2,
+            group: 0,
+            time: 0,
+            data: { type: "jump" },
+          },
+        },
+      },
+      {
+        type: "trace",
+        data: {
+          type: "event",
+          data: {
+            type: "after",
+            index: 2,
+            group: 0,
+            time: 0,
+            data: { type: "jump" },
+          },
+        },
+      },
       {
         type: "trace",
         data: {
