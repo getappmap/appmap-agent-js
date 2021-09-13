@@ -67,6 +67,7 @@ export default (dependencies) => {
   const serializeAfterQuery = (serialization, { error }) => ({
     error: serialize(serialization, error),
   });
+  const wrapIndex = (serialization, index) => ({ index });
   return {
     createRecording: (configuration) => ({
       current_group: createBox(0),
@@ -82,6 +83,8 @@ export default (dependencies) => {
       incrementCounter(event_counter),
     getSerializationEmptyValue: ({ recording: { serialization } }) =>
       getSerializationEmptyValue(serialization),
+    // placeholder //
+    recordPlaceholder: generateRecord("placeholder", "placeholder", wrapIndex),
     // bundle //
     recordBeginBundle: generateRecord("begin", "bundle", returnNull),
     recordEndBundle: generateRecord("end", "bundle", returnNull),

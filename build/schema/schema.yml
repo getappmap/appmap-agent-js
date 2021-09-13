@@ -704,6 +704,7 @@
                   properties:
                     type:
                       enum:
+                        - placeholder
                         - before
                         - after
                         - begin

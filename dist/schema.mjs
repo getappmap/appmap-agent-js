@@ -1430,6 +1430,7 @@ export const schema = [
                     "properties": {
                       "type": {
                         "enum": [
+                          "placeholder",
                           "before",
                           "after",
                           "begin",

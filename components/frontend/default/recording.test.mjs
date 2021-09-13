@@ -17,6 +17,7 @@ const {
   getCurrentGroup,
   getSerializationEmptyValue,
   incrementEventCounter,
+  recordPlaceholder,
   recordBeginApply,
   recordEndApply,
   recordBeforeQuery,
@@ -105,5 +106,13 @@ assertDeepEqual(
   createMessage("after", "index", {
     type: "query",
     error: { type: "number", print: "123" },
+  }),
+);
+
+assertDeepEqual(
+  recordPlaceholder({ session, recording }, "index", 123),
+  createMessage("placeholder", "index", {
+    type: "placeholder",
+    index: 123,
   }),
 );

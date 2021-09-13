@@ -9,6 +9,7 @@ await runAsync(
   {
     enabled: true,
     mode: "remote",
+    packages: { glob: "*" },
     protocol: "tcp",
     log: "debug",
     hooks: {
@@ -29,20 +30,20 @@ await runAsync(
       `
         import Http from "http";
         const server = Http.createServer();
-        server.on("request", (request, response) => {
-          request.on("data", () => {});
-          request.on("end", () => {
+        server.on("request", function onServerRequest (request, response) {
+          request.on("data", function onServerRequestData () {});
+          request.on("end", function onServerRequestEnd () {
             response.removeHeader("date");
             response.writeHead(200, "ok");
             response.end();
           });
         });
-        server.on("listening", () => {
+        server.on("listening", function onServerListening () {
           const {port} = server.address();
           const request = Http.get("http://localhost:" + String(port));
-          request.on("response", (response) => {
-            response.on("data", () => {});
-            response.on("end", () => {
+          request.on("response", function onClientResponse (response) {
+            response.on("data", function onClientResponseData () {});
+            response.on("end", function onClientResponseEnd () {
               server.close();
             });
           });

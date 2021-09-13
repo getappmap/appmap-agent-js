@@ -4,6 +4,7 @@ import Group from "./group.mjs";
 import Classmap from "./classmap.mjs";
 import Event from "./event/index.mjs";
 import Completion from "./completion.mjs";
+import Placeholder from "./placeholder.mjs";
 import Stack from "./stack.mjs";
 
 const VERSION = "1.6.0";
@@ -23,6 +24,7 @@ export default (dependencies) => {
   const { orderByStack } = Stack(dependencies);
   const { collectTracks } = Track(dependencies);
   const { compileEventTrace } = Event(dependencies);
+  const { resolvePlaceholder } = Placeholder(dependencies);
   /* c8 ignore start */
   const getName = ({ name }) => name;
   /* c8 ignore start */
@@ -34,6 +36,7 @@ export default (dependencies) => {
         marks,
         termination,
       );
+      marks = resolvePlaceholder(marks);
       const classmap = createClassmap(configuration1);
       for (const { type, data } of marks) {
         if (type === "file") {
