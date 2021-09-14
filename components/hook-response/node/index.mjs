@@ -80,9 +80,13 @@ export default (dependencies) => {
         };
         // jump //
         let jump_index = null;
-        let ended = false;
-        const resume = (emitter, name) => {
-          expect(!ended, "received event %j after close", name);
+        let closed = 0;
+        link.resume = (emitter, name) => {
+          expect(
+            closed < 2,
+            "received event %j after closing both request and response",
+            name,
+          );
           assert(
             jump_index !== null,
             "cannot resume http response because we are not in a jump state",
@@ -90,27 +94,34 @@ export default (dependencies) => {
           sendClient(client, recordAfterJump(frontend, jump_index, null));
           jump_index = null;
         };
-        const pause = (emitter, name) => {
+        link.pause = (emitter, name) => {
           assert(
             jump_index === null,
             "cannot pause http response because we are in jump state",
           );
-          if (ended) {
+          if (closed === 2) {
             end();
           } else {
             jump_index = incrementEventCounter(frontend);
             sendClient(client, recordBeforeJump(frontend, jump_index, null));
           }
         };
-        spyFlattenEmitterList([request, response], /^/u, resume, pause);
+        request.on("close", () => {
+          closed += 1;
+        });
         response.on("close", () => {
-          ended = true;
+          closed += 1;
         });
         begin();
-        link.pause = pause;
       };
-      const afterRequest = (emitter, name, args, link) => {
-        link.pause();
+      const afterRequest = (
+        emitter,
+        name,
+        [request, response],
+        { resume, pause },
+      ) => {
+        pause(emitter, name);
+        spyFlattenEmitterList([request, response], /^/u, resume, pause);
       };
       const spyServer = (server) => {
         spyEmitter(server, /^request$/, beforeRequest, afterRequest);
