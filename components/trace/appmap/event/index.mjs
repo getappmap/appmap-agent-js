@@ -20,6 +20,7 @@ export default (dependencies) => {
       }
       return false;
     };
+    let counter = 0;
     for (const event of events) {
       const { type, time, index, data } = event;
       const { type: data_type } = data;
@@ -34,24 +35,26 @@ export default (dependencies) => {
             } = getClassmapClosure(classmap, route));
             skip = shallow && isLastShallow(stack);
           }
-          stack.push({ time, shallow, skip });
+          let id = null;
           if (!skip) {
+            id = counter += 1;
             digest.push({
               event: "call",
               thread_id: 0,
-              id: 2 * index,
+              id,
               ...compileCallData(data, classmap),
             });
           }
+          stack.push({ time, shallow, id });
         } else {
           assert(type === "after" || type === "end", "invalid event type");
-          const { time: initial_time, skip } = stack.pop();
-          if (!skip) {
+          const { time: initial_time, id } = stack.pop();
+          if (id !== null) {
             digest.push({
               event: "return",
               thread_id: 0,
-              id: 2 * index + 1,
-              parent_id: 2 * index,
+              id: (counter += 1),
+              parent_id: id,
               elapsed: time - initial_time,
               ...compileReturnData(data, classmap),
             });

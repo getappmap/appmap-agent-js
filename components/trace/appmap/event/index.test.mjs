@@ -91,7 +91,7 @@ const { compileEventTrace } = Event(dependencies);
     [
       {
         event: "call",
-        id: 2,
+        id: 1,
         thread_id: 0,
         defined_class: "f",
         method_id: "()",
@@ -115,9 +115,9 @@ const { compileEventTrace } = Event(dependencies);
       },
       {
         event: "return",
-        id: 3,
+        id: 2,
         thread_id: 0,
-        parent_id: 2,
+        parent_id: 1,
         elapsed: 7,
         return_value: {
           name: "return",
