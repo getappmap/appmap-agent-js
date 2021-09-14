@@ -56,7 +56,7 @@ await runAsync(
         {
           event: 'call',
           thread_id: 0,
-          id: 2,
+          id: 1,
           defined_class: 'mainAsync',
           method_id: 'placeholder',
           path: 'main.mjs',
@@ -73,7 +73,7 @@ await runAsync(
         {
           event: 'call',
           thread_id: 0,
-          id: 4,
+          id: 2,
           defined_class: 'generateAsync',
           method_id: 'placeholder',
           path: 'main.mjs',
@@ -90,7 +90,7 @@ await runAsync(
         {
           event: 'call',
           thread_id: 0,
-          id: 10,
+          id: 3,
           defined_class: 'arrow-1',
           method_id: 'placeholder',
           path: 'main.mjs',
@@ -120,8 +120,8 @@ await runAsync(
         {
           event: 'return',
           thread_id: 0,
-          id: 11,
-          parent_id: 10,
+          id: 4,
+          parent_id: 3,
           return_value: null,
           exceptions: null
         },
@@ -129,15 +129,15 @@ await runAsync(
           event: 'return',
           thread_id: 0,
           id: 5,
-          parent_id: 4,
+          parent_id: 2,
           return_value: null,
           exceptions: null
         },
         {
           event: 'return',
           thread_id: 0,
-          id: 3,
-          parent_id: 2,
+          id: 6,
+          parent_id: 1,
           return_value: null,
           exceptions: null
         }

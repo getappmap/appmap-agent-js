@@ -12,7 +12,6 @@ await runAsync(
   null,
   {
     enabled: true,
-    log: "debug",
     name: "name",
     mode: "remote",
     recorder: "mocha",

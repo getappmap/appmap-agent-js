@@ -49,7 +49,7 @@ await runAsync(
       [event1, event2],
       [
         {
-          id: 4,
+          id: 1,
           event: "call",
           thread_id: 0,
           sql_query: {
@@ -74,10 +74,10 @@ await runAsync(
           ],
         },
         {
-          id: 5,
+          id: 2,
           event: "return",
           thread_id: 0,
-          parent_id: 4,
+          parent_id: 1,
         },
       ],
     );
