@@ -71,7 +71,7 @@ export default (dependencies) => {
         if (type === "after") {
           const jump = collectStack(event);
           const { index } = event;
-          assert(!jumps.has(index), "duplicate bubble");
+          assert(!jumps.has(index), "duplicate jump");
           jumps.set(index, jump);
         } else {
           stack.push(event);

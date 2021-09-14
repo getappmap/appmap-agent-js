@@ -86,6 +86,35 @@ assertDeepEqual(
   [],
 );
 
+const makeJump = (index) => [
+  {
+    type: "trace",
+    data: {
+      type: "event",
+      data: {
+        type: "before",
+        index,
+        group: 0,
+        time: 0,
+        data: { type: "jump" },
+      },
+    },
+  },
+  {
+    type: "trace",
+    data: {
+      type: "event",
+      data: {
+        type: "after",
+        index,
+        group: 0,
+        time: 0,
+        data: { type: "jump" },
+      },
+    },
+  },
+];
+
 const trace = [
   {
     type: "trace",
@@ -103,19 +132,7 @@ const trace = [
       },
     },
   },
-  {
-    type: "trace",
-    data: {
-      type: "event",
-      data: {
-        type: "before",
-        index: 3,
-        group: 0,
-        time: 0,
-        data: { type: "jump" },
-      },
-    },
-  },
+  makeJump(3)[0],
   {
     type: "trace",
     data: {
@@ -136,45 +153,11 @@ const trace = [
       },
     },
   },
-  {
-    type: "trace",
-    data: {
-      type: "event",
-      data: {
-        type: "after",
-        index: 3,
-        group: 0,
-        time: 0,
-        data: { type: "jump" },
-      },
-    },
-  },
-  {
-    type: "trace",
-    data: {
-      type: "event",
-      data: {
-        type: "before",
-        index: 4,
-        data: { type: "jump" },
-        group: 0,
-        time: 0,
-      },
-    },
-  },
-  {
-    type: "trace",
-    data: {
-      type: "event",
-      data: {
-        type: "after",
-        index: 4,
-        data: { type: "jump" },
-        group: 0,
-        time: 0,
-      },
-    },
-  },
+  makeJump(3)[1],
+  ...makeJump(4),
+  ...makeJump(5),
+  ...makeJump(6),
+  ...makeJump(7),
   {
     type: "trace",
     data: {

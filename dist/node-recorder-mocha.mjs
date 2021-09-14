@@ -36,6 +36,7 @@ import hook_apply$default from "./../components/hook-apply/default/index.mjs";
 import hook_group$node from "./../components/hook-group/node/index.mjs";
 import hook_module$node from "./../components/hook-module/node/index.mjs";
 import hook_request$node from "./../components/hook-request/node/index.mjs";
+import emitter$default from "./../components/emitter/default/index.mjs";
 import hook_response$node from "./../components/hook-response/node/index.mjs";
 import hook_query$node from "./../components/hook-query/node/index.mjs";
 import agent$default from "./../components/agent/default/index.mjs";
@@ -76,6 +77,7 @@ export default (blueprint) => {
   dependencies["hook-group"] = hook_group$node(dependencies);
   dependencies["hook-module"] = hook_module$node(dependencies);
   dependencies["hook-request"] = hook_request$node(dependencies);
+  dependencies["emitter"] = emitter$default(dependencies);
   dependencies["hook-response"] = hook_response$node(dependencies);
   dependencies["hook-query"] = hook_query$node(dependencies);
   dependencies["agent"] = agent$default(dependencies);
