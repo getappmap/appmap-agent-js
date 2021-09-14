@@ -55,7 +55,7 @@ export default (dependencies) => {
               thread_id: 0,
               id: (counter += 1),
               parent_id: id,
-              elapsed: time - initial_time,
+              elapsed: (time - initial_time) / 1000,
               ...compileReturnData(data, classmap),
             });
           }

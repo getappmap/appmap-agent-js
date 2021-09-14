@@ -118,7 +118,7 @@ const { compileEventTrace } = Event(dependencies);
         id: 2,
         thread_id: 0,
         parent_id: 1,
-        elapsed: 7,
+        elapsed: 0.007,
         return_value: {
           name: "return",
           class: "string",
