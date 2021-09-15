@@ -20,11 +20,13 @@ export default (dependencies) => {
       "hidden-identifier": identifier,
       exclude,
       packages,
+      source,
     }) => ({
       runtime: `${identifier}${getUUID()}`,
       version,
       exclude,
       packages,
+      source,
       naming: createCounter(0),
       indexing: createCounter(-1),
       uuid: getUUID(),
@@ -37,18 +39,30 @@ export default (dependencies) => {
         indexing,
         packages,
         version,
+        source: global_source,
         exclude: exclude1,
       } = instrumentation;
       for (let [specifier, data] of packages) {
         if (matchSpecifier(specifier, path)) {
-          const { enabled, shallow, exclude: exclude2 } = data;
+          const { enabled, shallow, exclude: exclude2, source } = data;
           if (!enabled) {
             break;
           }
           const index = incrementCounter(indexing);
           const exclude = [...exclude1, ...exclude2];
           return {
-            file: { index, exclude, shallow, type, path, code },
+            file: {
+              index,
+              exclude,
+              shallow,
+              type,
+              path,
+              code,
+              source:
+                /* c8 ignore start */ source === null
+                  ? global_source
+                  : source /* c8 ignore stop */,
+            },
             code: generate(
               visit(
                 expectSuccess(

@@ -60,6 +60,7 @@ const testAsync = async () => {
             path: fileURLToPath(import.meta.url),
             code: "123;",
             shallow: true,
+            source: false,
           },
         },
       },

@@ -69,6 +69,20 @@ export default (dependencies) => {
     };
   };
 
+  const getPredecessorComment = (code, index, comments) => {
+    index -= 1;
+    while (index > 0) {
+      if (comments.has(index)) {
+        return comments.get(index);
+      }
+      if (!/^\p{Zs}$/u.test(code[index])) {
+        break;
+      }
+      index -= 1;
+    }
+    return null;
+  };
+
   const isBound = ({ bound }) => bound;
   const isNotBound = ({ bound }) => !bound;
 
@@ -84,7 +98,7 @@ export default (dependencies) => {
       hasOwnProperty(node, "type")
     ) {
       lineage = { head: node, tail: lineage };
-      const { closures, path, naming, exclusion, placeholder } = context;
+      const { closures, naming, exclusion, placeholder } = context;
       const qualified_name = getQualifiedName(naming, lineage);
       if (qualified_name !== null && isExcluded(exclusion, qualified_name)) {
         return [];
@@ -135,8 +149,8 @@ export default (dependencies) => {
         type === "FunctionExpression" ||
         type === "FunctionDeclaration"
       ) {
-        const { file } = context;
         assert(qualified_name !== null, "missing name for function/arrow node");
+        const { shallow, source, path, code, comments } = context;
         const {
           loc: {
             start: { line },
@@ -148,7 +162,7 @@ export default (dependencies) => {
           static: _static,
         } = parseQualifiedName(qualified_name);
         closures.set(route, {
-          file,
+          shallow,
           link: {
             defined_class: name,
             method_id: placeholder,
@@ -170,8 +184,8 @@ export default (dependencies) => {
                 location: `${path}:${line}`,
                 static: _static === true,
                 labels: [],
-                comment: null,
-                source: null,
+                comment: getPredecessorComment(code, node.start, comments),
+                source: source ? code.substring(node.start, node.end) : null,
                 route,
               },
               ...node.params.flatMap((node, index) =>
@@ -206,9 +220,10 @@ export default (dependencies) => {
     }),
     addClassmapFile: (
       { closures, naming, version, directory, root, placeholder },
-      { index, exclude, shallow, type, path, code },
+      { index, exclude, shallow, type, path, code, source },
     ) => {
       path = toRelativePath(directory, path);
+      const comments = new Map();
       populate(
         root,
         path,
@@ -218,19 +233,22 @@ export default (dependencies) => {
             ecmaVersion: version,
             allowHashBang: true,
             locations: true,
+            onComment: (block, value, start, end) => {
+              comments.set(end, value);
+            },
           }),
           _String(index),
           null,
           {
             closures,
-            file: {
-              type,
-              path,
-              shallow,
-            },
+            comments,
+            type,
+            path,
+            code,
+            shallow,
+            source,
             exclusion: createExclusion(exclude),
             naming,
-            path,
             placeholder,
           },
         ),

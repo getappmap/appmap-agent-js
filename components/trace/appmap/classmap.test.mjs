@@ -44,7 +44,8 @@ assertDeepEqual(
     {
       index: 0,
       exclude: [],
-      shallow: true,
+      shallow: false,
+      source: false,
       type: "script",
       path: "/cwd/foo/bar",
       code: "123;",
@@ -52,7 +53,8 @@ assertDeepEqual(
     {
       index: 1,
       exclude: [],
-      shallow: true,
+      shallow: false,
+      source: false,
       type: "script",
       path: "/cwd/foo/bar/qux",
       code: "123;",
@@ -84,55 +86,95 @@ assertDeepEqual(
   ],
 );
 
-// object //
+// basic //
+assertDeepEqual(
+  test("/cwd", { ...default_conf }, [
+    {
+      index: 123,
+      exclude: [],
+      shallow: true,
+      source: true,
+      type: "script",
+      path: "/cwd/filename.js",
+      code: "// comment \nfunction f () {}",
+    },
+  ]),
+  [
+    {
+      type: "package",
+      name: "filename.js",
+      children: [
+        {
+          type: "class",
+          name: "f",
+          children: [
+            {
+              type: "function",
+              name: "$",
+              location: "filename.js:2",
+              static: false,
+              labels: [],
+              comment: " comment ",
+              source: "function f () {}",
+            },
+          ],
+        },
+      ],
+    },
+  ],
+);
 
-const testClass = (snippet) => {
-  assertDeepEqual(
-    test("/cwd", default_conf, [
-      {
-        index: 123,
-        exclude: [],
-        shallow: true,
-        type: "script",
-        path: "/cwd/filename.js",
-        code: `x = ${snippet};`,
-      },
-    ]),
-    [
-      {
-        type: "package",
-        name: "filename.js",
-        children: [
-          {
-            type: "class",
-            name: "x",
-            children: [
-              {
-                type: "class",
-                name: "k",
-                children: [
-                  {
-                    type: "function",
-                    name: "$",
-                    location: "filename.js:1",
-                    static: false,
-                    labels: [],
-                    comment: null,
-                    source: null,
-                  },
-                ],
-              },
-            ],
-          },
-        ],
-      },
-    ],
-  );
-};
+// class //
 
-testClass("{k: function () {} }");
-testClass("class { k () {} }");
-testClass("class extends Object { k () {} }");
+{
+  const testClass = (snippet) => {
+    assertDeepEqual(
+      test("/cwd", default_conf, [
+        {
+          index: 123,
+          exclude: [],
+          shallow: false,
+          source: false,
+          type: "script",
+          path: "/cwd/filename.js",
+          code: `x = ${snippet};`,
+        },
+      ]),
+      [
+        {
+          type: "package",
+          name: "filename.js",
+          children: [
+            {
+              type: "class",
+              name: "x",
+              children: [
+                {
+                  type: "class",
+                  name: "k",
+                  children: [
+                    {
+                      type: "function",
+                      name: "$",
+                      location: "filename.js:1",
+                      static: false,
+                      labels: [],
+                      comment: null,
+                      source: null,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    );
+  };
+  testClass("{k: function () {} }");
+  testClass("class { k () {} }");
+  testClass("class extends Object { k () {} }");
+}
 
 // exclude //
 
@@ -141,7 +183,8 @@ assertDeepEqual(
     {
       index: 0,
       exclude: ["f"],
-      shallow: true,
+      shallow: false,
+      source: false,
       type: "script",
       path: "/cwd/filename.js",
       code: "function f () {}",
@@ -166,7 +209,8 @@ assertDeepEqual(
       {
         index: 123,
         exclude: [],
-        shallow: true,
+        shallow: false,
+        source: false,
         type: "script",
         path: "/cwd/filename.js",
         code: "o1 = {k1 () {}}; o2 = {k2 () {} }",
@@ -213,7 +257,8 @@ assertDeepEqual(
       {
         index: 123,
         exclude: [],
-        shallow: true,
+        shallow: false,
+        source: false,
         type: "script",
         path: "/cwd/filename.js",
         code: "function f (x, ... xs) {}",
@@ -222,11 +267,7 @@ assertDeepEqual(
     "123/body/0",
   ),
   {
-    file: {
-      type: "script",
-      path: "filename.js",
-      shallow: true,
-    },
+    shallow: false,
     link: {
       defined_class: "f",
       method_id: "$",

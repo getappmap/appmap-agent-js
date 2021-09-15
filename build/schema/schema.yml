@@ -185,6 +185,9 @@
         enabled: {type: boolean}
         shallow: {type: boolean}
         exclude: {$ref: exclude}
+        source:
+          type: boolean
+          nullable: true
     - type: object
       additionalProperties: false
       required: [glob]
@@ -193,6 +196,9 @@
         enabled: {type: boolean}
         shallow: {type: boolean}
         exclude: {$ref: exclude}
+        source:
+          type: boolean
+          nullable: true
     - type: object
       additionalProperties: false
       required: [path]
@@ -202,6 +208,9 @@
         enabled: {type: boolean}
         shallow: {type: boolean}
         exclude: {$ref: exclude}
+        source:
+          type: boolean
+          nullable: true
     - type: object
       additionalProperties: false
       required: [dist]
@@ -212,6 +221,9 @@
         enabled: {type: boolean}
         shallow: {type: boolean}
         exclude: {$ref: exclude}
+        source:
+          type: boolean
+          nullable: true
 
 - $id: package-specifier
   anyOf:
@@ -228,6 +240,8 @@
           anyOf:
             - type: object
               required: [shallow]
+            - type: object
+              required: [source]
             - type: object
               required: [exclude]
 
@@ -646,10 +660,11 @@
                 data:
                   type: object
                   additionalProperties: false
-                  required: [index, shallow, exclude, type, path, code]
+                  required: [index, shallow, source, exclude, type, path, code]
                   properties:
                     index: {$ref: index}
                     shallow: {type: boolean}
+                    source: {type: boolean}
                     exclude:
                       type: array
                       items: {type: string}

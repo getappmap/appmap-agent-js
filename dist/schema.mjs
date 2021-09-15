@@ -268,6 +268,10 @@ export const schema = [
           },
           "exclude": {
             "$ref": "exclude"
+          },
+          "source": {
+            "type": "boolean",
+            "nullable": true
           }
         }
       },
@@ -289,6 +293,10 @@ export const schema = [
           },
           "exclude": {
             "$ref": "exclude"
+          },
+          "source": {
+            "type": "boolean",
+            "nullable": true
           }
         }
       },
@@ -313,6 +321,10 @@ export const schema = [
           },
           "exclude": {
             "$ref": "exclude"
+          },
+          "source": {
+            "type": "boolean",
+            "nullable": true
           }
         }
       },
@@ -340,6 +352,10 @@ export const schema = [
           },
           "exclude": {
             "$ref": "exclude"
+          },
+          "source": {
+            "type": "boolean",
+            "nullable": true
           }
         }
       }
@@ -377,6 +393,12 @@ export const schema = [
                   "type": "object",
                   "required": [
                     "shallow"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "required": [
+                    "source"
                   ]
                 },
                 {
@@ -1300,6 +1322,7 @@ export const schema = [
                     "required": [
                       "index",
                       "shallow",
+                      "source",
                       "exclude",
                       "type",
                       "path",
@@ -1310,6 +1333,9 @@ export const schema = [
                         "$ref": "index"
                       },
                       "shallow": {
+                        "type": "boolean"
+                      },
+                      "source": {
                         "type": "boolean"
                       },
                       "exclude": {

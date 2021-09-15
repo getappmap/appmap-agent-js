@@ -30,9 +30,7 @@ export default (dependencies) => {
           let skip = false;
           if (data_type === "apply") {
             const { function: route } = data;
-            ({
-              file: { shallow },
-            } = getClassmapClosure(classmap, route));
+            ({ shallow } = getClassmapClosure(classmap, route));
             skip = shallow && isLastShallow(stack);
           }
           let id = null;

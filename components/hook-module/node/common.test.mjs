@@ -76,6 +76,7 @@ const testAsync = async () => {
             path: resolved_path,
             code: "module.exports = 123;",
             shallow: true,
+            source: false,
           },
         },
       },
