@@ -31,12 +31,13 @@ const testAsync = async () => {
       host: "localhost",
       port: server.address().port,
     });
-    setTimeout(() => {
-      sendClient(client, 123);
+    sendClient(client, 123);
+    client.on("connect", () => {
+      sendClient(client, 456);
       interruptClient(client);
     });
     await executeClientAsync(client);
-    assertDeepEqual(buffer, [123]);
+    assertDeepEqual(buffer, [123, 456]);
     await new Promise((resolve) => {
       server.on("close", resolve);
       server.close();

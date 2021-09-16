@@ -10,7 +10,6 @@ await runAsync(
     enabled: true,
     mode: "remote",
     protocol: "tcp",
-    "function-name-placeholder": "placeholder",
     packages: { glob: "*" },
     hooks: {
       esm: true,
@@ -30,9 +29,13 @@ await runAsync(
       `
         async function* generateAsync (x) {
           yield 1 * x;
-          await new Promise((resolve, reject) => {
-            setTimeout(resolve, 0);
+          (function beforeAwait () {} ());
+          await new Promise(function promiseCallback (resolve, reject) {
+            setTimeout(function timeoutCallback () {
+              resolve();
+            }, 0);
           });
+          (function afterAwait () {} ());
           yield* [2 * x, 3  * x];
         }
         const mainAsync = async () => {
@@ -51,95 +54,71 @@ await runAsync(
     const { "main.appmap.json": appmap } = appmaps;
     const { events } = appmap;
     assertDeepEqual(
-      events.map(({elapsed, ...rest}) => rest),
+      events.map(({event, defined_class, id, parent_id}) => ({
+        event,
+        id,
+        ... event === "call" ? {defined_class} : {parent_id},
+      })),
       [
         {
           event: 'call',
-          thread_id: 0,
           id: 1,
           defined_class: 'mainAsync',
-          method_id: 'placeholder',
-          path: 'main.mjs',
-          lineno: 9,
-          static: false,
-          receiver: {
-            name: 'this',
-            class: 'undefined',
-            object_id: null,
-            value: 'undefined'
-          },
-          parameters: []
         },
         {
           event: 'call',
-          thread_id: 0,
           id: 2,
           defined_class: 'generateAsync',
-          method_id: 'placeholder',
-          path: 'main.mjs',
-          lineno: 2,
-          static: false,
-          receiver: {
-            name: 'this',
-            class: 'undefined',
-            object_id: null,
-            value: 'undefined'
-          },
-          parameters: [ { name: 'x', class: 'number', object_id: null, value: '2' } ]
         },
         {
           event: 'call',
-          thread_id: 0,
           id: 3,
-          defined_class: 'arrow-1',
-          method_id: 'placeholder',
-          path: 'main.mjs',
-          lineno: 4,
-          static: false,
-          receiver: {
-            name: 'this',
-            class: 'undefined',
-            object_id: null,
-            value: 'undefined'
-          },
-          parameters: [
-            {
-              name: 'resolve',
-              class: 'Function',
-              object_id: 1,
-              value: '[object Function]'
-            },
-            {
-              name: 'reject',
-              class: 'Function',
-              object_id: 2,
-              value: '[object Function]'
-            }
-          ]
+          defined_class: 'beforeAwait',
         },
         {
           event: 'return',
-          thread_id: 0,
           id: 4,
           parent_id: 3,
-          return_value: null,
-          exceptions: null
         },
         {
-          event: 'return',
-          thread_id: 0,
+          event: 'call',
           id: 5,
-          parent_id: 2,
-          return_value: null,
-          exceptions: null
+          defined_class: 'promiseCallback',
+        },
+        {
+          event: 'call',
+          id: 6,
+          defined_class: 'timeoutCallback',
         },
         {
           event: 'return',
-          thread_id: 0,
-          id: 6,
+          id: 7,
+          parent_id: 6,
+        },
+        {
+          event: 'return',
+          id: 8,
+          parent_id: 5,
+        },
+        {
+          event: 'call',
+          id: 9,
+          defined_class: 'afterAwait',
+        },
+        {
+          event: 'return',
+          id: 10,
+          parent_id: 9,
+        },
+        {
+          event: 'return',
+          id: 11,
+          parent_id: 2,
+        },
+        {
+          event: 'return',
+          id: 12,
           parent_id: 1,
-          return_value: null,
-          exceptions: null
         }
       ]
     );
