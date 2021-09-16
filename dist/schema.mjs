@@ -1281,39 +1281,6 @@ export const schema = [
                 ],
                 "properties": {
                   "type": {
-                    "const": "group"
-                  },
-                  "data": {
-                    "type": "object",
-                    "additionalProperties": false,
-                    "required": [
-                      "group",
-                      "origin",
-                      "description"
-                    ],
-                    "properties": {
-                      "group": {
-                        "$ref": "index"
-                      },
-                      "origin": {
-                        "$ref": "index"
-                      },
-                      "description": {
-                        "type": "string"
-                      }
-                    }
-                  }
-                }
-              },
-              {
-                "type": "object",
-                "additionalProperties": false,
-                "required": [
-                  "type",
-                  "data"
-                ],
-                "properties": {
-                  "type": {
                     "const": "file"
                   },
                   "data": {
@@ -1449,7 +1416,6 @@ export const schema = [
                     "required": [
                       "type",
                       "time",
-                      "group",
                       "index",
                       "data"
                     ],
@@ -1465,16 +1431,6 @@ export const schema = [
                       },
                       "time": {
                         "type": "number"
-                      },
-                      "group": {
-                        "anyOf": [
-                          {
-                            "const": null
-                          },
-                          {
-                            "$ref": "index"
-                          }
-                        ]
                       },
                       "index": {
                         "$ref": "index"

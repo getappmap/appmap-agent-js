@@ -637,20 +637,6 @@
         type: {const: trace}
         data:
           anyOf:
-            # group
-            - type: object
-              additionalProperties: false
-              required: [type, data]
-              properties:
-                type: {const: group}
-                data:
-                  type: object
-                  additionalProperties: false
-                  required: [group, origin, description]
-                  properties:
-                    group: {$ref: index}
-                    origin: {$ref: index}
-                    description: {type: string}
             # file
             - type: object
               additionalProperties: false
@@ -715,7 +701,7 @@
                 data:
                   type: object
                   additionalProperties: false
-                  required: [type, time, group, index, data]
+                  required: [type, time, index, data]
                   properties:
                     type:
                       enum:
@@ -725,10 +711,6 @@
                         - begin
                         - end
                     time: {type: number}
-                    group:
-                      anyOf:
-                        - const: null
-                        - $ref: index
                     index: {$ref: index}
                     # TODO
                     data: {type: object}

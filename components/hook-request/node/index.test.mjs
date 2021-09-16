@@ -65,7 +65,6 @@ const testAsync = async () => {
         data: {
           type: "begin",
           index: 1,
-          group: 0,
           time: 0,
           data: { type: "bundle" },
         },
@@ -85,7 +84,6 @@ const testAsync = async () => {
             url: "/path/?key=value",
             headers: { __proto__: null, host: `localhost:${String(port)}` },
           },
-          group: 0,
           time: 0,
         },
       },
@@ -106,7 +104,6 @@ const testAsync = async () => {
               connection: "close",
             },
           },
-          group: 0,
           time: 0,
         },
       },
@@ -118,7 +115,6 @@ const testAsync = async () => {
         data: {
           type: "end",
           index: 1,
-          group: 0,
           time: 0,
           data: { type: "bundle" },
         },

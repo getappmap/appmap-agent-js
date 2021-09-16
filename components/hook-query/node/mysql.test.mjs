@@ -82,7 +82,6 @@ const proceedAsync = async () => {
           data: {
             type: "begin",
             index: 1,
-            group: 0,
             time: 0,
             data: { type: "bundle" },
           },
@@ -105,7 +104,6 @@ const proceedAsync = async () => {
                 { type: "number", print: "3" },
               ],
             },
-            group: 0,
             time: 0,
           },
         },
@@ -121,7 +119,6 @@ const proceedAsync = async () => {
               type: "query",
               error: null,
             },
-            group: 0,
             time: 0,
           },
         },
@@ -133,7 +130,6 @@ const proceedAsync = async () => {
           data: {
             type: "end",
             index: 1,
-            group: 0,
             time: 0,
             data: { type: "bundle" },
           },

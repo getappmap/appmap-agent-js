@@ -6,15 +6,7 @@ const { fromEntries, entries: toEntries } = Object;
 export default (dependencies) => {
   const {
     time: { now },
-    util: {
-      returnSecond,
-      constant,
-      getBox,
-      setBox,
-      createBox,
-      createCounter,
-      incrementCounter,
-    },
+    util: { returnSecond, constant, createCounter, incrementCounter },
     serialization: {
       createSerialization,
       serialize,
@@ -25,7 +17,7 @@ export default (dependencies) => {
   const returnNull = constant(null);
   const generateRecord =
     (type1, type2, serializeData) =>
-    ({ session, recording: { serialization, current_group } }, index, data) =>
+    ({ session, recording: { serialization } }, index, data) =>
       traceEvent(session, {
         type: type1,
         index,
@@ -33,7 +25,6 @@ export default (dependencies) => {
           type: type2,
           ...serializeData(serialization, data),
         },
-        group: getBox(current_group),
         time: now(),
       });
   const serializeBeforeApply = (
@@ -70,15 +61,9 @@ export default (dependencies) => {
   const wrapIndex = (serialization, index) => ({ index });
   return {
     createRecording: (configuration) => ({
-      current_group: createBox(0),
       event_counter: createCounter(0),
       serialization: createSerialization(configuration),
     }),
-    getCurrentGroup: ({ recording: { current_group } }) =>
-      getBox(current_group),
-    setCurrentGroup: ({ recording: { current_group } }, group) => {
-      setBox(current_group, group);
-    },
     incrementEventCounter: ({ recording: { event_counter } }) =>
       incrementCounter(event_counter),
     getSerializationEmptyValue: ({ recording: { serialization } }) =>

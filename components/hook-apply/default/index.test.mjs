@@ -51,7 +51,6 @@ const testAsync = async () => {
               this: { type: "number", print: "123" },
               arguments: [{ type: "number", print: "456" }],
             },
-            group: 0,
             time: 0,
           },
         },
@@ -63,7 +62,6 @@ const testAsync = async () => {
           data: {
             type: "before",
             index: 2,
-            group: 0,
             time: 0,
             data: { type: "jump" },
           },
@@ -76,7 +74,6 @@ const testAsync = async () => {
           data: {
             type: "after",
             index: 2,
-            group: 0,
             time: 0,
             data: { type: "jump" },
           },
@@ -94,7 +91,6 @@ const testAsync = async () => {
               error: { type: "null", print: "null" },
               result: { type: "number", print: "789" },
             },
-            group: 0,
             time: 0,
           },
         },

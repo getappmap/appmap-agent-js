@@ -1,6 +1,5 @@
 import Metadata from "./metadata.mjs";
 import Track from "./track.mjs";
-import Group from "./group.mjs";
 import Classmap from "./classmap.mjs";
 import Event from "./event/index.mjs";
 import Completion from "./completion.mjs";
@@ -20,11 +19,12 @@ export default (dependencies) => {
   const { createClassmap, addClassmapFile, compileClassmap } =
     Classmap(dependencies);
   const { ensureCompletion } = Completion(dependencies);
-  const { orderByGroup } = Group(dependencies);
   const { orderByStack } = Stack(dependencies);
   const { collectTracks } = Track(dependencies);
   const { compileEventTrace } = Event(dependencies);
   const { resolvePlaceholder } = Placeholder(dependencies);
+  const isEvent = ({ type }) => type === "event";
+  const getData = ({ data }) => data;
   /* c8 ignore start */
   const getName = ({ name }) => name;
   /* c8 ignore start */
@@ -44,7 +44,7 @@ export default (dependencies) => {
         }
       }
       ensureCompletion(marks);
-      const events = orderByStack(orderByGroup(marks));
+      const events = orderByStack(marks.filter(isEvent).map(getData));
       return collectTracks(marks).map(({ configuration, slice, routes }) => {
         const configuration2 = extendConfiguration(
           configuration1,

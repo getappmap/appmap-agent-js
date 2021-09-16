@@ -60,7 +60,6 @@ const testAsync = async () => {
           data: {
             type: "bundle",
           },
-          group: 0,
           time: 0,
         },
       },
@@ -79,7 +78,6 @@ const testAsync = async () => {
             sql,
             parameters,
           },
-          group: 0,
           time: 0,
         },
       },
@@ -92,7 +90,6 @@ const testAsync = async () => {
           type: "after",
           index: 2,
           data: { type: "query", error },
-          group: 0,
           time: 0,
         },
       },
@@ -107,7 +104,6 @@ const testAsync = async () => {
           data: {
             type: "bundle",
           },
-          group: 0,
           time: 0,
         },
       },

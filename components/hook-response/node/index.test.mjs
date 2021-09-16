@@ -94,7 +94,6 @@ const makeJump = (index) => [
       data: {
         type: "before",
         index,
-        group: 0,
         time: 0,
         data: { type: "jump" },
       },
@@ -107,7 +106,6 @@ const makeJump = (index) => [
       data: {
         type: "after",
         index,
-        group: 0,
         time: 0,
         data: { type: "jump" },
       },
@@ -123,7 +121,6 @@ const trace = [
       data: {
         type: "placeholder",
         index: 1,
-        group: 0,
         time: 0,
         data: {
           type: "placeholder",
@@ -148,7 +145,6 @@ const trace = [
           url: "/route/foo/bar/qux",
           route: "/route/*/:param1/:param2",
         },
-        group: 0,
         time: 0,
       },
     },
@@ -171,7 +167,6 @@ const trace = [
           message: "OK",
           headers: null,
         },
-        group: 0,
         time: 0,
       },
     },
