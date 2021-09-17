@@ -18,7 +18,7 @@ export default (dependencies) => {
   const { compileMetadata } = Metadata(dependencies);
   const { createClassmap, addClassmapFile, compileClassmap } =
     Classmap(dependencies);
-  const { ensureCompletion } = Completion(dependencies);
+  const { manufactureCompletion } = Completion(dependencies);
   const { orderByStack } = Stack(dependencies);
   const { collectTracks } = Track(dependencies);
   const { compileEventTrace } = Event(dependencies);
@@ -43,8 +43,9 @@ export default (dependencies) => {
           addClassmapFile(classmap, data);
         }
       }
-      ensureCompletion(marks);
-      const events = orderByStack(marks.filter(isEvent).map(getData));
+      const events = orderByStack(
+        manufactureCompletion(marks.filter(isEvent).map(getData)),
+      );
       return collectTracks(marks).map(({ configuration, slice, routes }) => {
         const configuration2 = extendConfiguration(
           configuration1,

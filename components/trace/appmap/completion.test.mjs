@@ -11,51 +11,98 @@ const {
 } = Assert;
 
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
-const { ensureCompletion } = Completion(dependencies);
-const makeMark = (data) => ({ type: "event", data });
-const default_event = {
-  type: null,
-  time: 0,
-  group: 1,
-  index: null,
-  data: null,
-};
+const { manufactureCompletion } = Completion(dependencies);
 
-// general //
-{
-  const mark1 = makeMark({
-    ...default_event,
-    type: "begin",
-    index: 1,
-    group: 1,
-    data: { type: "bundle" },
-  });
-  const mark2 = makeMark({
-    ...default_event,
-    type: "end",
-    index: 1,
-    group: 1,
-    data: { type: "bundle" },
-  });
-  const mark3 = makeMark({
-    ...default_event,
-    type: "after",
-    group: 2,
-    index: 2,
-    data: { type: "bundle" },
-  });
-  const trace = [mark1, mark2, mark3];
-  ensureCompletion(trace);
-  assertDeepEqual(trace, [
-    mark1,
-    mark2,
-    mark3,
-    makeMark({
-      ...default_event,
-      type: "before",
-      group: 2,
-      index: Number.MAX_SAFE_INTEGER - 1,
-      data: { type: "jump" },
-    }),
-  ]);
-}
+const makeEvent = (type1, type2, index) => ({
+  type: type1,
+  index,
+  time: 0,
+  data: {
+    type: type2,
+  },
+});
+
+////////////
+// Normal //
+////////////
+
+assertDeepEqual(
+  manufactureCompletion([
+    makeEvent("begin", "bundle", 1),
+    makeEvent("before", "jump", 2),
+    makeEvent("after", "jump", 2),
+    makeEvent("end", "bundle", 1),
+  ]),
+  [
+    makeEvent("begin", "bundle", 1),
+    makeEvent("before", "jump", 2),
+    makeEvent("after", "jump", 2),
+    makeEvent("end", "bundle", 1),
+  ],
+);
+
+///////////////////////////////
+// Resolve Synchronous Stack //
+///////////////////////////////
+
+assertDeepEqual(manufactureCompletion([makeEvent("begin", "bundle", 1)]), [
+  makeEvent("begin", "bundle", 1),
+  makeEvent("before", "jump", Number.MAX_SAFE_INTEGER - 1),
+  makeEvent("after", "jump", Number.MAX_SAFE_INTEGER - 1),
+  makeEvent("end", "bundle", 1),
+]);
+
+assertDeepEqual(manufactureCompletion([makeEvent("end", "bundle", 1)]), [
+  makeEvent("begin", "bundle", 1),
+  makeEvent("before", "jump", Number.MAX_SAFE_INTEGER - 1),
+  makeEvent("after", "jump", Number.MAX_SAFE_INTEGER - 1),
+  makeEvent("end", "bundle", 1),
+]);
+
+///////////////////////////////
+// Resolve Asynchronous Jump //
+///////////////////////////////
+
+// manufactureAfterJump //
+assertDeepEqual(
+  manufactureCompletion([
+    makeEvent("begin", "bundle", 1),
+    makeEvent("before", "jump", 2),
+  ]),
+  [
+    makeEvent("begin", "bundle", 1),
+    makeEvent("before", "jump", 2),
+    makeEvent("after", "jump", 2),
+    makeEvent("end", "bundle", 1),
+  ],
+);
+
+// manufactureBeforeJump //
+assertDeepEqual(
+  manufactureCompletion([
+    makeEvent("after", "jump", 2),
+    makeEvent("end", "bundle", 1),
+  ]),
+  [
+    makeEvent("begin", "bundle", 1),
+    makeEvent("before", "jump", 2),
+    makeEvent("after", "jump", 2),
+    makeEvent("end", "bundle", 1),
+  ],
+);
+
+// manufactureBundle //
+assertDeepEqual(
+  manufactureCompletion([
+    makeEvent("after", "jump", 1),
+    makeEvent("before", "jump", 2),
+  ]),
+  [
+    makeEvent("begin", "bundle", Number.MAX_SAFE_INTEGER - 1),
+    makeEvent("before", "jump", 1),
+    makeEvent("after", "jump", 1),
+    makeEvent("before", "jump", 2),
+    makeEvent("after", "jump", 2),
+    makeEvent("end", "bundle", Number.MAX_SAFE_INTEGER - 1),
+  ],
+);
