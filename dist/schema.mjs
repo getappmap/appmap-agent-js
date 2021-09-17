@@ -1190,261 +1190,240 @@ export const schema = [
     }
   },
   {
-    "$id": "message",
-    "anyOf": [
-      {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "type",
-          "data"
-        ],
-        "properties": {
-          "type": {
-            "const": "initialize"
-          },
-          "data": {
-            "$ref": "cooked-configuration"
-          }
-        }
+    "$id": "initialization",
+    "$ref": "configuration"
+  },
+  {
+    "$id": "termination",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "status",
+      "errors"
+    ],
+    "properties": {
+      "status": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 255
       },
-      {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "type",
-          "data"
-        ],
-        "properties": {
-          "type": {
-            "const": "terminate"
-          },
-          "data": {
-            "type": "object",
-            "additionalProperties": false,
-            "required": [
-              "status",
-              "errors"
-            ],
-            "properties": {
-              "status": {
-                "type": "integer",
-                "minimum": 0,
-                "maximum": 255
-              },
-              "errors": {
-                "type": "array",
-                "items": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "required": [
-                    "name",
-                    "message",
-                    "stack"
-                  ],
-                  "properties": {
-                    "name": {
-                      "type": "string"
-                    },
-                    "message": {
-                      "type": "string"
-                    },
-                    "stack": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
+      "errors": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "name",
+            "message",
+            "stack"
+          ],
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "message": {
+              "type": "string"
+            },
+            "stack": {
+              "type": "string"
             }
           }
         }
+      }
+    }
+  },
+  {
+    "$id": "file",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "index",
+      "shallow",
+      "source",
+      "exclude",
+      "type",
+      "path",
+      "code"
+    ],
+    "properties": {
+      "index": {
+        "$ref": "index"
       },
-      {
+      "shallow": {
+        "type": "boolean"
+      },
+      "source": {
+        "type": "boolean"
+      },
+      "exclude": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "type": {
+        "$ref": "file-type"
+      },
+      "path": {
+        "$ref": "absolute-path"
+      },
+      "code": {
+        "type": "string"
+      }
+    }
+  },
+  {
+    "$id": "event",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "type",
+      "time",
+      "index",
+      "data"
+    ],
+    "properties": {
+      "type": {
+        "enum": [
+          "erratum",
+          "before",
+          "after",
+          "begin",
+          "end"
+        ]
+      },
+      "time": {
+        "type": "number"
+      },
+      "index": {
+        "$ref": "index"
+      },
+      "data": {
         "type": "object",
-        "additionalProperties": false,
         "required": [
-          "type",
-          "data"
+          "type"
         ],
         "properties": {
           "type": {
-            "const": "trace"
-          },
-          "data": {
-            "anyOf": [
-              {
-                "type": "object",
-                "additionalProperties": false,
-                "required": [
-                  "type",
-                  "data"
-                ],
-                "properties": {
-                  "type": {
-                    "const": "file"
-                  },
-                  "data": {
-                    "type": "object",
-                    "additionalProperties": false,
-                    "required": [
-                      "index",
-                      "shallow",
-                      "source",
-                      "exclude",
-                      "type",
-                      "path",
-                      "code"
-                    ],
-                    "properties": {
-                      "index": {
-                        "$ref": "index"
-                      },
-                      "shallow": {
-                        "type": "boolean"
-                      },
-                      "source": {
-                        "type": "boolean"
-                      },
-                      "exclude": {
-                        "type": "array",
-                        "items": {
-                          "type": "string"
-                        }
-                      },
-                      "type": {
-                        "$ref": "file-type"
-                      },
-                      "path": {
-                        "$ref": "absolute-path"
-                      },
-                      "code": {
-                        "type": "string"
-                      }
-                    }
-                  }
-                }
-              },
-              {
-                "type": "object",
-                "additionalProperties": false,
-                "required": [
-                  "type",
-                  "data"
-                ],
-                "properties": {
-                  "type": {
-                    "const": "track"
-                  },
-                  "data": {
-                    "anyOf": [
-                      {
-                        "type": "object",
-                        "additionalProperties": false,
-                        "required": [
-                          "type",
-                          "index",
-                          "configuration"
-                        ],
-                        "properties": {
-                          "type": {
-                            "const": "start"
-                          },
-                          "index": {
-                            "$ref": "index"
-                          },
-                          "configuration": {
-                            "type": "object",
-                            "additionalProperties": false,
-                            "properties": {
-                              "name": {
-                                "type": "string"
-                              },
-                              "recording": {
-                                "$ref": "recording"
-                              },
-                              "output": {
-                                "type": "object",
-                                "additionalProperties": false,
-                                "properties": {
-                                  "filename": {
-                                    "$ref": "filename"
-                                  }
-                                }
-                              }
-                            }
-                          }
-                        }
-                      },
-                      {
-                        "type": "object",
-                        "additionalProperties": false,
-                        "required": [
-                          "type",
-                          "index"
-                        ],
-                        "properties": {
-                          "type": {
-                            "enum": [
-                              "stop",
-                              "pause",
-                              "play"
-                            ]
-                          },
-                          "index": {
-                            "$ref": "index"
-                          }
-                        }
-                      }
-                    ]
-                  }
-                }
-              },
-              {
-                "type": "object",
-                "additionalProperties": false,
-                "required": [
-                  "type",
-                  "data"
-                ],
-                "properties": {
-                  "type": {
-                    "const": "event"
-                  },
-                  "data": {
-                    "type": "object",
-                    "additionalProperties": false,
-                    "required": [
-                      "type",
-                      "time",
-                      "index",
-                      "data"
-                    ],
-                    "properties": {
-                      "type": {
-                        "enum": [
-                          "placeholder",
-                          "before",
-                          "after",
-                          "begin",
-                          "end"
-                        ]
-                      },
-                      "time": {
-                        "type": "number"
-                      },
-                      "index": {
-                        "$ref": "index"
-                      },
-                      "data": {
-                        "type": "object"
-                      }
-                    }
-                  }
-                }
-              }
+            "enum": [
+              "bundle",
+              "apply",
+              "response",
+              "jump",
+              "request",
+              "query"
             ]
           }
         }
+      }
+    }
+  },
+  {
+    "$id": "message",
+    "anyOf": [
+      {
+        "type": "array",
+        "minItems": 2,
+        "maxItems": 2,
+        "items": [
+          {
+            "const": "initialize"
+          },
+          {
+            "$ref": "cooked-configuration"
+          }
+        ]
+      },
+      {
+        "type": "array",
+        "minItems": 2,
+        "maxItems": 2,
+        "items": [
+          {
+            "const": "terminate"
+          },
+          {
+            "$ref": "termination"
+          }
+        ]
+      },
+      {
+        "type": "array",
+        "minItems": 2,
+        "maxItems": 2,
+        "items": [
+          {
+            "const": "start"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "track",
+              "initialization"
+            ],
+            "properties": {
+              "track": {
+                "type": "string"
+              },
+              "initialization": {
+                "$ref": "configuration"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "type": "array",
+        "minItems": 2,
+        "maxItems": 2,
+        "items": [
+          {
+            "const": "stop"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "track",
+              "termination"
+            ],
+            "properties": {
+              "track": {
+                "type": "string"
+              },
+              "termination": {
+                "$ref": "termination"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "type": "array",
+        "minItems": 2,
+        "maxItems": 2,
+        "items": [
+          {
+            "const": "file"
+          },
+          {
+            "$ref": "file"
+          }
+        ]
+      },
+      {
+        "type": "array",
+        "minItems": 2,
+        "maxItems": 2,
+        "items": [
+          {
+            "const": "event"
+          },
+          {
+            "$ref": "event"
+          }
+        ]
       }
     ]
   }

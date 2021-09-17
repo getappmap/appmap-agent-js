@@ -48,6 +48,7 @@ const data_map = new _Map([
   [
     "begin/response",
     {
+      type: "response",
       protocol: `HTTP/1.1`,
       method: "GET",
       headers: {},
@@ -80,6 +81,7 @@ const data_map = new _Map([
   [
     "before/query",
     {
+      type: "query",
       database: "database",
       version: null,
       sql: "SELECT 'APPMAP-MANUFACTURED-BEFORE-QUERY';",
@@ -96,6 +98,7 @@ const data_map = new _Map([
   [
     "before/request",
     {
+      type: "request",
       protocol: "HTTP/1.1",
       method: "GET",
       url: "APPMAP-MANUFACTURED-BEFORE-REQUEST",

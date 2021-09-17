@@ -8,7 +8,7 @@ export default (dependencies) => {
   const { getClassmapClosure } = Classmap(dependencies);
   const { compileCallData, compileReturnData } = Data(dependencies);
 
-  const compileEventTrace = (events, slice, classmap) => {
+  const compileEventTrace = (events, classmap) => {
     const stack = [];
     const digest = [];
     const isLastShallow = (stack) => {
@@ -22,9 +22,9 @@ export default (dependencies) => {
     };
     let counter = 0;
     for (const event of events) {
-      const { type, time, index, data } = event;
+      const { type, time, data } = event;
       const { type: data_type } = data;
-      if (slice.has(index) && data_type !== "bundle" && data_type !== "jump") {
+      if (data_type !== "bundle" && data_type !== "jump") {
         if (type === "begin" || type === "before") {
           let shallow = null;
           let skip = false;

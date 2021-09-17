@@ -85,7 +85,6 @@ const { compileEventTrace } = Event(dependencies);
           time: 10,
         },
       ],
-      new Set([1, 2]),
       classmap,
     ),
     [

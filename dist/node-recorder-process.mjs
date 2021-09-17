@@ -16,15 +16,14 @@ import instrumentation$default from "./../components/instrumentation/default/ind
 import serialization$default from "./../components/serialization/default/index.mjs";
 import frontend$default from "./../components/frontend/default/index.mjs";
 import validate$ajv from "./../components/validate/ajv/index.mjs";
-import validate_message$off from "./../components/validate-message/off/index.mjs";
-import validate_message$on from "./../components/validate-message/on/index.mjs";
-import storage$file from "./../components/storage/file/index.mjs";
-import validate_appmap$off from "./../components/validate-appmap/off/index.mjs";
-import validate_appmap$on from "./../components/validate-appmap/on/index.mjs";
 import repository$node from "./../components/repository/node/index.mjs";
 import child$default from "./../components/child/default/index.mjs";
 import engine$node from "./../components/engine/node/index.mjs";
 import configuration$default from "./../components/configuration/default/index.mjs";
+import validate_message$off from "./../components/validate-message/off/index.mjs";
+import validate_message$on from "./../components/validate-message/on/index.mjs";
+import validate_appmap$off from "./../components/validate-appmap/off/index.mjs";
+import validate_appmap$on from "./../components/validate-appmap/on/index.mjs";
 import trace$appmap from "./../components/trace/appmap/index.mjs";
 import backend$default from "./../components/backend/default/index.mjs";
 import client$inline from "./../components/client/inline/index.mjs";
@@ -59,15 +58,14 @@ export default (blueprint) => {
   dependencies["serialization"] = serialization$default(dependencies);
   dependencies["frontend"] = frontend$default(dependencies);
   dependencies["validate"] = validate$ajv(dependencies);
-  if (!("validate-message" in blueprint)) { throw new Error("missing instance for component validate-message"); }
-  dependencies["validate-message"] = (blueprint["validate-message"] === "on" ? validate_message$on(dependencies) : (blueprint["validate-message"] === "off" ? validate_message$off(dependencies) : ((() => { throw new Error("invalid instance for component validate-message"); }) ())));
-  dependencies["storage"] = storage$file(dependencies);
-  if (!("validate-appmap" in blueprint)) { throw new Error("missing instance for component validate-appmap"); }
-  dependencies["validate-appmap"] = (blueprint["validate-appmap"] === "on" ? validate_appmap$on(dependencies) : (blueprint["validate-appmap"] === "off" ? validate_appmap$off(dependencies) : ((() => { throw new Error("invalid instance for component validate-appmap"); }) ())));
   dependencies["repository"] = repository$node(dependencies);
   dependencies["child"] = child$default(dependencies);
   dependencies["engine"] = engine$node(dependencies);
   dependencies["configuration"] = configuration$default(dependencies);
+  if (!("validate-message" in blueprint)) { throw new Error("missing instance for component validate-message"); }
+  dependencies["validate-message"] = (blueprint["validate-message"] === "on" ? validate_message$on(dependencies) : (blueprint["validate-message"] === "off" ? validate_message$off(dependencies) : ((() => { throw new Error("invalid instance for component validate-message"); }) ())));
+  if (!("validate-appmap" in blueprint)) { throw new Error("missing instance for component validate-appmap"); }
+  dependencies["validate-appmap"] = (blueprint["validate-appmap"] === "on" ? validate_appmap$on(dependencies) : (blueprint["validate-appmap"] === "off" ? validate_appmap$off(dependencies) : ((() => { throw new Error("invalid instance for component validate-appmap"); }) ())));
   dependencies["trace"] = trace$appmap(dependencies);
   dependencies["backend"] = backend$default(dependencies);
   if (!("client" in blueprint)) { throw new Error("missing instance for component client"); }

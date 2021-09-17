@@ -37,156 +37,128 @@ assertDeepEqual(
     configuration,
     [
       {
-        type: "track",
+        index: indexes.file,
+        path: "/cwd/filename.js",
+        type: "script",
+        code: "function f (x) {}",
+        exclude: [],
+      },
+    ],
+    [
+      {
+        type: "begin",
+        index: indexes.event1,
+        group: 0,
+        time: 0,
         data: {
-          type: "start",
-          index: indexes.track,
-          configuration: {
-            recording: {
-              "method-id": "method-id",
-              "defined-class": "defined-class",
-            },
-          },
+          type: "apply",
+          function: `${String(indexes.file)}/body/0`,
+          this: { type: "string", print: "this-print" },
+          arguments: [{ type: "string", print: "arg-print" }],
         },
       },
       {
-        type: "file",
+        type: "end",
+        index: indexes.event1,
+        group: 0,
+        time: 0,
         data: {
-          index: indexes.file,
-          path: "/cwd/filename.js",
-          type: "script",
-          code: "function f (x) {}",
-          exclude: [],
-        },
-      },
-      {
-        type: "event",
-        data: {
-          type: "begin",
-          index: indexes.event1,
-          group: 0,
-          time: 0,
-          data: {
-            type: "apply",
-            function: `${String(indexes.file)}/body/0`,
-            this: { type: "string", print: "this-print" },
-            arguments: [{ type: "string", print: "arg-print" }],
-          },
-        },
-      },
-      {
-        type: "event",
-        data: {
-          type: "end",
-          index: indexes.event1,
-          group: 0,
-          time: 0,
-          data: {
-            type: "apply",
-            error: null,
-            result: {
-              type: "string",
-              print: "result-print",
-            },
+          type: "apply",
+          error: null,
+          result: {
+            type: "string",
+            print: "result-print",
           },
         },
       },
     ],
     { errors: [], status: 0 },
   ),
-  [
-    {
+  {
+    version: "1.6.0",
+    metadata: {
       name: null,
-      data: {
-        version: "1.6.0",
-        metadata: {
-          name: null,
-          app: null,
-          labels: [],
-          language: {
-            name: "ecmascript",
-            version: "2020",
-            engine: "engine@0.0.0",
-          },
-          frameworks: [],
-          client: {
-            name: "@appland/appmap-agent-js",
-            url: "https://github.com/applandinc/appmap-agent-js",
-            version: "0.0.0",
-          },
-          recorder: { name: "process" },
-          recording: {
-            defined_class: "defined-class",
-            method_id: "method-id",
-          },
-          git: null,
-          test_status: "succeeded",
-          exception: null,
-        },
-        classMap: [
+      app: null,
+      labels: [],
+      language: {
+        name: "ecmascript",
+        version: "2020",
+        engine: "engine@0.0.0",
+      },
+      frameworks: [],
+      client: {
+        name: "@appland/appmap-agent-js",
+        url: "https://github.com/applandinc/appmap-agent-js",
+        version: "0.0.0",
+      },
+      recorder: { name: "process" },
+      recording: null,
+      git: null,
+      test_status: "succeeded",
+      exception: null,
+    },
+    classMap: [
+      {
+        type: "package",
+        name: "filename.js",
+        children: [
           {
-            type: "package",
-            name: "filename.js",
+            type: "class",
+            name: "f",
             children: [
               {
-                type: "class",
-                name: "f",
-                children: [
-                  {
-                    type: "function",
-                    name: "$",
-                    location: "filename.js:1",
-                    static: false,
-                    labels: [],
-                    comment: null,
-                    source: null,
-                  },
-                ],
+                type: "function",
+                name: "$",
+                location: "filename.js:1",
+                static: false,
+                labels: [],
+                comment: null,
+                source: null,
               },
             ],
-          },
-        ],
-        events: [
-          {
-            id: 1,
-            event: "call",
-            thread_id: 0,
-            defined_class: "f",
-            method_id: "$",
-            path: "filename.js",
-            lineno: 1,
-            static: false,
-            receiver: {
-              name: "this",
-              class: "string",
-              object_id: null,
-              value: "this-print",
-            },
-            parameters: [
-              {
-                name: "x",
-                class: "string",
-                object_id: null,
-                value: "arg-print",
-              },
-            ],
-          },
-          {
-            id: 2,
-            event: "return",
-            thread_id: 0,
-            parent_id: 1,
-            elapsed: 0,
-            return_value: {
-              name: "return",
-              class: "string",
-              object_id: null,
-              value: "result-print",
-            },
-            exceptions: null,
           },
         ],
       },
-    },
-  ],
+    ],
+    events: [
+      {
+        id: 1,
+        event: "call",
+        thread_id: 0,
+        defined_class: "f",
+        method_id: "$",
+        path: "filename.js",
+        lineno: 1,
+        static: false,
+        receiver: {
+          name: "this",
+          class: "string",
+          object_id: null,
+          value: "this-print",
+        },
+        parameters: [
+          {
+            name: "x",
+            class: "string",
+            object_id: null,
+            value: "arg-print",
+          },
+        ],
+      },
+      {
+        id: 2,
+        event: "return",
+        thread_id: 0,
+        parent_id: 1,
+        elapsed: 0,
+        return_value: {
+          name: "return",
+          class: "string",
+          object_id: null,
+          value: "result-print",
+        },
+        exceptions: null,
+      },
+    ],
+  },
 );
