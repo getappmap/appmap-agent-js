@@ -6,7 +6,7 @@ export default (dependencies) => {
       const map = new _Map();
       const output = [];
       for (const event of events) {
-        const key = `${String(event.index)}/${event.data.type}`;
+        const key = `${String(event.index)}/${event.type}`;
         if (map.has(key)) {
           const index = map.get(key);
           output[index] = {

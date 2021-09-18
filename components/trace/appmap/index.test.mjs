@@ -27,8 +27,6 @@ const configuration = extendConfiguration(
 const indexes = {
   file: 1,
   track: 2,
-  group1: 3,
-  group2: 4,
   event1: 5,
   event2: 6,
 };
@@ -48,7 +46,6 @@ assertDeepEqual(
       {
         type: "begin",
         index: indexes.event1,
-        group: 0,
         time: 0,
         data: {
           type: "apply",
@@ -60,7 +57,6 @@ assertDeepEqual(
       {
         type: "end",
         index: indexes.event1,
-        group: 0,
         time: 0,
         data: {
           type: "apply",
