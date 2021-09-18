@@ -31,49 +31,58 @@ export default (dependencies) => {
     sendBackend: (backend, message) => {
       logDebug("backend received: %j", message);
       validateMessage(message);
-      const [type, data] = message;
+      const type = message[0];
       let result = EMPTY;
       if (type === "event") {
+        const event = {
+          type: message[1],
+          index: message[2],
+          time: message[3],
+          data: {
+            type: message[4],
+            ...message[5],
+          },
+        };
         for (const { events } of backend.tracks.values()) {
-          events.push(data);
+          events.push(event);
         }
       } else if (type === "file") {
-        backend.files.push(data);
+        backend.files.push(message[1]);
       } else if (type === "start") {
-        const { track: key, initialization } = data;
+        const key = message[1];
         assert(!backend.tracks.has(key), "duplicate track");
-        backend.tracks.set(key, { initialization, events: [] });
+        backend.tracks.set(key, { initialization: message[2], events: [] });
       } else if (type === "stop") {
-        const { track: key, termination } = data;
+        const key = message[1];
         assert(backend.tracks.has(key), "missing track");
         assert(
           getBox(backend.configuration_box) !== null,
           "missing initialization (stop)",
         );
-        result = [finalize(backend, key, termination)];
+        result = [finalize(backend, key, message[2])];
       } else if (type === "initialize") {
         assert(
           getBox(backend.configuration_box) === null,
           "duplicate initialization",
         );
-        setBox(backend.configuration_box, data);
+        setBox(backend.configuration_box, message[1]);
       } else if (type === "terminate") {
         assert(
           getBox(backend.configuration_box) !== null,
           "missing initialization (termination)",
         );
         result = toArray(backend.tracks.keys()).map((key) =>
-          finalize(backend, key, data),
+          finalize(backend, key, message[1]),
         );
-      } else {
+      } /* c8 ignore start */ else {
         assert(false, "invalid message");
-      }
+      } /* c8 ignore stop */
       return result;
     },
     closeBackend: (backend) => {
       assert(
         getBox(backend.configuration_box) !== null,
-        "missing initialization (stop)",
+        "missing initialization (close)",
       );
       const termination = {
         errors: [{ name: "AppmapError", message: "client disconnection" }],

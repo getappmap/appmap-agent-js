@@ -1273,52 +1273,6 @@ export const schema = [
     }
   },
   {
-    "$id": "event",
-    "type": "object",
-    "additionalProperties": false,
-    "required": [
-      "type",
-      "time",
-      "index",
-      "data"
-    ],
-    "properties": {
-      "type": {
-        "enum": [
-          "erratum",
-          "before",
-          "after",
-          "begin",
-          "end"
-        ]
-      },
-      "time": {
-        "type": "number"
-      },
-      "index": {
-        "$ref": "index"
-      },
-      "data": {
-        "type": "object",
-        "required": [
-          "type"
-        ],
-        "properties": {
-          "type": {
-            "enum": [
-              "bundle",
-              "apply",
-              "response",
-              "jump",
-              "request",
-              "query"
-            ]
-          }
-        }
-      }
-    }
-  },
-  {
     "$id": "message",
     "anyOf": [
       {
@@ -1349,53 +1303,33 @@ export const schema = [
       },
       {
         "type": "array",
-        "minItems": 2,
-        "maxItems": 2,
+        "minItems": 3,
+        "maxItems": 3,
         "items": [
           {
             "const": "start"
           },
           {
-            "type": "object",
-            "additionalProperties": false,
-            "required": [
-              "track",
-              "initialization"
-            ],
-            "properties": {
-              "track": {
-                "type": "string"
-              },
-              "initialization": {
-                "$ref": "configuration"
-              }
-            }
+            "type": "string"
+          },
+          {
+            "$ref": "configuration"
           }
         ]
       },
       {
         "type": "array",
-        "minItems": 2,
-        "maxItems": 2,
+        "minItems": 3,
+        "maxItems": 3,
         "items": [
           {
             "const": "stop"
           },
           {
-            "type": "object",
-            "additionalProperties": false,
-            "required": [
-              "track",
-              "termination"
-            ],
-            "properties": {
-              "track": {
-                "type": "string"
-              },
-              "termination": {
-                "$ref": "termination"
-              }
-            }
+            "type": "string"
+          },
+          {
+            "$ref": "termination"
           }
         ]
       },
@@ -1414,15 +1348,37 @@ export const schema = [
       },
       {
         "type": "array",
-        "minItems": 2,
-        "maxItems": 2,
+        "minItems": 6,
+        "maxItems": 6,
         "items": [
           {
             "const": "event"
           },
           {
-            "$ref": "event"
-          }
+            "enum": [
+              "begin",
+              "end",
+              "before",
+              "after"
+            ]
+          },
+          {
+            "$ref": "index"
+          },
+          {
+            "type": "number"
+          },
+          {
+            "enum": [
+              "bundle",
+              "apply",
+              "response",
+              "jump",
+              "request",
+              "query"
+            ]
+          },
+          true
         ]
       }
     ]

@@ -636,34 +636,6 @@
     path: {$ref: absolute-path}
     code: {type: string}
 
-# TODO
-- $id: event
-  type: object
-  additionalProperties: false
-  required: [type, time, index, data]
-  properties:
-    type:
-      enum:
-        - erratum
-        - before
-        - after
-        - begin
-        - end
-    time: {type: number}
-    index: {$ref: index}
-    data:
-      type: object
-      required: [type]
-      properties:
-        type:
-          enum:
-            - bundle
-            - apply
-            - response
-            - jump
-            - request
-            - query
-
 - $id: message
   anyOf:
     - type: array
@@ -679,27 +651,19 @@
         - const: terminate
         - $ref: termination
     - type: array
-      minItems: 2
-      maxItems: 2
+      minItems: 3
+      maxItems: 3
       items:
         - const: start
-        - type: object
-          additionalProperties: false
-          required: [track, initialization]
-          properties:
-            track: {type: string}
-            initialization: {$ref: configuration}
+        - type: string
+        - $ref: configuration
     - type: array
-      minItems: 2
-      maxItems: 2
+      minItems: 3
+      maxItems: 3
       items:
         - const: stop
-        - type: object
-          additionalProperties: false
-          required: [track, termination]
-          properties:
-            track: {type: string}
-            termination: {$ref: termination}
+        - type: string
+        - $ref: termination
     - type: array
       minItems: 2
       maxItems: 2
@@ -707,8 +671,22 @@
         - const: file
         - $ref: file
     - type: array
-      minItems: 2
-      maxItems: 2
+      minItems: 6
+      maxItems: 6
       items:
         - const: event
-        - $ref: event
+        - enum:
+          - begin
+          - end
+          - before
+          - after
+        - $ref: index
+        - type: number
+        - enum:
+          - bundle
+          - apply
+          - response
+          - jump
+          - request
+          - query
+        - true

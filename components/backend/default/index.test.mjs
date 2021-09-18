@@ -17,11 +17,11 @@ const { createConfiguration } = await buildTestComponentAsync(
   "configuration",
   "test",
 );
-const { openBackend, sendBackend } = Backend(dependencies);
+const { openBackend, sendBackend, closeBackend } = Backend(dependencies);
 
 const configuration = createConfiguration("/cwd");
 
-{
+const test = (track, finalize, test_status, exception) => {
   const backend = openBackend();
   sendBackend(backend, ["initialize", configuration]);
   sendBackend(backend, [
@@ -36,57 +36,38 @@ const configuration = createConfiguration("/cwd");
       code: "function main () {}",
     },
   ]);
-  sendBackend(backend, [
-    "start",
-    { track: "track", initialization: { output: { filename: "filename" } } },
-  ]);
+  sendBackend(backend, ["start", track, { output: { filename: "filename" } }]);
   sendBackend(backend, [
     "event",
+    "begin",
+    1,
+    0,
+    "apply",
     {
-      type: "begin",
-      index: 1,
-      time: 0,
-      data: {
-        type: "apply",
-        function: "1/body/0",
-        this: {
-          type: "string",
-          print: "THIS",
-        },
-        arguments: [],
+      function: "1/body/0",
+      this: {
+        type: "string",
+        print: "THIS",
       },
+      arguments: [],
     },
   ]);
   sendBackend(backend, [
     "event",
+    "end",
+    1,
+    0,
+    "apply",
     {
-      type: "end",
-      index: 1,
-      time: 0,
-      data: {
-        type: "apply",
-        error: null,
-        result: {
-          type: "string",
-          print: "RESULT",
-        },
+      error: null,
+      result: {
+        type: "string",
+        print: "RESULT",
       },
     },
   ]);
   assertDeepEqual(
-    sendBackend(backend, [
-      "terminate",
-      {
-        errors: [
-          {
-            name: "error-name",
-            message: "error-message",
-            stack: "error-stack",
-          },
-        ],
-        status: 1,
-      },
-    ]).map(({ data }) => data),
+    finalize(backend).map(({ data }) => data),
     [
       {
         version: "1.6.0",
@@ -108,8 +89,8 @@ const configuration = createConfiguration("/cwd");
           recorder: { name: "process" },
           recording: null,
           git: null,
-          test_status: "failed",
-          exception: { class: "error-name", message: "error-message" },
+          test_status,
+          exception,
         },
         classMap: [
           {
@@ -170,4 +151,44 @@ const configuration = createConfiguration("/cwd");
       },
     ],
   );
-}
+};
+
+test(
+  "track",
+  (backend) =>
+    sendBackend(backend, [
+      "stop",
+      "track",
+      {
+        errors: [],
+        status: 0,
+      },
+    ]),
+  "succeeded",
+  null,
+);
+
+test(
+  "track",
+  (backend) =>
+    sendBackend(backend, [
+      "terminate",
+      {
+        errors: [
+          {
+            name: "error-name",
+            message: "error-message",
+            stack: "error-stack",
+          },
+        ],
+        status: 1,
+      },
+    ]),
+  "failed",
+  { class: "error-name", message: "error-message" },
+);
+
+test("track", closeBackend, "failed", {
+  class: "AppmapError",
+  message: "client disconnection",
+});
