@@ -28,11 +28,11 @@ const appmap = new Appmap(
   ),
 );
 
-const recording = appmap.start();
-recording.pause();
-recording.play();
-recording.stop();
+const recording = appmap.start({});
+// recording.pause();
+// recording.play();
+recording.stop({ errors: [], status: 0 });
 assertDeepEqual(
-  (await appmap.terminate()).map(({ type }) => type),
-  ["initialize", "trace", "trace", "trace", "trace", "terminate"],
+  (await appmap.terminate()).map(([type]) => type),
+  ["initialize", "start", "stop", "terminate"],
 );

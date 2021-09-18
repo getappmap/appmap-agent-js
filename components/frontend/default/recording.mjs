@@ -1,4 +1,4 @@
-import Trace from "./trace.mjs";
+import Session from "./session.mjs";
 
 const { isArray, from: toArray } = Array;
 const { fromEntries, entries: toEntries } = Object;
@@ -13,20 +13,19 @@ export default (dependencies) => {
       getSerializationEmptyValue,
     },
   } = dependencies;
-  const { traceEvent } = Trace(dependencies);
+  const { recordEventSession } = Session(dependencies);
   const returnNull = constant(null);
   const generateRecord =
     (type1, type2, serializeData) =>
     ({ session, recording: { serialization } }, index, data) =>
-      traceEvent(session, {
-        type: type1,
+      recordEventSession(
+        session,
+        type1,
         index,
-        data: {
-          type: type2,
-          ...serializeData(serialization, data),
-        },
-        time: now(),
-      });
+        now(),
+        type2,
+        serializeData(serialization, data),
+      );
   const serializeBeforeApply = (
     serialization,
     { function: _function, this: _this, arguments: _arguments },
@@ -58,7 +57,6 @@ export default (dependencies) => {
   const serializeAfterQuery = (serialization, { error }) => ({
     error: serialize(serialization, error),
   });
-  const wrapIndex = (serialization, index) => ({ index });
   return {
     createRecording: (configuration) => ({
       event_counter: createCounter(0),
@@ -68,8 +66,6 @@ export default (dependencies) => {
       incrementCounter(event_counter),
     getSerializationEmptyValue: ({ recording: { serialization } }) =>
       getSerializationEmptyValue(serialization),
-    // placeholder //
-    recordPlaceholder: generateRecord("placeholder", "placeholder", wrapIndex),
     // bundle //
     recordBeginBundle: generateRecord("begin", "bundle", returnNull),
     recordEndBundle: generateRecord("end", "bundle", returnNull),

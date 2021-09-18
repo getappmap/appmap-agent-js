@@ -5,7 +5,8 @@ export default (dependencies) => {
       createAgent,
       executeAgentAsync,
       createTrack,
-      controlTrack,
+      startTrack,
+      stopTrack,
       interruptAgent,
     },
   } = dependencies;
@@ -15,15 +16,16 @@ export default (dependencies) => {
       assert(recorder === "process", "expected process recorder");
       const agent = createAgent(configuration);
       const promise = executeAgentAsync(agent);
-      const track = createTrack(agent, {});
-      controlTrack(agent, track, "start");
+      const track = createTrack(agent);
+      startTrack(agent, track, {});
       const errors = [];
       process.on("uncaughtExceptionMonitor", (error) => {
         errors.push(error);
       });
       process.on("exit", (status, signal) => {
-        controlTrack(agent, track, "stop");
-        interruptAgent(agent, { errors, status });
+        const termination = { errors, status };
+        stopTrack(agent, track, termination);
+        interruptAgent(agent, termination);
       });
       return promise;
     },

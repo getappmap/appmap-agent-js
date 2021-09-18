@@ -2,6 +2,7 @@ import util$default from "./../components/util/default/index.mjs";
 import violation$exit from "./../components/violation/exit/index.mjs";
 import expect_inner$default from "./../components/expect-inner/default/index.mjs";
 import expect$default from "./../components/expect/default/index.mjs";
+import uuid$random from "./../components/uuid/random/index.mjs";
 import log_inner$write_sync from "./../components/log-inner/write-sync/index.mjs";
 import log$debug from "./../components/log/debug/index.mjs";
 import log$error from "./../components/log/error/index.mjs";
@@ -9,7 +10,6 @@ import log$info from "./../components/log/info/index.mjs";
 import log$off from "./../components/log/off/index.mjs";
 import log$warning from "./../components/log/warning/index.mjs";
 import time$performance_node from "./../components/time/performance-node/index.mjs";
-import uuid$random from "./../components/uuid/random/index.mjs";
 import specifier$default from "./../components/specifier/default/index.mjs";
 import naming$default from "./../components/naming/default/index.mjs";
 import instrumentation$default from "./../components/instrumentation/default/index.mjs";
@@ -47,11 +47,11 @@ export default (blueprint) => {
   dependencies["violation"] = violation$exit(dependencies);
   dependencies["expect-inner"] = expect_inner$default(dependencies);
   dependencies["expect"] = expect$default(dependencies);
+  dependencies["uuid"] = uuid$random(dependencies);
   dependencies["log-inner"] = log_inner$write_sync(dependencies);
   if (!("log" in blueprint)) { throw new Error("missing instance for component log"); }
   dependencies["log"] = (blueprint["log"] === "warning" ? log$warning(dependencies) : (blueprint["log"] === "off" ? log$off(dependencies) : (blueprint["log"] === "info" ? log$info(dependencies) : (blueprint["log"] === "error" ? log$error(dependencies) : (blueprint["log"] === "debug" ? log$debug(dependencies) : ((() => { throw new Error("invalid instance for component log"); }) ()))))));
   dependencies["time"] = time$performance_node(dependencies);
-  dependencies["uuid"] = uuid$random(dependencies);
   dependencies["specifier"] = specifier$default(dependencies);
   dependencies["naming"] = naming$default(dependencies);
   dependencies["instrumentation"] = instrumentation$default(dependencies);

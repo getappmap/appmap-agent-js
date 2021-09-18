@@ -64,12 +64,8 @@ const scenarioAsync = async (server) => {
 };
 
 const cleanupHeaders = (message) => {
-  if (
-    message.type === "trace" &&
-    message.data.type === "event" &&
-    message.data.data.data.type === "response"
-  ) {
-    message.data.data.data.headers = null;
+  if (message[0] === "event" && message[4] === "response") {
+    message[5].headers = null;
   }
   return message;
 };
@@ -87,90 +83,57 @@ assertDeepEqual(
 );
 
 const makeJump = (index) => [
-  {
-    type: "trace",
-    data: {
-      type: "event",
-      data: {
-        type: "before",
-        index,
-        time: 0,
-        data: { type: "jump" },
-      },
-    },
-  },
-  {
-    type: "trace",
-    data: {
-      type: "event",
-      data: {
-        type: "after",
-        index,
-        time: 0,
-        data: { type: "jump" },
-      },
-    },
-  },
+  ["event", "before", index, 0, "jump", null],
+  ["event", "after", index, 0, "jump", null],
 ];
 
 const trace = [
-  {
-    type: "trace",
-    data: {
-      type: "event",
-      data: {
-        type: "placeholder",
-        index: 1,
-        time: 0,
-        data: {
-          type: "placeholder",
-          index: 2,
-        },
-      },
+  [
+    "event",
+    "begin",
+    1,
+    0,
+    "response",
+    {
+      protocol: "HTTP/1.1",
+      method: "GET",
+      headers: null,
+      url: "/route/foo/bar/qux",
+      route: null,
     },
-  },
-  makeJump(3)[0],
-  {
-    type: "trace",
-    data: {
-      type: "event",
-      data: {
-        type: "begin",
-        index: 2,
-        data: {
-          type: "response",
-          protocol: "HTTP/1.1",
-          method: "GET",
-          headers: null,
-          url: "/route/foo/bar/qux",
-          route: "/route/*/:param1/:param2",
-        },
-        time: 0,
-      },
+  ],
+  makeJump(2)[0],
+  [
+    "event",
+    "begin",
+    1,
+    0,
+    "response",
+    {
+      protocol: "HTTP/1.1",
+      method: "GET",
+      headers: null,
+      url: "/route/foo/bar/qux",
+      route: "/route/*/:param1/:param2",
     },
-  },
-  makeJump(3)[1],
+  ],
+  makeJump(2)[1],
+  ...makeJump(3),
   ...makeJump(4),
   ...makeJump(5),
   ...makeJump(6),
-  ...makeJump(7),
-  {
-    type: "trace",
-    data: {
-      type: "event",
-      data: {
-        type: "end",
-        index: 1,
-        data: {
-          type: "response",
-          status: 200,
-          message: "OK",
-          headers: null,
-        },
-        time: 0,
-      },
+  [
+    "event",
+    "end",
+    1,
+    0,
+    "response",
+    {
+      status: 200,
+      message: "OK",
+      headers: null,
     },
-  },
+  ],
 ];
 
 assertDeepEqual(

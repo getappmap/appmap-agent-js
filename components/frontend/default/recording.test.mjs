@@ -15,7 +15,6 @@ const {
   createRecording,
   getSerializationEmptyValue,
   incrementEventCounter,
-  recordPlaceholder,
   recordBeginApply,
   recordEndApply,
   recordBeforeQuery,
@@ -28,18 +27,14 @@ const session = createSession(configuration);
 initializeSession(session);
 assertEqual(typeof incrementEventCounter({ recording }), "number");
 assertEqual(typeof getSerializationEmptyValue({ recording }), "symbol");
-const createMessage = (type, index, data) => ({
-  type: "trace",
-  data: {
-    type: "event",
-    data: {
-      type,
-      time: 0,
-      index,
-      data,
-    },
-  },
-});
+const createMessage = (type1, index, { type: type2, ...data }) => [
+  "event",
+  type1,
+  index,
+  0,
+  type2,
+  data,
+];
 assertDeepEqual(
   recordBeginApply({ session, recording }, "index", {
     function: "function",
@@ -101,13 +96,5 @@ assertDeepEqual(
   createMessage("after", "index", {
     type: "query",
     error: { type: "number", print: "123" },
-  }),
-);
-
-assertDeepEqual(
-  recordPlaceholder({ session, recording }, "index", 123),
-  createMessage("placeholder", "index", {
-    type: "placeholder",
-    index: 123,
   }),
 );

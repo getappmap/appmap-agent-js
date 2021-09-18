@@ -1,4 +1,4 @@
-const PAUSE_STATE = 1;
+// const PAUSE_STATE = 1;
 const PLAY_STATE = 2;
 const STOP_STATE = 3;
 
@@ -10,7 +10,8 @@ export default (dependencies) => {
       createAgent,
       executeAgentAsync,
       createTrack,
-      controlTrack,
+      startTrack,
+      stopTrack,
       interruptAgent,
     },
   } = dependencies;
@@ -38,37 +39,37 @@ export default (dependencies) => {
     }
   }
   class Recorder {
-    constructor(agent, options) {
-      const track = createTrack(agent, { ...options });
-      controlTrack(agent, track, "start");
+    constructor(agent, initialization) {
+      const track = createTrack(agent);
+      startTrack(agent, track, { ...initialization });
       this.agent = agent;
       this.track = track;
       this.state = PLAY_STATE;
     }
-    stop() {
+    stop(termination) {
       expect(
         this.state !== STOP_STATE,
         "cannot stop recording because it has already been stopped",
       );
       this.state = STOP_STATE;
-      controlTrack(this.agent, this.track, "stop");
+      stopTrack(this.agent, this.track, termination);
     }
-    play() {
-      expect(
-        this.state === PAUSE_STATE,
-        "cannot play recording because it is not currently on pause",
-      );
-      this.state = PLAY_STATE;
-      controlTrack(this.agent, this.track, "play");
-    }
-    pause() {
-      expect(
-        this.state === PLAY_STATE,
-        "cannot pause recording because it is not currently playing",
-      );
-      this.state = PAUSE_STATE;
-      controlTrack(this.agent, this.track, "pause");
-    }
+    // play() {
+    //   expect(
+    //     this.state === PAUSE_STATE,
+    //     "cannot play recording because it is not currently on pause",
+    //   );
+    //   this.state = PLAY_STATE;
+    //   controlTrack(this.agent, this.track, "play");
+    // }
+    // pause() {
+    //   expect(
+    //     this.state === PLAY_STATE,
+    //     "cannot pause recording because it is not currently playing",
+    //   );
+    //   this.state = PAUSE_STATE;
+    //   controlTrack(this.agent, this.track, "pause");
+    // }
   }
   return { Appmap };
 };

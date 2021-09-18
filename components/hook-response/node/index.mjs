@@ -13,7 +13,6 @@ export default (dependencies) => {
     emitter: { spyEmitter, spyFlattenEmitterList },
     frontend: {
       incrementEventCounter,
-      recordPlaceholder,
       recordBeginResponse,
       recordEndResponse,
       recordBeforeJump,
@@ -38,32 +37,30 @@ export default (dependencies) => {
         // bundle //
         const bundle_index = incrementEventCounter(frontend);
         const begin = () => {
-          const placeholder_index = incrementEventCounter(frontend);
-          sendClient(
-            client,
-            recordPlaceholder(frontend, bundle_index, placeholder_index),
-          );
+          const { httpVersion: version, method, url, headers } = request;
+          const data = {
+            protocol: `HTTP/${version}`,
+            method,
+            headers,
+            url,
+            route: null,
+          };
+          sendClient(client, recordBeginResponse(frontend, bundle_index, data));
           // Give time for express to populate the request
           nextTick(() => {
-            let route = null;
             if (
               typeof coalesce(request, "baseUrl", _undefined) === "string" &&
               typeof coalesce(request, "route", _undefined) === "object" &&
               typeof coalesce(request.route, "path", _undefined) === "string"
             ) {
-              route = `${request.baseUrl}${request.route.path}`;
+              sendClient(
+                client,
+                recordBeginResponse(frontend, bundle_index, {
+                  ...data,
+                  route: `${request.baseUrl}${request.route.path}`,
+                }),
+              );
             }
-            const { httpVersion: version, method, url, headers } = request;
-            sendClient(
-              client,
-              recordBeginResponse(frontend, placeholder_index, {
-                protocol: `HTTP/${version}`,
-                method,
-                headers,
-                url,
-                route,
-              }),
-            );
           });
         };
         const end = () => {

@@ -49,21 +49,18 @@ const testAsync = async () => {
       },
     ),
     [
-      {
-        type: "trace",
-        data: {
-          type: "file",
-          data: {
-            index: 0,
-            exclude: [],
-            type: "module",
-            path: fileURLToPath(import.meta.url),
-            code: "123;",
-            shallow: true,
-            source: false,
-          },
+      [
+        "file",
+        {
+          index: 0,
+          exclude: [],
+          type: "module",
+          path: fileURLToPath(import.meta.url),
+          code: "123;",
+          shallow: true,
+          source: false,
         },
-      },
+      ],
     ],
   );
 };

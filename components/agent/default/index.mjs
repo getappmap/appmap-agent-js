@@ -11,7 +11,8 @@ export default (dependencies) => {
       initializeFrontend,
       terminateFrontend,
       createTrack,
-      controlTrack,
+      startTrack,
+      stopTrack,
     },
     client: { createClient, executeClientAsync, sendClient, interruptClient },
   } = dependencies;
@@ -46,8 +47,11 @@ export default (dependencies) => {
       interruptClient(client);
     },
     createTrack: ({ frontend }, options) => createTrack(frontend, options),
-    controlTrack: ({ client, frontend }, track, action) => {
-      sendClient(client, controlTrack(frontend, track, action));
+    startTrack: ({ client, frontend }, track, initialization) => {
+      sendClient(client, startTrack(frontend, track, initialization));
+    },
+    stopTrack: ({ client, frontend }, track, termination) => {
+      sendClient(client, stopTrack(frontend, track, termination));
     },
   };
 };

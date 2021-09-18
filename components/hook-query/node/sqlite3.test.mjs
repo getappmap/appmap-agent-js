@@ -50,64 +50,22 @@ const testAsync = async () => {
     );
 
   const createTrace = (sql, parameters, error) => [
-    {
-      type: "trace",
-      data: {
-        type: "event",
-        data: {
-          type: "begin",
-          index: 1,
-          data: {
-            type: "bundle",
-          },
-          time: 0,
-        },
+    ["event", "begin", 1, 0, "bundle", null],
+    [
+      "event",
+      "before",
+      2,
+      0,
+      "query",
+      {
+        database: "sqlite3",
+        version: null,
+        sql,
+        parameters,
       },
-    },
-    {
-      type: "trace",
-      data: {
-        type: "event",
-        data: {
-          type: "before",
-          index: 2,
-          data: {
-            type: "query",
-            database: "sqlite3",
-            version: null,
-            sql,
-            parameters,
-          },
-          time: 0,
-        },
-      },
-    },
-    {
-      type: "trace",
-      data: {
-        type: "event",
-        data: {
-          type: "after",
-          index: 2,
-          data: { type: "query", error },
-          time: 0,
-        },
-      },
-    },
-    {
-      type: "trace",
-      data: {
-        type: "event",
-        data: {
-          type: "end",
-          index: 1,
-          data: {
-            type: "bundle",
-          },
-          time: 0,
-        },
-      },
-    },
+    ],
+    ["event", "after", 2, 0, "query", { error }],
+    ["event", "end", 1, 0, "bundle", null],
   ];
 
   // Disable //

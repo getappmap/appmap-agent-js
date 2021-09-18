@@ -38,7 +38,7 @@ const configuration = createConfiguration("/repository");
   emitter.emit("uncaughtExceptionMonitor", new Error("BOUM"));
   emitter.emit("exit", 123, "SIGINT");
   assertDeepEqual(
-    (await promise).map(({ type }) => type),
-    ["initialize", "trace", "trace", "terminate"],
+    (await promise).map(([type]) => type),
+    ["initialize", "start", "stop", "terminate"],
   );
 }

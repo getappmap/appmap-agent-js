@@ -10,7 +10,8 @@ export default (dependencies) => {
       createAgent,
       executeAgentAsync,
       createTrack,
-      controlTrack,
+      startTrack,
+      stopTrack,
       interruptAgent,
     },
   } = dependencies;
@@ -37,10 +38,11 @@ export default (dependencies) => {
         errors.push(error);
       });
       process.on("exit", (status, signal) => {
+        const termination = { errors, status };
         if (track !== null) {
-          controlTrack(agent, track, "stop");
+          stopTrack(agent, track, termination);
         }
-        interruptAgent(agent, { errors, status });
+        interruptAgent(agent, termination);
       });
       let track = null;
       return {
@@ -50,14 +52,14 @@ export default (dependencies) => {
             track === null,
             "mocha should not run test cases concurrently ...",
           );
-          track = createTrack(agent, {
+          track = createTrack(agent);
+          startTrack(agent, track, {
             name: this.currentTest.parent.fullTitle(),
           });
-          controlTrack(agent, track, "start");
         },
         afterEach() {
           assert(track !== null, "mocha invoked afterEach ");
-          controlTrack(agent, track, "stop");
+          stopTrack(agent, track, { errors: [], status: 0 });
           track = null;
         },
       };

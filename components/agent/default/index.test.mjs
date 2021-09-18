@@ -11,42 +11,40 @@ const {
   // equal: assertEqual
 } = Assert;
 
-const testAsync = async () => {
-  const dependencies = await buildTestDependenciesAsync(import.meta.url);
-  const { createConfiguration, extendConfiguration } =
-    await buildTestComponentAsync("configuration", "test");
-  const {
-    createAgent,
-    executeAgentAsync,
-    interruptAgent,
-    createTrack,
-    controlTrack,
-  } = Agent(dependencies);
-  const agent = createAgent(
-    extendConfiguration(
-      createConfiguration("/"),
-      {
-        hooks: {
-          apply: false,
-          cjs: false,
-          esm: false,
-          group: false,
-          mysql: false,
-          http: false,
-        },
+const dependencies = await buildTestDependenciesAsync(import.meta.url);
+const { createConfiguration, extendConfiguration } =
+  await buildTestComponentAsync("configuration", "test");
+const {
+  createAgent,
+  executeAgentAsync,
+  interruptAgent,
+  createTrack,
+  startTrack,
+  stopTrack,
+} = Agent(dependencies);
+const agent = createAgent(
+  extendConfiguration(
+    createConfiguration("/"),
+    {
+      hooks: {
+        apply: false,
+        cjs: false,
+        esm: false,
+        group: false,
+        mysql: false,
+        http: false,
       },
-      "/",
-    ),
-  );
-  setTimeout(() => {
-    const track = createTrack(agent);
-    controlTrack(agent, track, "start");
-    interruptAgent(agent, { errors: [], status: 123 });
-  });
-  assertDeepEqual(
-    (await executeAgentAsync(agent)).map(({ type }) => type),
-    ["initialize", "trace", "terminate"],
-  );
-};
-
-testAsync();
+    },
+    "/",
+  ),
+);
+setTimeout(() => {
+  const track = createTrack(agent);
+  startTrack(agent, track, {});
+  stopTrack(agent, track, { errors: [], status: 0 });
+  interruptAgent(agent, { errors: [], status: 123 });
+});
+assertDeepEqual(
+  (await executeAgentAsync(agent)).map(([type]) => type),
+  ["initialize", "start", "stop", "terminate"],
+);

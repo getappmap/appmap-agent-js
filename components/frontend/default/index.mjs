@@ -1,25 +1,26 @@
 import Session from "./session.mjs";
-import Trace from "./trace.mjs";
 import Recording from "./recording.mjs";
-import Track from "./track.mjs";
 
 export default (dependencies) => {
   const {
-    util: { createCounter, incrementCounter },
+    uuid: { getUUID },
     instrumentation: {
       createInstrumentation,
       instrument,
       getInstrumentationIdentifier,
     },
   } = dependencies;
-  const { createSession, initializeSession, terminateSession } =
-    Session(dependencies);
-  const { traceFile, traceGroup } = Trace(dependencies);
-  const { createTrack, controlTrack } = Track(dependencies);
+  const {
+    createSession,
+    initializeSession,
+    terminateSession,
+    registerFileSession,
+    startTrackSession,
+    stopTrackSession,
+  } = Session(dependencies);
   const { createRecording, ...RecordingLibrary } = Recording(dependencies);
   return {
     createFrontend: (configuration) => ({
-      track_counter: createCounter(0),
       session: createSession(configuration),
       recording: createRecording(configuration),
       instrumentation: createInstrumentation(configuration),
@@ -27,9 +28,6 @@ export default (dependencies) => {
     initializeFrontend: ({ session }) => initializeSession(session),
     terminateFrontend: ({ session }, termination) =>
       terminateSession(session, termination),
-    createTrack: ({ track_counter }, options) =>
-      createTrack(incrementCounter(track_counter), options),
-    declareGroup: ({ session }, group) => traceGroup(session, group),
     getInstrumentationIdentifier: ({ instrumentation }) =>
       getInstrumentationIdentifier(instrumentation),
     instrument: ({ instrumentation, session }, kind, path, code1) => {
@@ -41,15 +39,18 @@ export default (dependencies) => {
       );
       let message = null;
       if (file !== null) {
-        message = traceFile(session, file);
+        message = registerFileSession(session, file);
       }
       return {
         message,
         code: code2,
       };
     },
-    controlTrack: ({ session }, track, action) =>
-      controlTrack(session, track, action),
+    createTrack: getUUID,
+    startTrack: ({ session }, track, initialization) =>
+      startTrackSession(session, track, initialization),
+    stopTrack: ({ session }, track, termination) =>
+      stopTrackSession(session, track, termination),
     ...RecordingLibrary,
   };
 };

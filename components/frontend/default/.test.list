@@ -1,5 +1,3 @@
 - session.mjs
-- trace.mjs
-- * track.mjs
-  * recording.mjs
+- recording.mjs
 - index.mjs

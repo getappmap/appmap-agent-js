@@ -65,21 +65,18 @@ const testAsync = async () => {
       },
     ),
     [
-      {
-        type: "trace",
-        data: {
-          type: "file",
-          data: {
-            index: 0,
-            exclude: [],
-            type: "script",
-            path: resolved_path,
-            code: "module.exports = 123;",
-            shallow: true,
-            source: false,
-          },
+      [
+        "file",
+        {
+          index: 0,
+          exclude: [],
+          type: "script",
+          path: resolved_path,
+          code: "module.exports = 123;",
+          shallow: true,
+          source: false,
         },
-      },
+      ],
     ],
   );
 };

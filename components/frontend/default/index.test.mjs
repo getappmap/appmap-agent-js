@@ -16,8 +16,8 @@ const testAsync = async () => {
     initializeFrontend,
     terminateFrontend,
     createTrack,
-    controlTrack,
-    declareGroup,
+    startTrack,
+    stopTrack,
     getInstrumentationIdentifier,
     instrument,
   } = Frontend(dependencies);
@@ -34,60 +34,46 @@ const testAsync = async () => {
   );
   const { "hidden-identifier": identifier } = configuration;
   const frontend = createFrontend(configuration);
-  assertDeepEqual(initializeFrontend(frontend), {
-    type: "initialize",
-    data: configuration,
-  });
+  assertDeepEqual(initializeFrontend(frontend), ["initialize", configuration]);
   {
-    const track = createTrack(frontend, "configuration");
-    assertDeepEqual(controlTrack(frontend, track, "start"), {
-      type: "trace",
-      data: {
-        type: "track",
-        data: { type: "start", index: 1, configuration: "configuration" },
+    const track = createTrack(frontend);
+    assertDeepEqual(startTrack(frontend, track, "initialization"), [
+      "start",
+      track,
+      "initialization",
+    ]);
+    assertDeepEqual(stopTrack(frontend, track, { errors: [], status: 0 }), [
+      "stop",
+      track,
+      {
+        errors: [],
+        status: 0,
       },
-    });
+    ]);
   }
-  assertDeepEqual(
-    declareGroup(frontend, {
-      group: 123,
-      origin: 456,
-      description: "description",
-    }),
-    {
-      type: "trace",
-      data: {
-        type: "group",
-        data: { group: 123, origin: 456, description: "description" },
-      },
-    },
-  );
   assertEqual(
     getInstrumentationIdentifier(frontend).startsWith(identifier),
     true,
   );
   assertDeepEqual(instrument(frontend, "script", "/filename.js", "123;"), {
-    message: {
-      type: "trace",
-      data: {
-        type: "file",
-        data: {
-          index: 0,
-          exclude: [],
-          shallow: false,
-          source: false,
-          type: "script",
-          path: "/filename.js",
-          code: "123;",
-        },
+    message: [
+      "file",
+      {
+        index: 0,
+        exclude: [],
+        shallow: false,
+        source: false,
+        type: "script",
+        path: "/filename.js",
+        code: "123;",
       },
-    },
+    ],
     code: "123;",
   });
-  assertDeepEqual(terminateFrontend(frontend, { errors: [], status: 123 }), {
-    type: "terminate",
-    data: { errors: [], status: 123 },
-  });
+  assertDeepEqual(terminateFrontend(frontend, { errors: [], status: 123 }), [
+    "terminate",
+    { errors: [], status: 123 },
+  ]);
 };
 
 testAsync();

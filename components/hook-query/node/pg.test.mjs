@@ -50,63 +50,25 @@ const proceedAsync = async () => {
     });
 
   const trace = [
-    {
-      type: "trace",
-      data: {
-        type: "event",
-        data: {
-          type: "begin",
-          index: 1,
-          time: 0,
-          data: { type: "bundle" },
-        },
+    ["event", "begin", 1, 0, "bundle", null],
+    [
+      "event",
+      "before",
+      2,
+      0,
+      "query",
+      {
+        database: "postgres",
+        version: null,
+        sql: "SELECT $1::integer * $2::integer AS solution;",
+        parameters: [
+          { type: "number", print: "2" },
+          { type: "number", print: "3" },
+        ],
       },
-    },
-    {
-      type: "trace",
-      data: {
-        type: "event",
-        data: {
-          type: "before",
-          index: 2,
-          data: {
-            type: "query",
-            database: "postgres",
-            version: null,
-            sql: "SELECT $1::integer * $2::integer AS solution;",
-            parameters: [
-              { type: "number", print: "2" },
-              { type: "number", print: "3" },
-            ],
-          },
-          time: 0,
-        },
-      },
-    },
-    {
-      type: "trace",
-      data: {
-        type: "event",
-        data: {
-          type: "after",
-          index: 2,
-          data: { type: "query", error: null },
-          time: 0,
-        },
-      },
-    },
-    {
-      type: "trace",
-      data: {
-        type: "event",
-        data: {
-          type: "end",
-          index: 1,
-          time: 0,
-          data: { type: "bundle" },
-        },
-      },
-    },
+    ],
+    ["event", "after", 2, 0, "query", { error: null }],
+    ["event", "end", 1, 0, "bundle", null],
   ];
 
   // disabled //
@@ -162,22 +124,17 @@ const proceedAsync = async () => {
   {
     const extract = ([
       ,
-      {
-        data: {
-          data: {
-            data: { sql },
-          },
+      [, , , , , { sql }],
+      [
+        ,
+        ,
+        ,
+        ,
+        ,
+        {
+          error: { constructor: _constructor },
         },
-      },
-      {
-        data: {
-          data: {
-            data: {
-              error: { constructor: _constructor },
-            },
-          },
-        },
-      },
+      ],
       ,
     ]) => ({ sql, constructor: _constructor });
     assertDeepEqual(
