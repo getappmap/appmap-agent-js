@@ -21,6 +21,8 @@ const { openBackend, sendBackend, closeBackend } = Backend(dependencies);
 
 const configuration = createConfiguration("/cwd");
 
+assertDeepEqual(closeBackend(openBackend()), []);
+
 const test = (track, finalize, test_status, exception) => {
   const backend = openBackend();
   sendBackend(backend, ["initialize", configuration]);

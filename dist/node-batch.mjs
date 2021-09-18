@@ -15,6 +15,7 @@ import repository$node from "./../components/repository/node/index.mjs";
 import child$default from "./../components/child/default/index.mjs";
 import engine$node from "./../components/engine/node/index.mjs";
 import configuration$default from "./../components/configuration/default/index.mjs";
+import storage$file from "./../components/storage/file/index.mjs";
 import validate_message$off from "./../components/validate-message/off/index.mjs";
 import validate_message$on from "./../components/validate-message/on/index.mjs";
 import validate_appmap$off from "./../components/validate-appmap/off/index.mjs";
@@ -42,6 +43,7 @@ export default (blueprint) => {
   dependencies["child"] = child$default(dependencies);
   dependencies["engine"] = engine$node(dependencies);
   dependencies["configuration"] = configuration$default(dependencies);
+  dependencies["storage"] = storage$file(dependencies);
   if (!("validate-message" in blueprint)) { throw new Error("missing instance for component validate-message"); }
   dependencies["validate-message"] = (blueprint["validate-message"] === "on" ? validate_message$on(dependencies) : (blueprint["validate-message"] === "off" ? validate_message$off(dependencies) : ((() => { throw new Error("invalid instance for component validate-message"); }) ())));
   if (!("validate-appmap" in blueprint)) { throw new Error("missing instance for component validate-appmap"); }

@@ -1,7 +1,10 @@
 import { readFileSync } from "fs";
 import { tmpdir } from "os";
 import { strict as Assert } from "assert";
-import { buildTestDependenciesAsync } from "../../build.mjs";
+import {
+  buildTestDependenciesAsync,
+  buildTestComponentAsync,
+} from "../../build.mjs";
 import Storage from "./index.mjs";
 
 const { equal: assertEqual } = Assert;
@@ -10,20 +13,28 @@ const { createStorage, store, storeAsync } = Storage(
   await buildTestDependenciesAsync(import.meta.url),
 );
 
+const { createConfiguration, extendConfiguration } =
+  await buildTestComponentAsync("configuration", "test");
+
 const directory = `${tmpdir()}/${Math.random().toString(36).substring(2)}`;
 
-const storage = createStorage({
-  output: { directory, postfix: ".foo", indent: null },
+const configuration = extendConfiguration(createConfiguration("/cwd"), {
+  output: {
+    directory,
+    postfix: ".foo",
+  },
 });
 
-store(storage, "filename", 123);
+const storage = createStorage();
+
+store(storage, configuration, 123);
 assertEqual(
-  JSON.parse(readFileSync(`${directory}/filename.foo.json`, "utf8")),
+  JSON.parse(readFileSync(`${directory}/anonymous.foo.json`, "utf8")),
   123,
 );
 
-await storeAsync(storage, "filename", 456);
+await storeAsync(storage, configuration, 456);
 assertEqual(
-  JSON.parse(readFileSync(`${directory}/filename-1.foo.json`, "utf8")),
+  JSON.parse(readFileSync(`${directory}/anonymous-1.foo.json`, "utf8")),
   456,
 );

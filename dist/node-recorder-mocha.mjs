@@ -15,6 +15,7 @@ import naming$default from "./../components/naming/default/index.mjs";
 import instrumentation$default from "./../components/instrumentation/default/index.mjs";
 import serialization$default from "./../components/serialization/default/index.mjs";
 import frontend$default from "./../components/frontend/default/index.mjs";
+import storage$file from "./../components/storage/file/index.mjs";
 import validate$ajv from "./../components/validate/ajv/index.mjs";
 import repository$node from "./../components/repository/node/index.mjs";
 import child$default from "./../components/child/default/index.mjs";
@@ -57,6 +58,7 @@ export default (blueprint) => {
   dependencies["instrumentation"] = instrumentation$default(dependencies);
   dependencies["serialization"] = serialization$default(dependencies);
   dependencies["frontend"] = frontend$default(dependencies);
+  dependencies["storage"] = storage$file(dependencies);
   dependencies["validate"] = validate$ajv(dependencies);
   dependencies["repository"] = repository$node(dependencies);
   dependencies["child"] = child$default(dependencies);

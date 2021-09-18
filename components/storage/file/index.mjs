@@ -7,7 +7,7 @@ const _String = String;
 
 export default (dependencies) => {
   const {
-    util: { getDirectory },
+    util: { getDirectory, getBasename, mapMaybe },
     expect: { expect },
     log: { logInfo },
   } = dependencies;
@@ -41,7 +41,30 @@ export default (dependencies) => {
       mkdirSync(directory);
     }
   };
-  const getName = (versioning, name, postfix) => {
+  const getPath = (
+    storage,
+    {
+      name,
+      app,
+      main,
+      repository: { package: _package },
+      output: { directory, indent, postfix, filename },
+    },
+  ) =>
+    `${directory}/${getFreeName(
+      storage,
+      filename ||
+        name ||
+        mapMaybe(main, getBasename) ||
+        app ||
+        mapMaybe(_package, getName) ||
+        "anonymous",
+      postfix,
+    )}`;
+  /* c8 ignore start */
+  const getName = ({ name }) => name;
+  /* c8 ignore stop */
+  const getFreeName = (versioning, name, postfix) => {
     if (versioning.has(name)) {
       const counter = versioning.get(name);
       versioning.set(name, counter + 1);
@@ -52,28 +75,24 @@ export default (dependencies) => {
     return `${name}${postfix}.json`;
   };
   return {
-    createStorage: ({ output: { directory, indent, postfix } }) => {
+    createStorage: () => new _Map(),
+    store: (versioning, configuration, data) => {
+      const {
+        output: { directory, indent },
+      } = configuration;
+      const path = getPath(versioning, configuration);
       createDirectory(directory);
-      return {
-        directory,
-        indent,
-        postfix,
-        versioning: new _Map(),
-      };
-    },
-    store: ({ directory, indent, postfix, versioning }, name, data) => {
-      const path = `${directory}/${getName(versioning, name, postfix)}`;
       writeFileSync(path, stringify(data, null, indent), "utf8");
       logInfo("trace file (synchronously) written at: %j", path);
     },
-    storeAsync: async (
-      { directory, indent, postfix, versioning },
-      name,
-      data,
-    ) => {
-      const path = `${directory}/${getName(versioning, name, postfix)}`;
+    storeAsync: async (versioning, configuration, data) => {
+      const {
+        output: { directory, indent },
+      } = configuration;
+      const path = getPath(versioning, configuration);
+      createDirectory(directory);
       await writeFile(path, stringify(data, null, indent), "utf8");
-      logInfo("trace file (asynchronously) written at: %j", path);
+      logInfo("trace file (synchronously) written at: %j", path);
     },
   };
 };

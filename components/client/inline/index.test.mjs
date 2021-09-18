@@ -18,6 +18,8 @@ setTimeout(() => {
       `${tmpdir()}/${Math.random().toString(36).substring(2)}`,
     ),
   ]);
+  sendClient(client, ["start", "track", {}]);
+  sendClient(client, ["terminate", { errors: [], status: 0 }]);
   interruptClient(client);
 });
 await executeClientAsync(client);

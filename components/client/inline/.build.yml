@@ -1,2 +1,5 @@
 branches: [node, browser]
-dependencies: [util, backend]
+dependencies:
+  - storage
+  - util
+  - backend

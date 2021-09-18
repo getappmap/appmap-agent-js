@@ -62,7 +62,7 @@ await writeFile(
 const { main } = require("./main.js");
 assertEqual(main(), "MAIN");
 
-recorder.stop();
+recorder.stop({errors: [], status:0});
 appmap.terminate();
 
 const { events } = parseJSON(

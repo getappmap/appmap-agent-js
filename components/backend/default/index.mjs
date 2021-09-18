@@ -80,10 +80,9 @@ export default (dependencies) => {
       return result;
     },
     closeBackend: (backend) => {
-      assert(
-        getBox(backend.configuration_box) !== null,
-        "missing initialization (close)",
-      );
+      if (getBox(backend.configuration_box) === null) {
+        return [];
+      }
       const termination = {
         errors: [{ name: "AppmapError", message: "client disconnection" }],
         status: 1,
