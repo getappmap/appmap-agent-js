@@ -7,6 +7,7 @@ const { parse: parseJSON } = JSON;
 
 export default (dependencies) => {
   const {
+    util: { bind },
     backend: { openBackend, sendBackend, closeBackend },
     expect: { expectSuccess },
     storage: { createStorage, store },
@@ -18,6 +19,7 @@ export default (dependencies) => {
       const server = createServer();
       const sockets = new _Set();
       const storage = createStorage();
+      const storeEach = bind(store, storage);
       server.on("error", (error) => {
         server.close();
         for (const socket of sockets) {
@@ -30,9 +32,7 @@ export default (dependencies) => {
         sockets.add(socket);
         socket.on("close", () => {
           sockets.delete(socket);
-          for (const { configuration, data } of closeBackend(backend)) {
-            store(storage, configuration, data);
-          }
+          closeBackend(backend).forEach(storeEach);
         });
         /* c8 ignore start */
         socket.on("error", (error) => {
@@ -41,14 +41,14 @@ export default (dependencies) => {
         });
         /* c8 ignore stop */
         socket.on("message", (data) => {
-          const message = expectSuccess(
-            () => parseJSON(data),
-            "failed to parse JSON message %j >> %e",
-            data,
-          );
-          for (const { configuration, data } of sendBackend(backend, message)) {
-            store(storage, configuration, data);
-          }
+          sendBackend(
+            backend,
+            expectSuccess(
+              () => parseJSON(data),
+              "failed to parse JSON message %j >> %e",
+              data,
+            ),
+          ).forEach(storeEach);
         });
       });
       return new Promise((resolve, reject) => {

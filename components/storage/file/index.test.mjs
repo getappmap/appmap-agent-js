@@ -27,13 +27,13 @@ const configuration = extendConfiguration(createConfiguration("/cwd"), {
 
 const storage = createStorage();
 
-store(storage, configuration, 123);
+store(storage, { configuration, data: 123 });
 assertEqual(
   JSON.parse(readFileSync(`${directory}/anonymous.foo.json`, "utf8")),
   123,
 );
 
-await storeAsync(storage, configuration, 456);
+await storeAsync(storage, { configuration, data: 456 });
 assertEqual(
   JSON.parse(readFileSync(`${directory}/anonymous-1.foo.json`, "utf8")),
   456,

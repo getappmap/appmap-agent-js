@@ -76,7 +76,7 @@ export default (dependencies) => {
   };
   return {
     createStorage: () => new _Map(),
-    store: (versioning, configuration, data) => {
+    store: (versioning, { configuration, data }) => {
       const {
         output: { directory, indent },
       } = configuration;
@@ -85,7 +85,7 @@ export default (dependencies) => {
       writeFileSync(path, stringify(data, null, indent), "utf8");
       logInfo("trace file (synchronously) written at: %j", path);
     },
-    storeAsync: async (versioning, configuration, data) => {
+    storeAsync: async (versioning, { configuration, data }) => {
       const {
         output: { directory, indent },
       } = configuration;
