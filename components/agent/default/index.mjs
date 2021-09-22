@@ -6,15 +6,23 @@ export default (dependencies) => {
     "hook-request": { hookRequest, unhookRequest },
     "hook-response": { hookResponse, unhookResponse },
     "hook-query": { hookQuery, unhookQuery },
+    interpretation: { runScript },
     frontend: {
       createFrontend,
+      instrument,
       initializeFrontend,
       terminateFrontend,
-      createTrack,
       startTrack,
       stopTrack,
     },
-    client: { openClient, promiseClientTermination, sendClient, closeClient },
+    client: {
+      openClient,
+      pilotClient,
+      pilotClientAsync,
+      promiseClientTermination,
+      sendClient,
+      closeClient,
+    },
   } = dependencies;
   return {
     openAgent: (configuration) => ({
@@ -41,11 +49,28 @@ export default (dependencies) => {
         unhookQuery(hook_query);
       }
     },
+    runManually: ({ frontend, client }, path, code1) => {
+      const { message, code: code2 } = instrument(
+        frontend,
+        "script",
+        path,
+        code1,
+      );
+      if (message !== null) {
+        sendClient(client, message);
+      }
+      return runScript(code2);
+    },
+    /* c8 ignore start */
+    pilotAgent: ({ client }, method, path, body) =>
+      pilotClient(client, method, path, body),
+    pilotAgentAsync: ({ client }, method, path, body) =>
+      pilotClientAsync(client, method, path, body),
+    /* c8 ignore stop */
     closeAgent: ({ frontend, client }, termination) => {
       sendClient(client, terminateFrontend(frontend, termination));
       closeClient(client);
     },
-    createTrack: ({ frontend }, options) => createTrack(frontend, options),
     startTrack: ({ client, frontend }, track, initialization) => {
       sendClient(client, startTrack(frontend, track, initialization));
     },

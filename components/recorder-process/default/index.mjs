@@ -1,11 +1,11 @@
 export default (dependencies) => {
   const {
+    uuid: { getUUID },
     util: { assert },
     agent: {
       openAgent,
       promiseAgentTermination,
       closeAgent,
-      createTrack,
       startTrack,
       stopTrack,
     },
@@ -16,8 +16,8 @@ export default (dependencies) => {
       assert(recorder === "process", "expected process recorder");
       const agent = openAgent(configuration);
       const promise = promiseAgentTermination(agent);
-      const track = createTrack(agent);
-      startTrack(agent, track, { path: null, options: {} });
+      const track = getUUID();
+      startTrack(agent, track, { path: null, data: {} });
       const errors = [];
       process.on("uncaughtExceptionMonitor", (error) => {
         errors.push(error);

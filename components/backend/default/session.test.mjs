@@ -54,7 +54,7 @@ assertDeepEqual(closeSession(openSession()), []);
     sendSession(session, [
       "start",
       "track",
-      { path: null, options: { output: { basename: "basename" } } },
+      { path: null, data: { output: { basename: "basename" } } },
     ]),
     [],
   );
@@ -215,7 +215,7 @@ const getLength = ({ length }) => length;
   assertDeepEqual(getCode(respondSession(session, "POST", "/track")), 409);
   // Initialization //
   sendSession(session, ["initialize", configuration]);
-  sendSession(session, ["start", "track1", { path: null, options: {} }]);
+  sendSession(session, ["start", "track1", { path: null, data: {} }]);
   // POST //
   assertEqual(getCode(respondSession(session, "POST", "/track1")), 409);
   assertEqual(getCode(respondSession(session, "POST", "/track2")), 200);

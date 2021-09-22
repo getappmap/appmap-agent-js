@@ -79,7 +79,7 @@ export default (dependencies) => {
         }
         session.tracks.set(
           segment,
-          createServedTrack({ path: null, options: {} }),
+          createServedTrack({ path: null, data: {}, ...body }),
         );
         return { code: 200, message: null, body: null };
       }
@@ -125,7 +125,7 @@ export default (dependencies) => {
                 files: session.files,
                 configuration: getBox(session.box),
               },
-              { errors: [], status: 0 },
+              { errors: [], status: 0, ...body },
             ),
           };
         }

@@ -3,7 +3,6 @@ import Recording from "./recording.mjs";
 
 export default (dependencies) => {
   const {
-    uuid: { getUUID },
     instrumentation: {
       createInstrumentation,
       instrument,
@@ -46,7 +45,6 @@ export default (dependencies) => {
         code: code2,
       };
     },
-    createTrack: getUUID,
     startTrack: ({ session }, track, initialization) =>
       startTrackSession(session, track, initialization),
     stopTrack: ({ session }, track, termination) =>

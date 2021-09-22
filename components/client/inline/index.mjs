@@ -19,31 +19,35 @@ export default ({
 }) => {
   return {
     openClient: (configuration) => {
-      const key = getUUID();
+      const session = getUUID();
       const backend = createBackend();
       const responder = openResponder(bind(respondBackend, backend));
       listenResponderAsync(responder, configuration["remote-recording-port"]);
-      openBackendSession(backend, key);
+      openBackendSession(backend, session);
       return {
         responder,
         backend,
-        key,
+        session,
       };
     },
     promiseClientTermination: ({ responder }) =>
       promiseResponderTermination(responder),
-    closeClient: ({ responder, backend, key }) => {
-      closeBackendSession(backend, key).forEach(store);
+    closeClient: ({ responder, backend, session }) => {
+      closeBackendSession(backend, session).forEach(store);
       closeResponder(responder);
     },
-    sendClient: ({ backend, key }, message) => {
+    sendClient: ({ backend, session }, message) => {
       if (message !== null) {
-        sendBackend(backend, key, message).forEach(store);
+        sendBackend(backend, session, message).forEach(store);
       }
     },
     /* c8 ignore start */
-    requestClientAsync: ({ backend }, method, path, body) =>
-      _Promise.resolve(respondBackend(backend, method, path, body)),
+    pilotClientAsync: ({ backend, session }, method, path, body) =>
+      _Promise.resolve(
+        respondBackend(backend, method, `/${session}${path}`, body),
+      ),
+    pilotClient: ({ backend, session }, method, path, body) =>
+      respondBackend(backend, method, `/${session}${path}`, body),
     /* c8 ignore stop */
   };
 };

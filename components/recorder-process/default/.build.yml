@@ -1,2 +1,2 @@
 branches: [node]
-dependencies: [util, agent]
+dependencies: [uuid, util, agent]

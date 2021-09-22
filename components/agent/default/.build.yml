@@ -1,6 +1,7 @@
 branches: [test, node, browser]
 dependencies:
   - frontend
+  - interpretation
   - client
   - hook-apply
   - hook-group

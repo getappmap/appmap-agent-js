@@ -31,7 +31,7 @@ const {
 {
   const initialization = {
     path: null,
-    options: { output: { basename: "basename" } },
+    data: { output: { basename: "basename" } },
   };
   const termination = { errors: [], status: 0 };
   const backend = createBackend();

@@ -33,7 +33,7 @@ const configuration = createConfiguration("/cwd");
 
 const initialization = {
   path: null,
-  options: {},
+  data: {},
 };
 
 const termination = {
@@ -69,7 +69,7 @@ assertEqual(isServedTrack(createServedTrack(initialization)), true);
   const track = createStoredTrack({
     ...initialization,
     path: "/root",
-    options: {
+    data: {
       output: {
         directory: "directory",
         extension: ".extension",

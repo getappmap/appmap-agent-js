@@ -608,13 +608,13 @@
 - $id: initialization
   type: object
   additionalProperties: false
-  required: [options, path]
+  required: [path, data]
   properties:
-    options: {$ref: configuration}
     path:
       anyOf:
         - const: null
         - $ref: absolute-path
+    data: {$ref: configuration}
 
 - $id: termination
   type: object

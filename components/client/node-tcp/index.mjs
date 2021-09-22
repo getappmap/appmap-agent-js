@@ -8,6 +8,7 @@ const { stringify } = JSON;
 export default (dependencies) => {
   const {
     uuid: { getUUID },
+    util: { generateDeadcode },
     request: { requestAsync },
   } = dependencies;
   return {
@@ -19,7 +20,8 @@ export default (dependencies) => {
       const socket = connect(
         ...(typeof port === "string" ? [port] : [port, host]),
       );
-      const buffer = [createMessage(getUUID())];
+      const session = createMessage(getUUID());
+      const buffer = [session];
       socket.on("connect", () => {
         socket.unref();
         const {
@@ -38,6 +40,7 @@ export default (dependencies) => {
           socket.on("close", resolve);
         }),
         buffer,
+        session,
         host,
         port,
         remote_recording_port,
@@ -61,12 +64,22 @@ export default (dependencies) => {
       }
     },
     /* c8 ignore start */
-    requestClientAsync: async (
-      { host, remote_recording_port },
+    pilotClient: generateDeadcode(
+      "pilotClientAsync should be used instead of pilotClient for non-inline client",
+    ),
+    pilotClientAsync: async (
+      { host, remote_recording_port, session },
       method,
       path,
       body,
-    ) => requestAsync(host, remote_recording_port, method, path, body),
+    ) =>
+      requestAsync(
+        host,
+        remote_recording_port,
+        method,
+        `/${session}${path}`,
+        body,
+      ),
     /* c8 ignore stop */
   };
 };

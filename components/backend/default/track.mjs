@@ -20,11 +20,11 @@ export default (dependencies) => {
     ({ tag: tag2 }) =>
       tag1 === tag2;
   const compileTrack = (
-    { events, initialization: { options, path } },
+    { events, initialization: { path, data } },
     { files, configuration },
     termination,
   ) => {
-    configuration = extendConfiguration(configuration, options, path);
+    configuration = extendConfiguration(configuration, data, path);
     return {
       configuration,
       trace: compileTrace(configuration, files, events, termination),

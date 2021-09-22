@@ -50,7 +50,8 @@ const appmap = createAppmap(
   directory,
 );
 
-const recorder = appmap.start();
+appmap.startStoredTrack("track1");
+appmap.startTrack("track2");
 
 const require = createRequire(`${directory}/dummy.mjs`);
 await writeFile(
@@ -62,14 +63,17 @@ await writeFile(
 const { main } = require("./main.js");
 assertEqual(main(), "MAIN");
 
-recorder.stop({errors: [], status:0});
+const trace2 = appmap.stopTrack("track2");
+appmap.stopStoredTrack("track1");
 appmap.terminate();
 
-const { events } = parseJSON(
+const trace1 = parseJSON(
   await readFile(`${directory}/basename.appmap.json`, "utf8"),
 );
 
+assertDeepEqual(trace1, trace2);
+
 assertDeepEqual(
-  events.map(({ event }) => event),
+  trace1.events.map(({ event }) => event),
   ["call", "return"],
 );

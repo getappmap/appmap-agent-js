@@ -1,8 +1,8 @@
+import uuid$random from "./../components/uuid/random/index.mjs";
 import util$default from "./../components/util/default/index.mjs";
 import violation$exit from "./../components/violation/exit/index.mjs";
 import expect_inner$default from "./../components/expect-inner/default/index.mjs";
 import expect$default from "./../components/expect/default/index.mjs";
-import uuid$random from "./../components/uuid/random/index.mjs";
 import log_inner$write_sync from "./../components/log-inner/write-sync/index.mjs";
 import log$debug from "./../components/log/debug/index.mjs";
 import log$error from "./../components/log/error/index.mjs";
@@ -15,6 +15,7 @@ import naming$default from "./../components/naming/default/index.mjs";
 import instrumentation$default from "./../components/instrumentation/default/index.mjs";
 import serialization$default from "./../components/serialization/default/index.mjs";
 import frontend$default from "./../components/frontend/default/index.mjs";
+import interpretation$vm from "./../components/interpretation/vm/index.mjs";
 import request$node_http from "./../components/request/node-http/index.mjs";
 import storage$file from "./../components/storage/file/index.mjs";
 import validate$ajv from "./../components/validate/ajv/index.mjs";
@@ -32,7 +33,6 @@ import client$inline from "./../components/client/inline/index.mjs";
 import client$node_http1 from "./../components/client/node-http1/index.mjs";
 import client$node_http2 from "./../components/client/node-http2/index.mjs";
 import client$node_tcp from "./../components/client/node-tcp/index.mjs";
-import interpretation$vm from "./../components/interpretation/vm/index.mjs";
 import hook_apply$default from "./../components/hook-apply/default/index.mjs";
 import hook_group$node from "./../components/hook-group/node/index.mjs";
 import hook_module$node from "./../components/hook-module/node/index.mjs";
@@ -45,11 +45,11 @@ import recorder_mocha$default from "./../components/recorder-mocha/default/index
 
 export default (blueprint) => {
   const dependencies = {__proto__:null};
+  dependencies["uuid"] = uuid$random(dependencies);
   dependencies["util"] = util$default(dependencies);
   dependencies["violation"] = violation$exit(dependencies);
   dependencies["expect-inner"] = expect_inner$default(dependencies);
   dependencies["expect"] = expect$default(dependencies);
-  dependencies["uuid"] = uuid$random(dependencies);
   dependencies["log-inner"] = log_inner$write_sync(dependencies);
   if (!("log" in blueprint)) { throw new Error("missing instance for component log"); }
   dependencies["log"] = (blueprint["log"] === "warning" ? log$warning(dependencies) : (blueprint["log"] === "off" ? log$off(dependencies) : (blueprint["log"] === "info" ? log$info(dependencies) : (blueprint["log"] === "error" ? log$error(dependencies) : (blueprint["log"] === "debug" ? log$debug(dependencies) : ((() => { throw new Error("invalid instance for component log"); }) ()))))));
@@ -59,6 +59,7 @@ export default (blueprint) => {
   dependencies["instrumentation"] = instrumentation$default(dependencies);
   dependencies["serialization"] = serialization$default(dependencies);
   dependencies["frontend"] = frontend$default(dependencies);
+  dependencies["interpretation"] = interpretation$vm(dependencies);
   dependencies["request"] = request$node_http(dependencies);
   dependencies["storage"] = storage$file(dependencies);
   dependencies["validate"] = validate$ajv(dependencies);
@@ -74,7 +75,6 @@ export default (blueprint) => {
   dependencies["backend"] = backend$default(dependencies);
   if (!("client" in blueprint)) { throw new Error("missing instance for component client"); }
   dependencies["client"] = (blueprint["client"] === "node-tcp" ? client$node_tcp(dependencies) : (blueprint["client"] === "node-http2" ? client$node_http2(dependencies) : (blueprint["client"] === "node-http1" ? client$node_http1(dependencies) : (blueprint["client"] === "inline" ? client$inline(dependencies) : ((() => { throw new Error("invalid instance for component client"); }) ())))));
-  dependencies["interpretation"] = interpretation$vm(dependencies);
   dependencies["hook-apply"] = hook_apply$default(dependencies);
   dependencies["hook-group"] = hook_group$node(dependencies);
   dependencies["hook-module"] = hook_module$node(dependencies);

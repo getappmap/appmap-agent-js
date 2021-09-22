@@ -67,7 +67,7 @@ const {
           JSON.stringify([
             "start",
             "track",
-            { path: null, options: { output: { basename: "foo" } } },
+            { path: null, data: { output: { basename: "foo" } } },
           ]),
         ),
       );
@@ -81,7 +81,7 @@ const {
           JSON.stringify([
             "start",
             "track",
-            { path: null, options: { output: { basename: "bar" } } },
+            { path: null, data: { output: { basename: "bar" } } },
           ]),
         ),
       );

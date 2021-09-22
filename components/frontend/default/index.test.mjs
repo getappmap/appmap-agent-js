@@ -14,7 +14,6 @@ const {
   createFrontend,
   initializeFrontend,
   terminateFrontend,
-  createTrack,
   startTrack,
   stopTrack,
   getInstrumentationIdentifier,
@@ -35,15 +34,14 @@ const { "hidden-identifier": identifier } = configuration;
 const frontend = createFrontend(configuration);
 assertDeepEqual(initializeFrontend(frontend), ["initialize", configuration]);
 {
-  const track = createTrack(frontend);
-  assertDeepEqual(startTrack(frontend, track, "initialization"), [
+  assertDeepEqual(startTrack(frontend, "track", "initialization"), [
     "start",
-    track,
+    "track",
     "initialization",
   ]);
-  assertDeepEqual(stopTrack(frontend, track, { errors: [], status: 0 }), [
+  assertDeepEqual(stopTrack(frontend, "track", { errors: [], status: 0 }), [
     "stop",
-    track,
+    "track",
     {
       errors: [],
       status: 0,

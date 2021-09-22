@@ -1205,13 +1205,10 @@ export const schema = [
     "type": "object",
     "additionalProperties": false,
     "required": [
-      "options",
-      "path"
+      "path",
+      "data"
     ],
     "properties": {
-      "options": {
-        "$ref": "configuration"
-      },
       "path": {
         "anyOf": [
           {
@@ -1221,6 +1218,9 @@ export const schema = [
             "$ref": "absolute-path"
           }
         ]
+      },
+      "data": {
+        "$ref": "configuration"
       }
     }
   },

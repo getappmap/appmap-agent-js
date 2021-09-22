@@ -4,13 +4,13 @@ const _undefined = undefined;
 
 export default (dependencies) => {
   const {
+    uuid: { getUUID },
     util: { assert, coalesce, matchVersion },
     expect: { expect },
     agent: {
       openAgent,
       promiseAgentTermination,
       closeAgent,
-      createTrack,
       startTrack,
       stopTrack,
     },
@@ -52,10 +52,10 @@ export default (dependencies) => {
             track === null,
             "mocha should not run test cases concurrently ...",
           );
-          track = createTrack(agent);
+          track = getUUID();
           startTrack(agent, track, {
             path: null,
-            options: {
+            data: {
               name: this.currentTest.parent.fullTitle(),
             },
           });

@@ -1,58 +1,101 @@
-// const PAUSE_STATE = 1;
-const PLAY_STATE = 2;
-const STOP_STATE = 3;
+const _Set = Set;
 
 export default (dependencies) => {
   const {
+    uuid: { getUUID },
     util: { assert },
     expect: { expect },
     agent: {
       openAgent,
       promiseAgentTermination,
       closeAgent,
-      createTrack,
+      runManually,
+      pilotAgent,
       startTrack,
       stopTrack,
     },
   } = dependencies;
+  const start = ({ running, tracks }, track) => {
+    expect(
+      running,
+      "cannot start track %j because this appmap has been terminated",
+      track,
+    );
+    expect(
+      !tracks.has(track),
+      "cannot start track %j because it already exists",
+      track,
+    );
+    tracks.add(track);
+  };
+  const stop = ({ running, tracks }, track) => {
+    expect(
+      running,
+      "cannot start a new recording because this appmap has been terminated",
+    );
+    expect(
+      tracks.has(track),
+      "cannot stop track %j because it is missing",
+      track,
+    );
+    tracks.delete(track);
+  };
   class Appmap {
+    static getUniversalUniqueIdentifier() {
+      return getUUID();
+    }
     constructor(configuration) {
       const { mode, recorder } = configuration;
       assert(recorder === "manual", "expected manual recorder");
       expect(mode === "local", "manual recorder only supports local mode");
       this.agent = openAgent(configuration);
+      this.tracks = new _Set();
       this.running = true;
       this.promise = promiseAgentTermination(this.agent);
     }
-    start(options) {
-      expect(
-        this.running,
-        "cannot start a new recording because this appmap has been terminated",
+    runScript(path, code) {
+      return runManually(this.agent, path, code);
+    }
+    /* c8 ignore start */
+    startTrack(track, initialization = null) {
+      start(this, track);
+      const { code } = pilotAgent(
+        this.agent,
+        "POST",
+        `/${track}`,
+        initialization,
       );
-      return new Recorder(this.agent, options);
+      assert(code === 200, "unexpected http error status");
+    }
+    stopTrack(track, termination = null) {
+      stop(this, track);
+      const { code, body } = pilotAgent(
+        this.agent,
+        "DELETE",
+        `/${track}`,
+        termination,
+      );
+      assert(code === 200, "unexpect http error status");
+      return body;
+    }
+    /* c8 ignore stop */
+    startStoredTrack(track, initialization) {
+      start(this, track);
+      startTrack(this.agent, track, {
+        path: null,
+        data: {},
+        ...initialization,
+      });
+    }
+    stopStoredTrack(track, termination) {
+      stop(this, track);
+      stopTrack(this.agent, track, { errors: [], status: 0, ...termination });
     }
     terminate(termination) {
       expect(this.running, "this appmap has already been terminated");
       this.running = false;
       closeAgent(this.agent, { errors: [], status: 0, ...termination });
       return this.promise;
-    }
-  }
-  class Recorder {
-    constructor(agent, options) {
-      const track = createTrack(agent);
-      startTrack(agent, track, { path: null, options: { ...options } });
-      this.agent = agent;
-      this.track = track;
-      this.state = PLAY_STATE;
-    }
-    stop(termination) {
-      expect(
-        this.state !== STOP_STATE,
-        "cannot stop recording because it has already been stopped",
-      );
-      this.state = STOP_STATE;
-      stopTrack(this.agent, this.track, termination);
     }
   }
   return { Appmap };

@@ -18,7 +18,7 @@ setTimeout(() => {
       `${tmpdir()}/${Math.random().toString(36).substring(2)}`,
     ),
   ]);
-  sendClient(client, ["start", "track", { path: null, options: {} }]);
+  sendClient(client, ["start", "track", { path: null, data: {} }]);
   sendClient(client, ["terminate", { errors: [], status: 0 }]);
   closeClient(client);
 });
