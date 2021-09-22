@@ -12,11 +12,11 @@ export default (dependencies) => {
     child: { compileChild, getChildDescription },
     configuration: { extendConfiguration },
     request: {
-      openServer,
-      listenAsync,
-      getServerPort,
-      promiseServerTermination,
-      closeServer,
+      openResponder,
+      listenResponderAsync,
+      getResponderPort,
+      promiseResponderTermination,
+      closeResponder,
     },
     receptor: {
       openReceptorAsync,
@@ -55,8 +55,8 @@ export default (dependencies) => {
         "remote-recording-port": remote_recording_port,
       } = configuration;
       const backend = createBackend();
-      const server = await openServer(backend);
-      await listenAsync(server, remote_recording_port);
+      const responder = await openResponder(backend);
+      await listenResponderAsync(responder, remote_recording_port);
       const receptor = await openReceptorAsync(backend, {
         host: "localhost",
         port,
@@ -66,7 +66,7 @@ export default (dependencies) => {
           configuration,
           {
             port: getReceptorPort(receptor),
-            "remote-recording-port": getServerPort(server),
+            "remote-recording-port": getResponderPort(responder),
           },
           "/",
         ),
@@ -144,9 +144,9 @@ export default (dependencies) => {
         }
       } finally {
         closeReceptor(receptor);
-        closeServer(server);
+        closeResponder(responder);
         await promiseReceptorTermination(receptor);
-        await promiseServerTermination(server);
+        await promiseResponderTermination(responder);
       }
     },
   };

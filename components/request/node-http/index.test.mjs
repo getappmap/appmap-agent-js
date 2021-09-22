@@ -12,26 +12,26 @@ const {
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
 
 const {
-  openServer,
-  listenAsync,
-  promiseServerTermination,
-  closeServer,
-  getServerPort,
+  openResponder,
+  listenResponderAsync,
+  promiseResponderTermination,
+  closeResponder,
+  getResponderPort,
   requestAsync,
 } = Request(dependencies);
 
 // General //
 {
-  const server = openServer((method, path, body) => ({
+  const responder = openResponder((method, path, body) => ({
     code: 200,
     message: "ok",
     body: { method, path, body },
   }));
-  await listenAsync(server, 0);
+  await listenResponderAsync(responder, 0);
   assertDeepEqual(
     await requestAsync(
       "localhost",
-      getServerPort(server),
+      getResponderPort(responder),
       "GET",
       "/path",
       "body",
@@ -46,25 +46,25 @@ const {
       },
     },
   );
-  closeServer(server);
-  await promiseServerTermination(server);
+  closeResponder(responder);
+  await promiseResponderTermination(responder);
 }
 
 // Unix Domain Socket + Null Body //
 {
-  const server = openServer((method, path, body) => ({
+  const responder = openResponder((method, path, body) => ({
     code: 200,
     message: "ok",
     body: null,
   }));
-  await listenAsync(
-    server,
+  await listenResponderAsync(
+    responder,
     `${tmpdir()}/${Math.random().toString(36).substring(2)}`,
   );
   assertDeepEqual(
     await requestAsync(
       "localhost",
-      getServerPort(server),
+      getResponderPort(responder),
       "GET",
       "/path",
       null,
@@ -75,6 +75,6 @@ const {
       body: null,
     },
   );
-  closeServer(server);
-  await promiseServerTermination(server);
+  closeResponder(responder);
+  await promiseResponderTermination(responder);
 }

@@ -22,7 +22,7 @@ const stringify = (data) => {
 
 export default (dependencies) => {
   return {
-    openServer: (respond) => {
+    openResponder: (respond) => {
       const server = createServer();
       server.unref();
       const sockets = new _Set();
@@ -67,7 +67,7 @@ export default (dependencies) => {
         }),
       };
     },
-    getServerPort: ({ server }) => {
+    getResponderPort: ({ server }) => {
       const address = server.address();
       if (typeof address === "string") {
         return address;
@@ -75,14 +75,14 @@ export default (dependencies) => {
       const { port } = address;
       return port;
     },
-    listenAsync: ({ server }, port) =>
+    listenResponderAsync: ({ server }, port) =>
       new _Promise((resolve, reject) => {
         server.listen(port);
         server.on("error", reject);
         server.on("listening", resolve);
       }),
-    promiseServerTermination: ({ termination }) => termination,
-    closeServer: ({ server, sockets }) => {
+    promiseResponderTermination: ({ termination }) => termination,
+    closeResponder: ({ server, sockets }) => {
       server.close();
       for (const socket of sockets) {
         socket.end();
