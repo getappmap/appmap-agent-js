@@ -1,14 +1,11 @@
 import { writeFileSync, lstatSync, mkdirSync } from "fs";
-import { writeFile } from "fs/promises";
 
 const { stringify } = JSON;
-const _Map = Map;
-const _String = String;
 
 export default (dependencies) => {
   const {
-    util: { getDirectory, getBasename, mapMaybe },
-    expect: { expect },
+    util: { getDirectory },
+    expect: { expect, expectSuccess },
     log: { logInfo },
   } = dependencies;
   const isDirectory = (directory) => {
@@ -41,58 +38,27 @@ export default (dependencies) => {
       mkdirSync(directory);
     }
   };
-  const getPath = (
-    storage,
-    {
-      name,
-      app,
-      main,
-      repository: { package: _package },
-      output: { directory, indent, postfix, filename },
-    },
-  ) =>
-    `${directory}/${getFreeName(
-      storage,
-      filename ||
-        name ||
-        mapMaybe(main, getBasename) ||
-        app ||
-        mapMaybe(_package, getName) ||
-        "anonymous",
-      postfix,
-    )}`;
-  /* c8 ignore start */
-  const getName = ({ name }) => name;
-  /* c8 ignore stop */
-  const getFreeName = (versioning, name, postfix) => {
-    if (versioning.has(name)) {
-      const counter = versioning.get(name);
-      versioning.set(name, counter + 1);
-      name = `${name}-${_String(counter)}`;
-    } else {
-      versioning.set(name, 1);
-    }
-    return `${name}${postfix}.json`;
-  };
   return {
-    createStorage: () => new _Map(),
-    store: (versioning, { configuration, data }) => {
-      const {
-        output: { directory, indent },
-      } = configuration;
-      const path = getPath(versioning, configuration);
-      createDirectory(directory);
-      writeFileSync(path, stringify(data, null, indent), "utf8");
-      logInfo("trace file (synchronously) written at: %j", path);
-    },
-    storeAsync: async (versioning, { configuration, data }) => {
-      const {
-        output: { directory, indent },
-      } = configuration;
-      const path = getPath(versioning, configuration);
-      createDirectory(directory);
-      await writeFile(path, stringify(data, null, indent), "utf8");
-      logInfo("trace file (synchronously) written at: %j", path);
+    store: ({ path, data }) => {
+      const content = stringify(data);
+      try {
+        writeFileSync(path, content, "utf8");
+      } catch (error) {
+        const { code } = error;
+        expect(
+          code === "ENOENT",
+          "cannot write trace to %j >> %e",
+          path,
+          error,
+        );
+        createDirectory(getDirectory(path));
+        expectSuccess(
+          () => writeFileSync(path, content, "utf8"),
+          "cannot write trace to %j >> %e",
+          path,
+        );
+      }
+      logInfo("trace written to %j", path);
     },
   };
 };
