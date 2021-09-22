@@ -199,6 +199,10 @@ export default (dependencies) => {
       extend: overwrite,
       normalize: identity,
     },
+    "remote-recording-port": {
+      extend: overwrite,
+      normalize: normalizePort,
+    },
     port: {
       extend: overwrite,
       normalize: normalizePort,
@@ -324,6 +328,7 @@ export default (dependencies) => {
       protocol: "tcp",
       host: "localhost",
       port: 0, // possibly overwritten by the agent
+      "remote-recording-port": 0,
       validate: {
         appmap: false,
         message: false,

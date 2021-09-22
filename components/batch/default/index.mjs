@@ -11,11 +11,18 @@ export default (dependencies) => {
     spawn: { spawn },
     child: { compileChild, getChildDescription },
     configuration: { extendConfiguration },
-    server: {
-      openServerAsync,
-      closeServer,
-      promiseServerTermination,
+    request: {
+      openServer,
+      listenAsync,
       getServerPort,
+      promiseServerTermination,
+      closeServer,
+    },
+    receptor: {
+      openReceptorAsync,
+      closeReceptor,
+      promiseReceptorTermination,
+      getReceptorPort,
     },
   } = dependencies;
   return {
@@ -41,16 +48,26 @@ export default (dependencies) => {
           subprocess.kill("SIGINT");
         }
       });
-      const { scenario, scenarios, port } = configuration;
+      const {
+        scenario,
+        scenarios,
+        port,
+        "remote-recording-port": remote_recording_port,
+      } = configuration;
       const backend = createBackend();
-      const server = await openServerAsync(backend, {
+      const server = await openServer(backend);
+      await listenAsync(server, remote_recording_port);
+      const receptor = await openReceptorAsync(backend, {
         host: "localhost",
         port,
       });
       configuration = {
         ...extendConfiguration(
           configuration,
-          { port: getServerPort(server) },
+          {
+            port: getReceptorPort(receptor),
+            "remote-recording-port": getServerPort(server),
+          },
           "/",
         ),
         scenarios: {},
@@ -126,7 +143,9 @@ export default (dependencies) => {
           }
         }
       } finally {
+        closeReceptor(receptor);
         closeServer(server);
+        await promiseReceptorTermination(receptor);
         await promiseServerTermination(server);
       }
     },

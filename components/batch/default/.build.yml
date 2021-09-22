@@ -7,4 +7,5 @@ dependencies:
   - log
   - child
   - configuration
-  - server
+  - receptor
+  - request

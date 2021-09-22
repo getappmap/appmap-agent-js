@@ -121,6 +121,28 @@ export const schema = [
     "maximum": 65535
   },
   {
+    "$id": "port",
+    "anyOf": [
+      {
+        "$ref": "path"
+      },
+      {
+        "$ref": "port-number"
+      }
+    ]
+  },
+  {
+    "$id": "absolute-port",
+    "anyOf": [
+      {
+        "$ref": "absolute-path"
+      },
+      {
+        "$ref": "port-number"
+      }
+    ]
+  },
+  {
     "$id": "name-version-string",
     "type": "string",
     "pattern": "^[^@]+@[^@]+$"
@@ -678,14 +700,10 @@ export const schema = [
         "const": "localhost"
       },
       "port": {
-        "anyOf": [
-          {
-            "$ref": "path"
-          },
-          {
-            "$ref": "port-number"
-          }
-        ]
+        "$ref": "port"
+      },
+      "remote-recording-port": {
+        "$ref": "port"
       },
       "scenario": {
         "type": "string"
@@ -961,14 +979,10 @@ export const schema = [
         "const": "localhost"
       },
       "port": {
-        "anyOf": [
-          {
-            "$ref": "absolute-path"
-          },
-          {
-            "$ref": "port-number"
-          }
-        ]
+        "$ref": "absolute-port"
+      },
+      "remote-recording-port": {
+        "$ref": "absolute-port"
       },
       "recorder": {
         "$ref": "recorder"

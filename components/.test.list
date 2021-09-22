@@ -21,7 +21,7 @@
 - naming
 - trace
 - backend
-- server
+- receptor
 - * instrumentation
   * interpretation
   * serialization

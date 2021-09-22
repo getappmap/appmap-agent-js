@@ -100,6 +100,16 @@
   minimum: 0
   maximum: 65535
 
+- $id: port
+  anyOf:
+    - $ref: path
+    - $ref: port-number
+
+- $id: absolute-port
+  anyOf:
+    - $ref: absolute-path
+    - $ref: port-number
+
 # name-version #
 
 - $id: name-version-string
@@ -367,10 +377,8 @@
     protocol: {$ref: protocol}
     log: {$ref: log-level}
     host: {const: localhost}
-    port:
-      anyOf:
-        - $ref: path
-        - $ref: port-number
+    port: {$ref: port}
+    remote-recording-port: {$ref: port}
     scenario: {type: string}
     scenarios:
       type: object
@@ -491,10 +499,8 @@
     protocol: {$ref: protocol}
     log: {$ref: log-level}
     host: {const: localhost}
-    port:
-      anyOf:
-        - {$ref: absolute-path}
-        - {$ref: port-number}
+    port: {$ref: absolute-port}
+    remote-recording-port: {$ref: absolute-port}
     recorder: {$ref: recorder}
     source: {type: boolean}
     hooks:

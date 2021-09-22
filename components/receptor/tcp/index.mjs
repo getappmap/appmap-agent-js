@@ -12,7 +12,7 @@ export default (dependencies) => {
     log: { logError },
   } = dependencies;
   return {
-    openServerAsync: (backend, options) => {
+    openReceptorAsync: (backend, options) => {
       const { port } = { port: 0, ...options };
       const server = createServer();
       const sockets = new _Set();
@@ -60,14 +60,14 @@ export default (dependencies) => {
         server.listen(port);
       });
     },
-    promiseServerTermination: ({ termination }) => termination,
-    closeServer: ({ server, sockets }) => {
+    promiseReceptorTermination: ({ termination }) => termination,
+    closeReceptor: ({ server, sockets }) => {
       server.close();
       for (const socket of sockets) {
         socket.end();
       }
     },
-    getServerPort: ({ server }) => {
+    getReceptorPort: ({ server }) => {
       const address = server.address();
       if (typeof address === "string") {
         return address;

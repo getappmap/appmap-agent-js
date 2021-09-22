@@ -7,7 +7,7 @@ import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
 } from "../../build.mjs";
-import Server from "./index.mjs";
+import Receptor from "./index.mjs";
 
 const {
   // deepEqual: assertDeepEqual,
@@ -35,19 +35,19 @@ const {
   backend: { createBackend },
 } = dependencies;
 const {
-  openServerAsync,
-  getServerPort,
-  closeServer,
-  promiseServerTermination,
-} = Server(dependencies);
+  openReceptorAsync,
+  getReceptorPort,
+  closeReceptor,
+  promiseReceptorTermination,
+} = Receptor(dependencies);
 // happy path (unix domain socket) //
 {
   const port = `${tmpdir()}/appmap-server-tcp-${Math.random()
     .toString(36)
     .substring(2)}`;
-  const server = await openServerAsync(createBackend(), { port });
+  const server = await openReceptorAsync(createBackend(), { port });
   setTimeout(() => {
-    const socket = connect(getServerPort(server));
+    const socket = connect(getReceptorPort(server));
     socket.on("connect", () => {
       socket.write(createMessage("session"));
       socket.write(
@@ -89,17 +89,17 @@ const {
   });
   await promisePresence(directory, "foo.appmap.json");
   setTimeout(() => {
-    closeServer(server);
+    closeReceptor(server);
   });
   await promisePresence(directory, "bar.appmap.json");
-  await promiseServerTermination(server);
+  await promiseReceptorTermination(server);
 }
 
 // unhappy path (port) //
 {
-  const server = await openServerAsync(createBackend(), { port: 0 });
+  const server = await openReceptorAsync(createBackend(), { port: 0 });
   setTimeout(() => {
-    const socket = connect(getServerPort(server));
+    const socket = connect(getReceptorPort(server));
     socket.on("connect", () => {
       setTimeout(() => {
         server.server.emit("error", new Error("BOUM SERVER"));
@@ -107,7 +107,7 @@ const {
     });
   });
   try {
-    await promiseServerTermination(server);
+    await promiseReceptorTermination(server);
     assertFail();
   } catch ({ message }) {
     assertEqual(message, "BOUM SERVER");
