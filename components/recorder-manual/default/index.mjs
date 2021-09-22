@@ -7,12 +7,12 @@ export default (dependencies) => {
     util: { assert },
     expect: { expect },
     agent: {
-      createAgent,
-      executeAgentAsync,
+      openAgent,
+      promiseAgentTermination,
+      closeAgent,
       createTrack,
       startTrack,
       stopTrack,
-      interruptAgent,
     },
   } = dependencies;
   class Appmap {
@@ -20,9 +20,9 @@ export default (dependencies) => {
       const { mode, recorder } = configuration;
       assert(recorder === "manual", "expected manual recorder");
       expect(mode === "local", "manual recorder only supports local mode");
-      this.agent = createAgent(configuration);
+      this.agent = openAgent(configuration);
       this.running = true;
-      this.promise = executeAgentAsync(this.agent);
+      this.promise = promiseAgentTermination(this.agent);
     }
     start(options) {
       expect(
@@ -34,7 +34,7 @@ export default (dependencies) => {
     terminate(termination) {
       expect(this.running, "this appmap has already been terminated");
       this.running = false;
-      interruptAgent(this.agent, { errors: [], status: 0, ...termination });
+      closeAgent(this.agent, { errors: [], status: 0, ...termination });
       return this.promise;
     }
   }

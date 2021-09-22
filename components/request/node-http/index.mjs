@@ -24,6 +24,7 @@ export default (dependencies) => {
   return {
     openServer: (respond) => {
       const server = createServer();
+      server.unref();
       const sockets = new _Set();
       server.on("request", (readable, writable) => {
         const { method, url: path } = readable;

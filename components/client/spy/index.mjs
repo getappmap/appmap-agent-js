@@ -1,23 +1,24 @@
 const _Promise = Promise;
 
 export default (dependencies) => {
-  const {
-    util: { assert, createBox, getBox, setBox },
-  } = dependencies;
+  const {} = dependencies;
   return {
-    createClient: ({}) => ({
-      buffer: [],
-      interrupt: createBox(null),
-    }),
-    executeClientAsync: async ({ buffer, interrupt }) => {
-      await new _Promise((resolve) => {
-        assert(getBox(interrupt) === null, "client is already running");
-        setBox(interrupt, resolve);
+    openClient: ({}) => {
+      let resolve, reject;
+      const termination = new _Promise((_resolve, _reject) => {
+        resolve = _resolve;
+        reject = _reject;
       });
-      return buffer;
+      return {
+        buffer: [],
+        resolve,
+        reject,
+        termination,
+      };
     },
-    interruptClient: ({ interrupt }) => {
-      getBox(interrupt)();
+    promiseClientTermination: ({ termination }) => termination,
+    closeClient: ({ resolve, buffer }) => {
+      resolve(buffer);
     },
     sendClient: ({ buffer }, data) => {
       buffer.push(data);

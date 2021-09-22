@@ -2,6 +2,7 @@ import { connect } from "net";
 import { createMessage } from "net-socket-messaging";
 import { writeSync } from "fs";
 
+const _Promise = Promise;
 const { stringify } = JSON;
 
 export default (dependencies) => {
@@ -10,7 +11,7 @@ export default (dependencies) => {
     request: { requestAsync },
   } = dependencies;
   return {
-    createClient: ({
+    openClient: ({
       host,
       port,
       "remote-recording-port": remote_recording_port,
@@ -20,6 +21,7 @@ export default (dependencies) => {
       );
       const buffer = [createMessage(getUUID())];
       socket.on("connect", () => {
+        socket.unref();
         const {
           _handle: { fd },
         } = socket;
@@ -31,24 +33,18 @@ export default (dependencies) => {
       });
       return {
         socket,
+        termination: new _Promise((resolve, reject) => {
+          socket.on("error", reject);
+          socket.on("close", resolve);
+        }),
         buffer,
         host,
         port,
         remote_recording_port,
       };
     },
-    executeClientAsync: async ({ socket }) => {
-      socket.unref();
-      try {
-        await new Promise((resolve, reject) => {
-          socket.on("close", resolve);
-          socket.on("error", reject);
-        });
-      } finally {
-        socket.destroy();
-      }
-    },
-    interruptClient: ({ socket }) => {
+    promiseClientTermination: ({ termination }) => termination,
+    closeClient: ({ socket }) => {
       socket.end();
     },
     sendClient: ({ socket, buffer }, data) => {

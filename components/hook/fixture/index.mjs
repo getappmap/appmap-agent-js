@@ -7,7 +7,7 @@ export default (dependencies) => {
   const {
     configuration: { createConfiguration, extendConfiguration },
     frontend: { createFrontend, initializeFrontend },
-    client: { createClient, executeClientAsync, interruptClient },
+    client: { openClient, promiseClientTermination, closeClient },
   } = dependencies;
   return {
     testHookAsync: async (hook, unhook, config, callbackAsync) => {
@@ -18,13 +18,13 @@ export default (dependencies) => {
         directory,
       );
       const frontend = createFrontend(configuration);
-      const client = createClient(configuration);
-      const promise = executeClientAsync(client);
+      const client = openClient(configuration);
+      const promise = promiseClientTermination(client);
       initializeFrontend(frontend);
       const h = hook(client, frontend, configuration);
       try {
         await callbackAsync(frontend);
-        interruptClient(client);
+        closeClient(client);
         return await promise;
       } finally {
         unhook(h);

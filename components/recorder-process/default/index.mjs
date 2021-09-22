@@ -2,20 +2,20 @@ export default (dependencies) => {
   const {
     util: { assert },
     agent: {
-      createAgent,
-      executeAgentAsync,
+      openAgent,
+      promiseAgentTermination,
+      closeAgent,
       createTrack,
       startTrack,
       stopTrack,
-      interruptAgent,
     },
   } = dependencies;
   return {
     mainAsync: (process, configuration) => {
       const { recorder } = configuration;
       assert(recorder === "process", "expected process recorder");
-      const agent = createAgent(configuration);
-      const promise = executeAgentAsync(agent);
+      const agent = openAgent(configuration);
+      const promise = promiseAgentTermination(agent);
       const track = createTrack(agent);
       startTrack(agent, track, { path: null, options: {} });
       const errors = [];
@@ -25,7 +25,7 @@ export default (dependencies) => {
       process.on("exit", (status, signal) => {
         const termination = { errors, status };
         stopTrack(agent, track, termination);
-        interruptAgent(agent, termination);
+        closeAgent(agent, termination);
       });
       return promise;
     },

@@ -7,12 +7,12 @@ export default (dependencies) => {
     util: { assert, coalesce, matchVersion },
     expect: { expect },
     agent: {
-      createAgent,
-      executeAgentAsync,
+      openAgent,
+      promiseAgentTermination,
+      closeAgent,
       createTrack,
       startTrack,
       stopTrack,
-      interruptAgent,
     },
   } = dependencies;
   const prototype = coalesce(Mocha, "prototype", _undefined);
@@ -31,8 +31,8 @@ export default (dependencies) => {
     createMochaHooks: (process, configuration) => {
       const { recorder } = configuration;
       assert(recorder === "mocha", "expected mocha recorder");
-      const agent = createAgent(configuration);
-      const promise = executeAgentAsync(agent);
+      const agent = openAgent(configuration);
+      const promise = promiseAgentTermination(agent);
       const errors = [];
       process.on("uncaughtExceptionMonitor", (error) => {
         errors.push(error);
@@ -42,7 +42,7 @@ export default (dependencies) => {
         if (track !== null) {
           stopTrack(agent, track, termination);
         }
-        interruptAgent(agent, termination);
+        closeAgent(agent, termination);
       });
       let track = null;
       return {

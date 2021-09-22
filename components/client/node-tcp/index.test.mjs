@@ -13,7 +13,7 @@ const {
 
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
 
-const { createClient, executeClientAsync, interruptClient, sendClient } =
+const { openClient, promiseClientTermination, closeClient, sendClient } =
   Client(dependencies);
 // happy path //
 {
@@ -29,16 +29,16 @@ const { createClient, executeClientAsync, interruptClient, sendClient } =
     server.on("listening", resolve);
     server.listen(0);
   });
-  const client = createClient({
+  const client = openClient({
     host: "localhost",
     port: server.address().port,
   });
   sendClient(client, 123);
   client.socket.on("connect", () => {
     sendClient(client, 456);
-    interruptClient(client);
+    closeClient(client);
   });
-  await executeClientAsync(client);
+  await promiseClientTermination(client);
   assertDeepEqual(buffer, ["uuid", "123", "456"]);
   await new Promise((resolve) => {
     server.on("close", resolve);
@@ -47,12 +47,12 @@ const { createClient, executeClientAsync, interruptClient, sendClient } =
 }
 // posix-domain-socket with error //
 {
-  const client = createClient({
+  const client = openClient({
     host: "localhost",
     port: `${tmpdir()}/${Math.random().toString(36).substring(2)}`,
   });
   try {
-    await executeClientAsync(client);
+    await promiseClientTermination(client);
     assertFail();
   } catch ({ code }) {
     assertEqual(code, "ENOENT");

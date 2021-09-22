@@ -15,14 +15,14 @@ const dependencies = await buildTestDependenciesAsync(import.meta.url);
 const { createConfiguration, extendConfiguration } =
   await buildTestComponentAsync("configuration", "test");
 const {
-  createAgent,
-  executeAgentAsync,
-  interruptAgent,
+  openAgent,
+  promiseAgentTermination,
+  closeAgent,
   createTrack,
   startTrack,
   stopTrack,
 } = Agent(dependencies);
-const agent = createAgent(
+const agent = openAgent(
   extendConfiguration(
     createConfiguration("/"),
     {
@@ -42,9 +42,9 @@ setTimeout(() => {
   const track = createTrack(agent);
   startTrack(agent, track, {});
   stopTrack(agent, track, { errors: [], status: 0 });
-  interruptAgent(agent, { errors: [], status: 123 });
+  closeAgent(agent, { errors: [], status: 123 });
 });
 assertDeepEqual(
-  (await executeAgentAsync(agent)).map(([type]) => type),
+  (await promiseAgentTermination(agent)).map(([type]) => type),
   ["initialize", "start", "stop", "terminate"],
 );

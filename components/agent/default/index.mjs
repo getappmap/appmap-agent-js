@@ -14,16 +14,15 @@ export default (dependencies) => {
       startTrack,
       stopTrack,
     },
-    client: { createClient, executeClientAsync, sendClient, interruptClient },
+    client: { openClient, promiseClientTermination, sendClient, closeClient },
   } = dependencies;
   return {
-    createAgent: (configuration) => ({
+    openAgent: (configuration) => ({
       configuration,
       frontend: createFrontend(configuration),
-      client: createClient(configuration),
+      client: openClient(configuration),
     }),
-    executeAgentAsync: async ({ configuration, client, frontend }) => {
-      const promise = executeClientAsync(client);
+    promiseAgentTermination: async ({ configuration, client, frontend }) => {
       sendClient(client, initializeFrontend(frontend));
       const hook_group = hookGroup(client, frontend, configuration);
       const hook_module = hookModule(client, frontend, configuration);
@@ -32,7 +31,7 @@ export default (dependencies) => {
       const hook_response = hookResponse(client, frontend, configuration);
       const hook_query = hookQuery(client, frontend, configuration);
       try {
-        return await promise;
+        return await promiseClientTermination(client);
       } finally {
         unhookGroup(hook_group);
         unhookModule(hook_module);
@@ -42,9 +41,9 @@ export default (dependencies) => {
         unhookQuery(hook_query);
       }
     },
-    interruptAgent: ({ frontend, client }, termination) => {
+    closeAgent: ({ frontend, client }, termination) => {
       sendClient(client, terminateFrontend(frontend, termination));
-      interruptClient(client);
+      closeClient(client);
     },
     createTrack: ({ frontend }, options) => createTrack(frontend, options),
     startTrack: ({ client, frontend }, track, initialization) => {

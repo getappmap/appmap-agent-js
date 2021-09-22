@@ -3,6 +3,7 @@ export default ({
   uuid: { getUUID },
   util: { bind, assert, createBox, setBox, getBox },
   storage: { store },
+  request: { openServer, listenAsync, promiseServerTermination, closeServer },
   backend: {
     createBackend,
     openBackendSession,
@@ -12,24 +13,22 @@ export default ({
   },
 }) => {
   return {
-    createClient: (configuration) => {
+    openClient: (configuration) => {
       const key = getUUID();
       const backend = createBackend();
+      const server = openServer(bind(respondBackend, backend));
+      listenAsync(server, configuration["remote-recording-port"]);
       openBackendSession(backend, key);
       return {
+        server,
         backend,
         key,
-        box: createBox(null),
       };
     },
-    executeClientAsync: ({ backend, box }) =>
-      new _Promise((resolve) => {
-        assert(getBox(box) === null, "client is already running");
-        setBox(box, resolve);
-      }),
-    interruptClient: ({ backend, key, box }) => {
+    promiseClientTermination: ({ server }) => promiseServerTermination(server),
+    closeClient: ({ server, backend, key }) => {
       closeBackendSession(backend, key).forEach(store);
-      getBox(box)();
+      closeServer(server);
     },
     sendClient: ({ backend, key }, message) => {
       if (message !== null) {

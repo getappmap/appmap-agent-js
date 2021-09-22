@@ -8,9 +8,9 @@ import Client from "./index.mjs";
 
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
 const { createConfiguration } = await buildTestComponentAsync("configuration");
-const { createClient, executeClientAsync, interruptClient, sendClient } =
+const { openClient, promiseClientTermination, closeClient, sendClient } =
   Client(dependencies);
-const client = createClient({});
+const client = openClient({});
 setTimeout(() => {
   sendClient(client, [
     "initialize",
@@ -20,6 +20,6 @@ setTimeout(() => {
   ]);
   sendClient(client, ["start", "track", { path: null, options: {} }]);
   sendClient(client, ["terminate", { errors: [], status: 0 }]);
-  interruptClient(client);
+  closeClient(client);
 });
-await executeClientAsync(client);
+await promiseClientTermination(client);
