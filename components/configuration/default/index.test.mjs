@@ -113,11 +113,10 @@ assertDeepEqual(extend("scenarios", { name: ["exec", "argv0"] }, "/base"), {
 
 // output //
 
-assertDeepEqual(extend("output", "foo", "/base"), {
-  directory: "/base/foo",
-  filename: null,
-  postfix: ".appmap",
-  indent: 0,
+assertDeepEqual(extend("output", "directory", "/base"), {
+  directory: "/base/directory",
+  basename: null,
+  extension: ".appmap.json",
 });
 
 // enabled //

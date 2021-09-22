@@ -82,9 +82,13 @@
   type: string
   pattern: "^/"
 
-- $id: filename
+- $id: basename
   type: string
-  pattern: "^[^\/]+$"
+  pattern: "^[^/.]+$"
+
+- $id: extension
+  type: string
+  pattern: "^\\.[^/]+$"
 
 - $id: index
   type: integer
@@ -428,12 +432,10 @@
         - type: string
         - type: object
           additionalProperties: false
-          minProperties: 1
           properties:
-            directory: {type: string}
-            filename: {$ref: filename}
-            postfix: {$ref: filename}
-            indent: {$ref: indent}
+            directory: {$ref: path}
+            basename: {$ref: basename}
+            extension: {$ref: extension}
     app: {type: string}
     name: {type: string}
     feature: {type: string}
@@ -566,15 +568,14 @@
     output:
       type: object
       additionalProperties: false
-      required: [directory, filename, postfix, indent]
+      required: [directory, basename, extension]
       properties:
         directory: {$ref: absolute-path}
-        filename:
+        basename:
           anyOf:
             - const: null
-            - $ref: filename
-        postfix: {$ref: filename}
-        indent: {$ref: indent}
+            - $ref: basename
+        extension: {$ref: extension}
     app:
       type: string
       nullable: true

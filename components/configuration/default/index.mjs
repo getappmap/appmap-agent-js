@@ -333,9 +333,8 @@ export default (dependencies) => {
       log: "info",
       output: {
         directory: `${directory}/tmp/appmap`,
-        filename: null,
-        indent: 0,
-        postfix: ".appmap",
+        basename: null,
+        extension: ".appmap.json",
       },
       enabled: [],
       recorder: "process",
