@@ -1,5 +1,6 @@
 branches: [node, browser]
 dependencies:
+  - uuid
   - storage
   - util
   - backend

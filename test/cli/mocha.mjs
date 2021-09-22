@@ -22,7 +22,7 @@ await runAsync(
       apply: true,
       http: false,
     },
-    output: { filename: "filename" },
+    output: { basename: "basename" },
     scenario: "scenario",
     scenarios: {
       scenario: ["npx", "mocha", "./main.test.mjs"],

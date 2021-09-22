@@ -1,27 +1,38 @@
 const _Promise = Promise;
 export default ({
+  uuid: { getUUID },
   util: { bind, assert, createBox, setBox, getBox },
-  storage: { createStorage, store },
-  backend: { openBackend, sendBackend, closeBackend },
+  storage: { store },
+  backend: {
+    createBackend,
+    openBackendSession,
+    sendBackend,
+    closeBackendSession,
+  },
 }) => {
   return {
-    createClient: (configuration) => ({
-      backend: openBackend(),
-      storage: createStorage(),
-      box: createBox(null),
-    }),
-    executeClientAsync: ({ box }) =>
+    createClient: (configuration) => {
+      const key = getUUID();
+      const backend = createBackend();
+      openBackendSession(backend, key);
+      return {
+        backend,
+        key,
+        box: createBox(null),
+      };
+    },
+    executeClientAsync: ({ backend, box }) =>
       new _Promise((resolve) => {
         assert(getBox(box) === null, "client is already running");
         setBox(box, resolve);
       }),
-    interruptClient: ({ storage, backend, box }) => {
-      closeBackend(backend).forEach(bind(store, storage));
+    interruptClient: ({ backend, key, box }) => {
+      closeBackendSession(backend, key).forEach(store);
       getBox(box)();
     },
-    sendClient: ({ storage, backend }, message) => {
+    sendClient: ({ backend, key }, message) => {
       if (message !== null) {
-        sendBackend(backend, message).forEach(bind(store, storage));
+        sendBackend(backend, key, message).forEach(store);
       }
     },
   };

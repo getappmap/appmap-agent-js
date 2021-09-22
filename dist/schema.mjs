@@ -99,9 +99,14 @@ export const schema = [
     "pattern": "^/"
   },
   {
-    "$id": "filename",
+    "$id": "basename",
     "type": "string",
-    "pattern": "^[^/]+$"
+    "pattern": "^[^/.]+$"
+  },
+  {
+    "$id": "extension",
+    "type": "string",
+    "pattern": "^\\.[^/]+$"
   },
   {
     "$id": "index",
@@ -822,19 +827,15 @@ export const schema = [
           {
             "type": "object",
             "additionalProperties": false,
-            "minProperties": 1,
             "properties": {
               "directory": {
-                "type": "string"
+                "$ref": "path"
               },
-              "filename": {
-                "$ref": "filename"
+              "basename": {
+                "$ref": "basename"
               },
-              "postfix": {
-                "$ref": "filename"
-              },
-              "indent": {
-                "$ref": "indent"
+              "extension": {
+                "$ref": "extension"
               }
             }
           }
@@ -1133,29 +1134,25 @@ export const schema = [
         "additionalProperties": false,
         "required": [
           "directory",
-          "filename",
-          "postfix",
-          "indent"
+          "basename",
+          "extension"
         ],
         "properties": {
           "directory": {
             "$ref": "absolute-path"
           },
-          "filename": {
+          "basename": {
             "anyOf": [
               {
                 "const": null
               },
               {
-                "$ref": "filename"
+                "$ref": "basename"
               }
             ]
           },
-          "postfix": {
-            "$ref": "filename"
-          },
-          "indent": {
-            "$ref": "indent"
+          "extension": {
+            "$ref": "extension"
           }
         }
       },
@@ -1191,7 +1188,27 @@ export const schema = [
   },
   {
     "$id": "initialization",
-    "$ref": "configuration"
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "options",
+      "path"
+    ],
+    "properties": {
+      "options": {
+        "$ref": "configuration"
+      },
+      "path": {
+        "anyOf": [
+          {
+            "const": null
+          },
+          {
+            "$ref": "absolute-path"
+          }
+        ]
+      }
+    }
   },
   {
     "$id": "termination",
@@ -1313,7 +1330,7 @@ export const schema = [
             "type": "string"
           },
           {
-            "$ref": "configuration"
+            "$ref": "initialization"
           }
         ]
       },

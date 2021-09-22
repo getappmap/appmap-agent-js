@@ -46,6 +46,7 @@ const {
   setTimeout(() => {
     const socket = connect(getServerPort(server));
     socket.on("connect", () => {
+      socket.write(createMessage("session"));
       socket.write(
         createMessage(
           JSON.stringify([
@@ -60,7 +61,11 @@ const {
       );
       socket.write(
         createMessage(
-          JSON.stringify(["start", "track", { output: { filename: "foo" } }]),
+          JSON.stringify([
+            "start",
+            "track",
+            { path: null, options: { output: { basename: "foo" } } },
+          ]),
         ),
       );
       socket.write(
@@ -70,7 +75,11 @@ const {
       );
       socket.write(
         createMessage(
-          JSON.stringify(["start", "track", { output: { filename: "bar" } }]),
+          JSON.stringify([
+            "start",
+            "track",
+            { path: null, options: { output: { basename: "bar" } } },
+          ]),
         ),
       );
     });

@@ -39,9 +39,9 @@ export default (dependencies) => {
     }
   }
   class Recorder {
-    constructor(agent, initialization) {
+    constructor(agent, options) {
       const track = createTrack(agent);
-      startTrack(agent, track, { ...initialization });
+      startTrack(agent, track, { path: null, options: { ...options } });
       this.agent = agent;
       this.track = track;
       this.state = PLAY_STATE;
@@ -54,22 +54,6 @@ export default (dependencies) => {
       this.state = STOP_STATE;
       stopTrack(this.agent, this.track, termination);
     }
-    // play() {
-    //   expect(
-    //     this.state === PAUSE_STATE,
-    //     "cannot play recording because it is not currently on pause",
-    //   );
-    //   this.state = PLAY_STATE;
-    //   controlTrack(this.agent, this.track, "play");
-    // }
-    // pause() {
-    //   expect(
-    //     this.state === PLAY_STATE,
-    //     "cannot pause recording because it is not currently playing",
-    //   );
-    //   this.state = PAUSE_STATE;
-    //   controlTrack(this.agent, this.track, "pause");
-    // }
   }
   return { Appmap };
 };

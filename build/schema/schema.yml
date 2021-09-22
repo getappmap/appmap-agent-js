@@ -605,7 +605,10 @@
   required: [options, path]
   properties:
     options: {$ref: configuration}
-    path: {$ref: absolute-path}
+    path:
+      anyOf:
+        - const: null
+        - $ref: absolute-path
 
 - $id: termination
   type: object

@@ -54,7 +54,10 @@ export default (dependencies) => {
           );
           track = createTrack(agent);
           startTrack(agent, track, {
-            name: this.currentTest.parent.fullTitle(),
+            path: null,
+            options: {
+              name: this.currentTest.parent.fullTitle(),
+            },
           });
         },
         afterEach() {

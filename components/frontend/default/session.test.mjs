@@ -21,11 +21,10 @@ const {
 const configuration = createConfiguration("/");
 const session = createSession(configuration);
 assertDeepEqual(initializeSession(session), ["initialize", configuration]);
-assertDeepEqual(startTrackSession(session, "track", {}), [
-  "start",
-  "track",
-  {},
-]);
+assertDeepEqual(
+  startTrackSession(session, "track", { path: null, options: {} }),
+  ["start", "track", { path: null, options: {} }],
+);
 assertDeepEqual(registerFileSession(session, "file"), ["file", "file"]);
 assertDeepEqual(
   recordEventSession(session, "begin", "index", "time", "bundle", "data"),
@@ -47,4 +46,7 @@ assertDeepEqual(stopTrackSession(session, "track", { errors: [], status: 0 }), [
     { errors: [{ name: "TypeError", message: "BOUM" }], status: 0 },
   ]);
 }
-assertDeepEqual(startTrackSession(session, "track", {}), null);
+assertDeepEqual(
+  startTrackSession(session, "track", { path: null, options: {} }),
+  null,
+);

@@ -1,95 +1,92 @@
+import Session from "./session.mjs";
+
 const _Map = Map;
-const { from: toArray } = Array;
-const EMPTY = [];
+const _Set = Set;
+const _String = String;
 
 export default (dependencies) => {
   const {
-    util: { assert, createBox, setBox, getBox },
-    configuration: { extendConfiguration },
-    log: { logDebug },
-    "validate-message": { validateMessage },
-    trace: { compileTrace },
+    util: { assert, getDirectory, getBasename, getExtension },
   } = dependencies;
-  const finalize = ({ tracks, files, configuration_box }, key, termination) => {
-    const { initialization, events } = tracks.get(key);
-    tracks.delete(key);
-    const configuration = extendConfiguration(
-      getBox(configuration_box),
-      initialization,
-    );
-    return {
-      configuration,
-      data: compileTrace(configuration, files, events, termination),
-    };
+  const {
+    openSession,
+    closeSession,
+    respondSession,
+    sendSession,
+    isEmptySession,
+  } = Session(dependencies);
+  const preventConflict = (storables, paths) => {
+    // avoid arrow creation for the vast majority of events
+    if (storables.length === 0) {
+      return storables;
+    }
+    return storables.map(({ path, data }) => {
+      if (paths.has(path)) {
+        const directory = getDirectory(path);
+        const basename = getBasename(path);
+        const extension = getExtension(path);
+        let counter = 0;
+        do {
+          counter += 1;
+          path = `${directory}/${basename}-${_String(counter)}.${extension}`;
+        } while (paths.has(path));
+      }
+      paths.add(path);
+      return { path, data };
+    });
   };
   return {
-    openBackend: () => ({
-      files: [],
-      tracks: new _Map(),
-      configuration_box: createBox(null),
+    createBackend: () => ({
+      paths: new _Set(),
+      sessions: new _Map(),
     }),
-    sendBackend: (backend, message) => {
-      logDebug("backend received: %j", message);
-      validateMessage(message);
-      const type = message[0];
-      let result = EMPTY;
-      if (type === "event") {
-        const event = {
-          type: message[1],
-          index: message[2],
-          time: message[3],
-          data: {
-            type: message[4],
-            ...message[5],
-          },
-        };
-        for (const { events } of backend.tracks.values()) {
-          events.push(event);
-        }
-      } else if (type === "file") {
-        backend.files.push(message[1]);
-      } else if (type === "start") {
-        const key = message[1];
-        assert(!backend.tracks.has(key), "duplicate track");
-        backend.tracks.set(key, { initialization: message[2], events: [] });
-      } else if (type === "stop") {
-        const key = message[1];
-        assert(backend.tracks.has(key), "missing track");
-        assert(
-          getBox(backend.configuration_box) !== null,
-          "missing initialization (stop)",
-        );
-        result = [finalize(backend, key, message[2])];
-      } else if (type === "initialize") {
-        assert(
-          getBox(backend.configuration_box) === null,
-          "duplicate initialization",
-        );
-        setBox(backend.configuration_box, message[1]);
-      } else if (type === "terminate") {
-        assert(
-          getBox(backend.configuration_box) !== null,
-          "missing initialization (termination)",
-        );
-        result = toArray(backend.tracks.keys()).map((key) =>
-          finalize(backend, key, message[1]),
-        );
-      } /* c8 ignore start */ else {
-        assert(false, "invalid message");
-      } /* c8 ignore stop */
-      return result;
+    openBackendSession: ({ sessions }, key) => {
+      assert(!sessions.has(key), "duplicate backend session for opening");
+      sessions.set(key, openSession());
     },
-    closeBackend: (backend) => {
-      if (getBox(backend.configuration_box) === null) {
-        return [];
+    closeBackendSession: ({ sessions, paths }, key) => {
+      assert(sessions.has(key), "missing backend session for closing");
+      const session = sessions.get(key);
+      const storables = closeSession(session, key);
+      if (isEmptySession(session)) {
+        sessions.delete(key);
       }
-      const termination = {
-        errors: [{ name: "AppmapError", message: "client disconnection" }],
-        status: 1,
-      };
-      return toArray(backend.tracks.keys()).map((key) =>
-        finalize(backend, key, termination),
-      );
+      return preventConflict(storables, paths);
+    },
+    sendBackend: ({ sessions, paths }, key, message) => {
+      assert(sessions.has(key), "missing backend session for sending message");
+      return preventConflict(sendSession(sessions.get(key), message), paths);
+    },
+    respondBackend: ({ sessions }, method, segments) => {
+      if (segments.length === 0) {
+        return { code: 400, message: "missing session segment", body: null };
+      }
+      let [segment, ...rest] = segments;
+      if (segment === "_appmap") {
+        if (sessions.size === 0) {
+          return {
+            code: 404,
+            message: "not active backend session found",
+            body: null,
+          };
+        }
+        if (sessions.size > 1) {
+          return {
+            code: 409,
+            message: "multiple active backend session found",
+            body: null,
+          };
+        }
+        segment = sessions.keys().next().value;
+      } else if (!sessions.has(segment)) {
+        return { code: 404, message: "backend session not found", body: null };
+      }
+      const session = sessions.get(segment);
+      const response = respondSession(session, method, rest);
+      if (isEmptySession(session)) {
+        sessions.delete(segment);
+      }
+      return response;
     },
   };
 };

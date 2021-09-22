@@ -51,7 +51,7 @@ export const runAsync = async (_package, config, beforeAsync, afterAsync) => {
     stdio: "inherit",
   });
   const appmaps = [];
-  for (let filename of await readdir(`${directory}/tmp/appmap`)) {
+  for (const filename of await readdir(`${directory}/tmp/appmap`)) {
     const appmap = parseJSON(
       await readFile(`${directory}/tmp/appmap/${filename}`),
     );

@@ -17,7 +17,7 @@ export default (dependencies) => {
       const agent = createAgent(configuration);
       const promise = executeAgentAsync(agent);
       const track = createTrack(agent);
-      startTrack(agent, track, {});
+      startTrack(agent, track, { path: null, options: {} });
       const errors = [];
       process.on("uncaughtExceptionMonitor", (error) => {
         errors.push(error);

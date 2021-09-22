@@ -17,7 +17,7 @@ await runAsync(
       apply: false,
       http: false,
     },
-    output: { filename: "filename" },
+    output: { basename: "basename" },
     scenario: "scenario",
     scenarios: {
       scenario: ["node", "./main.mjs"],
@@ -27,7 +27,7 @@ await runAsync(
     await writeFile(`${repository}/main.mjs`, `123;`, "utf8");
   },
   async (appmaps) => {
-    const { "filename.appmap.json": appmap } = appmaps;
+    const { "basename.appmap.json": appmap } = appmaps;
     const { metadata } = appmap;
     const { name, app, client, recorder, test_status, exception } = metadata;
     {

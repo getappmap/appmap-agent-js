@@ -5,6 +5,9 @@ import { writeSync } from "fs";
 const { stringify } = JSON;
 
 export default (dependencies) => {
+  const {
+    uuid: { getUUID },
+  } = dependencies;
   function flushBuffer() {
     const {
       _handle: { fd },
@@ -20,7 +23,7 @@ export default (dependencies) => {
       const socket = connect(
         ...(typeof port === "string" ? [port] : [port, host]),
       );
-      socket._appmap_buffer = [];
+      socket._appmap_buffer = [createMessage(getUUID())];
       socket.on("connect", flushBuffer);
       return socket;
     },

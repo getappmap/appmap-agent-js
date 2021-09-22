@@ -7,19 +7,21 @@ const { parse: parseJSON } = JSON;
 
 export default (dependencies) => {
   const {
-    util: { bind },
-    backend: { openBackend, sendBackend, closeBackend },
-    expect: { expectSuccess },
-    storage: { createStorage, store },
+    backend: {
+      createBackend,
+      openBackendSession,
+      sendBackend,
+      closeBackendSession,
+    },
+    storage: { store },
     log: { logError },
   } = dependencies;
   return {
     openServerAsync: (options) => {
       const { port } = { port: 0, ...options };
+      const backend = createBackend();
       const server = createServer();
       const sockets = new _Set();
-      const storage = createStorage();
-      const storeEach = bind(store, storage);
       server.on("error", (error) => {
         server.close();
         for (const socket of sockets) {
@@ -28,11 +30,9 @@ export default (dependencies) => {
       });
       server.on("connection", (socket) => {
         patch(socket);
-        const backend = openBackend();
         sockets.add(socket);
         socket.on("close", () => {
           sockets.delete(socket);
-          closeBackend(backend).forEach(storeEach);
         });
         /* c8 ignore start */
         socket.on("error", (error) => {
@@ -40,15 +40,15 @@ export default (dependencies) => {
           socket.destroy();
         });
         /* c8 ignore stop */
-        socket.on("message", (data) => {
-          sendBackend(
-            backend,
-            expectSuccess(
-              () => parseJSON(data),
-              "failed to parse JSON message %j >> %e",
-              data,
-            ),
-          ).forEach(storeEach);
+        socket.on("message", (key) => {
+          openBackendSession(backend, key);
+          socket.removeAllListeners("message");
+          socket.on("close", () => {
+            closeBackendSession(backend, key).forEach(store);
+          });
+          socket.on("message", (message) => {
+            sendBackend(backend, key, parseJSON(message)).forEach(store);
+          });
         });
       });
       return new Promise((resolve, reject) => {

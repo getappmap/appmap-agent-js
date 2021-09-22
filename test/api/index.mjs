@@ -33,7 +33,7 @@ const appmap = createAppmap(
   {
     output: {
       directory: ".",
-      filename: "filename",
+      basename: "basename",
     },
     packages: "*",
     hooks: {
@@ -66,7 +66,7 @@ recorder.stop({errors: [], status:0});
 appmap.terminate();
 
 const { events } = parseJSON(
-  await readFile(`${directory}/filename.appmap.json`, "utf8"),
+  await readFile(`${directory}/basename.appmap.json`, "utf8"),
 );
 
 assertDeepEqual(
