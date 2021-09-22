@@ -57,11 +57,12 @@ export default (dependencies) => {
       assert(sessions.has(key), "missing backend session for sending message");
       return preventConflict(sendSession(sessions.get(key), message), paths);
     },
-    respondBackend: ({ sessions }, method, segments) => {
-      if (segments.length === 0) {
+    respondBackend: ({ sessions }, method, path, body) => {
+      const parts = /^\/([^/]+)(.*)/u.exec(path);
+      if (parts === null) {
         return { code: 400, message: "missing session segment", body: null };
       }
-      let [segment, ...rest] = segments;
+      let [, segment, rest] = parts;
       if (segment === "_appmap") {
         if (sessions.size === 0) {
           return {
@@ -82,7 +83,7 @@ export default (dependencies) => {
         return { code: 404, message: "backend session not found", body: null };
       }
       const session = sessions.get(segment);
-      const response = respondSession(session, method, rest);
+      const response = respondSession(session, method, rest, body);
       if (isEmptySession(session)) {
         sessions.delete(segment);
       }

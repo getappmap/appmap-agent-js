@@ -5,6 +5,7 @@ const { entries: toEntries } = Object;
 export default (dependencies) => {
   const {
     util: { assert },
+    backend: { createBackend },
     expect: { expectSuccessAsync, expectSuccess },
     log: { logDebug, logInfo, logWarning },
     spawn: { spawn },
@@ -41,7 +42,11 @@ export default (dependencies) => {
         }
       });
       const { scenario, scenarios, port } = configuration;
-      const server = await openServerAsync({ host: "localhost", port });
+      const backend = createBackend();
+      const server = await openServerAsync(backend, {
+        host: "localhost",
+        port,
+      });
       configuration = {
         ...extendConfiguration(
           configuration,

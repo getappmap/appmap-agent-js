@@ -56,15 +56,16 @@ export default (dependencies) => {
       traces: new _Map(),
       box: createBox(INITIAL_STATE),
     }),
-    respondSession: (session, method, segments) => {
-      if (segments.length !== 1) {
+    respondSession: (session, method, path, body) => {
+      const parts = /^\/([^/]+)$/u.exec(path);
+      if (parts === null) {
         return {
           code: 400,
           message: "malformed url: missing track segment",
           body: null,
         };
       }
-      const [segment] = segments;
+      const [, segment] = parts;
       if (method === "POST") {
         const state = getBox(session.box);
         if (state === INITIAL_STATE) {

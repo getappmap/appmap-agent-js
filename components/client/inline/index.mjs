@@ -7,6 +7,7 @@ export default ({
     createBackend,
     openBackendSession,
     sendBackend,
+    respondBackend,
     closeBackendSession,
   },
 }) => {
@@ -35,5 +36,9 @@ export default ({
         sendBackend(backend, key, message).forEach(store);
       }
     },
+    /* c8 ignore start */
+    requestClientAsync: ({ backend }, method, path, body) =>
+      _Promise.resolve(respondBackend(backend, method, path, body)),
+    /* c8 ignore stop */
   };
 };

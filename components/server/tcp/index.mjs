@@ -7,19 +7,13 @@ const { parse: parseJSON } = JSON;
 
 export default (dependencies) => {
   const {
-    backend: {
-      createBackend,
-      openBackendSession,
-      sendBackend,
-      closeBackendSession,
-    },
+    backend: { openBackendSession, sendBackend, closeBackendSession },
     storage: { store },
     log: { logError },
   } = dependencies;
   return {
-    openServerAsync: (options) => {
+    openServerAsync: (backend, options) => {
       const { port } = { port: 0, ...options };
-      const backend = createBackend();
       const server = createServer();
       const sockets = new _Set();
       server.on("error", (error) => {

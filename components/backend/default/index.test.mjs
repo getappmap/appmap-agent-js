@@ -61,35 +61,26 @@ const {
 
   const backend = createBackend();
 
-  assertEqual(getCode(respondBackend(backend, "POST", [])), 400);
+  assertEqual(getCode(respondBackend(backend, "POST", "")), 400);
 
-  assertEqual(
-    getCode(respondBackend(backend, "POST", ["_appmap", "track"])),
-    404,
-  );
+  assertEqual(getCode(respondBackend(backend, "POST", "/_appmap/track")), 404);
 
   openBackendSession(backend, "session1");
   sendBackend(backend, "session1", ["initialize", createConfiguration("/cwd")]);
-  assertEqual(
-    getCode(respondBackend(backend, "POST", ["_appmap", "track1"])),
-    200,
-  );
+  assertEqual(getCode(respondBackend(backend, "POST", "/_appmap/track1")), 200);
 
   // Multiple Session //
   openBackendSession(backend, "session2");
-  assertEqual(
-    getCode(respondBackend(backend, "POST", ["_appmap", "track"])),
-    409,
-  );
+  assertEqual(getCode(respondBackend(backend, "POST", "/_appmap/track")), 409);
   closeBackendSession(backend, "session2");
 
   assertEqual(
-    getCode(respondBackend(backend, "DELETE", ["session3", "track"])),
+    getCode(respondBackend(backend, "DELETE", "/session3/track")),
     404,
   );
   closeBackendSession(backend, "session1");
   assertEqual(
-    getCode(respondBackend(backend, "DELETE", ["session1", "track1"])),
+    getCode(respondBackend(backend, "DELETE", "/session1/track1")),
     200,
   );
 }

@@ -32,6 +32,9 @@ const configuration = createConfiguration("/cwd");
 
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
 const {
+  backend: { createBackend },
+} = dependencies;
+const {
   openServerAsync,
   getServerPort,
   closeServer,
@@ -42,7 +45,7 @@ const {
   const port = `${tmpdir()}/appmap-server-tcp-${Math.random()
     .toString(36)
     .substring(2)}`;
-  const server = await openServerAsync({ port });
+  const server = await openServerAsync(createBackend(), { port });
   setTimeout(() => {
     const socket = connect(getServerPort(server));
     socket.on("connect", () => {
@@ -94,7 +97,7 @@ const {
 
 // unhappy path (port) //
 {
-  const server = await openServerAsync({ port: 0 });
+  const server = await openServerAsync(createBackend(), { port: 0 });
   setTimeout(() => {
     const socket = connect(getServerPort(server));
     socket.on("connect", () => {

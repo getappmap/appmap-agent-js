@@ -34,7 +34,7 @@ const { createClient, executeClientAsync, interruptClient, sendClient } =
     port: server.address().port,
   });
   sendClient(client, 123);
-  client.on("connect", () => {
+  client.socket.on("connect", () => {
     sendClient(client, 456);
     interruptClient(client);
   });

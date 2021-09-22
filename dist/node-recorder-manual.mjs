@@ -27,6 +27,7 @@ import validate_appmap$off from "./../components/validate-appmap/off/index.mjs";
 import validate_appmap$on from "./../components/validate-appmap/on/index.mjs";
 import trace$appmap from "./../components/trace/appmap/index.mjs";
 import backend$default from "./../components/backend/default/index.mjs";
+import request$node_http from "./../components/request/node-http/index.mjs";
 import client$inline from "./../components/client/inline/index.mjs";
 import client$node_http1 from "./../components/client/node-http1/index.mjs";
 import client$node_http2 from "./../components/client/node-http2/index.mjs";
@@ -70,6 +71,7 @@ export default (blueprint) => {
   dependencies["validate-appmap"] = (blueprint["validate-appmap"] === "on" ? validate_appmap$on(dependencies) : (blueprint["validate-appmap"] === "off" ? validate_appmap$off(dependencies) : ((() => { throw new Error("invalid instance for component validate-appmap"); }) ())));
   dependencies["trace"] = trace$appmap(dependencies);
   dependencies["backend"] = backend$default(dependencies);
+  dependencies["request"] = request$node_http(dependencies);
   if (!("client" in blueprint)) { throw new Error("missing instance for component client"); }
   dependencies["client"] = (blueprint["client"] === "node-tcp" ? client$node_tcp(dependencies) : (blueprint["client"] === "node-http2" ? client$node_http2(dependencies) : (blueprint["client"] === "node-http1" ? client$node_http1(dependencies) : (blueprint["client"] === "inline" ? client$inline(dependencies) : ((() => { throw new Error("invalid instance for component client"); }) ())))));
   dependencies["interpretation"] = interpretation$vm(dependencies);

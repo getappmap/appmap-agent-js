@@ -7,27 +7,37 @@ const { stringify } = JSON;
 export default (dependencies) => {
   const {
     uuid: { getUUID },
+    request: { requestAsync },
   } = dependencies;
-  function flushBuffer() {
-    const {
-      _handle: { fd },
-    } = this;
-    // assert(fd > 0, "invalid socket fd after connect");
-    for (const buffer of this._appmap_buffer) {
-      writeSync(fd, buffer);
-    }
-    this._appmap_buffer = null;
-  }
   return {
-    createClient: ({ host, port }) => {
+    createClient: ({
+      host,
+      port,
+      "remote-recording-port": remote_recording_port,
+    }) => {
       const socket = connect(
         ...(typeof port === "string" ? [port] : [port, host]),
       );
-      socket._appmap_buffer = [createMessage(getUUID())];
-      socket.on("connect", flushBuffer);
-      return socket;
+      const buffer = [createMessage(getUUID())];
+      socket.on("connect", () => {
+        const {
+          _handle: { fd },
+        } = socket;
+        // assert(fd > 0, "invalid socket fd after connect");
+        for (const message of buffer) {
+          writeSync(fd, message);
+        }
+        buffer.length = 0;
+      });
+      return {
+        socket,
+        buffer,
+        host,
+        port,
+        remote_recording_port,
+      };
     },
-    executeClientAsync: async (socket) => {
+    executeClientAsync: async ({ socket }) => {
       socket.unref();
       try {
         await new Promise((resolve, reject) => {
@@ -38,21 +48,29 @@ export default (dependencies) => {
         socket.destroy();
       }
     },
-    interruptClient: (socket) => {
+    interruptClient: ({ socket }) => {
       socket.end();
     },
-    sendClient: (socket, data) => {
+    sendClient: ({ socket, buffer }, data) => {
       if (data !== null) {
-        const buffer = createMessage(stringify(data));
-        if (socket._appmap_buffer === null) {
+        const message = createMessage(stringify(data));
+        if (buffer.length === 0) {
           const {
             _handle: { fd },
           } = socket;
-          writeSync(fd, buffer);
+          writeSync(fd, message);
         } else {
-          socket._appmap_buffer.push(buffer);
+          buffer.push(message);
         }
       }
     },
+    /* c8 ignore start */
+    requestClientAsync: async (
+      { host, remote_recording_port },
+      method,
+      path,
+      body,
+    ) => requestAsync(host, remote_recording_port, method, path, body),
+    /* c8 ignore stop */
   };
 };

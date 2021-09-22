@@ -209,38 +209,38 @@ const getLength = ({ length }) => length;
 {
   const session = openSession();
   // Malformed Request //
-  assertEqual(getCode(respondSession(session, "PUT", ["track"])), 400);
-  assertEqual(getCode(respondSession(session, "PUT", [])), 400);
+  assertEqual(getCode(respondSession(session, "PUT", "/track")), 400);
+  assertEqual(getCode(respondSession(session, "PUT", "")), 400);
   // POST Before Initialization //
-  assertDeepEqual(getCode(respondSession(session, "POST", ["track"])), 409);
+  assertDeepEqual(getCode(respondSession(session, "POST", "/track")), 409);
   // Initialization //
   sendSession(session, ["initialize", configuration]);
   sendSession(session, ["start", "track1", { path: null, options: {} }]);
   // POST //
-  assertEqual(getCode(respondSession(session, "POST", ["track1"])), 409);
-  assertEqual(getCode(respondSession(session, "POST", ["track2"])), 200);
+  assertEqual(getCode(respondSession(session, "POST", "/track1")), 409);
+  assertEqual(getCode(respondSession(session, "POST", "/track2")), 200);
   // Get //
-  assertDeepEqual(removeMessage(respondSession(session, "GET", ["track1"])), {
+  assertDeepEqual(removeMessage(respondSession(session, "GET", "/track1")), {
     code: 200,
     body: { enabled: false },
   });
-  assertDeepEqual(removeMessage(respondSession(session, "GET", ["track2"])), {
+  assertDeepEqual(removeMessage(respondSession(session, "GET", "/track2")), {
     code: 200,
     body: { enabled: true },
   });
-  assertDeepEqual(removeMessage(respondSession(session, "GET", ["track3"])), {
+  assertDeepEqual(removeMessage(respondSession(session, "GET", "/track3")), {
     code: 200,
     body: { enabled: false },
   });
   // DELETE //
-  assertEqual(getCode(respondSession(session, "DELETE", ["track1"])), 404);
-  assertEqual(getCode(respondSession(session, "DELETE", ["track2"])), 200);
-  assertEqual(getCode(respondSession(session, "DELETE", ["track2"])), 404);
+  assertEqual(getCode(respondSession(session, "DELETE", "/track1")), 404);
+  assertEqual(getCode(respondSession(session, "DELETE", "/track2")), 200);
+  assertEqual(getCode(respondSession(session, "DELETE", "/track2")), 404);
   // Termination //
-  assertEqual(getCode(respondSession(session, "POST", ["track3"])), 200);
+  assertEqual(getCode(respondSession(session, "POST", "/track3")), 200);
   assertEqual(getLength(closeSession(session)), 1);
-  assertEqual(getCode(respondSession(session, "POST", ["track4"])), 409);
+  assertEqual(getCode(respondSession(session, "POST", "/track4")), 409);
   assertEqual(isEmptySession(session), false);
-  assertEqual(getCode(respondSession(session, "DELETE", ["track3"])), 200);
+  assertEqual(getCode(respondSession(session, "DELETE", "/track3")), 200);
   assertEqual(isEmptySession(session), true);
 }
