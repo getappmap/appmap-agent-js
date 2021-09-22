@@ -38,12 +38,12 @@ export default (dependencies) => {
   const makeApp = (app, { package: _package }) =>
     app === null ? mapMaybe(_package, getName) : app;
 
-  const makeName = (name, { filename }, main) => {
+  const makeName = (name, { basename }, main) => {
     if (name !== null) {
       return name;
     }
-    if (filename !== null) {
-      return filename;
+    if (basename !== null) {
+      return basename;
     }
     if (main !== null) {
       return getFilename(main).split(".")[0];

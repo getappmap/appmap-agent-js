@@ -77,9 +77,9 @@ assertDeepEqual(test({ name: "name" }, "/cwd"), {
   name: "name",
 });
 
-assertDeepEqual(test({ output: { filename: "filename" } }, "/cwd"), {
+assertDeepEqual(test({ output: { basename: "basename" } }, "/cwd"), {
   ...default_meta_data,
-  name: "filename",
+  name: "basename",
 });
 
 assertDeepEqual(test({ main: "/directory/filename.js" }, "/cwd"), {
