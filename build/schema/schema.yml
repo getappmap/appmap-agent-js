@@ -600,7 +600,12 @@
 ###########
 
 - $id: initialization
-  $ref: configuration
+  type: object
+  additionalProperties: false
+  required: [options, path]
+  properties:
+    options: {$ref: configuration}
+    path: {$ref: absolute-path}
 
 - $id: termination
   type: object
@@ -657,7 +662,7 @@
       items:
         - const: start
         - type: string
-        - $ref: configuration
+        - $ref: initialization
     - type: array
       minItems: 3
       maxItems: 3
