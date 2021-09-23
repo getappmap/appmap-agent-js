@@ -24,7 +24,7 @@ const {
 
 // General //
 {
-  const responder = openResponder((method, path, body) => ({
+  const responder = openResponder(async (method, path, body) => ({
     code: 200,
     message: "ok",
     body: { method, path, body },
@@ -52,13 +52,11 @@ const {
   await promiseResponderTermination(responder);
 }
 
-// Unix Domain Socket + Null Body //
+// Unix Domain Socket + Null Body + respondAsync error //
 {
-  const responder = openResponder((method, path, body) => ({
-    code: 200,
-    message: "ok",
-    body: null,
-  }));
+  const responder = openResponder(async (method, path, body) => {
+    throw new Error("BOUM");
+  });
   await listenResponderAsync(
     responder,
     `${tmpdir()}/${Math.random().toString(36).substring(2)}`,
@@ -72,8 +70,8 @@ const {
       null,
     ),
     {
-      code: 200,
-      message: "ok",
+      code: 500,
+      message: "BOUM",
       body: null,
     },
   );
@@ -112,7 +110,7 @@ const {
 
 // Invalid Request Headers //
 {
-  const responder = openResponder((method, path, body) => {
+  const responder = openResponder(async (method, path, body) => {
     assert(false);
   });
   await listenResponderAsync(responder, 0);

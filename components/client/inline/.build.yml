@@ -3,5 +3,4 @@ dependencies:
   - request
   - uuid
   - storage
-  - util
   - backend

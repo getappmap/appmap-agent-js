@@ -9,19 +9,32 @@ export default (dependencies) => {
   const {
     uuid: { getUUID },
     util: { generateDeadcode },
-    request: { requestAsync },
+    request: {
+      requestAsync,
+      openResponder,
+      listenResponderAsync,
+      promiseResponderTermination,
+      closeResponder,
+    },
   } = dependencies;
   return {
     openClient: ({
       host,
       "trace-port": trace_port,
       "track-port": track_port,
+      "local-track-port": local_track_port,
     }) => {
       const socket = connect(
         ...(typeof trace_port === "string" ? [trace_port] : [trace_port, host]),
       );
       const session = createMessage(getUUID());
       const buffer = [session];
+      const responder = openResponder((method, path, body) =>
+        requestAsync(host, track_port, method, `/${session}${path}`, body),
+      );
+      if (local_track_port !== 0) {
+        listenResponderAsync(responder, local_track_port);
+      }
       socket.on("connect", () => {
         socket.unref();
         const {
@@ -35,6 +48,7 @@ export default (dependencies) => {
       });
       return {
         socket,
+        responder,
         termination: new _Promise((resolve, reject) => {
           socket.on("error", reject);
           socket.on("close", resolve);
@@ -46,8 +60,12 @@ export default (dependencies) => {
         track_port,
       };
     },
-    promiseClientTermination: ({ termination }) => termination,
-    closeClient: ({ socket }) => {
+    promiseClientTermination: async ({ termination, responder }) => {
+      await termination;
+      await promiseResponderTermination(responder);
+    },
+    closeClient: ({ responder, socket }) => {
+      closeResponder(responder);
       socket.end();
     },
     traceClient: ({ socket, buffer }, data) => {

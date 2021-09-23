@@ -1,28 +1,36 @@
 const _Promise = Promise;
-export default ({
-  uuid: { getUUID },
-  util: { bind, assert, createBox, setBox, getBox },
-  storage: { store },
-  request: {
-    openResponder,
-    listenResponderAsync,
-    promiseResponderTermination,
-    closeResponder,
-  },
-  backend: {
-    createBackend,
-    openBackendSession,
-    sendBackend,
-    respondBackend,
-    closeBackendSession,
-  },
-}) => {
+export default (dependencies) => {
+  const {
+    uuid: { getUUID },
+    storage: { store },
+    request: {
+      openResponder,
+      listenResponderAsync,
+      promiseResponderTermination,
+      closeResponder,
+    },
+    backend: {
+      createBackend,
+      openBackendSession,
+      sendBackend,
+      respondBackend,
+      closeBackendSession,
+    },
+  } = dependencies;
   return {
     openClient: (configuration) => {
       const session = getUUID();
       const backend = createBackend();
-      const responder = openResponder(bind(respondBackend, backend));
-      listenResponderAsync(responder, configuration["track-port"]);
+      /* c8 ignore start */
+      const responder = openResponder((method, path, body) =>
+        _Promise.resolve(
+          respondBackend(backend, method, `/${session}${path}`, body),
+        ),
+      );
+      /* c8 ignore stop */
+      if (configuration["local-track-port"] !== 0) {
+        listenResponderAsync(responder, configuration["local-track-port"]);
+      }
       openBackendSession(backend, session);
       return {
         responder,

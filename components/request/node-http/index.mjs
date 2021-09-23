@@ -42,18 +42,27 @@ export default (dependencies) => {
       "content-length": length,
     };
   };
-  const respond = (onRequest, request, response) => {
+  const serve = (respondAsync, request, response) => {
     if (areValidHeaders(request.headers)) {
       let buffers = [];
       request.on("data", (buffer) => {
         buffers.push(buffer);
       });
-      request.on("end", () => {
-        const { code, message, body } = onRequest(
-          request.method,
-          request.url,
-          parse(concatBuffer(buffers).toString("utf8")),
-        );
+      request.on("end", async () => {
+        let code,
+          message,
+          body = parse(concatBuffer(buffers).toString("utf8"));
+        try {
+          ({ code, message, body } = await respondAsync(
+            request.method,
+            request.url,
+            body,
+          ));
+        } catch (error) {
+          code = 500;
+          message = error.message;
+          body = null;
+        }
         const buffer = toBuffer(stringify(body), "utf8");
         response.writeHead(code, message, createHeaders(buffer));
         response.end(buffer);
@@ -98,14 +107,14 @@ export default (dependencies) => {
       });
     });
   return {
-    respond,
+    serve,
     requestAsync,
-    openResponder: (onRequest) => {
+    openResponder: (respondAsync) => {
       const server = createServer();
       server.unref();
       const sockets = new _Set();
       server.on("request", (request, response) => {
-        respond(onRequest, request, response);
+        serve(respondAsync, request, response);
       });
       server.on("connection", (socket) => {
         sockets.add(socket);
