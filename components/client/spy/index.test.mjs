@@ -7,11 +7,11 @@ import Client from "./index.mjs";
 const { deepEqual: assertDeepEqual } = Assert;
 
 const testAsync = async () => {
-  const { openClient, promiseClientTermination, closeClient, sendClient } =
+  const { openClient, promiseClientTermination, closeClient, traceClient } =
     Client(await buildTestDependenciesAsync(import.meta.url));
   const client = openClient({});
   setTimeout(() => {
-    sendClient(client, "data");
+    traceClient(client, "data");
     closeClient(client);
   });
   assertDeepEqual(await promiseClientTermination(client), ["data"]);

@@ -10,7 +10,7 @@ export default (dependencies) => {
       recordBeforeJump,
       recordAfterJump,
     },
-    client: { sendClient },
+    client: { traceClient },
   } = dependencies;
   return {
     hookGroup: (client, frontend, { hooks: { group } }) => {
@@ -25,16 +25,16 @@ export default (dependencies) => {
           const bundle_index = incrementEventCounter(frontend);
           const jump_index = incrementEventCounter(frontend);
           groups.set(id, { bundle_index, jump_index });
-          sendClient(client, recordBeginBundle(frontend, bundle_index, null));
-          sendClient(client, recordBeforeJump(frontend, jump_index, null));
+          traceClient(client, recordBeginBundle(frontend, bundle_index, null));
+          traceClient(client, recordBeforeJump(frontend, jump_index, null));
         },
         destroy: (id) => {
           if (groups.has(id)) {
             assert(id !== current, "async computation destroyed itself");
             const { bundle_index, jump_index } = groups.get(id);
             groups.delete(id);
-            sendClient(client, recordAfterJump(frontend, jump_index, null));
-            sendClient(client, recordEndBundle(frontend, bundle_index, null));
+            traceClient(client, recordAfterJump(frontend, jump_index, null));
+            traceClient(client, recordEndBundle(frontend, bundle_index, null));
           }
         },
         before: (id) => {
@@ -44,11 +44,14 @@ export default (dependencies) => {
             const group = groups.get(id);
             const { jump_index } = group;
             group.jump_index = null;
-            sendClient(client, recordAfterJump(frontend, jump_index, null));
+            traceClient(client, recordAfterJump(frontend, jump_index, null));
           } else {
             const bundle_index = incrementEventCounter(frontend);
             groups.set(id, { bundle_index, jump_index: null });
-            sendClient(client, recordBeginBundle(frontend, bundle_index, null));
+            traceClient(
+              client,
+              recordBeginBundle(frontend, bundle_index, null),
+            );
           }
         },
         after: (id) => {
@@ -62,7 +65,7 @@ export default (dependencies) => {
           );
           const jump_index = incrementEventCounter(frontend);
           group.jump_index = jump_index;
-          sendClient(client, recordBeforeJump(frontend, jump_index, null));
+          traceClient(client, recordBeforeJump(frontend, jump_index, null));
         },
       });
       hook.enable();

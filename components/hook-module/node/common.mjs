@@ -7,7 +7,7 @@ export default (dependencies) => {
   const {
     util: { assignProperty },
     frontend: { instrument },
-    client: { sendClient },
+    client: { traceClient },
   } = dependencies;
   return {
     unhookCommonModule: (backup) => {
@@ -30,7 +30,7 @@ export default (dependencies) => {
           code1,
         );
         if (message !== null) {
-          sendClient(client, message);
+          traceClient(client, message);
         }
         return apply(original, this, [code2, path]);
       };

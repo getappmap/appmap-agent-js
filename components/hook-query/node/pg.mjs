@@ -16,7 +16,7 @@ export default (dependencies) => {
       recordBeforeQuery,
       recordAfterQuery,
     },
-    client: { sendClient },
+    client: { traceClient },
   } = dependencies;
   return {
     unhookPg: (backup) => {
@@ -66,8 +66,8 @@ export default (dependencies) => {
           }
           const index1 = incrementEventCounter(frontend);
           const index2 = incrementEventCounter(frontend);
-          sendClient(client, recordBeginBundle(frontend, index1, null));
-          sendClient(
+          traceClient(client, recordBeginBundle(frontend, index1, null));
+          traceClient(
             client,
             recordBeforeQuery(frontend, index2, {
               database: "postgres",
@@ -78,12 +78,12 @@ export default (dependencies) => {
           );
           callback = query.callback;
           query.callback = (error, result) => {
-            sendClient(
+            traceClient(
               client,
               recordAfterQuery(frontend, index2, { error: error || empty }),
             );
             callback(error, result);
-            sendClient(client, recordEndBundle(frontend, index1, null));
+            traceClient(client, recordEndBundle(frontend, index1, null));
           };
           apply(original, this, [query]);
           return result;

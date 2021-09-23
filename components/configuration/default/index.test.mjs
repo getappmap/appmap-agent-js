@@ -55,7 +55,7 @@ assertDeepEqual(extend("main", "foo.js", "/base"), "/base/foo.js");
 // port //
 
 assertDeepEqual(
-  extend("port", "unix-domain-socket", "/base"),
+  extend("trace-port", "unix-domain-socket", "/base"),
   "/base/unix-domain-socket",
 );
 

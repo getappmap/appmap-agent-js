@@ -13,7 +13,7 @@ const {
 
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
 
-const { openClient, promiseClientTermination, closeClient, sendClient } =
+const { openClient, promiseClientTermination, closeClient, traceClient } =
   Client(dependencies);
 // happy path //
 {
@@ -31,11 +31,12 @@ const { openClient, promiseClientTermination, closeClient, sendClient } =
   });
   const client = openClient({
     host: "localhost",
-    port: server.address().port,
+    "trace-port": server.address().port,
+    "track-port": 0,
   });
-  sendClient(client, 123);
+  traceClient(client, 123);
   client.socket.on("connect", () => {
-    sendClient(client, 456);
+    traceClient(client, 456);
     closeClient(client);
   });
   await promiseClientTermination(client);
@@ -49,7 +50,8 @@ const { openClient, promiseClientTermination, closeClient, sendClient } =
 {
   const client = openClient({
     host: "localhost",
-    port: `${tmpdir()}/${Math.random().toString(36).substring(2)}`,
+    "trace-port": `${tmpdir()}/${Math.random().toString(36).substring(2)}`,
+    "track-port": 0,
   });
   try {
     await promiseClientTermination(client);

@@ -10,7 +10,7 @@ export default (dependencies) => {
       promiseAgentTermination,
       closeAgent,
       runManually,
-      pilotAgent,
+      trackAgent,
       startTrack,
       stopTrack,
     },
@@ -59,7 +59,7 @@ export default (dependencies) => {
     /* c8 ignore start */
     startTrack(track, initialization = null) {
       start(this, track);
-      const { code } = pilotAgent(
+      const { code } = trackAgent(
         this.agent,
         "POST",
         `/${track}`,
@@ -69,7 +69,7 @@ export default (dependencies) => {
     }
     stopTrack(track, termination = null) {
       stop(this, track);
-      const { code, body } = pilotAgent(
+      const { code, body } = trackAgent(
         this.agent,
         "DELETE",
         `/${track}`,

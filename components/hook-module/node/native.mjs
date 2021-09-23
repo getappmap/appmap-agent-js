@@ -14,7 +14,7 @@ export default (dependencies) => {
   const {
     util: { assert },
     frontend: { instrument },
-    client: { sendClient },
+    client: { traceClient },
   } = dependencies;
   return {
     unhookNativeModule: (enabled) => {
@@ -50,7 +50,7 @@ export default (dependencies) => {
               content,
             );
             if (message !== null) {
-              sendClient(client, message);
+              traceClient(client, message);
             }
             content = code;
           }

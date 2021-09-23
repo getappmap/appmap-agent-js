@@ -4,7 +4,7 @@ export default (dependencies) => {
   const {
     util: { assignProperty },
     interpretation: { runScript },
-    client: { sendClient },
+    client: { traceClient },
     frontend: {
       getSerializationEmptyValue,
       getInstrumentationIdentifier,
@@ -41,7 +41,7 @@ export default (dependencies) => {
       runtime.empty = getSerializationEmptyValue(frontend);
       runtime.recordBeginApply = (_function, _this, _arguments) => {
         const index = incrementEventCounter(frontend);
-        sendClient(
+        traceClient(
           client,
           recordBeginApply(frontend, index, {
             function: _function,
@@ -52,15 +52,15 @@ export default (dependencies) => {
         return index;
       };
       runtime.recordEndApply = (index, error, result) => {
-        sendClient(client, recordEndApply(frontend, index, { error, result }));
+        traceClient(client, recordEndApply(frontend, index, { error, result }));
       };
       runtime.recordBeforeJump = () => {
         const index = incrementEventCounter(frontend);
-        sendClient(client, recordBeforeJump(frontend, index, null));
+        traceClient(client, recordBeforeJump(frontend, index, null));
         return index;
       };
       runtime.recordAfterJump = (index) => {
-        sendClient(client, recordAfterJump(frontend, index, null));
+        traceClient(client, recordAfterJump(frontend, index, null));
       };
       return [
         "recordBeginApply",

@@ -9,7 +9,6 @@ await runAsync(
   {
     enabled: true,
     mode: "remote",
-    protocol: "tcp",
     packages: { glob: "*" },
     hooks: {
       esm: true,

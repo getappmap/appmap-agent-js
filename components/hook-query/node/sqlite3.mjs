@@ -90,7 +90,7 @@ export default (dependencies) => {
       recordBeginBundle,
       recordEndBundle,
     },
-    client: { sendClient },
+    client: { traceClient },
   } = dependencies;
   return {
     unhookSqlite3: (backup) => {
@@ -117,8 +117,8 @@ export default (dependencies) => {
       const recordQuery = (sql, parameters, callback) => {
         const index1 = incrementEventCounter(frontend);
         const index2 = incrementEventCounter(frontend);
-        sendClient(client, recordBeginBundle(frontend, index1));
-        sendClient(
+        traceClient(client, recordBeginBundle(frontend, index1));
+        traceClient(
           client,
           recordBeforeQuery(frontend, index2, {
             database: "sqlite3",
@@ -128,7 +128,7 @@ export default (dependencies) => {
           }),
         );
         return function (...args) {
-          sendClient(
+          traceClient(
             client,
             recordAfterQuery(frontend, index2, {
               error: coalesce(args, 0, null) || empty,
@@ -137,7 +137,7 @@ export default (dependencies) => {
           try {
             return apply(callback, this, args);
           } finally {
-            sendClient(client, recordEndBundle(frontend, index1));
+            traceClient(client, recordEndBundle(frontend, index1));
           }
         };
       };

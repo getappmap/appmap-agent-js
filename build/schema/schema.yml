@@ -36,12 +36,6 @@
     - local
     - remote
 
-- $id: protocol
-  enum:
-    - tcp
-    - http1
-    - http2
-
 - $id: serialization-method
   enum:
     - toString
@@ -374,11 +368,15 @@
       properties:
         message: {type: boolean}
         appmap: {type: boolean}
-    protocol: {$ref: protocol}
+
     log: {$ref: log-level}
     host: {const: localhost}
-    port: {$ref: port}
-    remote-recording-port: {$ref: port}
+    trace-port: {$ref: port}
+    trace-protocol: {const: TCP}
+    track-port: {$ref: port}
+    track-protocol: {const: "HTTP/1.1"}
+    local-track-port: {$ref: port}
+    local-track-protocol: {const: "HTTP/1.1"}
     scenario: {type: string}
     scenarios:
       type: object
@@ -458,7 +456,7 @@
 - $id: cooked-configuration
   type: object
   additionalProperties: false
-  minProperties: 31
+  minProperties: 35
   properties:
     mode: {$ref: mode}
     validate:
@@ -496,11 +494,14 @@
         "^":
           type: array
           items: {$ref: cooked-child}
-    protocol: {$ref: protocol}
     log: {$ref: log-level}
     host: {const: localhost}
-    port: {$ref: absolute-port}
-    remote-recording-port: {$ref: absolute-port}
+    trace-port: {$ref: absolute-port}
+    trace-protocol: {const: TCP}
+    track-port: {$ref: absolute-port}
+    track-protocol: {const: "HTTP/1.1"}
+    local-track-port: {$ref: absolute-port}
+    local-track-protocol: {const: "HTTP/1.1"}
     recorder: {$ref: recorder}
     source: {type: boolean}
     hooks:

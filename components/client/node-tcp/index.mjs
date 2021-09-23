@@ -14,11 +14,11 @@ export default (dependencies) => {
   return {
     openClient: ({
       host,
-      port,
-      "remote-recording-port": remote_recording_port,
+      "trace-port": trace_port,
+      "track-port": track_port,
     }) => {
       const socket = connect(
-        ...(typeof port === "string" ? [port] : [port, host]),
+        ...(typeof trace_port === "string" ? [trace_port] : [trace_port, host]),
       );
       const session = createMessage(getUUID());
       const buffer = [session];
@@ -42,15 +42,15 @@ export default (dependencies) => {
         buffer,
         session,
         host,
-        port,
-        remote_recording_port,
+        trace_port,
+        track_port,
       };
     },
     promiseClientTermination: ({ termination }) => termination,
     closeClient: ({ socket }) => {
       socket.end();
     },
-    sendClient: ({ socket, buffer }, data) => {
+    traceClient: ({ socket, buffer }, data) => {
       if (data !== null) {
         const message = createMessage(stringify(data));
         if (buffer.length === 0) {
@@ -64,22 +64,15 @@ export default (dependencies) => {
       }
     },
     /* c8 ignore start */
-    pilotClient: generateDeadcode(
+    trackClient: generateDeadcode(
       "pilotClientAsync should be used instead of pilotClient for non-inline client",
     ),
-    pilotClientAsync: async (
-      { host, remote_recording_port, session },
+    trackClientAsync: async (
+      { host, track_port, session },
       method,
       path,
       body,
-    ) =>
-      requestAsync(
-        host,
-        remote_recording_port,
-        method,
-        `/${session}${path}`,
-        body,
-      ),
+    ) => requestAsync(host, track_port, method, `/${session}${path}`, body),
     /* c8 ignore stop */
   };
 };

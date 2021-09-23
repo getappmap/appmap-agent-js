@@ -22,14 +22,14 @@ export default (dependencies) => {
     closeClient: ({ resolve, buffer }) => {
       resolve(buffer);
     },
-    sendClient: ({ buffer }, data) => {
+    traceClient: ({ buffer }, data) => {
       buffer.push(data);
     },
-    pilotClient: generateDeadcode(
-      "pilotClient should not be called on spy client",
+    trackClient: generateDeadcode(
+      "trackClient should not be called on spy client",
     ),
-    pilotClientAsync: generateDeadcode(
-      "pilotClientAsync should not be called on spy client",
+    trackClientAsync: generateDeadcode(
+      "trackClientAsync should not be called on spy client",
     ),
   };
 };

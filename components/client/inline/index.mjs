@@ -22,7 +22,7 @@ export default ({
       const session = getUUID();
       const backend = createBackend();
       const responder = openResponder(bind(respondBackend, backend));
-      listenResponderAsync(responder, configuration["remote-recording-port"]);
+      listenResponderAsync(responder, configuration["track-port"]);
       openBackendSession(backend, session);
       return {
         responder,
@@ -36,17 +36,17 @@ export default ({
       closeBackendSession(backend, session).forEach(store);
       closeResponder(responder);
     },
-    sendClient: ({ backend, session }, message) => {
+    traceClient: ({ backend, session }, message) => {
       if (message !== null) {
         sendBackend(backend, session, message).forEach(store);
       }
     },
     /* c8 ignore start */
-    pilotClientAsync: ({ backend, session }, method, path, body) =>
+    trackClientAsync: ({ backend, session }, method, path, body) =>
       _Promise.resolve(
         respondBackend(backend, method, `/${session}${path}`, body),
       ),
-    pilotClient: ({ backend, session }, method, path, body) =>
+    trackClient: ({ backend, session }, method, path, body) =>
       respondBackend(backend, method, `/${session}${path}`, body),
     /* c8 ignore stop */
   };

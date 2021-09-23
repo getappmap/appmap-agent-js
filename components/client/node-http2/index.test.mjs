@@ -33,7 +33,7 @@ const testCaseAsync = async (port, respond, runAsync) => {
 };
 
 const testAsync = async () => {
-  const { createClient, executeClientAsync, interruptClient, sendClient } =
+  const { createClient, executeClientAsync, interruptClient, traceClient } =
     Client(await buildTestDependenciesAsync(import.meta.url));
   // happy path (unix-domain-socket) //
   {
@@ -48,7 +48,7 @@ const testAsync = async () => {
       async (port) => {
         const client = createClient({ host: "localhost", port });
         setTimeout(() => {
-          sendClient(client, 123);
+          traceClient(client, 123);
           interruptClient(client);
         });
         await executeClientAsync(client);
@@ -66,7 +66,7 @@ const testAsync = async () => {
     async (port) => {
       const client = createClient({ host: "localhost", port });
       setTimeout(() => {
-        sendClient(client, 123);
+        traceClient(client, 123);
       });
       try {
         await executeClientAsync(client);
@@ -87,7 +87,7 @@ const testAsync = async () => {
     async (port) => {
       const client = createClient({ host: "localhost", port });
       setTimeout(() => {
-        sendClient(client, 123);
+        traceClient(client, 123);
       });
       try {
         await executeClientAsync(client);

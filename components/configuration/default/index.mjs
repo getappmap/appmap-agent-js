@@ -191,21 +191,25 @@ export default (dependencies) => {
       extend: overwrite,
       normalize: identity,
     },
-    protocol: {
-      extend: overwrite,
-      normalize: identity,
-    },
     host: {
       extend: overwrite,
       normalize: identity,
     },
-    "remote-recording-port": {
+    "trace-port": {
       extend: overwrite,
       normalize: normalizePort,
     },
-    port: {
+    "trace-protocol": {
+      extend: overwrite,
+      normalize: identity,
+    },
+    "track-port": {
       extend: overwrite,
       normalize: normalizePort,
+    },
+    "track-protocol": {
+      extend: overwrite,
+      normalize: identity,
     },
     enabled: {
       extend: prepend,
@@ -325,10 +329,13 @@ export default (dependencies) => {
       recording: null,
       // provided by the user
       mode: "local",
-      protocol: "tcp",
       host: "localhost",
-      port: 0, // possibly overwritten by the agent
-      "remote-recording-port": 0,
+      "trace-port": 0, // possibly overwritten by the agent
+      "trace-protocol": "TCP",
+      "track-port": 0, // possibly overwritten by the agent
+      "track-protocol": "HTTP/1.1",
+      "local-track-port": 0,
+      "local-track-protocol": "HTTP/1.1",
       validate: {
         appmap: false,
         message: false,

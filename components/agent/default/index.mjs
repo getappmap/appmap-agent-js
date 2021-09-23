@@ -17,10 +17,10 @@ export default (dependencies) => {
     },
     client: {
       openClient,
-      pilotClient,
-      pilotClientAsync,
+      trackClient,
+      trackClientAsync,
       promiseClientTermination,
-      sendClient,
+      traceClient,
       closeClient,
     },
   } = dependencies;
@@ -31,7 +31,7 @@ export default (dependencies) => {
       client: openClient(configuration),
     }),
     promiseAgentTermination: async ({ configuration, client, frontend }) => {
-      sendClient(client, initializeFrontend(frontend));
+      traceClient(client, initializeFrontend(frontend));
       const hook_group = hookGroup(client, frontend, configuration);
       const hook_module = hookModule(client, frontend, configuration);
       const hook_apply = hookApply(client, frontend, configuration);
@@ -57,25 +57,25 @@ export default (dependencies) => {
         code1,
       );
       if (message !== null) {
-        sendClient(client, message);
+        traceClient(client, message);
       }
       return runScript(code2);
     },
     /* c8 ignore start */
-    pilotAgent: ({ client }, method, path, body) =>
-      pilotClient(client, method, path, body),
-    pilotAgentAsync: ({ client }, method, path, body) =>
-      pilotClientAsync(client, method, path, body),
+    trackAgent: ({ client }, method, path, body) =>
+      trackClient(client, method, path, body),
+    trackAgentAsync: ({ client }, method, path, body) =>
+      trackClientAsync(client, method, path, body),
     /* c8 ignore stop */
     closeAgent: ({ frontend, client }, termination) => {
-      sendClient(client, terminateFrontend(frontend, termination));
+      traceClient(client, terminateFrontend(frontend, termination));
       closeClient(client);
     },
     startTrack: ({ client, frontend }, track, initialization) => {
-      sendClient(client, startTrack(frontend, track, initialization));
+      traceClient(client, startTrack(frontend, track, initialization));
     },
     stopTrack: ({ client, frontend }, track, termination) => {
-      sendClient(client, stopTrack(frontend, track, termination));
+      traceClient(client, stopTrack(frontend, track, termination));
     },
   };
 };

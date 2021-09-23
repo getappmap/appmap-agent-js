@@ -41,14 +41,6 @@ export const schema = [
     ]
   },
   {
-    "$id": "protocol",
-    "enum": [
-      "tcp",
-      "http1",
-      "http2"
-    ]
-  },
-  {
     "$id": "serialization-method",
     "enum": [
       "toString",
@@ -690,20 +682,29 @@ export const schema = [
           }
         }
       },
-      "protocol": {
-        "$ref": "protocol"
-      },
       "log": {
         "$ref": "log-level"
       },
       "host": {
         "const": "localhost"
       },
-      "port": {
+      "trace-port": {
         "$ref": "port"
       },
-      "remote-recording-port": {
+      "trace-protocol": {
+        "const": "TCP"
+      },
+      "track-port": {
         "$ref": "port"
+      },
+      "track-protocol": {
+        "const": "HTTP/1.1"
+      },
+      "local-track-port": {
+        "$ref": "port"
+      },
+      "local-track-protocol": {
+        "const": "HTTP/1.1"
       },
       "scenario": {
         "type": "string"
@@ -889,7 +890,7 @@ export const schema = [
     "$id": "cooked-configuration",
     "type": "object",
     "additionalProperties": false,
-    "minProperties": 31,
+    "minProperties": 35,
     "properties": {
       "mode": {
         "$ref": "mode"
@@ -969,20 +970,29 @@ export const schema = [
           }
         }
       },
-      "protocol": {
-        "$ref": "protocol"
-      },
       "log": {
         "$ref": "log-level"
       },
       "host": {
         "const": "localhost"
       },
-      "port": {
+      "trace-port": {
         "$ref": "absolute-port"
       },
-      "remote-recording-port": {
+      "trace-protocol": {
+        "const": "TCP"
+      },
+      "track-port": {
         "$ref": "absolute-port"
+      },
+      "track-protocol": {
+        "const": "HTTP/1.1"
+      },
+      "local-track-port": {
+        "$ref": "absolute-port"
+      },
+      "local-track-protocol": {
+        "const": "HTTP/1.1"
       },
       "recorder": {
         "$ref": "recorder"

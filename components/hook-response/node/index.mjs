@@ -18,7 +18,7 @@ export default (dependencies) => {
       recordBeforeJump,
       recordAfterJump,
     },
-    client: { sendClient },
+    client: { traceClient },
   } = dependencies;
   return {
     unhookResponse: (backup) => backup.forEach(assignProperty),
@@ -45,7 +45,10 @@ export default (dependencies) => {
             url,
             route: null,
           };
-          sendClient(client, recordBeginResponse(frontend, bundle_index, data));
+          traceClient(
+            client,
+            recordBeginResponse(frontend, bundle_index, data),
+          );
           // Give time for express to populate the request
           nextTick(() => {
             if (
@@ -53,7 +56,7 @@ export default (dependencies) => {
               typeof coalesce(request, "route", _undefined) === "object" &&
               typeof coalesce(request.route, "path", _undefined) === "string"
             ) {
-              sendClient(
+              traceClient(
                 client,
                 recordBeginResponse(frontend, bundle_index, {
                   ...data,
@@ -66,7 +69,7 @@ export default (dependencies) => {
         const end = () => {
           const { statusCode: status, statusMessage: message } = response;
           const headers = response.getHeaders();
-          sendClient(
+          traceClient(
             client,
             recordEndResponse(frontend, bundle_index, {
               status,
@@ -88,7 +91,7 @@ export default (dependencies) => {
             jump_index !== null,
             "cannot resume http response because we are not in a jump state",
           );
-          sendClient(client, recordAfterJump(frontend, jump_index, null));
+          traceClient(client, recordAfterJump(frontend, jump_index, null));
           jump_index = null;
         };
         link.pause = (emitter, name) => {
@@ -100,7 +103,7 @@ export default (dependencies) => {
             end();
           } else {
             jump_index = incrementEventCounter(frontend);
-            sendClient(client, recordBeforeJump(frontend, jump_index, null));
+            traceClient(client, recordBeforeJump(frontend, jump_index, null));
           }
         };
         request.on("close", () => {

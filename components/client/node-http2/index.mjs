@@ -73,7 +73,7 @@ export default (dependencies) => {
         session.close();
       });
     },
-    sendClient: (session, data) => {
+    traceClient: (session, data) => {
       if (data !== null) {
         const stream = session.request(headers);
         stream._appmap_session = session;

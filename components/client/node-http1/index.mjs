@@ -111,7 +111,7 @@ export default (dependencies) => {
       setBox(running, false);
       resolveClientTermination(client);
     },
-    sendClient: (client, data) => {
+    traceClient: (client, data) => {
       const { running, pending, head, options } = client;
       if (getBox(running) && data !== null) {
         incrementCounter(pending);

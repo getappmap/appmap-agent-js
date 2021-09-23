@@ -51,22 +51,22 @@ export default (dependencies) => {
       const {
         scenario,
         scenarios,
-        port,
-        "remote-recording-port": remote_recording_port,
+        "trace-port": trace_port,
+        "track-port": track_port,
       } = configuration;
       const backend = createBackend();
       const responder = await openResponder(backend);
-      await listenResponderAsync(responder, remote_recording_port);
+      await listenResponderAsync(responder, track_port);
       const receptor = await openReceptorAsync(backend, {
         host: "localhost",
-        port,
+        port: trace_port,
       });
       configuration = {
         ...extendConfiguration(
           configuration,
           {
-            port: getReceptorPort(receptor),
-            "remote-recording-port": getResponderPort(responder),
+            "trace-port": getReceptorPort(receptor),
+            "track-port": getResponderPort(responder),
           },
           "/",
         ),
