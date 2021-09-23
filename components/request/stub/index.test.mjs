@@ -11,19 +11,17 @@ const {
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
 
 const {
-  openServer,
-  listenAsync,
-  promiseServerTermination,
-  closeServer,
-  getServerPort,
-  requestAsync,
+  openResponder,
+  listenResponderAsync,
+  promiseResponderTermination,
+  closeResponder,
+  getResponderPort,
 } = Request(dependencies);
 
 {
-  const server = openServer();
-  await listenAsync(server, 0);
-  getServerPort(server);
-  await requestAsync("host", "port", "method", "path", "body");
-  closeServer(server);
-  await promiseServerTermination(server);
+  const server = openResponder();
+  await listenResponderAsync(server, 0);
+  getResponderPort(server);
+  closeResponder(server);
+  await promiseResponderTermination(server);
 }

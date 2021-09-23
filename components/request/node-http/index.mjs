@@ -1,50 +1,111 @@
-import { createServer, request } from "http";
+import { createServer, request as createRequest } from "http";
 
-const { from: toBuffer } = Buffer;
+const { from: toBuffer, concat: concatBuffer } = Buffer;
 const _Promise = Promise;
 const _Set = Set;
 const _setTimeout = setTimeout;
 const { parse: parseJSON, stringify: stringifyJSON } = JSON;
 
-const parse = (body) => {
-  if (body === "") {
-    return null;
-  }
-  return parseJSON(body);
-};
-
-const stringify = (data) => {
-  if (data === null) {
-    return "";
-  }
-  return stringifyJSON(data);
-};
+const INVALID_HEADERS_MESSAGE =
+  "in the presence of a body, 'content-type' should be 'application/json; charset=UTF-8'";
 
 export default (dependencies) => {
+  const {
+    util: { noop, hasOwnProperty },
+  } = dependencies;
+  const parse = (body) => {
+    if (body === "") {
+      return null;
+    }
+    return parseJSON(body);
+  };
+  const stringify = (data) => {
+    if (data === null) {
+      return "";
+    }
+    return stringifyJSON(data);
+  };
+  const areValidHeaders = (headers) =>
+    (hasOwnProperty(headers, "content-length") &&
+      headers["content-length"] === "0") ||
+    (hasOwnProperty(headers, "content-type") &&
+      headers["content-type"] === "application/json; charset=UTF-8");
+  const empty_headers = {
+    "content-length": 0,
+  };
+  const createHeaders = ({ length }) => {
+    if (length === 0) {
+      return empty_headers;
+    }
+    return {
+      "content-type": "application/json; charset=UTF-8",
+      "content-length": length,
+    };
+  };
+  const respond = (onRequest, request, response) => {
+    if (areValidHeaders(request.headers)) {
+      let buffers = [];
+      request.on("data", (buffer) => {
+        buffers.push(buffer);
+      });
+      request.on("end", () => {
+        const { code, message, body } = onRequest(
+          request.method,
+          request.url,
+          parse(concatBuffer(buffers).toString("utf8")),
+        );
+        const buffer = toBuffer(stringify(body), "utf8");
+        response.writeHead(code, message, createHeaders(buffer));
+        response.end(buffer);
+      });
+    } else {
+      request.on("data", noop);
+      request.on("end", noop);
+      response.writeHead(400, INVALID_HEADERS_MESSAGE, empty_headers);
+      response.end();
+    }
+  };
+  const requestAsync = (host, port, method, path, data) =>
+    new Promise((resolve, reject) => {
+      const buffer = toBuffer(stringify(data), "utf8");
+      const request = createRequest({
+        host,
+        port: typeof port === "number" ? port : null,
+        socketPath: typeof port === "string" ? port : null,
+        method,
+        path,
+        headers: createHeaders(buffer),
+      });
+      request.end(buffer);
+      request.on("error", reject);
+      request.on("response", (response) => {
+        response.on("error", reject);
+        if (areValidHeaders(response.headers)) {
+          const buffers = [];
+          response.on("data", (buffer) => {
+            buffers.push(buffer);
+          });
+          response.on("end", () => {
+            resolve({
+              code: response.statusCode,
+              message: response.statusMessage,
+              body: parse(concatBuffer(buffers).toString("utf8")),
+            });
+          });
+        } else {
+          reject(new Error(INVALID_HEADERS_MESSAGE));
+        }
+      });
+    });
   return {
-    openResponder: (respond) => {
+    respond,
+    requestAsync,
+    openResponder: (onRequest) => {
       const server = createServer();
       server.unref();
       const sockets = new _Set();
-      server.on("request", (readable, writable) => {
-        const { method, url: path } = readable;
-        readable.setEncoding("utf8");
-        let body1 = "";
-        readable.on("data", (chunk) => {
-          body1 += chunk;
-        });
-        readable.on("end", () => {
-          const {
-            code,
-            message,
-            body: data2,
-          } = respond(method, path, parse(body1));
-          const buffer = toBuffer(stringify(data2), "utf8");
-          writable.writeHead(code, message, {
-            "content-length": buffer.length,
-          });
-          writable.end(buffer);
-        });
+      server.on("request", (request, response) => {
+        respond(onRequest, request, response);
       });
       server.on("connection", (socket) => {
         sockets.add(socket);
@@ -95,36 +156,5 @@ export default (dependencies) => {
         /* c8 ignore stop */
       }, 1000);
     },
-    requestAsync: (host, port, method, path, data) =>
-      new Promise((resolve, reject) => {
-        const buffer = toBuffer(stringify(data), "utf8");
-        const writable = request({
-          host,
-          port: typeof port === "number" ? port : null,
-          socketPath: typeof port === "string" ? port : null,
-          method,
-          path,
-          headers: {
-            "content-length": buffer.length,
-          },
-        });
-        writable.on("error", reject);
-        writable.on("response", (readable) => {
-          readable.setEncoding("utf8");
-          readable.on("error", reject);
-          let body = "";
-          readable.on("data", (chunk) => {
-            body += chunk;
-          });
-          readable.on("end", () => {
-            resolve({
-              code: readable.statusCode,
-              message: readable.statusMessage,
-              body: parse(body),
-            });
-          });
-        });
-        writable.end(buffer);
-      }),
   };
 };

@@ -1,2 +1,2 @@
 branches: [browser]
-dependencies: []
+dependencies: [util]

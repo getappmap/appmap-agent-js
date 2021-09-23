@@ -2,8 +2,15 @@ const _Promise = Promise;
 const _undefined = undefined;
 
 export default (dependencies) => {
+  const {
+    util: { generateDeadcode },
+  } = dependencies;
   return {
-    openServer: (respond) => {
+    respond: generateDeadcode("respond should not be called on request stub"),
+    requestAsync: generateDeadcode(
+      "requestAsync should not be called on request stub",
+    ),
+    openResponder: (respond) => {
       let resolve, reject;
       const termination = new Promise((_resolve, _reject) => {
         resolve = _resolve;
@@ -11,17 +18,11 @@ export default (dependencies) => {
       });
       return { termination, resolve, reject };
     },
-    promiseServerTermination: ({ termination }) => termination,
-    listenAsync: ({}) => _Promise.resolve(_undefined),
-    closeServer: ({ resolve }) => {
+    promiseResponderTermination: ({ termination }) => termination,
+    listenResponderAsync: ({}) => _Promise.resolve(_undefined),
+    closeResponder: ({ resolve }) => {
       resolve();
     },
-    getServerPort: ({}) => 0,
-    requestAsync: (host, port, method, path, body) =>
-      _Promise.resolve({
-        code: 500,
-        message: null,
-        body: null,
-      }),
+    getResponderPort: ({}) => 0,
   };
 };

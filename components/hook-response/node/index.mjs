@@ -20,6 +20,25 @@ export default (dependencies) => {
     },
     client: { traceClient },
   } = dependencies;
+  // const interceptTrack = (request, response, forward) => {
+  //   if (request.url.startsWith("/_appmap/")) {
+  //     let content = "";
+  //     request.on("data", (data) => {
+  //       content += data;
+  //     });
+  //     request.on("end", async () => {
+  //       const {code, message, body} = await trackClientAsync(
+  //         client,
+  //         request.method,
+  //         request.url.substring("/_appmap".length),
+  //         content === "" ? null : parse(content),
+  //       );
+  //       response.writeHead(code, message, body);
+  //     });
+  //   } else {
+  //     forward(request, response);
+  //   }
+  // }
   return {
     unhookResponse: (backup) => backup.forEach(assignProperty),
     hookResponse: (client, frontend, { hooks: { http } }) => {
