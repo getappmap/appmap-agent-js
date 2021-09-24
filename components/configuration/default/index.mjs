@@ -78,6 +78,9 @@ export default (dependencies) => {
   };
 
   const normalizeOutput = (output, nullable_directory) => {
+    if (output === null) {
+      return { target: "http" };
+    }
     if (typeof output === "string") {
       output = { directory: output };
     }
@@ -362,6 +365,7 @@ export default (dependencies) => {
       scenarios: {},
       log: "info",
       output: {
+        target: "file-system",
         directory: `${directory}/tmp/appmap`,
         basename: null,
         extension: ".appmap.json",

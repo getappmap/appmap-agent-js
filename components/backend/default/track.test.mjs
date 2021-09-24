@@ -19,15 +19,7 @@ const { createConfiguration } = await buildTestComponentAsync(
   "test",
 );
 
-const {
-  createServedTrack,
-  createStoredTrack,
-  isStoredTrack,
-  isServedTrack,
-  addTrackEvent,
-  serveTrack,
-  storeTrack,
-} = Track(dependencies);
+const { createTrack, compileTrack, addTrackEvent } = Track(dependencies);
 
 const configuration = createConfiguration("/cwd");
 
@@ -41,12 +33,13 @@ const termination = {
   status: 0,
 };
 
-assertEqual(isStoredTrack(createStoredTrack(initialization)), true);
-
-assertEqual(isServedTrack(createServedTrack(initialization)), true);
-
 {
-  const track = createServedTrack(initialization);
+  const track = createTrack(configuration, {
+    ...initialization,
+    data: {
+      output: null,
+    },
+  });
   addTrackEvent(track, {
     type: "begin",
     index: 1,
@@ -56,17 +49,17 @@ assertEqual(isServedTrack(createServedTrack(initialization)), true);
     },
   });
   const {
-    metadata: { test_status },
-  } = serveTrack(
-    track,
-    { files: [], configuration },
-    { ...termination, status: 1 },
-  );
+    path,
+    data: {
+      metadata: { test_status },
+    },
+  } = compileTrack(track, [], { ...termination, status: 1 });
+  assertEqual(path, null);
   assertEqual(test_status, "failed");
 }
 
 {
-  const track = createStoredTrack({
+  const track = createTrack(configuration, {
     ...initialization,
     path: "/root",
     data: {
@@ -76,6 +69,6 @@ assertEqual(isServedTrack(createServedTrack(initialization)), true);
       },
     },
   });
-  const { path } = storeTrack(track, { files: [], configuration }, termination);
+  const { path } = compileTrack(track, [], termination);
   assertEqual(path, "/root/directory/anonymous.extension");
 }

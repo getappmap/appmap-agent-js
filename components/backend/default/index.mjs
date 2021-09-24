@@ -60,12 +60,18 @@ export default (dependencies) => {
     respondBackend: ({ sessions }, method, path, body) => {
       const parts = /^\/([^/]+)(.*)/u.exec(path);
       if (parts === null) {
-        return { code: 400, message: "missing session segment", body: null };
+        return {
+          storables: [],
+          code: 400,
+          message: "missing session segment",
+          body: null,
+        };
       }
       let [, segment, rest] = parts;
       if (segment === "_appmap") {
         if (sessions.size === 0) {
           return {
+            storables: [],
             code: 404,
             message: "not active backend session found",
             body: null,
@@ -73,6 +79,7 @@ export default (dependencies) => {
         }
         if (sessions.size > 1) {
           return {
+            storables: [],
             code: 409,
             message: "multiple active backend session found",
             body: null,
@@ -80,7 +87,12 @@ export default (dependencies) => {
         }
         segment = sessions.keys().next().value;
       } else if (!sessions.has(segment)) {
-        return { code: 404, message: "backend session not found", body: null };
+        return {
+          storables: [],
+          code: 404,
+          message: "backend session not found",
+          body: null,
+        };
       }
       const session = sessions.get(segment);
       const response = respondSession(session, method, rest, body);

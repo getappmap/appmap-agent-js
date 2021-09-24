@@ -18,8 +18,9 @@ const appmap = new Appmap(
   extendConfiguration(
     createConfiguration("/repository"),
     {
-      packages: ["*"],
+      mode: "local",
       recorder: "manual",
+      packages: ["*"],
       hooks: { cjs: false, esm: false, apply: false, http: false },
     },
     "/repository",
@@ -27,10 +28,16 @@ const appmap = new Appmap(
 );
 
 const track = Appmap.getUniversalUniqueIdentifier();
-appmap.startStoredTrack(track);
+appmap.startTrack(track, { path: null, data: { output: null } });
 assertEqual(appmap.recordScript("/repository/main.js", "123;"), 123);
-appmap.stopStoredTrack(track);
+appmap.stopTrack(track);
+assertEqual(await appmap.claimTrackAsync(track), null);
 assertDeepEqual(
-  (await appmap.terminate()).map(([type]) => type),
-  ["initialize", "start", "file", "stop", "terminate"],
+  (await appmap.terminate()).map((element) => {
+    if (Array.isArray(element)) {
+      return element[0];
+    }
+    return element.method;
+  }),
+  ["initialize", "start", "file", "stop", "DELETE", "terminate"],
 );

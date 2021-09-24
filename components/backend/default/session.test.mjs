@@ -14,10 +14,8 @@ const {
 } = Assert;
 
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
-const { createConfiguration } = await buildTestComponentAsync(
-  "configuration",
-  "test",
-);
+const { createConfiguration, extendConfiguration } =
+  await buildTestComponentAsync("configuration", "test");
 const {
   openSession,
   sendSession,
@@ -26,12 +24,15 @@ const {
   respondSession,
 } = Session(dependencies);
 
-const configuration = createConfiguration("/cwd");
+const configuration = extendConfiguration(
+  createConfiguration("/cwd"),
+  { name: "name" },
+  null,
+);
 
 assertDeepEqual(closeSession(openSession()), []);
 
-// Storing //
-
+// sendSession //
 {
   const session = openSession();
   assertDeepEqual(sendSession(session, ["initialize", configuration]), []);
@@ -53,8 +54,16 @@ assertDeepEqual(closeSession(openSession()), []);
   assertDeepEqual(
     sendSession(session, [
       "start",
-      "track",
+      "track1",
       { path: null, data: { output: { basename: "basename" } } },
+    ]),
+    [],
+  );
+  assertDeepEqual(
+    sendSession(session, [
+      "start",
+      "track2",
+      { path: null, data: { output: null } },
     ]),
     [],
   );
@@ -93,10 +102,101 @@ assertDeepEqual(closeSession(openSession()), []);
     ]),
     [],
   );
+  const trace = {
+    version: "1.6.0",
+    metadata: {
+      name: "name",
+      app: null,
+      labels: [],
+      language: {
+        name: "ecmascript",
+        version: "2020",
+        engine: "engine@0.0.0",
+      },
+      frameworks: [],
+      client: {
+        name: "@appland/appmap-agent-js",
+        version: "0.0.0",
+        url: "https://github.com/applandinc/appmap-agent-js",
+      },
+      recorder: { name: "process" },
+      recording: null,
+      git: null,
+      test_status: "succeeded",
+      exception: null,
+    },
+    classMap: [
+      {
+        type: "package",
+        name: "main.js",
+        children: [
+          {
+            type: "class",
+            name: "main",
+            children: [
+              {
+                type: "function",
+                name: "()",
+                location: "main.js:1",
+                static: false,
+                labels: [],
+                comment: null,
+                source: null,
+              },
+            ],
+          },
+        ],
+      },
+    ],
+    events: [
+      {
+        event: "call",
+        thread_id: 0,
+        id: 1,
+        defined_class: "main",
+        method_id: "()",
+        path: "main.js",
+        lineno: 1,
+        static: false,
+        receiver: {
+          name: "this",
+          class: "string",
+          object_id: null,
+          value: "THIS",
+        },
+        parameters: [],
+      },
+      {
+        event: "return",
+        thread_id: 0,
+        id: 2,
+        parent_id: 1,
+        elapsed: 0,
+        return_value: {
+          name: "return",
+          class: "string",
+          object_id: null,
+          value: "RESULT",
+        },
+        exceptions: null,
+      },
+    ],
+  };
   assertDeepEqual(
     sendSession(session, [
       "stop",
-      "track",
+      "track2",
+      {
+        errors: [],
+        status: 0,
+      },
+    ]),
+    [],
+  );
+  assertDeepEqual(
+    sendSession(session, [
+      "stop",
+      "track1",
       {
         errors: [],
         status: 0,
@@ -105,86 +205,7 @@ assertDeepEqual(closeSession(openSession()), []);
     [
       {
         path: "/cwd/tmp/appmap/basename.appmap.json",
-        data: {
-          version: "1.6.0",
-          metadata: {
-            name: "basename",
-            app: null,
-            labels: [],
-            language: {
-              name: "ecmascript",
-              version: "2020",
-              engine: "engine@0.0.0",
-            },
-            frameworks: [],
-            client: {
-              name: "@appland/appmap-agent-js",
-              version: "0.0.0",
-              url: "https://github.com/applandinc/appmap-agent-js",
-            },
-            recorder: { name: "process" },
-            recording: null,
-            git: null,
-            test_status: "succeeded",
-            exception: null,
-          },
-          classMap: [
-            {
-              type: "package",
-              name: "main.js",
-              children: [
-                {
-                  type: "class",
-                  name: "main",
-                  children: [
-                    {
-                      type: "function",
-                      name: "()",
-                      location: "main.js:1",
-                      static: false,
-                      labels: [],
-                      comment: null,
-                      source: null,
-                    },
-                  ],
-                },
-              ],
-            },
-          ],
-          events: [
-            {
-              event: "call",
-              thread_id: 0,
-              id: 1,
-              defined_class: "main",
-              method_id: "()",
-              path: "main.js",
-              lineno: 1,
-              static: false,
-              receiver: {
-                name: "this",
-                class: "string",
-                object_id: null,
-                value: "THIS",
-              },
-              parameters: [],
-            },
-            {
-              event: "return",
-              thread_id: 0,
-              id: 2,
-              parent_id: 1,
-              elapsed: 0,
-              return_value: {
-                name: "return",
-                class: "string",
-                object_id: null,
-                value: "RESULT",
-              },
-              exceptions: null,
-            },
-          ],
-        },
+        data: trace,
       },
     ],
   );
@@ -199,14 +220,20 @@ assertDeepEqual(closeSession(openSession()), []);
     [],
   );
   assertDeepEqual(closeSession(session), []);
-  assertEqual(isEmptySession(session), true);
+  assertEqual(isEmptySession(session), false);
+  assertDeepEqual(respondSession(session, "DELETE", "/track2", null), {
+    code: 200,
+    message: null,
+    storables: [],
+    body: trace,
+  });
 }
 
-const removeMessage = ({ message, ...rest }) => rest;
-const getCode = ({ code }) => code;
-const getLength = ({ length }) => length;
-
+// respondSession //
 {
+  const removeMessage = ({ message, ...rest }) => rest;
+  const getCode = ({ code }) => code;
+  const getLength = ({ length }) => length;
   const session = openSession();
   // Malformed Request //
   assertEqual(getCode(respondSession(session, "PUT", "/track")), 400);
@@ -216,31 +243,37 @@ const getLength = ({ length }) => length;
   // Initialization //
   sendSession(session, ["initialize", configuration]);
   sendSession(session, ["start", "track1", { path: null, data: {} }]);
+
   // POST //
-  assertEqual(getCode(respondSession(session, "POST", "/track1")), 409);
-  assertEqual(getCode(respondSession(session, "POST", "/track2")), 200);
+  assertEqual(getCode(respondSession(session, "POST", "/track1", null)), 409);
+  assertEqual(getCode(respondSession(session, "POST", "/track2", null)), 200);
   // Get //
-  assertDeepEqual(removeMessage(respondSession(session, "GET", "/track1")), {
-    code: 200,
-    body: { enabled: false },
-  });
-  assertDeepEqual(removeMessage(respondSession(session, "GET", "/track2")), {
-    code: 200,
-    body: { enabled: true },
-  });
-  assertDeepEqual(removeMessage(respondSession(session, "GET", "/track3")), {
-    code: 200,
-    body: { enabled: false },
-  });
+  assertDeepEqual(
+    removeMessage(respondSession(session, "GET", "/track2", null)),
+    {
+      storables: [],
+      code: 200,
+      body: { enabled: true },
+    },
+  );
+  assertDeepEqual(
+    removeMessage(respondSession(session, "GET", "/track3", null)),
+    {
+      storables: [],
+      code: 200,
+      body: { enabled: false },
+    },
+  );
   // DELETE //
-  assertEqual(getCode(respondSession(session, "DELETE", "/track1")), 404);
-  assertEqual(getCode(respondSession(session, "DELETE", "/track2")), 200);
-  assertEqual(getCode(respondSession(session, "DELETE", "/track2")), 404);
+  assertEqual(getCode(respondSession(session, "DELETE", "/track1", null)), 200);
+  assertEqual(getCode(respondSession(session, "DELETE", "/track2", null)), 200);
+  assertEqual(getCode(respondSession(session, "DELETE", "/track2", null)), 404);
   // Termination //
-  assertEqual(getCode(respondSession(session, "POST", "/track3")), 200);
+  assertEqual(getCode(respondSession(session, "POST", "/track3", null)), 200);
+  sendSession(session, ["start", "track4", { path: null, data: {} }]);
   assertEqual(getLength(closeSession(session)), 1);
-  assertEqual(getCode(respondSession(session, "POST", "/track4")), 409);
+  assertEqual(getCode(respondSession(session, "POST", "/track5", null)), 409);
   assertEqual(isEmptySession(session), false);
-  assertEqual(getCode(respondSession(session, "DELETE", "/track3")), 200);
+  assertEqual(getCode(respondSession(session, "DELETE", "/track3", null)), 200);
   assertEqual(isEmptySession(session), true);
 }

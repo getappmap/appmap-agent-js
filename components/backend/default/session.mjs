@@ -13,30 +13,20 @@ export default (dependencies) => {
     log: { logDebug },
     "validate-message": { validateMessage },
   } = dependencies;
-  const {
-    createServedTrack,
-    createStoredTrack,
-    isServedTrack,
-    isStoredTrack,
-    serveTrack,
-    storeTrack,
-  } = Track(dependencies);
+  const { createTrack, compileTrack } = Track(dependencies);
   const terminateSession = (session, termination) => {
     const configuration = getBox(session.box);
     setBox(session.box, FINAL_STATE);
     if (typeof configuration === "number") {
       return EMPTY;
     }
-    const options = {
-      files: session.files,
-      configuration,
-    };
     const storables = [];
     for (const [key, track] of session.tracks) {
-      if (isStoredTrack(track)) {
-        storables.push(storeTrack(track, options, termination));
+      const { path, data } = compileTrack(track, session.files, termination);
+      if (path === null) {
+        session.traces.set(key, data);
       } else {
-        session.traces.set(key, serveTrack(track, options, termination));
+        storables.push({ path, data });
       }
     }
     return storables;
@@ -60,6 +50,7 @@ export default (dependencies) => {
       const parts = /^\/([^/]+)$/u.exec(path);
       if (parts === null) {
         return {
+          storables: EMPTY,
           code: 400,
           message: "malformed url: missing track segment",
           body: null,
@@ -67,11 +58,11 @@ export default (dependencies) => {
       }
       const [, segment] = parts;
       if (method === "POST") {
-        const state = getBox(session.box);
-        if (state === INITIAL_STATE) {
+        const configuration = getBox(session.box);
+        if (configuration === INITIAL_STATE) {
           return { code: 409, message: "not yet initialized", body: null };
         }
-        if (state === FINAL_STATE) {
+        if (configuration === FINAL_STATE) {
           return { code: 409, message: "already terminated", body: null };
         }
         if (session.tracks.has(segment) || session.traces.has(segment)) {
@@ -79,29 +70,31 @@ export default (dependencies) => {
         }
         session.tracks.set(
           segment,
-          createServedTrack({ path: null, data: {}, ...body }),
+          createTrack(configuration, {
+            path: null,
+            data: { output: null },
+            ...body,
+          }),
         );
         return { code: 200, message: null, body: null };
       }
       if (method === "GET") {
         return {
+          storables: EMPTY,
           code: 200,
           message: null,
           body: {
-            enabled:
-              session.tracks.has(segment) &&
-              isServedTrack(session.tracks.get(segment)),
+            enabled: session.tracks.has(segment),
           },
         };
       }
       if (method === "DELETE") {
         if (session.traces.has(segment)) {
-          const trace = session.traces.get(segment);
-          session.traces.delete(segment);
           return {
+            storables: EMPTY,
             code: 200,
             message: null,
-            body: trace,
+            body: take(session.traces, segment),
           };
         }
         if (session.tracks.has(segment)) {
@@ -109,33 +102,35 @@ export default (dependencies) => {
             typeof getBox(session.box) !== "number",
             "expected running state",
           );
-          if (isStoredTrack(session.tracks.get(segment))) {
+          const { path, data } = compileTrack(
+            take(session.tracks, segment),
+            session.files,
+            { errors: [], status: 0, ...body },
+          );
+          if (path === null) {
             return {
-              code: 404,
-              message: "track cannot be served",
-              body: null,
+              storables: EMPTY,
+              code: 200,
+              message: null,
+              body: data,
             };
           }
           return {
+            storables: [{ path, data }],
             code: 200,
             message: null,
-            body: serveTrack(
-              take(session.tracks, segment),
-              {
-                files: session.files,
-                configuration: getBox(session.box),
-              },
-              { errors: [], status: 0, ...body },
-            ),
+            body: null,
           };
         }
         return {
+          storables: EMPTY,
           code: 404,
           message: "missing trace",
           body: null,
         };
       }
       return {
+        storables: EMPTY,
         code: 400,
         message: "unsupported method",
         body: null,
@@ -168,13 +163,14 @@ export default (dependencies) => {
       }
       if (type === "start") {
         const [, key, initialization] = message;
+        const configuration = getBox(session.box);
         assert(
-          typeof getBox(session.box) !== "number",
+          typeof configuration !== "number",
           "exected running state (start)",
         );
         assert(!session.tracks.has(key), "duplicate (ongoing) track");
         assert(!session.traces.has(key), "duplicate (stopped) track");
-        session.tracks.set(key, createStoredTrack(initialization));
+        session.tracks.set(key, createTrack(configuration, initialization));
         return EMPTY;
       }
       if (type === "stop") {
@@ -184,20 +180,16 @@ export default (dependencies) => {
           "exected running state (stop)",
         );
         assert(session.tracks.has(key), "missing track");
-        assert(
-          isStoredTrack(session.tracks.get(key)),
-          "expected a stored track",
+        const { path, data } = compileTrack(
+          take(session.tracks, key),
+          session.files,
+          termination,
         );
-        return [
-          storeTrack(
-            take(session.tracks, key),
-            {
-              files: session.files,
-              configuration: getBox(session.box),
-            },
-            termination,
-          ),
-        ];
+        if (path !== null) {
+          return [{ path, data }];
+        }
+        session.traces.set(key, data);
+        return EMPTY;
       }
       if (type === "initialize") {
         const [, configuration] = message;

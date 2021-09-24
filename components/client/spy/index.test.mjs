@@ -12,20 +12,17 @@ const testAsync = async () => {
     promiseClientTermination,
     closeClient,
     traceClient,
-    trackClient,
     trackClientAsync,
   } = Client(await buildTestDependenciesAsync(import.meta.url));
   const client = openClient({});
   setTimeout(async () => {
     traceClient(client, "data");
-    trackClient(client, "GET", "/sync", null);
-    await trackClientAsync(client, "GET", "/async", null);
+    await trackClientAsync(client, "GET", "/path", null);
     closeClient(client);
   });
   assertDeepEqual(await promiseClientTermination(client), [
     "data",
-    { method: "GET", path: "/sync", body: null },
-    { method: "GET", path: "/async", body: null },
+    { method: "GET", path: "/path", body: null },
   ]);
 };
 

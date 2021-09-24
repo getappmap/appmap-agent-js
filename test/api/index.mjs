@@ -32,9 +32,9 @@ const require = createRequire(`${directory}/dummy.mjs`);
 const appmap = createAppmap(
   directory,
   {
+    name: "name",
     output: {
       directory: ".",
-      basename: "basename",
     },
     packages: "*",
     hooks: {
@@ -51,8 +51,8 @@ const appmap = createAppmap(
   directory,
 );
 
-appmap.startStoredTrack("track1");
-appmap.startTrack("track2");
+appmap.startTrack("track1", {path:null, data:{output:null}});
+appmap.startTrack("track2", {path:null, data:{output:{basename:"basename"}}});
 
 await writeFile(
   `${directory}/common.js`,
@@ -71,11 +71,13 @@ await writeFile(
   assertEqual(script(), "SCRIPT");
 }
 
-const trace2 = appmap.stopTrack("track2");
-appmap.stopStoredTrack("track1");
+appmap.stopTrack("track1");
+appmap.stopTrack("track2");
+const trace1 = await appmap.claimTrackAsync("track1");
+
 appmap.terminate();
 
-const trace1 = parseJSON(
+const trace2 = parseJSON(
   await readFile(`${directory}/basename.appmap.json`, "utf8"),
 );
 

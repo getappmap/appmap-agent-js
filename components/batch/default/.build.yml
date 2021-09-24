@@ -1,5 +1,6 @@
 branches: [node]
 dependencies:
+  - storage
   - backend
   - util
   - expect

@@ -5,7 +5,8 @@ const { entries: toEntries } = Object;
 export default (dependencies) => {
   const {
     util: { assert },
-    backend: { createBackend },
+    backend: { createBackend, respondBackend },
+    storage: { store },
     expect: { expectSuccessAsync, expectSuccess },
     log: { logDebug, logInfo, logWarning },
     spawn: { spawn },
@@ -55,7 +56,18 @@ export default (dependencies) => {
         "track-port": track_port,
       } = configuration;
       const backend = createBackend();
-      const responder = await openResponder(backend);
+      /* c8 ignore start */
+      const responder = await openResponder(async (method, path, body) => {
+        const { storables, ...response } = respondBackend(
+          backend,
+          method,
+          path,
+          body,
+        );
+        storables.forEach(store);
+        return response;
+      });
+      /* c8 ignore stop */
       await listenResponderAsync(responder, track_port);
       const receptor = await openReceptorAsync(backend, {
         host: "localhost",

@@ -50,12 +50,16 @@ export default (dependencies) => {
       }
     },
     /* c8 ignore start */
-    trackClientAsync: ({ backend, session }, method, path, body) =>
-      _Promise.resolve(
-        respondBackend(backend, method, `/${session}${path}`, body),
-      ),
-    trackClient: ({ backend, session }, method, path, body) =>
-      respondBackend(backend, method, `/${session}${path}`, body),
+    trackClientAsync: async ({ backend, session }, method, path, body) => {
+      const { storables, ...response } = respondBackend(
+        backend,
+        method,
+        `/${session}${path}`,
+        body,
+      );
+      storables.forEach(store);
+      return response;
+    },
     /* c8 ignore stop */
   };
 };

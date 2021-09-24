@@ -8,7 +8,6 @@ const { stringify } = JSON;
 export default (dependencies) => {
   const {
     uuid: { getUUID },
-    util: { generateDeadcode },
     request: {
       requestAsync,
       openResponder,
@@ -82,9 +81,6 @@ export default (dependencies) => {
       }
     },
     /* c8 ignore start */
-    trackClient: generateDeadcode(
-      "pilotClientAsync should be used instead of pilotClient for non-inline client",
-    ),
     trackClientAsync: async (
       { host, track_port, session },
       method,

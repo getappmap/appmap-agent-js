@@ -36,6 +36,11 @@
     - local
     - remote
 
+- $id: target
+  enum:
+    - file-system
+    - http
+
 - $id: serialization-method
   enum:
     - toString
@@ -437,10 +442,12 @@
     pruning: {type: boolean}
     output:
       anyOf:
+        - const: null
         - type: string
         - type: object
           additionalProperties: false
           properties:
+            target: {$ref: target}
             directory: {$ref: path}
             basename: {$ref: basename}
             extension: {$ref: extension}
@@ -579,8 +586,9 @@
     output:
       type: object
       additionalProperties: false
-      required: [directory, basename, extension]
+      required: [target, directory, basename, extension]
       properties:
+        target: {$ref: target}
         directory: {$ref: absolute-path}
         basename:
           anyOf:

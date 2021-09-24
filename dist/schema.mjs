@@ -41,6 +41,13 @@ export const schema = [
     ]
   },
   {
+    "$id": "target",
+    "enum": [
+      "file-system",
+      "http"
+    ]
+  },
+  {
     "$id": "serialization-method",
     "enum": [
       "toString",
@@ -847,12 +854,18 @@ export const schema = [
       "output": {
         "anyOf": [
           {
+            "const": null
+          },
+          {
             "type": "string"
           },
           {
             "type": "object",
             "additionalProperties": false,
             "properties": {
+              "target": {
+                "$ref": "target"
+              },
               "directory": {
                 "$ref": "path"
               },
@@ -1169,11 +1182,15 @@ export const schema = [
         "type": "object",
         "additionalProperties": false,
         "required": [
+          "target",
           "directory",
           "basename",
           "extension"
         ],
         "properties": {
+          "target": {
+            "$ref": "target"
+          },
           "directory": {
             "$ref": "absolute-path"
           },

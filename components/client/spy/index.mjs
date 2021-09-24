@@ -23,10 +23,6 @@ export default (dependencies) => {
     traceClient: ({ buffer }, data) => {
       buffer.push(data);
     },
-    trackClient: ({ buffer }, method, path, body) => {
-      buffer.push({ method, path, body });
-      return { code: 200, message: "ok", body: null };
-    },
     trackClientAsync: async ({ buffer }, method, path, body) => {
       buffer.push({ method, path, body });
       return { code: 200, message: "ok", body: null };
