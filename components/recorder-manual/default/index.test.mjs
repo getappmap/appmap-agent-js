@@ -28,7 +28,7 @@ const appmap = new Appmap(
 
 const track = Appmap.getUniversalUniqueIdentifier();
 appmap.startStoredTrack(track);
-assertEqual(appmap.runScript("/repository/main.js", "123;"), 123);
+assertEqual(appmap.recordScript("/repository/main.js", "123;"), 123);
 appmap.stopStoredTrack(track);
 assertDeepEqual(
   (await appmap.terminate()).map(([type]) => type),

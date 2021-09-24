@@ -13,7 +13,7 @@ const { createConfiguration, extendConfiguration } =
   await buildTestComponentAsync("configuration", "test");
 const {
   openAgent,
-  runManually,
+  recordAgentScript,
   promiseAgentTermination,
   closeAgent,
   startTrack,
@@ -38,7 +38,7 @@ const agent = openAgent(
 );
 setTimeout(() => {
   startTrack(agent, "track", {});
-  assertEqual(runManually(agent, "/main.js", "123;"), 123);
+  assertEqual(recordAgentScript(agent, "/main.js", "123;"), 123);
   stopTrack(agent, "track", { errors: [], status: 0 });
   closeAgent(agent, { errors: [], status: 123 });
 });

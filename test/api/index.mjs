@@ -28,6 +28,7 @@ await writeFile(
   "utf8",
 );
 
+const require = createRequire(`${directory}/dummy.mjs`);
 const appmap = createAppmap(
   directory,
   {
@@ -53,15 +54,22 @@ const appmap = createAppmap(
 appmap.startStoredTrack("track1");
 appmap.startTrack("track2");
 
-const require = createRequire(`${directory}/dummy.mjs`);
 await writeFile(
-  `${directory}/main.js`,
-  `exports.main = function main () { return "MAIN"; }`,
+  `${directory}/common.js`,
+  `exports.common = function common () { return "COMMON"; }`,
   "utf8",
 );
-
-const { main } = require("./main.js");
-assertEqual(main(), "MAIN");
+{
+  const { common } = require("./common.js");
+  assertEqual(common(), "COMMON");
+}
+{
+  const script = appmap.recordScript(
+    `${directory}/script.js`,
+    `(function script () { return "SCRIPT"; });`,
+  );
+  assertEqual(script(), "SCRIPT");
+}
 
 const trace2 = appmap.stopTrack("track2");
 appmap.stopStoredTrack("track1");
@@ -75,5 +83,5 @@ assertDeepEqual(trace1, trace2);
 
 assertDeepEqual(
   trace1.events.map(({ event }) => event),
-  ["call", "return"],
+  ["call", "return", "call", "return"],
 );

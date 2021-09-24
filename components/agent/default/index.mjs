@@ -49,7 +49,7 @@ export default (dependencies) => {
         unhookQuery(hook_query);
       }
     },
-    runManually: ({ frontend, client }, path, code1) => {
+    recordAgentScript: ({ frontend, client }, path, code1) => {
       const { message, code: code2 } = instrument(
         frontend,
         "script",

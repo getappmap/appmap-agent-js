@@ -9,7 +9,7 @@ export default (dependencies) => {
       openAgent,
       promiseAgentTermination,
       closeAgent,
-      runManually,
+      recordAgentScript,
       trackAgent,
       startTrack,
       stopTrack,
@@ -53,8 +53,9 @@ export default (dependencies) => {
       this.running = true;
       this.promise = promiseAgentTermination(this.agent);
     }
-    runScript(path, code) {
-      return runManually(this.agent, path, code);
+    recordScript(path, code) {
+      expect(path[0] === "/", "execpted an absolute path but got: %j", path);
+      return recordAgentScript(this.agent, path, code);
     }
     /* c8 ignore start */
     startTrack(track, initialization = null) {
@@ -75,7 +76,7 @@ export default (dependencies) => {
         `/${track}`,
         termination,
       );
-      assert(code === 200, "unexpect http error status");
+      assert(code === 200, "unexpected http error status");
       return body;
     }
     /* c8 ignore stop */
