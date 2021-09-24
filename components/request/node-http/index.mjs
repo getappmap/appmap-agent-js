@@ -26,8 +26,8 @@ export default (dependencies) => {
     return stringifyJSON(data);
   };
   const areValidHeaders = (headers) =>
-    (hasOwnProperty(headers, "content-length") &&
-      headers["content-length"] === "0") ||
+    !hasOwnProperty(headers, "content-length") ||
+    headers["content-length"] === "0" ||
     (hasOwnProperty(headers, "content-type") &&
       headers["content-type"] === "application/json; charset=UTF-8");
   const empty_headers = {

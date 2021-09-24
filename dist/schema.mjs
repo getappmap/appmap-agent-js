@@ -706,6 +706,12 @@ export const schema = [
       "local-track-protocol": {
         "const": "HTTP/1.1"
       },
+      "intercept-track-port": {
+        "$ref": "port"
+      },
+      "intercept-track-protocol": {
+        "const": "HTTP/1.1"
+      },
       "scenario": {
         "type": "string"
       },
@@ -992,6 +998,12 @@ export const schema = [
         "$ref": "absolute-port"
       },
       "local-track-protocol": {
+        "const": "HTTP/1.1"
+      },
+      "intercept-track-port": {
+        "$ref": "absolute-port"
+      },
+      "intercept-track-protocol": {
         "const": "HTTP/1.1"
       },
       "recorder": {

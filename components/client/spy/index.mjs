@@ -1,9 +1,7 @@
 const _Promise = Promise;
 
 export default (dependencies) => {
-  const {
-    util: { generateDeadcode },
-  } = dependencies;
+  const {} = dependencies;
   return {
     openClient: ({}) => {
       let resolve, reject;
@@ -25,11 +23,13 @@ export default (dependencies) => {
     traceClient: ({ buffer }, data) => {
       buffer.push(data);
     },
-    trackClient: generateDeadcode(
-      "trackClient should not be called on spy client",
-    ),
-    trackClientAsync: generateDeadcode(
-      "trackClientAsync should not be called on spy client",
-    ),
+    trackClient: ({ buffer }, method, path, body) => {
+      buffer.push({ method, path, body });
+      return { code: 200, message: "ok", body: null };
+    },
+    trackClientAsync: async ({ buffer }, method, path, body) => {
+      buffer.push({ method, path, body });
+      return { code: 200, message: "ok", body: null };
+    },
   };
 };

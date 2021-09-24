@@ -2,6 +2,7 @@ branches: [test, node]
 dependencies:
   - util
   - expect
-  - emitter
+  - patch
+  - request
   - frontend
   - client

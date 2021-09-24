@@ -211,6 +211,22 @@ export default (dependencies) => {
       extend: overwrite,
       normalize: identity,
     },
+    "local-track-port": {
+      extend: overwrite,
+      normalize: normalizePort,
+    },
+    "local-track-protocol": {
+      extend: overwrite,
+      normalize: identity,
+    },
+    "intercept-track-port": {
+      extend: overwrite,
+      normalize: normalizePort,
+    },
+    "intercept-track-protocol": {
+      extend: overwrite,
+      normalize: identity,
+    },
     enabled: {
       extend: prepend,
       normalize: normalizeEnabled,
@@ -336,6 +352,8 @@ export default (dependencies) => {
       "track-protocol": "HTTP/1.1",
       "local-track-port": 0,
       "local-track-protocol": "HTTP/1.1",
+      "intercept-track-port": 0,
+      "intercept-track-protocol": "HTTP/1.1",
       validate: {
         appmap: false,
         message: false,

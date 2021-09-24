@@ -377,6 +377,8 @@
     track-protocol: {const: "HTTP/1.1"}
     local-track-port: {$ref: port}
     local-track-protocol: {const: "HTTP/1.1"}
+    intercept-track-port: {$ref: port}
+    intercept-track-protocol: {const: "HTTP/1.1"}
     scenario: {type: string}
     scenarios:
       type: object
@@ -502,6 +504,8 @@
     track-protocol: {const: "HTTP/1.1"}
     local-track-port: {$ref: absolute-port}
     local-track-protocol: {const: "HTTP/1.1"}
+    intercept-track-port: {$ref: absolute-port}
+    intercept-track-protocol: {const: "HTTP/1.1"}
     recorder: {$ref: recorder}
     source: {type: boolean}
     hooks:

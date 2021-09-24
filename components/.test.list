@@ -7,7 +7,6 @@
 - validate
 - validate-message
 - validate-appmap
-- emitter
 - patch
 - * uuid
   * time
@@ -27,14 +26,14 @@
   * interpretation
   * serialization
 - frontend
-- * - hook
-    - * hook-apply
-      * hook-group
-      * hook-module
-      * hook-request
-      * hook-response
-      * hook-query
-  * client
+- client
+- hook
+- * hook-apply
+  * hook-group
+  * hook-module
+  * hook-request
+  * hook-response
+  * hook-query
 - agent
 - recorder-boot
 - recorder-manual
