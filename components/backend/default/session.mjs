@@ -60,13 +60,28 @@ export default (dependencies) => {
       if (method === "POST") {
         const configuration = getBox(session.box);
         if (configuration === INITIAL_STATE) {
-          return { code: 409, message: "not yet initialized", body: null };
+          return {
+            storables: EMPTY,
+            code: 409,
+            message: "not yet initialized",
+            body: null,
+          };
         }
         if (configuration === FINAL_STATE) {
-          return { code: 409, message: "already terminated", body: null };
+          return {
+            storables: EMPTY,
+            code: 409,
+            message: "already terminated",
+            body: null,
+          };
         }
         if (session.tracks.has(segment) || session.traces.has(segment)) {
-          return { code: 409, message: "duplicate track", body: null };
+          return {
+            storables: EMPTY,
+            code: 409,
+            message: "duplicate track",
+            body: null,
+          };
         }
         session.tracks.set(
           segment,
@@ -76,7 +91,7 @@ export default (dependencies) => {
             ...body,
           }),
         );
-        return { code: 200, message: null, body: null };
+        return { storables: EMPTY, code: 200, message: null, body: null };
       }
       if (method === "GET") {
         return {
