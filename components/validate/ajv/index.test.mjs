@@ -9,8 +9,8 @@ const testAsync = async () => {
     await buildTestDependenciesAsync(import.meta.url),
   );
   assertThrows(() => {
-    validateConfiguration({ protocol: "invalid-protocol" });
-  }, /^AppmapError: invalid configuration >> protocol\/enum/);
+    validateConfiguration({ mode: "invalid-mode" });
+  }, /^AppmapError: invalid configuration >> mode\/enum/u);
   assertThrows(() => {
     validateConfiguration({ engine: "invalid-engine-format" });
   }, /^AppmapError: invalid configuration\n/);
