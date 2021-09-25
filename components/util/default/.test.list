@@ -4,6 +4,7 @@
   * - print.mjs
     - format.mjs
   * counter.mjs
+  * either.mjs
   * function.mjs
   * object.mjs
   * path.mjs

@@ -2,6 +2,7 @@ import * as Array from "./array.mjs";
 import * as Assert from "./assert.mjs";
 import * as Box from "./box.mjs";
 import * as Counter from "./counter.mjs";
+import * as Either from "./either.mjs";
 import * as Format from "./format.mjs";
 import * as Function from "./function.mjs";
 import * as Object from "./object.mjs";
@@ -15,6 +16,7 @@ export default (dependencies) => {
     ...Assert,
     ...Box,
     ...Counter,
+    ...Either,
     ...Format,
     ...Function,
     ...Object,
