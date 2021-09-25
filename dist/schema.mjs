@@ -116,7 +116,7 @@ export const schema = [
   {
     "$id": "port-number",
     "type": "integer",
-    "minimum": 0,
+    "minimum": 1,
     "maximum": 65535
   },
   {
@@ -696,25 +696,56 @@ export const schema = [
         "const": "localhost"
       },
       "trace-port": {
-        "$ref": "port"
+        "anyOf": [
+          {
+            "const": 0
+          },
+          {
+            "$ref": "port"
+          }
+        ]
       },
       "trace-protocol": {
         "const": "TCP"
       },
       "track-port": {
-        "$ref": "port"
+        "anyOf": [
+          {
+            "const": null
+          },
+          {
+            "const": 0
+          },
+          {
+            "$ref": "port"
+          }
+        ]
       },
       "track-protocol": {
         "const": "HTTP/1.1"
       },
       "local-track-port": {
-        "$ref": "port"
+        "anyOf": [
+          {
+            "const": null
+          },
+          {
+            "$ref": "port"
+          }
+        ]
       },
       "local-track-protocol": {
         "const": "HTTP/1.1"
       },
       "intercept-track-port": {
-        "$ref": "port"
+        "anyOf": [
+          {
+            "const": null
+          },
+          {
+            "$ref": "port"
+          }
+        ]
       },
       "intercept-track-protocol": {
         "const": "HTTP/1.1"
@@ -996,25 +1027,56 @@ export const schema = [
         "const": "localhost"
       },
       "trace-port": {
-        "$ref": "absolute-port"
+        "anyOf": [
+          {
+            "const": 0
+          },
+          {
+            "$ref": "absolute-port"
+          }
+        ]
       },
       "trace-protocol": {
         "const": "TCP"
       },
       "track-port": {
-        "$ref": "absolute-port"
+        "anyOf": [
+          {
+            "const": 0
+          },
+          {
+            "const": null
+          },
+          {
+            "$ref": "absolute-port"
+          }
+        ]
       },
       "track-protocol": {
         "const": "HTTP/1.1"
       },
       "local-track-port": {
-        "$ref": "absolute-port"
+        "anyOf": [
+          {
+            "const": null
+          },
+          {
+            "$ref": "absolute-port"
+          }
+        ]
       },
       "local-track-protocol": {
         "const": "HTTP/1.1"
       },
       "intercept-track-port": {
-        "$ref": "absolute-port"
+        "anyOf": [
+          {
+            "const": null
+          },
+          {
+            "$ref": "absolute-port"
+          }
+        ]
       },
       "intercept-track-protocol": {
         "const": "HTTP/1.1"

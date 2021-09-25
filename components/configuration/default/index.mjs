@@ -353,9 +353,9 @@ export default (dependencies) => {
       "trace-protocol": "TCP",
       "track-port": 0, // possibly overwritten by the agent
       "track-protocol": "HTTP/1.1",
-      "local-track-port": 0,
+      "local-track-port": null,
       "local-track-protocol": "HTTP/1.1",
-      "intercept-track-port": 0,
+      "intercept-track-port": null,
       "intercept-track-protocol": "HTTP/1.1",
       validate: {
         appmap: false,
