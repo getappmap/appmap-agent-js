@@ -18,25 +18,26 @@ export default (dependencies) => {
     },
   } = dependencies;
   return {
-    openClient: (configuration) => {
+    openClient: ({ "local-track-port": local_track_port }) => {
       const session = getUUID();
       const backend = createBackend();
-      /* c8 ignore start */
       const responder = openResponder((method, path, body) =>
         _Promise.resolve(
           respondBackend(backend, method, `/${session}${path}`, body),
         ),
       );
-      /* c8 ignore stop */
-      if (configuration["local-track-port"] !== 0) {
-        listenResponderAsync(responder, configuration["local-track-port"]);
-      }
       openBackendSession(backend, session);
       return {
+        local_track_port,
         responder,
         backend,
         session,
       };
+    },
+    listenClientAsync: async ({ responder, local_track_port }) => {
+      if (local_track_port !== null) {
+        await listenResponderAsync(responder, local_track_port);
+      }
     },
     promiseClientTermination: ({ responder }) =>
       promiseResponderTermination(responder),
@@ -49,7 +50,6 @@ export default (dependencies) => {
         sendBackend(backend, session, message).forEach(store);
       }
     },
-    /* c8 ignore start */
     trackClientAsync: async ({ backend, session }, method, path, body) => {
       const { storables, ...response } = respondBackend(
         backend,
@@ -60,6 +60,5 @@ export default (dependencies) => {
       storables.forEach(store);
       return response;
     },
-    /* c8 ignore stop */
   };
 };

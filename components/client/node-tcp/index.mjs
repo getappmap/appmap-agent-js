@@ -7,6 +7,7 @@ const { stringify } = JSON;
 
 export default (dependencies) => {
   const {
+    util: { assert },
     uuid: { getUUID },
     request: {
       requestAsync,
@@ -31,15 +32,12 @@ export default (dependencies) => {
       const responder = openResponder((method, path, body) =>
         requestAsync(host, track_port, method, `/${session}${path}`, body),
       );
-      if (local_track_port !== 0) {
-        listenResponderAsync(responder, local_track_port);
-      }
       socket.on("connect", () => {
         socket.unref();
         const {
           _handle: { fd },
         } = socket;
-        // assert(fd > 0, "invalid socket fd after connect");
+        assert(fd > 0, "invalid socket fd after connect");
         for (const message of buffer) {
           writeSync(fd, message);
         }
@@ -57,7 +55,13 @@ export default (dependencies) => {
         host,
         trace_port,
         track_port,
+        local_track_port,
       };
+    },
+    listenClientAsync: async ({ local_track_port, responder }) => {
+      if (local_track_port !== null) {
+        await listenResponderAsync(responder, local_track_port);
+      }
     },
     promiseClientTermination: async ({ termination, responder }) => {
       await termination;

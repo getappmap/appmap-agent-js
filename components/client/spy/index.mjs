@@ -1,7 +1,10 @@
 const _Promise = Promise;
+const _undefined = undefined;
 
 export default (dependencies) => {
-  const {} = dependencies;
+  const {
+    util: { constant },
+  } = dependencies;
   return {
     openClient: ({}) => {
       let resolve, reject;
@@ -20,6 +23,7 @@ export default (dependencies) => {
     closeClient: ({ resolve, buffer }) => {
       resolve(buffer);
     },
+    listenClientAsync: constant(_Promise.resolve(_undefined)),
     traceClient: ({ buffer }, data) => {
       buffer.push(data);
     },

@@ -68,7 +68,7 @@ assertDeepEqual(
   await testHookAsync(
     hookResponse,
     unhookResponse,
-    { hooks: { http: false }, "intercept-track-port": 0 },
+    { hooks: { http: false }, "intercept-track-port": null },
     async () => {
       const server = Http.createServer();
       server.on("request", async (request, response) => {

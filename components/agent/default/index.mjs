@@ -17,7 +17,7 @@ export default (dependencies) => {
     },
     client: {
       openClient,
-      trackClient,
+      listenClientAsync,
       trackClientAsync,
       promiseClientTermination,
       traceClient,
@@ -38,6 +38,7 @@ export default (dependencies) => {
       const hook_request = hookRequest(client, frontend, configuration);
       const hook_response = hookResponse(client, frontend, configuration);
       const hook_query = hookQuery(client, frontend, configuration);
+      await listenClientAsync(client);
       try {
         return await promiseClientTermination(client);
       } finally {
@@ -62,8 +63,6 @@ export default (dependencies) => {
       return runScript(code2);
     },
     /* c8 ignore start */
-    trackAgent: ({ client }, method, path, body) =>
-      trackClient(client, method, path, body),
     trackAgentAsync: ({ client }, method, path, body) =>
       trackClientAsync(client, method, path, body),
     /* c8 ignore stop */

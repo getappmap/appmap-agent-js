@@ -186,11 +186,11 @@ export default (dependencies) => {
       frontend,
       { "intercept-track-port": intercept_track_port, hooks: { http } },
     ) => {
-      if (!http && intercept_track_port === 0) {
+      if (!http && intercept_track_port === null) {
         return [];
       }
       const interceptTraffic =
-        intercept_track_port === 0 ? constant(false) : interceptTrackTraffic;
+        intercept_track_port === null ? constant(false) : interceptTrackTraffic;
       const handleTraffic = http ? spyTraffic : forwardTraffic;
       const backup = [Http, Https].flatMap((object) =>
         ["Server", "createServer"].map((key) => ({
