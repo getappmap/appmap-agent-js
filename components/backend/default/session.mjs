@@ -11,8 +11,7 @@ const CLOSED_STATE = 3;
 
 const EMPTY = [];
 
-const PROTOTYPE = {
-  __proto__: null,
+const DEFAULT_RESPONSE = {
   storables: [],
   code: 200,
   message: null,
@@ -65,7 +64,7 @@ export default (dependencies) => {
       const parts = /^\/([^/]+)$/u.exec(path);
       if (parts === null) {
         return {
-          __proto__: PROTOTYPE,
+          ...DEFAULT_RESPONSE,
           code: 400,
           message: "malformed url: missing track segment",
         };
@@ -75,7 +74,7 @@ export default (dependencies) => {
         const state = getBox(session.state);
         if (MESSAGES.has(state)) {
           return {
-            __proto__: PROTOTYPE,
+            ...DEFAULT_RESPONSE,
             code: 409,
             message: MESSAGES.get(state),
           };
@@ -83,7 +82,7 @@ export default (dependencies) => {
         assert(state === RUNNING_STATE, "expected running state");
         if (session.tracks.has(segment) || session.traces.has(segment)) {
           return {
-            __proto__: PROTOTYPE,
+            ...DEFAULT_RESPONSE,
             code: 409,
             message: "duplicate track",
           };
@@ -97,13 +96,13 @@ export default (dependencies) => {
           }),
         );
         return {
-          __proto__: PROTOTYPE,
+          ...DEFAULT_RESPONSE,
           code: 200,
         };
       }
       if (method === "GET") {
         return {
-          __proto__: PROTOTYPE,
+          ...DEFAULT_RESPONSE,
           code: 200,
           body: {
             enabled: session.tracks.has(segment),
@@ -113,7 +112,7 @@ export default (dependencies) => {
       if (method === "DELETE") {
         if (session.traces.has(segment)) {
           return {
-            __proto__: PROTOTYPE,
+            ...DEFAULT_RESPONSE,
             code: 200,
             body: take(session.traces, segment),
           };
@@ -130,28 +129,27 @@ export default (dependencies) => {
           );
           if (path === null) {
             return {
-              __proto__: PROTOTYPE,
+              ...DEFAULT_RESPONSE,
               code: 200,
               body: data,
             };
           }
           return {
-            __proto__: PROTOTYPE,
+            ...DEFAULT_RESPONSE,
             code: 200,
             storables: [{ path, data }],
           };
         }
         return {
-          __proto__: PROTOTYPE,
+          ...DEFAULT_RESPONSE,
           code: 404,
           message: "missing trace",
         };
       }
       return {
-        storables: EMPTY,
+        ...DEFAULT_RESPONSE,
         code: 400,
         message: "unsupported method",
-        body: null,
       };
     },
     sendSession: (session, message) => {
