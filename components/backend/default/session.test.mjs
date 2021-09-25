@@ -13,6 +13,23 @@ const {
   // throws: assertThrows
 } = Assert;
 
+const filterObject = (object, keys) => {
+  const result = {};
+  for (const key of keys) {
+    Reflect.defineProperty(result, key, {
+      __proto__: null,
+      writable: true,
+      enumerable: true,
+      configuration: true,
+      value: object[key],
+    });
+  }
+  return result;
+};
+
+const getCode = ({ code }) => code;
+const getLength = ({ length }) => length;
+
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
 const { createConfiguration, extendConfiguration } =
   await buildTestComponentAsync("configuration", "test");
@@ -221,19 +238,15 @@ assertDeepEqual(closeSession(openSession()), []);
   );
   assertDeepEqual(closeSession(session), []);
   assertEqual(isEmptySession(session), false);
-  assertDeepEqual(respondSession(session, "DELETE", "/track2", null), {
-    code: 200,
-    message: null,
-    storables: [],
-    body: trace,
-  });
+  assertDeepEqual(
+    getCode(respondSession(session, "DELETE", "/track2", null)),
+    200,
+  );
 }
 
 // respondSession //
 {
-  const removeMessage = ({ message, ...rest }) => rest;
-  const getCode = ({ code }) => code;
-  const getLength = ({ length }) => length;
+  // const removeMessage = ({ message, ...rest }) => rest;
   const session = openSession();
   // Malformed Request //
   assertEqual(getCode(respondSession(session, "PUT", "/track")), 400);
@@ -249,17 +262,21 @@ assertDeepEqual(closeSession(openSession()), []);
   assertEqual(getCode(respondSession(session, "POST", "/track2", null)), 200);
   // Get //
   assertDeepEqual(
-    removeMessage(respondSession(session, "GET", "/track2", null)),
+    filterObject(respondSession(session, "GET", "/track2", null), [
+      "code",
+      "body",
+    ]),
     {
-      storables: [],
       code: 200,
       body: { enabled: true },
     },
   );
   assertDeepEqual(
-    removeMessage(respondSession(session, "GET", "/track3", null)),
+    filterObject(respondSession(session, "GET", "/track3", null), [
+      "code",
+      "body",
+    ]),
     {
-      storables: [],
       code: 200,
       body: { enabled: false },
     },

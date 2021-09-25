@@ -2,10 +2,28 @@ import Track from "./track.mjs";
 
 const _Map = Map;
 const _Set = Set;
-const EMPTY = [];
+const { assign } = Object;
 
 const INITIAL_STATE = 0;
-const FINAL_STATE = 1;
+const RUNNING_STATE = 1;
+const TERMINATED_STATE = 2;
+const CLOSED_STATE = 3;
+
+const EMPTY = [];
+
+const PROTOTYPE = {
+  __proto__: null,
+  storables: [],
+  code: 200,
+  message: null,
+  body: null,
+};
+
+const MESSAGES = new _Map([
+  [INITIAL_STATE, "not yet initialized"],
+  [TERMINATED_STATE, "already terminated"],
+  [CLOSED_STATE, "already closed"],
+]);
 
 export default (dependencies) => {
   const {
@@ -14,12 +32,7 @@ export default (dependencies) => {
     "validate-message": { validateMessage },
   } = dependencies;
   const { createTrack, compileTrack } = Track(dependencies);
-  const terminateSession = (session, termination) => {
-    const configuration = getBox(session.box);
-    setBox(session.box, FINAL_STATE);
-    if (typeof configuration === "number") {
-      return EMPTY;
-    }
+  const finalizeSession = (session, termination) => {
     const storables = [];
     for (const [key, track] of session.tracks) {
       const { path, data } = compileTrack(track, session.files, termination);
@@ -29,6 +42,7 @@ export default (dependencies) => {
         storables.push({ path, data });
       }
     }
+    session.tracks.clear();
     return storables;
   };
   const take = (map, key) => {
@@ -37,67 +51,60 @@ export default (dependencies) => {
     return value;
   };
   return {
-    isEmptySession: ({ box, traces }) =>
-      getBox(box) === FINAL_STATE && traces.size === 0,
+    isEmptySession: ({ state, traces }) =>
+      getBox(state) === CLOSED_STATE && traces.size === 0,
     openSession: () => ({
       files: [],
       paths: new _Set(),
       tracks: new _Map(),
       traces: new _Map(),
-      box: createBox(INITIAL_STATE),
+      configuration: {},
+      state: createBox(INITIAL_STATE),
     }),
     respondSession: (session, method, path, body) => {
       const parts = /^\/([^/]+)$/u.exec(path);
       if (parts === null) {
         return {
-          storables: EMPTY,
+          __proto__: PROTOTYPE,
           code: 400,
           message: "malformed url: missing track segment",
-          body: null,
         };
       }
       const [, segment] = parts;
       if (method === "POST") {
-        const configuration = getBox(session.box);
-        if (configuration === INITIAL_STATE) {
+        const state = getBox(session.state);
+        if (MESSAGES.has(state)) {
           return {
-            storables: EMPTY,
+            __proto__: PROTOTYPE,
             code: 409,
-            message: "not yet initialized",
-            body: null,
+            message: MESSAGES.get(state),
           };
         }
-        if (configuration === FINAL_STATE) {
-          return {
-            storables: EMPTY,
-            code: 409,
-            message: "already terminated",
-            body: null,
-          };
-        }
+        assert(state === RUNNING_STATE, "expected running state");
         if (session.tracks.has(segment) || session.traces.has(segment)) {
           return {
-            storables: EMPTY,
+            __proto__: PROTOTYPE,
             code: 409,
             message: "duplicate track",
-            body: null,
           };
         }
         session.tracks.set(
           segment,
-          createTrack(configuration, {
+          createTrack(session.configuration, {
             path: null,
             data: { output: null },
             ...body,
           }),
         );
-        return { storables: EMPTY, code: 200, message: null, body: null };
+        return {
+          __proto__: PROTOTYPE,
+          code: 200,
+        };
       }
       if (method === "GET") {
         return {
-          storables: EMPTY,
+          __proto__: PROTOTYPE,
           code: 200,
-          message: null,
           body: {
             enabled: session.tracks.has(segment),
           },
@@ -106,15 +113,14 @@ export default (dependencies) => {
       if (method === "DELETE") {
         if (session.traces.has(segment)) {
           return {
-            storables: EMPTY,
+            __proto__: PROTOTYPE,
             code: 200,
-            message: null,
             body: take(session.traces, segment),
           };
         }
         if (session.tracks.has(segment)) {
           assert(
-            typeof getBox(session.box) !== "number",
+            getBox(session.state) === RUNNING_STATE,
             "expected running state",
           );
           const { path, data } = compileTrack(
@@ -124,24 +130,21 @@ export default (dependencies) => {
           );
           if (path === null) {
             return {
-              storables: EMPTY,
+              __proto__: PROTOTYPE,
               code: 200,
-              message: null,
               body: data,
             };
           }
           return {
-            storables: [{ path, data }],
+            __proto__: PROTOTYPE,
             code: 200,
-            message: null,
-            body: null,
+            storables: [{ path, data }],
           };
         }
         return {
-          storables: EMPTY,
+          __proto__: PROTOTYPE,
           code: 404,
           message: "missing trace",
-          body: null,
         };
       }
       return {
@@ -155,6 +158,11 @@ export default (dependencies) => {
       logDebug("session received: %j", message);
       validateMessage(message);
       const type = message[0];
+      assert(
+        getBox(session.state) ===
+          (type === "initialize" ? INITIAL_STATE : RUNNING_STATE),
+        "invalid state",
+      );
       if (type === "event") {
         const [, type, index, time, data_type, data_rest] = message;
         const event = {
@@ -178,22 +186,16 @@ export default (dependencies) => {
       }
       if (type === "start") {
         const [, key, initialization] = message;
-        const configuration = getBox(session.box);
-        assert(
-          typeof configuration !== "number",
-          "exected running state (start)",
-        );
         assert(!session.tracks.has(key), "duplicate (ongoing) track");
         assert(!session.traces.has(key), "duplicate (stopped) track");
-        session.tracks.set(key, createTrack(configuration, initialization));
+        session.tracks.set(
+          key,
+          createTrack(session.configuration, initialization),
+        );
         return EMPTY;
       }
       if (type === "stop") {
         const [, key, termination] = message;
-        assert(
-          typeof getBox(session.box) !== "number",
-          "exected running state (stop)",
-        );
         assert(session.tracks.has(key), "missing track");
         const { path, data } = compileTrack(
           take(session.tracks, key),
@@ -208,22 +210,29 @@ export default (dependencies) => {
       }
       if (type === "initialize") {
         const [, configuration] = message;
-        assert(getBox(session.box) === INITIAL_STATE, "expected initial state");
-        setBox(session.box, configuration);
+        setBox(session.state, RUNNING_STATE);
+        assign(session.configuration, configuration);
         return EMPTY;
       }
       if (type === "terminate") {
         const [, termination] = message;
-        return terminateSession(session, termination);
+        setBox(session.state, TERMINATED_STATE);
+        return finalizeSession(session, termination);
       }
       /* c8 ignore start */
       assert(false, "invalid message");
       /* c8 ignore stop */
     },
-    closeSession: (session) =>
-      terminateSession(session, {
+    closeSession: (session) => {
+      assert(
+        getBox(session.state) !== CLOSED_STATE,
+        "duplicate session closing",
+      );
+      setBox(session.state, CLOSED_STATE);
+      return finalizeSession(session, {
         errors: [{ name: "AppmapError", message: "client disconnection" }],
         status: 1,
-      }),
+      });
+    },
   };
 };
