@@ -5,13 +5,14 @@
 - log-inner
 - log
 - validate
-- validate-message
-- validate-appmap
+- * validate-message
+  * validate-appmap
 - patch
 - * uuid
   * time
   * spawn
   * request
+  * prompts
 - specifier
 - engine
 - repository
@@ -36,8 +37,10 @@
   * hook-query
 - agent
 - recorder-boot
-- recorder-manual
-- recorder-process
-- recorder-mocha
+- * recorder-manual
+  * recorder-process
+  * recorder-mocha
+  * recorder-empty
+- questionnaire
 - batch-boot
 - batch

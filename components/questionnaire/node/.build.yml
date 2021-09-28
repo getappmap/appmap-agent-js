@@ -1,0 +1,4 @@
+branches: [node]
+dependencies:
+  - prompts
+  - util
