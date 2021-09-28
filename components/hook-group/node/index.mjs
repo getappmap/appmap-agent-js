@@ -13,8 +13,8 @@ export default (dependencies) => {
     client: { traceClient },
   } = dependencies;
   return {
-    hookGroup: (client, frontend, { hooks: { group } }) => {
-      if (!group) {
+    hookGroup: (client, frontend, { ordering }) => {
+      if (ordering !== "causal") {
         return null;
       }
       const groups = new Map();

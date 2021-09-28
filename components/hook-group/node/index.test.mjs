@@ -23,7 +23,7 @@ assertDeepEqual(
   await testHookAsync(
     hookGroup,
     unhookGroup,
-    { hooks: { group: false } },
+    { ordering: "chronological" },
     async () => {
       await new Promise((resolve) => {
         setTimeout(resolve);
@@ -37,7 +37,7 @@ setTimeout(() => {}, 100); // provide an unknown async id
 await testHookAsync(
   hookGroup,
   unhookGroup,
-  { hooks: { group: true } },
+  { ordering: "causal" },
   async (frontend) => {
     await new Promise((resolve) => {
       setTimeout(resolve, 100);

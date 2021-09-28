@@ -12,6 +12,11 @@
     - utf16le
     - latin1
 
+- $id: ordering
+  enum:
+    - chronological
+    - causal
+
 - $id: log-level
   enum:
     - debug
@@ -30,6 +35,7 @@
     - process
     - mocha
     - manual
+    - empty
 
 - $id: mode
   enum:
@@ -383,7 +389,6 @@
     trace-protocol: {const: TCP}
     track-port:
       anyOf:
-        - const: null
         - const: 0
         - $ref: port
     track-protocol: {const: "HTTP/1.1"}
@@ -416,13 +421,17 @@
       properties:
         cjs: {type: boolean}
         esm: {type: boolean}
-        group: {type: boolean}
         apply: {type: boolean}
         http: {type: boolean}
         mysql: {type: boolean}
         pg: {type: boolean}
         sqlite3: {type: boolean}
+    ordering: {$ref: ordering}
     enabled:
+      anyOf:
+        - const: process
+        - type: boolean
+    processes:
       anyOf:
         - $ref: enabled-specifier
         - type: array
@@ -526,7 +535,6 @@
     track-port:
       anyOf:
         - const: 0
-        - const: null
         - $ref: absolute-port
     track-protocol: {const: "HTTP/1.1"}
     local-track-port:
@@ -548,13 +556,17 @@
       properties:
         cjs: {type: boolean}
         esm: {type: boolean}
-        group: {type: boolean}
         apply: {type: boolean}
         http: {type: boolean}
         mysql: {type: boolean}
         pg: {type: boolean}
         sqlite3: {type: boolean}
+    ordering: {$ref: ordering}
     enabled:
+      anyOf:
+        - const: process
+        - type: boolean
+    processes:
       type: array
       items:
         type: array

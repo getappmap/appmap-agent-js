@@ -127,13 +127,9 @@ assertDeepEqual(extend("output", null, "/base"), {
   extension: ".appmap.json",
 });
 
-// enabled //
+// processes //
 
-assertDeepEqual(extend("enabled", true, "/base"), [
-  [{ source: "^", flags: "", basedir: "/base" }, true],
-]);
-
-assertDeepEqual(extend("enabled", ["/foo"], "/base"), [
+assertDeepEqual(extend("processes", "/foo", "/base"), [
   [
     {
       source: "^(?:\\/foo)$",

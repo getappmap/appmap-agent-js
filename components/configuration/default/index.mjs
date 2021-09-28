@@ -143,15 +143,13 @@ export default (dependencies) => {
       }),
     );
 
-  const normalizeEnabledSpecifier = (specifier, nullable_directory) => {
+  const normalizeProcessSpecifier = (specifier, nullable_directory) => {
     assert(
       nullable_directory !== null,
-      "normalizing enabled elements requires a directory",
+      "normalizing process elements requires a directory",
     );
     if (typeof specifier === "string") {
       specifier = { glob: specifier };
-    } else if (typeof specifier === "boolean") {
-      specifier = { regexp: "^", enabled: specifier };
     }
     const { enabled, ...rest } = {
       enabled: true,
@@ -160,12 +158,12 @@ export default (dependencies) => {
     return [createSpecifier(nullable_directory, rest), enabled];
   };
 
-  const normalizeEnabled = (specifiers, nullable_directory) => {
+  const normalizeProcesses = (specifiers, nullable_directory) => {
     if (!isArray(specifiers)) {
       specifiers = [specifiers];
     }
     return specifiers.map((specifier) =>
-      normalizeEnabledSpecifier(specifier, nullable_directory),
+      normalizeProcessSpecifier(specifier, nullable_directory),
     );
   };
 
@@ -231,8 +229,12 @@ export default (dependencies) => {
       normalize: identity,
     },
     enabled: {
+      extend: overwrite,
+      normalize: identity,
+    },
+    processes: {
       extend: prepend,
-      normalize: normalizeEnabled,
+      normalize: normalizeProcesses,
     },
     recorder: {
       extend: overwrite,
@@ -244,6 +246,10 @@ export default (dependencies) => {
     },
     hooks: {
       extend: assign,
+      normalize: identity,
+    },
+    ordering: {
+      extend: overwrite,
       normalize: identity,
     },
     "function-name-placeholder": {
@@ -370,7 +376,8 @@ export default (dependencies) => {
         basename: null,
         extension: ".appmap.json",
       },
-      enabled: [],
+      enabled: true,
+      processes: [],
       recorder: "process",
       source: false,
       hooks: {
@@ -382,6 +389,7 @@ export default (dependencies) => {
         sqlite3: false,
         pg: false,
       },
+      ordering: "chronological",
       "function-name-placeholder": "()",
       serialization: {
         "maximum-length": 96,

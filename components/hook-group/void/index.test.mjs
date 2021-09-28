@@ -20,7 +20,7 @@ const testAsync = async () => {
     await testHookAsync(
       hookGroup,
       unhookGroup,
-      { hooks: { group: false } },
+      { ordering: "chronological" },
       async (frontend) => null,
     ),
     [],

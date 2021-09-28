@@ -28,7 +28,6 @@ const agent = openAgent(
         apply: false,
         cjs: false,
         esm: false,
-        group: false,
         mysql: false,
         http: false,
       },

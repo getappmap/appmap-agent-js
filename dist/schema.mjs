@@ -9,6 +9,13 @@ export const schema = [
     ]
   },
   {
+    "$id": "ordering",
+    "enum": [
+      "chronological",
+      "causal"
+    ]
+  },
+  {
     "$id": "log-level",
     "enum": [
       "debug",
@@ -30,7 +37,8 @@ export const schema = [
     "enum": [
       "process",
       "mocha",
-      "manual"
+      "manual",
+      "empty"
     ]
   },
   {
@@ -711,9 +719,6 @@ export const schema = [
       "track-port": {
         "anyOf": [
           {
-            "const": null
-          },
-          {
             "const": 0
           },
           {
@@ -788,9 +793,6 @@ export const schema = [
           "esm": {
             "type": "boolean"
           },
-          "group": {
-            "type": "boolean"
-          },
           "apply": {
             "type": "boolean"
           },
@@ -808,7 +810,20 @@ export const schema = [
           }
         }
       },
+      "ordering": {
+        "$ref": "ordering"
+      },
       "enabled": {
+        "anyOf": [
+          {
+            "const": "process"
+          },
+          {
+            "type": "boolean"
+          }
+        ]
+      },
+      "processes": {
         "anyOf": [
           {
             "$ref": "enabled-specifier"
@@ -1045,9 +1060,6 @@ export const schema = [
             "const": 0
           },
           {
-            "const": null
-          },
-          {
             "$ref": "absolute-port"
           }
         ]
@@ -1106,9 +1118,6 @@ export const schema = [
           "esm": {
             "type": "boolean"
           },
-          "group": {
-            "type": "boolean"
-          },
           "apply": {
             "type": "boolean"
           },
@@ -1126,7 +1135,20 @@ export const schema = [
           }
         }
       },
+      "ordering": {
+        "$ref": "ordering"
+      },
       "enabled": {
+        "anyOf": [
+          {
+            "const": "process"
+          },
+          {
+            "type": "boolean"
+          }
+        ]
+      },
+      "processes": {
         "type": "array",
         "items": {
           "type": "array",

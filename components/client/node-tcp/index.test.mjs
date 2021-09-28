@@ -46,7 +46,7 @@ const {
       createConfiguration("/cwd"),
       {
         "trace-port": server.address().port,
-        "track-port": null,
+        "track-port": 0,
       },
       null,
     ),
