@@ -30,7 +30,7 @@ export default (dependencies) => {
       this.promise = promiseAgentTermination(this.agent);
     }
     recordScript(path, code) {
-      expect(path[0] === "/", "execpted an absolute path but got: %j", path);
+      expect(path[0] === "/", "expected an absolute path but got: %j", path);
       return recordAgentScript(this.agent, path, code);
     }
     startTrack(track, initialization) {

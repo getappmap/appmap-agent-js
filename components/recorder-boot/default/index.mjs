@@ -26,8 +26,12 @@ export default (dependencies) => {
       const { [1]: main } = argv;
       return extendConfiguration(configuration, { main }, cwd());
     },
-    isConfigurationEnabled: ({ enabled, main }) => {
-      for (const [specifier, boolean] of enabled) {
+    isConfigurationEnabled: ({ enabled, processes, main }) => {
+      if (typeof enabled === "boolean") {
+        logInfo(`${enabled ? "recording" : "bypassing"} %s`, main);
+        return enabled;
+      }
+      for (const [specifier, boolean] of processes) {
         if (matchSpecifier(specifier, main)) {
           logInfo(
             `${boolean ? "recording" : "bypassing"} %s because it matched %j`,

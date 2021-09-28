@@ -4,14 +4,14 @@ import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
 } from "../../build.mjs";
-import RecorderProcess from "./index.mjs";
+import RecorderEmpty from "./index.mjs";
 
 const {
   // equal: assertEqual,
   deepEqual: assertDeepEqual,
 } = Assert;
 
-const { mainAsync } = RecorderProcess(
+const { mainAsync } = RecorderEmpty(
   await buildTestDependenciesAsync(import.meta.url),
 );
 
@@ -27,7 +27,7 @@ const configuration = createConfiguration("/repository");
     extendConfiguration(
       configuration,
       {
-        recorder: "process",
+        recorder: "empty",
         hooks: { cjs: false, esm: false, apply: false, http: false },
       },
       "/directory",
@@ -37,6 +37,6 @@ const configuration = createConfiguration("/repository");
   emitter.emit("exit", 123, "SIGINT");
   assertDeepEqual(
     (await promise).map(([type]) => type),
-    ["initialize", "start", "stop", "terminate"],
+    ["initialize", "terminate"],
   );
 }

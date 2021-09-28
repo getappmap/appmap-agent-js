@@ -34,7 +34,28 @@ for (const enabled of [true, false]) {
         configuration,
         {
           enabled,
+          processes: [],
           main: "foo.mjs",
+        },
+        "/cwd",
+      ),
+    ),
+    enabled,
+  );
+}
+
+for (const enabled of [true, false]) {
+  assertEqual(
+    isConfigurationEnabled(
+      extendConfiguration(
+        configuration,
+        {
+          main: "foo.mjs",
+          enabled: "process",
+          processes: {
+            glob: "*.mjs",
+            enabled,
+          },
         },
         "/cwd",
       ),
@@ -49,6 +70,8 @@ assertEqual(
       configuration,
       {
         main: "foo.mjs",
+        enabled: "process",
+        processes: [],
       },
       "/cwd",
     ),
