@@ -1,7 +1,0 @@
-branches: [node]
-dependencies:
-  - prompts
-  - util
-  - expect
-  - configuration
-  - questionnaire
