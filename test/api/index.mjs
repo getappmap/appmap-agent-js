@@ -2,7 +2,7 @@ import { tmpdir } from "os";
 import { strict as Assert } from "assert";
 import { createRequire } from "module";
 import { mkdir, symlink, writeFile, realpath, readFile } from "fs/promises";
-import { createAppmap } from "../../lib/manual.mjs";
+import { createAppmapAsync } from "../../lib/manual.mjs";
 
 Error.stackTraceLimit = Infinity;
 
@@ -29,10 +29,11 @@ await writeFile(
 );
 
 const require = createRequire(`${directory}/dummy.mjs`);
-const appmap = createAppmap(
+const appmap = await createAppmapAsync(
   directory,
   {
     name: "name",
+    mode: "local",
     output: {
       directory: ".",
     },

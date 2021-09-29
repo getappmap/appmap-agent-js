@@ -8,24 +8,20 @@ import {
 import Configuration from "./index.mjs";
 
 const { cwd } = process;
-const {
-  deepEqual: assertDeepEqual,
-  // equal: assertEqual
-} = Assert;
+const { deepEqual: assertDeepEqual, equal: assertEqual } = Assert;
 
 const {
   createConfiguration,
   extendConfiguration,
-  extractEnvironmentConfiguration,
+  // extractEnvironmentConfiguration,
+  isConfigurationEnabled,
 } = Configuration(await buildTestDependenciesAsync(import.meta.url));
 
-const { validateCookedConfiguration } = await buildTestComponentAsync(
-  "validate",
-);
+const { validateConfiguration } = await buildTestComponentAsync("validate");
 
 const configuration = createConfiguration(cwd());
 
-validateCookedConfiguration(configuration);
+validateConfiguration(configuration);
 
 const extend = (name, value1, nullable_directory) => {
   const extended_configuration = extendConfiguration(
@@ -33,20 +29,74 @@ const extend = (name, value1, nullable_directory) => {
     { [name]: value1 },
     nullable_directory,
   );
-  validateCookedConfiguration(extended_configuration);
+  validateConfiguration(extended_configuration);
   const { [name]: value2 } = extended_configuration;
   return value2;
 };
 
+// isConfigurationEnabled //
+{
+  const configuration = createConfiguration("/repository");
+  for (const enabled of [true, false]) {
+    assertEqual(
+      isConfigurationEnabled(
+        extendConfiguration(
+          configuration,
+          {
+            enabled,
+            processes: [],
+            main: "foo.mjs",
+          },
+          "/cwd",
+        ),
+      ),
+      enabled,
+    );
+  }
+  for (const enabled of [true, false]) {
+    assertEqual(
+      isConfigurationEnabled(
+        extendConfiguration(
+          configuration,
+          {
+            main: "foo.mjs",
+            enabled: "process",
+            processes: {
+              glob: "*.mjs",
+              enabled,
+            },
+          },
+          "/cwd",
+        ),
+      ),
+      enabled,
+    );
+  }
+  assertEqual(
+    isConfigurationEnabled(
+      extendConfiguration(
+        configuration,
+        {
+          main: "foo.mjs",
+          enabled: "process",
+          processes: [],
+        },
+        "/cwd",
+      ),
+    ),
+    false,
+  );
+}
+
 // extract //
 
-assertDeepEqual(
-  extractEnvironmentConfiguration({
-    APPMAP_FOO_BAR: "value1",
-    QUX: "value2",
-  }),
-  { "foo-bar": "value1" },
-);
+// assertDeepEqual(
+//   extractEnvironmentConfiguration({
+//     APPMAP_FOO_BAR: "value1",
+//     QUX: "value2",
+//   }),
+//   { "foo-bar": "value1" },
+// );
 
 // main //
 

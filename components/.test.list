@@ -36,11 +36,10 @@
   * hook-response
   * hook-query
 - agent
-- recorder-boot
+- questionnaire
+- boot
 - * recorder-manual
   * recorder-process
   * recorder-mocha
   * recorder-empty
-- questionnaire
-- batch-boot
 - batch

@@ -46,7 +46,7 @@ export const runAsync = async (_package, config, beforeAsync, afterAsync) => {
   await mkdir(`${directory}/tmp`);
   await mkdir(`${directory}/tmp/appmap`);
   await beforeAsync(directory);
-  await spawnAsync("node", [`${cwd()}/bin/batch.mjs`], {
+  await spawnAsync("node", [`${cwd()}/bin/bin.mjs`], {
     cwd: directory,
     stdio: "inherit",
   });

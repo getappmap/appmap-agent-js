@@ -526,7 +526,7 @@ export const schema = [
             "const": "spawn"
           },
           "configuration": {
-            "$ref": "configuration"
+            "$ref": "config"
           },
           "exec": {
             "type": "string"
@@ -576,7 +576,7 @@ export const schema = [
             "const": "fork"
           },
           "configuration": {
-            "$ref": "configuration"
+            "$ref": "config"
           },
           "globbing": {
             "type": "boolean"
@@ -613,16 +613,19 @@ export const schema = [
         "type": "object",
         "nullable": true,
         "required": [
-          "directory",
-          "data"
+          "exec",
+          "argv"
         ],
         "additionalProperties": false,
         "properties": {
-          "directory": {
-            "$ref": "absolute-path"
+          "exec": {
+            "type": "string"
           },
-          "data": {
-            "$ref": "configuration"
+          "argv": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         }
       },
@@ -647,7 +650,7 @@ export const schema = [
             "$ref": "absolute-path"
           },
           "data": {
-            "$ref": "configuration"
+            "$ref": "config"
           }
         }
       },
@@ -678,7 +681,7 @@ export const schema = [
     }
   },
   {
-    "$id": "configuration",
+    "$id": "config",
     "type": "object",
     "additionalProperties": false,
     "properties": {
@@ -952,10 +955,10 @@ export const schema = [
     }
   },
   {
-    "$id": "cooked-configuration",
+    "$id": "configuration",
     "type": "object",
     "additionalProperties": false,
-    "minProperties": 35,
+    "minProperties": 39,
     "properties": {
       "mode": {
         "$ref": "mode"
@@ -1343,7 +1346,7 @@ export const schema = [
         ]
       },
       "data": {
-        "$ref": "configuration"
+        "$ref": "config"
       }
     }
   },
@@ -1438,7 +1441,7 @@ export const schema = [
             "const": "initialize"
           },
           {
-            "$ref": "cooked-configuration"
+            "$ref": "configuration"
           }
         ]
       },

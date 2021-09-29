@@ -20,6 +20,15 @@ const { createConfiguration, extendConfiguration } =
 
 const configuration = createConfiguration("/repository");
 
+await mainAsync(
+  new EventEmitter(),
+  extendConfiguration(
+    configuration,
+    { recorder: "empty", enabled: false },
+    null,
+  ),
+);
+
 {
   const emitter = new EventEmitter();
   const promise = mainAsync(
@@ -28,6 +37,7 @@ const configuration = createConfiguration("/repository");
       configuration,
       {
         recorder: "empty",
+        enabled: true,
         hooks: { cjs: false, esm: false, apply: false, http: false },
       },
       "/directory",

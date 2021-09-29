@@ -303,7 +303,7 @@
       required: [type, exec]
       properties:
         type: {const: spawn}
-        configuration: {$ref: configuration}
+        configuration: {$ref: config}
         exec: {type: string}
         argv:
           type: array
@@ -322,7 +322,7 @@
       required: [type, exec]
       properties:
         type: {const: fork}
-        configuration: {$ref: configuration}
+        configuration: {$ref: config}
         globbing: {type: boolean}
         exec: {type: string}
         argv:
@@ -338,11 +338,13 @@
     fork:
       type: object
       nullable: true
-      required: [directory, data]
+      required: [exec, argv]
       additionalProperties: false
       properties:
-        directory: {$ref: absolute-path}
-        data: {$ref: configuration}
+        exec: {type: string}
+        argv:
+          type: array
+          items: {type: string}
     exec: {type: string}
     argv:
       type: array
@@ -353,7 +355,7 @@
       required: [directory, data]
       properties:
         directory: {$ref: absolute-path}
-        data: {$ref: configuration}
+        data: {$ref: config}
     options:
       allOf:
         - $ref: child-options
@@ -367,7 +369,7 @@
 # Configuration #
 #################
 
-- $id: configuration
+- $id: config
   type: object
   additionalProperties: false
   properties:
@@ -484,10 +486,10 @@
       type: array
       items: {$ref: name-version}
 
-- $id: cooked-configuration
+- $id: configuration
   type: object
   additionalProperties: false
-  minProperties: 35
+  minProperties: 39
   properties:
     mode: {$ref: mode}
     validate:
@@ -665,7 +667,7 @@
       anyOf:
         - const: null
         - $ref: absolute-path
-    data: {$ref: configuration}
+    data: {$ref: config}
 
 - $id: termination
   type: object
@@ -709,7 +711,7 @@
       maxItems: 2
       items:
         - const: initialize
-        - $ref: cooked-configuration
+        - $ref: configuration
     - type: array
       minItems: 2
       maxItems: 2

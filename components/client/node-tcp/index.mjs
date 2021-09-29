@@ -27,8 +27,8 @@ export default (dependencies) => {
       const socket = connect(
         ...(typeof trace_port === "string" ? [trace_port] : [trace_port, host]),
       );
-      const session = createMessage(getUUID());
-      const buffer = [session];
+      const session = getUUID();
+      const buffer = [createMessage(session)];
       const responder = openResponder((method, path, body) =>
         requestAsync(host, track_port, method, `/${session}${path}`, body),
       );

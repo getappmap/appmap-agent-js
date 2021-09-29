@@ -3,6 +3,7 @@ import Treeify from "treeify";
 import AjvErrorTree from "ajv-error-tree";
 import { schema } from "../../../dist/schema.mjs";
 
+const _Map = Map;
 const { asTree } = Treeify;
 
 export default (dependencies) => {
@@ -10,6 +11,11 @@ export default (dependencies) => {
     util: { assert },
     expect: { expect },
   } = dependencies;
+  const naming = new _Map([
+    ["config", "configuration"],
+    ["configuration", "cooked-configuration"],
+    ["message", "message"],
+  ]);
   const ajv = new Ajv({ verbose: true });
   ajv.addSchema(schema);
   const generateValidate = (name) => {
@@ -23,16 +29,22 @@ export default (dependencies) => {
         // console.log(tree1);
         const tree2 = AjvErrorTree.summarizeAJVErrorTree(tree1);
         if (typeof tree2 === "string") {
-          expect(false, "invalid %s >> %s\n%j", name, tree2, json);
+          expect(false, "invalid %s >> %s\n%j", naming.get(name), tree2, json);
         } else {
-          expect(false, "invalid %s\n%s\n%j", name, asTree(tree2, true), json);
+          expect(
+            false,
+            "invalid %s\n%s\n%j",
+            naming.get(name),
+            asTree(tree2, true),
+            json,
+          );
         }
       }
     };
   };
   return {
     validateMessage: generateValidate("message"),
+    validateConfig: generateValidate("config"),
     validateConfiguration: generateValidate("configuration"),
-    validateCookedConfiguration: generateValidate("cooked-configuration"),
   };
 };

@@ -14,7 +14,6 @@ await runAsync(
       esm: false,
       cjs: false,
       apply: false,
-      group: false,
       http: true,
     },
     scenario: "scenario",

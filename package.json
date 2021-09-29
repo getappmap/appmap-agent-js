@@ -9,7 +9,7 @@
     "/dist/*.mjs"
   ],
   "bin": {
-    "appmap-agent-js": "bin/batch.mjs"
+    "appmap-agent-js": "bin/bin.mjs"
   },
   "main": "lib/manual.mjs",
   "os": [

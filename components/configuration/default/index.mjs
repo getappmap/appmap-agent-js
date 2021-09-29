@@ -5,7 +5,9 @@ const { ownKeys } = Reflect;
 export default (dependencies) => {
   const {
     util: { assert, identity, toAbsolutePath, hasOwnProperty },
-    validate: { validateConfiguration },
+    log: { logInfo },
+    validate: { validateConfig },
+    specifier: { matchSpecifier },
     engine: { getEngine },
     repository: {
       extractRepositoryHistory,
@@ -323,13 +325,13 @@ export default (dependencies) => {
     },
   };
 
-  const filterEnvironmentPair = ([key, value]) =>
-    key.toLowerCase().startsWith("appmap_");
-
-  const mapEnvironmentPair = ([key, value]) => [
-    key.toLowerCase().substring(7).replace(/_/g, "-"),
-    value,
-  ];
+  // const filterEnvironmentPair = ([key, value]) =>
+  //   key.toLowerCase().startsWith("appmap_");
+  //
+  // const mapEnvironmentPair = ([key, value]) => [
+  //   key.toLowerCase().substring(7).replace(/_/g, "-"),
+  //   value,
+  // ];
 
   ////////////
   // export //
@@ -407,15 +409,15 @@ export default (dependencies) => {
       app: null,
       name: null,
     }),
-    extractEnvironmentConfiguration: (env) =>
-      fromEntries(
-        toArray(toEntries(env))
-          .filter(filterEnvironmentPair)
-          .map(mapEnvironmentPair),
-      ),
+    // extractEnvironmentConfiguration: (env) =>
+    //   fromEntries(
+    //     toArray(toEntries(env))
+    //       .filter(filterEnvironmentPair)
+    //       .map(mapEnvironmentPair),
+    //   ),
     extendConfiguration: (configuration, data, nullable_directory) => {
       configuration = { ...configuration };
-      validateConfiguration(data);
+      validateConfig(data);
       for (let key of ownKeys(data)) {
         const { normalize, extend } = fields[key];
         configuration[key] = extend(
@@ -424,6 +426,28 @@ export default (dependencies) => {
         );
       }
       return configuration;
+    },
+    isConfigurationEnabled: ({ enabled, processes, main }) => {
+      if (typeof enabled === "boolean") {
+        logInfo(`${enabled ? "recording" : "bypassing"} %s`, main);
+        return enabled;
+      }
+      for (const [specifier, boolean] of processes) {
+        if (matchSpecifier(specifier, main)) {
+          logInfo(
+            `${boolean ? "recording" : "bypassing"} %s because it matched %j`,
+            main,
+            specifier,
+          );
+          return boolean;
+        }
+      }
+      logInfo(
+        "bypassing %j because it did not match any specifier in %j",
+        main,
+        enabled,
+      );
+      return false;
     },
   };
 };

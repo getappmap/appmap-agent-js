@@ -1,7 +1,11 @@
+const _Promise = Promise;
+const _undefined = undefined;
+
 export default (dependencies) => {
   const {
     uuid: { getUUID },
     util: { assert },
+    configuration: { isConfigurationEnabled },
     agent: {
       openAgent,
       promiseAgentTermination,
@@ -14,6 +18,9 @@ export default (dependencies) => {
     mainAsync: (process, configuration) => {
       const { recorder } = configuration;
       assert(recorder === "process", "expected process recorder");
+      if (!isConfigurationEnabled(configuration)) {
+        return _Promise.resolve(_undefined);
+      }
       const agent = openAgent(configuration);
       const promise = promiseAgentTermination(agent);
       const track = getUUID();

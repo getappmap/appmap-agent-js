@@ -1,10 +1,12 @@
 import Mocha from "mocha";
 
+const _Promise = Promise;
 const _undefined = undefined;
 
 export default (dependencies) => {
   const {
     uuid: { getUUID },
+    configuration: { isConfigurationEnabled },
     util: { assert, coalesce, matchVersion },
     expect: { expect },
     agent: {
@@ -31,6 +33,11 @@ export default (dependencies) => {
     createMochaHooks: (process, configuration) => {
       const { recorder } = configuration;
       assert(recorder === "mocha", "expected mocha recorder");
+      if (!isConfigurationEnabled(configuration)) {
+        return {
+          promise: _Promise.resolve(_undefined),
+        };
+      }
       const agent = openAgent(configuration);
       const promise = promiseAgentTermination(agent);
       const errors = [];

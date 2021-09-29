@@ -1,3 +1,4 @@
+import uuid$random from "./../components/uuid/random/index.mjs";
 import util$default from "./../components/util/default/index.mjs";
 import violation$exit from "./../components/violation/exit/index.mjs";
 import expect_inner$default from "./../components/expect-inner/default/index.mjs";
@@ -9,7 +10,6 @@ import log$info from "./../components/log/info/index.mjs";
 import log$off from "./../components/log/off/index.mjs";
 import log$warning from "./../components/log/warning/index.mjs";
 import time$performance_node from "./../components/time/performance-node/index.mjs";
-import uuid$random from "./../components/uuid/random/index.mjs";
 import specifier$default from "./../components/specifier/default/index.mjs";
 import naming$default from "./../components/naming/default/index.mjs";
 import instrumentation$default from "./../components/instrumentation/default/index.mjs";
@@ -41,10 +41,11 @@ import patch$default from "./../components/patch/default/index.mjs";
 import hook_response$node from "./../components/hook-response/node/index.mjs";
 import hook_query$node from "./../components/hook-query/node/index.mjs";
 import agent$default from "./../components/agent/default/index.mjs";
-import recorder_manual$default from "./../components/recorder-manual/default/index.mjs";
+import recorder_empty$default from "./../components/recorder-empty/default/index.mjs";
 
 export default (blueprint) => {
   const dependencies = {__proto__:null};
+  dependencies["uuid"] = uuid$random(dependencies);
   dependencies["util"] = util$default(dependencies);
   dependencies["violation"] = violation$exit(dependencies);
   dependencies["expect-inner"] = expect_inner$default(dependencies);
@@ -53,7 +54,6 @@ export default (blueprint) => {
   if (!("log" in blueprint)) { throw new Error("missing instance for component log"); }
   dependencies["log"] = (blueprint["log"] === "warning" ? log$warning(dependencies) : (blueprint["log"] === "off" ? log$off(dependencies) : (blueprint["log"] === "info" ? log$info(dependencies) : (blueprint["log"] === "error" ? log$error(dependencies) : (blueprint["log"] === "debug" ? log$debug(dependencies) : ((() => { throw new Error("invalid instance for component log"); }) ()))))));
   dependencies["time"] = time$performance_node(dependencies);
-  dependencies["uuid"] = uuid$random(dependencies);
   dependencies["specifier"] = specifier$default(dependencies);
   dependencies["naming"] = naming$default(dependencies);
   dependencies["instrumentation"] = instrumentation$default(dependencies);
@@ -83,6 +83,6 @@ export default (blueprint) => {
   dependencies["hook-response"] = hook_response$node(dependencies);
   dependencies["hook-query"] = hook_query$node(dependencies);
   dependencies["agent"] = agent$default(dependencies);
-  dependencies["recorder-manual"] = recorder_manual$default(dependencies);
-  return dependencies["recorder-manual"];
+  dependencies["recorder-empty"] = recorder_empty$default(dependencies);
+  return dependencies["recorder-empty"];
 };

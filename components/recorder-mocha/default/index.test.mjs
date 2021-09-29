@@ -21,6 +21,18 @@ const { createConfiguration, extendConfiguration } =
 const configuration = createConfiguration("/repository");
 
 {
+  const promise = createMochaHooks(
+    new EventEmitter(),
+    extendConfiguration(
+      configuration,
+      { recorder: "mocha", enabled: false },
+      null,
+    ),
+  );
+  await promise;
+}
+
+{
   const emitter = new EventEmitter();
   emitter.cwd = () => "/cwd";
   emitter.argv = ["node", "main.mjs"];

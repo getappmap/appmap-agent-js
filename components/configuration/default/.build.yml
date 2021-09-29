@@ -1,6 +1,7 @@
 branches: [test, node, browser]
 dependencies:
   - util
+  - log
   - validate
   - specifier
   - child

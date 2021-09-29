@@ -14,9 +14,9 @@ await runAsync(
       esm: true,
       cjs: true,
       apply: true,
-      group: true,
       http: false,
     },
+    ordering: "causal",
     scenario: "scenario",
     scenarios: {
       scenario: ["node", "./main.mjs"],

@@ -9,7 +9,7 @@ const BREAK = {};
 
 const { deepEqual: assertDeepEqual, equal: assertEqual } = Assert;
 
-const { validateConfiguration } = await buildTestComponentAsync("validate");
+const { validateConfig } = await buildTestComponentAsync("validate");
 
 const { questionConfigAsync } = Questionnaire(
   await buildTestDependenciesAsync(import.meta.url, {
@@ -28,7 +28,7 @@ const runAsync = async (answers) => {
   };
   const configuration = await questionConfigAsync();
   assertEqual(iterator.next().done, true);
-  validateConfiguration(configuration);
+  validateConfig(configuration);
   return configuration;
 };
 

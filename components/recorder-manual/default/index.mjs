@@ -3,9 +3,9 @@ const _Error = Error;
 
 export default (dependencies) => {
   const {
-    uuid: { getUUID },
-    util: { assert },
     expect: { expect },
+    configuration: { extendConfiguration },
+    log: { logGuardWarning },
     agent: {
       openAgent,
       promiseAgentTermination,
@@ -17,14 +17,37 @@ export default (dependencies) => {
     },
   } = dependencies;
   class Appmap {
-    static getUniversalUniqueIdentifier() {
-      return getUUID();
-    }
     constructor(configuration) {
-      const { mode, recorder } = configuration;
-      assert(recorder === "manual", "expected manual recorder");
-      expect(mode === "local", "manual recorder only supports local mode");
-      this.agent = openAgent(configuration);
+      {
+        const {
+          enabled,
+          recorder,
+          hooks: { esm },
+        } = configuration;
+        logGuardWarning(
+          recorder !== "manual",
+          "Manual recorder expected configuration field 'recorder' to be \"manual\" and got %j.",
+          recorder,
+        );
+        logGuardWarning(
+          enabled !== true,
+          "Manual recorder is always enabled and configuration field 'enabled' is %j.",
+          enabled,
+        );
+        logGuardWarning(
+          esm,
+          "Manual recorder does not support native module recording and configuration field 'hooks.esm' is enabled.",
+        );
+      }
+      this.agent = openAgent(
+        extendConfiguration(configuration, {
+          enabled: true,
+          recorder: "manual",
+          hooks: {
+            esm: false,
+          },
+        }),
+      );
       this.tracks = new _Set();
       this.running = true;
       this.promise = promiseAgentTermination(this.agent);
@@ -76,6 +99,7 @@ export default (dependencies) => {
         "cannot claim track %j because it is still running",
         track,
       );
+      debugger;
       const { code, message, body } = await trackAgentAsync(
         this.agent,
         "DELETE",

@@ -3,11 +3,11 @@ const _Error = Error;
 const { entries: toEntries, fromEntries } = Object;
 
 const levels = new _Map([
-  ["logDebug", 1],
-  ["logInfo", 2],
-  ["logWarning", 3],
-  ["logError", 4],
-  ["logOff", 5],
+  ["Debug", 1],
+  ["Info", 2],
+  ["Warning", 3],
+  ["Error", 4],
+  ["Off", 5],
 ]);
 
 const get = (map, key) => {
@@ -19,12 +19,24 @@ const get = (map, key) => {
 
 const noop = () => {};
 
-export const levelLog = (log, min_level_name) => {
+export const levelLog = (logs, min_level_name) => {
   const min_level = get(levels, min_level_name);
   return fromEntries(
-    toEntries(log).map(([level_name, log]) => [
-      level_name,
-      get(levels, level_name) >= min_level ? log : noop,
-    ]),
+    toEntries(logs).flatMap(([method_name, log]) => {
+      const level_name = method_name.substring(3);
+      return [
+        [`log${level_name}`, get(levels, level_name) >= min_level ? log : noop],
+        [
+          `logGuard${level_name}`,
+          get(levels, level_name) >= min_level
+            ? (guard, ...args) => {
+                if (guard) {
+                  log(...args);
+                }
+              }
+            : noop,
+        ],
+      ];
+    }),
   );
 };

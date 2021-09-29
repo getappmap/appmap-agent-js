@@ -8,7 +8,8 @@ await runAsync(
   null,
   {
     mode: "remote",
-    enabled: { path: "node_modules/.bin/bin" },
+    enabled: "process",
+    processes: { path: "node_modules/.bin/bin" },
     packages: "bin.cjs",
     recorder: "process",
     hooks: { esm: false, cjs: true, apply: false, http: false },

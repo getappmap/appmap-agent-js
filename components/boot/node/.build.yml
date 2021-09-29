@@ -1,7 +1,8 @@
 branches: [node]
 dependencies:
-  - uuid
+  - prompts
   - util
   - expect
-  - agent
+  - validate
   - configuration
+  - questionnaire

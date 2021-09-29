@@ -1,9 +1,8 @@
 import { writeEntryPointAsync } from "./static.mjs";
 
-writeEntryPointAsync("node", "recorder-boot");
-writeEntryPointAsync("node", "configuration");
+writeEntryPointAsync("node", "boot");
 writeEntryPointAsync("node", "recorder-process");
 writeEntryPointAsync("node", "recorder-mocha");
 writeEntryPointAsync("node", "recorder-manual");
-writeEntryPointAsync("node", "batch-boot");
+writeEntryPointAsync("node", "recorder-empty");
 writeEntryPointAsync("node", "batch");
