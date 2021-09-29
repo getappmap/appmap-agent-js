@@ -10,10 +10,10 @@ const testAsync = async () => {
   );
   assertThrows(() => {
     validateConfig({ mode: "invalid-mode" });
-  }, /^AppmapError: invalid configuration >> mode\/enum/u);
+  }, /^AppmapError: invalid configuration\n/u);
   assertThrows(() => {
     validateConfig({ engine: "invalid-engine-format" });
-  }, /^AppmapError: invalid configuration\n/);
+  }, /^AppmapError: invalid configuration\n/u);
 };
 
 testAsync();

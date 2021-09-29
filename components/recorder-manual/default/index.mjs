@@ -99,7 +99,6 @@ export default (dependencies) => {
         "cannot claim track %j because it is still running",
         track,
       );
-      debugger;
       const { code, message, body } = await trackAgentAsync(
         this.agent,
         "DELETE",

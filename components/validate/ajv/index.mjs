@@ -8,7 +8,7 @@ const { asTree } = Treeify;
 
 export default (dependencies) => {
   const {
-    util: { assert },
+    util: { assert, coalesce },
     expect: { expect },
   } = dependencies;
   const naming = new _Map([
@@ -26,19 +26,15 @@ export default (dependencies) => {
         const { length } = errors;
         assert(length > 0, "unexpected empty error array");
         const tree1 = AjvErrorTree.structureAJVErrorArray(errors);
-        // console.log(tree1);
         const tree2 = AjvErrorTree.summarizeAJVErrorTree(tree1);
-        if (typeof tree2 === "string") {
-          expect(false, "invalid %s >> %s\n%j", naming.get(name), tree2, json);
-        } else {
-          expect(
-            false,
-            "invalid %s\n%s\n%j",
-            naming.get(name),
-            asTree(tree2, true),
-            json,
-          );
-        }
+        expect(
+          false,
+          "invalid %s\n%s\n  Parameters = %j\n  Input = %j",
+          naming.get(name),
+          typeof tree2 === "string" ? tree2 : asTree(tree2, true),
+          errors.map((error) => coalesce(error, "params", null)),
+          json,
+        );
       }
     };
   };
