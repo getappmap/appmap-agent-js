@@ -11,7 +11,7 @@ const { deepEqual: assertDeepEqual, equal: assertEqual } = Assert;
 
 const { validateConfiguration } = await buildTestComponentAsync("validate");
 
-const { questionConfigurationAsync } = Questionnaire(
+const { questionConfigAsync } = Questionnaire(
   await buildTestDependenciesAsync(import.meta.url, {
     prompts: "fake",
   }),
@@ -26,7 +26,7 @@ const runAsync = async (answers) => {
     }
     return { [name]: answer };
   };
-  const configuration = await questionConfigurationAsync();
+  const configuration = await questionConfigAsync();
   assertEqual(iterator.next().done, true);
   validateConfiguration(configuration);
   return configuration;

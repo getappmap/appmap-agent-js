@@ -312,26 +312,26 @@ export default (dependencies) => {
     }),
   ];
 
-  return {
-    questionConfigurationAsync: async () => {
-      const options = {};
-      for (const createPrompt of questions) {
-        const prompt = createPrompt(options);
-        if (prompt !== null) {
-          const { message, ...rest } = prompt;
-          const result = await prompts({
-            message:
-              message.length === 1 ? message[0] : message.join("\n  ") + "\n",
-            ...rest,
-          });
-          if (hasOwnProperty(result, "value")) {
-            assign(options, result.value);
-          } else {
-            break;
-          }
+  const questionConfigAsync = async () => {
+    const config = {};
+    for (const createPrompt of questions) {
+      const prompt = createPrompt(config);
+      if (prompt !== null) {
+        const { message, ...rest } = prompt;
+        const result = await prompts({
+          message:
+            message.length === 1 ? message[0] : message.join("\n  ") + "\n",
+          ...rest,
+        });
+        if (hasOwnProperty(result, "value")) {
+          assign(config, result.value);
+        } else {
+          break;
         }
       }
-      return options;
-    },
+    }
+    return config;
   };
+
+  return { questionConfigAsync };
 };

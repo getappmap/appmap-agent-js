@@ -353,7 +353,7 @@ export default (dependencies) => {
       main: null,
       recording: null,
       // provided by the user
-      mode: "local",
+      mode: "remote",
       host: "localhost",
       "trace-port": 0, // possibly overwritten by the agent
       "trace-protocol": "TCP",
