@@ -9,9 +9,7 @@ npm install @appland/appmap-agent-js
 
 To run:
 ```sh
-echo '{enabled:true, packages:"**/*"}' > appmap.yml
-npx appmap-agent-js -- main.mjs argv0 argv1
-cat tmp/appmap/main.appmap.json
+npx appmap-agent-js
 ```
 
 Table of contents:
@@ -37,9 +35,12 @@ Table of contents:
 * any up-to-date major node release that is still maintained -- ie: 12, 14, 15, and 16
 * [mocha recorder only]: mocha >= 8.0.0 (because of root hooks)
 
-<!-- * `--experimental-loader` requires `>= nodev9.0.0` 
+<!--
+TODO: sql libraries requirements
+* `--experimental-loader` requires `>= nodev9.0.0` 
 * `NODE_OPTIONS` requires `>= nodev8.0.0`
-* `--require` requires `>= nodev1.6.0` -->
+* `--require` requires `>= nodev1.6.0`
+-->
 
 ## Automated Recording
 

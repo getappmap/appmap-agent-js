@@ -70,7 +70,7 @@ const { cwd } = process;
     argv: [],
     cwd,
   });
-  assertEqual(packages.length, 2);
+  assertEqual(packages.length, 4);
 }
 
 {

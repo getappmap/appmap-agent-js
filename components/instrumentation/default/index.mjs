@@ -8,7 +8,7 @@ const _String = String;
 export default (dependencies) => {
   const {
     util: { createCounter, incrementCounter },
-    specifier: { matchSpecifier },
+    configuration: { getConfigurationPackage },
     uuid: { getUUID },
     expect: { expectSuccess },
     naming: { createExclusion },
@@ -42,53 +42,53 @@ export default (dependencies) => {
         source: global_source,
         exclude: exclude1,
       } = instrumentation;
-      for (let [specifier, data] of packages) {
-        if (matchSpecifier(specifier, path)) {
-          const { enabled, shallow, exclude: exclude2, source } = data;
-          if (!enabled) {
-            break;
-          }
-          const index = incrementCounter(indexing);
-          const exclude = [...exclude1, ...exclude2];
-          return {
-            file: {
-              index,
-              exclude,
-              shallow,
-              type,
-              path,
-              code,
-              source:
-                /* c8 ignore start */ source === null
-                  ? global_source
-                  : source /* c8 ignore stop */,
-            },
-            code: generate(
-              visit(
-                expectSuccess(
-                  () =>
-                    parse(code, {
-                      allowHashBang: true,
-                      sourceType: type,
-                      ecmaVersion: version,
-                    }),
-                  "failed to parse file %j >> %e",
-                  path,
-                ),
-                _String(index),
-                null,
-                {
-                  path,
-                  naming,
-                  runtime,
-                  exclusion: createExclusion(exclude),
-                },
-              ),
-            ),
-          };
-        }
+      const {
+        enabled,
+        shallow,
+        exclude: exclude2,
+        source,
+      } = getConfigurationPackage(packages, path);
+      if (!enabled) {
+        return { file: null, code };
       }
-      return { code, file: null };
+      const index = incrementCounter(indexing);
+      const exclude = [...exclude1, ...exclude2];
+      return {
+        file: {
+          index,
+          exclude,
+          shallow,
+          type,
+          path,
+          code,
+          source:
+            /* c8 ignore start */ source === null
+              ? global_source
+              : source /* c8 ignore stop */,
+        },
+        code: generate(
+          visit(
+            expectSuccess(
+              () =>
+                parse(code, {
+                  allowHashBang: true,
+                  sourceType: type,
+                  ecmaVersion: version,
+                }),
+              "failed to parse file %j >> %e",
+              path,
+            ),
+            _String(index),
+            null,
+            {
+              path,
+              naming,
+              runtime,
+              exclusion: createExclusion(exclude),
+            },
+          ),
+        ),
+      };
     },
   };
 };

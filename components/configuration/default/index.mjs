@@ -333,6 +333,29 @@ export default (dependencies) => {
   //   value,
   // ];
 
+  const makeBlacklistSpecifier = (basedir) => ({
+    basedir,
+    source: "(^\\.\\.)|((^|/)node_modules/)",
+    flags: "u",
+  });
+
+  const makeWhitelistSpecifier = (basedir) => ({
+    basedir,
+    source: "^",
+    flags: "u",
+  });
+
+  const getSpecifierValue = (pairs, key) => {
+    for (const [specifier, value] of pairs) {
+      if (matchSpecifier(specifier, key)) {
+        return value;
+      }
+    }
+    /* c8 ignore start */
+    assert(false, "missing matching specifier");
+    /* c8 ignore stop */
+  };
+
   ////////////
   // export //
   ////////////
@@ -378,8 +401,11 @@ export default (dependencies) => {
         basename: null,
         extension: ".appmap.json",
       },
-      enabled: true,
-      processes: [],
+      enabled: "process",
+      processes: [
+        [makeBlacklistSpecifier(directory), false],
+        [makeWhitelistSpecifier(directory), true],
+      ],
       recorder: "process",
       source: false,
       hooks: {
@@ -403,7 +429,26 @@ export default (dependencies) => {
         name: "ecmascript",
         version: "2020",
       },
-      packages: [],
+      packages: [
+        [
+          makeBlacklistSpecifier(directory),
+          {
+            enabled: false,
+            shallow: true,
+            exclude: [],
+            source: null,
+          },
+        ],
+        [
+          makeWhitelistSpecifier(directory),
+          {
+            enabled: true,
+            shallow: false,
+            exclude: [],
+            source: null,
+          },
+        ],
+      ],
       exclude: [],
       pruning: false,
       app: null,
@@ -427,27 +472,16 @@ export default (dependencies) => {
       }
       return configuration;
     },
+    getConfigurationPackage: getSpecifierValue,
     isConfigurationEnabled: ({ enabled, processes, main }) => {
-      if (typeof enabled === "boolean") {
-        logInfo(`${enabled ? "recording" : "bypassing"} %s`, main);
-        return enabled;
-      }
-      for (const [specifier, boolean] of processes) {
-        if (matchSpecifier(specifier, main)) {
-          logInfo(
-            `${boolean ? "recording" : "bypassing"} %s because it matched %j`,
-            main,
-            specifier,
-          );
-          return boolean;
+      if (typeof enabled !== "boolean") {
+        assert(enabled === "process", "unexpeced enabled value");
+        if (main !== null) {
+          enabled = getSpecifierValue(processes, main);
         }
       }
-      logInfo(
-        "bypassing %j because it did not match any specifier in %j",
-        main,
-        enabled,
-      );
-      return false;
+      logInfo(`%s %s`, enabled ? "recording" : "bypassing", main);
+      return enabled;
     },
   };
 };

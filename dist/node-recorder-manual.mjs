@@ -9,8 +9,13 @@ import log$info from "./../components/log/info/index.mjs";
 import log$off from "./../components/log/off/index.mjs";
 import log$warning from "./../components/log/warning/index.mjs";
 import time$performance_node from "./../components/time/performance-node/index.mjs";
-import uuid$random from "./../components/uuid/random/index.mjs";
+import validate$ajv from "./../components/validate/ajv/index.mjs";
 import specifier$default from "./../components/specifier/default/index.mjs";
+import repository$node from "./../components/repository/node/index.mjs";
+import child$default from "./../components/child/default/index.mjs";
+import engine$node from "./../components/engine/node/index.mjs";
+import configuration$default from "./../components/configuration/default/index.mjs";
+import uuid$random from "./../components/uuid/random/index.mjs";
 import naming$default from "./../components/naming/default/index.mjs";
 import instrumentation$default from "./../components/instrumentation/default/index.mjs";
 import serialization$default from "./../components/serialization/default/index.mjs";
@@ -18,11 +23,6 @@ import frontend$default from "./../components/frontend/default/index.mjs";
 import interpretation$vm from "./../components/interpretation/vm/index.mjs";
 import request$node_http from "./../components/request/node-http/index.mjs";
 import storage$file from "./../components/storage/file/index.mjs";
-import validate$ajv from "./../components/validate/ajv/index.mjs";
-import repository$node from "./../components/repository/node/index.mjs";
-import child$default from "./../components/child/default/index.mjs";
-import engine$node from "./../components/engine/node/index.mjs";
-import configuration$default from "./../components/configuration/default/index.mjs";
 import validate_message$off from "./../components/validate-message/off/index.mjs";
 import validate_message$on from "./../components/validate-message/on/index.mjs";
 import validate_appmap$off from "./../components/validate-appmap/off/index.mjs";
@@ -53,8 +53,13 @@ export default (blueprint) => {
   if (!("log" in blueprint)) { throw new Error("missing instance for component log"); }
   dependencies["log"] = (blueprint["log"] === "warning" ? log$warning(dependencies) : (blueprint["log"] === "off" ? log$off(dependencies) : (blueprint["log"] === "info" ? log$info(dependencies) : (blueprint["log"] === "error" ? log$error(dependencies) : (blueprint["log"] === "debug" ? log$debug(dependencies) : ((() => { throw new Error("invalid instance for component log"); }) ()))))));
   dependencies["time"] = time$performance_node(dependencies);
-  dependencies["uuid"] = uuid$random(dependencies);
+  dependencies["validate"] = validate$ajv(dependencies);
   dependencies["specifier"] = specifier$default(dependencies);
+  dependencies["repository"] = repository$node(dependencies);
+  dependencies["child"] = child$default(dependencies);
+  dependencies["engine"] = engine$node(dependencies);
+  dependencies["configuration"] = configuration$default(dependencies);
+  dependencies["uuid"] = uuid$random(dependencies);
   dependencies["naming"] = naming$default(dependencies);
   dependencies["instrumentation"] = instrumentation$default(dependencies);
   dependencies["serialization"] = serialization$default(dependencies);
@@ -62,11 +67,6 @@ export default (blueprint) => {
   dependencies["interpretation"] = interpretation$vm(dependencies);
   dependencies["request"] = request$node_http(dependencies);
   dependencies["storage"] = storage$file(dependencies);
-  dependencies["validate"] = validate$ajv(dependencies);
-  dependencies["repository"] = repository$node(dependencies);
-  dependencies["child"] = child$default(dependencies);
-  dependencies["engine"] = engine$node(dependencies);
-  dependencies["configuration"] = configuration$default(dependencies);
   if (!("validate-message" in blueprint)) { throw new Error("missing instance for component validate-message"); }
   dependencies["validate-message"] = (blueprint["validate-message"] === "on" ? validate_message$on(dependencies) : (blueprint["validate-message"] === "off" ? validate_message$off(dependencies) : ((() => { throw new Error("invalid instance for component validate-message"); }) ())));
   if (!("validate-appmap" in blueprint)) { throw new Error("missing instance for component validate-appmap"); }

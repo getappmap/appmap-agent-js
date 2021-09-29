@@ -14,6 +14,7 @@ const {
   createConfiguration,
   extendConfiguration,
   // extractEnvironmentConfiguration,
+  getConfigurationPackage,
   isConfigurationEnabled,
 } = Configuration(await buildTestDependenciesAsync(import.meta.url));
 
@@ -37,56 +38,64 @@ const extend = (name, value1, nullable_directory) => {
 // isConfigurationEnabled //
 {
   const configuration = createConfiguration("/repository");
-  for (const enabled of [true, false]) {
-    assertEqual(
-      isConfigurationEnabled(
-        extendConfiguration(
-          configuration,
-          {
-            enabled,
-            processes: [],
-            main: "foo.mjs",
-          },
-          "/cwd",
-        ),
-      ),
-      enabled,
-    );
-  }
-  for (const enabled of [true, false]) {
-    assertEqual(
-      isConfigurationEnabled(
-        extendConfiguration(
-          configuration,
-          {
-            main: "foo.mjs",
-            enabled: "process",
-            processes: {
-              glob: "*.mjs",
-              enabled,
-            },
-          },
-          "/cwd",
-        ),
-      ),
-      enabled,
-    );
-  }
+  assertEqual(
+    isConfigurationEnabled(
+      extendConfiguration(configuration, { main: "main.js" }, "/repository"),
+    ),
+    true,
+  );
+  assertEqual(
+    isConfigurationEnabled(
+      extendConfiguration(configuration, { main: "main.js" }, "/directory"),
+    ),
+    false,
+  );
   assertEqual(
     isConfigurationEnabled(
       extendConfiguration(
         configuration,
         {
-          main: "foo.mjs",
-          enabled: "process",
-          processes: [],
+          processes: "*",
+          main: "main.js",
         },
-        "/cwd",
+        "/directory",
       ),
     ),
-    false,
+    true,
   );
 }
+
+// getConfigurationPackage //
+assertDeepEqual(
+  getConfigurationPackage(
+    createConfiguration("/repository").packages,
+    "/directory/foo",
+  ),
+  {
+    enabled: false,
+    shallow: true,
+    exclude: [],
+    source: null,
+  },
+);
+assertDeepEqual(
+  getConfigurationPackage(
+    extendConfiguration(
+      createConfiguration("/repository"),
+      {
+        packages: "*",
+      },
+      "/directory",
+    ).packages,
+    "/directory/foo",
+  ),
+  {
+    enabled: true,
+    shallow: false,
+    exclude: [],
+    source: null,
+  },
+);
 
 // extract //
 
@@ -180,11 +189,20 @@ assertDeepEqual(extend("output", null, "/base"), {
 // processes //
 
 assertDeepEqual(extend("processes", "/foo", "/base"), [
+  [{ basedir: "/base", source: "^(?:\\/foo)$", flags: "" }, true],
   [
     {
-      source: "^(?:\\/foo)$",
-      flags: "",
-      basedir: "/base",
+      basedir: "/Users/soft/Desktop/workspace/appmap-agent-js",
+      source: "(^\\.\\.)|((^|/)node_modules/)",
+      flags: "u",
+    },
+    false,
+  ],
+  [
+    {
+      basedir: "/Users/soft/Desktop/workspace/appmap-agent-js",
+      source: "^",
+      flags: "u",
     },
     true,
   ],
@@ -197,16 +215,3 @@ assertDeepEqual(extend("serialization", "toString", null), {
   "maximum-length": 96,
   "include-constructor-name": true,
 });
-
-// packages //
-
-assertDeepEqual(extend("packages", "foo", "/base"), [
-  [
-    {
-      source: "^(?:foo)$",
-      flags: "",
-      basedir: "/base",
-    },
-    { shallow: false, enabled: true, exclude: [], source: null },
-  ],
-]);
