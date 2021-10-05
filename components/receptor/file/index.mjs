@@ -85,7 +85,7 @@ export default (dependencies) => {
   };
   return {
     openReceptorAsync: async ({
-      "backend-trace-port": trace_port,
+      "trace-port": trace_port,
       output: { directory },
     }) => {
       await createDirectoryAsync(directory);
@@ -93,24 +93,26 @@ export default (dependencies) => {
       const paths = new _Set();
       server.on("connection", (socket) => {
         patch(socket);
-        socket.on("message", (content) => {
+        socket.on("message", (session) => {
           socket.removeAllListeners("message");
-          const { configuration } = parseJSON(content);
-          const backend = createBackend(configuration);
-          socket.on("close", () => {
-            for (const key of getBackendTrackIterator(backend)) {
-              sendBackend(backend, ["stop", key, disconnection]);
-            }
-            for (const key of getBackendTraceIterator()) {
-              store(paths, directory, takeBackendTrace(backend, key));
-            }
-          });
           socket.on("message", (content) => {
-            if (sendBackend(backend, parseJSON(content))) {
-              for (const key of getBackendTraceIterator()) {
+            socket.removeAllListeners("message");
+            const backend = createBackend(parseJSON(content));
+            socket.on("close", () => {
+              for (const key of getBackendTrackIterator(backend)) {
+                sendBackend(backend, ["stop", key, disconnection]);
+              }
+              for (const key of getBackendTraceIterator(backend)) {
                 store(paths, directory, takeBackendTrace(backend, key));
               }
-            }
+            });
+            socket.on("message", (content) => {
+              if (sendBackend(backend, parseJSON(content))) {
+                for (const key of getBackendTraceIterator(backend)) {
+                  store(paths, directory, takeBackendTrace(backend, key));
+                }
+              }
+            });
           });
         });
       });

@@ -38,7 +38,22 @@ await new Promise((resolve) => {
 socket.write(createMessage("session"));
 socket.write(createMessage(JSON.stringify(configuration)));
 socket.write(
-  createMessage(JSON.stringify(["start", "record", { path: null, data: {} }])),
+  createMessage(JSON.stringify(["start", "record1", { path: null, data: {} }])),
+);
+socket.write(
+  createMessage(JSON.stringify(["stop", "record1", { status: 0, errors: [] }])),
+);
+socket.write(
+  createMessage(JSON.stringify(["start", "record2", { path: null, data: {} }])),
+);
+socket.write(
+  createMessage(
+    JSON.stringify([
+      "start",
+      "record3",
+      { path: null, data: { name: "name" } },
+    ]),
+  ),
 );
 await new Promise((resolve) => {
   socket.on("close", resolve);
