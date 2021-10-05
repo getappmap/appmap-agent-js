@@ -35,7 +35,7 @@
     - process
     - mocha
     - manual
-    - empty
+    - remote
 
 - $id: mode
   enum:
@@ -44,7 +44,7 @@
 
 - $id: target
   enum:
-    - file-system
+    - file
     - http
 
 - $id: serialization-method
@@ -384,6 +384,7 @@
 
     log: {$ref: log-level}
     host: {const: localhost}
+    session: {$ref: basename}
     trace-port:
       anyOf:
         - const: 0
@@ -394,11 +395,11 @@
         - const: 0
         - $ref: port
     track-protocol: {const: "HTTP/1.1"}
-    local-track-port:
+    secondary-track-port:
       anyOf:
         - const: null
         - $ref: port
-    local-track-protocol: {const: "HTTP/1.1"}
+    secondary-track-protocol: {const: "HTTP/1.1"}
     intercept-track-port:
       anyOf:
         - const: null
@@ -529,6 +530,10 @@
           items: {$ref: cooked-child}
     log: {$ref: log-level}
     host: {const: localhost}
+    session:
+      anyOf:
+        - const: null
+        - $ref: basename
     trace-port:
       anyOf:
         - const: 0
@@ -539,11 +544,11 @@
         - const: 0
         - $ref: absolute-port
     track-protocol: {const: "HTTP/1.1"}
-    local-track-port:
+    secondary-track-port:
       anyOf:
         - const: null
         - $ref: absolute-port
-    local-track-protocol: {const: "HTTP/1.1"}
+    secondary-track-protocol: {const: "HTTP/1.1"}
     intercept-track-port:
       anyOf:
         - const: null

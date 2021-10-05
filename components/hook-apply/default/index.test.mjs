@@ -13,7 +13,7 @@ const {
 } = Assert;
 
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
-const { testHookAsync } = await buildTestComponentAsync("hook");
+const { testHookAsync, makeEvent } = await buildTestComponentAsync("hook");
 const { hookApply, unhookApply } = HookApply(dependencies);
 assertDeepEqual(
   await testHookAsync(
@@ -22,7 +22,7 @@ assertDeepEqual(
     { hooks: { apply: false } },
     async () => {},
   ),
-  [],
+  { files: [], events: [] },
 );
 assertDeepEqual(
   await testHookAsync(
@@ -36,31 +36,20 @@ assertDeepEqual(
       $uuid.recordEndApply(index1, null, 789);
     },
   ),
-  [
-    [
-      "event",
-      "begin",
-      1,
-      0,
-      "apply",
-      {
+  {
+    files: [],
+    events: [
+      makeEvent("begin", 1, 0, "apply", {
         function: "function",
         this: { type: "number", print: "123" },
         arguments: [{ type: "number", print: "456" }],
-      },
-    ],
-    ["event", "before", 2, 0, "jump", null],
-    ["event", "after", 2, 0, "jump", null],
-    [
-      "event",
-      "end",
-      1,
-      0,
-      "apply",
-      {
+      }),
+      makeEvent("before", 2, 0, "jump", null),
+      makeEvent("after", 2, 0, "jump", null),
+      makeEvent("end", 1, 0, "apply", {
         error: { type: "null", print: "null" },
         result: { type: "number", print: "789" },
-      },
+      }),
     ],
-  ],
+  },
 );

@@ -1,4 +1,4 @@
-import Session from "./session.mjs";
+import Protocol from "./protocol.mjs";
 
 const { isArray, from: toArray } = Array;
 const { fromEntries, entries: toEntries } = Object;
@@ -13,13 +13,12 @@ export default (dependencies) => {
       getSerializationEmptyValue,
     },
   } = dependencies;
-  const { recordEventSession } = Session(dependencies);
+  const { recordEventProtocol } = Protocol(dependencies);
   const returnNull = constant(null);
   const generateRecord =
     (type1, type2, serializeData) =>
-    ({ session, recording: { serialization } }, index, data) =>
-      recordEventSession(
-        session,
+    ({ recording: { serialization } }, index, data) =>
+      recordEventProtocol(
         type1,
         index,
         now(),

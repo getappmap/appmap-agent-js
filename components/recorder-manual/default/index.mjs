@@ -1,23 +1,28 @@
 const _Set = Set;
-const _Error = Error;
 
 export default (dependencies) => {
   const {
+    util: { assert },
     expect: { expect },
+    uuid: { getUUID },
     configuration: { extendConfiguration },
     log: { logGuardWarning },
     agent: {
       openAgent,
-      promiseAgentTermination,
       closeAgent,
       recordAgentScript,
-      trackAgentAsync,
       startTrack,
       stopTrack,
+      takeLocalAgentTrace,
     },
   } = dependencies;
+  let global_running = false;
   class Appmap {
     constructor(configuration) {
+      expect(
+        !global_running,
+        "Two appmap instances cannot be active concurrently.",
+      );
       {
         const {
           enabled,
@@ -50,21 +55,24 @@ export default (dependencies) => {
       );
       this.tracks = new _Set();
       this.running = true;
-      this.promise = promiseAgentTermination(this.agent);
+      global_running = true;
     }
     recordScript(path, code) {
       expect(path[0] === "/", "expected an absolute path but got: %j", path);
       return recordAgentScript(this.agent, path, code);
     }
     startTrack(track, initialization) {
+      if (track === null) {
+        track = getUUID();
+      }
       expect(
         this.running,
-        "cannot start track %j because this appmap has been terminated",
+        "Cannot start track %j because this appmap has been terminated.",
         track,
       );
       expect(
         !this.tracks.has(track),
-        "cannot start track %j because it already exists",
+        "Cannot start track %j because it already exists.",
         track,
       );
       this.tracks.add(track);
@@ -73,50 +81,29 @@ export default (dependencies) => {
         data: {},
         ...initialization,
       });
+      return track;
     }
     stopTrack(track, termination) {
       expect(
         this.running,
-        "cannot stop track %j because this appmap has been terminated",
+        "Cannot stop track %j because this appmap has been terminated.",
         track,
       );
       expect(
         this.tracks.has(track),
-        "cannot stop track %j because it is missing",
+        "Cannot stop track %j because it is missing.",
         track,
       );
       this.tracks.delete(track);
       stopTrack(this.agent, track, { errors: [], status: 0, ...termination });
+      return takeLocalAgentTrace(this.agent, track);
     }
-    async claimTrackAsync(track) {
-      expect(
-        this.running,
-        "cannot claim track %j because this appmap has been terminated",
-        track,
-      );
-      expect(
-        !this.tracks.has(track),
-        "cannot claim track %j because it is still running",
-        track,
-      );
-      const { code, message, body } = await trackAgentAsync(
-        this.agent,
-        "DELETE",
-        `/${track}`,
-        null,
-      );
-      /* c8 ignore start */
-      if (code !== 200) {
-        throw new _Error(message);
-      }
-      /* c8 ignore stop */
-      return body;
-    }
-    terminate(termination) {
-      expect(this.running, "this appmap has already been terminated");
+    terminate() {
+      expect(this.running, "This appmap has already been terminated.");
+      assert(global_running, "globally unregistered appmap instance");
+      global_running = false;
       this.running = false;
-      closeAgent(this.agent, { errors: [], status: 0, ...termination });
-      return this.promise;
+      closeAgent(this.agent);
     }
   }
   return { Appmap };

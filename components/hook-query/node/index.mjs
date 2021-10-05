@@ -7,10 +7,10 @@ export default (dependencies) => {
   const { hookPg, unhookPg } = Pg(dependencies);
   const { hookSqlite3, unhookSqlite3 } = Sqlite3(dependencies);
   return {
-    hookQuery: (client, frontend, configuration) => ({
-      mysql: hookMysql(client, frontend, configuration),
-      pg: hookPg(client, frontend, configuration),
-      sqlite3: hookSqlite3(client, frontend, configuration),
+    hookQuery: (emitter, frontend, configuration) => ({
+      mysql: hookMysql(emitter, frontend, configuration),
+      pg: hookPg(emitter, frontend, configuration),
+      sqlite3: hookSqlite3(emitter, frontend, configuration),
     }),
     unhookQuery: ({ mysql, pg, sqlite3 }) => {
       unhookMysql(mysql);

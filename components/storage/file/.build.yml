@@ -1,2 +1,0 @@
-branches: [test, node]
-dependencies: [util, expect, log]

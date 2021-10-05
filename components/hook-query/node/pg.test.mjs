@@ -29,7 +29,7 @@ const path = `${tmpdir()}/${Math.random().toString(36).substring(2)}`;
 
 const proceedAsync = async () => {
   const dependencies = await buildTestDependenciesAsync(import.meta.url);
-  const { testHookAsync } = await buildTestComponentAsync("hook");
+  const { testHookAsync, makeEvent } = await buildTestComponentAsync("hook");
 
   const { hookPg, unhookPg } = HookPg(dependencies);
 
@@ -49,30 +49,26 @@ const proceedAsync = async () => {
       }
     });
 
-  const trace = [
-    ["event", "begin", 1, 0, "bundle", null],
-    [
-      "event",
-      "before",
-      2,
-      0,
-      "query",
-      {
-        database: "postgres",
-        version: null,
-        sql: "SELECT $1::integer * $2::integer AS solution;",
-        parameters: [
-          { type: "number", print: "2" },
-          { type: "number", print: "3" },
-        ],
-      },
-    ],
-    ["event", "after", 2, 0, "query", { error: null }],
-    ["event", "end", 1, 0, "bundle", null],
+  const events = [
+    makeEvent("begin", 1, 0, "bundle", null),
+    makeEvent("before", 2, 0, "query", {
+      database: "postgres",
+      version: null,
+      sql: "SELECT $1::integer * $2::integer AS solution;",
+      parameters: [
+        { type: "number", print: "2" },
+        { type: "number", print: "3" },
+      ],
+    }),
+    makeEvent("after", 2, 0, "query", { error: null }),
+    makeEvent("end", 1, 0, "bundle", null),
   ];
 
   // disabled //
-  assertDeepEqual(await testCaseAsync(false, async () => {}), []);
+  assertDeepEqual(await testCaseAsync(false, async () => {}), {
+    files: [],
+    events: [],
+  });
 
   // promise //
   assertDeepEqual(
@@ -83,7 +79,7 @@ const proceedAsync = async () => {
       );
       assertDeepEqual(rows, [{ solution: 6 }]);
     }),
-    trace,
+    { files: [], events },
   );
 
   // callback //
@@ -104,7 +100,7 @@ const proceedAsync = async () => {
       });
       assertDeepEqual(rows, [{ solution: 6 }]);
     }),
-    trace,
+    { files: [], events },
   );
 
   // type error //
@@ -117,28 +113,17 @@ const proceedAsync = async () => {
         assertEqual(message, "Client was passed a null or undefined query");
       }
     }),
-    [],
+    { files: [], events: [] },
   );
 
   // invalid sql //
   {
-    const extract = ([
-      ,
-      [, , , , , { sql }],
-      [
-        ,
-        ,
-        ,
-        ,
-        ,
-        {
-          error: { constructor: _constructor },
-        },
-      ],
-      ,
-    ]) => ({ sql, constructor: _constructor });
+    const cleanup = ({ files, events }) => ({
+      files,
+      events: events.slice(0, 2),
+    });
     assertDeepEqual(
-      extract(
+      cleanup(
         await testCaseAsync(true, async (client) => {
           const query = new Query("INVALID SQL;");
           const promise = new Promise((resolve) => {
@@ -149,10 +134,21 @@ const proceedAsync = async () => {
           assertMatch(message, /^syntax error/);
         }),
       ),
-      { sql: "INVALID SQL;", constructor: "DatabaseError" },
+      {
+        files: [],
+        events: [
+          makeEvent("begin", 1, 0, "bundle", null),
+          makeEvent("before", 2, 0, "query", {
+            database: "postgres",
+            parameters: {},
+            sql: "INVALID SQL;",
+            version: null,
+          }),
+        ],
+      },
     );
     assertDeepEqual(
-      extract(
+      cleanup(
         await testCaseAsync(true, async (client) => {
           try {
             await client.query("INVALID SQL;");
@@ -161,7 +157,18 @@ const proceedAsync = async () => {
           }
         }),
       ),
-      { sql: "INVALID SQL;", constructor: "DatabaseError" },
+      {
+        files: [],
+        events: [
+          makeEvent("begin", 1, 0, "bundle", null),
+          makeEvent("before", 2, 0, "query", {
+            database: "postgres",
+            parameters: {},
+            sql: "INVALID SQL;",
+            version: null,
+          }),
+        ],
+      },
     );
   }
 };

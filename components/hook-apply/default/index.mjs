@@ -4,7 +4,7 @@ export default (dependencies) => {
   const {
     util: { assignProperty },
     interpretation: { runScript },
-    client: { traceClient },
+    emitter: { sendEmitter },
     frontend: {
       getSerializationEmptyValue,
       getInstrumentationIdentifier,
@@ -20,7 +20,7 @@ export default (dependencies) => {
     unhookApply: (backup) => {
       backup.forEach(assignProperty);
     },
-    hookApply: (client, frontend, { hooks: { apply } }) => {
+    hookApply: (emitter, frontend, { hooks: { apply } }) => {
       if (!apply) {
         return [];
       }
@@ -41,8 +41,8 @@ export default (dependencies) => {
       runtime.empty = getSerializationEmptyValue(frontend);
       runtime.recordBeginApply = (_function, _this, _arguments) => {
         const index = incrementEventCounter(frontend);
-        traceClient(
-          client,
+        sendEmitter(
+          emitter,
           recordBeginApply(frontend, index, {
             function: _function,
             this: _this,
@@ -52,15 +52,18 @@ export default (dependencies) => {
         return index;
       };
       runtime.recordEndApply = (index, error, result) => {
-        traceClient(client, recordEndApply(frontend, index, { error, result }));
+        sendEmitter(
+          emitter,
+          recordEndApply(frontend, index, { error, result }),
+        );
       };
       runtime.recordBeforeJump = () => {
         const index = incrementEventCounter(frontend);
-        traceClient(client, recordBeforeJump(frontend, index, null));
+        sendEmitter(emitter, recordBeforeJump(frontend, index, null));
         return index;
       };
       runtime.recordAfterJump = (index) => {
-        traceClient(client, recordAfterJump(frontend, index, null));
+        sendEmitter(emitter, recordAfterJump(frontend, index, null));
       };
       return [
         "recordBeginApply",

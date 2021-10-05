@@ -3,6 +3,6 @@ dependencies:
   - util
   - expect
   - patch
-  - request
   - frontend
-  - client
+  - emitter
+  - http

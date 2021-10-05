@@ -4,7 +4,7 @@
 // NB: since 15.x we can use module.preloading
 // const preloaded = Path.join(__dirname, "esm.js") in require.cache;
 // preloaded ? : {hookESM: (instrumentAsync) => {
-//   throw new Error("lib/client/hook/esm.js must be preloaded with --experimental loader");
+//   throw new Error("lib/emitter/hook/esm.js must be preloaded with --experimental loader");
 // }};
 
 const _URL = URL;
@@ -14,7 +14,7 @@ export default (dependencies) => {
   const {
     util: { assert },
     frontend: { instrument },
-    client: { traceClient },
+    emitter: { sendEmitter },
   } = dependencies;
   return {
     unhookNativeModule: (enabled) => {
@@ -26,7 +26,7 @@ export default (dependencies) => {
         APPMAP_TRANSFORM_SOURCE = null;
       }
     },
-    hookNativeModule: (client, frontend, { hooks: { esm } }) => {
+    hookNativeModule: (emitter, frontend, { hooks: { esm } }) => {
       if (esm) {
         assert(
           typeof APPMAP_TRANSFORM_SOURCE !== "undefined",
@@ -50,7 +50,7 @@ export default (dependencies) => {
               content,
             );
             if (message !== null) {
-              traceClient(client, message);
+              sendEmitter(emitter, message);
             }
             content = code;
           }

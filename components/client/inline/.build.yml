@@ -1,6 +1,0 @@
-branches: [node, browser]
-dependencies:
-  - request
-  - uuid
-  - storage
-  - backend

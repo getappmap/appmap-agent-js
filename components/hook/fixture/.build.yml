@@ -3,4 +3,4 @@ dependencies:
   - util
   - configuration
   - frontend
-  - client
+  - emitter

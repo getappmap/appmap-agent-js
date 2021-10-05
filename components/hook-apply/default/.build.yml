@@ -3,4 +3,4 @@ dependencies:
   - util
   - interpretation
   - frontend
-  - client
+  - emitter

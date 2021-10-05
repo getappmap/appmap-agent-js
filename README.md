@@ -44,18 +44,22 @@ TODO: sql libraries requirements
 
 ## Automated Recording
 
-The agent provides a CLI to automatically record node processes.
-By default, the agent will look for configuration in a file at `./appmap.yml`.
+The agent provides a CLI to spawn and record node processes.
+By default, the agent will look for a configuration file at `./appmap.yml`.
 The configuration format is detailed [here](#configuration).
 
 ### Scenario
 
 The information to spawn a process are provided to the agent as a format called *scenario*.
-Scenarios should be provided to the agent via a configuration file which by default at `./appmap.yml`.
+The most expressive option to provide scenario to the agent is via the `scenarios` configuration field.
 
 ```yml
 scenarios:
   my-scenario: [node main.mjs argv0 argv1]
+```
+
+```sh
+npx appmap-agent-js --scenario my-scenario
 ```
 
 Alternatively, a scenario can be provided as the positional arguments of the agent command:
@@ -97,28 +101,26 @@ scenarios:
     argv: [argv0, argv1]
 ```
 
-Note that scenarios can also provide their own configuration options:
+Note that scenarios can also provide their own configuration object:
 
 ```yaml
-output:
-  filename: default-filename
+name: default-appmap-name
 scenarios:
   my-scenario:
     type: fork
     exec: main.mjs
     configuration:
-      output:
-        filename: my-scenario-filename
+      name: my-scenario-appmap-name
 ```
 
 ### CLI
 
 * *Positional arguments* The parsed elements of a command.
-* *Named arguments* Any configuration option.
+* *Named arguments* Any configuration field.
   This takes precedence over the options from the configuration file.
   For instance:
   ```sh
-  npx appmap-agent-js --package 'lib/*.mjs' --package 'dist/*.mjs'
+  npx appmap-agent-js --name my-appmap-name --app my-app-name
   ```
 * *Environment variables*
     * `APPMAP_CONFIGURATION_PATH`: path to the configuration file, default: `./appmap.yml`.
@@ -130,9 +132,10 @@ scenarios:
 
 ### Recorder
 
-The `recorder` configuration option defines the main algorithm used for recording:
+The `recorder` configuration option defines how appmap should be generated:
 
 * `"process"` (default): Generate a single appmap which spans over the entire lifetime of the process.
+* `"remote"`: Generate appmaps on demand via [remote recording](remote-recording).
 * `"mocha"`: Generate an appmap for each test case (ie `it` calls) of the entire test suite (ie every `describe` calls on every test file).
   It is only available in the `spawn` format and expects the parsed command to start with either `mocha` or `npx mocha`.
   Note that mocha run the entire test suite within a single node process.
@@ -141,27 +144,36 @@ The `recorder` configuration option defines the main algorithm used for recordin
   If enabled, the appmap will be stripped of the elements of the classmap that did not cause any function applications.
   Example of configuration file:
   ```yaml
-  packages: "lib/**/*.mjs"
   pruning: true
   scenarios:
-    global-mocha:
+    mocha:
       type: spawn
       recorder: mocha
       exec: mocha
-      configuration:
-        enabled: true
-    local-mocha:
+    npx-mocha:
       type: spawn
       recorder: mocha
       exec: npx
       configuration:
-        # prevent recording of the npx command
-        enabled:
-          dist: "mocha"
       argv: [mocha]
   ```
 
-### Mode
+### Remote Recording
+
+
+When the `recorder` configuration field is set to `"remote"`, the agent will serve HTTP requests to generate appmaps on demand.
+This functionality is called remote recording and is better documented [here](https://appland.com/docs/reference/remote-recording).
+Remote recording requests can be delivered to three possible end points:
+
+|                   | Configuration Field       | Routing              | Comment                                                                                |
+|-------------------|---------------------------|----------------------|----------------------------------------------------------------------------------------|
+| Backend Port      | `backend-track-port`      | `/{session}/{track}` | If `session` is `"_appmap"` then the (assumed) single active session will be selected. |
+| Frontend Port     | `frontend-track-port`     | `/{track}`           | Not compatible with the record button of our editor plugins.                           |
+| Spy Frontend Port | `spy-frontend-track-port` | `/_appmap/{track}`   | Will not be active until the application deploy an HTTP server on that port.           |
+
+
+
+<!-- ### Mode
 
 The functionalities of the agent is split in two main parts.
 The *backend* buffers the trace and eventually post-process it and stores it.
@@ -174,7 +186,7 @@ Advantages of the remote mode over the local mode:
 * Appmap storage will always happens, regardless of how the recorded process is terminated.
   For instance, in the local mode, killing the recorded process with `SIGKILL` or performing `process.removeAllListeners("exit")` will preclude appmap storage.
 * The backend process manages multiple recorded processes and prevent accidental overwriting of appmap files.
-* Lower memory footprint of the agent on the recorded process because it contains less functionalities and no trace.
+* Lower memory footprint of the agent on the recorded process because it contains less functionalities and no trace. -->
 
 ## Manual Recording
 
@@ -182,41 +194,32 @@ The agent also provides an API to manually record the node process in which it i
 
 ```js
 import {createAppmap} from "@appland/appmap-agent-js";
-// Prepare the process for recording
 // NB: Only a single concurrent appmap is allowed per process
 const appmap = createAppmap(
   repository_directory,    // default: process.cwd()
   configuration,           // default: {}
   configuration_directory, // default: null
 );
-// Start recording events
-// NB: An appmap can create multiple (concurrent) recordings
-const recording = appmap.start({
-  name,
-  output: {
-    filname,
-  },
+// NB: An appmap can create multiple (concurrent) tracks
+const track = "my-unique-track-identifier";
+appmap.start(track, {
+  app: "my-app-name",
+  name: "my-appmap-name",
+  pruning: true,
   recording: {
-    "defined-class": defined_class, 
-    "method-id": method_id,
+    "recorded-method"
   },
 });
-// Stop recording events
-recording.pause();
-// Restart recording events
-recording.play();
-// Terminate the recording and write the appmap file
-recording.stop();
+appmap.recordScript(
+  "(function main () { return 123; } ());",
+  "path/to/main.js",
+);
+const trace = appmap.stop(track, {
+  status: 0,
+  errors: [] 
+});
+console.log(JSON.stringify(trace, null, 2));
 ```
-
-The configuration format is detailed [here](#configuration).
-The API offers the same functionalities as the CLI safe for the following caveats:
-* Only the `"inline"` mode is supported.
-* To enable native module instrumentation in the API, the node process should be started with the [`--experimental-loader`](https://nodejs.org/api/cli.html#cli_experimental_loader_module) node CLI option:
-  ```
-  node --experimental-loader=./node_modules/@appland/appmap-agent-js/lib/loader.mjs main.mjs argv0 argv1
-  ``` 
-  We are aware that this is limiting but we are bound to node's reflection capabilities.
 
 ## Configuration
 
@@ -224,29 +227,47 @@ The actual format requirements for configuration can be found as a json-schema [
 
 ### Prelude: Specifier Format
 
-The agent whitelist files based on a format called `Specifier`.
+The agent filter files based on a format called `Specifier`.
 A specifier can be any of:
-* `<RegexpSecifier>` Whitelist files based on a regular expression.
+* `<RegexpSecifier>` Filter files based on a regular expression.
     * `regexp <string>` The regular expression's source.
     * `flags <string>` The regular expression's flags. *Default*: `"u"`.
-* `<GlobSpecifier>` Whitelist files based on a glob expression
+* `<GlobSpecifier>` Filter files based on a glob expression
     * `glob <string>` The glob expression
-* `<PathSpecifier>` Whitelist files based on a path
+* `<PathSpecifier>` Filter files based on a path
     * `path <string>` Path to a file or a directory (without trailing `/`).
     * `recursive <boolean>` Indicates whether to whitelist files within nested directories. *Default*: `true`.
-* `<DistSpecifier>` Whitelist files based on a npm package name.
+* `<DistSpecifier>` Filter files based on a npm package name.
     * `dist <string>` Relative path that starts with a npm package name. For instance: `"package/lib"`.
     * `recursive <boolean>`: indicates whether to whitelist files within nested directories. *Default*: `true`.
     * `external <boolean>` Indicates whether to whitelist dependencies outside of the repository. *Default*: `false`.
 
-### Automated Recording Options
-
+<!-- * `hidden-identifier <string>` The prefix of hidden variables used by the agent. The instrumentation will fail if variables from the program under recording starts with this prefix. *Default*: `"APPMAP"`.
+* `function-name-placeholder <string>` The placeholder name for classmap function elements. *Default* `"()"`. 
 * `mode: "local" | "remote"` Defines whether the backend should be executed on the recorded process or on a remote process. *Default*: `"local"` for the API and `"remote"` for the CLI.
 * `protocol "tcp" | "http1" | "http2"` Defines the communication protocol between frontend and backend. Only applicable in remote mode. `"tcp"` refers to a simple messaging protocol directly built on top of tcp and is the fastest option. *Default*: `"tcp"`.
 * `port <number> | <string>` Defines the communication port between frontend and backend. Only applicable in remote mode. A string indicates a path to a unix domain socket which is faster. *Default*: `0` which will use a random available port.
-* `recorder: "process" | "mocha"` Defines the main algorithm used for recording. *Default* `"process"`.
+* `validate <boolean> | <object>` Validation options which are useful to debug the agent.
+  * `<boolean>` Shorthand, `true` is the same as `{message: true, appmap:true}` and `false` is the same as `{message:true, appmap:true}`.
+  * `<object>`
+      * `message <boolean>` Indicates whether to validate trace elements as they are buffered. This is useful to help diagnose the root cause of some bugs. *Default* `false`.
+      * `appmap <boolean>` Indicates whether to validate the appmap before writting it to a file. *Default* `false`. -->
+
+### Automated Recording Configuration Fields
+
+* `recorder: "process" | "remote" | "mocha"` Defines the main algorithm used for recording. *Default* `"process"`.
     * `"process"` Generate a single appmap which spans over the entire lifetime of the process.
     * `"mocha"` Generate an appmap for each test case (ie `it` calls) of the entire test suite (ie every `describe` calls on every test file).
+* `backend-track-port <number> | null`: Port in the backend process for serving remote recording HTTP requests. *Default*: `null`.
+* `frontend-track-port <number> | null`: Port in the frontend process for serving remote recording HTTP requests. *Default*: `null`.
+* `spy-frontend-track-port <number> | null`: Port in the frontend process for intercepting remote recording HTTP requests. *Default*: `null`.
+* `enabled <EnabledSpecifier> | <EnabledSpecifier[]>` Whitelist files to decide whether a node process should be instrumented based on the path of its main module. An `EnabledSpecifier` can be any of:
+    * `<string>` Shorthand, `"test/**/*.mjs"` is the same as `{glob:"test/**/*.mjs", enabled:true}`.
+    * `<boolean>` Shorthand, `true` is the same as `{regexp:"^", enabled:true}` and `false` is the same as `{regexp:"^", enabled:false}`.
+    * `<object>`
+        * `enabled <boolean>` Indicates whether whitelisted files are enabled or not. *Default*: `true`.
+        * `... <Specifier>` Extends from any specifier format. 
+  *Default*: `[]` -- ie: the agent starts disabled and requires configuration extensions to record node processes.
 * `scenario <string>` A regular expression to select scenarios for execution. *Default*: `"anonymous"` (the name of the scenario provided by command line argument).
 * `scenarios <object>`
   An object whose values are either a single scenario or a list of scenarios. A scenario can be any of:
@@ -276,32 +297,22 @@ A specifier can be any of:
             * `execArgv` List of command line arguments to pass to the node executable.
             * `... <SpawnScenario.options>` Any option from the `spawn` format is also supported
         * `configuration <Configuration>` Extension of the parent configuration. *Default*: `{}` -- ie: reuse the parent configuration.
+  * `output <string> | <object>` Options to store appmap files.
+      * `<string>` Shorthand, `"tmp/appmap"` is the same as `{directory: "tmp/appmap"}`.
+      * `<object>`
+          * `directory <string>` Directory to write appmap files.
+          * `filename null | <string>` Filename to write the appmap file. Indexing will be appended to prevent accidental overwriting of appmap files within a single run. *Default*: `null` the agent will look at `name` then `app` then `main` to infer a relevant file name.
+          * `indent 0 | 2 | 4 | 8` JSON indentation to use for writing appmap files. *Default*: `0` (no indentation).
+          * `postfix <string>` String to include between the filename and the `.json` extension. *Default*: `".appmap"`.
 
 ### Common Options
 
 * `log "debug" | "info" | "warning" | "error" | "off"` Usual log levels. *Default*: `"info"`.
-* `enabled <EnabledSpecifier> | <EnabledSpecifier[]>` Whitelist files to decide whether a node process should be instrumented based on the path of its main module. An `EnabledSpecifier` can be any of:
-    * `<string>` Shorthand, `"test/**/*.mjs"` is the same as `{glob:"test/**/*.mjs", enabled:true}`.
-    * `<boolean>` Shorthand, `true` is the same as `{regexp:"^", enabled:true}` and `false` is the same as `{regexp:"^", enabled:false}`.
+* `packages <PackageSpecifier> | <PackageSpecifier[]>` File filtering for instrumentation. A `PackageSpecifier` can be any of:
+    * `<string>`: Glob shorthand, `"lib/**/*.js"` is the same as `{glob: "lib/**/*.js"}`.
     * `<object>`
-        * `enabled <boolean>` Indicates whether whitelisted files are enabled or not. *Default*: `true`.
-        * `... <Specifier>` Extends from any specifier format. 
-  *Default*: `[]` -- ie: the agent starts disabled and requires configuration extensions to record node processes.
-* `language <string> | <object>`
-    * `<string>` Shorthand, `"ecmascript@2020"` is the same as `{name: "ecmascript", version:"2020"}`.
-    * `<object>`
-        * `name "ecmascript"`
-        * `version "es5" | "es6" | "es7" | "es"`
-* `engine <string> | <object>`
-    * `<string>` Shorthand, `name@version` is the same as `{name: "name", version:"version"}`.
-    * `<object>`
-        * `name <string>`
-        * `version <string>`  
-* `packages <PackageSpecifier> | <PackageSpecifier[]>` File whitelisting for instrumentation. A `PackageSpecifier` can be any of:
-    * `<string>`: Shorthand, `"lib/**/*.js"` is the same as `{glob: "lib/**/*.js"}`.
-    * `<object>`
-        * `enabled <boolean>` Indicates whether the whitelisted file should be instrumented or not. *Default*: `true`.
-    <!-- * `shallow <boolean>` -->
+        * `enabled <boolean>` Indicates whether the filtered file should be instrumented or not. *Default*: `true`.
+        * `shallow <boolean>` Indicates whether the filtered file should 
         * `exclude <string[]>` List of [qualified name](#qualified-name) to exclude from instrumentation. Regular expression are supported.
         * `... <Specifier>` Extends from any specifier format.
 * `exclude <string[]>` List of [qualified name](#qualified-name) to always exclude from instrumentation. Regular expression are supported.
@@ -314,23 +325,10 @@ A specifier can be any of:
     * `mysql <boolean>` Indicates whether [`mysql`](https://www.npmjs.com/package/mysql) should be monkey patched to monitor sql queries. The agent will crash if the `mysql` package is not available. *Default*: `false`.
     * `pg <boolean>` Indicates whether [`pg`](https://www.npmjs.com/pg) should be monkey patched to monitor sql queries. The agent will crash if the `pg` package is not available. *Default*: `false`.
     * `sqlite3 <boolean>` Indicates whether [`sqlite3`](https://www.npmjs.com/sqlite3) should be monkey patched to monitor sql queries. The agent will crash if the `sqlite3` package is not available. *Default*: `false`.
-* `hidden-identifier <string>` The prefix of hidden variables used by the agent. The instrumentation will fail if variables from the program under recording starts with this prefix. *Default*: `"APPMAP"`.
-* `function-name-placeholder <string>` The placeholder name for classmap function elements. *Default* `"()"`. 
-* `validate <boolean> | <object>` Validation options which are useful to debug the agent.
-* `<boolean>` Shorthand, `true` is the same as `{message: true, appmap:true}` and `false` is the same as `{message:true, appmap:true}`.
-* `<object>`
-    * `message <boolean>` Indicates whether to validate trace elements as they are buffered. This is useful to help diagnose the root cause of some bugs. *Default* `false`.
-    * `appmap <boolean>` Indicates whether to validate the appmap before writting it to a file. *Default* `false`.
+* `ordering "chronological" | "causal"` 
 * `app null | <string>` Name of the recorded application. *Default*: `name` value found in `package.json` (`null` if `package.json` is missing).
 * `name null | <string>` Name of the appmap. *Default*: `null`.
 * `pruning <boolean>` Remove elements of the classmap which did not trigger any function application event. *Default*: `false`.
-* `output <string> | <object>` Options to store appmap files.
-    * `<string>` Shorthand, `"tmp/appmap"` is the same as `{directory: "tmp/appmap"}`.
-    * `<object>`
-        * `directory <string>` Directory to write appmap files.
-        * `filename null | <string>` Filename to write the appmap file. Indexing will be appended to prevent accidental overwriting of appmap files within a single run. *Default*: `null` the agent will look at `name` then `app` then `main` to infer a relevant file name.
-        * `indent 0 | 2 | 4 | 8` JSON indentation to use for writing appmap files. *Default*: `0` (no indentation).
-        * `postfix <string>` String to include between the filename and the `.json` extension. *Default*: `".appmap"`.
 * `serialization <string> | <object>` Serialization options.
     * `<string>` Shorthand, `"toString"` is the same as `{method: "toString"}`.
     * `<object>`
@@ -347,7 +345,10 @@ A specifier can be any of:
 The appmap framework represent an application as a tree structure called *classmap*.
 The base of a classmap tree mirrors the file structure of the recorded application with nested `package` classmap nodes.
 Within a file, some [estree](https://github.com/estree/estree) nodes are selected to be represented as `class` classmap nodes based on their type.
-The name of these classmap nodes are based on an algorithm that resembles the [naming algorithm of functions](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/name). If a node has no such name, a unique indexed name will be provided. Estree nodes of type `ObjectExpression`, `ClassExpression`, or `ClassDeclaration` are qualified as *class-like* and are directly represented by a `class` node. Estree node of type: `ArrowFunctionExpression`, `FunctionExpresssion`, and `FunctionDeclaration` are qualified as *function-like* and are represented by a `class` classmap node which contains a `function` classmap node as first child. This circumvoluted representation is required because the [appmap specification](https://github.com/applandinc/appmap) does not allow `function` node to contain children. Other estree nodes are not represented in the classmap.
+The name of these classmap nodes are based on an algorithm that resembles the [naming algorithm of functions](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/name).
+If a node has no such name, a unique indexed name will be provided. Estree nodes of type `ObjectExpression`, `ClassExpression`, or `ClassDeclaration` are qualified as *class-like* and are directly represented by a `class` node.
+Estree node of type: `ArrowFunctionExpression`, `FunctionExpresssion`, and `FunctionDeclaration` are qualified as *function-like* and are represented by a `class` classmap node which contains a `function` classmap node as first child.
+This circumvoluted representation is required because the [appmap specification](https://github.com/applandinc/appmap) does not allow `function` node to contain children. Other estree nodes are not represented in the classmap.
 
 Example:
 

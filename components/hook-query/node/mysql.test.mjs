@@ -23,7 +23,7 @@ const path = `${tmpdir()}/${Math.random().toString(36).substring(2)}`;
 
 const proceedAsync = async () => {
   const dependencies = await buildTestDependenciesAsync(import.meta.url);
-  const { testHookAsync } = await buildTestComponentAsync("hook");
+  const { testHookAsync, makeEvent } = await buildTestComponentAsync("hook");
   const { hookMysql, unhookMysql } = HookMysql(dependencies);
   assertDeepEqual(
     await testHookAsync(
@@ -32,7 +32,7 @@ const proceedAsync = async () => {
       { hooks: { mysql: false } },
       async () => {},
     ),
-    [],
+    { events: [], files: [] },
   );
   assertDeepEqual(
     await testHookAsync(
@@ -74,15 +74,11 @@ const proceedAsync = async () => {
         }
       },
     ),
-    [
-      ["event", "begin", 1, 0, "bundle", null],
-      [
-        "event",
-        "before",
-        2,
-        0,
-        "query",
-        {
+    {
+      files: [],
+      events: [
+        makeEvent("begin", 1, 0, "bundle", null),
+        makeEvent("before", 2, 0, "query", {
           database: "mysql",
           version: null,
           sql: "SELECT ? * ? AS solution;",
@@ -90,11 +86,11 @@ const proceedAsync = async () => {
             { type: "number", print: "2" },
             { type: "number", print: "3" },
           ],
-        },
+        }),
+        makeEvent("after", 2, 0, "query", { error: null }),
+        makeEvent("end", 1, 0, "bundle", null),
       ],
-      ["event", "after", 2, 0, "query", { error: null }],
-      ["event", "end", 1, 0, "bundle", null],
-    ],
+    },
   );
 };
 

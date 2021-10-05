@@ -16,14 +16,14 @@ export default (dependencies) => {
       recordBeforeQuery,
       recordAfterQuery,
     },
-    client: { traceClient },
+    emitter: { sendEmitter },
   } = dependencies;
   return {
     unhookPg: (backup) => {
       backup.forEach(assignProperty);
     },
     hookPg: (
-      client,
+      emitter,
       frontend,
       { repository: { directory }, hooks: { pg } },
     ) => {
@@ -66,9 +66,9 @@ export default (dependencies) => {
           }
           const index1 = incrementEventCounter(frontend);
           const index2 = incrementEventCounter(frontend);
-          traceClient(client, recordBeginBundle(frontend, index1, null));
-          traceClient(
-            client,
+          sendEmitter(emitter, recordBeginBundle(frontend, index1, null));
+          sendEmitter(
+            emitter,
             recordBeforeQuery(frontend, index2, {
               database: "postgres",
               version: null,
@@ -78,12 +78,12 @@ export default (dependencies) => {
           );
           callback = query.callback;
           query.callback = (error, result) => {
-            traceClient(
-              client,
+            sendEmitter(
+              emitter,
               recordAfterQuery(frontend, index2, { error: error || empty }),
             );
             callback(error, result);
-            traceClient(client, recordEndBundle(frontend, index1, null));
+            sendEmitter(emitter, recordEndBundle(frontend, index1, null));
           };
           apply(original, this, [query]);
           return result;

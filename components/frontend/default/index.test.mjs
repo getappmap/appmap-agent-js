@@ -12,8 +12,6 @@ const { createConfiguration, extendConfiguration } =
   await buildTestComponentAsync("configuration", "test");
 const {
   createFrontend,
-  initializeFrontend,
-  terminateFrontend,
   startTrack,
   stopTrack,
   getInstrumentationIdentifier,
@@ -32,7 +30,6 @@ const configuration = extendConfiguration(
 );
 const { "hidden-identifier": identifier } = configuration;
 const frontend = createFrontend(configuration);
-assertDeepEqual(initializeFrontend(frontend), ["initialize", configuration]);
 {
   assertDeepEqual(startTrack(frontend, "track", "initialization"), [
     "start",
@@ -67,7 +64,3 @@ assertDeepEqual(instrument(frontend, "script", "/filename.js", "123;"), {
   ],
   code: "123;",
 });
-assertDeepEqual(terminateFrontend(frontend, { errors: [], status: 123 }), [
-  "terminate",
-  { errors: [], status: 123 },
-]);

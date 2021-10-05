@@ -7,9 +7,9 @@ export default (dependencies) => {
   const { hookCommonModule, unhookCommonModule } = Common(dependencies);
   return {
     transformSourceDefault,
-    hookModule: (client, frontend, configuration, box) => ({
-      common: hookCommonModule(client, frontend, configuration),
-      native: hookNativeModule(client, frontend, configuration, box),
+    hookModule: (emitter, frontend, configuration, box) => ({
+      common: hookCommonModule(emitter, frontend, configuration),
+      native: hookNativeModule(emitter, frontend, configuration, box),
     }),
     unhookModule: ({ common, native }) => {
       unhookCommonModule(common);

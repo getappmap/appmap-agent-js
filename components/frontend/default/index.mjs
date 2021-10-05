@@ -1,4 +1,4 @@
-import Session from "./session.mjs";
+import Protocol from "./protocol.mjs";
 import Recording from "./recording.mjs";
 
 export default (dependencies) => {
@@ -9,24 +9,14 @@ export default (dependencies) => {
       getInstrumentationIdentifier,
     },
   } = dependencies;
-  const {
-    createSession,
-    initializeSession,
-    terminateSession,
-    registerFileSession,
-    startTrackSession,
-    stopTrackSession,
-  } = Session(dependencies);
+  const { registerFileProtocol, startTrackProtocol, stopTrackProtocol } =
+    Protocol(dependencies);
   const { createRecording, ...RecordingLibrary } = Recording(dependencies);
   return {
     createFrontend: (configuration) => ({
-      session: createSession(configuration),
       recording: createRecording(configuration),
       instrumentation: createInstrumentation(configuration),
     }),
-    initializeFrontend: ({ session }) => initializeSession(session),
-    terminateFrontend: ({ session }, termination) =>
-      terminateSession(session, termination),
     getInstrumentationIdentifier: ({ instrumentation }) =>
       getInstrumentationIdentifier(instrumentation),
     instrument: ({ instrumentation, session }, kind, path, code1) => {
@@ -38,17 +28,17 @@ export default (dependencies) => {
       );
       let message = null;
       if (file !== null) {
-        message = registerFileSession(session, file);
+        message = registerFileProtocol(file);
       }
       return {
         message,
         code: code2,
       };
     },
-    startTrack: ({ session }, track, initialization) =>
-      startTrackSession(session, track, initialization),
-    stopTrack: ({ session }, track, termination) =>
-      stopTrackSession(session, track, termination),
+    startTrack: ({}, track, initialization) =>
+      startTrackProtocol(track, initialization),
+    stopTrack: ({}, track, termination) =>
+      stopTrackProtocol(track, termination),
     ...RecordingLibrary,
   };
 };

@@ -6,24 +6,16 @@ export default (dependencies) => {
   const {
     util: { assert },
     backend: { createBackend, respondBackend },
-    storage: { store },
     expect: { expectSuccessAsync, expectSuccess },
     log: { logDebug, logInfo, logWarning },
     spawn: { spawn },
     child: { compileChild, getChildDescription },
     configuration: { extendConfiguration },
-    request: {
-      openResponder,
-      listenResponderAsync,
-      getResponderPort,
-      promiseResponderTermination,
-      closeResponder,
-    },
     receptor: {
       openReceptorAsync,
-      closeReceptor,
-      promiseReceptorTermination,
-      getReceptorPort,
+      closeReceptorAsync,
+      getReceptorTracePort,
+      getReceptorTrackPort,
     },
   } = dependencies;
   return {
@@ -49,41 +41,19 @@ export default (dependencies) => {
           subprocess.kill("SIGINT");
         }
       });
+      const receptor = await openReceptorAsync(configuration);
+      configuration = extendConfiguration(
+        configuration,
+        {
+          "backend-trace-port": getReceptorTracePort(receptor),
+          "backend-track-port": getReceptorTrackPort(receptor),
+        },
+        null,
+      );
       const {
         scenario,
         scenarios,
-        "trace-port": trace_port,
-        "track-port": track_port,
       } = configuration;
-      const backend = createBackend();
-      /* c8 ignore start */
-      const responder = await openResponder(async (method, path, body) => {
-        const { storables, ...response } = respondBackend(
-          backend,
-          method,
-          path,
-          body,
-        );
-        storables.forEach(store);
-        return response;
-      });
-      /* c8 ignore stop */
-      await listenResponderAsync(responder, track_port);
-      const receptor = await openReceptorAsync(backend, {
-        host: "localhost",
-        port: trace_port,
-      });
-      configuration = {
-        ...extendConfiguration(
-          configuration,
-          {
-            "trace-port": getReceptorPort(receptor),
-            "track-port": getResponderPort(responder),
-          },
-          "/",
-        ),
-        scenarios: {},
-      };
       const runChildAsync = async (child) => {
         const description = getChildDescription(child);
         logInfo("%s ...", description);
@@ -155,10 +125,7 @@ export default (dependencies) => {
           }
         }
       } finally {
-        closeReceptor(receptor);
-        closeResponder(responder);
-        await promiseReceptorTermination(receptor);
-        await promiseResponderTermination(responder);
+        await closeReceptorAsync(receptor);
       }
     },
   };

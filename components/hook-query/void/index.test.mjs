@@ -23,7 +23,7 @@ const testAsync = async () => {
       { hooks: { cjs: false, esm: false } },
       async (frontend) => null,
     ),
-    [],
+    { files: [], events: [] },
   );
 };
 

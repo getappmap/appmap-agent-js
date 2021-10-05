@@ -3,7 +3,6 @@ import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
 } from "../../build.mjs";
-import Session from "./session.mjs";
 import Recording from "./recording.mjs";
 
 const { deepEqual: assertDeepEqual, equal: assertEqual } = Assert;
@@ -20,11 +19,8 @@ const {
   recordBeforeQuery,
   recordAfterQuery,
 } = Recording(dependencies);
-const { createSession, initializeSession } = Session(dependencies);
 const configuration = createConfiguration("/");
 const recording = createRecording(configuration);
-const session = createSession(configuration);
-initializeSession(session);
 assertEqual(typeof incrementEventCounter({ recording }), "number");
 assertEqual(typeof getSerializationEmptyValue({ recording }), "symbol");
 const createMessage = (type1, index, { type: type2, ...data }) => [
@@ -36,7 +32,7 @@ const createMessage = (type1, index, { type: type2, ...data }) => [
   data,
 ];
 assertDeepEqual(
-  recordBeginApply({ session, recording }, "index", {
+  recordBeginApply({ recording }, "index", {
     function: "function",
     this: 123,
     arguments: [456],
@@ -49,7 +45,7 @@ assertDeepEqual(
   }),
 );
 assertDeepEqual(
-  recordEndApply({ session, recording }, "index", {
+  recordEndApply({ recording }, "index", {
     result: 123,
     error: 456,
   }),
@@ -60,7 +56,7 @@ assertDeepEqual(
   }),
 );
 assertDeepEqual(
-  recordBeforeQuery({ session, recording }, "index", {
+  recordBeforeQuery({ recording }, "index", {
     database: "database",
     version: "version",
     sql: "sql",
@@ -75,7 +71,7 @@ assertDeepEqual(
   }),
 );
 assertDeepEqual(
-  recordBeforeQuery({ session, recording }, "index", {
+  recordBeforeQuery({ recording }, "index", {
     database: "database",
     version: "version",
     sql: "sql",
@@ -90,7 +86,7 @@ assertDeepEqual(
   }),
 );
 assertDeepEqual(
-  recordAfterQuery({ session, recording }, "index", {
+  recordAfterQuery({ recording }, "index", {
     error: 123,
   }),
   createMessage("after", "index", {

@@ -38,7 +38,7 @@ export const schema = [
       "process",
       "mocha",
       "manual",
-      "empty"
+      "remote"
     ]
   },
   {
@@ -51,7 +51,7 @@ export const schema = [
   {
     "$id": "target",
     "enum": [
-      "file-system",
+      "file",
       "http"
     ]
   },
@@ -706,6 +706,9 @@ export const schema = [
       "host": {
         "const": "localhost"
       },
+      "session": {
+        "$ref": "basename"
+      },
       "trace-port": {
         "anyOf": [
           {
@@ -732,7 +735,7 @@ export const schema = [
       "track-protocol": {
         "const": "HTTP/1.1"
       },
-      "local-track-port": {
+      "secondary-track-port": {
         "anyOf": [
           {
             "const": null
@@ -742,7 +745,7 @@ export const schema = [
           }
         ]
       },
-      "local-track-protocol": {
+      "secondary-track-protocol": {
         "const": "HTTP/1.1"
       },
       "intercept-track-port": {
@@ -1044,6 +1047,16 @@ export const schema = [
       "host": {
         "const": "localhost"
       },
+      "session": {
+        "anyOf": [
+          {
+            "const": null
+          },
+          {
+            "$ref": "basename"
+          }
+        ]
+      },
       "trace-port": {
         "anyOf": [
           {
@@ -1070,7 +1083,7 @@ export const schema = [
       "track-protocol": {
         "const": "HTTP/1.1"
       },
-      "local-track-port": {
+      "secondary-track-port": {
         "anyOf": [
           {
             "const": null
@@ -1080,7 +1093,7 @@ export const schema = [
           }
         ]
       },
-      "local-track-protocol": {
+      "secondary-track-protocol": {
         "const": "HTTP/1.1"
       },
       "intercept-track-port": {

@@ -173,7 +173,7 @@ assertDeepEqual(extend("scenarios", { name: ["exec", "argv0"] }, "/base"), {
 // output //
 
 assertDeepEqual(extend("output", "directory", "/base"), {
-  target: "file-system",
+  target: "file",
   directory: "/base/directory",
   basename: null,
   extension: ".appmap.json",

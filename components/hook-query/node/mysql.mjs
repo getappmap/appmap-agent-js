@@ -13,14 +13,14 @@ export default (dependencies) => {
       recordBeforeQuery,
       recordAfterQuery,
     },
-    client: { traceClient },
+    emitter: { sendEmitter },
   } = dependencies;
   return {
     unhookMysql: (backup) => {
       backup.forEach(assignProperty);
     },
     hookMysql: (
-      client,
+      emitter,
       frontend,
       { repository: { directory }, hooks: { mysql } },
     ) => {
@@ -38,9 +38,9 @@ export default (dependencies) => {
         ({ sql, values, _callback: callback } = { values: [], ...query });
         const index1 = incrementEventCounter(frontend);
         const index2 = incrementEventCounter(frontend);
-        traceClient(client, recordBeginBundle(frontend, index1, null));
-        traceClient(
-          client,
+        sendEmitter(emitter, recordBeginBundle(frontend, index1, null));
+        sendEmitter(
+          emitter,
           recordBeforeQuery(frontend, index2, {
             database: "mysql",
             version: null,
@@ -49,12 +49,12 @@ export default (dependencies) => {
           }),
         );
         query._callback = (error, result, fields) => {
-          traceClient(
-            client,
+          sendEmitter(
+            emitter,
             recordAfterQuery(frontend, index2, { error: error || empty }),
           );
           callback(error, result, fields);
-          traceClient(client, recordEndBundle(frontend, index1, null));
+          sendEmitter(emitter, recordEndBundle(frontend, index1, null));
         };
         return apply(original, this, [query]);
       };

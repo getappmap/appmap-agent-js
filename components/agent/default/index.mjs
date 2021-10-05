@@ -7,50 +7,52 @@ export default (dependencies) => {
     "hook-response": { hookResponse, unhookResponse },
     "hook-query": { hookQuery, unhookQuery },
     interpretation: { runScript },
-    frontend: {
-      createFrontend,
-      instrument,
-      initializeFrontend,
-      terminateFrontend,
-      startTrack,
-      stopTrack,
-    },
-    client: {
-      openClient,
-      listenClientAsync,
-      trackClientAsync,
-      promiseClientTermination,
-      traceClient,
-      closeClient,
+    frontend: { createFrontend, instrument, startTrack, stopTrack },
+    emitter: {
+      openEmitter,
+      closeEmitter,
+      sendEmitter,
+      requestRemoteEmitterAsync,
+      takeLocalEmitterTrace,
     },
   } = dependencies;
   return {
-    openAgent: (configuration) => ({
-      configuration,
-      frontend: createFrontend(configuration),
-      client: openClient(configuration),
-    }),
-    promiseAgentTermination: async ({ configuration, client, frontend }) => {
-      traceClient(client, initializeFrontend(frontend));
-      const hook_group = hookGroup(client, frontend, configuration);
-      const hook_module = hookModule(client, frontend, configuration);
-      const hook_apply = hookApply(client, frontend, configuration);
-      const hook_request = hookRequest(client, frontend, configuration);
-      const hook_response = hookResponse(client, frontend, configuration);
-      const hook_query = hookQuery(client, frontend, configuration);
-      await listenClientAsync(client);
-      try {
-        return await promiseClientTermination(client);
-      } finally {
-        unhookGroup(hook_group);
-        unhookModule(hook_module);
-        unhookApply(hook_apply);
-        unhookRequest(hook_request);
-        unhookResponse(hook_response);
-        unhookQuery(hook_query);
-      }
+    openAgent: (configuration) => {
+      const emitter = openEmitter(configuration);
+      const frontend = createFrontend(configuration);
+      return {
+        frontend,
+        emitter,
+        group_hook: hookGroup(emitter, frontend, configuration),
+        module_hook: hookModule(emitter, frontend, configuration),
+        apply_hook: hookApply(emitter, frontend, configuration),
+        request_hook: hookRequest(emitter, frontend, configuration),
+        response_hook: hookResponse(emitter, frontend, configuration),
+        query_hook: hookQuery(emitter, frontend, configuration),
+      };
     },
-    recordAgentScript: ({ frontend, client }, path, code1) => {
+    closeAgent: (
+      {
+        frontend,
+        emitter,
+        group_hook,
+        module_hook,
+        apply_hook,
+        request_hook,
+        response_hook,
+        query_hook,
+      },
+      termination,
+    ) => {
+      closeEmitter(emitter);
+      unhookGroup(group_hook);
+      unhookModule(module_hook);
+      unhookApply(apply_hook);
+      unhookRequest(request_hook);
+      unhookResponse(response_hook);
+      unhookQuery(query_hook);
+    },
+    recordAgentScript: ({ frontend, emitter }, path, code1) => {
       const { message, code: code2 } = instrument(
         frontend,
         "script",
@@ -58,23 +60,21 @@ export default (dependencies) => {
         code1,
       );
       if (message !== null) {
-        traceClient(client, message);
+        sendEmitter(emitter, message);
       }
       return runScript(code2);
     },
+    takeLocalAgentTrace: ({ emitter }, key) =>
+      takeLocalEmitterTrace(emitter, key),
     /* c8 ignore start */
-    trackAgentAsync: ({ client }, method, path, body) =>
-      trackClientAsync(client, method, path, body),
+    requestRemoteAgentAsync: ({ emitter }, method, path, body) =>
+      requestRemoteEmitterAsync(emitter, method, path, body),
     /* c8 ignore stop */
-    closeAgent: ({ frontend, client }, termination) => {
-      traceClient(client, terminateFrontend(frontend, termination));
-      closeClient(client);
+    startTrack: ({ emitter, frontend }, key, initialization) => {
+      sendEmitter(emitter, startTrack(frontend, key, initialization));
     },
-    startTrack: ({ client, frontend }, track, initialization) => {
-      traceClient(client, startTrack(frontend, track, initialization));
-    },
-    stopTrack: ({ client, frontend }, track, termination) => {
-      traceClient(client, stopTrack(frontend, track, termination));
+    stopTrack: ({ emitter, frontend }, key, termination) => {
+      sendEmitter(emitter, stopTrack(frontend, key, termination));
     },
   };
 };

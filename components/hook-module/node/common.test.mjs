@@ -44,7 +44,7 @@ const testAsync = async () => {
         assertEqual(require(path), 123);
       },
     ),
-    [],
+    { files: [], events: [] },
   );
   delete require.cache[resolved_path];
   assertDeepEqual(
@@ -64,9 +64,8 @@ const testAsync = async () => {
         assertEqual(require(path), 123);
       },
     ),
-    [
-      [
-        "file",
+    {
+      files: [
         {
           index: 0,
           exclude: [],
@@ -77,7 +76,8 @@ const testAsync = async () => {
           source: false,
         },
       ],
-    ],
+      events: [],
+    },
   );
 };
 

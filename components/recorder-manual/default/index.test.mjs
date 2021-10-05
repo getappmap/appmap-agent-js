@@ -14,30 +14,43 @@ const { Appmap } = RecorderManual(
 const { createConfiguration, extendConfiguration } =
   await buildTestComponentAsync("configuration");
 
-const appmap = new Appmap(
-  extendConfiguration(
-    createConfiguration("/repository"),
-    {
-      mode: "local",
-      recorder: "manual",
-      packages: ["*"],
-      hooks: { cjs: false, esm: false, apply: false, http: false },
-    },
-    "/repository",
-  ),
+const configuration = extendConfiguration(
+  createConfiguration("/repository"),
+  {
+    mode: "local",
+    name: "name1",
+    enabled: true,
+    recorder: "manual",
+    packages: ["*"],
+    hooks: { cjs: false, esm: false, apply: false, http: false },
+  },
+  "/repository",
 );
 
-const track = "track";
-appmap.startTrack(track, { path: null, data: { output: null } });
+const appmap = new Appmap(configuration);
+
+const track = appmap.startTrack(null, { path: null, data: { name: "name2" } });
 assertEqual(appmap.recordScript("/repository/main.js", "123;"), 123);
-appmap.stopTrack(track);
-assertEqual(await appmap.claimTrackAsync(track), null);
-assertDeepEqual(
-  (await appmap.terminate()).map((element) => {
-    if (Array.isArray(element)) {
-      return element[0];
-    }
-    return element.method;
-  }),
-  ["initialize", "start", "file", "stop", "DELETE", "terminate"],
-);
+assertDeepEqual(appmap.stopTrack(track, { status: 123, errors: [] }), {
+  configuration: {
+    ...configuration,
+    name: "name2",
+  },
+  files: [
+    {
+      code: "123;",
+      exclude: [],
+      index: 0,
+      path: "/repository/main.js",
+      shallow: false,
+      source: false,
+      type: "script",
+    },
+  ],
+  events: [],
+  termination: {
+    status: 123,
+    errors: [],
+  },
+});
+appmap.terminate();

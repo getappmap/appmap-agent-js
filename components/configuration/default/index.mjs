@@ -198,6 +198,10 @@ export default (dependencies) => {
       extend: overwrite,
       normalize: identity,
     },
+    session: {
+      extend: overwrite,
+      normalize: identity,
+    },
     "trace-port": {
       extend: overwrite,
       normalize: normalizePort,
@@ -214,11 +218,11 @@ export default (dependencies) => {
       extend: overwrite,
       normalize: identity,
     },
-    "local-track-port": {
+    "secondary-track-port": {
       extend: overwrite,
       normalize: normalizePort,
     },
-    "local-track-protocol": {
+    "secondary-track-protocol": {
       extend: overwrite,
       normalize: identity,
     },
@@ -380,12 +384,13 @@ export default (dependencies) => {
       // provided by the user
       mode: "remote",
       host: "localhost",
+      session: null,
       "trace-port": 0, // possibly overwritten by the agent
       "trace-protocol": "TCP",
       "track-port": 0, // possibly overwritten by the agent
       "track-protocol": "HTTP/1.1",
-      "local-track-port": null,
-      "local-track-protocol": "HTTP/1.1",
+      "secondary-track-port": null,
+      "secondary-track-protocol": "HTTP/1.1",
       "intercept-track-port": null,
       "intercept-track-protocol": "HTTP/1.1",
       validate: {
@@ -396,7 +401,7 @@ export default (dependencies) => {
       scenarios: {},
       log: "info",
       output: {
-        target: "file-system",
+        target: "file",
         directory: `${directory}/tmp/appmap`,
         basename: null,
         extension: ".appmap.json",

@@ -1,0 +1,7 @@
+branches: [node]
+dependencies:
+  - uuid
+  - util
+  - agent
+  - configuration
+  - http

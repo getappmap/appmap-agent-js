@@ -8,7 +8,7 @@ import RecorderMocha from "./index.mjs";
 
 const {
   // equal: assertEqual,
-  deepEqual: assertDeepEqual,
+  // deepEqual: assertDeepEqual,
 } = Assert;
 
 const { createMochaHooks } = RecorderMocha(
@@ -20,23 +20,20 @@ const { createConfiguration, extendConfiguration } =
 
 const configuration = createConfiguration("/repository");
 
-{
-  const promise = createMochaHooks(
-    new EventEmitter(),
-    extendConfiguration(
-      configuration,
-      { recorder: "mocha", enabled: false },
-      null,
-    ),
-  );
-  await promise;
-}
+createMochaHooks(
+  new EventEmitter(),
+  extendConfiguration(
+    configuration,
+    { recorder: "mocha", enabled: false },
+    null,
+  ),
+);
 
 {
   const emitter = new EventEmitter();
   emitter.cwd = () => "/cwd";
   emitter.argv = ["node", "main.mjs"];
-  const { promise, beforeEach, afterEach } = createMochaHooks(
+  const { beforeEach, afterEach } = createMochaHooks(
     emitter,
     extendConfiguration(
       configuration,
@@ -55,17 +52,13 @@ const configuration = createConfiguration("/repository");
     },
   });
   afterEach();
-  beforeEach.call({
-    currentTest: {
-      parent: {
-        fullTitle: () => "full-title-2",
-      },
-    },
-  });
+  // beforeEach.call({
+  //   currentTest: {
+  //     parent: {
+  //       fullTitle: () => "full-title-2",
+  //     },
+  //   },
+  // });
   emitter.emit("uncaughtExceptionMonitor", new Error("BOUM"));
   emitter.emit("exit", 123, "SIGINT");
-  assertDeepEqual(
-    (await promise).map(([type]) => type),
-    ["initialize", "start", "stop", "start", "stop", "terminate"],
-  );
 }

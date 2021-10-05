@@ -11,23 +11,22 @@
 - * uuid
   * time
   * spawn
-  * request
   * prompts
+  * http
+  * service
 - specifier
 - engine
 - repository
 - child
 - configuration
-- storage
 - naming
 - trace
 - backend
-- receptor
 - * instrumentation
   * interpretation
   * serialization
 - frontend
-- client
+- emitter
 - hook
 - * hook-apply
   * hook-group
@@ -41,5 +40,6 @@
 - * recorder-manual
   * recorder-process
   * recorder-mocha
-  * recorder-empty
+  * recorder-remote
+- receptor
 - batch

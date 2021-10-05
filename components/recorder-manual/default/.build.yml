@@ -1,6 +1,8 @@
 branches: [node]
 dependencies:
   - log
+  - util
   - expect
   - agent
+  - uuid
   - configuration

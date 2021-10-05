@@ -13,9 +13,9 @@ const { createConfiguration, extendConfiguration } =
   await buildTestComponentAsync("configuration", "test");
 const {
   openAgent,
-  recordAgentScript,
-  promiseAgentTermination,
   closeAgent,
+  recordAgentScript,
+  takeLocalAgentTrace,
   startTrack,
   stopTrack,
 } = Agent(dependencies);
@@ -35,13 +35,25 @@ const agent = openAgent(
     "/",
   ),
 );
-setTimeout(() => {
-  startTrack(agent, "track", {});
-  assertEqual(recordAgentScript(agent, "/main.js", "123;"), 123);
-  stopTrack(agent, "track", { errors: [], status: 0 });
-  closeAgent(agent, { errors: [], status: 123 });
-});
+startTrack(agent, "record", { path: null, data: {} });
+assertEqual(recordAgentScript(agent, "/main.js", "123;"), 123);
+stopTrack(agent, "record", { errors: [], status: 0 });
+closeAgent(agent, { errors: [], status: 123 });
+const { files, events } = takeLocalAgentTrace(agent, "record");
 assertDeepEqual(
-  (await promiseAgentTermination(agent)).map(([type]) => type),
-  ["initialize", "start", "file", "stop", "terminate"],
+  { files, events },
+  {
+    files: [
+      {
+        code: "123;",
+        exclude: [],
+        index: 0,
+        path: "/main.js",
+        shallow: false,
+        source: false,
+        type: "script",
+      },
+    ],
+    events: [],
+  },
 );

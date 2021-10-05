@@ -1,5 +1,5 @@
-const getUUID = () => "uuid";
-
 export default (dependencies) => {
-  return { getUUID };
+  return {
+    getUUID: () => `uuid`,
+  };
 };

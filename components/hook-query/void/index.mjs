@@ -4,7 +4,7 @@ export default (dependencies) => {
     expect: { expect },
   } = dependencies;
   return {
-    hookQuery: (client, frontend, { hooks: { mysql, pg, sqlite3 } }) => {
+    hookQuery: (emitter, frontend, { hooks: { mysql, pg, sqlite3 } }) => {
       expect(
         !mysql && !pg && !sqlite3,
         "expected configuration to disable query hooks (mysql && pg && sqlite3)",

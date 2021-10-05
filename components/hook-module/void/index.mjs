@@ -6,7 +6,7 @@ export default (dependencies) => {
   return {
     transformSourceDefault: (content, context, transformSource) =>
       transformSource(content, context, transformSource),
-    hookModule: (client, frontend, { hooks: { esm, cjs } }) => {
+    hookModule: (emitter, frontend, { hooks: { esm, cjs } }) => {
       expect(
         !esm && !cjs,
         "expected configuration to disable module hooks (cjs && esm)",

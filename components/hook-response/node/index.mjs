@@ -12,7 +12,7 @@ const {
 
 export default (dependencies) => {
   const {
-    util: { constant, bind, assert, coalesce, assignProperty },
+    util: { constant, assert, coalesce, assignProperty },
     expect: { expect },
     patch: { patch },
     frontend: {
@@ -22,8 +22,8 @@ export default (dependencies) => {
       recordBeforeJump,
       recordAfterJump,
     },
-    client: { trackClientAsync, traceClient },
-    request: { serve },
+    emitter: { requestRemoteEmitterAsync, sendEmitter },
+    http: { generateRespond },
   } = dependencies;
   const getPort = (server) => {
     const address = server.address();
@@ -32,22 +32,23 @@ export default (dependencies) => {
     /* c8 ignore stop */
   };
   const interceptTrackTraffic = (
-    { client, intercept_track_port },
+    { emitter, port },
     server,
     request,
     response,
   ) => {
-    if (
-      getPort(server) !== intercept_track_port ||
-      !request.url.startsWith("/_appmap/")
-    ) {
+    if (getPort(server) !== port || !request.url.startsWith("/_appmap/")) {
       return false;
     }
+    /* c8 ignore start */
     request.url = request.url.substring("/_appmap".length);
-    serve(bind(trackClientAsync, client), request, response);
+    generateRespond((method, path, body) =>
+      requestRemoteEmitterAsync(emitter, method, path, body),
+    )(request, response);
     return true;
+    /* c8 ignore stop */
   };
-  const beforeRequest = ({ frontend, client }, request, response) => {
+  const beforeRequest = ({ frontend, emitter }, request, response) => {
     // bundle //
     const bundle_index = incrementEventCounter(frontend);
     const begin = () => {
@@ -59,7 +60,7 @@ export default (dependencies) => {
         url,
         route: null,
       };
-      traceClient(client, recordBeginResponse(frontend, bundle_index, data));
+      sendEmitter(emitter, recordBeginResponse(frontend, bundle_index, data));
       // Give time for express to populate the request
       nextTick(() => {
         if (
@@ -67,8 +68,8 @@ export default (dependencies) => {
           typeof coalesce(request, "route", _undefined) === "object" &&
           typeof coalesce(request.route, "path", _undefined) === "string"
         ) {
-          traceClient(
-            client,
+          sendEmitter(
+            emitter,
             recordBeginResponse(frontend, bundle_index, {
               ...data,
               route: `${request.baseUrl}${request.route.path}`,
@@ -80,8 +81,8 @@ export default (dependencies) => {
     const end = () => {
       const { statusCode: status, statusMessage: message } = response;
       const headers = response.getHeaders();
-      traceClient(
-        client,
+      sendEmitter(
+        emitter,
         recordEndResponse(frontend, bundle_index, {
           status,
           message,
@@ -109,7 +110,7 @@ export default (dependencies) => {
           end();
         } else {
           jump_index = incrementEventCounter(frontend);
-          traceClient(client, recordBeforeJump(frontend, jump_index, null));
+          sendEmitter(emitter, recordBeforeJump(frontend, jump_index, null));
         }
       },
       resume: () => {
@@ -121,7 +122,7 @@ export default (dependencies) => {
           jump_index !== null,
           "cannot resume http response because we are not in a jump state",
         );
-        traceClient(client, recordAfterJump(frontend, jump_index, null));
+        sendEmitter(emitter, recordAfterJump(frontend, jump_index, null));
         jump_index = null;
       },
     };
@@ -182,15 +183,15 @@ export default (dependencies) => {
   return {
     unhookResponse: (backup) => backup.forEach(assignProperty),
     hookResponse: (
-      client,
+      emitter,
       frontend,
-      { "intercept-track-port": intercept_track_port, hooks: { http } },
+      { "intercept-track-port": port, hooks: { http } },
     ) => {
-      if (!http && intercept_track_port === null) {
+      if (!http && port === null) {
         return [];
       }
       const interceptTraffic =
-        intercept_track_port === null ? constant(false) : interceptTrackTraffic;
+        port === null ? constant(false) : interceptTrackTraffic;
       const handleTraffic = http ? spyTraffic : forwardTraffic;
       const backup = [Http, Https].flatMap((object) =>
         ["Server", "createServer"].map((key) => ({
@@ -199,7 +200,7 @@ export default (dependencies) => {
           value: object[key],
         })),
       );
-      const state = { client, frontend, intercept_track_port };
+      const state = { emitter, frontend, port };
       const traps = {
         __proto__: null,
         apply: (target, context, values) => {

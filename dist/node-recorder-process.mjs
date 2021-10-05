@@ -21,18 +21,17 @@ import instrumentation$default from "./../components/instrumentation/default/ind
 import serialization$default from "./../components/serialization/default/index.mjs";
 import frontend$default from "./../components/frontend/default/index.mjs";
 import interpretation$vm from "./../components/interpretation/vm/index.mjs";
-import request$node_http from "./../components/request/node-http/index.mjs";
-import storage$file from "./../components/storage/file/index.mjs";
 import validate_message$off from "./../components/validate-message/off/index.mjs";
 import validate_message$on from "./../components/validate-message/on/index.mjs";
 import validate_appmap$off from "./../components/validate-appmap/off/index.mjs";
 import validate_appmap$on from "./../components/validate-appmap/on/index.mjs";
 import trace$appmap from "./../components/trace/appmap/index.mjs";
 import backend$default from "./../components/backend/default/index.mjs";
-import client$inline from "./../components/client/inline/index.mjs";
-import client$node_http1 from "./../components/client/node-http1/index.mjs";
-import client$node_http2 from "./../components/client/node-http2/index.mjs";
-import client$node_tcp from "./../components/client/node-tcp/index.mjs";
+import http$node_http from "./../components/http/node-http/index.mjs";
+import emitter$local from "./../components/emitter/local/index.mjs";
+import emitter$remote_node_http1 from "./../components/emitter/remote-node-http1/index.mjs";
+import emitter$remote_node_http2 from "./../components/emitter/remote-node-http2/index.mjs";
+import emitter$remote_node_tcp from "./../components/emitter/remote-node-tcp/index.mjs";
 import hook_apply$default from "./../components/hook-apply/default/index.mjs";
 import hook_group$node from "./../components/hook-group/node/index.mjs";
 import hook_module$node from "./../components/hook-module/node/index.mjs";
@@ -65,16 +64,15 @@ export default (blueprint) => {
   dependencies["serialization"] = serialization$default(dependencies);
   dependencies["frontend"] = frontend$default(dependencies);
   dependencies["interpretation"] = interpretation$vm(dependencies);
-  dependencies["request"] = request$node_http(dependencies);
-  dependencies["storage"] = storage$file(dependencies);
   if (!("validate-message" in blueprint)) { throw new Error("missing instance for component validate-message"); }
   dependencies["validate-message"] = (blueprint["validate-message"] === "on" ? validate_message$on(dependencies) : (blueprint["validate-message"] === "off" ? validate_message$off(dependencies) : ((() => { throw new Error("invalid instance for component validate-message"); }) ())));
   if (!("validate-appmap" in blueprint)) { throw new Error("missing instance for component validate-appmap"); }
   dependencies["validate-appmap"] = (blueprint["validate-appmap"] === "on" ? validate_appmap$on(dependencies) : (blueprint["validate-appmap"] === "off" ? validate_appmap$off(dependencies) : ((() => { throw new Error("invalid instance for component validate-appmap"); }) ())));
   dependencies["trace"] = trace$appmap(dependencies);
   dependencies["backend"] = backend$default(dependencies);
-  if (!("client" in blueprint)) { throw new Error("missing instance for component client"); }
-  dependencies["client"] = (blueprint["client"] === "node-tcp" ? client$node_tcp(dependencies) : (blueprint["client"] === "node-http2" ? client$node_http2(dependencies) : (blueprint["client"] === "node-http1" ? client$node_http1(dependencies) : (blueprint["client"] === "inline" ? client$inline(dependencies) : ((() => { throw new Error("invalid instance for component client"); }) ())))));
+  dependencies["http"] = http$node_http(dependencies);
+  if (!("emitter" in blueprint)) { throw new Error("missing instance for component emitter"); }
+  dependencies["emitter"] = (blueprint["emitter"] === "remote-node-tcp" ? emitter$remote_node_tcp(dependencies) : (blueprint["emitter"] === "remote-node-http2" ? emitter$remote_node_http2(dependencies) : (blueprint["emitter"] === "remote-node-http1" ? emitter$remote_node_http1(dependencies) : (blueprint["emitter"] === "local" ? emitter$local(dependencies) : ((() => { throw new Error("invalid instance for component emitter"); }) ())))));
   dependencies["hook-apply"] = hook_apply$default(dependencies);
   dependencies["hook-group"] = hook_group$node(dependencies);
   dependencies["hook-module"] = hook_module$node(dependencies);

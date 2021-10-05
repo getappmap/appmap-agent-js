@@ -28,7 +28,7 @@ const testAsync = async () => {
       { hooks: { cjs: false, esm: false } },
       async (state) => null,
     ),
-    [],
+    { files: [], events: [] },
   );
 };
 

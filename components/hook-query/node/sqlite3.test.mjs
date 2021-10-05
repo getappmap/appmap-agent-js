@@ -38,7 +38,7 @@ const testAsync = async () => {
   const database = new Database(":memory:");
 
   const dependencies = await buildTestDependenciesAsync(import.meta.url);
-  const { testHookAsync } = await buildTestComponentAsync("hook");
+  const { testHookAsync, makeEvent } = await buildTestComponentAsync("hook");
   const { hookSqlite3, unhookSqlite3 } = HookSqlite3(dependencies);
 
   const testCaseAsync = (enabled, runAsync) =>
@@ -49,27 +49,26 @@ const testAsync = async () => {
       runAsync,
     );
 
-  const createTrace = (sql, parameters, error) => [
-    ["event", "begin", 1, 0, "bundle", null],
-    [
-      "event",
-      "before",
-      2,
-      0,
-      "query",
-      {
+  const createTrace = (sql, parameters, error) => ({
+    files: [],
+    events: [
+      makeEvent("begin", 1, 0, "bundle", null),
+      makeEvent("before", 2, 0, "query", {
         database: "sqlite3",
         version: null,
         sql,
         parameters,
-      },
+      }),
+      makeEvent("after", 2, 0, "query", { error }),
+      makeEvent("end", 1, 0, "bundle", null),
     ],
-    ["event", "after", 2, 0, "query", { error }],
-    ["event", "end", 1, 0, "bundle", null],
-  ];
+  });
 
   // Disable //
-  assertDeepEqual(await testCaseAsync(false, async () => {}), []);
+  assertDeepEqual(await testCaseAsync(false, async () => {}), {
+    files: [],
+    events: [],
+  });
 
   // TypeError //
   assertDeepEqual(
@@ -83,7 +82,7 @@ const testAsync = async () => {
         /^TypeError: first argument is expected to be a sql query string/u,
       );
     }),
-    [],
+    { files: [], events: [] },
   );
 
   //////////////

@@ -48,9 +48,8 @@ const testAsync = async () => {
         );
       },
     ),
-    [
-      [
-        "file",
+    {
+      files: [
         {
           index: 0,
           exclude: [],
@@ -61,7 +60,8 @@ const testAsync = async () => {
           source: false,
         },
       ],
-    ],
+      events: [],
+    },
   );
 };
 

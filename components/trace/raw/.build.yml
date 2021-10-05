@@ -1,0 +1,7 @@
+branches: [test]
+dependencies:
+  - util
+  - expect
+  - validate-appmap
+  - log
+  - naming

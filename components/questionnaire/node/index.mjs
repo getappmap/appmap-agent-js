@@ -127,7 +127,9 @@ export default (dependencies) => {
             ],
             initial: "0",
             validate: generateValidatePort(true),
-            format: (input) => ({ "track-port": parsePossibleInteger(input) }),
+            format: (input) => ({
+              "track-port": parsePossibleInteger(input),
+            }),
           }
         : null,
     ({ recorder }) =>

@@ -1,5 +1,0 @@
-branches: [node]
-dependencies:
-  - util
-  - uuid
-  - request

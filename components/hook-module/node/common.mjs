@@ -7,14 +7,14 @@ export default (dependencies) => {
   const {
     util: { assignProperty },
     frontend: { instrument },
-    client: { traceClient },
+    emitter: { sendEmitter },
   } = dependencies;
   return {
     unhookCommonModule: (backup) => {
       backup.forEach(assignProperty);
     },
     hookCommonModule: (
-      client,
+      emitter,
       frontend,
       { hooks: { cjs }, repository: { directory } },
     ) => {
@@ -30,7 +30,7 @@ export default (dependencies) => {
           code1,
         );
         if (message !== null) {
-          traceClient(client, message);
+          sendEmitter(emitter, message);
         }
         return apply(original, this, [code2, path]);
       };

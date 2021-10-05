@@ -1,6 +1,5 @@
 import Mocha from "mocha";
 
-const _Promise = Promise;
 const _undefined = undefined;
 
 export default (dependencies) => {
@@ -9,13 +8,7 @@ export default (dependencies) => {
     configuration: { isConfigurationEnabled },
     util: { assert, coalesce, matchVersion },
     expect: { expect },
-    agent: {
-      openAgent,
-      promiseAgentTermination,
-      closeAgent,
-      startTrack,
-      stopTrack,
-    },
+    agent: { openAgent, closeAgent, startTrack, stopTrack },
   } = dependencies;
   const prototype = coalesce(Mocha, "prototype", _undefined);
   const version = coalesce(prototype, "version", _undefined);
@@ -34,31 +27,26 @@ export default (dependencies) => {
       const { recorder } = configuration;
       assert(recorder === "mocha", "expected mocha recorder");
       if (!isConfigurationEnabled(configuration)) {
-        return {
-          promise: _Promise.resolve(_undefined),
-        };
+        return {};
       }
       const agent = openAgent(configuration);
-      const promise = promiseAgentTermination(agent);
       const errors = [];
       process.on("uncaughtExceptionMonitor", (error) => {
         errors.push(error);
       });
       process.on("exit", (status, signal) => {
         const termination = { errors, status };
+        /* c8 ignore start */
         if (track !== null) {
           stopTrack(agent, track, termination);
         }
-        closeAgent(agent, termination);
+        /* c8 ignore stop */
+        closeAgent(agent);
       });
       let track = null;
       return {
-        promise,
         beforeEach() {
-          assert(
-            track === null,
-            "mocha should not run test cases concurrently ...",
-          );
+          assert(track === null, "unexpected mocha concurrent test cases");
           track = getUUID();
           startTrack(agent, track, {
             path: null,

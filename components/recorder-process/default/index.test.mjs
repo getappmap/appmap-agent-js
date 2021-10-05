@@ -8,10 +8,10 @@ import RecorderProcess from "./index.mjs";
 
 const {
   // equal: assertEqual,
-  deepEqual: assertDeepEqual,
+  // deepEqual: assertDeepEqual,
 } = Assert;
 
-const { mainAsync } = RecorderProcess(
+const { main } = RecorderProcess(
   await buildTestDependenciesAsync(import.meta.url),
 );
 
@@ -20,18 +20,9 @@ const { createConfiguration, extendConfiguration } =
 
 const configuration = createConfiguration("/repository");
 
-await mainAsync(
-  new EventEmitter(),
-  extendConfiguration(
-    configuration,
-    { recorder: "process", enabled: false },
-    null,
-  ),
-);
-
 {
   const emitter = new EventEmitter();
-  const promise = mainAsync(
+  main(
     emitter,
     extendConfiguration(
       configuration,
@@ -45,8 +36,4 @@ await mainAsync(
   );
   emitter.emit("uncaughtExceptionMonitor", new Error("BOUM"));
   emitter.emit("exit", 123, "SIGINT");
-  assertDeepEqual(
-    (await promise).map(([type]) => type),
-    ["initialize", "start", "stop", "terminate"],
-  );
 }

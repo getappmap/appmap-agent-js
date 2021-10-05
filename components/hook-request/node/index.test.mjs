@@ -14,7 +14,7 @@ const {
 } = Assert;
 
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
-const { testHookAsync } = await buildTestComponentAsync("hook");
+const { testHookAsync, makeEvent } = await buildTestComponentAsync("hook");
 const { hookRequest, unhookRequest } = HookRequest(dependencies);
 
 const server = createServer();
@@ -53,40 +53,26 @@ assertDeepEqual(
       await promiseResponse(Http.get(url));
     },
   ),
-  [],
+  { files: [], events: [] },
 );
 
-const trace = [
-  ["event", "begin", 1, 0, "bundle", null],
-  [
-    "event",
-    "before",
-    2,
-    0,
-    "request",
-    {
-      protocol: "HTTP/1.1",
-      method: "GET",
-      url: "/path/?key=value",
-      headers: { __proto__: null, host: `localhost:${String(port)}` },
+const events = [
+  makeEvent("begin", 1, 0, "bundle", null),
+  makeEvent("before", 2, 0, "request", {
+    protocol: "HTTP/1.1",
+    method: "GET",
+    url: "/path/?key=value",
+    headers: { __proto__: null, host: `localhost:${String(port)}` },
+  }),
+  makeEvent("after", 2, 0, "request", {
+    status: 200,
+    message: "ok",
+    headers: {
+      "transfer-encoding": "chunked",
+      connection: "close",
     },
-  ],
-  [
-    "event",
-    "after",
-    2,
-    0,
-    "request",
-    {
-      status: 200,
-      message: "ok",
-      headers: {
-        "transfer-encoding": "chunked",
-        connection: "close",
-      },
-    },
-  ],
-  ["event", "end", 1, 0, "bundle", null],
+  }),
+  makeEvent("end", 1, 0, "bundle", null),
 ];
 
 assertDeepEqual(
@@ -98,7 +84,7 @@ assertDeepEqual(
       await promiseResponse(Http.get(url));
     },
   ),
-  trace,
+  { files: [], events },
 );
 
 assertDeepEqual(
@@ -112,7 +98,7 @@ assertDeepEqual(
       await promiseResponse(request);
     },
   ),
-  trace,
+  { files: [], events },
 );
 
 await new Promise((resolve) => {

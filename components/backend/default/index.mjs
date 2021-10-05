@@ -1,105 +1,72 @@
-import Session from "./session.mjs";
-
 const _Map = Map;
-const _Set = Set;
-const _String = String;
 
 export default (dependencies) => {
   const {
-    util: { assert, getDirectory, getBasename, getExtension },
+    util: { assert },
+    "validate-message": { validateMessage },
+    trace: { compileTrace },
+    configuration: { extendConfiguration },
   } = dependencies;
-  const {
-    openSession,
-    closeSession,
-    respondSession,
-    sendSession,
-    isEmptySession,
-  } = Session(dependencies);
-  const preventConflict = (storables, paths) => {
-    // avoid arrow creation for the vast majority of events
-    if (storables.length === 0) {
-      return storables;
-    }
-    return storables.map(({ path, data }) => {
-      if (paths.has(path)) {
-        const directory = getDirectory(path);
-        const basename = getBasename(path);
-        const extension = getExtension(path);
-        let counter = 0;
-        do {
-          counter += 1;
-          path = `${directory}/${basename}-${_String(counter)}.${extension}`;
-        } while (paths.has(path));
-      }
-      paths.add(path);
-      return { path, data };
-    });
-  };
   return {
-    createBackend: () => ({
-      paths: new _Set(),
-      sessions: new _Map(),
+    createBackend: (configuration) => ({
+      configuration,
+      files: [],
+      tracks: new _Map(),
+      traces: new _Map(),
     }),
-    openBackendSession: ({ sessions }, key) => {
-      assert(!sessions.has(key), "duplicate backend session for opening");
-      sessions.set(key, openSession());
+    getBackendTrackIterator: ({ tracks }) => tracks.keys(),
+    getBackendTraceIterator: ({ traces }) => traces.keys(),
+    hasBackendTrack: ({ tracks }, key) => tracks.has(key),
+    hasBackendTrace: ({ traces }, key) => traces.has(key),
+    takeBackendTrace: ({ traces }, key) => {
+      assert(traces.has(key), "missing trace");
+      const trace = traces.get(key);
+      traces.delete(key);
+      return trace;
     },
-    closeBackendSession: ({ sessions, paths }, key) => {
-      assert(sessions.has(key), "missing backend session for closing");
-      const session = sessions.get(key);
-      const storables = closeSession(session, key);
-      if (isEmptySession(session)) {
-        sessions.delete(key);
-      }
-      return preventConflict(storables, paths);
-    },
-    sendBackend: ({ sessions, paths }, key, message) => {
-      assert(sessions.has(key), "missing backend session for sending message");
-      return preventConflict(sendSession(sessions.get(key), message), paths);
-    },
-    respondBackend: ({ sessions }, method, path, body) => {
-      const parts = /^\/([^/]+)(.*)/u.exec(path);
-      if (parts === null) {
-        return {
-          storables: [],
-          code: 400,
-          message: "missing session segment",
-          body: null,
+    sendBackend: ({ configuration, files, tracks, traces }, message) => {
+      validateMessage(message);
+      const type = message[0];
+      if (type === "event") {
+        const event = {
+          type: message[1],
+          index: message[2],
+          time: message[3],
+          data: {
+            type: message[4],
+            ...message[5],
+          },
         };
-      }
-      let [, segment, rest] = parts;
-      if (segment === "_appmap") {
-        if (sessions.size === 0) {
-          return {
-            storables: [],
-            code: 404,
-            message: "not active backend session found",
-            body: null,
-          };
+        for (const { events } of tracks.values()) {
+          events.push(event);
         }
-        if (sessions.size > 1) {
-          return {
-            storables: [],
-            code: 409,
-            message: "multiple active backend session found",
-            body: null,
-          };
-        }
-        segment = sessions.keys().next().value;
-      } else if (!sessions.has(segment)) {
-        return {
-          storables: [],
-          code: 404,
-          message: "backend session not found",
-          body: null,
-        };
-      }
-      const session = sessions.get(segment);
-      const response = respondSession(session, method, rest, body);
-      if (isEmptySession(session)) {
-        sessions.delete(segment);
-      }
-      return response;
+      } else if (type === "file") {
+        files.push(message[1]);
+      } else if (type === "start") {
+        const [, key, initialization] = message;
+        assert(!tracks.has(key), "duplicate track");
+        tracks.set(key, {
+          configuration: extendConfiguration(
+            configuration,
+            initialization.data,
+            initialization.path,
+          ),
+          events: [],
+        });
+      } else if (type === "stop") {
+        const [, key, termination] = message;
+        assert(tracks.has(key), "missing track");
+        assert(!traces.has(key), "duplicate trace");
+        const { events, configuration } = tracks.get(key);
+        tracks.delete(key);
+        traces.set(key, {
+          head: configuration,
+          body: compileTrace(configuration, files, events, termination),
+        });
+      } /* c8 ignore start */ else {
+        assert(false, "invalid message type");
+      } /* c8 ignore stop */
+      return type === "stop";
     },
   };
 };
