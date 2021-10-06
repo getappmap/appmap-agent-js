@@ -59,7 +59,7 @@ const testAsync = async () => {
             key1: "value1",
             key2: "value2",
             NODE_OPTIONS:
-              "node-options-1 --require=/agent-directory/lib/abomination.js --experimental-loader=/agent-directory/lib/process.mjs",
+              "node-options-1 --require=/agent-directory/lib/abomination.js --experimental-loader=/agent-directory/lib/recorder-process.mjs",
             APPMAP_CONFIGURATION: JSON.stringify({
               directory: "/configuration-directory",
               agent: { directory: "/agent-directory" },
@@ -100,7 +100,7 @@ const testAsync = async () => {
           argv: [
             ...(npx ? ["--always-spawn", "mocha"] : []),
             "--require",
-            "/agent-directory/lib/mocha.mjs",
+            "/agent-directory/lib/recorder-mocha.mjs",
             "argv0",
           ],
         },
@@ -156,7 +156,7 @@ const testAsync = async () => {
         argv: [
           "exec-argv-0",
           "--experimental-loader",
-          "/agent-directory/lib/process.mjs",
+          "/agent-directory/lib/recorder-process.mjs",
           "exec",
           "argv0",
         ],

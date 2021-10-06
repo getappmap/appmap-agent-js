@@ -69,7 +69,7 @@ export default (dependencies) => {
           argv = [
             ...part1,
             "--require",
-            `${agent_directory}/lib/mocha.mjs`,
+            `${agent_directory}/lib/recorder-mocha.mjs`,
             ...part2,
           ];
         }
@@ -79,7 +79,7 @@ export default (dependencies) => {
             coalesce(env3, "NODE_OPTIONS", ""),
             // abomination: https://github.com/mochajs/mocha/issues/4720
             `--require=${agent_directory}/lib/abomination.js`,
-            `--experimental-loader=${agent_directory}/lib/${
+            `--experimental-loader=${agent_directory}/lib/recorder-${
               recorder === "mocha" ? "loader" : recorder
             }.mjs`,
           ].join(" "),
@@ -93,7 +93,7 @@ export default (dependencies) => {
         argv = [
           ...fork_argv,
           "--experimental-loader",
-          `${agent_directory}/lib/${recorder}.mjs`,
+          `${agent_directory}/lib/recorder-${recorder}.mjs`,
           exec,
           ...argv,
         ];

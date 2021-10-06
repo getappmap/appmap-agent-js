@@ -152,6 +152,8 @@ export default (dependencies) => {
     );
     if (typeof specifier === "string") {
       specifier = { glob: specifier };
+    } else if (typeof specifier === "boolean") {
+      specifier = { regexp: "^", flags: "u", enabled: specifier };
     }
     const { enabled, ...rest } = {
       enabled: true,
@@ -391,7 +393,6 @@ export default (dependencies) => {
         basename: null,
         extension: ".appmap.json",
       },
-      enabled: "process",
       processes: [
         [makeBlacklistSpecifier(directory), false],
         [makeWhitelistSpecifier(directory), true],
@@ -463,13 +464,8 @@ export default (dependencies) => {
       return configuration;
     },
     getConfigurationPackage: getSpecifierValue,
-    isConfigurationEnabled: ({ enabled, processes, main }) => {
-      if (typeof enabled !== "boolean") {
-        assert(enabled === "process", "unexpeced enabled value");
-        if (main !== null) {
-          enabled = getSpecifierValue(processes, main);
-        }
-      }
+    isConfigurationEnabled: ({ processes, main }) => {
+      const enabled = main === null || getSpecifierValue(processes, main);
       logInfo(`%s %s`, enabled ? "recording" : "bypassing", main);
       return enabled;
     },

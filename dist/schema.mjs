@@ -796,16 +796,6 @@ export const schema = [
       "ordering": {
         "$ref": "ordering"
       },
-      "enabled": {
-        "anyOf": [
-          {
-            "const": "process"
-          },
-          {
-            "type": "boolean"
-          }
-        ]
-      },
       "processes": {
         "anyOf": [
           {
@@ -938,7 +928,7 @@ export const schema = [
     "$id": "configuration",
     "type": "object",
     "additionalProperties": false,
-    "minProperties": 37,
+    "minProperties": 36,
     "properties": {
       "validate": {
         "type": "object",
@@ -1114,16 +1104,6 @@ export const schema = [
       },
       "ordering": {
         "$ref": "ordering"
-      },
-      "enabled": {
-        "anyOf": [
-          {
-            "const": "process"
-          },
-          {
-            "type": "boolean"
-          }
-        ]
       },
       "processes": {
         "type": "array",

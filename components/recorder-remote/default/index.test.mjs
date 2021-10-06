@@ -28,7 +28,6 @@ const configuration = createConfiguration("/repository");
       configuration,
       {
         recorder: "remote",
-        enabled: true,
         hooks: { cjs: false, esm: false, apply: false, http: false },
       },
       "/directory",

@@ -18,7 +18,6 @@ const configuration = extendConfiguration(
   createConfiguration("/repository"),
   {
     name: "name1",
-    enabled: true,
     recorder: "manual",
     packages: ["*"],
     hooks: { cjs: false, esm: false, apply: false, http: false },

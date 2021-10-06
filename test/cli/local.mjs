@@ -10,8 +10,6 @@ const {
 await runAsync(
   null,
   {
-    enabled: true,
-    mode: "local",
     hooks: {
       esm: false,
       cjs: false,

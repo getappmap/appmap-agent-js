@@ -7,9 +7,7 @@ const { equal: assertEqual, deepEqual: assertDeepEqual } = Assert;
 await runAsync(
   { name: "app", version: "1.2.3" },
   {
-    enabled: true,
     name: "name",
-    mode: "remote",
     hooks: {
       esm: false,
       cjs: false,

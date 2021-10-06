@@ -7,8 +7,6 @@ const { deepEqual: assertDeepEqual } = Assert;
 await runAsync(
   null,
   {
-    mode: "remote",
-    enabled: "process",
     processes: { path: "node_modules/.bin/bin" },
     packages: "bin.cjs",
     recorder: "process",

@@ -25,7 +25,6 @@ export default (dependencies) => {
       );
       {
         const {
-          enabled,
           recorder,
           hooks: { esm },
         } = configuration;
@@ -35,18 +34,12 @@ export default (dependencies) => {
           recorder,
         );
         logGuardWarning(
-          enabled !== true,
-          "Manual recorder is always enabled and configuration field 'enabled' is %j.",
-          enabled,
-        );
-        logGuardWarning(
           esm,
           "Manual recorder does not support native module recording and configuration field 'hooks.esm' is enabled.",
         );
       }
       this.agent = openAgent(
         extendConfiguration(configuration, {
-          enabled: true,
           recorder: "manual",
           hooks: {
             esm: false,

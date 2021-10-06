@@ -419,10 +419,6 @@
         pg: {type: boolean}
         sqlite3: {type: boolean}
     ordering: {$ref: ordering}
-    enabled:
-      anyOf:
-        - const: process
-        - type: boolean
     processes:
       anyOf:
         - $ref: enabled-specifier
@@ -479,7 +475,7 @@
 - $id: configuration
   type: object
   additionalProperties: false
-  minProperties: 37
+  minProperties: 36
   properties:
     validate:
       type: object
@@ -552,10 +548,6 @@
         pg: {type: boolean}
         sqlite3: {type: boolean}
     ordering: {$ref: ordering}
-    enabled:
-      anyOf:
-        - const: process
-        - type: boolean
     processes:
       type: array
       items:

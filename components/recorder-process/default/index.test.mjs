@@ -27,7 +27,6 @@ const configuration = createConfiguration("/repository");
     extendConfiguration(
       configuration,
       {
-        enabled: true,
         recorder: "process",
         hooks: { cjs: false, esm: false, apply: false, http: false },
       },

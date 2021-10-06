@@ -123,7 +123,7 @@ export default (dependencies) => {
       return trace_service;
     },
     getReceptorTracePort: getServicePort,
-    getReceptorTrackPort: constant(null),
+    getReceptorTrackPort: constant(0),
     closeReceptorAsync: closeServiceAsync,
   };
 };

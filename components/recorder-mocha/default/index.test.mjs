@@ -24,8 +24,8 @@ createMochaHooks(
   new EventEmitter(),
   extendConfiguration(
     configuration,
-    { recorder: "mocha", enabled: false },
-    null,
+    { recorder: "mocha", processes: false, main: "foo.js" },
+    "/cwd",
   ),
 );
 

@@ -7,8 +7,6 @@ const { deepEqual: assertDeepEqual } = Assert;
 await runAsync(
   null,
   {
-    enabled: true,
-    mode: "remote",
     packages: { glob: "*" },
     hooks: {
       esm: true,
@@ -53,73 +51,73 @@ await runAsync(
     const { "main.appmap.json": appmap } = appmaps;
     const { events } = appmap;
     assertDeepEqual(
-      events.map(({event, defined_class, id, parent_id}) => ({
+      events.map(({ event, defined_class, id, parent_id }) => ({
         event,
         id,
-        ... event === "call" ? {defined_class} : {parent_id},
+        ...(event === "call" ? { defined_class } : { parent_id }),
       })),
       [
         {
-          event: 'call',
+          event: "call",
           id: 1,
-          defined_class: 'mainAsync',
+          defined_class: "mainAsync",
         },
         {
-          event: 'call',
+          event: "call",
           id: 2,
-          defined_class: 'generateAsync',
+          defined_class: "generateAsync",
         },
         {
-          event: 'call',
+          event: "call",
           id: 3,
-          defined_class: 'beforeAwait',
+          defined_class: "beforeAwait",
         },
         {
-          event: 'return',
+          event: "return",
           id: 4,
           parent_id: 3,
         },
         {
-          event: 'call',
+          event: "call",
           id: 5,
-          defined_class: 'promiseCallback',
+          defined_class: "promiseCallback",
         },
         {
-          event: 'call',
+          event: "call",
           id: 6,
-          defined_class: 'timeoutCallback',
+          defined_class: "timeoutCallback",
         },
         {
-          event: 'return',
+          event: "return",
           id: 7,
           parent_id: 6,
         },
         {
-          event: 'return',
+          event: "return",
           id: 8,
           parent_id: 5,
         },
         {
-          event: 'call',
+          event: "call",
           id: 9,
-          defined_class: 'afterAwait',
+          defined_class: "afterAwait",
         },
         {
-          event: 'return',
+          event: "return",
           id: 10,
           parent_id: 9,
         },
         {
-          event: 'return',
+          event: "return",
           id: 11,
           parent_id: 2,
         },
         {
-          event: 'return',
+          event: "return",
           id: 12,
           parent_id: 1,
-        }
-      ]
+        },
+      ],
     );
   },
 );

@@ -8,8 +8,6 @@ const { deepEqual: assertDeepEqual } = Assert;
 await runAsync(
   null,
   {
-    enabled: true,
-    mode: "remote",
     hooks: {
       esm: false,
       cjs: false,

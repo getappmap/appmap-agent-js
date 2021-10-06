@@ -188,6 +188,26 @@ assertDeepEqual(extend("output", null, "/base"), {
 
 // processes //
 
+assertDeepEqual(extend("processes", true, "/base"), [
+  [{ basedir: "/base", source: "^", flags: "u" }, true],
+  [
+    {
+      basedir: "/Users/soft/Desktop/workspace/appmap-agent-js",
+      source: "(^\\.\\.)|((^|/)node_modules/)",
+      flags: "u",
+    },
+    false,
+  ],
+  [
+    {
+      basedir: "/Users/soft/Desktop/workspace/appmap-agent-js",
+      source: "^",
+      flags: "u",
+    },
+    true,
+  ],
+]);
+
 assertDeepEqual(extend("processes", "/foo", "/base"), [
   [{ basedir: "/base", source: "^(?:\\/foo)$", flags: "" }, true],
   [
