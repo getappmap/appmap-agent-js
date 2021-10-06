@@ -71,7 +71,7 @@ export default (dependencies) => {
         },
         {
           title: "By remote HTTP requests",
-          value: { recorder: "empty", mode: "remote", output: null },
+          value: { recorder: "remote", mode: "remote", output: null },
           description: [
             "Appmaps will be generated on demand via HTTP requests.",
             "These requests can be send via the record button in our editors plugins.",
@@ -116,7 +116,7 @@ export default (dependencies) => {
           },
     // Remote Recording //
     ({ recorder }) =>
-      recorder === "empty"
+      recorder === "remote"
         ? {
             type: "text",
             name: "value",
@@ -133,7 +133,7 @@ export default (dependencies) => {
           }
         : null,
     ({ recorder }) =>
-      recorder === "empty"
+      recorder === "remote"
         ? {
             type: "text",
             name: "value",

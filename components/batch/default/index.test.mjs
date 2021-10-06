@@ -31,7 +31,6 @@ global.GLOBAL_SPY_SPAWN = (exec, argv, options) => {
 
 const { mainAsync } = Batch(
   await buildTestDependenciesAsync(import.meta.url, {
-    receptor: "stub",
     spawn: "spy",
   }),
 );

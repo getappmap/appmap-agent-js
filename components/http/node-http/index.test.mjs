@@ -59,18 +59,20 @@ const closeServerAsync = (server) =>
   await closeServerAsync(server);
 }
 
-// Unix Domain Socket + Null Body + respondAsync error //
+// Unix Domain Socket + Null Body //
 {
   const server = createServer(
-    generateRespond(async (method, path, body) => {
-      throw new Error("BOUM");
-    }),
+    generateRespond(async (method, path, body) => ({
+      code: 200,
+      message: "OK",
+      body: null,
+    })),
   );
   const port = `${tmpdir()}/${Math.random().toString(36).substring(2)}`;
   await listenServerAsync(server, port);
   assertDeepEqual(await requestAsync("localhost", port, "GET", "/path", null), {
-    code: 500,
-    message: "BOUM",
+    code: 200,
+    message: "OK",
     body: null,
   });
   await closeServerAsync(server);

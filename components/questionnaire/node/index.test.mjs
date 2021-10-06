@@ -86,7 +86,7 @@ assertDeepEqual(
   },
 );
 
-// {recorder:"empty"} //
+// {recorder:"remote"} //
 assertDeepEqual(
   await runAsync([
     ({ format }) => format(""),
@@ -103,7 +103,7 @@ assertDeepEqual(
     ({}) => BREAK,
   ]),
   {
-    recorder: "empty",
+    recorder: "remote",
     mode: "remote",
     output: null,
     "track-port": 0,

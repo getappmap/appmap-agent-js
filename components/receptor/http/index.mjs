@@ -1,5 +1,6 @@
 import { createServer as createTCPServer } from "net";
 import { createServer as createHTTPServer } from "http";
+import { patch } from "net-socket-messaging";
 
 const _Map = Map;
 const { parse: parseJSON } = JSON;
@@ -37,7 +38,7 @@ export default (dependencies) => {
       const backends = new _Map();
       track_server.on(
         "request",
-        generateRespond((method, path, body) => {
+        generateRespond(async (method, path, body) => {
           const parts = path.split("/");
           if (parts.length !== 3 || parts[0] !== "") {
             return {
@@ -67,21 +68,21 @@ export default (dependencies) => {
           }
           const backend = backends.get(session);
           if (method === "POST") {
-            if (hasBackendTrack(backend, record)) {
+            if (
+              hasBackendTrack(backend, record) ||
+              hasBackendTrace(backend, record)
+            ) {
               return {
                 code: 409,
-                message: "Duplicate Active Record",
+                message: "Duplicate Track",
                 body: null,
               };
             }
-            if (hasBackendTrace(backend, record)) {
-              return {
-                code: 409,
-                message: "Duplicate Inactive Record",
-                body: null,
-              };
-            }
-            sendBackend(backend, ["start", record, body]);
+            sendBackend(backend, [
+              "start",
+              record,
+              { path: null, data: {}, ...body },
+            ]);
             return {
               code: 200,
               message: "OK",
@@ -99,24 +100,29 @@ export default (dependencies) => {
           }
           if (method === "DELETE") {
             if (hasBackendTrack(backend, record)) {
-              sendBackend(backend, ["stop", record, body]);
+              sendBackend(backend, [
+                "stop",
+                record,
+                { status: 0, errors: [], ...body },
+              ]);
             } else if (!hasBackendTrace(backend, record)) {
               return {
                 code: 404,
-                message: "Missing Record",
+                message: "Missing Track",
                 body: null,
               };
             }
-            const { body } = takeBackendTrace(backend, record);
+            const { body: trace } = takeBackendTrace(backend, record);
             return {
               code: 200,
               message: "OK",
-              body,
+              body: trace,
             };
           }
         }),
       );
       trace_server.on("connection", (socket) => {
+        patch(socket);
         socket.on("message", (session) => {
           socket.removeAllListeners("message");
           socket.on("message", (content) => {

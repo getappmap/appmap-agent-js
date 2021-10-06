@@ -80,20 +80,11 @@ export default (dependencies) => {
           buffers.push(buffer);
         });
         request.on("end", async () => {
-          let code,
-            message,
-            body = parse(concatBuffer(buffers).toString("utf8"));
-          try {
-            ({ code, message, body } = await respondAsync(
-              request.method,
-              request.url,
-              body,
-            ));
-          } catch (error) {
-            code = 500;
-            message = error.message;
-            body = null;
-          }
+          const { code, message, body } = await respondAsync(
+            request.method,
+            request.url,
+            parse(concatBuffer(buffers).toString("utf8")),
+          );
           const buffer = toBuffer(stringify(body), "utf8");
           response.writeHead(code, message, createHeaders(buffer));
           response.end(buffer);

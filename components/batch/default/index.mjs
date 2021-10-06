@@ -5,7 +5,6 @@ const { entries: toEntries } = Object;
 export default (dependencies) => {
   const {
     util: { assert },
-    backend: { createBackend, respondBackend },
     expect: { expectSuccessAsync, expectSuccess },
     log: { logDebug, logInfo, logWarning },
     spawn: { spawn },
@@ -45,15 +44,12 @@ export default (dependencies) => {
       configuration = extendConfiguration(
         configuration,
         {
-          "backend-trace-port": getReceptorTracePort(receptor),
-          "backend-track-port": getReceptorTrackPort(receptor),
+          "trace-port": getReceptorTracePort(receptor),
+          "track-port": getReceptorTrackPort(receptor),
         },
         null,
       );
-      const {
-        scenario,
-        scenarios,
-      } = configuration;
+      const { scenario, scenarios } = configuration;
       const runChildAsync = async (child) => {
         const description = getChildDescription(child);
         logInfo("%s ...", description);
