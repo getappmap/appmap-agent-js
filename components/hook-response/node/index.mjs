@@ -32,12 +32,15 @@ export default (dependencies) => {
     /* c8 ignore stop */
   };
   const interceptTrackTraffic = (
-    { emitter, port },
+    { emitter, intercept_track_port },
     server,
     request,
     response,
   ) => {
-    if (getPort(server) !== port || !request.url.startsWith("/_appmap/")) {
+    if (
+      getPort(server) !== intercept_track_port ||
+      !request.url.startsWith("/_appmap/")
+    ) {
       return false;
     }
     /* c8 ignore start */
@@ -181,17 +184,19 @@ export default (dependencies) => {
     expect(emit === _emit, "Unexpected 'emit' method on http.Server");
   };
   return {
-    unhookResponse: (backup) => backup.forEach(assignProperty),
+    unhookResponse: (backup) => {
+      backup.forEach(assignProperty);
+    },
     hookResponse: (
       emitter,
       frontend,
-      { "intercept-track-port": port, hooks: { http } },
+      { "intercept-track-port": intercept_track_port, hooks: { http } },
     ) => {
-      if (!http && port === null) {
+      if (!http && intercept_track_port === null) {
         return [];
       }
       const interceptTraffic =
-        port === null ? constant(false) : interceptTrackTraffic;
+        intercept_track_port === null ? constant(false) : interceptTrackTraffic;
       const handleTraffic = http ? spyTraffic : forwardTraffic;
       const backup = [Http, Https].flatMap((object) =>
         ["Server", "createServer"].map((key) => ({
@@ -200,7 +205,7 @@ export default (dependencies) => {
           value: object[key],
         })),
       );
-      const state = { emitter, frontend, port };
+      const state = { emitter, frontend, intercept_track_port };
       const traps = {
         __proto__: null,
         apply: (target, context, values) => {

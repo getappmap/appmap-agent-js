@@ -1,6 +1,6 @@
 branches: [node]
 dependencies:
+  - prompts
   - util
-  - expect
+  - questionnaire
   - validate
-  - configuration

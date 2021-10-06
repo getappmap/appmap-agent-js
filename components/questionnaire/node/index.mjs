@@ -56,7 +56,7 @@ export default (dependencies) => {
       choices: [
         {
           title: "By recording processes",
-          value: { recorder: "process", mode: "remote" },
+          value: { recorder: "process" },
           description: [
             "Record node processes from start to finish.",
             "A single appmap will be generated per spawned node process.",
@@ -64,14 +64,14 @@ export default (dependencies) => {
         },
         {
           title: "By recording mocha test cases",
-          value: { recorder: "mocha", mode: "remote" },
+          value: { recorder: "mocha" },
           description: [
             "An appmap will be generated for each mocha test case.",
           ].join(" "),
         },
         {
           title: "By remote HTTP requests",
-          value: { recorder: "remote", mode: "remote", output: null },
+          value: { recorder: "remote", output: { target: "http" } },
           description: [
             "Appmaps will be generated on demand via HTTP requests.",
             "These requests can be send via the record button in our editors plugins.",
@@ -83,7 +83,6 @@ export default (dependencies) => {
           title: "Manually",
           value: {
             recorder: "manual",
-            mode: "local",
             hooks: { cjs: false, esm: false },
             packages: [{ regexp: "^", flags: "u", enabled: true }],
           },
@@ -116,25 +115,26 @@ export default (dependencies) => {
           },
     // Remote Recording //
     ({ recorder }) =>
-      recorder === "remote"
-        ? {
+      recorder !== "remote"
+        ? null
+        : {
             type: "text",
             name: "value",
             message: [
               "On which primary port should the agent listen for remote recording requests?",
               "Either provide a port number or a path to a unix domain socket.",
-              "Provide 0 to use a random available port.",
+              "Provide `0` to use a random available port.",
             ],
             initial: "0",
             validate: generateValidatePort(true),
             format: (input) => ({
               "track-port": parsePossibleInteger(input),
             }),
-          }
-        : null,
+          },
     ({ recorder }) =>
-      recorder === "remote"
-        ? {
+      recorder !== "remote"
+        ? null
+        : {
             type: "text",
             name: "value",
             message: [
@@ -148,12 +148,12 @@ export default (dependencies) => {
             format: (input) => ({
               "intercept-track-port": parsePossibleInteger(input),
             }),
-          }
-        : null,
+          },
     // Storage //
     ({ recorder }) =>
-      recorder === "process" || recorder === "mocha"
-        ? {
+      recorder !== "process" && recorder !== "mocha"
+        ? null
+        : {
             type: "text",
             name: "value",
             message: [
@@ -161,9 +161,8 @@ export default (dependencies) => {
               "Provide a relative path to a directory.",
             ],
             initial: "tmp/appmap",
-            format: (directory) => ({ output: { directory } }),
-          }
-        : null,
+            format: (directory) => ({ output: { target: "file", directory } }),
+          },
     // Hooks //
     ({ recorder }) => ({
       type: "multiselect",

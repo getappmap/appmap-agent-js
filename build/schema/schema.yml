@@ -37,11 +37,6 @@
     - manual
     - remote
 
-- $id: mode
-  enum:
-    - local
-    - remote
-
 - $id: target
   enum:
     - file
@@ -374,7 +369,6 @@
   additionalProperties: false
   properties:
     # server
-    mode: {$ref: mode}
     validate:
       type: object
       additionalProperties: false
@@ -395,11 +389,6 @@
         - const: 0
         - $ref: port
     track-protocol: {const: "HTTP/1.1"}
-    secondary-track-port:
-      anyOf:
-        - const: null
-        - $ref: port
-    secondary-track-protocol: {const: "HTTP/1.1"}
     intercept-track-port:
       anyOf:
         - const: null
@@ -490,9 +479,8 @@
 - $id: configuration
   type: object
   additionalProperties: false
-  minProperties: 39
+  minProperties: 37
   properties:
-    mode: {$ref: mode}
     validate:
       type: object
       additionalProperties: false
@@ -544,11 +532,6 @@
         - const: 0
         - $ref: absolute-port
     track-protocol: {const: "HTTP/1.1"}
-    secondary-track-port:
-      anyOf:
-        - const: null
-        - $ref: absolute-port
-    secondary-track-protocol: {const: "HTTP/1.1"}
     intercept-track-port:
       anyOf:
         - const: null

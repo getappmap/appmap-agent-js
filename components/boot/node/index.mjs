@@ -1,17 +1,14 @@
 import minimist from "minimist";
-import { readFile, writeFile } from "fs/promises";
 import { readFileSync } from "fs";
 import YAML from "yaml";
 
-const { stringify: stringifyJSON, parse: parseJSON } = JSON;
-const { parse: parseYAML, stringify: stringifyYAML } = YAML;
+const { parse: parseJSON } = JSON;
+const { parse: parseYAML } = YAML;
 
 export default (dependencies) => {
   const {
     expect: { expect },
     validate: { validateConfiguration },
-    questionnaire: { questionConfigAsync },
-    prompts: { prompts },
     util: { hasOwnProperty, getDirectory, coalesce },
     expect: { expectSuccess },
     configuration: { createConfiguration, extendConfiguration },
@@ -20,81 +17,18 @@ export default (dependencies) => {
   const loadConfigFile = (path) => {
     const content = expectSuccess(
       () => readFileSync(path, "utf8"),
-      "failed to open configuration file %j >> %e",
+      "failed to read configuration file %j, running `npx appmap-agent-js setup` will help you create one >> %e",
       path,
     );
     const config = expectSuccess(
       () => parseYAML(content),
-      "failed to parse configuration file %j >> %e",
+      "failed to parse configuration file %j, running `npx appmap-agent-js setup` will help you create one >> %e",
       path,
     );
     return config;
   };
 
-  const loadConfigFileAsync = async (path) => {
-    let content;
-    try {
-      content = await readFile(path, "utf8");
-    } catch (error) {
-      expect(
-        error.code === "ENOENT",
-        "failed to open configuration file %j >> %e",
-        path,
-        error,
-      );
-      if (
-        !coalesce(
-          prompts({
-            type: "toggle",
-            name: "answer",
-            initial: true,
-            message: [
-              `We could not find a configuration file at ${stringifyJSON(
-                path,
-              )}.`,
-              "Do you wish to answer several questions to create a suitable configuration?",
-              `All paths should be relative to ${stringifyJSON(
-                getDirectory(path),
-              )}.`,
-            ].join("\n  "),
-            active: "yes",
-            inactive: "no",
-          }),
-          "answer",
-          false,
-        )
-      ) {
-        return { packages: ["*", "**/*"] };
-      }
-      const config = await questionConfigAsync();
-      if (
-        coalesce(
-          prompts({
-            type: "toggle",
-            name: "answer",
-            initial: true,
-            message: `Do you wish to save this configuration for later at ${stringifyJSON(
-              path,
-            )}?`,
-            active: "yes",
-            inactive: "no",
-          }),
-          "answer",
-          false,
-        )
-      ) {
-        await writeFile(path, stringifyYAML(config), "utf8");
-      }
-      return config;
-    }
-    return expectSuccess(
-      () => parseYAML(content),
-      "failed to parse configuration file %j >> %e",
-      path,
-    );
-  };
-
-  const bootBatchAsync = async ({ env, argv, cwd }) => {
+  const bootBatch = ({ env, argv, cwd }) => {
     const path = coalesce(
       env,
       "APPMAP_CONFIGURATION_PATH",
@@ -107,7 +41,7 @@ export default (dependencies) => {
     );
     configuration = extendConfiguration(
       configuration,
-      await loadConfigFileAsync(path),
+      loadConfigFile(path),
       getDirectory(path),
     );
     configuration = extendConfiguration(configuration, config, cwd());
@@ -145,19 +79,11 @@ export default (dependencies) => {
     return extendConfiguration(createConfiguration(home), conf, base);
   };
 
-  const bootManualRecorderAsync = async (home, conf, base) => {
-    if (typeof conf === "string") {
-      conf = await loadConfigFileAsync(conf);
-    }
-    return extendConfiguration(createConfiguration(home), conf, base);
-  };
-
   return {
-    bootBatchAsync,
+    bootBatch,
     bootProcessRecorder: bootAutomatedRecorder,
     bootMochaRecorder: bootAutomatedRecorder,
     bootRemoteRecorder: bootAutomatedRecorder,
-    bootManualRecorderAsync,
     bootManualRecorder,
   };
 };

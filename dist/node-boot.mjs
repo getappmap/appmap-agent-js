@@ -1,5 +1,6 @@
 import prompts$node from "./../components/prompts/node/index.mjs";
 import util$default from "./../components/util/default/index.mjs";
+import violation$error from "./../components/violation/error/index.mjs";
 import violation$exit from "./../components/violation/exit/index.mjs";
 import expect_inner$default from "./../components/expect-inner/default/index.mjs";
 import expect$default from "./../components/expect/default/index.mjs";
@@ -15,14 +16,14 @@ import repository$node from "./../components/repository/node/index.mjs";
 import child$default from "./../components/child/default/index.mjs";
 import engine$node from "./../components/engine/node/index.mjs";
 import configuration$default from "./../components/configuration/default/index.mjs";
-import questionnaire$node from "./../components/questionnaire/node/index.mjs";
 import boot$node from "./../components/boot/node/index.mjs";
 
 export default (blueprint) => {
   const dependencies = {__proto__:null};
   dependencies["prompts"] = prompts$node(dependencies);
   dependencies["util"] = util$default(dependencies);
-  dependencies["violation"] = violation$exit(dependencies);
+  if (!("violation" in blueprint)) { throw new Error("missing instance for component violation"); }
+  dependencies["violation"] = (blueprint["violation"] === "exit" ? violation$exit(dependencies) : (blueprint["violation"] === "error" ? violation$error(dependencies) : ((() => { throw new Error("invalid instance for component violation"); }) ())));
   dependencies["expect-inner"] = expect_inner$default(dependencies);
   dependencies["expect"] = expect$default(dependencies);
   dependencies["validate"] = validate$ajv(dependencies);
@@ -34,7 +35,6 @@ export default (blueprint) => {
   dependencies["child"] = child$default(dependencies);
   dependencies["engine"] = engine$node(dependencies);
   dependencies["configuration"] = configuration$default(dependencies);
-  dependencies["questionnaire"] = questionnaire$node(dependencies);
   dependencies["boot"] = boot$node(dependencies);
   return dependencies["boot"];
 };

@@ -11,7 +11,7 @@
   "bin": {
     "appmap-agent-js": "bin/bin.mjs"
   },
-  "main": "lib/manual.mjs",
+  "main": "lib/recorder-manual.mjs",
   "os": [
     "linux",
     "darwin"

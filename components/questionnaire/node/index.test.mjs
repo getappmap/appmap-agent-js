@@ -49,12 +49,12 @@ assertDeepEqual(
   {
     app: "app",
     recorder: "process",
-    mode: "remote",
     scenario: "my-scenario",
     scenarios: {
       "my-scenario": "command",
     },
     output: {
+      target: "file",
       directory: "output-directory",
     },
     hooks: {
@@ -82,7 +82,6 @@ assertDeepEqual(
   ]),
   {
     recorder: "mocha",
-    mode: "remote",
   },
 );
 
@@ -104,8 +103,9 @@ assertDeepEqual(
   ]),
   {
     recorder: "remote",
-    mode: "remote",
-    output: null,
+    output: {
+      target: "http",
+    },
     "track-port": 0,
     "intercept-track-port": "unix-domain-socket",
   },
@@ -123,7 +123,6 @@ assertDeepEqual(
   ]),
   {
     recorder: "manual",
-    mode: "local",
     hooks: {
       esm: false,
       cjs: false,

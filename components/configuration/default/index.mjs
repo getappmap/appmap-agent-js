@@ -178,10 +178,6 @@ export default (dependencies) => {
       extend: assign,
       normalize: identity,
     },
-    mode: {
-      extend: overwrite,
-      normalize: identity,
-    },
     scenario: {
       extend: overwrite,
       normalize: identity,
@@ -215,14 +211,6 @@ export default (dependencies) => {
       normalize: normalizePort,
     },
     "track-protocol": {
-      extend: overwrite,
-      normalize: identity,
-    },
-    "secondary-track-port": {
-      extend: overwrite,
-      normalize: normalizePort,
-    },
-    "secondary-track-protocol": {
       extend: overwrite,
       normalize: identity,
     },
@@ -382,15 +370,12 @@ export default (dependencies) => {
       main: null,
       recording: null,
       // provided by the user
-      mode: "remote",
       host: "localhost",
       session: null,
       "trace-port": 0, // possibly overwritten by the agent
       "trace-protocol": "TCP",
       "track-port": 0, // possibly overwritten by the agent
       "track-protocol": "HTTP/1.1",
-      "secondary-track-port": null,
-      "secondary-track-protocol": "HTTP/1.1",
       "intercept-track-port": null,
       "intercept-track-protocol": "HTTP/1.1",
       validate: {

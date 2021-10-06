@@ -42,13 +42,6 @@ export const schema = [
     ]
   },
   {
-    "$id": "mode",
-    "enum": [
-      "local",
-      "remote"
-    ]
-  },
-  {
     "$id": "target",
     "enum": [
       "file",
@@ -685,9 +678,6 @@ export const schema = [
     "type": "object",
     "additionalProperties": false,
     "properties": {
-      "mode": {
-        "$ref": "mode"
-      },
       "validate": {
         "type": "object",
         "additionalProperties": false,
@@ -733,19 +723,6 @@ export const schema = [
         ]
       },
       "track-protocol": {
-        "const": "HTTP/1.1"
-      },
-      "secondary-track-port": {
-        "anyOf": [
-          {
-            "const": null
-          },
-          {
-            "$ref": "port"
-          }
-        ]
-      },
-      "secondary-track-protocol": {
         "const": "HTTP/1.1"
       },
       "intercept-track-port": {
@@ -961,11 +938,8 @@ export const schema = [
     "$id": "configuration",
     "type": "object",
     "additionalProperties": false,
-    "minProperties": 39,
+    "minProperties": 37,
     "properties": {
-      "mode": {
-        "$ref": "mode"
-      },
       "validate": {
         "type": "object",
         "additionalProperties": false,
@@ -1081,19 +1055,6 @@ export const schema = [
         ]
       },
       "track-protocol": {
-        "const": "HTTP/1.1"
-      },
-      "secondary-track-port": {
-        "anyOf": [
-          {
-            "const": null
-          },
-          {
-            "$ref": "absolute-port"
-          }
-        ]
-      },
-      "secondary-track-protocol": {
         "const": "HTTP/1.1"
       },
       "intercept-track-port": {

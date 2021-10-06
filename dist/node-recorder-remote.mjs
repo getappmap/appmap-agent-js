@@ -1,5 +1,6 @@
 import uuid$random from "./../components/uuid/random/index.mjs";
 import util$default from "./../components/util/default/index.mjs";
+import violation$error from "./../components/violation/error/index.mjs";
 import violation$exit from "./../components/violation/exit/index.mjs";
 import expect_inner$default from "./../components/expect-inner/default/index.mjs";
 import expect$default from "./../components/expect/default/index.mjs";
@@ -46,7 +47,8 @@ export default (blueprint) => {
   const dependencies = {__proto__:null};
   dependencies["uuid"] = uuid$random(dependencies);
   dependencies["util"] = util$default(dependencies);
-  dependencies["violation"] = violation$exit(dependencies);
+  if (!("violation" in blueprint)) { throw new Error("missing instance for component violation"); }
+  dependencies["violation"] = (blueprint["violation"] === "exit" ? violation$exit(dependencies) : (blueprint["violation"] === "error" ? violation$error(dependencies) : ((() => { throw new Error("invalid instance for component violation"); }) ())));
   dependencies["expect-inner"] = expect_inner$default(dependencies);
   dependencies["expect"] = expect$default(dependencies);
   dependencies["log-inner"] = log_inner$write_sync(dependencies);

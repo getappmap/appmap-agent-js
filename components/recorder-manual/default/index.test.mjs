@@ -17,7 +17,6 @@ const { createConfiguration, extendConfiguration } =
 const configuration = extendConfiguration(
   createConfiguration("/repository"),
   {
-    mode: "local",
     name: "name1",
     enabled: true,
     recorder: "manual",

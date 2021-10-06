@@ -35,7 +35,6 @@
   * hook-response
   * hook-query
 - agent
-- questionnaire
 - boot
 - * recorder-manual
   * recorder-process
@@ -43,3 +42,5 @@
   * recorder-remote
 - receptor
 - batch
+- questionnaire
+- setup

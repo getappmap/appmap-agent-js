@@ -1,4 +1,5 @@
 import util$default from "./../components/util/default/index.mjs";
+import violation$error from "./../components/violation/error/index.mjs";
 import violation$exit from "./../components/violation/exit/index.mjs";
 import expect_inner$default from "./../components/expect-inner/default/index.mjs";
 import expect$default from "./../components/expect/default/index.mjs";
@@ -22,14 +23,18 @@ import naming$default from "./../components/naming/default/index.mjs";
 import trace$appmap from "./../components/trace/appmap/index.mjs";
 import backend$default from "./../components/backend/default/index.mjs";
 import spawn$node from "./../components/spawn/node/index.mjs";
-import receptor$fs from "./../components/receptor/fs/index.mjs";
+import uuid$random from "./../components/uuid/random/index.mjs";
+import service$default from "./../components/service/default/index.mjs";
+import http$node_http from "./../components/http/node-http/index.mjs";
+import receptor$file from "./../components/receptor/file/index.mjs";
 import receptor$http from "./../components/receptor/http/index.mjs";
 import batch$default from "./../components/batch/default/index.mjs";
 
 export default (blueprint) => {
   const dependencies = {__proto__:null};
   dependencies["util"] = util$default(dependencies);
-  dependencies["violation"] = violation$exit(dependencies);
+  if (!("violation" in blueprint)) { throw new Error("missing instance for component violation"); }
+  dependencies["violation"] = (blueprint["violation"] === "exit" ? violation$exit(dependencies) : (blueprint["violation"] === "error" ? violation$error(dependencies) : ((() => { throw new Error("invalid instance for component violation"); }) ())));
   dependencies["expect-inner"] = expect_inner$default(dependencies);
   dependencies["expect"] = expect$default(dependencies);
   dependencies["log-inner"] = log_inner$write_sync(dependencies);
@@ -49,8 +54,11 @@ export default (blueprint) => {
   dependencies["trace"] = trace$appmap(dependencies);
   dependencies["backend"] = backend$default(dependencies);
   dependencies["spawn"] = spawn$node(dependencies);
+  dependencies["uuid"] = uuid$random(dependencies);
+  dependencies["service"] = service$default(dependencies);
+  dependencies["http"] = http$node_http(dependencies);
   if (!("receptor" in blueprint)) { throw new Error("missing instance for component receptor"); }
-  dependencies["receptor"] = (blueprint["receptor"] === "http" ? receptor$http(dependencies) : (blueprint["receptor"] === "fs" ? receptor$fs(dependencies) : ((() => { throw new Error("invalid instance for component receptor"); }) ())));
+  dependencies["receptor"] = (blueprint["receptor"] === "http" ? receptor$http(dependencies) : (blueprint["receptor"] === "file" ? receptor$file(dependencies) : ((() => { throw new Error("invalid instance for component receptor"); }) ())));
   dependencies["batch"] = batch$default(dependencies);
   return dependencies["batch"];
 };
