@@ -9,7 +9,8 @@ const _Set = Set;
 
 export default (dependencies) => {
   const {
-    util: { constant, getDirectory },
+    util: { assert, constant, getDirectory },
+    log: { logInfo },
     expect: { expect },
     service: { openServiceAsync, closeServiceAsync, getServicePort },
     backend: {
@@ -86,8 +87,9 @@ export default (dependencies) => {
   return {
     openReceptorAsync: async ({
       "trace-port": trace_port,
-      output: { directory },
+      output: { target, directory },
     }) => {
+      assert(target === "file", "invalid output.target configuration field");
       await createDirectoryAsync(directory);
       const server = createServer();
       const paths = new _Set();
@@ -116,7 +118,9 @@ export default (dependencies) => {
           });
         });
       });
-      return await openServiceAsync(server, trace_port);
+      const trace_service = await openServiceAsync(server, trace_port);
+      logInfo("Trace port: %j", getServicePort(trace_service));
+      return trace_service;
     },
     getReceptorTracePort: getServicePort,
     getReceptorTrackPort: constant(null),

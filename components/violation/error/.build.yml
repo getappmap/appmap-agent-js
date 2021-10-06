@@ -1,2 +1,2 @@
-branches: [test]
+branches: [node, test]
 dependencies: []

@@ -16,7 +16,7 @@ const {
 
 const {
   bootBatchAsync,
-  bootEmptyRecorder,
+  bootProcessRecorder,
   bootManualRecorder,
   bootManualRecorderAsync,
 } = Boot(await buildTestDependenciesAsync(import.meta.url));
@@ -104,7 +104,7 @@ const { cwd } = process;
   const configuration = createConfiguration("/repository");
   assertDeepEqual(
     extendConfiguration(configuration, { main: "main.mjs" }, "/cwd"),
-    bootEmptyRecorder({
+    bootProcessRecorder({
       env: {
         APPMAP_CONFIGURATION: JSON.stringify(configuration),
       },

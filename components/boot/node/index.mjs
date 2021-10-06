@@ -156,7 +156,7 @@ export default (dependencies) => {
     bootBatchAsync,
     bootProcessRecorder: bootAutomatedRecorder,
     bootMochaRecorder: bootAutomatedRecorder,
-    bootEmptyRecorder: bootAutomatedRecorder,
+    bootRemoteRecorder: bootAutomatedRecorder,
     bootManualRecorderAsync,
     bootManualRecorder,
   };

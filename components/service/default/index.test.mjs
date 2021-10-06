@@ -1,4 +1,3 @@
-import { tmpdir } from "os";
 import { strict as Assert } from "assert";
 import { createServer, Socket } from "net";
 
@@ -29,8 +28,7 @@ const { openServiceAsync, closeServiceAsync, getServicePort } = Service(
 }
 
 {
-  const port = `${tmpdir()}/${Math.random().toString(36).substring(2)}`;
-  const service = await openServiceAsync(createServer(), port);
+  const service = await openServiceAsync(createServer(), "");
   const socket = new Socket();
   await new Promise((resolve, reject) => {
     socket.on("connect", resolve);

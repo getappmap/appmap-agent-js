@@ -1,3 +1,4 @@
+import { tmpdir } from "os";
 const _Promise = Promise;
 const _Set = Set;
 const _setTimeout = setTimeout;
@@ -5,6 +6,7 @@ const _setTimeout = setTimeout;
 export default (dependencies) => {
   const {
     log: { logWarning },
+    uuid: { getUUID },
   } = dependencies;
   return {
     openServiceAsync: (server, port) => {
@@ -26,7 +28,7 @@ export default (dependencies) => {
           server.removeListener("error", reject);
           resolve({ server, sockets });
         });
-        server.listen(port);
+        server.listen(port === "" ? `${tmpdir()}/${getUUID()}` : port);
       });
     },
     getServicePort: ({ server }) => {

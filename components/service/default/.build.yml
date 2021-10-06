@@ -1,2 +1,4 @@
 branches: [test, node]
-dependencies: [log]
+dependencies:
+  - log
+  - uuid

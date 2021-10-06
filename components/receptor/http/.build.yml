@@ -3,3 +3,5 @@ dependencies:
   - service
   - http
   - backend
+  - log
+  - util

@@ -7,7 +7,9 @@ const { parse: parseJSON } = JSON;
 
 export default (dependencies) => {
   const {
+    util: { assert },
     http: { generateRespond },
+    log: { logInfo },
     service: { openServiceAsync, closeServiceAsync, getServicePort },
     backend: {
       createBackend,
@@ -32,7 +34,9 @@ export default (dependencies) => {
     openReceptorAsync: async ({
       "track-port": track_port,
       "trace-port": trace_port,
+      output: { target },
     }) => {
+      assert(target === "http", "invalid output.target configuration field");
       const trace_server = createTCPServer();
       const track_server = createHTTPServer();
       const backends = new _Map();
@@ -143,6 +147,8 @@ export default (dependencies) => {
       });
       const trace_service = await openServiceAsync(trace_server, trace_port);
       const track_service = await openServiceAsync(track_server, track_port);
+      logInfo("Trace port: %j", getServicePort(trace_service));
+      logInfo("Track port: %j", getServicePort(track_service));
       return { trace_service, track_service };
     },
     getReceptorTracePort: ({ trace_service }) => getServicePort(trace_service),

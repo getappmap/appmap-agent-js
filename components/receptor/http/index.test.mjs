@@ -30,7 +30,7 @@ const configuration = extendConfiguration(
   createConfiguration("/root"),
   {
     output: {
-      directory: "directory",
+      target: "http",
     },
   },
   repository,

@@ -24,6 +24,7 @@ const configuration = extendConfiguration(
   createConfiguration("/root"),
   {
     output: {
+      target: "file",
       directory: "directory",
     },
   },
