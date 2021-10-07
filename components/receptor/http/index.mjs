@@ -46,6 +46,7 @@ export default (dependencies) => {
       track_server.on(
         "request",
         generateRespond(async (method, path, body) => {
+          logInfo("Received remote recording request: %s %s", method, path);
           const parts = path.split("/");
           if (parts.length !== 3 || parts[0] !== "") {
             return {

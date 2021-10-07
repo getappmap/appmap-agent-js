@@ -140,7 +140,7 @@ export default (dependencies) => {
     type: type_map.get(type),
     index,
     time,
-    data: data_map.get(`${type}/${data_type}`),
+    data: data_map.get(`${type_map.get(type)}/${data_type}`),
   });
   const generateManufacture = (type1, type2) => (index) => ({
     type: type1,

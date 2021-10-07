@@ -73,6 +73,7 @@ export default (dependencies) => {
     }
     paths.add(path);
     writeFileSync(path, stringifyJSON(trace), "utf8");
+    logInfo("Trace written at: %s", path);
   };
   const disconnection = {
     status: 1,

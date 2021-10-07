@@ -144,7 +144,7 @@ mode: local
 recorder: process # or mocha
 # Where to write appmaps:
 output:
-  directory: tmp/appmaps
+  directory: tmp/appmap
 ```
 
 The `recorder` configuration field support two strategies to generate appmaps:

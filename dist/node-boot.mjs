@@ -18,40 +18,16 @@ import configuration$default from "./../components/configuration/default/index.m
 import boot$node from "./../components/boot/node/index.mjs";
 
 export default (blueprint) => {
-  const dependencies = { __proto__: null };
+  const dependencies = {__proto__:null};
   dependencies["util"] = util$default(dependencies);
-  if (!("violation" in blueprint)) {
-    throw new Error("missing instance for component violation");
-  }
-  dependencies["violation"] =
-    blueprint["violation"] === "exit"
-      ? violation$exit(dependencies)
-      : blueprint["violation"] === "error"
-      ? violation$error(dependencies)
-      : (() => {
-          throw new Error("invalid instance for component violation");
-        })();
+  if (!("violation" in blueprint)) { throw new Error("missing instance for component violation"); }
+  dependencies["violation"] = (blueprint["violation"] === "exit" ? violation$exit(dependencies) : (blueprint["violation"] === "error" ? violation$error(dependencies) : ((() => { throw new Error("invalid instance for component violation"); }) ())));
   dependencies["expect-inner"] = expect_inner$default(dependencies);
   dependencies["expect"] = expect$default(dependencies);
   dependencies["validate"] = validate$ajv(dependencies);
   dependencies["log-inner"] = log_inner$write_sync(dependencies);
-  if (!("log" in blueprint)) {
-    throw new Error("missing instance for component log");
-  }
-  dependencies["log"] =
-    blueprint["log"] === "warning"
-      ? log$warning(dependencies)
-      : blueprint["log"] === "off"
-      ? log$off(dependencies)
-      : blueprint["log"] === "info"
-      ? log$info(dependencies)
-      : blueprint["log"] === "error"
-      ? log$error(dependencies)
-      : blueprint["log"] === "debug"
-      ? log$debug(dependencies)
-      : (() => {
-          throw new Error("invalid instance for component log");
-        })();
+  if (!("log" in blueprint)) { throw new Error("missing instance for component log"); }
+  dependencies["log"] = (blueprint["log"] === "warning" ? log$warning(dependencies) : (blueprint["log"] === "off" ? log$off(dependencies) : (blueprint["log"] === "info" ? log$info(dependencies) : (blueprint["log"] === "error" ? log$error(dependencies) : (blueprint["log"] === "debug" ? log$debug(dependencies) : ((() => { throw new Error("invalid instance for component log"); }) ()))))));
   dependencies["specifier"] = specifier$default(dependencies);
   dependencies["repository"] = repository$node(dependencies);
   dependencies["child"] = child$default(dependencies);

@@ -3,6 +3,7 @@ const _Map = Map;
 export default (dependencies) => {
   const {
     util: { assert },
+    log: { logDebug },
     "validate-message": { validateMessage },
     trace: { compileTrace },
     configuration: { extendConfiguration },
@@ -26,6 +27,7 @@ export default (dependencies) => {
     },
     sendBackend: ({ configuration, files, tracks, traces }, message) => {
       validateMessage(message);
+      logDebug("message >> %j", message);
       const type = message[0];
       if (type === "event") {
         const event = {
