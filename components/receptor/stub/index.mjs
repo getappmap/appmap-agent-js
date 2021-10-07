@@ -9,6 +9,7 @@ export default (dependencies) => {
     openReceptorAsync: constant(_Promise.resolve(_undefined)),
     getReceptorTracePort: constant(0),
     getReceptorTrackPort: constant(0),
+    getReceptorDefaultRecorder: constant("process"),
     closeReceptorAsync: constant(_Promise.resolve(_undefined)),
   };
 };

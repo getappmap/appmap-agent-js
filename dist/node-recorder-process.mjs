@@ -34,15 +34,30 @@ import agent$default from "./../components/agent/default/index.mjs";
 import recorder_process$default from "./../components/recorder-process/default/index.mjs";
 
 export default (blueprint) => {
-  const dependencies = {__proto__:null};
+  const dependencies = { __proto__: null };
   dependencies["uuid"] = uuid$random(dependencies);
   dependencies["util"] = util$default(dependencies);
   dependencies["violation"] = violation$exit(dependencies);
   dependencies["expect-inner"] = expect_inner$default(dependencies);
   dependencies["expect"] = expect$default(dependencies);
   dependencies["log-inner"] = log_inner$write_sync(dependencies);
-  if (!("log" in blueprint)) { throw new Error("missing instance for component log"); }
-  dependencies["log"] = (blueprint["log"] === "warning" ? log$warning(dependencies) : (blueprint["log"] === "off" ? log$off(dependencies) : (blueprint["log"] === "info" ? log$info(dependencies) : (blueprint["log"] === "error" ? log$error(dependencies) : (blueprint["log"] === "debug" ? log$debug(dependencies) : ((() => { throw new Error("invalid instance for component log"); }) ()))))));
+  if (!("log" in blueprint)) {
+    throw new Error("missing instance for component log");
+  }
+  dependencies["log"] =
+    blueprint["log"] === "warning"
+      ? log$warning(dependencies)
+      : blueprint["log"] === "off"
+      ? log$off(dependencies)
+      : blueprint["log"] === "info"
+      ? log$info(dependencies)
+      : blueprint["log"] === "error"
+      ? log$error(dependencies)
+      : blueprint["log"] === "debug"
+      ? log$debug(dependencies)
+      : (() => {
+          throw new Error("invalid instance for component log");
+        })();
   dependencies["time"] = time$performance_node(dependencies);
   dependencies["validate"] = validate$ajv(dependencies);
   dependencies["specifier"] = specifier$default(dependencies);

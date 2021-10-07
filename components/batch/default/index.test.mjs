@@ -76,6 +76,7 @@ const configuration = createConfiguration("/repository");
     extendConfiguration(
       configuration,
       {
+        recorder: "process",
         scenario: "foo",
         scenarios: { foo: ["sleep"], bar: ["sleep"] },
       },

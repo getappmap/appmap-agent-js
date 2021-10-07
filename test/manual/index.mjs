@@ -1,14 +1,14 @@
 import { tmpdir } from "os";
 import { strict as Assert } from "assert";
 import { createRequire } from "module";
-import { mkdir, symlink, writeFile, realpath, readFile } from "fs/promises";
+import { mkdir, symlink, writeFile, realpath } from "fs/promises";
 import { createAppmap } from "../../lib/recorder-manual.mjs";
 
 Error.stackTraceLimit = Infinity;
 
 const { cwd } = process;
 const { equal: assertEqual, deepEqual: assertDeepEqual } = Assert;
-const { stringify: stringifyJSON, parse: parseJSON } = JSON;
+const { stringify: stringifyJSON } = JSON;
 
 const directory = `${await realpath(tmpdir())}/${Math.random()
   .toString(36)
@@ -49,7 +49,7 @@ const appmap = createAppmap(
   directory,
 );
 
-appmap.startTrack("track", { path: null, data: { } });
+appmap.startTrack("track", { path: null, data: {} });
 
 await writeFile(
   `${directory}/common.js`,

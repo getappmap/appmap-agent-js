@@ -27,7 +27,7 @@ const {
 const configuration = extendConfiguration(
   createConfiguration("/root"),
   {
-    mode: "http",
+    mode: "remote",
   },
   null,
 );

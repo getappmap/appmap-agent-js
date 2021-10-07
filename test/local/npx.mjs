@@ -7,7 +7,7 @@ const { deepEqual: assertDeepEqual } = Assert;
 await runAsync(
   null,
   {
-    mode: "file",
+    mode: "local",
     name: "name",
     processes: { path: "node_modules/.bin/bin" },
     packages: "bin.cjs",

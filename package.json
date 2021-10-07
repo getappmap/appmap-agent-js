@@ -40,7 +40,7 @@
     "format": "npx prettier -w '**/*.mjs'",
     "build": "node build/index.mjs",
     "unit": "for test in $(find build components -name '*.test.mjs'); do echo \"$test ...\" && (node \"$test\" || echo \"> Failure $?\"); done",
-    "integration": "node test/cli/index.mjs && node test/api/index.mjs && echo 'DONE'",
+    "integration": "node test/index.mjs",
     "commit": "npm run lint && npm run format && npx cz",
     "deploy": "npm i -D @semantic-release/changelog @semantic-release/git && npx semantic-release"
   },

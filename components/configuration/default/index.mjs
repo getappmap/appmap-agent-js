@@ -361,7 +361,7 @@ export default (dependencies) => {
       main: null,
       recording: null,
       // provided by the user
-      mode: "file",
+      mode: "local",
       host: "localhost",
       session: null,
       "trace-port": 0, // possibly overwritten by the agent
@@ -392,7 +392,7 @@ export default (dependencies) => {
           true,
         ],
       ],
-      recorder: "process",
+      recorder: null,
       source: false,
       hooks: {
         apply: true,

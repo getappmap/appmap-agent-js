@@ -15,6 +15,7 @@ export default (dependencies) => {
       closeReceptorAsync,
       getReceptorTracePort,
       getReceptorTrackPort,
+      getReceptorDefaultRecorder,
     },
   } = dependencies;
   return {
@@ -41,9 +42,12 @@ export default (dependencies) => {
         }
       });
       const receptor = await openReceptorAsync(configuration);
+      const { recorder } = configuration;
       configuration = extendConfiguration(
         configuration,
         {
+          recorder:
+            recorder === null ? getReceptorDefaultRecorder(receptor) : recorder,
           "trace-port": getReceptorTracePort(receptor),
           "track-port": getReceptorTrackPort(receptor),
         },

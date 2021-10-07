@@ -14,8 +14,8 @@
 
 - $id: mode
   enum:
-    - file
-    - http
+    - local
+    - remote
 
 - $id: ordering
   enum:
@@ -533,7 +533,10 @@
         - const: null
         - $ref: absolute-port
     intercept-track-protocol: {const: "HTTP/1.1"}
-    recorder: {$ref: recorder}
+    recorder:
+      anyOf:
+        - const: null
+        - $ref: recorder
     source: {type: boolean}
     hooks:
       type: object

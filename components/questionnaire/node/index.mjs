@@ -56,7 +56,7 @@ export default (dependencies) => {
       choices: [
         {
           title: "By recording processes",
-          value: { recorder: "process", mode: "file" },
+          value: { recorder: "process", mode: "local" },
           description: [
             "Record node processes from start to finish.",
             "A single appmap will be generated per spawned node process.",
@@ -64,14 +64,14 @@ export default (dependencies) => {
         },
         {
           title: "By recording mocha test cases",
-          value: { recorder: "mocha", mode: "file" },
+          value: { recorder: "mocha", mode: "local" },
           description: [
             "An appmap will be generated for each mocha test case.",
           ].join(" "),
         },
         {
           title: "By remote HTTP requests",
-          value: { recorder: "remote", mode: "http" },
+          value: { recorder: "remote", mode: "remote" },
           description: [
             "Appmaps will be generated on demand via HTTP requests.",
             "These requests can be send via the record button in our editors plugins.",

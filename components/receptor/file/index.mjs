@@ -91,8 +91,8 @@ export default (dependencies) => {
       output: { directory },
     }) => {
       assert(
-        mode === "file",
-        "receptor/file expected configuration.mode to be 'file'",
+        mode === "local",
+        "receptor/file expected configuration.mode to be 'local'",
       );
       await createDirectoryAsync(directory);
       const server = createServer();
@@ -136,6 +136,7 @@ export default (dependencies) => {
       logInfo("Trace port: %j", getServicePort(trace_service));
       return trace_service;
     },
+    getReceptorDefaultRecorder: constant("process"),
     getReceptorTracePort: getServicePort,
     getReceptorTrackPort: constant(0),
     closeReceptorAsync: closeServiceAsync,
