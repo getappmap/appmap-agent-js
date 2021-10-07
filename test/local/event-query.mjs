@@ -1,4 +1,4 @@
-import { writeFile, symlink } from "fs/promises";
+import { writeFile, symlink, readFile } from "fs/promises";
 import { strict as Assert } from "assert";
 import { runAsync } from "./__fixture__.mjs";
 
@@ -38,8 +38,10 @@ await runAsync(
       "utf8",
     );
   },
-  async (appmaps) => {
-    const { "name.appmap.json": appmap } = appmaps;
+  async (directory) => {
+    const appmap = JSON.parse(
+      await readFile(`${directory}/tmp/appmap/name.appmap.json`, "utf8"),
+    );
     const { events } = appmap;
     /* eslint-disable no-unused-vars */
     const [event1, { elapsed, ...event2 }] = events;

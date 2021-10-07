@@ -1,10 +1,8 @@
-import { writeFile, symlink, realpath } from "fs/promises";
+import { writeFile, symlink, realpath, readdir } from "fs/promises";
 import { strict as Assert } from "assert";
 import { runAsync } from "./__fixture__.mjs";
 
 const { cwd } = process;
-const { entries: toEntries } = Object;
-const { from: toArray } = Array;
 
 const { deepEqual: assertDeepEqual } = Assert;
 
@@ -21,7 +19,6 @@ await runAsync(
       apply: true,
       http: false,
     },
-    output: { basename: "basename" },
     scenario: "scenario",
     scenarios: {
       scenario: ["npx", "mocha", "./main.test.mjs"],
@@ -61,17 +58,14 @@ await runAsync(
       "utf8",
     );
   },
-  async (appmaps) => {
+  async (directory) => {
     assertDeepEqual(
-      toArray(toEntries(appmaps)).map(
-        ([
-          key,
-          {
-            metadata: { name },
-          },
-        ]) => name,
-      ),
-      ["suite", "suite", "suite"],
+      new Set(await readdir(`${directory}/tmp/appmap`)),
+      new Set([
+        "suite.appmap.json",
+        "suite-1.appmap.json",
+        "suite-2.appmap.json",
+      ]),
     );
   },
 );

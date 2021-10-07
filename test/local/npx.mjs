@@ -1,4 +1,4 @@
-import { writeFile, symlink } from "fs/promises";
+import { writeFile, symlink, readFile } from "fs/promises";
 import { strict as Assert } from "assert";
 import { runAsync } from "./__fixture__.mjs";
 
@@ -25,8 +25,10 @@ await runAsync(
     });
     await symlink("../../bin", `${repository}/node_modules/.bin/bin`);
   },
-  async (appmaps) => {
-    const { "name.appmap.json": appmap } = appmaps;
+  async (directory) => {
+    const appmap = JSON.parse(
+      await readFile(`${directory}/tmp/appmap/name.appmap.json`, "utf8"),
+    );
     const { classMap: classmap } = appmap;
     assertDeepEqual(classmap, [
       { type: "package", name: "bin.cjs", children: [] },

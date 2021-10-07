@@ -1,4 +1,4 @@
-import { writeFile } from "fs/promises";
+import { writeFile, readFile } from "fs/promises";
 import { strict as Assert } from "assert";
 import { runAsync } from "./__fixture__.mjs";
 
@@ -24,8 +24,10 @@ await runAsync(
   async (repository) => {
     await writeFile(`${repository}/main.mjs`, `123;`, "utf8");
   },
-  async (appmaps) => {
-    const { "basename.appmap.json": appmap } = appmaps;
+  async (directory) => {
+    const appmap = JSON.parse(
+      await readFile(`${directory}/tmp/appmap/basename.appmap.json`, "utf8"),
+    );
     const { metadata } = appmap;
     const { name, app, client, recorder, test_status, exception } = metadata;
     {

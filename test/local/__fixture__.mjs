@@ -1,20 +1,12 @@
 // import * as Path from 'path';
 import { tmpdir } from "os";
-import {
-  mkdir,
-  symlink,
-  writeFile,
-  realpath,
-  readdir,
-  readFile,
-} from "fs/promises";
+import { mkdir, symlink, writeFile, realpath } from "fs/promises";
 import YAML from "yaml";
 import { spawnAsync } from "../spawn.mjs";
 
 const { cwd } = process;
-const { fromEntries } = Object;
 const { stringify: stringifyYAML } = YAML;
-const { stringify: stringifyJSON, parse: parseJSON } = JSON;
+const { stringify: stringifyJSON } = JSON;
 
 export const runAsync = async (_package, config, beforeAsync, afterAsync) => {
   const directory = `${await realpath(tmpdir())}/${Math.random()
@@ -43,20 +35,11 @@ export const runAsync = async (_package, config, beforeAsync, afterAsync) => {
       ...config,
     }),
   );
-  await mkdir(`${directory}/tmp`);
-  await mkdir(`${directory}/tmp/appmap`);
   await beforeAsync(directory);
   await spawnAsync("node", [`${cwd()}/bin/bin.mjs`], {
     cwd: directory,
     stdio: "inherit",
   });
-  const appmaps = [];
-  for (const filename of await readdir(`${directory}/tmp/appmap`)) {
-    const appmap = parseJSON(
-      await readFile(`${directory}/tmp/appmap/${filename}`),
-    );
-    appmaps.push([filename, appmap]);
-  }
-  await afterAsync(fromEntries(appmaps));
+  await afterAsync(directory);
   await spawnAsync("/bin/sh", ["rm", "-rf", directory], {});
 };
