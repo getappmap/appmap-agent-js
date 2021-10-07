@@ -16,6 +16,7 @@ await runAsync(
       apply: false,
       http: false,
     },
+    name: "name",
     scenario: "scenario",
     scenarios: {
       scenario: ["node", "./main.mjs"],
@@ -25,6 +26,6 @@ await runAsync(
     await writeFile(`${repository}/main.mjs`, "123;", "utf8");
   },
   async (appmaps) => {
-    assert("main.appmap.json" in appmaps);
+    assert("name.appmap.json" in appmaps);
   },
 );

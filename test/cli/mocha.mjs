@@ -11,8 +11,8 @@ const { deepEqual: assertDeepEqual } = Assert;
 await runAsync(
   null,
   {
-    name: "name",
     recorder: "mocha",
+    log: "debug",
     packages: { path: "index.js" },
     hooks: {
       esm: false,

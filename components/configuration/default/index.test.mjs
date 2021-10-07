@@ -46,22 +46,19 @@ const extend = (name, value1, nullable_directory) => {
   );
   assertEqual(
     isConfigurationEnabled(
-      extendConfiguration(configuration, { main: "main.js" }, "/directory"),
-    ),
-    false,
-  );
-  assertEqual(
-    isConfigurationEnabled(
       extendConfiguration(
         configuration,
         {
-          processes: "*",
+          processes: {
+            glob: "*",
+            enabled: false,
+          },
           main: "main.js",
         },
         "/directory",
       ),
     ),
-    true,
+    false,
   );
 }
 
@@ -193,14 +190,6 @@ assertDeepEqual(extend("processes", true, "/base"), [
   [
     {
       basedir: "/Users/soft/Desktop/workspace/appmap-agent-js",
-      source: "(^\\.\\.)|((^|/)node_modules/)",
-      flags: "u",
-    },
-    false,
-  ],
-  [
-    {
-      basedir: "/Users/soft/Desktop/workspace/appmap-agent-js",
       source: "^",
       flags: "u",
     },
@@ -210,14 +199,6 @@ assertDeepEqual(extend("processes", true, "/base"), [
 
 assertDeepEqual(extend("processes", "/foo", "/base"), [
   [{ basedir: "/base", source: "^(?:\\/foo)$", flags: "" }, true],
-  [
-    {
-      basedir: "/Users/soft/Desktop/workspace/appmap-agent-js",
-      source: "(^\\.\\.)|((^|/)node_modules/)",
-      flags: "u",
-    },
-    false,
-  ],
   [
     {
       basedir: "/Users/soft/Desktop/workspace/appmap-agent-js",

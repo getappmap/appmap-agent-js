@@ -4,6 +4,7 @@ import { fileURLToPath } from "url";
 import { expect } from "./expect.mjs";
 import { loadConfAsync } from "./conf.mjs";
 
+const { entries: toEntries } = Object;
 const __filname = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filname);
 
@@ -13,7 +14,7 @@ const getIdentifier = (component, instance) =>
   `${component.replace(/-/gu, "_")}$${instance.replace(/-/gu, "_")}`;
 
 const visitComponentAsync = async (component, context) => {
-  const { branch, cache, root, main, conf, directory } = context;
+  const { branch, cache, root, main, conf, directory, blueprint } = context;
   /* c8 ignore start */
   if (cache.has(component)) {
     return { head: [], body: [] };
@@ -23,20 +24,31 @@ const visitComponentAsync = async (component, context) => {
   const head = [];
   const body = [];
   const instances = [];
-  for (const instance of await readdir(`${root}/${component}`)) {
-    if ((await lstat(`${root}/${component}/${instance}`)).isDirectory()) {
+  const components = [];
+  if (blueprint.has(component)) {
+    for (const instance of blueprint.get(component)) {
       const { branches, dependencies } = await loadConfAsync(
         `${root}/${component}/${instance}/${conf}`,
       );
-      if (branches.includes(branch)) {
-        instances.push(instance);
-        for (const component of dependencies) {
-          const { head: lines1, body: lines2 } = await visitComponentAsync(
-            component,
-            context,
-          );
-          head.push(...lines1);
-          body.push(...lines2);
+      expect(
+        branches.includes(branch),
+        "component %s of instance %s is not available for branch %s",
+        component,
+        instance,
+        branch,
+      );
+      instances.push(instance);
+      components.push(...dependencies);
+    }
+  } else {
+    for (const instance of await readdir(`${root}/${component}`)) {
+      if ((await lstat(`${root}/${component}/${instance}`)).isDirectory()) {
+        const { branches, dependencies } = await loadConfAsync(
+          `${root}/${component}/${instance}/${conf}`,
+        );
+        if (branches.includes(branch)) {
+          instances.push(instance);
+          components.push(...dependencies);
         }
       }
     }
@@ -48,6 +60,14 @@ const visitComponentAsync = async (component, context) => {
     component,
     branch,
   );
+  for (const component of components) {
+    const { head: lines1, body: lines2 } = await visitComponentAsync(
+      component,
+      context,
+    );
+    head.push(...lines1);
+    body.push(...lines2);
+  }
   return {
     head: [
       ...head,
@@ -90,10 +110,12 @@ export const writeEntryPointAsync = async (branch, component, options) => {
     filename: `${branch}-${component}.mjs`,
     conf: ".build.yml",
     main: "index.mjs",
+    blueprint: {},
     ...options,
     branch,
     cache: new Set(),
   };
+  context.blueprint = new Map(toEntries(context.blueprint));
   const { directory, filename } = context;
   const { head, body } = await visitComponentAsync(component, context);
   await writeFile(

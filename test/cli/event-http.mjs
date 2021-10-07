@@ -8,6 +8,7 @@ await runAsync(
   null,
   {
     packages: { glob: "*" },
+    name: "name",
     hooks: {
       esm: false,
       cjs: false,
@@ -49,7 +50,7 @@ await runAsync(
     );
   },
   async (appmaps) => {
-    const { "main.appmap.json": appmap } = appmaps;
+    const { "name.appmap.json": appmap } = appmaps;
     let { events } = appmap;
     /* eslint-disable no-unused-vars */
     events = events.map(({ elapsed, ...event }) => event);

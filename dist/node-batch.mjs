@@ -1,6 +1,5 @@
 import util$default from "./../components/util/default/index.mjs";
 import violation$error from "./../components/violation/error/index.mjs";
-import violation$exit from "./../components/violation/exit/index.mjs";
 import expect_inner$default from "./../components/expect-inner/default/index.mjs";
 import expect$default from "./../components/expect/default/index.mjs";
 import log_inner$write_sync from "./../components/log-inner/write-sync/index.mjs";
@@ -33,8 +32,7 @@ import batch$default from "./../components/batch/default/index.mjs";
 export default (blueprint) => {
   const dependencies = {__proto__:null};
   dependencies["util"] = util$default(dependencies);
-  if (!("violation" in blueprint)) { throw new Error("missing instance for component violation"); }
-  dependencies["violation"] = (blueprint["violation"] === "exit" ? violation$exit(dependencies) : (blueprint["violation"] === "error" ? violation$error(dependencies) : ((() => { throw new Error("invalid instance for component violation"); }) ())));
+  dependencies["violation"] = violation$error(dependencies);
   dependencies["expect-inner"] = expect_inner$default(dependencies);
   dependencies["expect"] = expect$default(dependencies);
   dependencies["log-inner"] = log_inner$write_sync(dependencies);

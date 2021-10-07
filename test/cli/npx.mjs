@@ -7,6 +7,7 @@ const { deepEqual: assertDeepEqual } = Assert;
 await runAsync(
   null,
   {
+    name: "name",
     processes: { path: "node_modules/.bin/bin" },
     packages: "bin.cjs",
     recorder: "process",
@@ -24,7 +25,7 @@ await runAsync(
     await symlink("../../bin", `${repository}/node_modules/.bin/bin`);
   },
   async (appmaps) => {
-    const { "bin.appmap.json": appmap } = appmaps;
+    const { "name.appmap.json": appmap } = appmaps;
     const { classMap: classmap } = appmap;
     assertDeepEqual(classmap, [
       { type: "package", name: "bin.cjs", children: [] },

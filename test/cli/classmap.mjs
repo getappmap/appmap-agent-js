@@ -15,6 +15,7 @@ await runAsync(
       apply: false,
       http: false,
     },
+    name: "name",
     scenario: "scenario",
     scenarios: {
       scenario: ["node", "./main.mjs"],
@@ -38,7 +39,7 @@ await runAsync(
     );
   },
   async (appmaps) => {
-    const { "main.appmap.json": appmap } = appmaps;
+    const { "name.appmap.json": appmap } = appmaps;
     const { classMap: classmap } = appmap;
     assertDeepEqual(classmap, [
       {

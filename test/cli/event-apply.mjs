@@ -8,6 +8,7 @@ await runAsync(
   null,
   {
     packages: { glob: "*" },
+    name: "name",
     hooks: {
       esm: true,
       cjs: true,
@@ -48,7 +49,7 @@ await runAsync(
     );
   },
   async (appmaps) => {
-    const { "main.appmap.json": appmap } = appmaps;
+    const { "name.appmap.json": appmap } = appmaps;
     const { events } = appmap;
     assertDeepEqual(
       events.map(({ event, defined_class, id, parent_id }) => ({

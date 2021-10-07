@@ -82,18 +82,33 @@ export const testAsync = async (type, module) => {
       );
     } else if (type === "static") {
       const { writeEntryPointAsync } = module;
-      await writeEntryPointAsync("branch1", "component1", {
-        directory: root,
-        ...options,
-      });
-      const { default: Component1 } = await import(
-        `${root}/branch1-component1.mjs`
-      );
-      assertDeepEqual(Component1({ component2: "instance1" }), [
-        "component1",
-        "instance",
-        dependencies,
-      ]);
+      {
+        await writeEntryPointAsync("branch1", "component1", {
+          directory: root,
+          filename: "main1.mjs",
+          ...options,
+        });
+        const { default: Component1 } = await import(`${root}/main1.mjs`);
+        assertDeepEqual(Component1({ component2: "instance1" }), [
+          "component1",
+          "instance",
+          dependencies,
+        ]);
+      }
+      {
+        await writeEntryPointAsync("branch1", "component1", {
+          directory: root,
+          blueprint: { component2: ["instance1"] },
+          filename: "main2.mjs",
+          ...options,
+        });
+        const { default: Component1 } = await import(`${root}/main2.mjs`);
+        assertDeepEqual(Component1({}), [
+          "component1",
+          "instance",
+          dependencies,
+        ]);
+      }
     } else {
       throw new Error("Invalid type");
     }

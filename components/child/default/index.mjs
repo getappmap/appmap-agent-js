@@ -79,8 +79,8 @@ export default (dependencies) => {
             coalesce(env3, "NODE_OPTIONS", ""),
             // abomination: https://github.com/mochajs/mocha/issues/4720
             `--require=${agent_directory}/lib/abomination.js`,
-            `--experimental-loader=${agent_directory}/lib/recorder-${
-              recorder === "mocha" ? "loader" : recorder
+            `--experimental-loader=${agent_directory}/lib/${
+              recorder === "mocha" ? "loader" : `recorder-${recorder}`
             }.mjs`,
           ].join(" "),
         };

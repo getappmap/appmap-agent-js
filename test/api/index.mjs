@@ -33,10 +33,7 @@ const appmap = createAppmap(
   directory,
   {
     name: "name",
-    mode: "local",
-    output: {
-      directory: ".",
-    },
+    recorder: "manual",
     packages: "*",
     hooks: {
       esm: false,
@@ -52,11 +49,7 @@ const appmap = createAppmap(
   directory,
 );
 
-appmap.startTrack("track1", { path: null, data: { output: null } });
-appmap.startTrack("track2", {
-  path: null,
-  data: { output: { basename: "basename" } },
-});
+appmap.startTrack("track", { path: null, data: { output: null } });
 
 await writeFile(
   `${directory}/common.js`,
@@ -75,19 +68,11 @@ await writeFile(
   assertEqual(script(), "SCRIPT");
 }
 
-appmap.stopTrack("track1");
-appmap.stopTrack("track2");
-const trace1 = await appmap.claimTrackAsync("track1");
+const trace = appmap.stopTrack("track");
 
 appmap.terminate();
 
-const trace2 = parseJSON(
-  await readFile(`${directory}/basename.appmap.json`, "utf8"),
-);
-
-assertDeepEqual(trace1, trace2);
-
 assertDeepEqual(
-  trace1.events.map(({ event }) => event),
+  trace.events.map(({ event }) => event),
   ["call", "return", "call", "return"],
 );

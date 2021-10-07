@@ -327,18 +327,6 @@ export default (dependencies) => {
   //   value,
   // ];
 
-  const makeBlacklistSpecifier = (basedir) => ({
-    basedir,
-    source: "(^\\.\\.)|((^|/)node_modules/)",
-    flags: "u",
-  });
-
-  const makeWhitelistSpecifier = (basedir) => ({
-    basedir,
-    source: "^",
-    flags: "u",
-  });
-
   const getSpecifierValue = (pairs, key) => {
     for (const [specifier, value] of pairs) {
       if (matchSpecifier(specifier, key)) {
@@ -394,8 +382,14 @@ export default (dependencies) => {
         extension: ".appmap.json",
       },
       processes: [
-        [makeBlacklistSpecifier(directory), false],
-        [makeWhitelistSpecifier(directory), true],
+        [
+          {
+            basedir: directory,
+            source: "^",
+            flags: "u",
+          },
+          true,
+        ],
       ],
       recorder: "process",
       source: false,
@@ -422,7 +416,11 @@ export default (dependencies) => {
       },
       packages: [
         [
-          makeBlacklistSpecifier(directory),
+          {
+            basedir: directory,
+            source: "(^\\.\\.)|((^|/)node_modules/)",
+            flags: "u",
+          },
           {
             enabled: false,
             shallow: true,
@@ -431,7 +429,11 @@ export default (dependencies) => {
           },
         ],
         [
-          makeWhitelistSpecifier(directory),
+          {
+            basedir: directory,
+            source: "^",
+            flags: "u",
+          },
           {
             enabled: true,
             shallow: false,

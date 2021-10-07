@@ -158,6 +158,9 @@ The `recorder` configuration option defines how appmap should be generated:
       recorder: mocha
       exec: npx
       configuration:
+        processes:
+          regexp: npx
+          enabled: false
       argv: [mocha]
   ```
 
@@ -266,7 +269,7 @@ A specifier can be any of:
     * `<object>`
         * `enabled <boolean>` Indicates whether whitelisted files are enabled or not. *Default*: `true`.
         * `... <Specifier>` Extends from any specifier format. 
-  *Default*: `[]` -- ie: the agent will be enabled for every process whose entry script resides in the current directory but outside of any `node_modules` directory.
+  *Default*: `[]` -- ie: the agent will be enabled for every process whose entry script resides in the repository directory.
 * `scenario <string>` A regular expression to select scenarios for execution. *Default*: `"anonymous"` (the name of the scenario provided by command line argument).
 * `scenarios <object>`
   An object whose values are either a single scenario or a list of scenarios. A scenario can be any of:

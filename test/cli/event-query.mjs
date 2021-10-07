@@ -15,6 +15,7 @@ await runAsync(
       http: false,
       sqlite3: true,
     },
+    name: "name",
     scenario: "scenario",
     scenarios: {
       scenario: ["node", "./main.mjs"],
@@ -37,7 +38,7 @@ await runAsync(
     );
   },
   async (appmaps) => {
-    const { "main.appmap.json": appmap } = appmaps;
+    const { "name.appmap.json": appmap } = appmaps;
     const { events } = appmap;
     /* eslint-disable no-unused-vars */
     const [event1, { elapsed, ...event2 }] = events;
