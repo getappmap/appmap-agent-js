@@ -1,6 +1,6 @@
 import { writeFile, symlink, realpath, readdir } from "fs/promises";
 import { strict as Assert } from "assert";
-import { runAsync } from "./__fixture__.mjs";
+import { runAsync } from "../__fixture__.mjs";
 
 const { cwd } = process;
 

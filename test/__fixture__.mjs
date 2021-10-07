@@ -2,7 +2,7 @@
 import { tmpdir } from "os";
 import { mkdir, symlink, writeFile, realpath } from "fs/promises";
 import YAML from "yaml";
-import { spawnAsync } from "../spawn.mjs";
+import { spawnAsync } from "./spawn.mjs";
 
 const { cwd } = process;
 const { stringify: stringifyYAML } = YAML;

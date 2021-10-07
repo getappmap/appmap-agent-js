@@ -1,0 +1,117 @@
+// import { writeFile, readFile } from "fs/promises";
+// import { strict as Assert } from "assert";
+// import { runAsync } from "../__fixture__.mjs";
+//
+// const { deepEqual: assertDeepEqual } = Assert;
+//
+// const port = `${tmpdir()}/${Math.random().toString(36).substring(2)}`;
+//
+// await runAsync(
+//   null,
+//   {
+//     mode: "remote",
+//     packages: { glob: "*" },
+//     name: "name",
+//     `track-port`: port,
+//     hooks: {
+//       esm: true,
+//       cjs: true,
+//       apply: true,
+//       http: false,
+//     },
+//     ordering: "causal",
+//     scenario: "scenario",
+//     scenarios: {
+//       scenario: ["node", "./main.mjs"],
+//     },
+//   },
+//   async (repository) => {
+//     await writeFile(
+//       `${repository}/main.mjs`,
+//       `
+//         const interval = setInterval(function heartbeat () {}, 100);
+//         setTimeout(() => {
+//           clearInterval(interval);
+//         }, 5000);
+//       `
+//     ),
+//     setTimeout(() => {
+//
+//     }, 1000);
+//   },
+//   async (directory) => {
+//     const appmap = JSON.parse(
+//       await readFile(`${directory}/tmp/appmap/name.appmap.json`, "utf8"),
+//     );
+//     const { events } = appmap;
+//     assertDeepEqual(
+//       events.map(({ event, defined_class, id, parent_id }) => ({
+//         event,
+//         id,
+//         ...(event === "call" ? { defined_class } : { parent_id }),
+//       })),
+//       [
+//         {
+//           event: "call",
+//           id: 1,
+//           defined_class: "mainAsync",
+//         },
+//         {
+//           event: "call",
+//           id: 2,
+//           defined_class: "generateAsync",
+//         },
+//         {
+//           event: "call",
+//           id: 3,
+//           defined_class: "beforeAwait",
+//         },
+//         {
+//           event: "return",
+//           id: 4,
+//           parent_id: 3,
+//         },
+//         {
+//           event: "call",
+//           id: 5,
+//           defined_class: "promiseCallback",
+//         },
+//         {
+//           event: "call",
+//           id: 6,
+//           defined_class: "timeoutCallback",
+//         },
+//         {
+//           event: "return",
+//           id: 7,
+//           parent_id: 6,
+//         },
+//         {
+//           event: "return",
+//           id: 8,
+//           parent_id: 5,
+//         },
+//         {
+//           event: "call",
+//           id: 9,
+//           defined_class: "afterAwait",
+//         },
+//         {
+//           event: "return",
+//           id: 10,
+//           parent_id: 9,
+//         },
+//         {
+//           event: "return",
+//           id: 11,
+//           parent_id: 2,
+//         },
+//         {
+//           event: "return",
+//           id: 12,
+//           parent_id: 1,
+//         },
+//       ],
+//     );
+//   },
+// );
