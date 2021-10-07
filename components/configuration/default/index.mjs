@@ -80,9 +80,6 @@ export default (dependencies) => {
   };
 
   const normalizeOutput = (output, nullable_directory) => {
-    if (output === null) {
-      return { target: "http" };
-    }
     if (typeof output === "string") {
       output = { directory: output };
     }
@@ -176,6 +173,10 @@ export default (dependencies) => {
   ////////////
 
   const fields = {
+    mode: {
+      extend: overwrite,
+      normalize: identity,
+    },
     validate: {
       extend: assign,
       normalize: identity,
@@ -360,6 +361,7 @@ export default (dependencies) => {
       main: null,
       recording: null,
       // provided by the user
+      mode: "file",
       host: "localhost",
       session: null,
       "trace-port": 0, // possibly overwritten by the agent
@@ -376,7 +378,6 @@ export default (dependencies) => {
       scenarios: {},
       log: "info",
       output: {
-        target: "file",
         directory: `${directory}/tmp/appmap`,
         basename: null,
         extension: ".appmap.json",

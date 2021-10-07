@@ -4,7 +4,6 @@ for (const name of [
   "event-apply",
   "event-http",
   "event-query",
-  "local",
   "npx",
   "mocha",
 ]) {

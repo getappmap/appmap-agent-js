@@ -1,4 +1,3 @@
-import { tmpdir } from "os";
 import { strict as Assert } from "assert";
 import { Socket } from "net";
 import { createMessage } from "net-socket-messaging";
@@ -25,15 +24,12 @@ const {
   closeReceptorAsync,
 } = Receptor(await buildTestDependenciesAsync(import.meta.url));
 
-const repository = `${tmpdir()}/${Math.random().toString(36).substring(2)}`;
 const configuration = extendConfiguration(
   createConfiguration("/root"),
   {
-    output: {
-      target: "http",
-    },
+    mode: "http",
   },
-  repository,
+  null,
 );
 const receptor = await openReceptorAsync(configuration);
 
@@ -68,75 +64,108 @@ await assertRequestAsync("GET", "/_appmap/track", null, {
   message: "No Active Session",
 });
 
-const socket = new Socket();
-await new Promise((resolve) => {
-  socket.on("connect", resolve);
-  socket.connect(getReceptorTracePort(receptor));
-});
-socket.write(createMessage("session"));
-socket.write(createMessage(JSON.stringify(configuration)));
-await new Promise((resolve) => {
-  setTimeout(resolve, 100);
-});
+{
+  const socket = new Socket();
+  await new Promise((resolve) => {
+    socket.on("connect", resolve);
+    socket.connect(getReceptorTracePort(receptor));
+  });
+  socket.write(createMessage("session"));
+  socket.write(
+    createMessage(
+      JSON.stringify(
+        extendConfiguration(configuration, { recorder: "process" }, null),
+      ),
+    ),
+  );
+  await new Promise((resolve) => {
+    socket.on("close", resolve);
+  });
+}
 
-await assertRequestAsync(
-  "POST",
-  "/session/track1",
-  { path: null, data: { name: "name" } },
-  {},
-);
-await assertRequestAsync(
-  "POST",
-  "/session/track1",
-  { path: null, data: {} },
-  { code: 409, message: "Duplicate Track" },
-);
-await assertRequestAsync("GET", "/_appmap/track1", null, {
-  body: { enabled: true },
-});
-await assertRequestAsync(
-  "DELETE",
-  "/session/track1",
-  { status: 123, errors: [] },
-  {
-    body: {
-      configuration: { ...configuration, name: "name" },
-      files: [],
-      events: [],
-      termination: { status: 123, errors: [] },
-    },
-  },
-);
-await assertRequestAsync("GET", "/_appmap/track1", null, {
-  body: { enabled: false },
-});
-await assertRequestAsync(
-  "DELETE",
-  "/session/track1",
-  { status: 123, errors: [] },
-  { code: 404, message: "Missing Track" },
-);
-socket.write(
-  createMessage(JSON.stringify(["start", "track2", { path: null, data: {} }])),
-);
-await new Promise((resolve) => {
-  socket.on("close", resolve);
-  socket.end();
-});
-await assertRequestAsync(
-  "DELETE",
-  "/session/track2",
-  { status: 123, errors: [] },
-  {
-    body: {
-      configuration,
-      files: [],
-      events: [],
-      termination: {
-        status: 1,
-        errors: [{ name: "AppmapError", message: "disconnection", stack: "" }],
+{
+  const socket = new Socket();
+  await new Promise((resolve) => {
+    socket.on("connect", resolve);
+    socket.connect(getReceptorTracePort(receptor));
+  });
+  socket.write(createMessage("session"));
+  socket.write(
+    createMessage(
+      JSON.stringify(
+        extendConfiguration(configuration, { recorder: "remote" }, null),
+      ),
+    ),
+  );
+  await new Promise((resolve) => {
+    setTimeout(resolve, 100);
+  });
+  await assertRequestAsync(
+    "POST",
+    "/session/track1",
+    { path: null, data: { name: "name" } },
+    {},
+  );
+  await assertRequestAsync(
+    "POST",
+    "/session/track1",
+    { path: null, data: {} },
+    { code: 409, message: "Duplicate Track" },
+  );
+  await assertRequestAsync("GET", "/_appmap/track1", null, {
+    body: { enabled: true },
+  });
+  await assertRequestAsync(
+    "DELETE",
+    "/session/track1",
+    { status: 123, errors: [] },
+    {
+      body: {
+        configuration: { ...configuration, recorder: "remote", name: "name" },
+        files: [],
+        events: [],
+        termination: { status: 123, errors: [] },
       },
     },
-  },
-);
-await closeReceptorAsync(receptor);
+  );
+  await assertRequestAsync("GET", "/_appmap/track1", null, {
+    body: { enabled: false },
+  });
+  await assertRequestAsync(
+    "DELETE",
+    "/session/track1",
+    { status: 123, errors: [] },
+    { code: 404, message: "Missing Track" },
+  );
+  socket.write(
+    createMessage(
+      JSON.stringify(["start", "track2", { path: null, data: {} }]),
+    ),
+  );
+  await new Promise((resolve) => {
+    socket.on("close", resolve);
+    socket.end();
+  });
+  await assertRequestAsync(
+    "DELETE",
+    "/session/track2",
+    { status: 123, errors: [] },
+    {
+      body: {
+        configuration: {
+          ...configuration,
+          recorder: "remote",
+        },
+        files: [],
+        events: [],
+        termination: {
+          status: 1,
+          errors: [
+            { name: "AppmapError", message: "disconnection", stack: "" },
+          ],
+        },
+      },
+    },
+  );
+  await closeReceptorAsync(receptor);
+}

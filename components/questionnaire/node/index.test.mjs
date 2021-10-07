@@ -47,6 +47,7 @@ assertDeepEqual(
     ({ choices }) => choices[0].value,
   ]),
   {
+    mode: "file",
     app: "app",
     recorder: "process",
     scenario: "my-scenario",
@@ -54,7 +55,6 @@ assertDeepEqual(
       "my-scenario": "command",
     },
     output: {
-      target: "file",
       directory: "output-directory",
     },
     hooks: {
@@ -82,6 +82,7 @@ assertDeepEqual(
   ]),
   {
     recorder: "mocha",
+    mode: "file",
   },
 );
 
@@ -102,10 +103,8 @@ assertDeepEqual(
     ({}) => BREAK,
   ]),
   {
+    mode: "http",
     recorder: "remote",
-    output: {
-      target: "http",
-    },
     "track-port": 0,
     "intercept-track-port": "unix-domain-socket",
   },

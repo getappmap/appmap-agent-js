@@ -44,6 +44,12 @@ export default (dependencies) => {
         agent: { directory: agent_directory },
       } = configuration2;
       if (fork === null) {
+        expect(
+          recorder === "process" ||
+            recorder === "remote" ||
+            recorder === "mocha",
+          "only process/remote/mocha recorders are supported by scenario fork format",
+        );
         if (recorder === "mocha") {
           let part1;
           let part2;
@@ -86,8 +92,8 @@ export default (dependencies) => {
         };
       } else {
         expect(
-          recorder === "process",
-          "only process recorder is supported by scenario fork format",
+          recorder === "remote" || recorder === "process",
+          "only process/remote recorders are supported by scenario fork format",
         );
         const { exec: fork_exec, argv: fork_argv } = fork;
         argv = [

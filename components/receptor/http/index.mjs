@@ -9,7 +9,7 @@ export default (dependencies) => {
   const {
     util: { assert },
     http: { generateRespond },
-    log: { logInfo },
+    log: { logInfo, logError },
     service: { openServiceAsync, closeServiceAsync, getServicePort },
     backend: {
       createBackend,
@@ -32,11 +32,14 @@ export default (dependencies) => {
   };
   return {
     openReceptorAsync: async ({
+      mode,
       "track-port": track_port,
       "trace-port": trace_port,
-      output: { target },
     }) => {
-      assert(target === "http", "invalid output.target configuration field");
+      assert(
+        mode === "http",
+        "receptor/http expected configuration.mode to be 'http'",
+      );
       const trace_server = createTCPServer();
       const track_server = createHTTPServer();
       const backends = new _Map();
@@ -132,16 +135,25 @@ export default (dependencies) => {
           socket.on("message", (content) => {
             socket.removeAllListeners("message");
             const configuration = parseJSON(content);
-            const backend = createBackend(configuration);
-            backends.set(session, backend);
-            socket.on("close", () => {
-              for (const key of getBackendTrackIterator(backend)) {
-                sendBackend(backend, ["stop", key, disconnection]);
-              }
-            });
-            socket.on("message", (content) => {
-              sendBackend(backend, parseJSON(content));
-            });
+            const { recorder } = configuration;
+            if (recorder !== "remote") {
+              logError(
+                "Http receptor expected remote recorder but got: ",
+                recorder,
+              );
+              socket.destroy();
+            } else {
+              const backend = createBackend(configuration);
+              backends.set(session, backend);
+              socket.on("close", () => {
+                for (const key of getBackendTrackIterator(backend)) {
+                  sendBackend(backend, ["stop", key, disconnection]);
+                }
+              });
+              socket.on("message", (content) => {
+                sendBackend(backend, parseJSON(content));
+              });
+            }
           });
         });
       });

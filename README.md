@@ -18,8 +18,8 @@ Table of contents:
 2. [Automated Recording](#automated-recording)
     1. [Scenario](#scenario)
     2. [CLI](#cli)
-    3. [Recorder](#recorder)
-    4. [Mode](#mode)
+    3. [Local Recording](#local-recording)
+    4. [Remote Recording](#remote-recording)
 3. [Manual Recording](#manual-recording)
 4. [Configuration](#configuration)
     1. [Prelude: Specifier Format](#prelude-specifier-format)
@@ -133,12 +133,23 @@ Note that the configuration object of scenarios cannot overwrite the fields `out
       * *[preferred]* Be a git repository.
       * *[preferred]* Contain a valid `package.json` file.
 
-### Recorder
+### Local Recording
 
-The `recorder` configuration option defines how appmap should be generated:
+The first option to generate appmaps is called local recording.
+It involves indicating the agent when to generate appmaps and where to write them:
+
+```yaml
+mode: local
+# When to generate appmaps:
+recorder: process # or mocha
+# Where to write appmaps:
+output:
+  directory: tmp/appmaps
+```
+
+The `recorder` configuration field support two strategies to generate appmaps:
 
 * `"process"` (default): Generate a single appmap which spans over the entire lifetime of the process.
-* `"remote"`: Generate appmaps on demand via [remote recording](remote-recording).
 * `"mocha"`: Generate an appmap for each test case (ie `it` calls) of the entire test suite (ie every `describe` calls on every test file).
   It is only available in the `spawn` format and expects the parsed command to start with either `mocha` or `npx mocha`.
   Note that mocha run the entire test suite within a single node process.
@@ -147,17 +158,19 @@ The `recorder` configuration option defines how appmap should be generated:
   If enabled, the appmap will be stripped of the elements of the classmap that did not cause any function applications.
   Example of configuration file:
   ```yaml
+  mode: file
   pruning: true
   scenarios:
     mocha:
       type: spawn
-      recorder: mocha
       exec: mocha
+      configuration:
+        recorder: mocha
     npx-mocha:
       type: spawn
-      recorder: mocha
       exec: npx
       configuration:
+        recorder: mocha
         processes:
           regexp: npx
           enabled: false
@@ -166,14 +179,20 @@ The `recorder` configuration option defines how appmap should be generated:
 
 ### Remote Recording
 
+The second option to generate appmaps is on-demand via HTTP requests.
+The remote recording web API is documented [here](https://appland.com/docs/reference/remote-recording).
 
-When the `recorder` configuration field is set to `"remote"`, the agent will serve HTTP requests to generate appmaps on demand.
-This functionality is called remote recording and is better documented [here](https://appland.com/docs/reference/remote-recording).
+```yaml
+mode: remote
+track-port: 8080
+intercept-track-port: 8000
+```
+
 Remote recording requests can be delivered to two possible end points:
 
 |                         | Configuration Field    | Routing              | Comment                                                                                |
 |-------------------------|------------------------|----------------------|----------------------------------------------------------------------------------------|
-| Backend Port            | `track-port`           | `/{session}/{track}` | If `session` is `"_appmap"` then the (assumed) single active session will be selected. |
+| Dedicated Backend Port  | `track-port`           | `/{session}/{track}` | If `session` is `"_appmap"` then the (assumed) single active session will be selected. |
 | Intercept Frontend Port | `intercept-track-port` | `/_appmap/{track}`   | Will not be active until the application deploy an HTTP server on that port.           |
 
 <!-- ### Mode
@@ -204,7 +223,8 @@ const appmap = createAppmap(
   configuration_directory, // default: null
 );
 // NB: An appmap can create multiple (concurrent) tracks
-const track = appmap.start(null, {
+const track = "my-identifier";
+appmap.start(track, {
   app: "my-app-name",
   name: "my-appmap-name",
   pruning: true,
@@ -258,7 +278,8 @@ A specifier can be any of:
 
 ### Automated Recording Configuration Fields
 
-* `recorder: "process" | "remote" | "mocha"` Defines the main algorithm used for recording. *Default* `"process"`.
+* `mode "local" | "remote"`
+* `recorder "process" | "remote"` Defines the main algorithm used for recording. *Default* `"process"`.
     * `"process"` Generate a single appmap which spans over the entire lifetime of the process.
     * `"mocha"` Generate an appmap for each test case (ie `it` calls) of the entire test suite (ie every `describe` calls on every test file).
 * `track-port <number> | null`: Port in the backend process for serving remote recording HTTP requests. *Default*: `0` A random port will be used.
@@ -271,42 +292,41 @@ A specifier can be any of:
         * `... <Specifier>` Extends from any specifier format. 
   *Default*: `[]` -- ie: the agent will be enabled for every process whose entry script resides in the repository directory.
 * `scenario <string>` A regular expression to select scenarios for execution. *Default*: `"anonymous"` (the name of the scenario provided by command line argument).
-* `scenarios <object>`
-  An object whose values are either a single scenario or a list of scenarios. A scenario can be any of:
-    * `<string>` Command which gets converted in the `spawn` format. For instance: `"exec argv0"` is the same as `{type: "spawn", exec: "/bin/sh", argv: ["-c", "exec argv0"]}`.
-    * `<string[]>` Parsed command which gets converted in the `spawn` format. For instance: `["exec", "argv0"]` is the same as `{type: "spawn", exec: "exec", argv: ["argv0"]}`.
-    * `<SpawnScenario>` The spawn scenario format which is inspired from [child_process#spawn](https://nodejs.org/api/child_process.html#child_process_child_process_spawn_command_args_options):
-      * `type "spawn"`
-      * `exec <string>` Executable to run, paths should be relative to `options.cwd`.
-      * `argv <string[]>` List of command line arguments to pass to the executable.
-      * `options <object>` Options object
-        * `cwd <string>` Current working directory of the child process. *Default*: the directory of the configuration file.
-        * `env <object>` Environment variables. Note that Unlike for the [child_process#spawn](https://nodejs.org/api/child_process.html#child_process_child_process_spawn_command_args_options), the environment variables from the parent process will always be included.
-  *Default*: `{}` -- ie: the environment variables from the parent process.
-        * `stdio <string> | <string[]>` Stdio configuration, only `"ignore"` and `"inherit"` are supported.
-        * `encoding "utf8" | "utf16le" | "latin1"` Encoding of all the child's stdio streams.
-        * `timeout <number>` The maximum number of millisecond the child process is allowed to run before being killed. *Default*: `0` (no timeout).
-        * `killSignal <string>` The signal used to kill the child process when it runs out of time. *Default*: `"SIGTERM"`.
-      * `configuration <Configuration>`: Extension of the parent configuration. 
-      *Default*: `{}` -- ie: reuse the parent configuration.
-    * `<ForkScenario>` The spawn scenario format which is inspired from [child_process#fork][https://nodejs.org/api/child_process.html#child_process_child_process_fork_modulepath_args_options]
-      * `type "fork"`
-      * `globbing <boolean>` Indicates whether the `exec` property should be interpreted as a glob or a path. *Default*: `true`.
-      * `exec <string>` Path to the main module relative to `options.cwd`.
-      * `argv <string[]>` List of command line arguments to pass to the main module.
-      * `options <Object>`
-        * `execPath` Path to a node executable
-        * `execArgv` List of command line arguments to pass to the node executable.
-        * `... <SpawnScenario.options>` Any option from the `spawn` format is also supported.
-      * `configuration <Configuration>` Extension of the parent configuration. *Default*: `{}` -- ie: reuse the parent configuration.
-  * `output <string> | <object>` Options to store appmap files.
+* `scenarios <object>` An object whose values are either a single scenario or a list of scenarios. A scenario can be any of:
+      * `<string>` Command which gets converted in the `spawn` format. For instance: `"exec argv0"` is the same as `{type: "spawn", exec: "/bin/sh", argv: ["-c", "exec argv0"]}`.
+      * `<string[]>` Parsed command which gets converted in the `spawn` format. For instance: `["exec", "argv0"]` is the same as `{type: "spawn", exec: "exec", argv: ["argv0"]}`.
+      * `<SpawnScenario>` The spawn scenario format which is inspired from [child_process#spawn](https://nodejs.org/api/child_process.html#child_process_child_process_spawn_command_args_options):
+          * `type "spawn"`
+          * `exec <string>` Executable to run, paths should be relative to `options.cwd`.
+          * `argv <string[]>` List of command line arguments to pass to the executable.
+          * `options <object>` Options object
+              * `cwd <string>` Current working directory of the child process. *Default*: the directory of the configuration file.
+              * `env <object>` Environment variables. Note that Unlike for the [child_process#spawn](https://nodejs.org/api/child_process.html#child_process_child_process_spawn_command_args_options), the environment variables from the parent process will always be included.
+        *Default*: `{}` -- ie: the environment variables from the parent process.
+              * `stdio <string> | <string[]>` Stdio configuration, only `"ignore"` and `"inherit"` are supported.
+              * `encoding "utf8" | "utf16le" | "latin1"` Encoding of all the child's stdio streams.
+              * `timeout <number>` The maximum number of millisecond the child process is allowed to run before being killed. *Default*: `0` (no timeout).
+              * `killSignal <string>` The signal used to kill the child process when it runs out of time. *Default*: `"SIGTERM"`.
+          * `configuration <Configuration>`: Extension of the parent configuration.
+          *Default*: `{}` -- ie: reuse the parent configuration.
+      * `<ForkScenario>` The spawn scenario format which is inspired from [child_process#fork][https://nodejs.org/api/child_process.html#child_process_child_process_fork_modulepath_args_options]
+          * `type "fork"`
+          * `globbing <boolean>` Indicates whether the `exec` property should be interpreted as a glob or a path. *Default*: `true`.
+          * `exec <string>` Path to the main module relative to `options.cwd`.
+          * `argv <string[]>` List of command line arguments to pass to the main module.
+          * `options <Object>`
+              * `execPath` Path to a node executable
+              * `execArgv` List of command line arguments to pass to the node executable.
+              * `... <SpawnScenario.options>` Any option from the `spawn` format is also supported.
+          * `configuration <Configuration>` Extension of the parent configuration. *Default*: `{}` -- ie: reuse the parent configuration.
+* `output <string> | <object>` Options to store appmap files.
     * `null` Shorthand for `{target:"http"}`.
     * `<string>` Shorthand, `"tmp/appmap"` is the same as `{target: "file", directory: "tmp/appmap"}`.
     * `<object>`
-      * `target "file" | "http"` Either write appmaps in files or serve through HTTP.
-      * `directory <string>` Directory to write appmap files.
-      * `basename null | <string>` Basename of the future appmap file. Indexing will be appended to prevent accidental overwriting of appmap files within a single run. *Default*: `null` the agent will look at the `name` configuration field, if it is `null` as well, `"anonymous"` will be used.
-      * `extension <string>` Extension to append after the basename. *Default*: `".appmap.json"`.
+        * `target "file" | "http"` Either write appmaps in files or serve through HTTP.
+        * `directory <string>` Directory to write appmap files.
+        * `basename null | <string>` Basename of the future appmap file. Indexing will be appended to prevent accidental overwriting of appmap files within a single run. *Default*: `null` the agent will look at the `name` configuration field, if it is `null` as well, `"anonymous"` will be used.
+        * `extension <string>` Extension to append after the basename. *Default*: `".appmap.json"`.
 
 ### Common Options
 

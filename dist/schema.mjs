@@ -9,6 +9,13 @@ export const schema = [
     ]
   },
   {
+    "$id": "mode",
+    "enum": [
+      "file",
+      "http"
+    ]
+  },
+  {
     "$id": "ordering",
     "enum": [
       "chronological",
@@ -39,13 +46,6 @@ export const schema = [
       "mocha",
       "manual",
       "remote"
-    ]
-  },
-  {
-    "$id": "target",
-    "enum": [
-      "file",
-      "http"
     ]
   },
   {
@@ -678,6 +678,9 @@ export const schema = [
     "type": "object",
     "additionalProperties": false,
     "properties": {
+      "mode": {
+        "$ref": "mode"
+      },
       "validate": {
         "type": "object",
         "additionalProperties": false,
@@ -873,18 +876,12 @@ export const schema = [
       "output": {
         "anyOf": [
           {
-            "const": null
-          },
-          {
             "type": "string"
           },
           {
             "type": "object",
             "additionalProperties": false,
             "properties": {
-              "target": {
-                "$ref": "target"
-              },
               "directory": {
                 "$ref": "path"
               },
@@ -928,8 +925,11 @@ export const schema = [
     "$id": "configuration",
     "type": "object",
     "additionalProperties": false,
-    "minProperties": 36,
+    "minProperties": 37,
     "properties": {
+      "mode": {
+        "$ref": "mode"
+      },
       "validate": {
         "type": "object",
         "additionalProperties": false,
@@ -1223,15 +1223,11 @@ export const schema = [
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "target",
           "directory",
           "basename",
           "extension"
         ],
         "properties": {
-          "target": {
-            "$ref": "target"
-          },
           "directory": {
             "$ref": "absolute-path"
           },

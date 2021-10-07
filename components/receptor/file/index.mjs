@@ -10,7 +10,7 @@ const _Set = Set;
 export default (dependencies) => {
   const {
     util: { assert, constant, getDirectory },
-    log: { logInfo },
+    log: { logInfo, logError },
     expect: { expect },
     service: { openServiceAsync, closeServiceAsync, getServicePort },
     backend: {
@@ -87,9 +87,13 @@ export default (dependencies) => {
   return {
     openReceptorAsync: async ({
       "trace-port": trace_port,
-      output: { target, directory },
+      mode,
+      output: { directory },
     }) => {
-      assert(target === "file", "invalid output.target configuration field");
+      assert(
+        mode === "file",
+        "receptor/file expected configuration.mode to be 'file'",
+      );
       await createDirectoryAsync(directory);
       const server = createServer();
       const paths = new _Set();
@@ -99,22 +103,32 @@ export default (dependencies) => {
           socket.removeAllListeners("message");
           socket.on("message", (content) => {
             socket.removeAllListeners("message");
-            const backend = createBackend(parseJSON(content));
-            socket.on("close", () => {
-              for (const key of getBackendTrackIterator(backend)) {
-                sendBackend(backend, ["stop", key, disconnection]);
-              }
-              for (const key of getBackendTraceIterator(backend)) {
-                store(paths, directory, takeBackendTrace(backend, key));
-              }
-            });
-            socket.on("message", (content) => {
-              if (sendBackend(backend, parseJSON(content))) {
+            const configuration = parseJSON(content);
+            const { recorder } = configuration;
+            if (recorder !== "process" && recorder !== "mocha") {
+              logError(
+                "File receptor expected process/mocha recorder but got: ",
+                recorder,
+              );
+              socket.destroy();
+            } else {
+              const backend = createBackend(configuration);
+              socket.on("close", () => {
+                for (const key of getBackendTrackIterator(backend)) {
+                  sendBackend(backend, ["stop", key, disconnection]);
+                }
                 for (const key of getBackendTraceIterator(backend)) {
                   store(paths, directory, takeBackendTrace(backend, key));
                 }
-              }
-            });
+              });
+              socket.on("message", (content) => {
+                if (sendBackend(backend, parseJSON(content))) {
+                  for (const key of getBackendTraceIterator(backend)) {
+                    store(paths, directory, takeBackendTrace(backend, key));
+                  }
+                }
+              });
+            }
           });
         });
       });

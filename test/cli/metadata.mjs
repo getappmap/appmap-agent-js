@@ -7,6 +7,7 @@ const { equal: assertEqual, deepEqual: assertDeepEqual } = Assert;
 await runAsync(
   { name: "app", version: "1.2.3" },
   {
+    mode: "file",
     name: "name",
     hooks: {
       esm: false,

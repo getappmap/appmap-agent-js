@@ -7,6 +7,7 @@ const { deepEqual: assertDeepEqual } = Assert;
 await runAsync(
   null,
   {
+    mode: "file",
     "function-name-placeholder": "placeholder",
     packages: { glob: "*" },
     hooks: {
