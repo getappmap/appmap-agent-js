@@ -1,3 +1,5 @@
+const { stdout } = process;
+
 for (const name of [
   "metadata",
   "classmap",
@@ -7,6 +9,6 @@ for (const name of [
   "npx",
   "mocha",
 ]) {
-  process.stdout.write(`${"\n"}${name}${"\n"}`);
+  stdout.write(`${"\n"}${name}${"\n"}`);
   await import(`./${name}.mjs`);
 }

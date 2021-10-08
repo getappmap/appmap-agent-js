@@ -18,7 +18,9 @@ export default (dependencies) => {
         return null;
       }
       const groups = new Map();
-      let current = null;
+      // It appears nested asynchronous operations are possible...
+      // So we need a stack instead of a scalar.
+      const stack = [];
       const hook = createHook({
         init: (id, description, origin) => {
           assert(!groups.has(id), "duplicate async id");
@@ -30,7 +32,10 @@ export default (dependencies) => {
         },
         destroy: (id) => {
           if (groups.has(id)) {
-            assert(id !== current, "async computation destroyed itself");
+            assert(
+              stack[stack.length - 1] !== id,
+              "async computation destroyed itself",
+            );
             const { bundle_index, jump_index } = groups.get(id);
             groups.delete(id);
             sendEmitter(emitter, recordAfterJump(frontend, jump_index, null));
@@ -38,8 +43,7 @@ export default (dependencies) => {
           }
         },
         before: (id) => {
-          assert(current === null, "nested async computation");
-          current = id;
+          stack.push(id);
           if (groups.has(id)) {
             const group = groups.get(id);
             const { jump_index } = group;
@@ -56,8 +60,7 @@ export default (dependencies) => {
         },
         after: (id) => {
           assert(groups.has(id), "missing async id (after)");
-          assert(current === id, "async id mismatch");
-          current = null;
+          assert(stack.pop() === id, "async id mismatch");
           const group = groups.get(id);
           assert(
             group.jump_index === null,
