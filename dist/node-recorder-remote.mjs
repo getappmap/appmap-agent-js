@@ -1,4 +1,3 @@
-import uuid$random from "./../components/uuid/random/index.mjs";
 import util$default from "./../components/util/default/index.mjs";
 import violation$exit from "./../components/violation/exit/index.mjs";
 import expect_inner$default from "./../components/expect-inner/default/index.mjs";
@@ -9,6 +8,7 @@ import log$error from "./../components/log/error/index.mjs";
 import log$info from "./../components/log/info/index.mjs";
 import log$off from "./../components/log/off/index.mjs";
 import log$warning from "./../components/log/warning/index.mjs";
+import uuid$random from "./../components/uuid/random/index.mjs";
 import time$performance_node from "./../components/time/performance-node/index.mjs";
 import validate$ajv from "./../components/validate/ajv/index.mjs";
 import specifier$default from "./../components/specifier/default/index.mjs";
@@ -34,30 +34,15 @@ import agent$default from "./../components/agent/default/index.mjs";
 import recorder_remote$default from "./../components/recorder-remote/default/index.mjs";
 
 export default (blueprint) => {
-  const dependencies = { __proto__: null };
-  dependencies["uuid"] = uuid$random(dependencies);
+  const dependencies = {__proto__:null};
   dependencies["util"] = util$default(dependencies);
   dependencies["violation"] = violation$exit(dependencies);
   dependencies["expect-inner"] = expect_inner$default(dependencies);
   dependencies["expect"] = expect$default(dependencies);
   dependencies["log-inner"] = log_inner$write_sync(dependencies);
-  if (!("log" in blueprint)) {
-    throw new Error("missing instance for component log");
-  }
-  dependencies["log"] =
-    blueprint["log"] === "warning"
-      ? log$warning(dependencies)
-      : blueprint["log"] === "off"
-      ? log$off(dependencies)
-      : blueprint["log"] === "info"
-      ? log$info(dependencies)
-      : blueprint["log"] === "error"
-      ? log$error(dependencies)
-      : blueprint["log"] === "debug"
-      ? log$debug(dependencies)
-      : (() => {
-          throw new Error("invalid instance for component log");
-        })();
+  if (!("log" in blueprint)) { throw new Error("missing instance for component log"); }
+  dependencies["log"] = (blueprint["log"] === "warning" ? log$warning(dependencies) : (blueprint["log"] === "off" ? log$off(dependencies) : (blueprint["log"] === "info" ? log$info(dependencies) : (blueprint["log"] === "error" ? log$error(dependencies) : (blueprint["log"] === "debug" ? log$debug(dependencies) : ((() => { throw new Error("invalid instance for component log"); }) ()))))));
+  dependencies["uuid"] = uuid$random(dependencies);
   dependencies["time"] = time$performance_node(dependencies);
   dependencies["validate"] = validate$ajv(dependencies);
   dependencies["specifier"] = specifier$default(dependencies);

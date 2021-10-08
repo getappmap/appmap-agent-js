@@ -8,7 +8,7 @@ import validate$ajv from "./../components/validate/ajv/index.mjs";
 import setup$node from "./../components/setup/node/index.mjs";
 
 export default (blueprint) => {
-  const dependencies = { __proto__: null };
+  const dependencies = {__proto__:null};
   dependencies["prompts"] = prompts$node(dependencies);
   dependencies["util"] = util$default(dependencies);
   dependencies["questionnaire"] = questionnaire$node(dependencies);
