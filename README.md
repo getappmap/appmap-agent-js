@@ -33,7 +33,7 @@ Table of contents:
 
 * unix-like os
 * git
-* any up-to-date major node release that is still maintained -- ie: 12, 14, 15, and 16
+* node 14, 16, 17, or 18
 * [mocha recorder only]: mocha >= 8.0.0 (because of root hooks)
 
 <!--
