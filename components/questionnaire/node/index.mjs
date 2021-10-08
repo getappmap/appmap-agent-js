@@ -106,7 +106,7 @@ export default (dependencies) => {
               "What command should be executed and recorded when running `npx appmap-agent-js`?",
               "Skip to provide an inline command -- eg: `npx appmap-agent-js -- node path/to/main.js argv0 argv1`",
             ],
-            initial: recorder === "mocha" ? "npx mocha" : "node bin/main.js",
+            initial: "",
             format: (input) =>
               input === ""
                 ? {}
@@ -281,7 +281,7 @@ export default (dependencies) => {
       type: "toggle",
       name: "value",
       message: ["Should we include code that did not get executed in appmaps?"],
-      initial: recorder === "mocha",
+      initial: recorder !== "mocha",
       active: "yes",
       inactive: "no",
       format: (complete) => ({ pruning: !complete }),
