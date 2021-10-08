@@ -1,6 +1,8 @@
 const { parseInt } = Number;
 const { assign } = Object;
 
+const { fromEntries } = Object;
+
 export default (dependencies) => {
   const {
     prompts: { prompts },
@@ -172,42 +174,42 @@ export default (dependencies) => {
       choices: [
         {
           title: "Applications of functions located in CommonJS modules",
-          value: { cjs: true },
+          value: "cjs",
           disabled: recorder === "manual",
           selected: recorder !== "manual",
         },
         {
           title: "Application of functions located in native modules",
-          value: { esm: true },
+          value: "esm",
           disabled: recorder === "manual",
           selected: recorder !== "manual",
         },
         {
           title: "HTTP/1.1 traffic (via node's builtin http package)",
-          value: { http: true },
+          value: "http",
           disabled: false,
           selected: true,
         },
         {
           title: "MySQL queries (via mysql package)",
-          value: { mysql: true },
+          value: "mysql",
           disabled: false,
           selected: false,
         },
         {
           title: "Postgres queries (via pg package)",
-          value: { pg: true },
+          value: "pg",
           disabled: false,
           selected: false,
         },
         {
           title: "SQLite3 queries (via sqlite3 package)",
-          value: { sqlite3: true },
+          value: "sqlite3",
           disabled: false,
           selected: false,
         },
       ],
-      format: (hooks) => ({
+      format: (keys) => ({
         hooks: {
           esm: false,
           cjs: false,
@@ -215,7 +217,7 @@ export default (dependencies) => {
           mysql: false,
           pg: false,
           sqlite3: false,
-          ...hooks,
+          ...fromEntries(keys.map((key) => [key, true])),
         },
       }),
     }),

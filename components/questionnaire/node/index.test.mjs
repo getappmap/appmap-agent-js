@@ -39,7 +39,7 @@ assertDeepEqual(
     ({ choices }) => choices[0].value,
     ({ format }) => format("command"),
     ({ format }) => format("output-directory"),
-    ({ format }) => format({ esm: true, cjs: true }),
+    ({ format }) => format(["esm", "cjs"]),
     ({ choices }) => choices[0].value,
     // ({ format }) => format(["process1", "process2"]),
     // ({ format }) => format(["package1", "package2"]),
@@ -115,7 +115,7 @@ assertDeepEqual(
   await runAsync([
     ({ format }) => format(""),
     ({ choices }) => choices[3].value,
-    ({ format }) => format({ http: true }),
+    ({ format }) => format(["http"]),
     ({ choices }) => choices[1].value,
     ({ format }) => format(false),
     ({ choices }) => choices[4].value,
