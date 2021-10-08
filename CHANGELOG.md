@@ -1,3 +1,10 @@
+## [4.0.1](https://github.com/applandinc/appmap-agent-js/compare/v4.0.0...v4.0.1) (2021-10-08)
+
+
+### Bug Fixes
+
+* integration tests now fail on promise rejection ([4f2c03c](https://github.com/applandinc/appmap-agent-js/commit/4f2c03c8b0ee49011e6eff9127998cef4d9f6e22))
+
 # [4.0.0](https://github.com/applandinc/appmap-agent-js/compare/v3.2.0...v4.0.0) (2021-10-08)
 
 
