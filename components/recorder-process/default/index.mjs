@@ -1,6 +1,7 @@
 export default (dependencies) => {
   const {
     uuid: { getUUID },
+    log: {logInfo},
     expect: { expect },
     util: { assert },
     configuration: { isConfigurationEnabled },
@@ -8,6 +9,7 @@ export default (dependencies) => {
   } = dependencies;
   return {
     main: (process, configuration) => {
+      logInfo("Recorder 'process' caught process %j", process.pid);
       const { recorder } = configuration;
       assert(recorder === "process", "expected process recorder");
       if (isConfigurationEnabled(configuration)) {

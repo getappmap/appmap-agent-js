@@ -3,12 +3,14 @@ import { createServer } from "http";
 export default (dependencies) => {
   const {
     util: { assert },
+    log: {logInfo},
     configuration: { isConfigurationEnabled },
     agent: { openAgent, closeAgent, requestRemoteAgentAsync },
     http: { generateRespond },
   } = dependencies;
   return {
     main: (process, configuration) => {
+      logInfo("Recorder 'remote' caught process %j", process.pid);
       const { recorder, "frontend-track-port": port } = configuration;
       assert(recorder === "remote", "expected remote recorder");
       if (isConfigurationEnabled(configuration)) {
