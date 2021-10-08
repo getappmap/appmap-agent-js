@@ -3,7 +3,7 @@ import { createServer } from "http";
 export default (dependencies) => {
   const {
     util: { assert },
-    log: {logInfo},
+    log: { logInfo },
     configuration: { isConfigurationEnabled },
     agent: { openAgent, closeAgent, requestRemoteAgentAsync },
     http: { generateRespond },

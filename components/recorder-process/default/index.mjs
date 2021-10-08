@@ -1,7 +1,7 @@
 export default (dependencies) => {
   const {
     uuid: { getUUID },
-    log: {logInfo},
+    log: { logInfo },
     expect: { expect },
     util: { assert },
     configuration: { isConfigurationEnabled },

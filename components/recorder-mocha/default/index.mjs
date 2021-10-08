@@ -5,7 +5,7 @@ const _undefined = undefined;
 export default (dependencies) => {
   const {
     uuid: { getUUID },
-    log: {logInfo},
+    log: { logInfo },
     configuration: { isConfigurationEnabled },
     util: { assert, coalesce, matchVersion },
     expect: { expect },
