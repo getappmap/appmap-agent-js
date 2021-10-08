@@ -28,6 +28,11 @@ const { cwd } = process;
 
 {
   const path = `${tmpdir()}/${Math.random().toString(36).substring(2)}`;
+  bootBatch({
+    env: { APPMAP_CONFIGURATION_PATH: path },
+    argv: ["node", "main.mjs"],
+    cwd,
+  });
   await writeFile(path, "app: app", "utf8");
   const {
     app,
@@ -37,7 +42,7 @@ const { cwd } = process;
     },
   } = bootBatch({
     env: { APPMAP_CONFIGURATION_PATH: path },
-    argv: ["node", "batch.mjs", "--name", "name", "--", "exec", "argv0"],
+    argv: ["node", "main.mjs", "--name", "name", "--", "exec", "argv0"],
     cwd,
   });
   assertDeepEqual(

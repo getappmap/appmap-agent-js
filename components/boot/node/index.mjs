@@ -8,6 +8,7 @@ const { parse: parseYAML } = YAML;
 export default (dependencies) => {
   const {
     expect: { expect },
+    log: { logWarning },
     validate: { validateConfiguration },
     util: { hasOwnProperty, getDirectory, coalesce },
     expect: { expectSuccess },
@@ -15,17 +16,28 @@ export default (dependencies) => {
   } = dependencies;
 
   const loadConfigFile = (path) => {
-    const content = expectSuccess(
-      () => readFileSync(path, "utf8"),
-      "failed to read configuration file %j, running `npx appmap-agent-js setup` will help you create one >> %e",
-      path,
-    );
-    const config = expectSuccess(
+    let content = null;
+    try {
+      content = readFileSync(path, "utf8");
+    } catch (error) {
+      const { code } = error;
+      expect(
+        code === "ENOENT",
+        "Cannot read configuration file at %j >> %e",
+        path,
+        error,
+      );
+      logWarning(
+        "Missing configuration file at %j, running `npx appmap-agent-js setup` will help you create one",
+        path,
+      );
+      return {};
+    }
+    return expectSuccess(
       () => parseYAML(content),
-      "failed to parse configuration file %j, running `npx appmap-agent-js setup` will help you create one >> %e",
+      "failed to parse configuration file at %j >> %e",
       path,
     );
-    return config;
   };
 
   const bootBatch = ({ env, argv, cwd }) => {
