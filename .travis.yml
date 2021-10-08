@@ -1,0 +1,22 @@
+arch: arm64
+os: linux
+dist: focal
+language: node_js
+node_js: [12]
+cache: npm
+
+install:
+  - npm install
+
+script:
+  - npm run lint
+  - npm run test-unit
+  - npm run test-integration
+
+deploy:
+  - provider: script
+    # skip_cleanup: true
+    cleanup: false  # keep semantic release! (and npm modules?)
+    script: npm run deploy
+    on:
+      branch: main
