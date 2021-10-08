@@ -68,7 +68,7 @@ assertDeepEqual(
     ordering: "chronological",
     // processes: [{ glob: "process1" }, { glob: "process2" }],
     // packages: [{ glob: "package1" }, { glob: "package2" }],
-    pruning: true,
+    pruning: false,
     log: "debug",
   },
 );
@@ -132,7 +132,7 @@ assertDeepEqual(
     },
     ordering: "causal",
     packages: [{ enabled: true, regexp: "^", flags: "u" }],
-    pruning: false,
+    pruning: true,
     log: "off",
   },
 );

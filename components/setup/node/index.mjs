@@ -10,14 +10,14 @@ export default (dependencies) => {
   const {
     validate: { validateConfig },
     questionnaire: { questionConfigAsync },
-    util: { toAbsolutePath, hasOwnProperty },
+    util: { assert, toAbsolutePath, hasOwnProperty },
     prompts: { prompts },
   } = dependencies;
   const generateLog = (prefix, writable) => (message) => {
     writable.write(`${prefix} ${message}${"\n"}`);
   };
   return {
-    mainAsync: async ({ cwd, env, stdout, stderr }) => {
+    mainAsync: async ({ version, platform, cwd, env, stdout, stderr }) => {
       const logSuccess = generateLog(chalkGreen("\u2714"), stdout);
       const logWarning = generateLog(chalkYellow("\u26A0"), stderr);
       const logFailure = generateLog(chalkRed("\u2716"), stderr);
@@ -28,6 +28,23 @@ export default (dependencies) => {
       let repo_path = cwd();
       if (hasOwnProperty(env, "APPMAP_REPOSITORY_DIRECTORY")) {
         repo_path = toAbsolutePath(cwd(), env.APPMAP_REPOSITORY_DIRECTORY);
+      }
+      // os //
+      if (platform === "win32") {
+        logFailure("unfortunately, windows is not currently supported");
+        return false;
+      }
+      logSuccess(`unix-like os: ${platform}`);
+      // node //
+      {
+        const parts = /^v([0-9][0-9])\./u.exec(version);
+        assert(parts !== null, "invalid process.version format");
+        const major = parseInt(parts[1]);
+        if (major < 14) {
+          logFailure(`incompatible node version (min 14.x), got: ${version}`);
+          return false;
+        }
+        logSuccess(`compatible node version: ${version}`);
       }
       // configuration file //
       {
@@ -46,9 +63,8 @@ export default (dependencies) => {
               await prompts({
                 type: "toggle",
                 name: "value",
-                message: [
+                message:
                   "Do you wish to answer several questions to help you create a configuration file?",
-                ],
                 initial: true,
                 active: "yes",
                 inactive: "no",

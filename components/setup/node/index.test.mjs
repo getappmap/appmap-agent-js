@@ -13,7 +13,14 @@ const directory = `${tmpdir()}/${Math.random().toString(36).substring(2)}`;
 const cwd = () => directory;
 await mkdir(directory);
 
+assertEqual(await mainAsync({ ...process, platform: "win32" }), false);
+process.stdout.write("\n");
+
+assertEqual(await mainAsync({ ...process, version: "v12.34.56" }), false);
+process.stdout.write("\n");
+
 global.GLOBAL_PROMPTS = () => ({ value: false });
+
 assertEqual(
   await mainAsync({
     ...process,

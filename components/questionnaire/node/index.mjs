@@ -223,7 +223,7 @@ export default (dependencies) => {
       type: "select",
       name: "value",
       message: ["How should events be ordered?"],
-      initial: 1,
+      initial: 0,
       choices: [
         {
           title: "Chronologically",
@@ -278,13 +278,11 @@ export default (dependencies) => {
     ({ recorder }) => ({
       type: "toggle",
       name: "value",
-      message: [
-        "Should appmaps only contain code that led to the recording of a function application?",
-      ],
+      message: ["Should we include code that did not get executed in appmaps?"],
       initial: recorder === "mocha",
       active: "yes",
       inactive: "no",
-      format: (pruning) => ({ pruning }),
+      format: (complete) => ({ pruning: !complete }),
     }),
     // Log //
     constant({
