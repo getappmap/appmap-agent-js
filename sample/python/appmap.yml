@@ -1,4 +1,0 @@
-name: sample
-packages:
-  - path: hello
-    shallow: true

@@ -1,7 +1,0 @@
-enabled: true
-hooks:
-  group: true
-packages:
-  - glob: "*"
-output:
-  indent: 2
