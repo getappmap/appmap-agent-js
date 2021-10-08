@@ -9,7 +9,7 @@ import {
   buildTestComponentAsync,
 } from "../../build.mjs";
 
-if (Reflect.getOwnPropertyDescriptor(process.env, "TRAVIS") !== undefined) {
+if (Reflect.getOwnPropertyDescriptor(process.env, "TRAVIS") === undefined) {
   const { default: HookMysql } = await import("./mysql.mjs");
 
   const { equal: assertEqual, deepEqual: assertDeepEqual } = Assert;
