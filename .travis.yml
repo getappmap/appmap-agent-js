@@ -9,7 +9,6 @@ install:
   - npm install
 
 services:
-  - mysql
   - postgresql
 
 script:
