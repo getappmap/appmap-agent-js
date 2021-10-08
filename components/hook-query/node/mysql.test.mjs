@@ -18,7 +18,7 @@ const promiseTermination = (child) =>
     child.on("error", reject);
   });
 
-const port = 3307;
+const port = 3306;
 const path = `${tmpdir()}/${Math.random().toString(36).substring(2)}`;
 
 const proceedAsync = async () => {
