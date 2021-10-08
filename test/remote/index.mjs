@@ -48,7 +48,7 @@ export const requestAsync = (host, port, method, path, body) =>
 
 export const forkAsync = async (host, port) => {
   await new Promise((resolve) => {
-    setTimeout(resolve, 2000);
+    setTimeout(resolve, 3000);
   });
   assertDeepEqual(
     await requestAsync(host, port, "POST", "/_appmap/record", {
@@ -62,7 +62,7 @@ export const forkAsync = async (host, port) => {
     { code: 200, body: { enabled: true } },
   );
   await new Promise((resolve) => {
-    setTimeout(resolve, 2000);
+    setTimeout(resolve, 3000);
   });
   const {
     code,
@@ -131,7 +131,7 @@ await testAsync(
     const interval = setInterval(function heartbeat () {}, 100);
     setTimeout(() => {
       clearInterval(interval);
-    }, 6000);
+    }, 9000);
   `,
 );
 
