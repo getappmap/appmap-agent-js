@@ -60,6 +60,8 @@ assertDeepEqual(instrument(frontend, "script", "/filename.js", "123;"), {
       type: "script",
       path: "/filename.js",
       code: "123;",
+      source_map_url: null,
+      source_map: null,
     },
   ],
   code: "123;",

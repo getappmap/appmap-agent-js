@@ -17,6 +17,7 @@ import child$default from "./../components/child/default/index.mjs";
 import engine$node from "./../components/engine/node/index.mjs";
 import configuration$default from "./../components/configuration/default/index.mjs";
 import naming$default from "./../components/naming/default/index.mjs";
+import source_map$node from "./../components/source-map/node/index.mjs";
 import instrumentation$default from "./../components/instrumentation/default/index.mjs";
 import serialization$default from "./../components/serialization/default/index.mjs";
 import frontend$default from "./../components/frontend/default/index.mjs";
@@ -34,29 +35,14 @@ import agent$default from "./../components/agent/default/index.mjs";
 import recorder_remote$default from "./../components/recorder-remote/default/index.mjs";
 
 export default (blueprint) => {
-  const dependencies = { __proto__: null };
+  const dependencies = {__proto__:null};
   dependencies["util"] = util$default(dependencies);
   dependencies["violation"] = violation$exit(dependencies);
   dependencies["expect-inner"] = expect_inner$default(dependencies);
   dependencies["expect"] = expect$default(dependencies);
   dependencies["log-inner"] = log_inner$write_sync(dependencies);
-  if (!("log" in blueprint)) {
-    throw new Error("missing instance for component log");
-  }
-  dependencies["log"] =
-    blueprint["log"] === "warning"
-      ? log$warning(dependencies)
-      : blueprint["log"] === "off"
-      ? log$off(dependencies)
-      : blueprint["log"] === "info"
-      ? log$info(dependencies)
-      : blueprint["log"] === "error"
-      ? log$error(dependencies)
-      : blueprint["log"] === "debug"
-      ? log$debug(dependencies)
-      : (() => {
-          throw new Error("invalid instance for component log");
-        })();
+  if (!("log" in blueprint)) { throw new Error("missing instance for component log"); }
+  dependencies["log"] = (blueprint["log"] === "warning" ? log$warning(dependencies) : (blueprint["log"] === "off" ? log$off(dependencies) : (blueprint["log"] === "info" ? log$info(dependencies) : (blueprint["log"] === "error" ? log$error(dependencies) : (blueprint["log"] === "debug" ? log$debug(dependencies) : ((() => { throw new Error("invalid instance for component log"); }) ()))))));
   dependencies["uuid"] = uuid$random(dependencies);
   dependencies["time"] = time$performance_node(dependencies);
   dependencies["validate"] = validate$ajv(dependencies);
@@ -66,6 +52,7 @@ export default (blueprint) => {
   dependencies["engine"] = engine$node(dependencies);
   dependencies["configuration"] = configuration$default(dependencies);
   dependencies["naming"] = naming$default(dependencies);
+  dependencies["source-map"] = source_map$node(dependencies);
   dependencies["instrumentation"] = instrumentation$default(dependencies);
   dependencies["serialization"] = serialization$default(dependencies);
   dependencies["frontend"] = frontend$default(dependencies);

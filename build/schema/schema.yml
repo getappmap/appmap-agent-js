@@ -674,7 +674,7 @@
 - $id: file
   type: object
   additionalProperties: false
-  required: [index, shallow, source, exclude, type, path, code]
+  required: [index, shallow, source, exclude, type, path, code, source_map, source_map_url]
   properties:
     index: {$ref: index}
     shallow: {type: boolean}
@@ -685,6 +685,12 @@
     type: {$ref: file-type}
     path: {$ref: absolute-path}
     code: {type: string}
+    source_map:
+      type: object
+      nullable: true
+    source_map_url:
+      type: string
+      nullable: true
 
 - $id: message
   anyOf:

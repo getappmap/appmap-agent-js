@@ -5,3 +5,4 @@ dependencies:
   - expect
   - uuid
   - naming
+  - source-map

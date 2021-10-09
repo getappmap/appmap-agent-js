@@ -1,4 +1,6 @@
 import { strict as Assert } from "assert";
+import { tmpdir } from "os";
+import { writeFile, mkdir } from "fs/promises";
 import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
@@ -12,6 +14,9 @@ const { createConfiguration, extendConfiguration } =
   await buildTestComponentAsync("configuration", "test");
 const { createInstrumentation, instrument, getInstrumentationIdentifier } =
   Instrumentation(dependencies);
+
+const directory = `${tmpdir()}/${Math.random().toString(36).substring(2)}`;
+await mkdir(directory);
 
 const instrumentation = createInstrumentation(
   extendConfiguration(
@@ -38,26 +43,41 @@ const instrumentation = createInstrumentation(
         },
       ],
     },
-    "/cwd",
+    directory,
   ),
 );
 
 assertEqual(getInstrumentationIdentifier(instrumentation), "$uuid");
 
-assertDeepEqual(instrument(instrumentation, "script", "/cwd/foo.js", "123;"), {
-  code: "123;",
-  file: {
-    index: 0,
-    exclude: [],
-    shallow: true,
-    source: false,
-    type: "script",
-    path: "/cwd/foo.js",
-    code: "123;",
-  },
-});
+await writeFile(`${directory}/foo.js.map`, "[123]", "utf8");
 
-assertDeepEqual(instrument(instrumentation, "script", "/cwd/bar.js", "456;"), {
-  code: "456;",
-  file: null,
-});
+assertDeepEqual(
+  instrument(
+    instrumentation,
+    "script",
+    `${directory}/foo.js`,
+    `123;//# sourceMappingURL=foo.js.map`,
+  ),
+  {
+    code: "123;",
+    file: {
+      index: 0,
+      exclude: [],
+      shallow: true,
+      source: false,
+      type: "script",
+      path: `${directory}/foo.js`,
+      code: `123;//# sourceMappingURL=foo.js.map`,
+      source_map_url: `file://${directory}/foo.js.map`,
+      source_map: [123],
+    },
+  },
+);
+
+assertDeepEqual(
+  instrument(instrumentation, "script", `${directory}/bar.js`, "456;"),
+  {
+    code: "456;",
+    file: null,
+  },
+);

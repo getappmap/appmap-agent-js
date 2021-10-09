@@ -7,11 +7,12 @@ const _String = String;
 
 export default (dependencies) => {
   const {
-    util: { createCounter, incrementCounter },
+    util: { createCounter, incrementCounter, toAbsolutePath, getDirectory },
     configuration: { getConfigurationPackage },
     uuid: { getUUID },
     expect: { expectSuccess },
     naming: { createExclusion },
+    "source-map": { loadSourceMap },
   } = dependencies;
   const { visit } = Visit(dependencies);
   return {
@@ -53,6 +54,22 @@ export default (dependencies) => {
       }
       const index = incrementCounter(indexing);
       const exclude = [...exclude1, ...exclude2];
+      let source_map_url = null;
+      {
+        const parts = /\/\/# sourceMappingURL=(.*)$/u.exec(code);
+        if (parts !== null) {
+          source_map_url = parts[1];
+          if (!/^[a-z]+:\/\//u.test(source_map_url)) {
+            if (!source_map_url.startsWith("/")) {
+              source_map_url = toAbsolutePath(
+                getDirectory(path),
+                source_map_url,
+              );
+            }
+            source_map_url = `file://${source_map_url}`;
+          }
+        }
+      }
       return {
         file: {
           index,
@@ -61,6 +78,8 @@ export default (dependencies) => {
           type,
           path,
           code,
+          source_map_url,
+          source_map: loadSourceMap(source_map_url),
           source:
             /* c8 ignore start */ source === null
               ? global_source

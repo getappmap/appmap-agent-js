@@ -15,54 +15,52 @@ const {
   deepEqual: assertDeepEqual,
 } = Assert;
 
-const testAsync = async () => {
-  const dependencies = await buildTestDependenciesAsync(import.meta.url);
-  const { testHookAsync } = await buildTestComponentAsync("hook");
-  const { hookNativeModule, unhookNativeModule } = Native(dependencies);
-  global.APPMAP_TRANSFORM_SOURCE = null;
-  assertDeepEqual(
-    await testHookAsync(
-      hookNativeModule,
-      unhookNativeModule,
-      {
-        hooks: { esm: true },
-        packages: [
-          {
-            regexp: "^",
-            shallow: true,
-          },
-        ],
-      },
-      async () => {
-        assertEqual(
-          _eval(
-            global
-              .APPMAP_TRANSFORM_SOURCE(
-                from("123;", "utf8"),
-                { format: "module", ...import.meta },
-                (code) => code,
-              )
-              .toString("utf8"),
-          ),
-          123,
-        );
-      },
-    ),
+const dependencies = await buildTestDependenciesAsync(import.meta.url);
+const { testHookAsync } = await buildTestComponentAsync("hook");
+const { hookNativeModule, unhookNativeModule } = Native(dependencies);
+global.APPMAP_TRANSFORM_SOURCE = null;
+assertDeepEqual(
+  await testHookAsync(
+    hookNativeModule,
+    unhookNativeModule,
     {
-      files: [
+      hooks: { esm: true },
+      packages: [
         {
-          index: 0,
-          exclude: [],
-          type: "module",
-          path: fileURLToPath(import.meta.url),
-          code: "123;",
+          regexp: "^",
           shallow: true,
-          source: false,
         },
       ],
-      events: [],
     },
-  );
-};
-
-testAsync();
+    async () => {
+      assertEqual(
+        _eval(
+          global
+            .APPMAP_TRANSFORM_SOURCE(
+              from("123;", "utf8"),
+              { format: "module", ...import.meta },
+              (code) => code,
+            )
+            .toString("utf8"),
+        ),
+        123,
+      );
+    },
+  ),
+  {
+    files: [
+      {
+        index: 0,
+        exclude: [],
+        type: "module",
+        path: fileURLToPath(import.meta.url),
+        code: "123;",
+        shallow: true,
+        source: false,
+        source_map_url: null,
+        source_map: null,
+      },
+    ],
+    events: [],
+  },
+);

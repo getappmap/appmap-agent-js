@@ -52,6 +52,8 @@ assertDeepEqual(
         shallow: false,
         source: false,
         type: "script",
+        source_map: null,
+        source_map_url: null,
       },
     ],
     events: [],

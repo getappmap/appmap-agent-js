@@ -19,66 +19,64 @@ const {
   deepEqual: assertDeepEqual,
 } = Assert;
 
-const testAsync = async () => {
-  const dependencies = await buildTestDependenciesAsync(import.meta.url);
-  const { testHookAsync } = await buildTestComponentAsync("hook");
-  const { hookCommonModule, unhookCommonModule } = Common(dependencies);
-  const require = createRequire(`${cwd()}/dummy.js`);
-  const { resolve } = require;
-  const path = `${tmpdir()}/${random().toString(36).substring(2)}.js`;
-  await writeFile(path, "module.exports = 123;", "utf8");
-  const resolved_path = resolve(path);
-  assertDeepEqual(
-    await testHookAsync(
-      hookCommonModule,
-      unhookCommonModule,
-      {
-        hooks: { cjs: false },
-        packages: [
-          {
-            regexp: "^",
-          },
-        ],
-      },
-      async () => {
-        assertEqual(require(path), 123);
-      },
-    ),
-    { files: [], events: [] },
-  );
-  delete require.cache[resolved_path];
-  assertDeepEqual(
-    await testHookAsync(
-      hookCommonModule,
-      unhookCommonModule,
-      {
-        hooks: { cjs: true },
-        packages: [
-          {
-            regexp: "^",
-            shallow: true,
-          },
-        ],
-      },
-      async () => {
-        assertEqual(require(path), 123);
-      },
-    ),
+const dependencies = await buildTestDependenciesAsync(import.meta.url);
+const { testHookAsync } = await buildTestComponentAsync("hook");
+const { hookCommonModule, unhookCommonModule } = Common(dependencies);
+const require = createRequire(`${cwd()}/dummy.js`);
+const { resolve } = require;
+const path = `${tmpdir()}/${random().toString(36).substring(2)}.js`;
+await writeFile(path, "module.exports = 123;", "utf8");
+const resolved_path = resolve(path);
+assertDeepEqual(
+  await testHookAsync(
+    hookCommonModule,
+    unhookCommonModule,
     {
-      files: [
+      hooks: { cjs: false },
+      packages: [
         {
-          index: 0,
-          exclude: [],
-          type: "script",
-          path: resolved_path,
-          code: "module.exports = 123;",
-          shallow: true,
-          source: false,
+          regexp: "^",
         },
       ],
-      events: [],
     },
-  );
-};
-
-testAsync();
+    async () => {
+      assertEqual(require(path), 123);
+    },
+  ),
+  { files: [], events: [] },
+);
+delete require.cache[resolved_path];
+assertDeepEqual(
+  await testHookAsync(
+    hookCommonModule,
+    unhookCommonModule,
+    {
+      hooks: { cjs: true },
+      packages: [
+        {
+          regexp: "^",
+          shallow: true,
+        },
+      ],
+    },
+    async () => {
+      assertEqual(require(path), 123);
+    },
+  ),
+  {
+    files: [
+      {
+        index: 0,
+        exclude: [],
+        type: "script",
+        path: resolved_path,
+        code: "module.exports = 123;",
+        shallow: true,
+        source: false,
+        source_map_url: null,
+        source_map: null,
+      },
+    ],
+    events: [],
+  },
+);

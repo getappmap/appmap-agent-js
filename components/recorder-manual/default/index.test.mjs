@@ -43,6 +43,8 @@ assertDeepEqual(appmap.stopTrack(track, { status: 123, errors: [] }), {
       shallow: false,
       source: false,
       type: "script",
+      source_map: null,
+      source_map_url: null,
     },
   ],
   events: [],
