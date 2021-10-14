@@ -42,5 +42,6 @@ export default (dependencies) => {
     validateMessage: generateValidate("message"),
     validateConfig: generateValidate("config"),
     validateConfiguration: generateValidate("configuration"),
+    validateSourceMap: generateValidate("source-map"),
   };
 };

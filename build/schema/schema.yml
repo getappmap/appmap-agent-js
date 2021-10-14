@@ -746,3 +746,36 @@
           - request
           - query
         - true
+
+################
+## Source Map ##
+################
+
+- $id: source-map
+  type: object
+  required: [version, sources, names, mappings]
+  properties:
+    version:
+      const: 3
+    file:
+      type: string
+      nullable: true
+    sourceRoot:
+      type: string
+      nullable: true
+    sources:
+      type: array
+      items:
+        type: string
+    sourcesContent:
+      type: array
+      nullable: true
+      items:
+        type: string
+        nullable: true
+    names:
+      type: array
+      items:
+        type: string
+    mappings:
+      type: string
