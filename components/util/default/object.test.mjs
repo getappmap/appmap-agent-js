@@ -6,6 +6,7 @@ import {
   coalesceCaseInsensitive,
   mapMaybe,
   assignProperty,
+  generateGet,
 } from "./object.mjs";
 
 const {
@@ -81,3 +82,7 @@ assertEqual(
   coalesceCaseInsensitive({ Key: "value" }, "missing", "default"),
   "default",
 );
+
+// generateGet //
+
+assertEqual(generateGet("key")({ key: "value" }), "value");

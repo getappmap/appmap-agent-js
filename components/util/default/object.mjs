@@ -43,3 +43,8 @@ export const coalesceCaseInsensitive = (value, key1, _default) => {
 
 export const mapMaybe = (maybe, transform) =>
   maybe === null ? null : transform(maybe);
+
+export const generateGet =
+  (key) =>
+  ({ [key]: value }) =>
+    value;
