@@ -31,20 +31,20 @@ export default (dependencies) => {
       }
       // os //
       if (platform === "win32") {
-        logFailure("unfortunately, windows is not currently supported");
+        logFailure("Windows is currently not supported.");
         return false;
       }
-      logSuccess(`unix-like os: ${platform}`);
+      logSuccess(`Supported operating system detected: ${platform}`);
       // node //
       {
         const parts = /^v([0-9][0-9])\./u.exec(version);
         assert(parts !== null, "invalid process.version format");
         const major = parseInt(parts[1]);
         if (major < 14) {
-          logFailure(`incompatible node version (min 14.x), got: ${version}`);
+          logFailure(`Unsupported node version detected (v14+ required, detected: ${version})`);
           return false;
         }
-        logSuccess(`compatible node version: ${version}`);
+        logSuccess(`Supported node detected: ${version}.`);
       }
       // configuration file //
       {
@@ -54,7 +54,7 @@ export default (dependencies) => {
         } catch ({ code, message }) {
           /* c8 ignore start */
           if (code !== "ENOENT") {
-            logFailure(`configuration file cannot be read: ${message}`);
+            logFailure(`appmap.yml file could not be read: ${message}.`);
             return false;
           }
           /* c8 ignore stop */
@@ -64,14 +64,14 @@ export default (dependencies) => {
                 type: "toggle",
                 name: "value",
                 message:
-                  "Do you wish to answer several questions to help you create a configuration file?",
+                  "Run AppMap configuration wizard for this project?",
                 initial: true,
                 active: "yes",
                 inactive: "no",
               })
             ).value
           ) {
-            logFailure("missing configuration file");
+            logFailure("appmap.yml not found.");
             return false;
           }
           /* c8 ignore start */
@@ -79,27 +79,27 @@ export default (dependencies) => {
           try {
             await writeFile(conf_path, content, "utf8");
           } catch ({ message }) {
-            logFailure(`configuration file cannot not be written: ${message}`);
+            logFailure(`Could not create appmap.yml: ${message}`);
             return false;
           }
           /* c8 ignore stop */
         }
-        logSuccess("configuration file exists");
+        logSuccess("appmap.yml created.");
         let config;
         try {
           config = parseYAML(content);
         } catch ({ message }) {
-          logFailure(`configuration file is not valid YAML: ${message}`);
+          logFailure(`appmap.yml is not a valid YAML file: ${message}.`);
           return false;
         }
-        logSuccess("configuration file is valid YAML");
+        logSuccess("appmap.yml file is a valid YAML file.");
         try {
           validateConfig(config);
         } catch ({ message }) {
-          logFailure(`configuration file is invalid: ${message}`);
+          logFailure(`appmap.yml file is invalid: ${message}.`);
           return false;
         }
-        logSuccess("configuration file is valid");
+        logSuccess("appmap.yml file is valid.");
       }
       // appmap-agent-js //
       {
@@ -107,10 +107,10 @@ export default (dependencies) => {
         try {
           resolve("@appland/appmap-agent-js");
         } catch ({ message }) {
-          logFailure(`cannot resolve appmap-agent-js module: ${message}`);
+          logFailure(`Could not resolve the appmap-agent-js module: ${message}.`);
           return false;
         }
-        logSuccess("appmap-agent-js module is available");
+        logSuccess("The appmap-agent-js module is available.");
       }
       // git repository //
       {
@@ -120,12 +120,12 @@ export default (dependencies) => {
         } catch ({ message }) {
           success = false;
           logWarning(
-            `current working directory does not appear to be a git repository: ${message}`,
+            `Current directory does not look like a git repository: ${message}.`,
           );
         }
         if (success) {
           logSuccess(
-            "current working directory appears to be a git repository",
+            "Current directory looks like a git repository.",
           );
         }
       }
@@ -137,13 +137,13 @@ export default (dependencies) => {
         } catch ({ code, message }) {
           success = false;
           if (code === "ENOENT") {
-            logWarning(`missing package.json file`);
+            logWarning(`package.json file is missing.`);
           } /* c8 ignore start */ else {
-            logWarning(`cannot read package.json file: ${message}`);
+            logWarning(`Could not read package.json file: ${message}.`);
           } /* c8 ignore stop */
         }
         if (success) {
-          logSuccess("package.json file exists");
+          logSuccess("package.json file exists.");
         }
       }
       // overall success //
