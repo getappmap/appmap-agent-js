@@ -1,4 +1,4 @@
-import Clash from "./clash.mjs";
+import Source from "./source.mjs";
 
 const _String = String;
 const { isArray } = Array;
@@ -197,11 +197,11 @@ const makeReturnStatement = (argument) => ({
 
 export default (dependencies) => {
   const {
-    naming: { getQualifiedName, isExcluded },
-    util: { hasOwnProperty, coalesce },
+    expect: { expect },
+    util: { assert, hasOwnProperty, coalesce },
   } = dependencies;
 
-  const { checkIdentifierClash } = Clash(dependencies);
+  const { mapSource } = Source(dependencies);
 
   const makeCatchJumpStatement = (runtime) =>
     makeIfStatement(
@@ -298,24 +298,21 @@ export default (dependencies) => {
       node3,
     );
 
-  const compileProgram = (source, nodes, runtime) => ({
+  const compileProgram = (type, nodes, runtime) => ({
     type: "Program",
-    sourceType: source,
-    body:
-      source === "module"
-        ? [
-            makeVariableDeclaration("let", [
-              makeVariableDeclarator(
-                makeIdentifier(`${runtime}_JUMP_ID`),
-                makeLiteral(null),
-              ),
-            ]),
-            ...nodes,
-          ]
-        : nodes,
+    sourceType: type,
+    body: [
+      makeVariableDeclaration("let", [
+        makeVariableDeclarator(
+          makeIdentifier(`${runtime}_JUMP_ID`),
+          makeLiteral(null),
+        ),
+      ]),
+      ...nodes,
+    ],
   });
 
-  const compileFunction = (node, params, body, route, { runtime }) => ({
+  const compileFunction = (node, params, body, url, runtime) => ({
     type: node.type,
     id: coalesce(node, "id", null),
     expression: false,
@@ -329,7 +326,7 @@ export default (dependencies) => {
           makeCallExpression(
             makeRegularMemberExpression(runtime, "recordBeginApply"),
             [
-              makeLiteral(route),
+              makeLiteral(url),
               makeThisExpression(),
               makeArrayExpression(
                 params.map((param, index) =>
@@ -431,57 +428,40 @@ export default (dependencies) => {
     ]),
   });
 
-  const visit = (node, route, lineage, context) => {
+  const visitGeneric = (node, instrumented, context) =>
+    fromEntries(
+      entries(node).map(([key, node]) => [
+        key,
+        visit(node, instrumented, context),
+      ]),
+    );
+
+  const visit = (node, instrumented, context) => {
     if (isArray(node)) {
-      return node.map((element, index) =>
-        visit(element, `${route}/${_String(index)}`, lineage, context),
-      );
+      return node.map((element) => visit(element, instrumented, context));
     }
     if (
       typeof node === "object" &&
       node !== null &&
       hasOwnProperty(node, "type")
     ) {
-      lineage = { head: node, tail: lineage };
-      checkIdentifierClash(lineage, context);
       const { type } = node;
-      const { runtime, exclusion, naming } = context;
-      if (isExcluded(exclusion, getQualifiedName(naming, lineage))) {
-        return node;
-      }
-      if (type === "Program") {
-        return compileProgram(
-          node.sourceType,
-          visit(node.body, `${route}/body`, lineage, context),
+      if (type === "Identifier") {
+        const { url, runtime } = context;
+        const {
+          name,
+          loc: {
+            start: { line, column },
+          },
+        } = node;
+        expect(
+          !name.startsWith(runtime),
+          "Identifier collision detected at %j line %j column %j >> identifier should not start with %j, got: %j",
+          url,
+          line,
+          column,
           runtime,
-        );
-      }
-      if (type === "TryStatement") {
-        return compileTryStatement(
-          visit(node.block, `${route}/block`, lineage, context),
-          visit(node.handler, `${route}/handler`, lineage, context),
-          visit(node.finalizer, `${route}/finalizer`, lineage, context),
-          runtime,
-        );
-      }
-      if (type === "AwaitExpression") {
-        return makeJumpExpression(
-          visit(node.argument, `${route}/argument`, lineage, context),
-          makeAwaitExpression,
-          runtime,
-        );
-      }
-      if (type === "YieldExpression") {
-        return makeJumpExpression(
-          visit(node.argument, `${route}/argument`, lineage, context),
-          (expression) => makeYieldExpression(node.delegate, expression),
-          runtime,
-        );
-      }
-      if (type === "ReturnStatement") {
-        return compileReturn(
-          visit(node.argument, `${route}/argument`, lineage, context),
-          runtime,
+          name,
         );
       }
       if (
@@ -489,26 +469,73 @@ export default (dependencies) => {
         type === "FunctionExpression" ||
         type === "FunctionDeclaration"
       ) {
-        const { params, body } = node;
-        return compileFunction(
-          node,
-          params.map((node, index) =>
-            visit(node, `${route}/params/${index}`, lineage, context),
-          ),
-          visit(body, `${route}/body`, lineage, context),
-          route,
-          context,
-        );
+        const { whitelist, mapping } = context;
+        const {
+          loc: {
+            start: { line, column },
+          },
+        } = node;
+        const loc = mapSource(mapping, line, column);
+        return loc !== null && whitelist.has(loc.url)
+          ? compileFunction(
+              node,
+              visit(node.params, true, context),
+              visit(node.body, true, context),
+              `${loc.url}#${_String(loc.line)}-${_String(loc.column)}`,
+              context.runtime,
+            )
+          : visitGeneric(node, false, context);
       }
-      return fromEntries(
-        entries(node).map(([key, node]) => [
-          key,
-          visit(node, `${route}/${key}`, lineage, context),
-        ]),
-      );
+      if (instrumented) {
+        if (type === "Program") {
+          return compileProgram(
+            node.sourceType,
+            visit(node.body, instrumented, context),
+            context.runtime,
+          );
+        }
+        if (type === "TryStatement") {
+          return compileTryStatement(
+            visit(node.block, instrumented, context),
+            visit(node.handler, instrumented, context),
+            visit(node.finalizer, instrumented, context),
+            context.runtime,
+          );
+        }
+        if (type === "AwaitExpression") {
+          return makeJumpExpression(
+            visit(node.argument, instrumented, context),
+            makeAwaitExpression,
+            context.runtime,
+          );
+        }
+        if (type === "YieldExpression") {
+          return makeJumpExpression(
+            visit(node.argument, instrumented, context),
+            (expression) => makeYieldExpression(node.delegate, expression),
+            context.runtime,
+          );
+        }
+        if (type === "ReturnStatement") {
+          return compileReturn(
+            visit(node.argument, instrumented, context),
+            context.runtime,
+          );
+        }
+      }
+      return visitGeneric(node, instrumented, context);
     }
     return node;
   };
-
-  return { visit };
+  return {
+    visit: (node, context) => {
+      assert(
+        node.type === "Program",
+        "expected program as top level estree node",
+      );
+      // Top level async jump only present in module.
+      // Avoid poluting global scope in script.
+      return visit(node, node.sourceType === "module", context);
+    },
+  };
 };

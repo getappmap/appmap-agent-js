@@ -4,5 +4,5 @@ dependencies:
   - util
   - expect
   - uuid
-  - naming
-  - source-map
+  - source
+  - validate

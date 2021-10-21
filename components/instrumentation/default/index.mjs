@@ -1,112 +1,122 @@
+/* globals URL */
+
 import { generate } from "escodegen";
 import { parse } from "acorn";
 
 import Visit from "./visit.mjs";
+import Source from "./source.mjs";
 
-const _String = String;
+const _Set = Set;
 
 export default (dependencies) => {
   const {
-    util: { createCounter, incrementCounter, toAbsolutePath, getDirectory },
+    util: { generateGet },
     configuration: { getConfigurationPackage },
     uuid: { getUUID },
     expect: { expectSuccess },
-    naming: { createExclusion },
-    "source-map": { loadSourceMap },
   } = dependencies;
   const { visit } = Visit(dependencies);
+  const {
+    createSourceMap,
+    createMirrorSourceMap,
+    extractSourceMapURL,
+    getSources,
+  } = Source(dependencies);
+  const getHead = generateGet("head");
+  const getBody = generateGet("body");
+  const getURL = generateGet("url");
   return {
     createInstrumentation: ({
       language: { version },
       "hidden-identifier": identifier,
-      exclude,
+      exclude: default_exclude,
       packages,
-      source,
+      "inline-source": default_inline,
     }) => ({
-      runtime: `${identifier}${getUUID()}`,
       version,
-      exclude,
       packages,
-      source,
-      naming: createCounter(0),
-      indexing: createCounter(-1),
-      uuid: getUUID(),
+      default_exclude,
+      default_inline,
+      runtime: `${identifier}${getUUID()}`,
+      done: new _Set(),
     }),
     getInstrumentationIdentifier: ({ runtime }) => runtime,
-    instrument: (instrumentation, type, path, code) => {
-      const {
-        runtime,
-        naming,
-        indexing,
-        packages,
-        version,
-        source: global_source,
-        exclude: exclude1,
-      } = instrumentation;
-      const {
-        enabled,
-        shallow,
-        exclude: exclude2,
-        source,
-      } = getConfigurationPackage(packages, path);
-      if (!enabled) {
-        return { file: null, code };
-      }
-      const index = incrementCounter(indexing);
-      const exclude = [...exclude1, ...exclude2];
-      let source_map_url = null;
+    extractInstrumentationSourceMapURL: extractSourceMapURL,
+    instrument: (
       {
-        const parts = /\/\/# sourceMappingURL=(.*)$/u.exec(code);
-        if (parts !== null) {
-          source_map_url = parts[1];
-          if (!/^[a-z]+:\/\//u.test(source_map_url)) {
-            if (!source_map_url.startsWith("/")) {
-              source_map_url = toAbsolutePath(
-                getDirectory(path),
-                source_map_url,
-              );
-            }
-            source_map_url = `file://${source_map_url}`;
-          }
-        }
+        version,
+        packages,
+        default_exclude,
+        default_inline,
+        runtime,
+        counter,
+        done,
+      },
+      script_file,
+      source_map_file,
+    ) => {
+      /* c8 ignore start */
+      const mapping =
+        source_map_file === null
+          ? createSourceMap(source_map_file)
+          : createMirrorSourceMap(script_file);
+      /* c8 ignore stop */
+      let sources = getSources(mapping);
+      sources = sources
+        .map(({ url, content }) => {
+          const { pathname: path } = new URL(url);
+          const {
+            enabled,
+            shallow,
+            exclude,
+            "inline-source": inline,
+          } = getConfigurationPackage(packages, path);
+          return {
+            head: enabled,
+            body: {
+              url,
+              content,
+              shallow,
+              /* c8 ignore start */
+              "inline-source": inline === null ? default_inline : inline,
+              /* c8 ignore stop */
+              exclude: [...default_exclude, ...exclude],
+            },
+          };
+        })
+        .filter(getHead)
+        .map(getBody);
+      const { type, url, content } = script_file;
+      if (sources.length === 0) {
+        return { url, content, sources: [] };
+      }
+      sources = sources.filter(({ url }) => !done.has(url));
+      for (const { url } of sources) {
+        done.add(url);
       }
       return {
-        file: {
-          index,
-          exclude,
-          shallow,
-          type,
-          path,
-          code,
-          source_map_url,
-          source_map: loadSourceMap(source_map_url),
-          source:
-            /* c8 ignore start */ source === null
-              ? global_source
-              : source /* c8 ignore stop */,
-        },
-        code: generate(
+        url,
+        content: generate(
           visit(
             expectSuccess(
               () =>
-                parse(code, {
+                parse(content, {
                   allowHashBang: true,
                   sourceType: type,
                   ecmaVersion: version,
                 }),
               "failed to parse file %j >> %e",
-              path,
+              url,
             ),
-            _String(index),
-            null,
             {
-              path,
-              naming,
+              url,
               runtime,
-              exclusion: createExclusion(exclude),
+              whitelist: new _Set(sources.map(getURL)),
+              mapping,
             },
           ),
         ),
+        sources,
       };
     },
   };
