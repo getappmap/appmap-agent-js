@@ -35,11 +35,11 @@ assertDeepEqual(
     configuration,
     [
       {
-        index: indexes.file,
-        path: "/cwd/filename.js",
-        type: "script",
-        code: "function f (x) {}",
+        url: "file:///cwd/filename.js",
+        content: "function f (x) {}",
+        shallow: false,
         exclude: [],
+        inline: false,
       },
     ],
     [
@@ -49,7 +49,7 @@ assertDeepEqual(
         time: 0,
         data: {
           type: "apply",
-          function: `${String(indexes.file)}/body/0`,
+          function: "file:///cwd/filename.js#1-0",
           this: { type: "string", print: "this-print" },
           arguments: [{ type: "string", print: "arg-print" }],
         },
@@ -108,7 +108,7 @@ assertDeepEqual(
                 location: "filename.js:1",
                 static: false,
                 labels: [],
-                comment: null,
+                comment: "",
                 source: null,
               },
             ],

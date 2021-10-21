@@ -26,7 +26,7 @@ const termination = { status: 0, errors: [] };
 
 assertDeepEqual(compileTrace(configuration, [], [], termination), {
   configuration,
-  files: [],
+  sources: [],
   events: [],
   termination,
 });

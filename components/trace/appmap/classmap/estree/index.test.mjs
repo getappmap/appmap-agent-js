@@ -1,5 +1,8 @@
 import { strict as Assert } from "assert";
-import { buildTestDependenciesAsync } from "../../../../build.mjs";
+import {
+  buildTestDependenciesAsync,
+  buildTestComponentAsync,
+} from "../../../../build.mjs";
 import Estree from "./index.mjs";
 
 Error.stackTraceLimit = Infinity;
@@ -9,8 +12,16 @@ const {
   // equal: assertEqual,
 } = Assert;
 
-const { extractEstreeClassmap } = Estree(
+const { extractEstreeEntityArray } = Estree(
   await buildTestDependenciesAsync(import.meta.url),
 );
 
-assertDeepEqual(extractEstreeClassmap("123;", { path: "path" }), []);
+const { createCounter } = await buildTestComponentAsync("util");
+
+assertDeepEqual(
+  extractEstreeEntityArray("path", "123;", {
+    separator: "@",
+    counter: createCounter(0),
+  }),
+  [],
+);

@@ -3,7 +3,7 @@ import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
 } from "../../../build.mjs";
-import Classmap from "../classmap.mjs";
+import Classmap from "../classmap/index.mjs";
 import Event from "./index.mjs";
 
 Error.stackTraceLimit = Infinity;
@@ -14,7 +14,7 @@ const {
 } = Assert;
 
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
-const { createClassmap, addClassmapFile } = Classmap(dependencies);
+const { createClassmap, addClassmapSource } = Classmap(dependencies);
 const { createConfiguration } = await buildTestComponentAsync(
   "configuration",
   "test",
@@ -23,11 +23,10 @@ const { compileEventTrace } = Event(dependencies);
 
 {
   const classmap = createClassmap(createConfiguration("/cwd"));
-  addClassmapFile(classmap, {
-    index: 123,
-    path: "/cwd/filename.js",
-    type: "script",
-    code: "function f (x) {}",
+  addClassmapSource(classmap, {
+    url: "file:///cwd/filename.js",
+    content: "function f (x) {}",
+    inline: false,
     exclude: [],
     shallow: true,
   });
@@ -37,7 +36,7 @@ const { compileEventTrace } = Event(dependencies);
     time: 0,
     data: {
       type: "apply",
-      function: "123/body/0",
+      function: "file:///cwd/filename.js#1-0",
       this: {
         type: "string",
         print: "this",

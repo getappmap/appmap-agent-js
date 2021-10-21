@@ -1,8 +1,8 @@
 export default (dependencies) => {
   return {
-    compileTrace: (configuration, files, events, termination) => ({
+    compileTrace: (configuration, sources, events, termination) => ({
       configuration,
-      files,
+      sources,
       events,
       termination,
     }),

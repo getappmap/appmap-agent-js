@@ -2,7 +2,6 @@
 const _URL = URL;
 const _URLSearchParams = URLSearchParams;
 const _String = String;
-import Classmap from "../classmap.mjs";
 
 const { entries: toEntries } = Object;
 const { from: arrayFrom } = Array;
@@ -11,7 +10,6 @@ export default (dependencies) => {
   const {
     util: { assert, coalesceCaseInsensitive, zip },
   } = dependencies;
-  const { getClassmapClosure } = Classmap(dependencies);
 
   const parseURL = (url, headers) =>
     new _URL(
@@ -40,12 +38,11 @@ export default (dependencies) => {
   const compileSearchMessage = (search) =>
     arrayFrom(new _URLSearchParams(search).entries());
 
-  const compileCallData = (data, classmap) => {
+  const compileCallData = (data, options) => {
     const { type } = data;
     if (type === "apply") {
-      const { function: route, this: _this, arguments: _arguments } = data;
-      const { link, parameters } = getClassmapClosure(classmap, route);
-      // route === null ? placeholder : getClassmapClosure(classmap, route);
+      const { this: _this, arguments: _arguments } = data;
+      const { link, parameters } = options;
       return {
         ...link,
         receiver: compileParameterSerial(["this", _this]),
@@ -106,7 +103,7 @@ export default (dependencies) => {
     /* c8 ignore stop */
   };
 
-  const compileReturnData = (data, classmap) => {
+  const compileReturnData = (data, options) => {
     const { type } = data;
     if (type === "apply") {
       const { result, error } = data;

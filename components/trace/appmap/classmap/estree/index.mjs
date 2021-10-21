@@ -5,10 +5,9 @@ export default (dependencies) => {
   const { visit } = Visit(dependencies);
   const { parse, getLeadingComment } = Parse(dependencies);
   return {
-    extractEstreeClassmap: (content, context) => {
-      const { path } = context;
+    extractEstreeEntityArray: (path, content, naming) => {
       return visit(parse(path, content), {
-        ...context,
+        naming,
         getLeadingComment,
       });
     },

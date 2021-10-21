@@ -1,5 +1,5 @@
 import Metadata from "./metadata.mjs";
-import Classmap from "./classmap.mjs";
+import Classmap from "./classmap/index.mjs";
 import Event from "./event/index.mjs";
 import Completion from "./completion.mjs";
 import Erratum from "./erratum.mjs";
@@ -13,24 +13,24 @@ export default (dependencies) => {
     "validate-appmap": { validateAppmap },
   } = dependencies;
   const { compileMetadata } = Metadata(dependencies);
-  const { createClassmap, addClassmapFile, compileClassmap } =
+  const { createClassmap, addClassmapSource, compileClassmap } =
     Classmap(dependencies);
   const { manufactureCompletion } = Completion(dependencies);
   const { orderByStack } = Stack(dependencies);
   const { compileEventTrace } = Event(dependencies);
   const { substituteErratum } = Erratum(dependencies);
   return {
-    compileTrace: (configuration, files, events, termination) => {
+    compileTrace: (configuration, sources, events, termination) => {
       logDebug(
-        "Trace:\n  configuration = %j\n  files = %j\n  events = %j\n  termination = %j",
+        "Trace:\n  configuration = %j\n  sources = %j\n  events = %j\n  termination = %j",
         configuration,
-        files,
+        sources,
         events,
         termination,
       );
       const classmap = createClassmap(configuration);
-      for (const file of files) {
-        addClassmapFile(classmap, file);
+      for (const source of sources) {
+        addClassmapSource(classmap, source);
       }
       events = substituteErratum(events);
       const routes = new Set();

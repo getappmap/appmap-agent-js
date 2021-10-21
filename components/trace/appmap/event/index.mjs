@@ -1,4 +1,4 @@
-import Classmap from "../classmap.mjs";
+import Classmap from "../classmap/index.mjs";
 import Data from "./data.mjs";
 
 export default (dependencies) => {
@@ -28,10 +28,15 @@ export default (dependencies) => {
         if (type === "begin" || type === "before") {
           let shallow = null;
           let skip = false;
+          let options = null;
           if (data_type === "apply") {
             const { function: route } = data;
-            ({ shallow } = getClassmapClosure(classmap, route));
-            skip = shallow && isLastShallow(stack);
+            let excluded;
+            ({ shallow, excluded, ...options } = getClassmapClosure(
+              classmap,
+              route,
+            ));
+            skip = excluded || (shallow && isLastShallow(stack));
           }
           let id = null;
           if (!skip) {
@@ -40,7 +45,7 @@ export default (dependencies) => {
               event: "call",
               thread_id: 0,
               id,
-              ...compileCallData(data, classmap),
+              ...compileCallData(data, options),
             });
           }
           stack.push({ time, shallow, id });
@@ -54,7 +59,7 @@ export default (dependencies) => {
               id: (counter += 1),
               parent_id: id,
               elapsed: (time - initial_time) / 1000,
-              ...compileReturnData(data, classmap),
+              ...compileReturnData(data, null),
             });
           }
         }

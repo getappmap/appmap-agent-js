@@ -1,9 +1,5 @@
 import { strict as Assert } from "assert";
-import {
-  buildTestDependenciesAsync,
-  buildTestComponentAsync,
-} from "../../../build.mjs";
-import Classmap from "../classmap.mjs";
+import { buildTestDependenciesAsync } from "../../../build.mjs";
 import Data from "./data.mjs";
 
 Error.stackTraceLimit = Infinity;
@@ -15,9 +11,6 @@ const {
 } = Assert;
 
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
-const { createConfiguration, extendConfiguration } =
-  await buildTestComponentAsync("configuration", "test");
-const { createClassmap, addClassmapFile } = Classmap(dependencies);
 const {
   compileCallData,
   compileReturnData,
@@ -25,17 +18,6 @@ const {
   compileExceptionSerial,
   compileParameterSerial,
 } = Data(dependencies);
-const configuration = extendConfiguration(createConfiguration("/cwd"), {
-  "function-name-placeholder": "$",
-});
-const classmap = createClassmap(configuration);
-addClassmapFile(classmap, {
-  index: 123,
-  path: "/cwd/filename.js",
-  type: "script",
-  code: "function f (x) {}",
-  exclude: [],
-});
 
 ////////////
 // serial //
@@ -129,14 +111,12 @@ assertDeepEqual(
       this: { type: "string", print: "print-this" },
       arguments: [{ type: "string", print: "print-arg" }],
     },
-    classmap,
+    {
+      parameters: ["x"],
+      link: null,
+    },
   ),
   {
-    defined_class: "f",
-    lineno: 1,
-    method_id: "$",
-    static: false,
-    path: "filename.js",
     parameters: [
       {
         class: "string",
@@ -153,33 +133,6 @@ assertDeepEqual(
     },
   },
 );
-
-// apply >> missing routing //
-// assertDeepEqual(
-//   compileCallData(
-//     {
-//       type: "apply",
-//       function: null,
-//       this: { type: "string", print: "print-this" },
-//       arguments: [{ type: "string", print: "print-arg" }],
-//     },
-//     classmap,
-//   ),
-//   {
-//     defined_class: "MANUFACTURED_APPMAP_CLASS",
-//     lineno: 0,
-//     method_id: "MANUFACTURED_APPMAP_METHOD",
-//     static: false,
-//     path: "MANUFACTURED_APPMAP_FILE.js",
-//     parameters: [],
-//     receiver: {
-//       class: "string",
-//       name: "this",
-//       object_id: null,
-//       value: "print-this",
-//     },
-//   },
-// );
 
 // response >> message //
 assertDeepEqual(
@@ -336,7 +289,7 @@ assertDeepEqual(
       error: null,
       result: { type: "string", print: "print" },
     },
-    classmap,
+    null,
   ),
   {
     exceptions: null,
@@ -362,7 +315,7 @@ assertDeepEqual(
       },
       result: null,
     },
-    classmap,
+    null,
   ),
   {
     exceptions: [
@@ -386,7 +339,7 @@ assertDeepEqual(
       status: 200,
       headers: { "CONTENT-TYPE": "content-type" },
     },
-    classmap,
+    null,
   ),
   {
     http_server_response: {
@@ -406,7 +359,7 @@ assertDeepEqual(
     {
       type: "query",
     },
-    classmap,
+    null,
   ),
   {},
 );
@@ -419,7 +372,7 @@ assertDeepEqual(
       status: 200,
       headers: { "CONTENT-TYPE": "content-type" },
     },
-    classmap,
+    null,
   ),
   {
     http_client_response: {

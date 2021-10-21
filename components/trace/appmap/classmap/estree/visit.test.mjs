@@ -17,7 +17,7 @@ const { createCounter } = await buildTestComponentAsync("util");
 
 const { visit } = Visit(await buildTestDependenciesAsync(import.meta.url));
 
-const test = (content, options) =>
+const test = (content, separator, comment) =>
   visit(
     parseAcorn(content, {
       ecmaVersion: 2021,
@@ -26,21 +26,14 @@ const test = (content, options) =>
     }),
     {
       naming: {
-        separator: "@",
+        separator,
         counter: createCounter(0),
       },
-      key: "key",
-      path: "path",
-      inline: true,
-      content,
-      getLeadingComment: () => "comment",
-      placeholder: "placeholder",
-      closures: new Map(),
-      ...options,
+      getLeadingComment: () => comment,
     },
   );
 
-assertDeepEqual(test("({k:{}});"), [
+assertDeepEqual(test("({k:{}});", "@", "comment"), [
   {
     type: "class",
     name: "object@1",
@@ -54,25 +47,22 @@ assertDeepEqual(test("({k:{}});"), [
   },
 ]);
 
-assertDeepEqual(test("class c { static m () { } }"), [
+assertDeepEqual(test("class c { static m (x) { } }", "@", "comment"), [
   {
     type: "class",
     name: "c",
     children: [
       {
-        type: "class",
+        type: "function",
         name: "m",
-        children: [
-          {
-            type: "function",
-            name: "placeholder",
-            comment: "comment",
-            location: "path:1",
-            labels: [],
-            source: "() { }",
-            static: true,
-          },
-        ],
+        line: 1,
+        column: 19,
+        static: true,
+        comment: "comment",
+        range: [19, 26],
+        parameters: [[20, 21]],
+        labels: [],
+        children: [],
       },
     ],
   },
