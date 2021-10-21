@@ -9,20 +9,20 @@
   * validate-appmap
 - patch
 - * uuid
+  * file
   * time
   * spawn
   * prompts
   * http
   * service
+  * source
 - specifier
 - engine
 - repository
 - child
 - configuration
-- naming
 - trace
 - backend
-- source-map
 - * instrumentation
   * interpretation
   * serialization

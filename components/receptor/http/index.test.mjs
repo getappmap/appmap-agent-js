@@ -122,7 +122,7 @@ await assertRequestAsync("GET", "/_appmap/track", null, {
     {
       body: {
         configuration: { ...configuration, recorder: "remote", name: "name" },
-        files: [],
+        sources: [],
         events: [],
         termination: { status: 123, errors: [] },
       },
@@ -156,7 +156,7 @@ await assertRequestAsync("GET", "/_appmap/track", null, {
           ...configuration,
           recorder: "remote",
         },
-        files: [],
+        sources: [],
         events: [],
         termination: {
           status: 1,

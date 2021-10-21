@@ -50,9 +50,12 @@ export default (dependencies) => {
       this.running = true;
       global_running = true;
     }
-    recordScript(path, code) {
-      expect(path[0] === "/", "expected an absolute path but got: %j", path);
-      return recordAgentScript(this.agent, path, code);
+    recordScript(url, content) {
+      if (!/^[a-z]:\/\//u.test(url)) {
+        expect(url[0] === "/", "expected an absolute path but got: %j", url);
+        url = `file://${url}`;
+      }
+      return recordAgentScript(this.agent, url, content);
     }
     startTrack(track, initialization) {
       if (track === null) {

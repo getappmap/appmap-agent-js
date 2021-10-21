@@ -34,17 +34,13 @@ assertDeepEqual(appmap.stopTrack(track, { status: 123, errors: [] }), {
     ...configuration,
     name: "name2",
   },
-  files: [
+  sources: [
     {
-      code: "123;",
+      url: "file:///repository/main.js",
+      content: "123;",
       exclude: [],
-      index: 0,
-      path: "/repository/main.js",
       shallow: false,
-      source: false,
-      type: "script",
-      source_map: null,
-      source_map_url: null,
+      inline: false,
     },
   ],
   events: [],

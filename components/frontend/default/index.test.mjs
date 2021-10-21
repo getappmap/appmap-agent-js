@@ -49,20 +49,26 @@ assertEqual(
   getInstrumentationIdentifier(frontend).startsWith(identifier),
   true,
 );
-assertDeepEqual(instrument(frontend, "script", "/filename.js", "123;"), {
-  message: [
-    "file",
-    {
-      index: 0,
-      exclude: [],
-      shallow: false,
-      source: false,
-      type: "script",
-      path: "/filename.js",
-      code: "123;",
-      source_map_url: null,
-      source_map: null,
-    },
-  ],
-  code: "123;",
-});
+assertDeepEqual(
+  instrument(
+    frontend,
+    { url: "file://filename.js", content: "123;", type: "script" },
+    null,
+  ),
+  {
+    url: "file://filename.js",
+    content: "123;",
+    messages: [
+      [
+        "source",
+        {
+          url: "file://filename.js",
+          content: "123;",
+          exclude: [],
+          shallow: false,
+          inline: false,
+        },
+      ],
+    ],
+  },
+);

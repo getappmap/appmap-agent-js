@@ -7,7 +7,7 @@ const testAsync = async () => {
   const { runScript } = component(
     await buildTestDependenciesAsync(import.meta.url),
   );
-  Assert.equal(runScript("let x = 123;"), undefined);
+  Assert.equal(runScript("let x = 123;", "file:///script.js"), undefined);
   Assert.equal(x, 123);
 };
 

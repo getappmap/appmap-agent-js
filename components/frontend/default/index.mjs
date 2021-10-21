@@ -7,9 +7,10 @@ export default (dependencies) => {
       createInstrumentation,
       instrument,
       getInstrumentationIdentifier,
+      extractInstrumentationSourceMapURL,
     },
   } = dependencies;
-  const { registerFileProtocol, startTrackProtocol, stopTrackProtocol } =
+  const { registerSourceProtocol, startTrackProtocol, stopTrackProtocol } =
     Protocol(dependencies);
   const { createRecording, ...RecordingLibrary } = Recording(dependencies);
   return {
@@ -17,22 +18,23 @@ export default (dependencies) => {
       recording: createRecording(configuration),
       instrumentation: createInstrumentation(configuration),
     }),
+    extractSourceMapURL: extractInstrumentationSourceMapURL,
     getInstrumentationIdentifier: ({ instrumentation }) =>
       getInstrumentationIdentifier(instrumentation),
-    instrument: ({ instrumentation, session }, kind, path, code1) => {
-      const { code: code2, file } = instrument(
+    instrument: (
+      { instrumentation, session },
+      script_file,
+      source_map_file,
+    ) => {
+      const { url, content, sources } = instrument(
         instrumentation,
-        kind,
-        path,
-        code1,
+        script_file,
+        source_map_file,
       );
-      let message = null;
-      if (file !== null) {
-        message = registerFileProtocol(file);
-      }
       return {
-        message,
-        code: code2,
+        url,
+        content,
+        messages: sources.map(registerSourceProtocol),
       };
     },
     startTrack: ({}, track, initialization) =>

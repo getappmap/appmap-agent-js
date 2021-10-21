@@ -21,7 +21,7 @@ sendEmitter(emitter, ["start", "record1", { data: {}, path: null }]);
 sendEmitter(emitter, ["stop", "record1", { status: 0, errors: [] }]);
 assertDeepEqual(takeLocalEmitterTrace(emitter, "record1"), {
   configuration,
-  files: [],
+  sources: [],
   events: [],
   termination: { status: 0, errors: [] },
 });

@@ -1,6 +1,7 @@
 /* globals URL */
 
 const { parse: parseJSON } = JSON;
+const _URL = URL;
 
 export default (dependencies) => {
   const {
@@ -14,7 +15,7 @@ export default (dependencies) => {
     if (/^[a-z]+:\/\//u.test(relative_url)) {
       return relative_url;
     }
-    const url_object = new URL(url);
+    const url_object = new _URL(url);
     const { pathname: path } = url_object;
     url_object.pathname = toAbsolutePath(getDirectory(path), relative_url);
     return url_object.toString();

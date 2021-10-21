@@ -22,5 +22,5 @@ assertDeepEqual(
     { hooks: { esm: false, cjs: false } },
     async () => {},
   ),
-  { files: [], events: [] },
+  { sources: [], events: [] },
 );

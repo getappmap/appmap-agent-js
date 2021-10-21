@@ -22,7 +22,7 @@ assertDeepEqual(
     { hooks: { apply: false } },
     async () => {},
   ),
-  { files: [], events: [] },
+  { sources: [], events: [] },
 );
 assertDeepEqual(
   await testHookAsync(
@@ -37,7 +37,7 @@ assertDeepEqual(
     },
   ),
   {
-    files: [],
+    sources: [],
     events: [
       makeEvent("begin", 1, 0, "apply", {
         function: "function",

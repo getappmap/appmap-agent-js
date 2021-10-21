@@ -1,4 +1,4 @@
-/* globals APPMAP_TRANSFORM_SOURCE:writable */
+/* globals APPMAP_TRANSFORM_SOURCE_ASYNC:writable */
 
 // TODO: detect if preloaded with `--experimental-loader`
 // NB: since 15.x we can use module.preloading
@@ -7,54 +7,66 @@
 //   throw new Error("lib/emitter/hook/esm.js must be preloaded with --experimental loader");
 // }};
 
-const _URL = URL;
-const { from } = Buffer;
+import File from "./file.mjs";
+
+const { from: toBuffer } = Buffer;
 
 export default (dependencies) => {
   const {
-    util: { assert },
-    frontend: { instrument },
+    util: { assert, mapMaybeAsync },
+    frontend: { instrument, extractSourceMapURL },
     emitter: { sendEmitter },
   } = dependencies;
+  const { readFileAsync } = File(dependencies);
   return {
     unhookNativeModule: (enabled) => {
       if (enabled) {
         assert(
-          typeof APPMAP_TRANSFORM_SOURCE === "function",
+          typeof APPMAP_TRANSFORM_SOURCE_ASYNC === "function",
           "native modules are not currently hooked",
         );
-        APPMAP_TRANSFORM_SOURCE = null;
+        APPMAP_TRANSFORM_SOURCE_ASYNC = null;
       }
     },
     hookNativeModule: (emitter, frontend, { hooks: { esm } }) => {
       if (esm) {
         assert(
-          typeof APPMAP_TRANSFORM_SOURCE !== "undefined",
+          typeof APPMAP_TRANSFORM_SOURCE_ASYNC !== "undefined",
           "the agent was not setup to hook native modules; the node executable should have been given: '--experimental-loader=main/loader.mjs'",
         );
         assert(
-          APPMAP_TRANSFORM_SOURCE === null,
+          APPMAP_TRANSFORM_SOURCE_ASYNC === null,
           "native modules are already hooked",
         );
-        APPMAP_TRANSFORM_SOURCE = (content, context, transformSource) => {
+        APPMAP_TRANSFORM_SOURCE_ASYNC = async (
+          content1,
+          context,
+          transformSourceAsync,
+        ) => {
           const { format, url } = context;
           if (format === "module") {
-            const { pathname } = new _URL(url);
-            if (typeof content !== "string") {
-              content = from(content).toString("utf8");
+            if (typeof content1 !== "string") {
+              content1 = toBuffer(content1).toString("utf8");
             }
-            const { code, message } = instrument(
+            const { content: content2, messages } = instrument(
               frontend,
-              "module",
-              pathname,
-              content,
+              {
+                url,
+                content: content1,
+                type: "module",
+              },
+              await mapMaybeAsync(extractSourceMapURL(content1), readFileAsync),
             );
-            if (message !== null) {
+            for (const message of messages) {
               sendEmitter(emitter, message);
             }
-            content = code;
+            content1 = content2;
           }
-          return transformSource(content, context, transformSource);
+          return await transformSourceAsync(
+            content1,
+            context,
+            transformSourceAsync,
+          );
         };
       }
       return esm;

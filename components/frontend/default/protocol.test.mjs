@@ -8,7 +8,7 @@ const dependencies = await buildTestDependenciesAsync(import.meta.url);
 
 const {
   startTrackProtocol,
-  registerFileProtocol,
+  registerSourceProtocol,
   recordEventProtocol,
   stopTrackProtocol,
 } = Protocol(dependencies);
@@ -18,7 +18,7 @@ assertDeepEqual(startTrackProtocol("key", { path: null, options: {} }), [
   "key",
   { path: null, options: {} },
 ]);
-assertDeepEqual(registerFileProtocol("file"), ["file", "file"]);
+assertDeepEqual(registerSourceProtocol("source"), ["source", "source"]);
 assertDeepEqual(
   recordEventProtocol("begin", "index", "time", "bundle", "data"),
   ["event", "begin", "index", "time", "bundle", "data"],

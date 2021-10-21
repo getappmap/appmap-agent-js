@@ -45,11 +45,15 @@ const instrumentation = createInstrumentation(
 assertEqual(getInstrumentationIdentifier(instrumentation), "$uuid");
 
 assertDeepEqual(
-  instrument(instrumentation, {
-    url: "file:///cwd/foo.js",
-    content: "123;",
-    type: "script",
-  }),
+  instrument(
+    instrumentation,
+    {
+      url: "file:///cwd/foo.js",
+      content: "123;",
+      type: "script",
+    },
+    null,
+  ),
   {
     url: "file:///cwd/foo.js",
     content: "123;",
@@ -58,7 +62,7 @@ assertDeepEqual(
         url: "file:///cwd/foo.js",
         content: "123;",
         shallow: true,
-        "inline-source": true,
+        inline: true,
         exclude: ["qux", "foo"],
       },
     ],
@@ -66,11 +70,15 @@ assertDeepEqual(
 );
 
 assertDeepEqual(
-  instrument(instrumentation, {
-    url: "file:///cwd/bar.js",
-    content: "456;",
-    type: "script",
-  }),
+  instrument(
+    instrumentation,
+    {
+      url: "file:///cwd/bar.js",
+      content: "456;",
+      type: "script",
+    },
+    null,
+  ),
   {
     url: "file:///cwd/bar.js",
     content: "456;",

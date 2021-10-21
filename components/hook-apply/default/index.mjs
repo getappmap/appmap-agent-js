@@ -36,6 +36,7 @@ export default (dependencies) => {
             empty: null
           };
         `,
+        "file:///appmap-setup.js",
       );
       const runtime = _eval(identifier);
       runtime.empty = getSerializationEmptyValue(frontend);

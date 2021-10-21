@@ -18,7 +18,7 @@ import validate_message$off from "./../components/validate-message/off/index.mjs
 import validate_message$on from "./../components/validate-message/on/index.mjs";
 import validate_appmap$off from "./../components/validate-appmap/off/index.mjs";
 import validate_appmap$on from "./../components/validate-appmap/on/index.mjs";
-import naming$default from "./../components/naming/default/index.mjs";
+import source$node from "./../components/source/node/index.mjs";
 import trace$appmap from "./../components/trace/appmap/index.mjs";
 import backend$default from "./../components/backend/default/index.mjs";
 import spawn$node from "./../components/spawn/node/index.mjs";
@@ -48,7 +48,7 @@ export default (blueprint) => {
   dependencies["validate-message"] = (blueprint["validate-message"] === "on" ? validate_message$on(dependencies) : (blueprint["validate-message"] === "off" ? validate_message$off(dependencies) : ((() => { throw new Error("invalid instance for component validate-message"); }) ())));
   if (!("validate-appmap" in blueprint)) { throw new Error("missing instance for component validate-appmap"); }
   dependencies["validate-appmap"] = (blueprint["validate-appmap"] === "on" ? validate_appmap$on(dependencies) : (blueprint["validate-appmap"] === "off" ? validate_appmap$off(dependencies) : ((() => { throw new Error("invalid instance for component validate-appmap"); }) ())));
-  dependencies["naming"] = naming$default(dependencies);
+  dependencies["source"] = source$node(dependencies);
   dependencies["trace"] = trace$appmap(dependencies);
   dependencies["backend"] = backend$default(dependencies);
   dependencies["spawn"] = spawn$node(dependencies);

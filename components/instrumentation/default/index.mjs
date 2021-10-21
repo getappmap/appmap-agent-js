@@ -1,11 +1,12 @@
 /* globals URL */
 
-import { generate } from "escodegen";
-import { parse } from "acorn";
+import { generate as generateEstree } from "escodegen";
+import { parse as parseEstree } from "acorn";
 
 import Visit from "./visit.mjs";
 import Source from "./source.mjs";
 
+const _URL = URL;
 const _Set = Set;
 
 export default (dependencies) => {
@@ -58,13 +59,13 @@ export default (dependencies) => {
       /* c8 ignore start */
       const mapping =
         source_map_file === null
-          ? createSourceMap(source_map_file)
-          : createMirrorSourceMap(script_file);
+          ? createMirrorSourceMap(script_file)
+          : createSourceMap(source_map_file);
       /* c8 ignore stop */
       let sources = getSources(mapping);
       sources = sources
         .map(({ url, content }) => {
-          const { pathname: path } = new URL(url);
+          const { pathname: path } = new _URL(url);
           const {
             enabled,
             shallow,
@@ -78,7 +79,7 @@ export default (dependencies) => {
               content,
               shallow,
               /* c8 ignore start */
-              "inline-source": inline === null ? default_inline : inline,
+              inline: inline === null ? default_inline : inline,
               /* c8 ignore stop */
               exclude: [...default_exclude, ...exclude],
             },
@@ -96,14 +97,15 @@ export default (dependencies) => {
       }
       return {
         url,
-        content: generate(
+        content: generateEstree(
           visit(
             expectSuccess(
               () =>
-                parse(content, {
+                parseEstree(content, {
                   allowHashBang: true,
                   sourceType: type,
                   ecmaVersion: version,
+                  locations: true,
                 }),
               "failed to parse file %j >> %e",
               url,

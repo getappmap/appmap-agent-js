@@ -85,7 +85,7 @@ assertDeepEqual(
       await closeAsync(server);
     },
   ),
-  { files: [], events: [] },
+  { sources: [], events: [] },
 );
 
 // Express && http.createServer //
@@ -220,7 +220,7 @@ assertDeepEqual(
       },
     ),
     {
-      files: [],
+      sources: [],
       events: [],
     },
   );

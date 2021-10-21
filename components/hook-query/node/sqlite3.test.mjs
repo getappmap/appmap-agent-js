@@ -50,7 +50,7 @@ const testAsync = async () => {
     );
 
   const createTrace = (sql, parameters, error) => ({
-    files: [],
+    sources: [],
     events: [
       makeEvent("begin", 1, 0, "bundle", null),
       makeEvent("before", 2, 0, "query", {
@@ -66,7 +66,7 @@ const testAsync = async () => {
 
   // Disable //
   assertDeepEqual(await testCaseAsync(false, async () => {}), {
-    files: [],
+    sources: [],
     events: [],
   });
 
@@ -82,7 +82,7 @@ const testAsync = async () => {
         /^TypeError: first argument is expected to be a sql query string/u,
       );
     }),
-    { files: [], events: [] },
+    { sources: [], events: [] },
   );
 
   //////////////

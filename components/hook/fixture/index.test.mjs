@@ -25,5 +25,5 @@ assertDeepEqual(
       sendEmitter(emitter, ["event", ...event]);
     },
   ),
-  { files: [], events: [makeEvent(...event)] },
+  { sources: [], events: [makeEvent(...event)] },
 );

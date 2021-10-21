@@ -66,7 +66,7 @@ const proceedAsync = async () => {
 
   // disabled //
   assertDeepEqual(await testCaseAsync(false, async () => {}), {
-    files: [],
+    sources: [],
     events: [],
   });
 
@@ -79,7 +79,7 @@ const proceedAsync = async () => {
       );
       assertDeepEqual(rows, [{ solution: 6 }]);
     }),
-    { files: [], events },
+    { sources: [], events },
   );
 
   // callback //
@@ -100,7 +100,7 @@ const proceedAsync = async () => {
       });
       assertDeepEqual(rows, [{ solution: 6 }]);
     }),
-    { files: [], events },
+    { sources: [], events },
   );
 
   // type error //
@@ -113,13 +113,13 @@ const proceedAsync = async () => {
         assertEqual(message, "Client was passed a null or undefined query");
       }
     }),
-    { files: [], events: [] },
+    { sources: [], events: [] },
   );
 
   // invalid sql //
   {
-    const cleanup = ({ files, events }) => ({
-      files,
+    const cleanup = ({ sources, events }) => ({
+      sources,
       events: events.slice(0, 2),
     });
     assertDeepEqual(
@@ -135,7 +135,7 @@ const proceedAsync = async () => {
         }),
       ),
       {
-        files: [],
+        sources: [],
         events: [
           makeEvent("begin", 1, 0, "bundle", null),
           makeEvent("before", 2, 0, "query", {
@@ -158,7 +158,7 @@ const proceedAsync = async () => {
         }),
       ),
       {
-        files: [],
+        sources: [],
         events: [
           makeEvent("begin", 1, 0, "bundle", null),
           makeEvent("before", 2, 0, "query", {

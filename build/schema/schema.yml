@@ -678,13 +678,10 @@
 - $id: source
   type: object
   additionalProperties: false
-  required: [url, content, alias, shallow, inline, exclude]
+  required: [url, content, shallow, inline, exclude]
   properties:
     url: {$ref: url}
     content: {type: string}
-    alias:
-      type: string
-      pattern: "^[a-z0-9]+$"
     shallow: {type: boolean}
     inline: {type: boolean}
     exclude:

@@ -33,8 +33,8 @@ export default (dependencies) => {
         sendEmitter(emitter, ["start", "record", { data: {}, path: null }]);
         await callbackAsync(frontend);
         sendEmitter(emitter, ["stop", "record", { status: 0, errors: [] }]);
-        const { files, events } = takeLocalEmitterTrace(emitter, "record");
-        return { files, events };
+        const { sources, events } = takeLocalEmitterTrace(emitter, "record");
+        return { sources, events };
       } finally {
         closeEmitter(emitter, { status: 1, errors: [] });
         unhook(recovery);

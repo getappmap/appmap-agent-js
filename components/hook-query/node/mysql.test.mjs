@@ -34,7 +34,7 @@ if (Reflect.getOwnPropertyDescriptor(process.env, "TRAVIS") === undefined) {
         { hooks: { mysql: false } },
         async () => {},
       ),
-      { events: [], files: [] },
+      { events: [], sources: [] },
     );
     assertDeepEqual(
       await testHookAsync(
@@ -77,7 +77,7 @@ if (Reflect.getOwnPropertyDescriptor(process.env, "TRAVIS") === undefined) {
         },
       ),
       {
-        files: [],
+        sources: [],
         events: [
           makeEvent("begin", 1, 0, "bundle", null),
           makeEvent("before", 2, 0, "query", {

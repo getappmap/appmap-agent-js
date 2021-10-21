@@ -81,6 +81,11 @@ export const schema = [
     ]
   },
   {
+    "$id": "url",
+    "type": "string",
+    "pattern": "^[a-z]+://"
+  },
+  {
     "$id": "exclusion",
     "type": "string"
   },
@@ -296,7 +301,7 @@ export const schema = [
           "exclude": {
             "$ref": "exclude"
           },
-          "source": {
+          "inline-source": {
             "type": "boolean",
             "nullable": true
           }
@@ -321,7 +326,7 @@ export const schema = [
           "exclude": {
             "$ref": "exclude"
           },
-          "source": {
+          "inline-source": {
             "type": "boolean",
             "nullable": true
           }
@@ -349,7 +354,7 @@ export const schema = [
           "exclude": {
             "$ref": "exclude"
           },
-          "source": {
+          "inline-source": {
             "type": "boolean",
             "nullable": true
           }
@@ -380,7 +385,7 @@ export const schema = [
           "exclude": {
             "$ref": "exclude"
           },
-          "source": {
+          "inline-source": {
             "type": "boolean",
             "nullable": true
           }
@@ -425,7 +430,7 @@ export const schema = [
                 {
                   "type": "object",
                   "required": [
-                    "source"
+                    "inline-source"
                   ]
                 },
                 {
@@ -766,7 +771,7 @@ export const schema = [
       "recorder": {
         "$ref": "recorder"
       },
-      "source": {
+      "inline-source": {
         "type": "boolean"
       },
       "hooks": {
@@ -1070,7 +1075,7 @@ export const schema = [
           }
         ]
       },
-      "source": {
+      "inline-source": {
         "type": "boolean"
       },
       "hooks": {
@@ -1173,7 +1178,7 @@ export const schema = [
                 "shallow": {
                   "type": "boolean"
                 },
-                "source": {
+                "inline-source": {
                   "type": "boolean",
                   "nullable": true
                 },
@@ -1347,28 +1352,27 @@ export const schema = [
     }
   },
   {
-    "$id": "file",
+    "$id": "source",
     "type": "object",
     "additionalProperties": false,
     "required": [
-      "index",
+      "url",
+      "content",
       "shallow",
-      "source",
-      "exclude",
-      "type",
-      "path",
-      "code",
-      "source_map",
-      "source_map_url"
+      "inline",
+      "exclude"
     ],
     "properties": {
-      "index": {
-        "$ref": "index"
+      "url": {
+        "$ref": "url"
+      },
+      "content": {
+        "type": "string"
       },
       "shallow": {
         "type": "boolean"
       },
-      "source": {
+      "inline": {
         "type": "boolean"
       },
       "exclude": {
@@ -1376,23 +1380,6 @@ export const schema = [
         "items": {
           "type": "string"
         }
-      },
-      "type": {
-        "$ref": "file-type"
-      },
-      "path": {
-        "$ref": "absolute-path"
-      },
-      "code": {
-        "type": "string"
-      },
-      "source_map": {
-        "type": "object",
-        "nullable": true
-      },
-      "source_map_url": {
-        "type": "string",
-        "nullable": true
       }
     }
   },
@@ -1463,10 +1450,10 @@ export const schema = [
         "maxItems": 2,
         "items": [
           {
-            "const": "file"
+            "const": "source"
           },
           {
-            "$ref": "file"
+            "$ref": "source"
           }
         ]
       },
@@ -1506,5 +1493,51 @@ export const schema = [
         ]
       }
     ]
+  },
+  {
+    "$id": "source-map",
+    "type": "object",
+    "required": [
+      "version",
+      "sources",
+      "names",
+      "mappings"
+    ],
+    "properties": {
+      "version": {
+        "const": 3
+      },
+      "file": {
+        "type": "string",
+        "nullable": true
+      },
+      "sourceRoot": {
+        "type": "string",
+        "nullable": true
+      },
+      "sources": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "sourcesContent": {
+        "type": "array",
+        "nullable": true,
+        "items": {
+          "type": "string",
+          "nullable": true
+        }
+      },
+      "names": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "mappings": {
+        "type": "string"
+      }
+    }
   }
 ];

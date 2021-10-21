@@ -23,7 +23,7 @@ const testAsync = async () => {
       { ordering: "chronological" },
       async (frontend) => null,
     ),
-    { files: [], events: [] },
+    { sources: [], events: [] },
   );
 };
 

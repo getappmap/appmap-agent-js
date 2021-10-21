@@ -43,7 +43,7 @@ assertDeepEqual(
       assertEqual(require(path), 123);
     },
   ),
-  { files: [], events: [] },
+  { sources: [], events: [] },
 );
 delete require.cache[resolved_path];
 assertDeepEqual(
@@ -64,17 +64,13 @@ assertDeepEqual(
     },
   ),
   {
-    files: [
+    sources: [
       {
-        index: 0,
+        url: `file://${resolved_path}`,
+        content: "module.exports = 123;",
         exclude: [],
-        type: "script",
-        path: resolved_path,
-        code: "module.exports = 123;",
         shallow: true,
-        source: false,
-        source_map_url: null,
-        source_map: null,
+        inline: false,
       },
     ],
     events: [],

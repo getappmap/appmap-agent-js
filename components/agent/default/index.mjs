@@ -52,17 +52,20 @@ export default (dependencies) => {
       unhookResponse(response_hook);
       unhookQuery(query_hook);
     },
-    recordAgentScript: ({ frontend, emitter }, path, code1) => {
-      const { message, code: code2 } = instrument(
+    recordAgentScript: ({ frontend, emitter }, url, content) => {
+      const { messages, content: instrumented_content } = instrument(
         frontend,
-        "script",
-        path,
-        code1,
+        {
+          url,
+          content,
+          type: "script",
+        },
+        null,
       );
-      if (message !== null) {
+      for (const message of messages) {
         sendEmitter(emitter, message);
       }
-      return runScript(code2);
+      return runScript(instrumented_content, url);
     },
     takeLocalAgentTrace: ({ emitter }, key) =>
       takeLocalEmitterTrace(emitter, key),

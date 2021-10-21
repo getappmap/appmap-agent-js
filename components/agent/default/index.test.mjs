@@ -36,24 +36,20 @@ const agent = openAgent(
   ),
 );
 startTrack(agent, "record", { path: null, data: {} });
-assertEqual(recordAgentScript(agent, "/main.js", "123;"), 123);
+assertEqual(recordAgentScript(agent, "file:///main.js", "123;"), 123);
 stopTrack(agent, "record", { errors: [], status: 0 });
 closeAgent(agent, { errors: [], status: 123 });
-const { files, events } = takeLocalAgentTrace(agent, "record");
+const { sources, events } = takeLocalAgentTrace(agent, "record");
 assertDeepEqual(
-  { files, events },
+  { sources, events },
   {
-    files: [
+    sources: [
       {
-        code: "123;",
+        url: "file:///main.js",
+        content: "123;",
         exclude: [],
-        index: 0,
-        path: "/main.js",
         shallow: false,
-        source: false,
-        type: "script",
-        source_map: null,
-        source_map_url: null,
+        inline: false,
       },
     ],
     events: [],

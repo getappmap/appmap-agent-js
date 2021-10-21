@@ -1,5 +1,4 @@
 import { strict as Assert } from "assert";
-import { fileURLToPath } from "url";
 import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
@@ -18,7 +17,7 @@ const {
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
 const { testHookAsync } = await buildTestComponentAsync("hook");
 const { hookNativeModule, unhookNativeModule } = Native(dependencies);
-global.APPMAP_TRANSFORM_SOURCE = null;
+global.APPMAP_TRANSFORM_SOURCE_ASYNC = null;
 assertDeepEqual(
   await testHookAsync(
     hookNativeModule,
@@ -35,30 +34,26 @@ assertDeepEqual(
     async () => {
       assertEqual(
         _eval(
-          global
-            .APPMAP_TRANSFORM_SOURCE(
+          (
+            await global.APPMAP_TRANSFORM_SOURCE_ASYNC(
               from("123;", "utf8"),
               { format: "module", ...import.meta },
               (code) => code,
             )
-            .toString("utf8"),
+          ).toString("utf8"),
         ),
         123,
       );
     },
   ),
   {
-    files: [
+    sources: [
       {
-        index: 0,
-        exclude: [],
-        type: "module",
-        path: fileURLToPath(import.meta.url),
-        code: "123;",
+        url: import.meta.url,
+        content: "123;",
         shallow: true,
-        source: false,
-        source_map_url: null,
-        source_map: null,
+        exclude: [],
+        inline: false,
       },
     ],
     events: [],

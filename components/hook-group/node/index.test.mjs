@@ -30,7 +30,7 @@ assertDeepEqual(
       });
     },
   ),
-  { files: [], events: [] },
+  { sources: [], events: [] },
 );
 
 setTimeout(() => {}, 100); // provide an unknown async id

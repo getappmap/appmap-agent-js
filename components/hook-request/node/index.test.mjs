@@ -53,7 +53,7 @@ assertDeepEqual(
       await promiseResponse(Http.get(url));
     },
   ),
-  { files: [], events: [] },
+  { sources: [], events: [] },
 );
 
 const events = [
@@ -84,7 +84,7 @@ assertDeepEqual(
       await promiseResponse(Http.get(url));
     },
   ),
-  { files: [], events },
+  { sources: [], events },
 );
 
 assertDeepEqual(
@@ -98,7 +98,7 @@ assertDeepEqual(
       await promiseResponse(request);
     },
   ),
-  { files: [], events },
+  { sources: [], events },
 );
 
 await new Promise((resolve) => {
