@@ -1,40 +1,279 @@
-# appmap-agent-js
+# Get started with appmap-agent-js
 
-JavaScript agent for the AppMap framework.
+`appmap-agent-js` is a JavaScript recording agent for the [AppMap](https://appland.org) framework.
 
-To install:
+Table of contents:
+- [Get started with appmap-agent-js](#get-started-with-appmap-agent-js)
+  - [How it works](#how-it-works)
+  - [Installation and setup](#installation-and-setup)
+    - [Requirements](#requirements)
+    - [Installation](#installation)
+    - [Initial setup](#initial-setup)
+      - [Know before you start](#know-before-you-start)
+      - [Start the setup wizard](#start-the-setup-wizard)
+      - [To set up recording mocha test cases:](#to-set-up-recording-mocha-test-cases)
+      - [To set up remote recording:](#to-set-up-remote-recording)
+  - [Recording AppMaps](#recording-appmaps)
+    - [To record mocha test cases:](#to-record-mocha-test-cases)
+    - [To record running node processes with remote recording:](#to-record-running-node-processes-with-remote-recording)
+  - [Viewing AppMaps](#viewing-appmaps)
+- [Reference](#reference)
+  - [Automated Recording](#automated-recording)
+    - [Scenario](#scenario)
+    - [CLI](#cli)
+    - [Local Recording](#local-recording)
+    - [Remote Recording](#remote-recording)
+  - [Manual Recording](#manual-recording)
+  - [Configuration](#configuration)
+    - [Prelude: Specifier Format](#prelude-specifier-format)
+    - [Automated Recording Configuration Fields](#automated-recording-configuration-fields)
+    - [Common Options](#common-options)
+  - [Application Representation](#application-representation)
+    - [Classmap](#classmap)
+    - [Qualified Name](#qualified-name)
+
+
+## How it works
+ 
+`appmap-agent-js` records AppMaps from node processes when they are run. Typical strategies for recording AppMap are:
+
+1. recording `mocha` test cases when they are run
+2. recording the application processes when the application is run, with two options:
+    1. recording complete processes, start-to-finish
+    2. recording selected time spans, using start/stop controls provided by the AppMap agent
+        - with HTTP endpoints to start/stop the recording remotely
+        - with programmatic APIs to start/stop the recording locally in the application code
+
+To record application processes or tests when they run, either have to be started by the AppMap agent, as described in the setup instructions.
+
+
+## Installation and setup
+
+### Requirements
+
+* unix-like os, tested on Linux and macOS; Windows is currently not supported
+* node 14, 16, 17, or 18
+* use of express.js is highly recommended - some HTTP mapping features are only available with express 
+* git is highly recommended 
+* mocha >= 8.0.0 when recording AppMaps from mocha test cases (earlier versions do not support required root hooks)
+
+
+### Installation
+
+To install the agent in your node project, run `npm install` in its root folder (where `package.json` is located): 
 ```sh
 npm install @appland/appmap-agent-js
-npx appmap-agent-js setup
 ```
 
-To run:
+
+### Initial setup
+
+The AppMap agent requires a valid configuration in an `appmap.yml` file to run. This file sets up the recording
+strategies and configuration details for your project, such as
+- the name of the application
+- the command that starts the application or that runs the tests
+- selected recording method and its configuration
+- the output directory
+
+
+#### Know before you start
+
+You should know these details before you begin:
+- what command starts the application, example: `node app.js`
+- does the application have mocha tests? If so, what command runs the tests, i.e. `npx mocha --recursive test/**/*.ts`
+- the HTTP port of the application (typical values are 3000, 4000, 8000)
+- does the application use the `mysql`, `pg` or `sqlite3` package?
+
+
+#### Start the setup wizard
+
+`appmap-agent-js` comes with a setup wizard that creates the initial configuration in `appmap.yml`.  
+Run this command in the root folder of your project to start the wizard:
+
+```sh
+npx appmap-agent-js setup
+```
+You should see a prompt like this:
+```
+✔ Supported operating system detected: darwin
+✔ Supported node detected: v14.17.6.
+? Run AppMap configuration wizard for this project? › no / yes
+```
+
+Answer `yes` and continue:
+
+1. Enter the application name, it is used to identify the app in recorded AppMaps
+2. Select the recording method. You have several choices:
+    1. if your application has `mocha` tests, we recommend to record `mocha` test cases
+    2. if you don't have tests or when troubleshooting a code issue, we recommend remote recording
+    3.  for small and short-lived programs, recording their processes end-to-finish is a simple viable option, but it can lead to large and noisy AppMaps for more complex applications
+    4. programmatic recording is a good option when you need fine control over what code gets recorded when it runs, at the expense of adding your own start/stop recording logic to the application code
+
+We recommend recording test cases or remote recording when starting with AppMaps. 
+
+Based on the recording method selected, the wizard will ask you to enter additional application and configuration details.
+
+---
+
+#### To set up recording mocha test cases:
+
+1. Pick the `Record mocha test cases when they run` recording method
+2. Enter the command that runs your tests, example: `npx mocha --recursive test/**/*.ts`
+3. Press Enter to use the default output directory `tmp/appmap`
+4. Select the recording scope. Add a database **if and only if** the required database driver package exists as a dependency in `package.json`. If you aren't sure, leave the database commands unchecked for now.
+5. Select the ordering of events. We recommend `Causal` for better user experience when viewing the AppMaps, at the cost of a slight performance penalty when the AppMaps are recorded.
+6. Select `no` for `keep all imported sources in class maps`.
+7. Pick the logging level
+
+The setup command now creates a new `appmap.yml` file in the current directory and runs validation checks. You should see output like this:
+```sh
+✔ Supported operating system detected: darwin
+✔ Supported node detected: v14.17.6.
+✔ Run AppMap configuration wizard for this project? … no / yes
+✔ Enter application name: … JuiceShop
+✔ Select recording method: › Record mocha test cases when they run
+✔ Enter command to start the recorded application: (example: 'node path/to/main.js argv0 argv1') … npx mocha
+✔ Enter AppMap output directory: (default: `tmp/appmap`) … tmp/appmap
+✔ Select recording scope - what events get recorded: › Functions located in CommonJS modules, Functions located in native modules, HTTP requests
+✔ Select ordering of events in recorded AppMaps: › Causal
+✔ Keep imported sources that were not executed during recording in class maps? (default: yes, no for mocha tests) … no / yes
+✔ Select AppMap logging level: › Info
+✔ appmap.yml created.
+✔ appmap.yml file is a valid YAML file.
+✔ appmap.yml file is valid.
+✔ The appmap-agent-js module is available.
+✔ Current directory looks like a git repository.
+✔ package.json file exists.
+```
+
+Your `appmap.yml` should look like this:
+```yaml
+app: MyApp
+recorder: mocha
+mode: local
+scenario: my-scenario
+scenarios:
+  my-scenario: npx mocha
+output:
+  directory: tmp/appmap
+hooks:
+  esm: true
+  cjs: true
+  http: true
+  mysql: false
+  pg: false
+  sqlite3: false
+ordering: causal
+pruning: true
+log: info
+```
+
+The initial setup is now complete, proceed to [recording AppMaps](#recording-appmaps). 
+
+---
+
+#### To set up remote recording:
+
+1. Pick the `Use remote recording to record node processes` recording method
+2. Enter the command that runs your tests, example: `node app.js`
+3. Enter the HTTP port of the application. Leave blank to use the fallback port for remote recording control.
+4. Enter the fallback port for remote recording control. We recommend that you pick a free port close to the app HTTP port, i.e. 3003.
+5. Select the recording scope. Confirm the default selection or add a database if and only if the required database driver package exists as a dependency in `package.json`. If you aren't sure, leave the database commands unchecked for now.
+6. Select the ordering of events. We recommend `Causal` for better user experience when viewing the AppMaps, at the cost of a slight performance penalty when the AppMaps are recorded.
+7. Select `yes` for `keep all imported sources in class maps`.
+8. In the final question, pick the logging level. 
+
+The setup script now creates a new `appmap.yml` file in the current directory and runs validation checks. You should see an output like this:
+
+```sh
+✔ Supported operating system detected: darwin
+✔ Supported node detected: v14.17.6.
+✔ Run AppMap configuration wizard for this project? … no / yes
+✔ Enter application name: … Demo
+✔ Select recording method: › Use remote recording to record node processes
+✔ Enter command to start the recorded application: (example: 'node path/to/main.js argv0 argv1') … node app.js
+✔ Enter HTTP port of the recorded application (typical values: 3000, 4000, 8000):
+  The agent will be expecting the app to be accepting HTTP requests on this port.
+  Leave blank to not use the application port for remote recording control.
+ …
+✔ Enter fallback port for remote recording control: (1..65535, 0 for auto-assigned) … 3003
+✔ Select recording scope - what events get recorded: › Functions located in CommonJS modules, Functions located in native modules, HTTP requests
+✔ Select ordering of events in recorded AppMaps: › Causal
+✔ Keep imported sources that were not executed during recording in class maps? (default: yes, no for mocha tests) … no / yes
+✔ Select AppMap logging level: › Info
+✔ appmap.yml created.
+✔ appmap.yml file is a valid YAML file.
+✔ appmap.yml file is valid.
+✔ The appmap-agent-js module is available.
+✔ Current directory looks like a git repository.
+✔ package.json file exists.
+```
+
+Your `appmap.yml` should look like this:
+```yaml
+app: MyApp
+recorder: remote
+mode: remote
+scenario: my-scenario
+scenarios:
+  my-scenario: node app.js
+intercept-track-port: 3000
+track-port: 3003
+hooks:
+  esm: true
+  cjs: true
+  http: true
+  mysql: false
+  pg: false
+  sqlite3: false
+ordering: causal
+pruning: false
+log: info
+```
+
+The initial setup is now complete, proceed to [recording AppMaps](#recording-appmaps). 
+
+---
+
+## Recording AppMaps
+
+Once `appmap.yml` is configured, you are ready to record AppMaps. 
+
+
+### To record mocha test cases:
+
+1. Make sure that the rests run prior to recording AppMaps
+2. Run the `appmap-agent-js`:
 ```sh
 npx appmap-agent-js
 ```
+3. `appmap-agent-js` will use the command entered during setup to run the tests and record AppMaps when thery run
+4. When the tests complete, the AppMaps are stored in the output directory entered during configuration (`tmp/appmap`)
 
-Table of contents:
-1. [Requirements](#requirements)
-2. [Automated Recording](#automated-recording)
-    1. [Scenario](#scenario)
-    2. [CLI](#cli)
-    3. [Local Recording](#local-recording)
-    4. [Remote Recording](#remote-recording)
-3. [Manual Recording](#manual-recording)
-4. [Configuration](#configuration)
-    1. [Prelude: Specifier Format](#prelude-specifier-format)
-    2. [Automated Recording Options](#automated-recording-options)
-    3. [Common Options](#common-options)
-5. [Application Representation](#application-representation)
-    1. [Classmap](#classmap)
-    2. [Qualified Name](#qualified-name)
+---
 
-## Requirements
+### To record running node processes with remote recording:
 
-* unix-like os
-* git
-* node 14, 16, 17, or 18
-* [mocha recorder only]: mocha >= 8.0.0 (because of root hooks)
+1. Shut down the application if already running
+2. Run the `appmap-agent-js`:
+```sh
+npx appmap-agent-js
+```
+3. The agent will use the command entered during setup to start the application. When started, use [any remote
+   recording control](https://appland.com/docs/reference/remote-recording) to start the recording,
+   using the port of your choice to connect to the agent. 
+4. Interact with your application or service to execise code to be recorded
+5. Stop the recording and save the new AppMap to disk
+
+---
+
+## Viewing AppMaps
+
+Follow the documentation for your IDE:
+- [AppMap for JetBrains](https://appland.com/docs/reference/jetbrains)
+- [AppMap for VSCode](https://appland.com/docs/reference/vscode)
+
+
 
 <!--
 TODO: sql libraries requirements
@@ -42,6 +281,12 @@ TODO: sql libraries requirements
 * `NODE_OPTIONS` requires `>= nodev8.0.0`
 * `--require` requires `>= nodev1.6.0`
 -->
+
+---
+
+&nbsp;
+
+# Reference
 
 ## Automated Recording
 
@@ -147,7 +392,7 @@ output:
   directory: tmp/appmap
 ```
 
-The `recorder` configuration field support two strategies to generate appmaps:
+The `recorder` configuration field supports two strategies to generate appmaps:
 
 * `"process"` (default): Generate a single appmap which spans over the entire lifetime of the process.
 * `"mocha"`: Generate an appmap for each test case (ie `it` calls) of the entire test suite (ie every `describe` calls on every test file).
@@ -184,7 +429,7 @@ The remote recording web API is documented [here](https://appland.com/docs/refer
 
 ```yaml
 mode: remote
-track-port: 8080
+track-port: 8001
 intercept-track-port: 8000
 ```
 
@@ -192,8 +437,8 @@ Remote recording requests can be delivered to two possible end points:
 
 |                         | Configuration Field    | Routing              | Comment                                                                                |
 |-------------------------|------------------------|----------------------|----------------------------------------------------------------------------------------|
-| Dedicated Backend Port  | `track-port`           | `/{session}/{track}` | If `session` is `"_appmap"` then the (assumed) single active session will be selected. |
-| Intercept Frontend Port | `intercept-track-port` | `/_appmap/{track}`   | Will not be active until the application deploy an HTTP server on that port.           |
+| Dedicated backend port, a.k.a. the fallback port  | `track-port`           | `/{session}/{track}` | If `session` is `"_appmap"` then the (assumed) single active session will be selected. |
+| Intercepted HTTP port of the application | `intercept-track-port` | `/_appmap/{track}`   | Will not be active until the application deploy an HTTP server on that port.           |
 
 <!-- ### Mode
 
