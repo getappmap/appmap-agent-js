@@ -72,7 +72,7 @@ assertDeepEqual(
     enabled: false,
     shallow: true,
     exclude: [],
-    source: null,
+    "inline-source": null,
   },
 );
 assertDeepEqual(
@@ -90,7 +90,7 @@ assertDeepEqual(
     enabled: true,
     shallow: false,
     exclude: [],
-    source: null,
+    "inline-source": null,
   },
 );
 

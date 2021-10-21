@@ -68,6 +68,10 @@
 
 # primitive #
 
+- $id: url
+  type: string
+  pattern: "^[a-z]+://"
+
 - $id: exclusion
   type: string
 
@@ -199,7 +203,7 @@
         enabled: {type: boolean}
         shallow: {type: boolean}
         exclude: {$ref: exclude}
-        source:
+        inline-source:
           type: boolean
           nullable: true
     - type: object
@@ -210,7 +214,7 @@
         enabled: {type: boolean}
         shallow: {type: boolean}
         exclude: {$ref: exclude}
-        source:
+        inline-source:
           type: boolean
           nullable: true
     - type: object
@@ -222,7 +226,7 @@
         enabled: {type: boolean}
         shallow: {type: boolean}
         exclude: {$ref: exclude}
-        source:
+        inline-source:
           type: boolean
           nullable: true
     - type: object
@@ -235,7 +239,7 @@
         enabled: {type: boolean}
         shallow: {type: boolean}
         exclude: {$ref: exclude}
-        source:
+        inline-source:
           type: boolean
           nullable: true
 
@@ -255,7 +259,7 @@
             - type: object
               required: [shallow]
             - type: object
-              required: [source]
+              required: [inline-source]
             - type: object
               required: [exclude]
 
@@ -407,7 +411,7 @@
             - $ref: child
     # client
     recorder: {$ref: recorder}
-    source: {type: boolean}
+    inline-source: {type: boolean}
     hooks:
       type: object
       additionalProperties: false
@@ -537,7 +541,7 @@
       anyOf:
         - const: null
         - $ref: recorder
-    source: {type: boolean}
+    inline-source: {type: boolean}
     hooks:
       type: object
       additionalProperties: false
@@ -583,7 +587,7 @@
             properties:
               enabled: {type: boolean}
               shallow: {type: boolean}
-              source:
+              inline-source:
                 type: boolean
                 nullable: true
               exclude: {$ref: exclude}
@@ -671,26 +675,21 @@
           message: {type: string}
           stack: {type: string}
 
-- $id: file
+- $id: source
   type: object
   additionalProperties: false
-  required: [index, shallow, source, exclude, type, path, code, source_map, source_map_url]
+  required: [url, content, alias, shallow, inline, exclude]
   properties:
-    index: {$ref: index}
+    url: {$ref: url}
+    content: {type: string}
+    alias:
+      type: string
+      pattern: "^[a-z0-9]+$"
     shallow: {type: boolean}
-    source: {type: boolean}
+    inline: {type: boolean}
     exclude:
       type: array
       items: {type: string}
-    type: {$ref: file-type}
-    path: {$ref: absolute-path}
-    code: {type: string}
-    source_map:
-      type: object
-      nullable: true
-    source_map_url:
-      type: string
-      nullable: true
 
 - $id: message
   anyOf:
@@ -724,8 +723,8 @@
       minItems: 2
       maxItems: 2
       items:
-        - const: file
-        - $ref: file
+        - const: source
+        - $ref: source
     - type: array
       minItems: 6
       maxItems: 6

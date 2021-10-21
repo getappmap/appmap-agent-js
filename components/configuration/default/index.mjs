@@ -101,16 +101,22 @@ export default (dependencies) => {
     if (typeof specifier === "string") {
       specifier = { glob: specifier };
     }
-    const { enabled, shallow, source, exclude, ...rest } = {
+    const {
+      enabled,
+      shallow,
+      "inline-source": inline,
+      exclude,
+      ...rest
+    } = {
       enabled: true,
-      source: null,
+      "inline-source": null,
       shallow: hasOwnProperty(specifier, "dist"),
       exclude: [],
       ...specifier,
     };
     return [
       createSpecifier(nullable_directory, rest),
-      { enabled, source, shallow, exclude },
+      { enabled, "inline-source": inline, shallow, exclude },
     ];
   };
 
@@ -237,7 +243,7 @@ export default (dependencies) => {
       extend: overwrite,
       normalize: identity,
     },
-    source: {
+    "inline-source": {
       extend: overwrite,
       normalize: identity,
     },
@@ -393,7 +399,7 @@ export default (dependencies) => {
         ],
       ],
       recorder: null,
-      source: false,
+      "inline-source": false,
       hooks: {
         apply: true,
         esm: true,
@@ -426,7 +432,7 @@ export default (dependencies) => {
             enabled: false,
             shallow: true,
             exclude: [],
-            source: null,
+            "inline-source": null,
           },
         ],
         [
@@ -439,7 +445,7 @@ export default (dependencies) => {
             enabled: true,
             shallow: false,
             exclude: [],
-            source: null,
+            "inline-source": null,
           },
         ],
       ],
