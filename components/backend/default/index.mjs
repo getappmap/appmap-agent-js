@@ -11,7 +11,7 @@ export default (dependencies) => {
   return {
     createBackend: (configuration) => ({
       configuration,
-      files: [],
+      sources: [],
       tracks: new _Map(),
       traces: new _Map(),
     }),
@@ -25,7 +25,7 @@ export default (dependencies) => {
       traces.delete(key);
       return trace;
     },
-    sendBackend: ({ configuration, files, tracks, traces }, message) => {
+    sendBackend: ({ configuration, sources, tracks, traces }, message) => {
       validateMessage(message);
       logDebug("message >> %j", message);
       const type = message[0];
@@ -42,8 +42,8 @@ export default (dependencies) => {
         for (const { events } of tracks.values()) {
           events.push(event);
         }
-      } else if (type === "file") {
-        files.push(message[1]);
+      } else if (type === "source") {
+        sources.push(message[1]);
       } else if (type === "start") {
         const [, key, initialization] = message;
         assert(!tracks.has(key), "duplicate track");
@@ -63,7 +63,7 @@ export default (dependencies) => {
         tracks.delete(key);
         traces.set(key, {
           head: configuration,
-          body: compileTrace(configuration, files, events, termination),
+          body: compileTrace(configuration, sources, events, termination),
         });
       } /* c8 ignore start */ else {
         assert(false, "invalid message type");

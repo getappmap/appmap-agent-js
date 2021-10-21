@@ -53,15 +53,14 @@ const configuration = extendConfiguration(
   const backend = createBackend(configuration);
   assertEqual(
     sendBackend(backend, [
-      "file",
+      "source",
       {
-        index: 1,
+        url: "file:///cwd/main.js",
+        content: "function main () {}",
+        alias: "alias",
         shallow: false,
-        source: false,
+        inline: false,
         exclude: [],
-        type: "script",
-        path: "/cwd/main.js",
-        code: "function main () {}",
       },
     ]),
     false,
@@ -94,15 +93,14 @@ const configuration = extendConfiguration(
         { name: "name2" },
         null,
       ),
-      files: [
+      sources: [
         {
-          index: 1,
+          url: "file:///cwd/main.js",
+          content: "function main () {}",
+          alias: "alias",
           shallow: false,
-          source: false,
+          inline: false,
           exclude: [],
-          type: "script",
-          path: "/cwd/main.js",
-          code: "function main () {}",
         },
       ],
       events: [
