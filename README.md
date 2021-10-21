@@ -8,9 +8,9 @@ Table of contents:
   - [Installation and setup](#installation-and-setup)
     - [Requirements](#requirements)
     - [Installation](#installation)
-    - [Initial setup](#initial-setup)
+    - [Initial configuration](#initial-configuration)
       - [Know before you start](#know-before-you-start)
-      - [Start the setup wizard](#start-the-setup-wizard)
+      - [Start the setup command](#start-the-setup-command)
       - [To set up recording mocha test cases:](#to-set-up-recording-mocha-test-cases)
       - [To set up remote recording:](#to-set-up-remote-recording)
   - [Recording AppMaps](#recording-appmaps)
@@ -35,16 +35,17 @@ Table of contents:
 
 ## How it works
  
-`appmap-agent-js` records AppMaps from node processes when they are run. Typical strategies for recording AppMap are:
+`appmap-agent-js` records AppMaps from node processes when they are run. There are several strategies for recording AppMaps:
 
 1. recording `mocha` test cases when they are run
-2. recording the application processes when the application is run, with two options:
+2. recording the application processes when the application is run:
     1. recording complete processes, start-to-finish
-    2. recording selected time spans, using start/stop controls provided by the AppMap agent
-        - with HTTP endpoints to start/stop the recording remotely
-        - with programmatic APIs to start/stop the recording locally in the application code
+    2. recording selected time spans using start/stop controls provided by the AppMap agent
+        - with HTTP calls to the agent that start/stop the recording remotely
+        - with programmatic API that start/stop the recording locally in the application code
 
-To record application processes or tests when they run, either have to be started by the AppMap agent, as described in the setup instructions.
+To record application processes or tests when they run, they tests or processes have to be started by the AppMap agent,
+as described in the next steps.
 
 
 ## Installation and setup
@@ -66,7 +67,7 @@ npm install @appland/appmap-agent-js
 ```
 
 
-### Initial setup
+### Initial configuration
 
 The AppMap agent requires a valid configuration in an `appmap.yml` file to run. This file sets up the recording
 strategies and configuration details for your project, such as
@@ -80,38 +81,38 @@ strategies and configuration details for your project, such as
 
 You should know these details before you begin:
 - what command starts the application, example: `node app.js`
-- does the application have mocha tests? If so, what command runs the tests, i.e. `npx mocha --recursive test/**/*.ts`
+- does the application have `mocha` tests? If so, what command runs the tests? example: `npx mocha --recursive test/**/*.ts`
 - the HTTP port of the application (typical values are 3000, 4000, 8000)
-- does the application use the `mysql`, `pg` or `sqlite3` package?
+- does the application use the `mysql`, `pg` or `sqlite3` package? Check the dependencies in `package.json`.
 
 
-#### Start the setup wizard
+#### Start the setup command
 
-`appmap-agent-js` comes with a setup wizard that creates the initial configuration in `appmap.yml`.  
-Run this command in the root folder of your project to start the wizard:
+We recommend you start with a setup command that creates the initial configuration in `appmap.yml`.  
+Run this command in the root folder of your project:
 
 ```sh
 npx appmap-agent-js setup
 ```
-You should see a prompt like this:
+You should see a prompt similar to this:
 ```
 ✔ Supported operating system detected: darwin
 ✔ Supported node detected: v14.17.6.
 ? Run AppMap configuration wizard for this project? › no / yes
 ```
 
-Answer `yes` and continue:
+Answer `yes` to continue:
 
-1. Enter the application name, it is used to identify the app in recorded AppMaps
+1. Enter the application name. It will be used to identify the app in recorded AppMaps
 2. Select the recording method. You have several choices:
     1. if your application has `mocha` tests, we recommend to record `mocha` test cases
-    2. if you don't have tests or when troubleshooting a code issue, we recommend remote recording
-    3.  for small and short-lived programs, recording their processes end-to-finish is a simple viable option, but it can lead to large and noisy AppMaps for more complex applications
-    4. programmatic recording is a good option when you need fine control over what code gets recorded when it runs, at the expense of adding your own start/stop recording logic to the application code
+    2. if you don't have good tests or when troubleshooting a code issue, we recommend remote recording
+    3. for small and short-lived programs, recording their processes end-to-finish is a simple viable option, but it can lead to large and noisy AppMaps for more complex applications
+    4. programmatic recording is a good option when you need a fine control over what code gets recorded when it runs. You will nedd to add your own start/stop recording logic to the recorded application code.
 
 We recommend recording test cases or remote recording when starting with AppMaps. 
 
-Based on the recording method selected, the wizard will ask you to enter additional application and configuration details.
+Based on the recording method selected, you will be asked you to enter additional application and configuration details.
 
 ---
 
@@ -120,12 +121,12 @@ Based on the recording method selected, the wizard will ask you to enter additio
 1. Pick the `Record mocha test cases when they run` recording method
 2. Enter the command that runs your tests, example: `npx mocha --recursive test/**/*.ts`
 3. Press Enter to use the default output directory `tmp/appmap`
-4. Select the recording scope. Add a database **if and only if** the required database driver package exists as a dependency in `package.json`. If you aren't sure, leave the database commands unchecked for now.
+4. Select the recording scope. Add a database **if and only if** the required database driver package exists as a dependency in the `package.json` file of your project. If you aren't sure, leave the database commands unchecked for now.
 5. Select the ordering of events. We recommend `Causal` for better user experience when viewing the AppMaps, at the cost of a slight performance penalty when the AppMaps are recorded.
-6. Select `no` for `keep all imported sources in class maps`.
-7. Pick the logging level
+6. Select `no` for `keep all imported sources in class maps`
+7. Pick the logging level, `Info` is the recommended default level.
 
-The setup command now creates a new `appmap.yml` file in the current directory and runs validation checks. You should see output like this:
+The setup command now creates a new `appmap.yml` file in the current directory and runs validation checks. You should see output similar to this:
 ```sh
 ✔ Supported operating system detected: darwin
 ✔ Supported node detected: v14.17.6.
@@ -146,7 +147,7 @@ The setup command now creates a new `appmap.yml` file in the current directory a
 ✔ package.json file exists.
 ```
 
-Your `appmap.yml` should look like this:
+Your `appmap.yml` should be similar to this:
 ```yaml
 app: MyApp
 recorder: mocha
@@ -181,9 +182,9 @@ The initial setup is now complete, proceed to [recording AppMaps](#recording-app
 5. Select the recording scope. Confirm the default selection or add a database if and only if the required database driver package exists as a dependency in `package.json`. If you aren't sure, leave the database commands unchecked for now.
 6. Select the ordering of events. We recommend `Causal` for better user experience when viewing the AppMaps, at the cost of a slight performance penalty when the AppMaps are recorded.
 7. Select `yes` for `keep all imported sources in class maps`.
-8. In the final question, pick the logging level. 
+8. Pick the logging level, `Info` is the recommended default level.
 
-The setup script now creates a new `appmap.yml` file in the current directory and runs validation checks. You should see an output like this:
+The setup script now creates a new `appmap.yml` file in the current directory and runs validation checks. You should see an output similar to this:
 
 ```sh
 ✔ Supported operating system detected: darwin
@@ -209,7 +210,7 @@ The setup script now creates a new `appmap.yml` file in the current directory an
 ✔ package.json file exists.
 ```
 
-Your `appmap.yml` should look like this:
+Your `appmap.yml` should be similar to this:
 ```yaml
 app: MyApp
 recorder: remote
@@ -247,8 +248,8 @@ Once `appmap.yml` is configured, you are ready to record AppMaps.
 ```sh
 npx appmap-agent-js
 ```
-3. `appmap-agent-js` will use the command entered during setup to run the tests and record AppMaps when thery run
-4. When the tests complete, the AppMaps are stored in the output directory entered during configuration (`tmp/appmap`)
+1. `appmap-agent-js` will use the command entered during setup to run the tests and record AppMaps
+2. When the tests complete, the AppMaps are stored in the output directory entered during configuration (`tmp/appmap`)
 
 ---
 
@@ -259,11 +260,11 @@ npx appmap-agent-js
 ```sh
 npx appmap-agent-js
 ```
-3. The agent will use the command entered during setup to start the application. When started, use [any remote
-   recording control](https://appland.com/docs/reference/remote-recording) to start the recording,
-   using the port of your choice to connect to the agent. 
-4. Interact with your application or service to execise code to be recorded
-5. Stop the recording and save the new AppMap to disk
+3. The agent will use the command entered during setup to start the application. When started, use [a remote
+   recording control of your preference](https://appland.com/docs/reference/remote-recording) to start the recording
+   using the port of your choice when connecting to the agent. 
+4. Interact with your application or service to exercise code to be recorded
+5. Stop the recording and save the new AppMap to disk.
 
 ---
 
