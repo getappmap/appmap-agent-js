@@ -195,6 +195,7 @@ const makeReturnStatement = (argument) => ({
 
 export default (dependencies) => {
   const {
+    log: { logGuardWarning },
     expect: { expect },
     util: { assert, hasOwnProperty, coalesce },
     source: { mapSource },
@@ -466,13 +467,20 @@ export default (dependencies) => {
         type === "FunctionExpression" ||
         type === "FunctionDeclaration"
       ) {
-        const { whitelist, mapping } = context;
+        const { url, whitelist, mapping } = context;
         const {
           loc: {
             start: { line, column },
           },
         } = node;
         const loc = mapSource(mapping, line, column);
+        logGuardWarning(
+          loc === null,
+          "Missing mapped source code location of file %j line %j column %j",
+          url,
+          line,
+          column,
+        );
         return loc !== null && whitelist.has(loc.url)
           ? compileFunction(
               node,

@@ -11,7 +11,8 @@ import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
 } from "../../build.mjs";
-import HookMysql from "./mysql.mjs";
+
+const {default:HookMysql} = await import("./mysql.mjs");
 
 const { equal: assertEqual, deepEqual: assertDeepEqual } = Assert;
 
