@@ -22,7 +22,7 @@ export default (dependencies) => {
       const either = readFile(source_map_url);
       if (isLeft(either)) {
         logWarning(
-          "Cannot read source map file at %j which is referenced in script file %j >> %s",
+          "Cannot read source map file %j\n  Referenced in script file at %j\n  >> %s",
           source_map_url,
           file.url,
           fromLeft(either),
@@ -35,7 +35,7 @@ export default (dependencies) => {
           const either = readFile(url);
           if (isLeft(either)) {
             logWarning(
-              "Cannot read source file at %j which is referenced in source map file %j which is referenced in script file %j >> %s",
+              "Cannot read source file %j\n  Referenced in source map file %j\n  Referenced in script file %j\n  >> %s",
               url,
               source_map_url,
               file.url,
