@@ -1,3 +1,19 @@
+# [5.0.0](https://github.com/applandinc/appmap-agent-js/compare/v4.0.1...v5.0.0) (2021-10-22)
+
+
+### Features
+
+* change ([40e4e20](https://github.com/applandinc/appmap-agent-js/commit/40e4e20300c85c956bcd0c6d11b6ff453dc6d64a))
+* source map support ([7b7cd96](https://github.com/applandinc/appmap-agent-js/commit/7b7cd96915a23b4da4c80b8210cbb94921faef44))
+
+
+### BREAKING CHANGES
+
+* configuration field 'packages' acts on sources instead 
+on generated javascript code
+* change configuration field `source` into 
+`inline-source`
+
 ## [4.0.1](https://github.com/applandinc/appmap-agent-js/compare/v4.0.0...v4.0.1) (2021-10-08)
 
 
