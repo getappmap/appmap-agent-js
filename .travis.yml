@@ -18,8 +18,8 @@ script:
 
 deploy:
   - provider: script
-    # skip_cleanup: true
-    cleanup: false  # keep semantic release! (and npm modules?)
+    skip_cleanup: true # keep semantic release! (and npm modules?)
+    # cleanup: false  # keep semantic release! (and npm modules?)
     script: npm run deploy
     on:
       branch: main

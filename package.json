@@ -43,7 +43,7 @@
     "commit": "npx cz",
     "test-unit": "npx test-turtle --layout alongside 'npx c8 --include $1 --check-coverage --branches 100 --functions 100 -- node --unhandled-rejections=strict $2'",
     "test-integration": "node --unhandled-rejections=strict test/index.mjs",
-    "deploy": "semantic-release"
+    "deploy": "npx semantic-release"
   },
   "dependencies": {
     "@appland/appmap-validate": "^2.0.0",
