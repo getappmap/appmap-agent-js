@@ -4,51 +4,61 @@ const assertAbsolutePath = (path) => {
   assert(path[0] === "/", "expected an absolute path");
 };
 
-const getNormalizedParts = (path) => {
+const normalizeSegments = (segments) => {
   const stack = [];
-  for (const part of path.split("/")) {
-    if (part === "..") {
-      stack.pop();
-    } else if (part !== "." && part !== "") {
-      stack.push(part);
+  for (const segment of segments) {
+    if (segment !== "." && segment !== "") {
+      if (segment === ".." && stack.length > 0) {
+        stack.pop();
+      } else {
+        stack.push(segment);
+      }
     }
+  }
+  if (segments[0] === "") {
+    stack.unshift("");
   }
   return stack;
 };
 
+export const normalizePath = (path) =>
+  normalizeSegments(path.split("/")).join("/");
+
 export const toRelativePath = (path1, path2) => {
   assertAbsolutePath(path1);
   assertAbsolutePath(path2);
-  const parts1 = getNormalizedParts(path1);
-  const parts2 = getNormalizedParts(path2);
+  const segments1 = normalizeSegments(path1.split("/"));
+  const segments2 = normalizeSegments(path2.split("/"));
+  if (segments1.join("/") === segments2.join("/")) {
+    return ".";
+  }
   let index = 0;
   while (
-    index < parts1.length &&
-    index < parts2.length &&
-    parts1[index] === parts2[index]
+    index < segments1.length &&
+    index < segments2.length &&
+    segments1[index] === segments2[index]
   ) {
     index += 1;
   }
-  const parts = [...parts1.slice(index).fill(".."), ...parts2.slice(index)];
-  const { length } = parts;
-  if (length === 0) {
-    return ".";
-  }
-  return parts.join("/");
+  return normalizeSegments([
+    ...segments1.slice(index).fill(".."),
+    ...segments2.slice(index),
+  ]).join("/");
 };
 
 export const toAbsolutePath = (nullable_directory, path) => {
   if (path[0] === "/") {
-    return `/${getNormalizedParts(path).join("/")}`;
+    return normalizeSegments(path.split("\n")).join("\n");
   }
   assert(
     nullable_directory !== null,
     "the base directory was required to create absolute path because the target path was relative",
   );
   assertAbsolutePath(nullable_directory);
-  const parts1 = getNormalizedParts(nullable_directory);
-  const parts2 = getNormalizedParts(path);
-  return ["", ...parts1, ...parts2].join("/");
+  return normalizeSegments([
+    ...nullable_directory.split("/"),
+    ...path.split("/"),
+  ]).join("/");
 };
 
 export const getFilename = (path) => {

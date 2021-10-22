@@ -1,5 +1,6 @@
 import { strict as Assert } from "assert";
 import {
+  normalizePath,
   toRelativePath,
   toAbsolutePath,
   getFilename,
@@ -10,13 +11,21 @@ import {
 
 const { equal: assertEqual } = Assert;
 
+// normalizePath //
+assertEqual(normalizePath("/foo"), "/foo");
+assertEqual(normalizePath("foo"), "foo");
+assertEqual(normalizePath("foo/"), "foo");
+assertEqual(normalizePath("../foo"), "../foo");
+assertEqual(normalizePath("./foo"), "foo");
+assertEqual(normalizePath("/foo/bar/../qux"), "/foo/qux");
+
 // toRelativePath //
 assertEqual(toRelativePath("/foo", "/foo/bar"), "bar");
 assertEqual(toRelativePath("/foo/", "/foo/bar"), "bar");
 assertEqual(toRelativePath("/foo", "/foo/bar/"), "bar");
 assertEqual(toRelativePath("/foo/bar/../bar/..", "/foo/bar/qux"), "bar/qux");
 assertEqual(toRelativePath("/foo/bar", "/foo/bar/qux/"), "qux");
-assertEqual(toRelativePath("/foo", "/foo"), ".");
+assertEqual(toRelativePath("/foo/../foo", "/foo"), ".");
 assertEqual(toRelativePath("/foo/bar1", "/foo/bar2/qux"), "../bar2/qux");
 
 // toAbsolutePath //

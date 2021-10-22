@@ -26,6 +26,16 @@ const { extractSourceMap, extractSourceMapAsync } = SourceOuter(
 {
   const directory = `${tmpdir()}/${Math.random().toString(36).substring(2)}`;
   await mkdirAsync(directory);
+  const file = {
+    url: `file://${directory}/script.js`,
+    content: "789; //# sourceMappingURL=source.map",
+  };
+  const sources = [
+    { url: `file://${directory}/source1.js`, content: "123;" },
+    { url: `file://${directory}/source2.js`, content: "456;" },
+  ];
+  assertDeepEqual(getSources(extractSourceMap(file)), [file]);
+  assertDeepEqual(getSources(await extractSourceMapAsync(file)), [file]);
   await writeFileAsync(
     `${directory}/source.map`,
     JSON.stringify({
@@ -37,15 +47,9 @@ const { extractSourceMap, extractSourceMapAsync } = SourceOuter(
     }),
     "utf8",
   );
+  assertDeepEqual(getSources(extractSourceMap(file)), [file]);
+  assertDeepEqual(getSources(await extractSourceMapAsync(file)), [file]);
   await writeFileAsync(`${directory}/source2.js`, "456;", "utf8");
-  const file = {
-    url: `file://${directory}/script.js`,
-    content: "789; //# sourceMappingURL=source.map",
-  };
-  const sources = [
-    { url: `file://${directory}/source1.js`, content: "123;" },
-    { url: `file://${directory}/source2.js`, content: "456;" },
-  ];
   assertDeepEqual(getSources(extractSourceMap(file)), sources);
   assertDeepEqual(getSources(await extractSourceMapAsync(file)), sources);
 }
