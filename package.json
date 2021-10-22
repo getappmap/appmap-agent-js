@@ -43,7 +43,7 @@
     "commit": "npx cz",
     "test-unit": "npx test-turtle --layout alongside 'npx c8 --include $1 --check-coverage --branches 100 --functions 100 -- node --unhandled-rejections=strict $2'",
     "test-integration": "node --unhandled-rejections=strict test/index.mjs",
-    "deploy": "npm i -D @semantic-release/changelog @semantic-release/git && npx semantic-release"
+    "deploy": "npx semantic-release"
   },
   "dependencies": {
     "@appland/appmap-validate": "^2.0.0",
@@ -65,8 +65,8 @@
     "@babel/eslint-parser": "^7.15.0",
     "@babel/plugin-syntax-top-level-await": "^7.14.5",
     "@rollup/plugin-commonjs": "^18.0.0",
-    "@semantic-release/changelog": "^5.0.1",
-    "@semantic-release/git": "^9.0.1",
+    "@semantic-release/changelog": "^6.0.0",
+    "@semantic-release/git": "^10.0.0",
     "c8": "^7.6.0",
     "commitizen": "^4.2.3",
     "cz-conventional-changelog": "^3.3.0",
@@ -78,6 +78,7 @@
     "mysql": "^2.18.1",
     "pg": "^8.6.0",
     "prettier": "^2.2.1",
+    "semantic-release": "^18.0.0",
     "source-map": "^0.7.3",
     "sqlite3": "^5.0.2",
     "tap": "^15.0.10",
