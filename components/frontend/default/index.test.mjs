@@ -8,6 +8,7 @@ import Frontend from "./index.mjs";
 const { equal: assertEqual, deepEqual: assertDeepEqual } = Assert;
 
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
+const { createMirrorSourceMap } = await buildTestComponentAsync("source");
 const { createConfiguration, extendConfiguration } =
   await buildTestComponentAsync("configuration", "test");
 const {
@@ -49,13 +50,9 @@ assertEqual(
   getInstrumentationIdentifier(frontend).startsWith(identifier),
   true,
 );
-assertDeepEqual(
-  instrument(
-    frontend,
-    { url: "file://filename.js", content: "123;", type: "script" },
-    null,
-  ),
-  {
+{
+  const file = { url: "file://filename.js", content: "123;", type: "script" };
+  assertDeepEqual(instrument(frontend, file, createMirrorSourceMap(file)), {
     url: "file://filename.js",
     content: "123;",
     messages: [
@@ -70,5 +67,5 @@ assertDeepEqual(
         },
       ],
     ],
-  },
-);
+  });
+}

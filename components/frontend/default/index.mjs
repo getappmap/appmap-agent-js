@@ -7,7 +7,6 @@ export default (dependencies) => {
       createInstrumentation,
       instrument,
       getInstrumentationIdentifier,
-      extractInstrumentationSourceMapURL,
     },
   } = dependencies;
   const { registerSourceProtocol, startTrackProtocol, stopTrackProtocol } =
@@ -18,7 +17,6 @@ export default (dependencies) => {
       recording: createRecording(configuration),
       instrumentation: createInstrumentation(configuration),
     }),
-    extractSourceMapURL: extractInstrumentationSourceMapURL,
     getInstrumentationIdentifier: ({ instrumentation }) =>
       getInstrumentationIdentifier(instrumentation),
     instrument: (

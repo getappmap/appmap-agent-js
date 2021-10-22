@@ -1,6 +1,6 @@
 import { strict as Assert } from "assert";
 import { buildTestDependenciesAsync } from "../../build.mjs";
-import SourceMap from "./index.mjs";
+import SourceInner from "./index.mjs";
 import { SourceMapGenerator } from "source-map";
 
 const {
@@ -11,7 +11,7 @@ const {
 } = Assert;
 
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
-const { compileSourceMap, mapSource } = SourceMap(dependencies);
+const { compileSourceMap, mapSource } = SourceInner(dependencies);
 
 const generator = new SourceMapGenerator({
   file: "file:///generated.js",

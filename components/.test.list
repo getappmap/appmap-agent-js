@@ -15,7 +15,6 @@
   * prompts
   * http
   * service
-  * source
 - specifier
 - engine
 - repository
@@ -23,6 +22,9 @@
 - configuration
 - trace
 - backend
+- source-inner
+- source
+- source-outer
 - * instrumentation
   * interpretation
   * serialization

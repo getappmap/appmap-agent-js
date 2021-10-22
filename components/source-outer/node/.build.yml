@@ -1,0 +1,4 @@
+branches: [test, node]
+dependencies:
+  - source
+  - expect

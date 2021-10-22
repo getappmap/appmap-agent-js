@@ -9,3 +9,4 @@ dependencies:
   - hook-request
   - hook-response
   - hook-query
+  - source

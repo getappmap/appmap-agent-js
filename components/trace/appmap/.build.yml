@@ -4,4 +4,3 @@ dependencies:
   - expect
   - validate-appmap
   - log
-  - source

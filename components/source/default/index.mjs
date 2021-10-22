@@ -6,9 +6,9 @@ const _URL = URL;
 export default (dependencies) => {
   const {
     expect: { expectSuccess },
-    util: { toAbsolutePath, getDirectory, coalesce },
+    util: { assert, toAbsolutePath, getDirectory, coalesce },
     validate: { validateSourceMap },
-    source: { compileSourceMap, mapSource },
+    "source-inner": { compileSourceMap, mapSource },
   } = dependencies;
 
   const normalizeURL = (url, relative_url) => {
@@ -30,7 +30,7 @@ export default (dependencies) => {
       ...payload,
       sourceRoot: "",
       sources: sources.map((relative_url) =>
-        normalizeURL(url, `${prefix}${relative_url}`),
+        normalizeURL(url, `${prefix === null ? "" : prefix}${relative_url}`),
       ),
       sourcesContent: sources.map((url, index) =>
         coalesce(contents, index, null),
@@ -76,6 +76,21 @@ export default (dependencies) => {
         const { map } = mapping;
         return mapSource(map, line, column);
       }
+    },
+
+    setSourceContent: (mapping, { url, content }) => {
+      const { mirrored } = mapping;
+      assert(!mirrored, "mirrored source mapping should never be completed");
+      const {
+        payload: { sourcesContent: contents, sources: urls },
+      } = mapping;
+      const index = urls.indexOf(url);
+      assert(index !== -1, "missing source url to set content");
+      assert(
+        contents[index] === null,
+        "source content has already been assigned",
+      );
+      contents[index] = content;
     },
 
     getSources: (mapping) => {

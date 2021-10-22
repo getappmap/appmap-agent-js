@@ -7,6 +7,7 @@ export default (dependencies) => {
     "hook-response": { hookResponse, unhookResponse },
     "hook-query": { hookQuery, unhookQuery },
     interpretation: { runScript },
+    source: { createMirrorSourceMap },
     frontend: { createFrontend, instrument, startTrack, stopTrack },
     emitter: {
       openEmitter,
@@ -52,19 +53,19 @@ export default (dependencies) => {
       unhookResponse(response_hook);
       unhookQuery(query_hook);
     },
-    recordAgentScript: ({ frontend, emitter }, url, content) => {
+    recordAgentScript: ({ frontend, emitter }, file) => {
       const { messages, content: instrumented_content } = instrument(
         frontend,
         {
-          url,
-          content,
+          ...file,
           type: "script",
         },
-        null,
+        createMirrorSourceMap(file),
       );
       for (const message of messages) {
         sendEmitter(emitter, message);
       }
+      const { url } = file;
       return runScript(instrumented_content, url);
     },
     takeLocalAgentTrace: ({ emitter }, key) =>

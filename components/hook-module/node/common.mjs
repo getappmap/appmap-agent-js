@@ -1,5 +1,4 @@
 import Module from "module";
-import File from "./file.mjs";
 
 const { apply } = Reflect;
 const { prototype } = Module;
@@ -7,11 +6,11 @@ const { cwd } = process;
 
 export default (dependencies) => {
   const {
-    util: { assignProperty, mapMaybe, toAbsolutePath },
-    frontend: { instrument, extractSourceMapURL },
+    util: { assignProperty, toAbsolutePath },
+    frontend: { instrument },
     emitter: { sendEmitter },
+    "source-outer": { extractSourceMap },
   } = dependencies;
-  const { readFile } = File(dependencies);
   return {
     unhookCommonModule: (backup) => {
       backup.forEach(assignProperty);
@@ -26,14 +25,15 @@ export default (dependencies) => {
       }
       const { _compile: original } = prototype;
       prototype._compile = function _compile(content1, path) {
+        const file = {
+          url: `file://${toAbsolutePath(cwd(), path)}`,
+          content: content1,
+          type: "script",
+        };
         const { content: content2, messages } = instrument(
           frontend,
-          {
-            url: `file://${toAbsolutePath(cwd(), path)}`,
-            content: content1,
-            type: "script",
-          },
-          mapMaybe(extractSourceMapURL(content1), readFile),
+          file,
+          extractSourceMap(file),
         );
         for (const message of messages) {
           sendEmitter(emitter, message);

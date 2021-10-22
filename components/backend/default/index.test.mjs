@@ -57,7 +57,6 @@ const configuration = extendConfiguration(
       {
         url: "file:///cwd/main.js",
         content: "function main () {}",
-        alias: "alias",
         shallow: false,
         inline: false,
         exclude: [],
@@ -97,7 +96,6 @@ const configuration = extendConfiguration(
         {
           url: "file:///cwd/main.js",
           content: "function main () {}",
-          alias: "alias",
           shallow: false,
           inline: false,
           exclude: [],

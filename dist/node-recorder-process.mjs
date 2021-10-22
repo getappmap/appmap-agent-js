@@ -16,7 +16,8 @@ import repository$node from "./../components/repository/node/index.mjs";
 import child$default from "./../components/child/default/index.mjs";
 import engine$node from "./../components/engine/node/index.mjs";
 import configuration$default from "./../components/configuration/default/index.mjs";
-import source$node from "./../components/source/node/index.mjs";
+import source_inner$node from "./../components/source-inner/node/index.mjs";
+import source$default from "./../components/source/default/index.mjs";
 import instrumentation$default from "./../components/instrumentation/default/index.mjs";
 import serialization$default from "./../components/serialization/default/index.mjs";
 import frontend$default from "./../components/frontend/default/index.mjs";
@@ -25,6 +26,7 @@ import http$node_http from "./../components/http/node-http/index.mjs";
 import emitter$remote_node_tcp from "./../components/emitter/remote-node-tcp/index.mjs";
 import hook_apply$default from "./../components/hook-apply/default/index.mjs";
 import hook_group$node from "./../components/hook-group/node/index.mjs";
+import source_outer$node from "./../components/source-outer/node/index.mjs";
 import hook_module$node from "./../components/hook-module/node/index.mjs";
 import hook_request$node from "./../components/hook-request/node/index.mjs";
 import patch$default from "./../components/patch/default/index.mjs";
@@ -34,14 +36,29 @@ import agent$default from "./../components/agent/default/index.mjs";
 import recorder_process$default from "./../components/recorder-process/default/index.mjs";
 
 export default (blueprint) => {
-  const dependencies = {__proto__:null};
+  const dependencies = { __proto__: null };
   dependencies["util"] = util$default(dependencies);
   dependencies["violation"] = violation$exit(dependencies);
   dependencies["expect-inner"] = expect_inner$default(dependencies);
   dependencies["expect"] = expect$default(dependencies);
   dependencies["log-inner"] = log_inner$write_sync(dependencies);
-  if (!("log" in blueprint)) { throw new Error("missing instance for component log"); }
-  dependencies["log"] = (blueprint["log"] === "warning" ? log$warning(dependencies) : (blueprint["log"] === "off" ? log$off(dependencies) : (blueprint["log"] === "info" ? log$info(dependencies) : (blueprint["log"] === "error" ? log$error(dependencies) : (blueprint["log"] === "debug" ? log$debug(dependencies) : ((() => { throw new Error("invalid instance for component log"); }) ()))))));
+  if (!("log" in blueprint)) {
+    throw new Error("missing instance for component log");
+  }
+  dependencies["log"] =
+    blueprint["log"] === "warning"
+      ? log$warning(dependencies)
+      : blueprint["log"] === "off"
+      ? log$off(dependencies)
+      : blueprint["log"] === "info"
+      ? log$info(dependencies)
+      : blueprint["log"] === "error"
+      ? log$error(dependencies)
+      : blueprint["log"] === "debug"
+      ? log$debug(dependencies)
+      : (() => {
+          throw new Error("invalid instance for component log");
+        })();
   dependencies["uuid"] = uuid$random(dependencies);
   dependencies["time"] = time$performance_node(dependencies);
   dependencies["validate"] = validate$ajv(dependencies);
@@ -50,7 +67,8 @@ export default (blueprint) => {
   dependencies["child"] = child$default(dependencies);
   dependencies["engine"] = engine$node(dependencies);
   dependencies["configuration"] = configuration$default(dependencies);
-  dependencies["source"] = source$node(dependencies);
+  dependencies["source-inner"] = source_inner$node(dependencies);
+  dependencies["source"] = source$default(dependencies);
   dependencies["instrumentation"] = instrumentation$default(dependencies);
   dependencies["serialization"] = serialization$default(dependencies);
   dependencies["frontend"] = frontend$default(dependencies);
@@ -59,6 +77,7 @@ export default (blueprint) => {
   dependencies["emitter"] = emitter$remote_node_tcp(dependencies);
   dependencies["hook-apply"] = hook_apply$default(dependencies);
   dependencies["hook-group"] = hook_group$node(dependencies);
+  dependencies["source-outer"] = source_outer$node(dependencies);
   dependencies["hook-module"] = hook_module$node(dependencies);
   dependencies["hook-request"] = hook_request$node(dependencies);
   dependencies["patch"] = patch$default(dependencies);

@@ -6,3 +6,4 @@ dependencies:
   - agent
   - uuid
   - configuration
+  - source-outer

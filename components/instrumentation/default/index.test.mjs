@@ -7,11 +7,11 @@ import Instrumentation from "./index.mjs";
 
 const { deepEqual: assertDeepEqual, equal: assertEqual } = Assert;
 
-const dependencies = await buildTestDependenciesAsync(import.meta.url);
+const { createMirrorSourceMap } = await buildTestComponentAsync("source");
 const { createConfiguration, extendConfiguration } =
-  await buildTestComponentAsync("configuration", "test");
+  await buildTestComponentAsync("configuration");
 const { createInstrumentation, instrument, getInstrumentationIdentifier } =
-  Instrumentation(dependencies);
+  Instrumentation(await buildTestDependenciesAsync(import.meta.url));
 
 const instrumentation = createInstrumentation(
   extendConfiguration(
@@ -44,44 +44,42 @@ const instrumentation = createInstrumentation(
 
 assertEqual(getInstrumentationIdentifier(instrumentation), "$uuid");
 
-assertDeepEqual(
-  instrument(
-    instrumentation,
+{
+  const file = {
+    url: "file:///cwd/foo.js",
+    content: "123;",
+    type: "script",
+  };
+  assertDeepEqual(
+    instrument(instrumentation, file, createMirrorSourceMap(file)),
     {
       url: "file:///cwd/foo.js",
       content: "123;",
-      type: "script",
+      sources: [
+        {
+          url: "file:///cwd/foo.js",
+          content: "123;",
+          shallow: true,
+          inline: true,
+          exclude: ["qux", "foo"],
+        },
+      ],
     },
-    null,
-  ),
-  {
-    url: "file:///cwd/foo.js",
-    content: "123;",
-    sources: [
-      {
-        url: "file:///cwd/foo.js",
-        content: "123;",
-        shallow: true,
-        inline: true,
-        exclude: ["qux", "foo"],
-      },
-    ],
-  },
-);
+  );
+}
 
-assertDeepEqual(
-  instrument(
-    instrumentation,
+{
+  const file = {
+    url: "file:///cwd/bar.js",
+    content: "456;",
+    type: "script",
+  };
+  assertDeepEqual(
+    instrument(instrumentation, file, createMirrorSourceMap(file)),
     {
       url: "file:///cwd/bar.js",
       content: "456;",
-      type: "script",
+      sources: [],
     },
-    null,
-  ),
-  {
-    url: "file:///cwd/bar.js",
-    content: "456;",
-    sources: [],
-  },
-);
+  );
+}

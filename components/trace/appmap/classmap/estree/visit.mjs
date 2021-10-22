@@ -66,7 +66,7 @@ export default (dependencies) => {
             start: { line, column },
           },
         } = node;
-        const { naming, getLeadingComment } = context;
+        const { naming, getLeadingCommentArray } = context;
         return {
           head: {
             type: "function",
@@ -78,7 +78,7 @@ export default (dependencies) => {
             parameters: node.params.map(({ start, end }) => [start, end]),
             labels: [],
             static: parent.type === "MethodDefinition" && parent.static,
-            comment: getLeadingComment(node),
+            comments: getLeadingCommentArray(node),
             range: [start, end],
             line,
             column,

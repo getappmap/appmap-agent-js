@@ -14,6 +14,18 @@ export default (dependencies) => {
     log: { logWarning },
   } = dependencies;
   const { createExclusion, isExcluded } = Exclusion(dependencies);
+  const printCommentArray = (comments) => {
+    const { length } = comments;
+    if (length === 0) {
+      return null;
+    }
+    if (length === 1) {
+      return comments[0];
+    }
+    /* c8 ignore start */
+    return comments.join("\n");
+    /* c8 ignore stop */
+  };
   const { extractEstreeEntityArray } = Estree(dependencies);
   const default_closure_information = {
     excluded: true,
@@ -47,7 +59,7 @@ export default (dependencies) => {
         parameters,
         labels,
         static: _static,
-        comment,
+        comments,
         range,
         line,
         column,
@@ -79,7 +91,7 @@ export default (dependencies) => {
             location: `${path}:${line}`,
             static: _static,
             source: inline ? cutContent(range) : null,
-            comment,
+            comment: printCommentArray(comments),
             labels,
           },
           ...children.map(transformChildEntity),

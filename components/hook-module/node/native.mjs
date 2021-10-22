@@ -7,17 +7,15 @@
 //   throw new Error("lib/emitter/hook/esm.js must be preloaded with --experimental loader");
 // }};
 
-import File from "./file.mjs";
-
 const { from: toBuffer } = Buffer;
 
 export default (dependencies) => {
   const {
-    util: { assert, mapMaybeAsync },
-    frontend: { instrument, extractSourceMapURL },
+    util: { assert },
+    frontend: { instrument },
     emitter: { sendEmitter },
+    "source-outer": { extractSourceMapAsync },
   } = dependencies;
-  const { readFileAsync } = File(dependencies);
   return {
     unhookNativeModule: (enabled) => {
       if (enabled) {
@@ -48,14 +46,15 @@ export default (dependencies) => {
             if (typeof content1 !== "string") {
               content1 = toBuffer(content1).toString("utf8");
             }
+            const file = {
+              url,
+              content: content1,
+              type: "module",
+            };
             const { content: content2, messages } = instrument(
               frontend,
-              {
-                url,
-                content: content1,
-                type: "module",
-              },
-              await mapMaybeAsync(extractSourceMapURL(content1), readFileAsync),
+              file,
+              await extractSourceMapAsync(file),
             );
             for (const message of messages) {
               sendEmitter(emitter, message);

@@ -15,6 +15,7 @@ export default (dependencies) => {
     ["config", "configuration"],
     ["configuration", "cooked-configuration"],
     ["message", "message"],
+    ["source-map", "source-map"],
   ]);
   const ajv = new Ajv({ verbose: true });
   ajv.addSchema(schema);

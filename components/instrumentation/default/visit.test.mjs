@@ -1,9 +1,11 @@
 import { strict as Assert } from "assert";
 import { parse } from "acorn";
 import { generate } from "escodegen";
-import { buildTestDependenciesAsync } from "../../build.mjs";
+import {
+  buildTestDependenciesAsync,
+  buildTestComponentAsync,
+} from "../../build.mjs";
 import Visit from "./visit.mjs";
-import Source from "./source.mjs";
 
 Error.stackTraceLimit = Infinity;
 
@@ -11,7 +13,7 @@ const { equal: assertEqual } = Assert;
 
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
 const { visit } = Visit(dependencies);
-const { createMirrorSourceMap } = Source(dependencies);
+const { createMirrorSourceMap } = await buildTestComponentAsync("source");
 
 const normalize = (code, source) =>
   generate(parse(code, { ecmaVersion: 2021, sourceType: source }));

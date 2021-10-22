@@ -34,8 +34,8 @@ export default (dependencies) => {
   };
 
   return {
-    getLeadingComment: (node) =>
-      coalesce(node, "leadingComments", []).map(printComment).join("\n"),
+    getLeadingCommentArray: (node) =>
+      coalesce(node, "leadingComments", []).map(printComment),
     parse: (path, content) => {
       let source_type = "unambiguous";
       if (path.endsWith(".cjs") || path.endsWith(".node")) {

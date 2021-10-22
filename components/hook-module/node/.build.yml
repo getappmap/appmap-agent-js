@@ -4,3 +4,4 @@ dependencies:
   - frontend
   - emitter
   - expect
+  - source-outer

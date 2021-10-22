@@ -1,5 +1,3 @@
-import Source from "./source.mjs";
-
 const _String = String;
 const { isArray } = Array;
 const { fromEntries, entries } = Object;
@@ -199,9 +197,8 @@ export default (dependencies) => {
   const {
     expect: { expect },
     util: { assert, hasOwnProperty, coalesce },
+    source: { mapSource },
   } = dependencies;
-
-  const { mapSource } = Source(dependencies);
 
   const makeCatchJumpStatement = (runtime) =>
     makeIfStatement(

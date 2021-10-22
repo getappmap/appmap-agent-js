@@ -108,7 +108,7 @@ assertDeepEqual(
                 location: "filename.js:1",
                 static: false,
                 labels: [],
-                comment: "",
+                comment: null,
                 source: null,
               },
             ],

@@ -1,1543 +1,1393 @@
 export const schema = [
   {
-    "$id": "encoding",
-    "enum": [
-      "buffer",
-      "utf8",
-      "utf16le",
-      "latin1"
-    ]
+    $id: "encoding",
+    enum: ["buffer", "utf8", "utf16le", "latin1"],
   },
   {
-    "$id": "mode",
-    "enum": [
-      "local",
-      "remote"
-    ]
+    $id: "mode",
+    enum: ["local", "remote"],
   },
   {
-    "$id": "ordering",
-    "enum": [
-      "chronological",
-      "causal"
-    ]
+    $id: "ordering",
+    enum: ["chronological", "causal"],
   },
   {
-    "$id": "log-level",
-    "enum": [
-      "debug",
-      "info",
-      "warning",
-      "error",
-      "off"
-    ]
+    $id: "log-level",
+    enum: ["debug", "info", "warning", "error", "off"],
   },
   {
-    "$id": "file-type",
-    "enum": [
-      "script",
-      "module"
-    ]
+    $id: "file-type",
+    enum: ["script", "module"],
   },
   {
-    "$id": "recorder",
-    "enum": [
-      "process",
-      "mocha",
-      "manual",
-      "remote"
-    ]
+    $id: "recorder",
+    enum: ["process", "mocha", "manual", "remote"],
   },
   {
-    "$id": "serialization-method",
-    "enum": [
-      "toString",
-      "Object.prototype.toString"
-    ]
+    $id: "serialization-method",
+    enum: ["toString", "Object.prototype.toString"],
   },
   {
-    "$id": "stdio-stream",
-    "enum": [
-      "ignore",
-      "pipe",
-      "inherit"
-    ]
+    $id: "stdio-stream",
+    enum: ["ignore", "pipe", "inherit"],
   },
   {
-    "$id": "signal",
-    "enum": [
-      "SIGINT",
-      "SIGTERM",
-      "SIGKILL"
-    ]
+    $id: "signal",
+    enum: ["SIGINT", "SIGTERM", "SIGKILL"],
   },
   {
-    "$id": "indent",
-    "enum": [
-      0,
-      2,
-      4,
-      8
-    ]
+    $id: "indent",
+    enum: [0, 2, 4, 8],
   },
   {
-    "$id": "url",
-    "type": "string",
-    "pattern": "^[a-z]+://"
+    $id: "url",
+    type: "string",
+    pattern: "^[a-z]+://",
   },
   {
-    "$id": "exclusion",
-    "type": "string"
+    $id: "exclusion",
+    type: "string",
   },
   {
-    "$id": "regular-identifier",
-    "type": "string",
-    "pattern": "^[a-zA-Z_$][a-zA-Z_$-9]*$"
+    $id: "regular-identifier",
+    type: "string",
+    pattern: "^[a-zA-Z_$][a-zA-Z_$-9]*$",
   },
   {
-    "$id": "path",
-    "type": "string"
+    $id: "path",
+    type: "string",
   },
   {
-    "$id": "absolute-path",
-    "type": "string",
-    "pattern": "^/"
+    $id: "absolute-path",
+    type: "string",
+    pattern: "^/",
   },
   {
-    "$id": "basename",
-    "type": "string",
-    "pattern": "^[^/.]+$"
+    $id: "basename",
+    type: "string",
+    pattern: "^[^/.]+$",
   },
   {
-    "$id": "extension",
-    "type": "string",
-    "pattern": "^\\.[^/]+$"
+    $id: "extension",
+    type: "string",
+    pattern: "^\\.[^/]+$",
   },
   {
-    "$id": "index",
-    "type": "integer",
-    "minimum": 0,
-    "maximum": 9007199254740991
+    $id: "index",
+    type: "integer",
+    minimum: 0,
+    maximum: 9007199254740991,
   },
   {
-    "$id": "port-number",
-    "type": "integer",
-    "minimum": 1,
-    "maximum": 65535
+    $id: "port-number",
+    type: "integer",
+    minimum: 1,
+    maximum: 65535,
   },
   {
-    "$id": "port",
-    "anyOf": [
+    $id: "port",
+    anyOf: [
       {
-        "$ref": "path"
+        $ref: "path",
       },
       {
-        "$ref": "port-number"
-      }
-    ]
-  },
-  {
-    "$id": "absolute-port",
-    "anyOf": [
-      {
-        "$ref": "absolute-path"
+        $ref: "port-number",
       },
-      {
-        "$ref": "port-number"
-      }
-    ]
-  },
-  {
-    "$id": "name-version-string",
-    "type": "string",
-    "pattern": "^[^@]+@[^@]+$"
-  },
-  {
-    "$id": "name-version-object",
-    "type": "object",
-    "additionalProperties": false,
-    "required": [
-      "name",
-      "version"
     ],
-    "properties": {
-      "name": {
-        "type": "string"
-      },
-      "version": {
-        "type": "string"
-      }
-    }
   },
   {
-    "$id": "name-version",
-    "anyOf": [
+    $id: "absolute-port",
+    anyOf: [
       {
-        "$ref": "name-version-string"
+        $ref: "absolute-path",
       },
       {
-        "$ref": "name-version-object"
-      }
-    ]
-  },
-  {
-    "$id": "recording-string",
-    "type": "string",
-    "pattern": "^[^.]+.[^.]+$"
-  },
-  {
-    "$id": "recording-object",
-    "type": "object",
-    "additionalProperties": false,
-    "required": [
-      "defined-class",
-      "method-id"
+        $ref: "port-number",
+      },
     ],
-    "properties": {
+  },
+  {
+    $id: "name-version-string",
+    type: "string",
+    pattern: "^[^@]+@[^@]+$",
+  },
+  {
+    $id: "name-version-object",
+    type: "object",
+    additionalProperties: false,
+    required: ["name", "version"],
+    properties: {
+      name: {
+        type: "string",
+      },
+      version: {
+        type: "string",
+      },
+    },
+  },
+  {
+    $id: "name-version",
+    anyOf: [
+      {
+        $ref: "name-version-string",
+      },
+      {
+        $ref: "name-version-object",
+      },
+    ],
+  },
+  {
+    $id: "recording-string",
+    type: "string",
+    pattern: "^[^.]+.[^.]+$",
+  },
+  {
+    $id: "recording-object",
+    type: "object",
+    additionalProperties: false,
+    required: ["defined-class", "method-id"],
+    properties: {
       "defined-class": {
-        "type": "string"
+        type: "string",
       },
       "method-id": {
-        "type": "string"
-      }
-    }
+        type: "string",
+      },
+    },
   },
   {
-    "$id": "recording",
-    "anyOf": [
+    $id: "recording",
+    anyOf: [
       {
-        "$ref": "recording-string"
+        $ref: "recording-string",
       },
       {
-        "$ref": "recording-object"
-      }
-    ]
-  },
-  {
-    "$id": "package",
-    "type": "object",
-    "additionalProperties": false,
-    "required": [
-      "name",
-      "version",
-      "homepage"
+        $ref: "recording-object",
+      },
     ],
-    "properties": {
-      "name": {
-        "type": "string"
-      },
-      "version": {
-        "type": "string"
-      },
-      "homepage": {
-        "type": "string",
-        "nullable": true
-      }
-    }
   },
   {
-    "$id": "exclude",
-    "type": "array",
-    "items": {
-      "$ref": "exclusion"
-    }
+    $id: "package",
+    type: "object",
+    additionalProperties: false,
+    required: ["name", "version", "homepage"],
+    properties: {
+      name: {
+        type: "string",
+      },
+      version: {
+        type: "string",
+      },
+      homepage: {
+        type: "string",
+        nullable: true,
+      },
+    },
   },
   {
-    "$id": "stdio",
-    "anyOf": [
+    $id: "exclude",
+    type: "array",
+    items: {
+      $ref: "exclusion",
+    },
+  },
+  {
+    $id: "stdio",
+    anyOf: [
       {
-        "$ref": "stdio-stream"
+        $ref: "stdio-stream",
       },
       {
-        "type": "array",
-        "minItems": 3,
-        "maxItems": 3,
-        "items": [
+        type: "array",
+        minItems: 3,
+        maxItems: 3,
+        items: [
           {
-            "$ref": "stdio-stream"
+            $ref: "stdio-stream",
           },
           {
-            "$ref": "stdio-stream"
+            $ref: "stdio-stream",
           },
           {
-            "$ref": "stdio-stream"
-          }
-        ]
-      }
-    ]
+            $ref: "stdio-stream",
+          },
+        ],
+      },
+    ],
   },
   {
-    "$id": "env",
-    "type": "object",
-    "additionalProperties": false,
-    "patternProperties": {
+    $id: "env",
+    type: "object",
+    additionalProperties: false,
+    patternProperties: {
       "^": {
-        "type": "string"
-      }
-    }
+        type: "string",
+      },
+    },
   },
   {
-    "$id": "specifier",
-    "anyOf": [
+    $id: "specifier",
+    anyOf: [
       {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "regexp"
-        ],
-        "properties": {
-          "regexp": {
-            "type": "string"
+        type: "object",
+        additionalProperties: false,
+        required: ["regexp"],
+        properties: {
+          regexp: {
+            type: "string",
           },
-          "flags": {
-            "type": "string"
+          flags: {
+            type: "string",
           },
-          "enabled": {
-            "type": "boolean"
+          enabled: {
+            type: "boolean",
           },
-          "shallow": {
-            "type": "boolean"
+          shallow: {
+            type: "boolean",
           },
-          "exclude": {
-            "$ref": "exclude"
+          exclude: {
+            $ref: "exclude",
           },
           "inline-source": {
-            "type": "boolean",
-            "nullable": true
-          }
-        }
+            type: "boolean",
+            nullable: true,
+          },
+        },
       },
       {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "glob"
-        ],
-        "properties": {
-          "glob": {
-            "type": "string"
+        type: "object",
+        additionalProperties: false,
+        required: ["glob"],
+        properties: {
+          glob: {
+            type: "string",
           },
-          "enabled": {
-            "type": "boolean"
+          enabled: {
+            type: "boolean",
           },
-          "shallow": {
-            "type": "boolean"
+          shallow: {
+            type: "boolean",
           },
-          "exclude": {
-            "$ref": "exclude"
+          exclude: {
+            $ref: "exclude",
           },
           "inline-source": {
-            "type": "boolean",
-            "nullable": true
-          }
-        }
+            type: "boolean",
+            nullable: true,
+          },
+        },
       },
       {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "path"
-        ],
-        "properties": {
-          "path": {
-            "type": "string"
+        type: "object",
+        additionalProperties: false,
+        required: ["path"],
+        properties: {
+          path: {
+            type: "string",
           },
-          "recursive": {
-            "type": "boolean"
+          recursive: {
+            type: "boolean",
           },
-          "enabled": {
-            "type": "boolean"
+          enabled: {
+            type: "boolean",
           },
-          "shallow": {
-            "type": "boolean"
+          shallow: {
+            type: "boolean",
           },
-          "exclude": {
-            "$ref": "exclude"
+          exclude: {
+            $ref: "exclude",
           },
           "inline-source": {
-            "type": "boolean",
-            "nullable": true
-          }
-        }
+            type: "boolean",
+            nullable: true,
+          },
+        },
       },
       {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "dist"
-        ],
-        "properties": {
-          "dist": {
-            "type": "string"
+        type: "object",
+        additionalProperties: false,
+        required: ["dist"],
+        properties: {
+          dist: {
+            type: "string",
           },
-          "recursive": {
-            "type": "boolean"
+          recursive: {
+            type: "boolean",
           },
-          "external": {
-            "type": "boolean"
+          external: {
+            type: "boolean",
           },
-          "enabled": {
-            "type": "boolean"
+          enabled: {
+            type: "boolean",
           },
-          "shallow": {
-            "type": "boolean"
+          shallow: {
+            type: "boolean",
           },
-          "exclude": {
-            "$ref": "exclude"
+          exclude: {
+            $ref: "exclude",
           },
           "inline-source": {
-            "type": "boolean",
-            "nullable": true
-          }
-        }
-      }
-    ]
-  },
-  {
-    "$id": "package-specifier",
-    "anyOf": [
-      {
-        "type": "string"
-      },
-      {
-        "$ref": "specifier"
-      }
-    ]
-  },
-  {
-    "$id": "enabled-specifier",
-    "anyOf": [
-      {
-        "type": "boolean"
-      },
-      {
-        "type": "string"
-      },
-      {
-        "allOf": [
-          {
-            "$ref": "specifier"
+            type: "boolean",
+            nullable: true,
           },
-          {
-            "not": {
-              "anyOf": [
-                {
-                  "type": "object",
-                  "required": [
-                    "shallow"
-                  ]
-                },
-                {
-                  "type": "object",
-                  "required": [
-                    "inline-source"
-                  ]
-                },
-                {
-                  "type": "object",
-                  "required": [
-                    "exclude"
-                  ]
-                }
-              ]
-            }
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "$id": "cooked-specifier",
-    "type": "object",
-    "additionalProperties": false,
-    "required": [
-      "basedir",
-      "source",
-      "flags"
+        },
+      },
     ],
-    "properties": {
-      "basedir": {
-        "$ref": "absolute-path"
-      },
-      "source": {
-        "type": "string"
-      },
-      "flags": {
-        "type": "string"
-      }
-    }
   },
   {
-    "$id": "child-options",
-    "type": "object",
-    "additionalProperties": false,
-    "properties": {
-      "execPath": {
-        "type": "string"
+    $id: "package-specifier",
+    anyOf: [
+      {
+        type: "string",
       },
-      "execArgv": {
-        "type": "string"
+      {
+        $ref: "specifier",
       },
-      "encoding": {
-        "$ref": "encoding"
-      },
-      "cwd": {
-        "$ref": "path"
-      },
-      "env": {
-        "$ref": "env"
-      },
-      "stdio": {
-        "$ref": "stdio"
-      },
-      "timeout": {
-        "type": "integer",
-        "minimum": 0
-      },
-      "killSignal": {
-        "$ref": "signal"
-      }
-    }
+    ],
   },
   {
-    "$id": "child",
-    "anyOf": [
+    $id: "enabled-specifier",
+    anyOf: [
       {
-        "type": "string"
+        type: "boolean",
       },
       {
-        "type": "array",
-        "minItems": 1,
-        "items": {
-          "type": "string"
-        }
+        type: "string",
       },
       {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "type",
-          "exec"
+        allOf: [
+          {
+            $ref: "specifier",
+          },
+          {
+            not: {
+              anyOf: [
+                {
+                  type: "object",
+                  required: ["shallow"],
+                },
+                {
+                  type: "object",
+                  required: ["inline-source"],
+                },
+                {
+                  type: "object",
+                  required: ["exclude"],
+                },
+              ],
+            },
+          },
         ],
-        "properties": {
-          "type": {
-            "const": "spawn"
+      },
+    ],
+  },
+  {
+    $id: "cooked-specifier",
+    type: "object",
+    additionalProperties: false,
+    required: ["basedir", "source", "flags"],
+    properties: {
+      basedir: {
+        $ref: "absolute-path",
+      },
+      source: {
+        type: "string",
+      },
+      flags: {
+        type: "string",
+      },
+    },
+  },
+  {
+    $id: "child-options",
+    type: "object",
+    additionalProperties: false,
+    properties: {
+      execPath: {
+        type: "string",
+      },
+      execArgv: {
+        type: "string",
+      },
+      encoding: {
+        $ref: "encoding",
+      },
+      cwd: {
+        $ref: "path",
+      },
+      env: {
+        $ref: "env",
+      },
+      stdio: {
+        $ref: "stdio",
+      },
+      timeout: {
+        type: "integer",
+        minimum: 0,
+      },
+      killSignal: {
+        $ref: "signal",
+      },
+    },
+  },
+  {
+    $id: "child",
+    anyOf: [
+      {
+        type: "string",
+      },
+      {
+        type: "array",
+        minItems: 1,
+        items: {
+          type: "string",
+        },
+      },
+      {
+        type: "object",
+        additionalProperties: false,
+        required: ["type", "exec"],
+        properties: {
+          type: {
+            const: "spawn",
           },
-          "configuration": {
-            "$ref": "config"
+          configuration: {
+            $ref: "config",
           },
-          "exec": {
-            "type": "string"
+          exec: {
+            type: "string",
           },
-          "argv": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
+          argv: {
+            type: "array",
+            items: {
+              type: "string",
+            },
           },
-          "options": {
-            "allOf": [
+          options: {
+            allOf: [
               {
-                "$ref": "child-options"
+                $ref: "child-options",
               },
               {
-                "not": {
-                  "anyOf": [
+                not: {
+                  anyOf: [
                     {
-                      "type": "object",
-                      "required": [
-                        "execPath"
-                      ]
+                      type: "object",
+                      required: ["execPath"],
                     },
                     {
-                      "type": "object",
-                      "required": [
-                        "execArgv"
-                      ]
-                    }
-                  ]
-                }
-              }
-            ]
-          }
-        }
+                      type: "object",
+                      required: ["execArgv"],
+                    },
+                  ],
+                },
+              },
+            ],
+          },
+        },
       },
       {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "type",
-          "exec"
-        ],
-        "properties": {
-          "type": {
-            "const": "fork"
+        type: "object",
+        additionalProperties: false,
+        required: ["type", "exec"],
+        properties: {
+          type: {
+            const: "fork",
           },
-          "configuration": {
-            "$ref": "config"
+          configuration: {
+            $ref: "config",
           },
-          "globbing": {
-            "type": "boolean"
+          globbing: {
+            type: "boolean",
           },
-          "exec": {
-            "type": "string"
+          exec: {
+            type: "string",
           },
-          "argv": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
+          argv: {
+            type: "array",
+            items: {
+              type: "string",
+            },
           },
-          "options": {
-            "$ref": "child-options"
-          }
-        }
-      }
-    ]
+          options: {
+            $ref: "child-options",
+          },
+        },
+      },
+    ],
   },
   {
-    "$id": "cooked-child",
-    "type": "object",
-    "additionalProperties": false,
-    "required": [
-      "fork",
-      "exec",
-      "argv",
-      "configuration",
-      "options"
-    ],
-    "properties": {
-      "fork": {
-        "type": "object",
-        "nullable": true,
-        "required": [
-          "exec",
-          "argv"
-        ],
-        "additionalProperties": false,
-        "properties": {
-          "exec": {
-            "type": "string"
+    $id: "cooked-child",
+    type: "object",
+    additionalProperties: false,
+    required: ["fork", "exec", "argv", "configuration", "options"],
+    properties: {
+      fork: {
+        type: "object",
+        nullable: true,
+        required: ["exec", "argv"],
+        additionalProperties: false,
+        properties: {
+          exec: {
+            type: "string",
           },
-          "argv": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          }
-        }
-      },
-      "exec": {
-        "type": "string"
-      },
-      "argv": {
-        "type": "array",
-        "items": {
-          "type": "string"
-        }
-      },
-      "configuration": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "directory",
-          "data"
-        ],
-        "properties": {
-          "directory": {
-            "$ref": "absolute-path"
+          argv: {
+            type: "array",
+            items: {
+              type: "string",
+            },
           },
-          "data": {
-            "$ref": "config"
-          }
-        }
+        },
       },
-      "options": {
-        "allOf": [
+      exec: {
+        type: "string",
+      },
+      argv: {
+        type: "array",
+        items: {
+          type: "string",
+        },
+      },
+      configuration: {
+        type: "object",
+        additionalProperties: false,
+        required: ["directory", "data"],
+        properties: {
+          directory: {
+            $ref: "absolute-path",
+          },
+          data: {
+            $ref: "config",
+          },
+        },
+      },
+      options: {
+        allOf: [
           {
-            "$ref": "child-options"
+            $ref: "child-options",
           },
           {
-            "type": "object",
-            "required": [
+            type: "object",
+            required: [
               "encoding",
               "cwd",
               "env",
               "stdio",
               "timeout",
-              "killSignal"
+              "killSignal",
             ],
-            "maxProperties": 6,
-            "properties": {
-              "cwd": {
-                "$ref": "absolute-path"
-              }
-            }
-          }
-        ]
-      }
-    }
+            maxProperties: 6,
+            properties: {
+              cwd: {
+                $ref: "absolute-path",
+              },
+            },
+          },
+        ],
+      },
+    },
   },
   {
-    "$id": "config",
-    "type": "object",
-    "additionalProperties": false,
-    "properties": {
-      "mode": {
-        "$ref": "mode"
+    $id: "config",
+    type: "object",
+    additionalProperties: false,
+    properties: {
+      mode: {
+        $ref: "mode",
       },
-      "validate": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "message": {
-            "type": "boolean"
+      validate: {
+        type: "object",
+        additionalProperties: false,
+        properties: {
+          message: {
+            type: "boolean",
           },
-          "appmap": {
-            "type": "boolean"
-          }
-        }
+          appmap: {
+            type: "boolean",
+          },
+        },
       },
-      "log": {
-        "$ref": "log-level"
+      log: {
+        $ref: "log-level",
       },
-      "host": {
-        "const": "localhost"
+      host: {
+        const: "localhost",
       },
-      "session": {
-        "$ref": "basename"
+      session: {
+        $ref: "basename",
       },
       "trace-port": {
-        "anyOf": [
+        anyOf: [
           {
-            "const": 0
+            const: 0,
           },
           {
-            "$ref": "port"
-          }
-        ]
+            $ref: "port",
+          },
+        ],
       },
       "trace-protocol": {
-        "const": "TCP"
+        const: "TCP",
       },
       "track-port": {
-        "anyOf": [
+        anyOf: [
           {
-            "const": 0
+            const: 0,
           },
           {
-            "$ref": "port"
-          }
-        ]
+            $ref: "port",
+          },
+        ],
       },
       "track-protocol": {
-        "const": "HTTP/1.1"
+        const: "HTTP/1.1",
       },
       "intercept-track-port": {
-        "anyOf": [
+        anyOf: [
           {
-            "const": null
+            const: null,
           },
           {
-            "$ref": "port"
-          }
-        ]
+            $ref: "port",
+          },
+        ],
       },
       "intercept-track-protocol": {
-        "const": "HTTP/1.1"
+        const: "HTTP/1.1",
       },
-      "scenario": {
-        "type": "string"
+      scenario: {
+        type: "string",
       },
-      "scenarios": {
-        "type": "object",
-        "additionalProperties": false,
-        "patternProperties": {
+      scenarios: {
+        type: "object",
+        additionalProperties: false,
+        patternProperties: {
           "^": {
-            "anyOf": [
+            anyOf: [
               {
-                "type": "array",
-                "items": {
-                  "$ref": "child"
-                }
+                type: "array",
+                items: {
+                  $ref: "child",
+                },
               },
               {
-                "$ref": "child"
-              }
-            ]
-          }
-        }
+                $ref: "child",
+              },
+            ],
+          },
+        },
       },
-      "recorder": {
-        "$ref": "recorder"
+      recorder: {
+        $ref: "recorder",
       },
       "inline-source": {
-        "type": "boolean"
+        type: "boolean",
       },
-      "hooks": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "cjs": {
-            "type": "boolean"
+      hooks: {
+        type: "object",
+        additionalProperties: false,
+        properties: {
+          cjs: {
+            type: "boolean",
           },
-          "esm": {
-            "type": "boolean"
+          esm: {
+            type: "boolean",
           },
-          "apply": {
-            "type": "boolean"
+          apply: {
+            type: "boolean",
           },
-          "http": {
-            "type": "boolean"
+          http: {
+            type: "boolean",
           },
-          "mysql": {
-            "type": "boolean"
+          mysql: {
+            type: "boolean",
           },
-          "pg": {
-            "type": "boolean"
+          pg: {
+            type: "boolean",
           },
-          "sqlite3": {
-            "type": "boolean"
-          }
-        }
+          sqlite3: {
+            type: "boolean",
+          },
+        },
       },
-      "ordering": {
-        "$ref": "ordering"
+      ordering: {
+        $ref: "ordering",
       },
-      "processes": {
-        "anyOf": [
+      processes: {
+        anyOf: [
           {
-            "$ref": "enabled-specifier"
+            $ref: "enabled-specifier",
           },
           {
-            "type": "array",
-            "items": {
-              "$ref": "enabled-specifier"
-            }
-          }
-        ]
+            type: "array",
+            items: {
+              $ref: "enabled-specifier",
+            },
+          },
+        ],
       },
       "hidden-identifier": {
-        "$ref": "regular-identifier"
+        $ref: "regular-identifier",
       },
-      "main": {
-        "$ref": "path"
+      main: {
+        $ref: "path",
       },
-      "engine": {
-        "$ref": "name-version"
+      engine: {
+        $ref: "name-version",
       },
-      "language": {
-        "$ref": "name-version"
+      language: {
+        $ref: "name-version",
       },
-      "packages": {
-        "anyOf": [
+      packages: {
+        anyOf: [
           {
-            "$ref": "package-specifier"
+            $ref: "package-specifier",
           },
           {
-            "type": "array",
-            "items": {
-              "$ref": "package-specifier"
-            }
-          }
-        ]
+            type: "array",
+            items: {
+              $ref: "package-specifier",
+            },
+          },
+        ],
       },
-      "exclude": {
-        "$ref": "exclude"
+      exclude: {
+        $ref: "exclude",
       },
       "function-name-placeholder": {
-        "type": "string"
+        type: "string",
       },
-      "recording": {
-        "$ref": "recording"
+      recording: {
+        $ref: "recording",
       },
-      "serialization": {
-        "anyOf": [
+      serialization: {
+        anyOf: [
           {
-            "type": "string"
+            type: "string",
           },
           {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-              "method": {
-                "$ref": "serialization-method"
+            type: "object",
+            additionalProperties: false,
+            properties: {
+              method: {
+                $ref: "serialization-method",
               },
               "include-constructor-name": {
-                "type": "boolean"
+                type: "boolean",
               },
               "maximum-length": {
-                "type": "integer",
-                "minimum": 0,
-                "nullable": true
-              }
-            }
-          }
-        ]
+                type: "integer",
+                minimum: 0,
+                nullable: true,
+              },
+            },
+          },
+        ],
       },
-      "pruning": {
-        "type": "boolean"
+      pruning: {
+        type: "boolean",
       },
-      "output": {
-        "anyOf": [
+      output: {
+        anyOf: [
           {
-            "type": "string"
+            type: "string",
           },
           {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-              "directory": {
-                "$ref": "path"
+            type: "object",
+            additionalProperties: false,
+            properties: {
+              directory: {
+                $ref: "path",
               },
-              "basename": {
-                "$ref": "basename"
+              basename: {
+                $ref: "basename",
               },
-              "extension": {
-                "$ref": "extension"
-              }
-            }
-          }
-        ]
+              extension: {
+                $ref: "extension",
+              },
+            },
+          },
+        ],
       },
-      "app": {
-        "type": "string"
+      app: {
+        type: "string",
       },
-      "name": {
-        "type": "string"
+      name: {
+        type: "string",
       },
-      "feature": {
-        "type": "string"
+      feature: {
+        type: "string",
       },
       "feature-group": {
-        "type": "string"
+        type: "string",
       },
-      "labels": {
-        "type": "array",
-        "items": {
-          "type": "string"
-        }
+      labels: {
+        type: "array",
+        items: {
+          type: "string",
+        },
       },
-      "frameworks": {
-        "type": "array",
-        "items": {
-          "$ref": "name-version"
-        }
-      }
-    }
+      frameworks: {
+        type: "array",
+        items: {
+          $ref: "name-version",
+        },
+      },
+    },
   },
   {
-    "$id": "configuration",
-    "type": "object",
-    "additionalProperties": false,
-    "minProperties": 37,
-    "properties": {
-      "mode": {
-        "$ref": "mode"
+    $id: "configuration",
+    type: "object",
+    additionalProperties: false,
+    minProperties: 37,
+    properties: {
+      mode: {
+        $ref: "mode",
       },
-      "validate": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "message",
-          "appmap"
-        ],
-        "properties": {
-          "message": {
-            "type": "boolean"
+      validate: {
+        type: "object",
+        additionalProperties: false,
+        required: ["message", "appmap"],
+        properties: {
+          message: {
+            type: "boolean",
           },
-          "appmap": {
-            "type": "boolean"
-          }
-        }
+          appmap: {
+            type: "boolean",
+          },
+        },
       },
-      "repository": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "directory",
-          "history",
-          "package"
-        ],
-        "properties": {
-          "directory": {
-            "$ref": "absolute-path"
+      repository: {
+        type: "object",
+        additionalProperties: false,
+        required: ["directory", "history", "package"],
+        properties: {
+          directory: {
+            $ref: "absolute-path",
           },
-          "history": {
-            "type": "object",
-            "nullable": true
+          history: {
+            type: "object",
+            nullable: true,
           },
-          "package": {
-            "anyOf": [
+          package: {
+            anyOf: [
               {
-                "const": null
+                const: null,
               },
               {
-                "$ref": "package"
-              }
-            ]
-          }
-        }
-      },
-      "agent": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "directory",
-          "package"
-        ],
-        "properties": {
-          "directory": {
-            "$ref": "absolute-path"
+                $ref: "package",
+              },
+            ],
           },
-          "package": {
-            "$ref": "package"
-          }
-        }
+        },
       },
-      "scenario": {
-        "type": "string"
+      agent: {
+        type: "object",
+        additionalProperties: false,
+        required: ["directory", "package"],
+        properties: {
+          directory: {
+            $ref: "absolute-path",
+          },
+          package: {
+            $ref: "package",
+          },
+        },
       },
-      "scenarios": {
-        "type": "object",
-        "additionalProperties": false,
-        "patternProperties": {
+      scenario: {
+        type: "string",
+      },
+      scenarios: {
+        type: "object",
+        additionalProperties: false,
+        patternProperties: {
           "^": {
-            "type": "array",
-            "items": {
-              "$ref": "cooked-child"
-            }
-          }
-        }
+            type: "array",
+            items: {
+              $ref: "cooked-child",
+            },
+          },
+        },
       },
-      "log": {
-        "$ref": "log-level"
+      log: {
+        $ref: "log-level",
       },
-      "host": {
-        "const": "localhost"
+      host: {
+        const: "localhost",
       },
-      "session": {
-        "anyOf": [
+      session: {
+        anyOf: [
           {
-            "const": null
+            const: null,
           },
           {
-            "$ref": "basename"
-          }
-        ]
+            $ref: "basename",
+          },
+        ],
       },
       "trace-port": {
-        "anyOf": [
+        anyOf: [
           {
-            "const": 0
+            const: 0,
           },
           {
-            "$ref": "absolute-port"
-          }
-        ]
+            $ref: "absolute-port",
+          },
+        ],
       },
       "trace-protocol": {
-        "const": "TCP"
+        const: "TCP",
       },
       "track-port": {
-        "anyOf": [
+        anyOf: [
           {
-            "const": 0
+            const: 0,
           },
           {
-            "$ref": "absolute-port"
-          }
-        ]
+            $ref: "absolute-port",
+          },
+        ],
       },
       "track-protocol": {
-        "const": "HTTP/1.1"
+        const: "HTTP/1.1",
       },
       "intercept-track-port": {
-        "anyOf": [
+        anyOf: [
           {
-            "const": null
+            const: null,
           },
           {
-            "$ref": "absolute-port"
-          }
-        ]
+            $ref: "absolute-port",
+          },
+        ],
       },
       "intercept-track-protocol": {
-        "const": "HTTP/1.1"
+        const: "HTTP/1.1",
       },
-      "recorder": {
-        "anyOf": [
+      recorder: {
+        anyOf: [
           {
-            "const": null
+            const: null,
           },
           {
-            "$ref": "recorder"
-          }
-        ]
+            $ref: "recorder",
+          },
+        ],
       },
       "inline-source": {
-        "type": "boolean"
+        type: "boolean",
       },
-      "hooks": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "cjs",
-          "esm",
-          "apply",
-          "http",
-          "mysql",
-          "pg",
-          "sqlite3"
-        ],
-        "properties": {
-          "cjs": {
-            "type": "boolean"
+      hooks: {
+        type: "object",
+        additionalProperties: false,
+        required: ["cjs", "esm", "apply", "http", "mysql", "pg", "sqlite3"],
+        properties: {
+          cjs: {
+            type: "boolean",
           },
-          "esm": {
-            "type": "boolean"
+          esm: {
+            type: "boolean",
           },
-          "apply": {
-            "type": "boolean"
+          apply: {
+            type: "boolean",
           },
-          "http": {
-            "type": "boolean"
+          http: {
+            type: "boolean",
           },
-          "mysql": {
-            "type": "boolean"
+          mysql: {
+            type: "boolean",
           },
-          "pg": {
-            "type": "boolean"
+          pg: {
+            type: "boolean",
           },
-          "sqlite3": {
-            "type": "boolean"
-          }
-        }
+          sqlite3: {
+            type: "boolean",
+          },
+        },
       },
-      "ordering": {
-        "$ref": "ordering"
+      ordering: {
+        $ref: "ordering",
       },
-      "processes": {
-        "type": "array",
-        "items": {
-          "type": "array",
-          "minItems": 2,
-          "maxItems": 2,
-          "items": [
+      processes: {
+        type: "array",
+        items: {
+          type: "array",
+          minItems: 2,
+          maxItems: 2,
+          items: [
             {
-              "$ref": "cooked-specifier"
+              $ref: "cooked-specifier",
             },
             {
-              "type": "boolean"
-            }
-          ]
-        }
+              type: "boolean",
+            },
+          ],
+        },
       },
       "hidden-identifier": {
-        "$ref": "regular-identifier"
+        $ref: "regular-identifier",
       },
-      "main": {
-        "anyOf": [
+      main: {
+        anyOf: [
           {
-            "const": null
+            const: null,
           },
           {
-            "$ref": "absolute-path"
-          }
-        ]
+            $ref: "absolute-path",
+          },
+        ],
       },
-      "engine": {
-        "anyOf": [
+      engine: {
+        anyOf: [
           {
-            "const": null
+            const: null,
           },
           {
-            "$ref": "name-version-object"
-          }
-        ]
+            $ref: "name-version-object",
+          },
+        ],
       },
-      "language": {
-        "$ref": "name-version-object"
+      language: {
+        $ref: "name-version-object",
       },
-      "packages": {
-        "type": "array",
-        "items": {
-          "type": "array",
-          "minItems": 2,
-          "maxItems": 2,
-          "items": [
+      packages: {
+        type: "array",
+        items: {
+          type: "array",
+          minItems: 2,
+          maxItems: 2,
+          items: [
             {
-              "$ref": "cooked-specifier"
+              $ref: "cooked-specifier",
             },
             {
-              "type": "object",
-              "properties": {
-                "enabled": {
-                  "type": "boolean"
+              type: "object",
+              properties: {
+                enabled: {
+                  type: "boolean",
                 },
-                "shallow": {
-                  "type": "boolean"
+                shallow: {
+                  type: "boolean",
                 },
                 "inline-source": {
-                  "type": "boolean",
-                  "nullable": true
+                  type: "boolean",
+                  nullable: true,
                 },
-                "exclude": {
-                  "$ref": "exclude"
-                }
-              }
-            }
-          ]
-        }
+                exclude: {
+                  $ref: "exclude",
+                },
+              },
+            },
+          ],
+        },
       },
-      "exclude": {
-        "$ref": "exclude"
+      exclude: {
+        $ref: "exclude",
       },
       "function-name-placeholder": {
-        "type": "string"
+        type: "string",
       },
-      "recording": {
-        "anyOf": [
+      recording: {
+        anyOf: [
           {
-            "const": null
+            const: null,
           },
           {
-            "$ref": "recording-object"
-          }
-        ]
-      },
-      "serialization": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "maximum-length",
-          "include-constructor-name",
-          "method"
+            $ref: "recording-object",
+          },
         ],
-        "properties": {
+      },
+      serialization: {
+        type: "object",
+        additionalProperties: false,
+        required: ["maximum-length", "include-constructor-name", "method"],
+        properties: {
           "maximum-length": {
-            "type": "integer",
-            "minimum": 0,
-            "nullable": true
+            type: "integer",
+            minimum: 0,
+            nullable: true,
           },
           "include-constructor-name": {
-            "type": "boolean"
+            type: "boolean",
           },
-          "method": {
-            "$ref": "serialization-method"
-          }
-        }
-      },
-      "pruning": {
-        "type": "boolean"
-      },
-      "output": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "directory",
-          "basename",
-          "extension"
-        ],
-        "properties": {
-          "directory": {
-            "$ref": "absolute-path"
+          method: {
+            $ref: "serialization-method",
           },
-          "basename": {
-            "anyOf": [
+        },
+      },
+      pruning: {
+        type: "boolean",
+      },
+      output: {
+        type: "object",
+        additionalProperties: false,
+        required: ["directory", "basename", "extension"],
+        properties: {
+          directory: {
+            $ref: "absolute-path",
+          },
+          basename: {
+            anyOf: [
               {
-                "const": null
+                const: null,
               },
               {
-                "$ref": "basename"
-              }
-            ]
+                $ref: "basename",
+              },
+            ],
           },
-          "extension": {
-            "$ref": "extension"
-          }
-        }
+          extension: {
+            $ref: "extension",
+          },
+        },
       },
-      "app": {
-        "type": "string",
-        "nullable": true
+      app: {
+        type: "string",
+        nullable: true,
       },
-      "name": {
-        "type": "string",
-        "nullable": true
+      name: {
+        type: "string",
+        nullable: true,
       },
-      "feature": {
-        "type": "string",
-        "nullable": true
+      feature: {
+        type: "string",
+        nullable: true,
       },
       "feature-group": {
-        "type": "string",
-        "nullable": true
+        type: "string",
+        nullable: true,
       },
-      "labels": {
-        "type": "array",
-        "items": {
-          "type": "string"
-        }
+      labels: {
+        type: "array",
+        items: {
+          type: "string",
+        },
       },
-      "frameworks": {
-        "type": "array",
-        "items": {
-          "$ref": "name-version"
-        }
-      }
-    }
+      frameworks: {
+        type: "array",
+        items: {
+          $ref: "name-version",
+        },
+      },
+    },
   },
   {
-    "$id": "initialization",
-    "type": "object",
-    "additionalProperties": false,
-    "required": [
-      "path",
-      "data"
-    ],
-    "properties": {
-      "path": {
-        "anyOf": [
+    $id: "initialization",
+    type: "object",
+    additionalProperties: false,
+    required: ["path", "data"],
+    properties: {
+      path: {
+        anyOf: [
           {
-            "const": null
+            const: null,
           },
           {
-            "$ref": "absolute-path"
-          }
-        ]
+            $ref: "absolute-path",
+          },
+        ],
       },
-      "data": {
-        "$ref": "config"
-      }
-    }
+      data: {
+        $ref: "config",
+      },
+    },
   },
   {
-    "$id": "termination",
-    "type": "object",
-    "additionalProperties": false,
-    "required": [
-      "status",
-      "errors"
-    ],
-    "properties": {
-      "status": {
-        "type": "integer",
-        "minimum": 0,
-        "maximum": 255
+    $id: "termination",
+    type: "object",
+    additionalProperties: false,
+    required: ["status", "errors"],
+    properties: {
+      status: {
+        type: "integer",
+        minimum: 0,
+        maximum: 255,
       },
-      "errors": {
-        "type": "array",
-        "items": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": [
-            "name",
-            "message",
-            "stack"
-          ],
-          "properties": {
-            "name": {
-              "type": "string"
+      errors: {
+        type: "array",
+        items: {
+          type: "object",
+          additionalProperties: false,
+          required: ["name", "message", "stack"],
+          properties: {
+            name: {
+              type: "string",
             },
-            "message": {
-              "type": "string"
+            message: {
+              type: "string",
             },
-            "stack": {
-              "type": "string"
-            }
-          }
-        }
-      }
-    }
+            stack: {
+              type: "string",
+            },
+          },
+        },
+      },
+    },
   },
   {
-    "$id": "source",
-    "type": "object",
-    "additionalProperties": false,
-    "required": [
-      "url",
-      "content",
-      "shallow",
-      "inline",
-      "exclude"
+    $id: "source",
+    type: "object",
+    additionalProperties: false,
+    required: ["url", "content", "shallow", "inline", "exclude"],
+    properties: {
+      url: {
+        $ref: "url",
+      },
+      content: {
+        type: "string",
+      },
+      shallow: {
+        type: "boolean",
+      },
+      inline: {
+        type: "boolean",
+      },
+      exclude: {
+        type: "array",
+        items: {
+          type: "string",
+        },
+      },
+    },
+  },
+  {
+    $id: "message",
+    anyOf: [
+      {
+        type: "array",
+        minItems: 2,
+        maxItems: 2,
+        items: [
+          {
+            const: "initialize",
+          },
+          {
+            $ref: "configuration",
+          },
+        ],
+      },
+      {
+        type: "array",
+        minItems: 2,
+        maxItems: 2,
+        items: [
+          {
+            const: "terminate",
+          },
+          {
+            $ref: "termination",
+          },
+        ],
+      },
+      {
+        type: "array",
+        minItems: 3,
+        maxItems: 3,
+        items: [
+          {
+            const: "start",
+          },
+          {
+            type: "string",
+          },
+          {
+            $ref: "initialization",
+          },
+        ],
+      },
+      {
+        type: "array",
+        minItems: 3,
+        maxItems: 3,
+        items: [
+          {
+            const: "stop",
+          },
+          {
+            type: "string",
+          },
+          {
+            $ref: "termination",
+          },
+        ],
+      },
+      {
+        type: "array",
+        minItems: 2,
+        maxItems: 2,
+        items: [
+          {
+            const: "source",
+          },
+          {
+            $ref: "source",
+          },
+        ],
+      },
+      {
+        type: "array",
+        minItems: 6,
+        maxItems: 6,
+        items: [
+          {
+            const: "event",
+          },
+          {
+            enum: ["begin", "end", "before", "after"],
+          },
+          {
+            $ref: "index",
+          },
+          {
+            type: "number",
+          },
+          {
+            enum: ["bundle", "apply", "response", "jump", "request", "query"],
+          },
+          true,
+        ],
+      },
     ],
-    "properties": {
-      "url": {
-        "$ref": "url"
-      },
-      "content": {
-        "type": "string"
-      },
-      "shallow": {
-        "type": "boolean"
-      },
-      "inline": {
-        "type": "boolean"
-      },
-      "exclude": {
-        "type": "array",
-        "items": {
-          "type": "string"
-        }
-      }
-    }
   },
   {
-    "$id": "message",
-    "anyOf": [
-      {
-        "type": "array",
-        "minItems": 2,
-        "maxItems": 2,
-        "items": [
-          {
-            "const": "initialize"
-          },
-          {
-            "$ref": "configuration"
-          }
-        ]
+    $id: "source-map",
+    type: "object",
+    required: ["version", "sources", "names", "mappings"],
+    properties: {
+      version: {
+        const: 3,
       },
-      {
-        "type": "array",
-        "minItems": 2,
-        "maxItems": 2,
-        "items": [
-          {
-            "const": "terminate"
-          },
-          {
-            "$ref": "termination"
-          }
-        ]
+      file: {
+        type: "string",
+        nullable: true,
       },
-      {
-        "type": "array",
-        "minItems": 3,
-        "maxItems": 3,
-        "items": [
-          {
-            "const": "start"
-          },
-          {
-            "type": "string"
-          },
-          {
-            "$ref": "initialization"
-          }
-        ]
+      sourceRoot: {
+        type: "string",
+        nullable: true,
       },
-      {
-        "type": "array",
-        "minItems": 3,
-        "maxItems": 3,
-        "items": [
-          {
-            "const": "stop"
-          },
-          {
-            "type": "string"
-          },
-          {
-            "$ref": "termination"
-          }
-        ]
+      sources: {
+        type: "array",
+        items: {
+          type: "string",
+        },
       },
-      {
-        "type": "array",
-        "minItems": 2,
-        "maxItems": 2,
-        "items": [
-          {
-            "const": "source"
-          },
-          {
-            "$ref": "source"
-          }
-        ]
+      sourcesContent: {
+        type: "array",
+        nullable: true,
+        items: {
+          type: "string",
+          nullable: true,
+        },
       },
-      {
-        "type": "array",
-        "minItems": 6,
-        "maxItems": 6,
-        "items": [
-          {
-            "const": "event"
-          },
-          {
-            "enum": [
-              "begin",
-              "end",
-              "before",
-              "after"
-            ]
-          },
-          {
-            "$ref": "index"
-          },
-          {
-            "type": "number"
-          },
-          {
-            "enum": [
-              "bundle",
-              "apply",
-              "response",
-              "jump",
-              "request",
-              "query"
-            ]
-          },
-          true
-        ]
-      }
-    ]
+      names: {
+        type: "array",
+        items: {
+          type: "string",
+        },
+      },
+      mappings: {
+        type: "string",
+      },
+    },
   },
-  {
-    "$id": "source-map",
-    "type": "object",
-    "required": [
-      "version",
-      "sources",
-      "names",
-      "mappings"
-    ],
-    "properties": {
-      "version": {
-        "const": 3
-      },
-      "file": {
-        "type": "string",
-        "nullable": true
-      },
-      "sourceRoot": {
-        "type": "string",
-        "nullable": true
-      },
-      "sources": {
-        "type": "array",
-        "items": {
-          "type": "string"
-        }
-      },
-      "sourcesContent": {
-        "type": "array",
-        "nullable": true,
-        "items": {
-          "type": "string",
-          "nullable": true
-        }
-      },
-      "names": {
-        "type": "array",
-        "items": {
-          "type": "string"
-        }
-      },
-      "mappings": {
-        "type": "string"
-      }
-    }
-  }
 ];

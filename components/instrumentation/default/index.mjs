@@ -4,7 +4,6 @@ import { generate as generateEstree } from "escodegen";
 import { parse as parseEstree } from "acorn";
 
 import Visit from "./visit.mjs";
-import Source from "./source.mjs";
 
 const _URL = URL;
 const _Set = Set;
@@ -15,14 +14,9 @@ export default (dependencies) => {
     configuration: { getConfigurationPackage },
     uuid: { getUUID },
     expect: { expectSuccess },
+    source: { getSources },
   } = dependencies;
   const { visit } = Visit(dependencies);
-  const {
-    createSourceMap,
-    createMirrorSourceMap,
-    extractSourceMapURL,
-    getSources,
-  } = Source(dependencies);
   const getHead = generateGet("head");
   const getBody = generateGet("body");
   const getURL = generateGet("url");
@@ -42,7 +36,6 @@ export default (dependencies) => {
       done: new _Set(),
     }),
     getInstrumentationIdentifier: ({ runtime }) => runtime,
-    extractInstrumentationSourceMapURL: extractSourceMapURL,
     instrument: (
       {
         version,
@@ -53,15 +46,9 @@ export default (dependencies) => {
         counter,
         done,
       },
-      script_file,
-      source_map_file,
+      { type, url, content },
+      mapping,
     ) => {
-      /* c8 ignore start */
-      const mapping =
-        source_map_file === null
-          ? createMirrorSourceMap(script_file)
-          : createSourceMap(source_map_file);
-      /* c8 ignore stop */
       let sources = getSources(mapping);
       sources = sources
         .map(({ url, content }) => {
@@ -87,7 +74,6 @@ export default (dependencies) => {
         })
         .filter(getHead)
         .map(getBody);
-      const { type, url, content } = script_file;
       if (sources.length === 0) {
         return { url, content, sources: [] };
       }

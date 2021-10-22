@@ -7,6 +7,7 @@ export default (dependencies) => {
     uuid: { getUUID },
     configuration: { extendConfiguration },
     log: { logGuardWarning },
+    "source-outer": { extractSourceMap },
     agent: {
       openAgent,
       closeAgent,
@@ -55,7 +56,8 @@ export default (dependencies) => {
         expect(url[0] === "/", "expected an absolute path but got: %j", url);
         url = `file://${url}`;
       }
-      return recordAgentScript(this.agent, url, content);
+      const file = { url, content };
+      return recordAgentScript(this.agent, file, extractSourceMap(file));
     }
     startTrack(track, initialization) {
       if (track === null) {
