@@ -1,3 +1,15 @@
+# [5.1.0](https://github.com/applandinc/appmap-agent-js/compare/v5.0.0...v5.1.0) (2021-10-22)
+
+
+### Bug Fixes
+
+* normalization path now handles properly multiple '..' in succession ([4d70273](https://github.com/applandinc/appmap-agent-js/commit/4d70273f408a99ba869a74670c1a4a6ae10e1fc2))
+
+
+### Features
+
+* recovery when failing to read files related to source map ([2decdeb](https://github.com/applandinc/appmap-agent-js/commit/2decdeb5f25751168e16308afd9e0c64fe3fbc2b))
+
 # [5.0.0](https://github.com/applandinc/appmap-agent-js/compare/v4.0.1...v5.0.0) (2021-10-22)
 
 
