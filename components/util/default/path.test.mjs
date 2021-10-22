@@ -27,6 +27,9 @@ assertEqual(toRelativePath("/foo/bar/../bar/..", "/foo/bar/qux"), "bar/qux");
 assertEqual(toRelativePath("/foo/bar", "/foo/bar/qux/"), "qux");
 assertEqual(toRelativePath("/foo/../foo", "/foo"), ".");
 assertEqual(toRelativePath("/foo/bar1", "/foo/bar2/qux"), "../bar2/qux");
+assertEqual(toRelativePath("/foo/bar", "/qux"), "../../qux");
+
+// throw "BOUM";
 
 // toAbsolutePath //
 assertEqual(toAbsolutePath("/foo", "/bar"), "/bar");

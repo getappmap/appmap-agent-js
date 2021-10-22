@@ -10,6 +10,7 @@ const _Set = Set;
 
 export default (dependencies) => {
   const {
+    log: { logDebug },
     util: { generateGet },
     configuration: { getConfigurationPackage },
     uuid: { getUUID },
@@ -75,8 +76,10 @@ export default (dependencies) => {
         .filter(getHead)
         .map(getBody);
       if (sources.length === 0) {
+        logDebug("Not instrumenting %j", url);
         return { url, content, sources: [] };
       }
+      logDebug("Instrumenting %j", url);
       sources = sources.filter(({ url }) => !done.has(url));
       for (const { url } of sources) {
         done.add(url);

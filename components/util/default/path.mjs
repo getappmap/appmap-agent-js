@@ -8,7 +8,11 @@ const normalizeSegments = (segments) => {
   const stack = [];
   for (const segment of segments) {
     if (segment !== "." && segment !== "") {
-      if (segment === ".." && stack.length > 0) {
+      if (
+        segment === ".." &&
+        stack.length > 0 &&
+        stack[stack.length - 1] !== ".."
+      ) {
         stack.pop();
       } else {
         stack.push(segment);
