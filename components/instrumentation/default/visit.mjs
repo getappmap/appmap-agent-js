@@ -198,6 +198,7 @@ export default (dependencies) => {
     expect: { expect },
     util: { assert, hasOwnProperty, coalesce },
     source: { mapSource },
+    log: { logGuardWarning },
   } = dependencies;
 
   const makeCatchJumpStatement = (runtime) =>
@@ -466,13 +467,20 @@ export default (dependencies) => {
         type === "FunctionExpression" ||
         type === "FunctionDeclaration"
       ) {
-        const { whitelist, mapping } = context;
+        const { url, whitelist, mapping } = context;
         const {
           loc: {
             start: { line, column },
           },
         } = node;
         const location = mapSource(mapping, line, column);
+        logGuardWarning(
+          location === null,
+          "Missing source map at file %j at line %j at column %j",
+          url,
+          line,
+          column,
+        );
         return location !== null && whitelist.has(location.url)
           ? compileFunction(
               node,
