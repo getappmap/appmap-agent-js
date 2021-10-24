@@ -128,6 +128,7 @@ export default (dependencies) => {
       urls.add(url);
       let { pathname: path } = new URL(url);
       path = toRelativePath(directory, path);
+      const cutContent = ([start, end]) => content.substring(start, end);
       sources.push({
         url,
         path,
@@ -141,7 +142,7 @@ export default (dependencies) => {
               url,
               path,
               placeholder,
-              cutContent: ([start, end]) => content.substring(start, end),
+              cutContent,
             }),
         ),
       });

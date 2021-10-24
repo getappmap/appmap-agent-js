@@ -1,13 +1,7 @@
 {
   "name": "@appland/appmap-agent-js",
   "version": "5.1.1",
-  "files": [
-    "/components/**/*.mjs",
-    "/lib/*.mjs",
-    "/lib/*.js",
-    "/bin/*.mjs",
-    "/dist/*.mjs"
-  ],
+  "files": [],
   "bin": {
     "appmap-agent-js": "bin/bin.mjs"
   },
