@@ -17,6 +17,17 @@ const { createCounter } = await buildTestComponentAsync("util");
 
 const { visit } = Visit(await buildTestDependenciesAsync(import.meta.url));
 
+// console.log(JSON.stringify(visit(
+//   (await import("@babel/parser")).default.parse(await (await import("fs/promises")).readFile("./yo.ts", "utf8"), {sourceType:"module", plugins:["typescript", "estree"]}),
+//   {
+//     naming: {
+//       separator: "-",
+//       counter: createCounter(0),
+//     },
+//     getLeadingCommentArray: () => [],
+//   },
+// ), null, 2));
+
 const test = (content, separator, comments) =>
   visit(
     parseAcorn(content, {

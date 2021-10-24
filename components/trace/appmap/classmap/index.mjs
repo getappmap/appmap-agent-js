@@ -3,6 +3,7 @@
 import Estree from "./estree/index.mjs";
 import Exclusion from "./exclusion.mjs";
 
+const { parseInt } = Number;
 const _Set = Set;
 const _Map = Map;
 const _undefined = undefined;
@@ -11,7 +12,7 @@ const _String = String;
 export default (dependencies) => {
   const {
     util: { assert, createCounter, toRelativePath },
-    log: { logWarning },
+    log: { logWarning, logDebug },
   } = dependencies;
   const { createExclusion, isExcluded } = Exclusion(dependencies);
   const printCommentArray = (comments) => {
@@ -150,6 +151,19 @@ export default (dependencies) => {
     getClassmapClosure: ({ closures }, url) => {
       if (closures.has(url)) {
         return closures.get(url);
+      }
+      const parts = /^([^#]+)#([0-9]+)-([0-9]+)$/u.exec(url);
+      assert(parts !== null, "invalid location url format");
+      const [, prefix, line_string, column_string] = parts;
+      const next_url = `${prefix}#${line_string}-${_String(
+        parseInt(column_string) + 1,
+      )}`;
+      if (closures.has(next_url)) {
+        logDebug(
+          "Had to increase column by to fetch closure information at %j",
+          url,
+        );
+        return closures.get(next_url);
       }
       logWarning("Missing file information for closure at %s", url);
       return default_closure_information;

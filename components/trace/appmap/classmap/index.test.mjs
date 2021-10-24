@@ -36,7 +36,7 @@ const classmap = createClassmap(
 
 addClassmapSource(classmap, {
   url: `file://${cwd}/directory/function.js`,
-  content: "// comment\nfunction f (x) {}",
+  content: "// comment\n function f (x) {}",
   inline: true,
   exclude: ["^"],
   shallow: true,
@@ -45,7 +45,7 @@ addClassmapSource(classmap, {
 getClassmapClosure(classmap, `file://${cwd}/directory/function.js#0-0`);
 
 assertDeepEqual(
-  getClassmapClosure(classmap, `file://${cwd}/directory/function.js#2-0`),
+  getClassmapClosure(classmap, `file://${cwd}/directory/function.js#2-1`),
   {
     excluded: true,
     parameters: ["x"],
@@ -58,6 +58,11 @@ assertDeepEqual(
       static: false,
     },
   },
+);
+
+assertDeepEqual(
+  getClassmapClosure(classmap, `file://${cwd}/directory/function.js#2-0`),
+  getClassmapClosure(classmap, `file://${cwd}/directory/function.js#2-1`),
 );
 
 addClassmapSource(classmap, {

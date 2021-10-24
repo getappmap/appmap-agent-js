@@ -39,6 +39,16 @@ export default (dependencies) => {
   const initial_parent = { type: "File" };
   const initial_grand_parent = { type: "Root" };
 
+  // let depth = 0;
+  // const visit = (node, ...args) => {
+  //   depth += 1;
+  //   console.log("*".repeat(depth), node && node.type);
+  //   const result = visitInner(node, ...args);
+  //   console.log("*".repeat(depth), JSON.stringify(result));
+  //   depth -= 1;
+  //   return result;
+  // };
+
   const visit = (node, parent, grand_parent, context) => {
     if (isArray(node)) {
       return {
