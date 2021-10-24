@@ -20,7 +20,7 @@ export default (dependencies) => {
       } = entry;
       return {
         url: url2,
-        line: line2,
+        line: line2 + 1, // 0-indexed line
         column: column2,
       };
     },
