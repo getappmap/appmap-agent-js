@@ -17,22 +17,22 @@ export default (dependencies) => {
     head === null ? body : [head, ...body];
 
   const visitBody = (nodes, parent, grand_parent, name, context) => {
-    const children = [];
-    const body = [];
+    const head_children = [];
+    const body_children = [];
     for (const node of nodes) {
       const { head, body } = visit(node, parent, grand_parent, context);
       if (head !== null) {
-        children.push(head);
+        head_children.push(head);
       }
-      body.push(...body);
+      body_children.push(...body);
     }
     return {
       head: {
         type: "class",
         name,
-        children,
+        children: head_children,
       },
-      body,
+      body: body_children,
     };
   };
 
