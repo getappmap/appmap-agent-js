@@ -1,5 +1,7 @@
 import { SourceMap } from "module";
 
+// The node implementation for source map fails on juice shop's source map...
+
 export default (dependencies) => {
   const {
     util: { hasOwnProperty },
@@ -18,7 +20,7 @@ export default (dependencies) => {
       } = entry;
       return {
         url: url2,
-        line: line2 + 1, // line is 0-indexed but should be 1-indexed
+        line: line2,
         column: column2,
       };
     },

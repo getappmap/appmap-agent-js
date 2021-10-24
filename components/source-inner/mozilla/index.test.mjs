@@ -32,5 +32,4 @@ assertDeepEqual(mapSource(source_map, 30, 40), {
   url: "file:///original.ts",
 });
 
-// TODO: investigate why mapSource(source_map, 50, 60) does not return null
-assertEqual(mapSource(source_map, 0, 0), null);
+assertEqual(mapSource(source_map, 50, 60), null);

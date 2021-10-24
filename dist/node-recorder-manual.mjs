@@ -16,7 +16,7 @@ import child$default from "./../components/child/default/index.mjs";
 import engine$node from "./../components/engine/node/index.mjs";
 import configuration$default from "./../components/configuration/default/index.mjs";
 import uuid$random from "./../components/uuid/random/index.mjs";
-import source_inner$node from "./../components/source-inner/node/index.mjs";
+import source_inner$mozilla from "./../components/source-inner/mozilla/index.mjs";
 import source$default from "./../components/source/default/index.mjs";
 import instrumentation$default from "./../components/instrumentation/default/index.mjs";
 import serialization$default from "./../components/serialization/default/index.mjs";
@@ -73,7 +73,7 @@ export default (blueprint) => {
   dependencies["engine"] = engine$node(dependencies);
   dependencies["configuration"] = configuration$default(dependencies);
   dependencies["uuid"] = uuid$random(dependencies);
-  dependencies["source-inner"] = source_inner$node(dependencies);
+  dependencies["source-inner"] = source_inner$mozilla(dependencies);
   dependencies["source"] = source$default(dependencies);
   dependencies["instrumentation"] = instrumentation$default(dependencies);
   dependencies["serialization"] = serialization$default(dependencies);

@@ -12,7 +12,7 @@ import {
   buildTestComponentAsync,
 } from "../../build.mjs";
 
-const {default:HookMysql} = await import("./mysql.mjs");
+const { default: HookMysql } = await import("./mysql.mjs");
 
 const { equal: assertEqual, deepEqual: assertDeepEqual } = Assert;
 

@@ -84,7 +84,7 @@ assertEqual(
     line: 10,
     column: 20,
   });
-  assertEqual(mapSource(mapping, 0, 0), null);
+  assertEqual(mapSource(mapping, 50, 60), null);
   assertDeepEqual(getSources(mapping), [
     { url: "file:///directory/root/source.js", content: "456;" },
   ]);

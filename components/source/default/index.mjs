@@ -6,6 +6,7 @@ const _URL = URL;
 export default (dependencies) => {
   const {
     expect: { expectSuccess },
+    log: { logWarning },
     util: { assert, toAbsolutePath, getDirectory, coalesce },
     validate: { validateSourceMap },
     "source-inner": { compileSourceMap, mapSource },
@@ -74,7 +75,19 @@ export default (dependencies) => {
         return { url, line, column };
       } else {
         const { map } = mapping;
-        return mapSource(map, line, column);
+        const location = mapSource(map, line, column);
+        if (location === null) {
+          const {
+            payload: { file: url },
+          } = mapping;
+          logWarning(
+            "Missing source map at file %j at line %j at column %j",
+            url,
+            line,
+            column,
+          );
+        }
+        return location;
       }
     },
 

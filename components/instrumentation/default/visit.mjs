@@ -195,7 +195,6 @@ const makeReturnStatement = (argument) => ({
 
 export default (dependencies) => {
   const {
-    log: { logGuardWarning },
     expect: { expect },
     util: { assert, hasOwnProperty, coalesce },
     source: { mapSource },
@@ -467,26 +466,21 @@ export default (dependencies) => {
         type === "FunctionExpression" ||
         type === "FunctionDeclaration"
       ) {
-        const { url, whitelist, mapping } = context;
+        const { whitelist, mapping } = context;
         const {
           loc: {
             start: { line, column },
           },
         } = node;
-        const loc = mapSource(mapping, line, column);
-        logGuardWarning(
-          loc === null,
-          "Missing mapped source code location of file %j line %j column %j",
-          url,
-          line,
-          column,
-        );
-        return loc !== null && whitelist.has(loc.url)
+        const location = mapSource(mapping, line, column);
+        return location !== null && whitelist.has(location.url)
           ? compileFunction(
               node,
               visit(node.params, true, context),
               visit(node.body, true, context),
-              `${loc.url}#${_String(loc.line)}-${_String(loc.column)}`,
+              `${location.url}#${_String(location.line)}-${_String(
+                location.column,
+              )}`,
               context.runtime,
             )
           : visitGeneric(node, false, context);
