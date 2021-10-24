@@ -1,3 +1,10 @@
+## [5.1.2](https://github.com/applandinc/appmap-agent-js/compare/v5.1.1...v5.1.2) (2021-10-24)
+
+
+### Bug Fixes
+
+* code entities in objects properties are no longer discarded ([b5d3b08](https://github.com/applandinc/appmap-agent-js/commit/b5d3b08737dcbbedb0ce1edb26bc31b09d9ac7e2))
+
 ## [5.1.1](https://github.com/applandinc/appmap-agent-js/compare/v5.1.0...v5.1.1) (2021-10-24)
 
 
