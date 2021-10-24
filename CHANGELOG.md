@@ -1,3 +1,10 @@
+## [5.1.1](https://github.com/applandinc/appmap-agent-js/compare/v5.1.0...v5.1.1) (2021-10-24)
+
+
+### Bug Fixes
+
+* use mozilla's source-map@0.6.1 instead of (flawed) node's builtin ([72cc494](https://github.com/applandinc/appmap-agent-js/commit/72cc494fca270f283dd09944d308f10263a146a3))
+
 # [5.1.0](https://github.com/applandinc/appmap-agent-js/compare/v5.0.0...v5.1.0) (2021-10-22)
 
 
