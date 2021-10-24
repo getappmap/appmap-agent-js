@@ -1,3 +1,15 @@
+# [5.2.0](https://github.com/applandinc/appmap-agent-js/compare/v5.1.2...v5.2.0) (2021-10-24)
+
+
+### Bug Fixes
+
+* remove files from package.json, use npm ignore instead ([4fb337e](https://github.com/applandinc/appmap-agent-js/commit/4fb337ea96b51533f397f605a722872db842a883))
+
+
+### Features
+
+* in case of closure source map location miss check one column after ([292c1d2](https://github.com/applandinc/appmap-agent-js/commit/292c1d232c0ad7c1da882f9461402cb663757278))
+
 ## [5.1.2](https://github.com/applandinc/appmap-agent-js/compare/v5.1.1...v5.1.2) (2021-10-24)
 
 
