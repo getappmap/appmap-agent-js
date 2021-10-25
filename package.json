@@ -12,6 +12,7 @@
   "engine": {
     "node": ">=12.0.0 <13.0.0 || >= 14.0.0"
   },
+  "licence": "MIT",
   "keywords": [
     "appmap",
     "appland",
@@ -49,7 +50,8 @@
     "minimatch": "^3.0.4",
     "minimist": "^1.2.5",
     "net-socket-messaging": "^0.1.6",
-    "npm": "^6.14.15",
+    "posix-socket": "^1.1.1",
+    "posix-socket-messaging": "0.0.1",
     "prompts": "^2.4.2",
     "source-map": "^0.6.1",
     "treeify": "^1.1.0",

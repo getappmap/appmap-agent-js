@@ -58,6 +58,7 @@ export default (dependencies) => {
       return emitter;
     },
     closeEmitter: ({ socket, state }) => {
+      assert(getBox(state) !== STATE2, "emitter has already been closed");
       setBox(state, STATE2);
       socket.end();
     },
@@ -74,7 +75,7 @@ export default (dependencies) => {
       }
     },
     takeLocalEmitterTrace: generateDeadcode(
-      "takeLocalEmitterTrace should not be called on emitter/node-tcp",
+      "takeLocalEmitterTrace should not be called on emitter/remote-node-tcp",
     ),
     requestRemoteEmitterAsync: (
       { host, track_port, session },

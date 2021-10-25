@@ -1,0 +1,6 @@
+branches: [node]
+dependencies:
+  - util
+  - uuid
+  - http
+  - log

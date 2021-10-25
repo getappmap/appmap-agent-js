@@ -2,7 +2,7 @@ import { writeEntryPointAsync } from "./static.mjs";
 
 const automated_recorder_options = {
   blueprint: {
-    emitter: ["remote-node-tcp"],
+    emitter: ["remote-node-posix"],
     violation: ["exit"],
   },
 };

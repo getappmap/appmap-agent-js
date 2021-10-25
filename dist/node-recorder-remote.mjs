@@ -23,7 +23,7 @@ import serialization$default from "./../components/serialization/default/index.m
 import frontend$default from "./../components/frontend/default/index.mjs";
 import interpretation$vm from "./../components/interpretation/vm/index.mjs";
 import http$node_http from "./../components/http/node-http/index.mjs";
-import emitter$remote_node_tcp from "./../components/emitter/remote-node-tcp/index.mjs";
+import emitter$remote_node_posix from "./../components/emitter/remote-node-posix/index.mjs";
 import hook_apply$default from "./../components/hook-apply/default/index.mjs";
 import hook_group$node from "./../components/hook-group/node/index.mjs";
 import source_outer$node from "./../components/source-outer/node/index.mjs";
@@ -74,7 +74,7 @@ export default (blueprint) => {
   dependencies["frontend"] = frontend$default(dependencies);
   dependencies["interpretation"] = interpretation$vm(dependencies);
   dependencies["http"] = http$node_http(dependencies);
-  dependencies["emitter"] = emitter$remote_node_tcp(dependencies);
+  dependencies["emitter"] = emitter$remote_node_posix(dependencies);
   dependencies["hook-apply"] = hook_apply$default(dependencies);
   dependencies["hook-group"] = hook_group$node(dependencies);
   dependencies["source-outer"] = source_outer$node(dependencies);
