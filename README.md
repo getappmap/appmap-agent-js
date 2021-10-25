@@ -44,7 +44,7 @@ Table of contents:
         - with HTTP calls to the agent that start/stop the recording remotely
         - with programmatic API that start/stop the recording locally in the application code
 
-To record application processes or tests when they run, they tests or processes have to be started by the AppMap agent,
+To record application processes or tests when they run, the tests or processes must be started by the AppMap agent,
 as described in the next steps.
 
 
@@ -70,18 +70,18 @@ npm install @appland/appmap-agent-js
 ### Initial configuration
 
 The AppMap agent requires a valid configuration in an `appmap.yml` file to run. This file sets up the recording
-strategies and configuration details for your project, such as
+strategies and configuration details for your project, such as:
 - the name of the application
-- the command that starts the application or that runs the tests
-- selected recording method and its configuration
+- the command that starts the application or runs the tests
+- the selected recording method and its configuration
 - the output directory
 
 
 #### Know before you start
 
-You should know these details before you begin:
-- what command starts the application, example: `node app.js`
-- does the application have `mocha` tests? If so, what command runs the tests? example: `npx mocha --recursive test/**/*.ts`
+You should know this information before you begin:
+- what command starts the application, for example: `node app.js`
+- does the application have `mocha` tests? If so, what command runs the tests? For example: `npx mocha --recursive test/**/*.ts`
 - the HTTP port of the application (typical values are 3000, 4000, 8000)
 - does the application use the `mysql`, `pg` or `sqlite3` package? Check the dependencies in `package.json`.
 
@@ -105,28 +105,28 @@ Answer `yes` to continue:
 
 1. Enter the application name. It will be used to identify the app in recorded AppMaps
 2. Select the recording method. You have several choices:
-    1. if your application has `mocha` tests, we recommend to record `mocha` test cases
-    2. if you don't have good tests or when troubleshooting a code issue, we recommend remote recording
-    3. for small and short-lived programs, recording their processes end-to-finish is a simple viable option, but it can lead to large and noisy AppMaps for more complex applications
-    4. programmatic recording is a good option when you need a fine control over what code gets recorded when it runs. You will nedd to add your own start/stop recording logic to the recorded application code.
+    1. if your application has `mocha` tests, we recommend recording `mocha` test cases
+    2. if you don't have good tests or if you're troubleshooting a code issue, we recommend remote recording
+    3. for small and short-lived programs, recording their processes end-to-finish is a fine option, but it can lead to large and noisy AppMaps when used with more complex applications
+    4. programmatic recording is a good option when you need fine control over what code gets recorded when it runs. You'll need to add your own start/stop recording logic to the recorded application code.
 
-We recommend recording test cases or remote recording when starting with AppMaps. 
+When you're first starting out with AppMaps, we recommend recording test cases or using remote recording. 
 
-Based on the recording method selected, you will be asked you to enter additional application and configuration details.
+Based on the recording method you select, you'll be asked to enter additional application and configuration details.
 
 ---
 
 #### To set up recording mocha test cases:
 
 1. Pick the `Record mocha test cases when they run` recording method
-2. Enter the command that runs your tests, example: `npx mocha --recursive test/**/*.ts`
+2. Enter the command that runs your tests, for example: `npx mocha --recursive test/**/*.ts`
 3. Press Enter to use the default output directory `tmp/appmap`
-4. Select the recording scope. Add a database **if and only if** the required database driver package exists as a dependency in the `package.json` file of your project. If you aren't sure, leave the database commands unchecked for now.
-5. Select the ordering of events. We recommend `Causal` for better user experience when viewing the AppMaps, at the cost of a slight performance penalty when the AppMaps are recorded.
+4. Select the recording scope. Add a database **if and only if** the required database driver package exists as a dependency in the `package.json` file of your project. If you aren't sure, just leave the database commands unchecked for now.
+5. Select the ordering of events. We recommend `Causal` for a better user experience when viewing AppMaps, although there will be a slight performance penalty when the AppMaps are recorded.
 6. Select `no` for `keep all imported sources in class maps`
 7. Pick the logging level, `Info` is the recommended default level.
 
-The setup command now creates a new `appmap.yml` file in the current directory and runs validation checks. You should see output similar to this:
+The setup command now creates a new `appmap.yml` file in the current directory and runs validation checks. You should see an output similar to this:
 ```sh
 ✔ Supported operating system detected: darwin
 ✔ Supported node detected: v14.17.6.
@@ -176,11 +176,11 @@ The initial setup is now complete, proceed to [recording AppMaps](#recording-app
 #### To set up remote recording:
 
 1. Pick the `Use remote recording to record node processes` recording method
-2. Enter the command that runs your tests, example: `node app.js`
-3. Enter the HTTP port of the application. Leave blank to use the fallback port for remote recording control.
+2. Enter the command that runs your tests, for example: `node app.js`
+3. Enter the HTTP port of the application. Leave it blank to use the fallback port for remote recording control.
 4. Enter the fallback port for remote recording control. We recommend that you pick a free port close to the app HTTP port, i.e. 3003.
-5. Select the recording scope. Confirm the default selection or add a database if and only if the required database driver package exists as a dependency in `package.json`. If you aren't sure, leave the database commands unchecked for now.
-6. Select the ordering of events. We recommend `Causal` for better user experience when viewing the AppMaps, at the cost of a slight performance penalty when the AppMaps are recorded.
+5. Select the recording scope. Confirm the default selection or add a database if and only if the required database driver package exists as a dependency in `package.json`. If you aren't sure, just leave the database commands unchecked for now.
+6. Select the ordering of events. We recommend `Causal` for a better user experience when viewing AppMaps, although there will be a slight performance penalty when the AppMaps are recorded.
 7. Select `yes` for `keep all imported sources in class maps`.
 8. Pick the logging level, `Info` is the recommended default level.
 
@@ -238,7 +238,7 @@ The initial setup is now complete, proceed to [recording AppMaps](#recording-app
 
 ## Recording AppMaps
 
-Once `appmap.yml` is configured, you are ready to record AppMaps. 
+Once `appmap.yml` is configured, you're ready to record AppMaps. 
 
 
 ### To record mocha test cases:
@@ -297,8 +297,8 @@ The configuration format is detailed [here](#configuration).
 
 ### Scenario
 
-The information to spawn a process are provided to the agent as a format called *scenario*.
-The most expressive option to provide scenario to the agent is via the `scenarios` configuration field.
+The information to spawn a process is provided to the agent as a format called *scenario*.
+The most expressive option to provide a scenario to the agent is via the `scenarios` configuration field.
 
 ```yml
 scenarios:
@@ -315,7 +315,7 @@ Alternatively, a scenario can be provided as the positional arguments of the age
 npx appmap-agent-js -- node main.mjs argv0 argv1
 ```
 
-There exists two different scenario formats which are inspired from [`child_process`](https://nodejs.org/api/child_process.html).
+There are two different scenario formats which are inspired from [`child_process`](https://nodejs.org/api/child_process.html).
 The `fork` format spawns a node process and supports file globbing.
 The `spawn` format spawns any kind of process and does not support file globbing.
 Another important difference between the two formats is that the `spawn` format will also record grand-child processes which is not the case for the `fork` format.
@@ -382,7 +382,7 @@ Note that the configuration object of scenarios cannot overwrite the fields `out
 ### Local Recording
 
 The first option to generate appmaps is called local recording.
-It involves indicating the agent when to generate appmaps and where to write them:
+It involves telling the agent when to generate appmaps and where to write them:
 
 ```yaml
 mode: local
@@ -395,14 +395,14 @@ output:
 
 The `recorder` configuration field supports two strategies to generate appmaps:
 
-* `"process"` (default): Generate a single appmap which spans over the entire lifetime of the process.
+* `"process"` (default): Generate a single appmap that spans the entire lifetime of the process.
 * `"mocha"`: Generate an appmap for each test case (ie `it` calls) of the entire test suite (ie every `describe` calls on every test file).
   It is only available in the `spawn` format and expects the parsed command to start with either `mocha` or `npx mocha`.
   Note that mocha run the entire test suite within a single node process.
   Hence all the exercised parts of the application will probably end up being included into every generated appmap.
   The `pruning` configuration option can be used to solve this issue.
   If enabled, the appmap will be stripped of the elements of the classmap that did not cause any function applications.
-  Example of configuration file:
+  Here's an example of the configuration file:
   ```yaml
   mode: file
   pruning: true
@@ -444,16 +444,16 @@ Remote recording requests can be delivered to two possible end points:
 <!-- ### Mode
 
 The functionalities of the agent is split in two main parts.
-The *backend* buffers the trace and eventually post-process it and stores it.
+The *backend* buffers the trace and eventually post-processes it and stores it.
 The *frontend* contains all the other functionalities of the agent which should always be located on the recorded process -- eg: intercepting http traffic.
 The `mode` configuration option defines where the backend is located:
 * `"local"`: the backend is executed by the recorded process.
 * `"remote"`: the backend is executed by another node process. 
 
 Advantages of the remote mode over the local mode:
-* Appmap storage will always happens, regardless of how the recorded process is terminated.
+* Appmap storage will always happen, regardless of how the recorded process is terminated.
   For instance, in the local mode, killing the recorded process with `SIGKILL` or performing `process.removeAllListeners("exit")` will preclude appmap storage.
-* The backend process manages multiple recorded processes and prevent accidental overwriting of appmap files.
+* The backend process manages multiple recorded processes and prevents accidental overwriting of appmap files.
 * Lower memory footprint of the agent on the recorded process because it contains less functionalities and no trace. -->
 
 ## Manual Recording
@@ -646,8 +646,8 @@ function main () {
 
 Excluding some parts of the files for instrumentation is based on *qualified name*.
 A qualified name is based on whether an estree node resides at the `value` field of a `Property` or a `MethodDefinition`.
-If it is the case the node is said to be *bound*, else it is said to be *free*.
-The qualified name of a *bound* estree node is the combination of the name of its parent classmap node and the name if its classmap node.
+If it is the case the node is said to be *bound*, otherwise it is said to be *free*.
+The qualified name of a *bound* estree node is the combination of the name of its parent classmap node and the name of its classmap node.
 The qualified name of a free estree node is the same as the name of its classmap name.
 
 Examples:
