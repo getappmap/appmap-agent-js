@@ -1,3 +1,10 @@
+## [5.2.1](https://github.com/applandinc/appmap-agent-js/compare/v5.2.0...v5.2.1) (2021-10-25)
+
+
+### Bug Fixes
+
+* use posix-socket-messaging instead of fs.writeSync ([ed2acf7](https://github.com/applandinc/appmap-agent-js/commit/ed2acf74f3aae013aa641e22f101fa8a70a63faf))
+
 # [5.2.0](https://github.com/applandinc/appmap-agent-js/compare/v5.1.2...v5.2.0) (2021-10-24)
 
 
