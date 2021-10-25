@@ -26,10 +26,11 @@ const {
 // compileParameterSerial //
 
 assertDeepEqual(
-  compileParameterSerial([
-    "name",
-    { type: "string", truncated: true, print: "print" },
-  ]),
+  compileParameterSerial("name", {
+    type: "string",
+    truncated: true,
+    print: "print",
+  }),
   {
     name: "name",
     object_id: null,
@@ -39,15 +40,12 @@ assertDeepEqual(
 );
 
 assertDeepEqual(
-  compileParameterSerial([
-    "name",
-    {
-      index: 123,
-      constructor: "constructor",
-      type: "object",
-      print: "print",
-    },
-  ]),
+  compileParameterSerial("name", {
+    index: 123,
+    constructor: "constructor",
+    type: "object",
+    print: "print",
+  }),
   {
     name: "name",
     object_id: 123,
@@ -58,7 +56,7 @@ assertDeepEqual(
 
 // compileParameterPrimitive //
 
-assertDeepEqual(compileParameterPrimitive(["name", "primitive"]), {
+assertDeepEqual(compileParameterPrimitive("name", "primitive"), {
   name: "name",
   object_id: null,
   class: "string",
@@ -98,16 +96,16 @@ assertDeepEqual(
   },
 );
 
-///////////////////////////
+/////////////////////
 // compileCallData //
-///////////////////////////
+/////////////////////
 
 // apply >> routing //
 assertDeepEqual(
   compileCallData(
     {
       type: "apply",
-      function: "123/body/0",
+      function: "foobar",
       this: { type: "string", print: "print-this" },
       arguments: [{ type: "string", print: "print-arg" }],
     },
@@ -130,6 +128,31 @@ assertDeepEqual(
       name: "this",
       object_id: null,
       value: "print-this",
+    },
+  },
+);
+
+// apply >> missing receiver //
+assertDeepEqual(
+  compileCallData(
+    {
+      type: "apply",
+      function: "foobar",
+      this: null,
+      arguments: [],
+    },
+    {
+      parameters: [],
+      link: null,
+    },
+  ),
+  {
+    parameters: [],
+    receiver: {
+      class: "undefined",
+      name: "this",
+      object_id: null,
+      value: "undefined",
     },
   },
 );
@@ -201,9 +224,9 @@ assertDeepEqual(
   },
 );
 
-////////////////////////////
+/////////////////////
 // compileCallData //
-////////////////////////////
+/////////////////////
 
 // query //
 assertDeepEqual(

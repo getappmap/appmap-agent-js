@@ -1,6 +1,7 @@
 const _String = String;
 const { isArray } = Array;
-const { fromEntries, entries } = Object;
+const { fromEntries } = Object;
+const { ownKeys } = Reflect;
 
 //////////////////////////////
 // Difficulties with groups //
@@ -201,6 +202,9 @@ export default (dependencies) => {
     log: { logGuardWarning },
   } = dependencies;
 
+  const isEstreeKey = (key) =>
+    key !== "loc" && key !== "start" && key !== "end";
+
   const makeCatchJumpStatement = (runtime) =>
     makeIfStatement(
       makeBinaryExpression(
@@ -310,7 +314,14 @@ export default (dependencies) => {
     ],
   });
 
-  const compileFunction = (node, params, body, url, runtime) => ({
+  const compileFunction = (
+    node,
+    is_child_constructor,
+    params,
+    body,
+    url,
+    runtime,
+  ) => ({
     type: node.type,
     id: coalesce(node, "id", null),
     expression: false,
@@ -325,7 +336,9 @@ export default (dependencies) => {
             makeRegularMemberExpression(runtime, "recordBeginApply"),
             [
               makeLiteral(url),
-              makeThisExpression(),
+              node.type === "ArrowFunctionExpression" || is_child_constructor
+                ? makeRegularMemberExpression(runtime, "empty")
+                : makeThisExpression(),
               makeArrayExpression(
                 params.map((param, index) =>
                   makeIdentifier(`${runtime}_ARGUMENT_${_String(index)}`),
@@ -426,17 +439,21 @@ export default (dependencies) => {
     ]),
   });
 
-  const visitGeneric = (node, instrumented, context) =>
+  const visitGeneric = (node, parent, instrumented, context) =>
     fromEntries(
-      entries(node).map(([key, node]) => [
-        key,
-        visit(node, instrumented, context),
-      ]),
+      ownKeys(node)
+        .filter(isEstreeKey)
+        .map((key) => [
+          key,
+          visit(node[key], node, parent, instrumented, context),
+        ]),
     );
 
-  const visit = (node, instrumented, context) => {
+  const visit = (node, parent, grand_parent, instrumented, context) => {
     if (isArray(node)) {
-      return node.map((element) => visit(element, instrumented, context));
+      return node.map((node) =>
+        visit(node, parent, grand_parent, instrumented, context),
+      );
     }
     if (
       typeof node === "object" &&
@@ -484,56 +501,61 @@ export default (dependencies) => {
         return location !== null && whitelist.has(location.url)
           ? compileFunction(
               node,
-              visit(node.params, true, context),
-              visit(node.body, true, context),
+              parent.type === "MethodDefinition" &&
+                parent.kind === "constructor" &&
+                grand_parent.superClass !== null,
+              visit(node.params, node, parent, true, context),
+              visit(node.body, node, parent, true, context),
               `${location.url}#${_String(location.line)}-${_String(
                 location.column,
               )}`,
               context.runtime,
             )
-          : visitGeneric(node, false, context);
+          : visitGeneric(node, parent, false, context);
       }
       if (instrumented) {
         if (type === "Program") {
           return compileProgram(
             node.sourceType,
-            visit(node.body, instrumented, context),
+            visit(node.body, node, parent, instrumented, context),
             context.runtime,
           );
         }
         if (type === "TryStatement") {
           return compileTryStatement(
-            visit(node.block, instrumented, context),
-            visit(node.handler, instrumented, context),
-            visit(node.finalizer, instrumented, context),
+            visit(node.block, node, parent, instrumented, context),
+            visit(node.handler, node, parent, instrumented, context),
+            visit(node.finalizer, node, parent, instrumented, context),
             context.runtime,
           );
         }
         if (type === "AwaitExpression") {
           return makeJumpExpression(
-            visit(node.argument, instrumented, context),
+            visit(node.argument, node, parent, instrumented, context),
             makeAwaitExpression,
             context.runtime,
           );
         }
         if (type === "YieldExpression") {
           return makeJumpExpression(
-            visit(node.argument, instrumented, context),
+            visit(node.argument, node, parent, instrumented, context),
             (expression) => makeYieldExpression(node.delegate, expression),
             context.runtime,
           );
         }
         if (type === "ReturnStatement") {
           return compileReturn(
-            visit(node.argument, instrumented, context),
+            visit(node.argument, node, parent, instrumented, context),
             context.runtime,
           );
         }
       }
-      return visitGeneric(node, instrumented, context);
+      return visitGeneric(node, parent, instrumented, context);
     }
     return node;
   };
+  const initial_parent = { type: "File" };
+  const initial_grand_parent = { type: "Root" };
   return {
     visit: (node, context) => {
       assert(
@@ -542,7 +564,13 @@ export default (dependencies) => {
       );
       // Top level async jump only present in module.
       // Avoid poluting global scope in script.
-      return visit(node, node.sourceType === "module", context);
+      return visit(
+        node,
+        initial_parent,
+        initial_grand_parent,
+        node.sourceType === "module",
+        context,
+      );
     },
   };
 };

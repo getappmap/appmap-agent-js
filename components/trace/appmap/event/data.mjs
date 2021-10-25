@@ -2,13 +2,14 @@
 const _URL = URL;
 const _URLSearchParams = URLSearchParams;
 const _String = String;
+const _undefined = undefined;
 
 const { entries: toEntries } = Object;
 const { from: arrayFrom } = Array;
 
 export default (dependencies) => {
   const {
-    util: { assert, coalesceCaseInsensitive, zip },
+    util: { assert, coalesceCaseInsensitive, zip, mapMaybe },
   } = dependencies;
 
   const parseURL = (url, headers) =>
@@ -45,8 +46,15 @@ export default (dependencies) => {
       const { link, parameters } = options;
       return {
         ...link,
-        receiver: compileParameterSerial(["this", _this]),
-        parameters: zip(parameters, _arguments).map(compileParameterSerial),
+        // TODO: It would make more sense to allow receiver to be null.
+        // receiver: mapMaybe(this, compileParameterSerialThis),
+        receiver:
+          _this === null
+            ? compileParameterPrimitive("this", _undefined)
+            : compileParameterSerialThis(_this),
+        parameters: zip(parameters, _arguments).map(
+          compileParameterSerialTuple,
+        ),
       };
     }
     if (type === "response") {
@@ -71,7 +79,7 @@ export default (dependencies) => {
             ? []
             : zip(route.split("/"), pathname.split("/")).filter(isFirstColon)),
           ...compileSearchMessage(search),
-        ].map(compileParameterPrimitive),
+        ].map(compileParameterPrimitiveTuple),
       };
     }
     if (type === "query") {
@@ -83,7 +91,7 @@ export default (dependencies) => {
           sql,
           explain_sql: null,
         },
-        message: toEntries(parameters).map(compileParameterSerial),
+        message: toEntries(parameters).map(compileParameterSerialTuple),
       };
     }
     if (type === "request") {
@@ -95,7 +103,9 @@ export default (dependencies) => {
           url: `${origin}${pathname}`,
           headers,
         },
-        message: compileSearchMessage(search).map(compileParameterPrimitive),
+        message: compileSearchMessage(search).map(
+          compileParameterPrimitiveTuple,
+        ),
       };
     }
     /* c8 ignore start */
@@ -108,8 +118,7 @@ export default (dependencies) => {
     if (type === "apply") {
       const { result, error } = data;
       return {
-        return_value:
-          result === null ? null : compileParameterSerial(["return", result]),
+        return_value: mapMaybe(result, compileParameterSerialReturn),
         exceptions: error === null ? null : [compileExceptionSerial(error)],
       };
     }
@@ -140,14 +149,17 @@ export default (dependencies) => {
     /* c8 ignore stop */
   };
 
-  const compileParameterPrimitive = ([name, primitive]) => ({
+  const compileParameterPrimitive = (name, primitive) => ({
     name,
     class: typeof primitive,
     object_id: null,
     value: _String(primitive),
   });
 
-  const compileParameterSerial = ([name, serial]) => {
+  const compileParameterPrimitiveTuple = ([name, primitive]) =>
+    compileParameterPrimitive(name, primitive);
+
+  const compileParameterSerial = (name, serial) => {
     const {
       type,
       constructor: _constructor,
@@ -169,6 +181,15 @@ export default (dependencies) => {
       value: truncated ? `${print} ...` : print,
     };
   };
+
+  const compileParameterSerialReturn = (serial) =>
+    compileParameterSerial("return", serial);
+
+  const compileParameterSerialThis = (serial) =>
+    compileParameterSerial("this", serial);
+
+  const compileParameterSerialTuple = ([name, serial]) =>
+    compileParameterSerial(name, serial);
 
   const compileExceptionSerial = (serial) => {
     const {

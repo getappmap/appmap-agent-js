@@ -52,7 +52,7 @@ assertEqual(
       var
         $_APPLY_ID = $.recordBeginApply(
           'file:///script.js#1-1',
-          this,
+          $.empty,
           [$_ARGUMENT_0, $_ARGUMENT_1, $_ARGUMENT_2],
         ),
         $_FAILURE = $.empty,
@@ -148,6 +148,48 @@ for (const [code1, code2] of [
     ),
   );
 }
+
+// super constructor should not access this //
+
+assertEqual(
+  instrument(
+    {
+      url: "file:///script.js",
+      content: "class C extends Object {constructor\n() { super(); } }",
+      type: "script",
+    },
+    ["file:///script.js"],
+  ),
+  normalize(
+    `
+      class C extends Object {
+        constructor () {
+          var
+            $_APPLY_ID = $.recordBeginApply(
+              'file:///script.js#2-0',
+              $.empty,
+              [],
+            ),
+            $_FAILURE = $.empty,
+            $_SUCCESS = $.empty,
+            $_JUMP = null,
+            $_JUMP_ID = null;
+          try {
+            super();
+          } catch ($_ERROR) {
+            if ($_JUMP_ID !== null) {
+              $.recordAfterJump($_JUMP_ID);
+              $_JUMP_ID = null;
+            }
+            throw $_FAILURE = $_ERROR;
+          } finally {
+            $.recordEndApply($_APPLY_ID, $_FAILURE, $_SUCCESS);
+          }
+        }
+      }
+    `,
+  ),
+);
 
 // try statement //
 
