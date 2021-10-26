@@ -1,3 +1,10 @@
+## [5.2.2](https://github.com/applandinc/appmap-agent-js/compare/v5.2.1...v5.2.2) (2021-10-25)
+
+
+### Bug Fixes
+
+* make sure to not access 'this' in child constructors ([4b3969a](https://github.com/applandinc/appmap-agent-js/commit/4b3969aff8f21e7722506e2c41fc10a22bcd2b64))
+
 ## [5.2.1](https://github.com/applandinc/appmap-agent-js/compare/v5.2.0...v5.2.1) (2021-10-25)
 
 
