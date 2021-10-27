@@ -248,8 +248,8 @@ Once `appmap.yml` is configured, you're ready to record AppMaps.
 ```sh
 npx appmap-agent-js
 ```
-1. `appmap-agent-js` will use the command entered during setup to run the tests and record AppMaps
-2. When the tests complete, the AppMaps are stored in the output directory entered during configuration (`tmp/appmap`)
+3. `appmap-agent-js` will use the command entered during setup to run the tests and record AppMaps
+4. When the tests complete, the AppMaps are stored in the output directory entered during configuration (`tmp/appmap`)
 
 ---
 
