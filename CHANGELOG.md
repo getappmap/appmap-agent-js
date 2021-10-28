@@ -1,3 +1,21 @@
+# [6.0.0](https://github.com/applandinc/appmap-agent-js/compare/v5.2.2...v6.0.0) (2021-10-28)
+
+
+### Features
+
+* revamp scenario feature in the configuration ([e31411e](https://github.com/applandinc/appmap-agent-js/commit/e31411e0dc9553ed2ecf25b30acecd2820bbe9c8))
+
+
+### BREAKING CHANGES
+
+* Revamped scenario feature in the configuration.
+The configuration format accepts a command field (parsed arrays are no 
+longer supported).
+Scenarios are just configuration (the fork and spawn format are no 
+longer supported).
+The mode configuration field has been removed (redundant with the 
+recorder field).
+
 ## [5.2.2](https://github.com/applandinc/appmap-agent-js/compare/v5.2.1...v5.2.2) (2021-10-25)
 
 
