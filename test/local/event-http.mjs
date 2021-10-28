@@ -7,18 +7,14 @@ const { deepEqual: assertDeepEqual } = Assert;
 await runAsync(
   null,
   {
-    mode: "local",
     packages: { glob: "*" },
+    command: "node ./main.mjs",
     name: "name",
     hooks: {
       esm: false,
       cjs: false,
       apply: false,
       http: true,
-    },
-    scenario: "scenario",
-    scenarios: {
-      scenario: ["node", "./main.mjs"],
     },
   },
   async (repository) => {

@@ -9,7 +9,7 @@ const _Set = Set;
 
 export default (dependencies) => {
   const {
-    util: { assert, constant, getDirectory },
+    util: { constant, getDirectory },
     log: { logInfo, logError },
     expect: { expect },
     service: { openServiceAsync, closeServiceAsync, getServicePort },
@@ -88,13 +88,8 @@ export default (dependencies) => {
   return {
     openReceptorAsync: async ({
       "trace-port": trace_port,
-      mode,
       output: { directory },
     }) => {
-      assert(
-        mode === "local",
-        "receptor/file expected configuration.mode to be 'local'",
-      );
       await createDirectoryAsync(directory);
       const server = createServer();
       const paths = new _Set();

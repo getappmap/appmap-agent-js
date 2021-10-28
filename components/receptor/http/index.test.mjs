@@ -27,7 +27,7 @@ const {
 const configuration = extendConfiguration(
   createConfiguration("/root"),
   {
-    mode: "remote",
+    recorder: "remote",
   },
   null,
 );

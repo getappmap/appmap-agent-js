@@ -23,7 +23,7 @@ const repository = `${tmpdir()}/${Math.random().toString(36).substring(2)}`;
 const configuration = extendConfiguration(
   createConfiguration("/root"),
   {
-    mode: "local",
+    recorder: "process",
     output: {
       directory: "directory",
     },

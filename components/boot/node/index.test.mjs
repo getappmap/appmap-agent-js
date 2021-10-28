@@ -34,24 +34,16 @@ const { cwd } = process;
     cwd,
   });
   await writeFile(path, "app: app", "utf8");
-  const {
-    app,
-    name,
-    scenarios: {
-      anonymous: [{ exec, argv }],
-    },
-  } = bootBatch({
+  const { app, name } = bootBatch({
     env: { APPMAP_CONFIGURATION_PATH: path },
-    argv: ["node", "main.mjs", "--name", "name", "--", "exec", "argv0"],
+    argv: ["node", "main.mjs", "--name", "name"],
     cwd,
   });
   assertDeepEqual(
-    { app, name, exec, argv },
+    { app, name },
     {
       app: "app",
       name: "name",
-      exec: "exec",
-      argv: ["argv0"],
     },
   );
 }

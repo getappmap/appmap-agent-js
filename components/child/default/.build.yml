@@ -1,7 +1,0 @@
-branches: [test, node]
-dependencies:
-  - util
-  - expect
-  - validate
-  - specifier
-  - repository

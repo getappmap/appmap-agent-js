@@ -46,7 +46,9 @@ export default (dependencies) => {
       "APPMAP_CONFIGURATION_PATH",
       `${cwd()}/appmap.yml`,
     );
-    const { _: child, ...config } = minimist(argv.slice(2));
+    /* eslint-disable no-unused-vars */
+    const { _: positional, ...config } = minimist(argv.slice(2));
+    /* eslint-enabled no-unused-vars */
     let configuration;
     configuration = createConfiguration(
       coalesce(env, "APPMAP_REPOSITORY_DIRECTORY", cwd()),
@@ -57,13 +59,6 @@ export default (dependencies) => {
       getDirectory(path),
     );
     configuration = extendConfiguration(configuration, config, cwd());
-    if (child.length > 0) {
-      configuration = extendConfiguration(
-        configuration,
-        { scenarios: { anonymous: child } },
-        cwd(),
-      );
-    }
     return configuration;
   };
 

@@ -9,7 +9,7 @@ const { deepEqual: assertDeepEqual } = Assert;
 await runAsync(
   null,
   {
-    mode: "local",
+    command: "npx mocha ./main.test.mjs",
     recorder: "mocha",
     log: "info",
     packages: { path: "index.js" },
@@ -18,10 +18,6 @@ await runAsync(
       cjs: true,
       apply: true,
       http: false,
-    },
-    scenario: "scenario",
-    scenarios: {
-      scenario: ["npx", "mocha", "./main.test.mjs"],
     },
   },
   async (repository) => {

@@ -14,7 +14,7 @@ const {
 await runAsync(
   null,
   {
-    mode: "local",
+    command: "node ./script.js",
     packages: { glob: "*" },
     name: "name",
     hooks: {
@@ -24,10 +24,6 @@ await runAsync(
       http: false,
     },
     ordering: "causal",
-    scenario: "scenario",
-    scenarios: {
-      scenario: ["node", "./script.js"],
-    },
   },
   async (repository) => {
     await writeFileAsync(

@@ -7,7 +7,7 @@ const { parse: parseJSON } = JSON;
 
 export default (dependencies) => {
   const {
-    util: { assert, constant },
+    util: { constant },
     http: { generateRespond },
     log: { logInfo, logError },
     service: { openServiceAsync, closeServiceAsync, getServicePort },
@@ -32,14 +32,9 @@ export default (dependencies) => {
   };
   return {
     openReceptorAsync: async ({
-      mode,
       "track-port": track_port,
       "trace-port": trace_port,
     }) => {
-      assert(
-        mode === "remote",
-        "receptor/http expected configuration.mode to be 'remote'",
-      );
       const trace_server = createTCPServer();
       const track_server = createHTTPServer();
       const backends = new _Map();

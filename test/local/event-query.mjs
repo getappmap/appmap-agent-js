@@ -8,7 +8,7 @@ const { deepEqual: assertDeepEqual } = Assert;
 await runAsync(
   null,
   {
-    mode: "local",
+    command: "node ./main.mjs",
     hooks: {
       esm: false,
       cjs: false,
@@ -17,10 +17,6 @@ await runAsync(
       sqlite3: true,
     },
     name: "name",
-    scenario: "scenario",
-    scenarios: {
-      scenario: ["node", "./main.mjs"],
-    },
   },
   async (repository) => {
     await symlink(

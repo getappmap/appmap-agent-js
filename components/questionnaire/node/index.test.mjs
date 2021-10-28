@@ -47,13 +47,9 @@ assertDeepEqual(
     ({ choices }) => choices[0].value,
   ]),
   {
-    mode: "local",
     app: "app",
     recorder: "process",
-    scenario: "my-scenario",
-    scenarios: {
-      "my-scenario": "command",
-    },
+    command: "command",
     output: {
       directory: "output-directory",
     },
@@ -82,7 +78,6 @@ assertDeepEqual(
   ]),
   {
     recorder: "mocha",
-    mode: "local",
   },
 );
 
@@ -103,7 +98,6 @@ assertDeepEqual(
     ({}) => BREAK,
   ]),
   {
-    mode: "remote",
     recorder: "remote",
     "track-port": 0,
     "intercept-track-port": "unix-domain-socket",

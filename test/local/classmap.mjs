@@ -7,8 +7,7 @@ const { deepEqual: assertDeepEqual } = Assert;
 await runAsync(
   null,
   {
-    mode: "local",
-    "function-name-placeholder": "placeholder",
+    command: "node ./main.mjs",
     packages: { glob: "*" },
     hooks: {
       esm: true,
@@ -17,10 +16,7 @@ await runAsync(
       http: false,
     },
     name: "name",
-    scenario: "scenario",
-    scenarios: {
-      scenario: ["node", "./main.mjs"],
-    },
+    "function-name-placeholder": "placeholder",
   },
   async (repository) => {
     await writeFile(

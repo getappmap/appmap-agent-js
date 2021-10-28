@@ -7,7 +7,7 @@ const { equal: assertEqual, deepEqual: assertDeepEqual } = Assert;
 await runAsync(
   { name: "app", version: "1.2.3" },
   {
-    mode: "local",
+    command: "node ./main.mjs",
     name: "name",
     hooks: {
       esm: false,
@@ -16,10 +16,6 @@ await runAsync(
       http: false,
     },
     output: { basename: "basename" },
-    scenario: "scenario",
-    scenarios: {
-      scenario: ["node", "./main.mjs"],
-    },
   },
   async (repository) => {
     await writeFile(`${repository}/main.mjs`, `123;`, "utf8");

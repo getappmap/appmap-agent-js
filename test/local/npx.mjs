@@ -7,16 +7,12 @@ const { deepEqual: assertDeepEqual } = Assert;
 await runAsync(
   null,
   {
-    mode: "local",
+    command: "npx --always-spawn bin",
     name: "name",
     processes: { path: "node_modules/.bin/bin" },
     packages: "bin.cjs",
     recorder: "process",
     hooks: { esm: false, cjs: true, apply: false, http: false },
-    scenario: "scenario",
-    scenarios: {
-      scenario: ["npx", "--always-spawn", "bin"],
-    },
   },
   async (repository) => {
     await writeFile(`${repository}/bin`, "#!/usr/bin/env node\n123;", {

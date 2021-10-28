@@ -1,11 +1,21 @@
-const { from: toArray, isArray } = Array;
-const { fromEntries, entries: toEntries } = Object;
+import { parse as parseShell } from "shell-quote";
+
+const { stringify: stringifyJSON } = JSON;
+const { isArray } = Array;
 const { ownKeys } = Reflect;
 
 export default (dependencies) => {
   const {
-    util: { assert, identity, toAbsolutePath, hasOwnProperty },
-    log: { logInfo },
+    util: {
+      generateDeadcode,
+      coalesce,
+      assert,
+      identity,
+      toAbsolutePath,
+      hasOwnProperty,
+    },
+    log: { logInfo, logGuardWarning },
+    expect: { expect },
     validate: { validateConfig },
     specifier: { matchSpecifier },
     engine: { getEngine },
@@ -15,7 +25,6 @@ export default (dependencies) => {
       extractRepositoryDependency,
     },
     specifier: { createSpecifier },
-    child: { createChildren },
   } = dependencies;
 
   ////////////
@@ -30,10 +39,17 @@ export default (dependencies) => {
 
   const prepend = (value1, value2) => [...value2, ...value1];
 
-  const isString = (any) => typeof any === "string";
-
   const toAbsolutePathFlip = (relative, absolute) =>
     toAbsolutePath(absolute, relative);
+
+  const extendCommandOptions = (options1, options2) => ({
+    ...options1,
+    ...options2,
+    env: {
+      ...coalesce(options1, "env", {}),
+      ...coalesce(options2, "env", {}),
+    },
+  });
 
   ///////////////
   // Normalize //
@@ -129,25 +145,6 @@ export default (dependencies) => {
     );
   };
 
-  const normalizeScenarios = (scenarios, nullable_directory) =>
-    fromEntries(
-      toArray(toEntries(scenarios)).map(([name, children]) => {
-        assert(
-          nullable_directory !== null,
-          "normalizing scenarios elements requires a directory",
-        );
-        if (!isArray(children) || children.every(isString)) {
-          children = [children];
-        }
-        return [
-          name,
-          children.flatMap((child) =>
-            createChildren(child, nullable_directory),
-          ),
-        ];
-      }),
-    );
-
   const normalizeProcessSpecifier = (specifier, nullable_directory) => {
     assert(
       nullable_directory !== null,
@@ -179,21 +176,29 @@ export default (dependencies) => {
   ////////////
 
   const fields = {
-    mode: {
-      extend: overwrite,
-      normalize: identity,
-    },
-    validate: {
-      extend: assign,
-      normalize: identity,
-    },
     scenario: {
       extend: overwrite,
       normalize: identity,
     },
     scenarios: {
+      extend: generateDeadcode("scenarios should be manually extended"),
+      normalize: generateDeadcode("scenarios should be manually normalized"),
+    },
+    "recursive-process-recording": {
+      extend: overwrite,
+      normalize: identity,
+    },
+    command: {
+      extend: overwrite,
+      normalize: identity,
+    },
+    "command-options": {
+      extend: extendCommandOptions,
+      normalize: identity,
+    },
+    validate: {
       extend: assign,
-      normalize: normalizeScenarios,
+      normalize: identity,
     },
     log: {
       extend: overwrite,
@@ -349,8 +354,57 @@ export default (dependencies) => {
   // export //
   ////////////
 
+  const quote = (token) => {
+    if (typeof token === "object") {
+      const { op } = token;
+      if (op === "glob") {
+        const { pattern } = token;
+        return pattern;
+      }
+      return op;
+    }
+    return `'${token.replace(/'/gu, "\\'")}'`;
+  };
+
+  const extendConfiguration = (configuration, config, nullable_directory) => {
+    configuration = { ...configuration };
+    validateConfig(config);
+    for (let key of ownKeys(config)) {
+      if (key !== "scenarios") {
+        const { normalize, extend } = fields[key];
+        configuration[key] = extend(
+          configuration[key],
+          normalize(config[key], nullable_directory),
+        );
+      }
+    }
+    const parent_configuration = {
+      ...configuration,
+      scenarios: [],
+    };
+    configuration.scenarios = [
+      ...configuration.scenarios,
+      ...coalesce(config, "scenarios", []).map((config) =>
+        extendConfiguration(parent_configuration, config, nullable_directory),
+      ),
+    ];
+    return configuration;
+  };
+
   return {
     createConfiguration: (directory) => ({
+      scenarios: [],
+      scenario: "^",
+      "recursive-process-recording": true,
+      command: null,
+      "command-options": {
+        encoding: "utf8",
+        cwd: directory, // NB: defines cwd for exec
+        env: {},
+        stdio: "inherit",
+        timeout: 0,
+        killSignal: "SIGTERM",
+      },
       // defined at initialization (cannot be overwritten)
       agent: extractRepositoryDependency(directory, "@appland/appmap-agent-js"),
       repository: {
@@ -367,7 +421,6 @@ export default (dependencies) => {
       main: null,
       recording: null,
       // provided by the user
-      mode: "local",
       host: "localhost",
       session: null,
       "trace-port": 0, // possibly overwritten by the agent
@@ -380,8 +433,6 @@ export default (dependencies) => {
         appmap: false,
         message: false,
       },
-      scenario: "anonymous",
-      scenarios: {},
       log: "info",
       output: {
         directory: `${directory}/tmp/appmap`,
@@ -398,7 +449,7 @@ export default (dependencies) => {
           true,
         ],
       ],
-      recorder: null,
+      recorder: "process",
       "inline-source": false,
       hooks: {
         apply: true,
@@ -454,29 +505,103 @@ export default (dependencies) => {
       app: null,
       name: null,
     }),
+    extendConfiguration,
     // extractEnvironmentConfiguration: (env) =>
     //   fromEntries(
     //     toArray(toEntries(env))
     //       .filter(filterEnvironmentPair)
     //       .map(mapEnvironmentPair),
     //   ),
-    extendConfiguration: (configuration, data, nullable_directory) => {
-      configuration = { ...configuration };
-      validateConfig(data);
-      for (let key of ownKeys(data)) {
-        const { normalize, extend } = fields[key];
-        configuration[key] = extend(
-          configuration[key],
-          normalize(data[key], nullable_directory),
-        );
-      }
-      return configuration;
-    },
     getConfigurationPackage: getSpecifierValue,
     isConfigurationEnabled: ({ processes, main }) => {
       const enabled = main === null || getSpecifierValue(processes, main);
       logInfo(`%s %s`, enabled ? "recording" : "bypassing", main);
       return enabled;
+    },
+    compileCommandConfiguration: (configuration, env) => {
+      let { command } = configuration;
+      assert(command !== null, "missing command in configuration");
+      const {
+        recorder,
+        "command-options": options,
+        "recursive-process-recording": recursive,
+        agent: { directory },
+      } = configuration;
+      env = {
+        ...env,
+        ...options.env,
+        APPMAP_CONFIGURATION: stringifyJSON(configuration),
+      };
+      logGuardWarning(
+        recursive && recorder === "mocha",
+        "The mocha recorder cannot recursively record processes.",
+      );
+      if (recursive || recorder === "mocha") {
+        if (recorder === "mocha") {
+          let tokens = parseShell(command, env);
+          const hook = ["--require", `${directory}/lib/recorder-mocha.mjs`];
+          if (tokens.length > 0 && tokens[0] === "mocha") {
+            tokens = ["mocha", ...hook, ...tokens.slice(1)];
+          } else if (
+            tokens.length > 1 &&
+            tokens[0] === "npx" &&
+            tokens[1] === "mocha"
+          ) {
+            tokens = [
+              "npx",
+              "--always-spawn",
+              "mocha",
+              ...hook,
+              ...tokens.slice(2),
+            ];
+          } else {
+            expect(
+              false,
+              "The mocha recorder expected the command to start by either 'mocha' or 'npx mocha', got %j.",
+              tokens,
+            );
+          }
+          command = tokens.map(quote).join(" ");
+        }
+        env = {
+          ...env,
+          NODE_OPTIONS: [
+            coalesce(env, "NODE_OPTIONS", ""),
+            // abomination: https://github.com/mochajs/mocha/issues/4720
+            `--require=${directory}/lib/abomination.js`,
+            `--experimental-loader=${directory}/lib/${
+              recorder === "mocha" ? "loader" : `recorder-${recorder}`
+            }.mjs`,
+          ].join(" "),
+        };
+      } else {
+        const tokens = parseShell(command, env);
+        expect(
+          tokens.length > 0,
+          "Could not find executable from command: %j.",
+          command,
+        );
+        logGuardWarning(
+          tokens[0] !== "node",
+          "Assuming %j is a node executable, recording will *not* happens if this is not the case.",
+          tokens[0],
+        );
+        command = [
+          tokens[0],
+          "--experimental-loader",
+          `${directory}/lib/recorder-${recorder}.mjs`,
+          ...tokens.slice(1),
+        ]
+          .map(quote)
+          .join(" ");
+      }
+      return {
+        command,
+        options: {
+          ...options,
+          env,
+        },
+      };
     },
   };
 };

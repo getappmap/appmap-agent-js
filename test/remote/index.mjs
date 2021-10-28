@@ -101,7 +101,8 @@ const testAsync = async (port_key, port, main) => {
   await runAsync(
     null,
     {
-      mode: "remote",
+      recorder: "remote",
+      command: "node ./main.mjs",
       packages: { glob: "*" },
       [port_key]: port,
       log: "info",
@@ -113,10 +114,6 @@ const testAsync = async (port_key, port, main) => {
         http: false,
       },
       ordering: "causal",
-      scenario: "scenario",
-      scenarios: {
-        scenario: ["node", "./main.mjs"],
-      },
     },
     async (repository) => {
       await writeFile(`${repository}/main.mjs`, main, "utf8");

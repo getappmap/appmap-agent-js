@@ -18,7 +18,6 @@
 - specifier
 - engine
 - repository
-- child
 - configuration
 - trace
 - backend

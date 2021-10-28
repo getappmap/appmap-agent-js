@@ -10,9 +10,8 @@ import log$off from "./../components/log/off/index.mjs";
 import log$warning from "./../components/log/warning/index.mjs";
 import validate$ajv from "./../components/validate/ajv/index.mjs";
 import specifier$default from "./../components/specifier/default/index.mjs";
-import repository$node from "./../components/repository/node/index.mjs";
-import child$default from "./../components/child/default/index.mjs";
 import engine$node from "./../components/engine/node/index.mjs";
+import repository$node from "./../components/repository/node/index.mjs";
 import configuration$default from "./../components/configuration/default/index.mjs";
 import validate_message$off from "./../components/validate-message/off/index.mjs";
 import validate_message$on from "./../components/validate-message/on/index.mjs";
@@ -54,9 +53,8 @@ export default (blueprint) => {
         })();
   dependencies["validate"] = validate$ajv(dependencies);
   dependencies["specifier"] = specifier$default(dependencies);
-  dependencies["repository"] = repository$node(dependencies);
-  dependencies["child"] = child$default(dependencies);
   dependencies["engine"] = engine$node(dependencies);
+  dependencies["repository"] = repository$node(dependencies);
   dependencies["configuration"] = configuration$default(dependencies);
   if (!("validate-message" in blueprint)) {
     throw new Error("missing instance for component validate-message");

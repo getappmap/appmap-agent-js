@@ -4,10 +4,6 @@ export const schema = [
     enum: ["buffer", "utf8", "utf16le", "latin1"],
   },
   {
-    $id: "mode",
-    enum: ["local", "remote"],
-  },
-  {
     $id: "ordering",
     enum: ["chronological", "causal"],
   },
@@ -399,16 +395,10 @@ export const schema = [
     },
   },
   {
-    $id: "child-options",
+    $id: "command-options",
     type: "object",
     additionalProperties: false,
     properties: {
-      execPath: {
-        type: "string",
-      },
-      execArgv: {
-        type: "string",
-      },
       encoding: {
         $ref: "encoding",
       },
@@ -431,169 +421,39 @@ export const schema = [
     },
   },
   {
-    $id: "child",
-    anyOf: [
+    $id: "cooked-command-options",
+    allOf: [
       {
-        type: "string",
-      },
-      {
-        type: "array",
-        minItems: 1,
-        items: {
-          type: "string",
-        },
+        $ref: "command-options",
       },
       {
         type: "object",
-        additionalProperties: false,
-        required: ["type", "exec"],
-        properties: {
-          type: {
-            const: "spawn",
-          },
-          configuration: {
-            $ref: "config",
-          },
-          exec: {
-            type: "string",
-          },
-          argv: {
-            type: "array",
-            items: {
-              type: "string",
-            },
-          },
-          options: {
-            allOf: [
-              {
-                $ref: "child-options",
-              },
-              {
-                not: {
-                  anyOf: [
-                    {
-                      type: "object",
-                      required: ["execPath"],
-                    },
-                    {
-                      type: "object",
-                      required: ["execArgv"],
-                    },
-                  ],
-                },
-              },
-            ],
-          },
-        },
-      },
-      {
-        type: "object",
-        additionalProperties: false,
-        required: ["type", "exec"],
-        properties: {
-          type: {
-            const: "fork",
-          },
-          configuration: {
-            $ref: "config",
-          },
-          globbing: {
-            type: "boolean",
-          },
-          exec: {
-            type: "string",
-          },
-          argv: {
-            type: "array",
-            items: {
-              type: "string",
-            },
-          },
-          options: {
-            $ref: "child-options",
-          },
-        },
+        required: ["encoding", "cwd", "env", "stdio", "timeout", "killSignal"],
       },
     ],
-  },
-  {
-    $id: "cooked-child",
-    type: "object",
-    additionalProperties: false,
-    required: ["fork", "exec", "argv", "configuration", "options"],
-    properties: {
-      fork: {
-        type: "object",
-        nullable: true,
-        required: ["exec", "argv"],
-        additionalProperties: false,
-        properties: {
-          exec: {
-            type: "string",
-          },
-          argv: {
-            type: "array",
-            items: {
-              type: "string",
-            },
-          },
-        },
-      },
-      exec: {
-        type: "string",
-      },
-      argv: {
-        type: "array",
-        items: {
-          type: "string",
-        },
-      },
-      configuration: {
-        type: "object",
-        additionalProperties: false,
-        required: ["directory", "data"],
-        properties: {
-          directory: {
-            $ref: "absolute-path",
-          },
-          data: {
-            $ref: "config",
-          },
-        },
-      },
-      options: {
-        allOf: [
-          {
-            $ref: "child-options",
-          },
-          {
-            type: "object",
-            required: [
-              "encoding",
-              "cwd",
-              "env",
-              "stdio",
-              "timeout",
-              "killSignal",
-            ],
-            maxProperties: 6,
-            properties: {
-              cwd: {
-                $ref: "absolute-path",
-              },
-            },
-          },
-        ],
-      },
-    },
   },
   {
     $id: "config",
     type: "object",
     additionalProperties: false,
     properties: {
-      mode: {
-        $ref: "mode",
+      scenarios: {
+        type: "array",
+        items: {
+          $ref: "config",
+        },
+      },
+      scenario: {
+        type: "string",
+      },
+      "recursive-process-recording": {
+        type: "boolean",
+      },
+      command: {
+        type: "string",
+      },
+      "command-options": {
+        $ref: "command-options",
       },
       validate: {
         type: "object",
@@ -654,28 +514,6 @@ export const schema = [
       },
       "intercept-track-protocol": {
         const: "HTTP/1.1",
-      },
-      scenario: {
-        type: "string",
-      },
-      scenarios: {
-        type: "object",
-        additionalProperties: false,
-        patternProperties: {
-          "^": {
-            anyOf: [
-              {
-                type: "array",
-                items: {
-                  $ref: "child",
-                },
-              },
-              {
-                $ref: "child",
-              },
-            ],
-          },
-        },
       },
       recorder: {
         $ref: "recorder",
@@ -839,10 +677,26 @@ export const schema = [
     $id: "configuration",
     type: "object",
     additionalProperties: false,
-    minProperties: 37,
+    minProperties: 39,
     properties: {
-      mode: {
-        $ref: "mode",
+      scenario: {
+        type: "string",
+      },
+      scenarios: {
+        type: "array",
+        items: {
+          $ref: "configuration",
+        },
+      },
+      "recursive-process-recording": {
+        type: "boolean",
+      },
+      command: {
+        type: "string",
+        nullable: true,
+      },
+      "command-options": {
+        $ref: "cooked-command-options",
       },
       validate: {
         type: "object",
@@ -891,21 +745,6 @@ export const schema = [
           },
           package: {
             $ref: "package",
-          },
-        },
-      },
-      scenario: {
-        type: "string",
-      },
-      scenarios: {
-        type: "object",
-        additionalProperties: false,
-        patternProperties: {
-          "^": {
-            type: "array",
-            items: {
-              $ref: "cooked-child",
-            },
           },
         },
       },
@@ -965,14 +804,7 @@ export const schema = [
         const: "HTTP/1.1",
       },
       recorder: {
-        anyOf: [
-          {
-            const: null,
-          },
-          {
-            $ref: "recorder",
-          },
-        ],
+        $ref: "recorder",
       },
       "inline-source": {
         type: "boolean",

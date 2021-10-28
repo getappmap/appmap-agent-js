@@ -4,6 +4,6 @@ dependencies:
   - log
   - validate
   - specifier
-  - child
   - engine
   - repository
+  - expect

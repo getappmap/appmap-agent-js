@@ -7,7 +7,7 @@ import {
 import Batch from "./index.mjs";
 
 const {
-  // equal: assertEqual,
+  equal: assertEqual,
   // fail: assertFail,
   // deepEqual: assertDeepEqual
 } = Assert;
@@ -17,14 +17,20 @@ global.GLOBAL_SPY_SPAWN = (exec, argv, options) => {
   emitter.kill = (signal) => {
     emitter.emit("close", null, signal);
   };
-  if (exec === "success") {
+  assertEqual(exec, "/bin/sh");
+  assertEqual(argv.length, 2);
+  assertEqual(argv[0], "-c");
+  const command = argv[1];
+  if (command === "success") {
     setTimeout(() => {
       emitter.emit("close", 0, null);
     }, 0);
-  } else if (exec === "failure") {
+  } else if (command === "failure") {
     setTimeout(() => {
       emitter.emit("close", 1, null);
     }, 0);
+  } else {
+    assertEqual(command, "sleep");
   }
   return emitter;
 };
@@ -77,8 +83,26 @@ const configuration = createConfiguration("/repository");
       configuration,
       {
         recorder: "process",
-        scenario: "foo",
-        scenarios: { foo: ["sleep"], bar: ["sleep"] },
+        scenario: "^",
+        scenarios: [{ command: "sleep" }, { command: "sleep" }],
+      },
+      "/directory",
+    ),
+  );
+}
+
+// single child
+{
+  const emitter = new EventEmitter();
+  emitter.env = {};
+  await mainAsync(
+    emitter,
+    extendConfiguration(
+      configuration,
+      {
+        recorder: "process",
+        scenario: "^",
+        scenarios: [{ command: "success" }],
       },
       "/directory",
     ),
@@ -94,10 +118,9 @@ const configuration = createConfiguration("/repository");
     extendConfiguration(
       configuration,
       {
+        recorder: "process",
         scenario: "^",
-        scenarios: {
-          name: [["success"], ["failure"]],
-        },
+        scenarios: [{ command: "success" }, { command: "failure" }],
       },
       "/directory",
     ),

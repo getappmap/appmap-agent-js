@@ -58,7 +58,7 @@ export default (dependencies) => {
       choices: [
         {
           title: "By recording processes",
-          value: { recorder: "process", mode: "local" },
+          value: { recorder: "process" },
           description: [
             "Record node processes from start to finish.",
             "A single appmap will be generated per spawned node process.",
@@ -66,14 +66,14 @@ export default (dependencies) => {
         },
         {
           title: "By recording mocha test cases",
-          value: { recorder: "mocha", mode: "local" },
+          value: { recorder: "mocha" },
           description: [
             "An appmap will be generated for each mocha test case.",
           ].join(" "),
         },
         {
           title: "By remote HTTP requests",
-          value: { recorder: "remote", mode: "remote" },
+          value: { recorder: "remote" },
           description: [
             "Appmaps will be generated on demand via HTTP requests.",
             "These requests can be send via the record button in our editors plugins.",
@@ -104,16 +104,10 @@ export default (dependencies) => {
             name: "value",
             message: [
               "What command should be executed and recorded when running `npx appmap-agent-js`?",
-              "Skip to provide an inline command -- eg: `npx appmap-agent-js -- node path/to/main.js argv0 argv1`",
+              "Skip to provide an inline command -- eg: `npx appmap-agent-js --command 'node path/to/main.js'",
             ],
             initial: "",
-            format: (input) =>
-              input === ""
-                ? {}
-                : {
-                    scenario: "my-scenario",
-                    scenarios: { "my-scenario": input },
-                  },
+            format: (input) => (input === "" ? {} : { command: input }),
           },
     // Remote Recording //
     ({ recorder }) =>

@@ -1,6 +1,4 @@
 const _RegExp = RegExp;
-const { from: toArray } = Array;
-const { entries: toEntries } = Object;
 
 export default (dependencies) => {
   const {
@@ -8,16 +6,15 @@ export default (dependencies) => {
     expect: { expectSuccessAsync, expectSuccess },
     log: { logDebug, logInfo, logWarning },
     spawn: { spawn },
-    child: { compileChild, getChildDescription },
-    configuration: { extendConfiguration },
+    configuration: { extendConfiguration, compileCommandConfiguration },
     receptor: {
       openReceptorAsync,
       closeReceptorAsync,
       getReceptorTracePort,
       getReceptorTrackPort,
-      getReceptorDefaultRecorder,
     },
   } = dependencies;
+  const isCommandNonNull = ({ command }) => command !== null;
   return {
     mainAsync: async (process, configuration) => {
       const { env } = process;
@@ -42,34 +39,23 @@ export default (dependencies) => {
         }
       });
       const receptor = await openReceptorAsync(configuration);
-      const { recorder } = configuration;
       configuration = extendConfiguration(
         configuration,
         {
-          recorder:
-            recorder === null ? getReceptorDefaultRecorder(receptor) : recorder,
           "trace-port": getReceptorTracePort(receptor),
           "track-port": getReceptorTrackPort(receptor),
         },
         null,
       );
-      const { scenario, scenarios } = configuration;
-      const runChildAsync = async (child) => {
-        const description = getChildDescription(child);
+      const runConfigurationAsync = async (configuration, env) => {
+        const { command: description } = configuration;
         logInfo("%s ...", description);
-        const { exec, argv, options } = compileChild(
-          child,
-          env,
+        const { command, options } = compileCommandConfiguration(
           configuration,
-          extendConfiguration,
+          env,
         );
-        logDebug(
-          "spawn child: exec = %j, argv = %j, options = %j",
-          exec,
-          argv,
-          options,
-        );
-        subprocess = spawn(exec, argv, options);
+        logDebug("spawn child command = %j, options = %j", command, options);
+        subprocess = spawn("/bin/sh", ["-c", command], options);
         const { signal, status } = await expectSuccessAsync(
           new Promise((resolve, reject) => {
             subprocess.on("error", reject);
@@ -88,15 +74,17 @@ export default (dependencies) => {
         }
         return { description, signal, status };
       };
+      const { scenario, scenarios } = configuration;
       const regexp = expectSuccess(
         () => new _RegExp(scenario, "u"),
-        "scenario configuration property is not a valid regexp: %j >> %e",
+        "Scenario configuration field is not a valid regexp: %j >> %e",
         scenario,
       );
-      const children = toArray(toEntries(scenarios)).flatMap(
-        ([name, children]) => (regexp.test(name) ? children : []),
-      );
-      const { length } = children;
+      const configurations = [
+        configuration,
+        ...scenarios.filter(({ name }) => regexp.test(name)),
+      ].filter(isCommandNonNull);
+      const { length } = configurations;
       try {
         if (length === 0) {
           logWarning(
@@ -104,8 +92,8 @@ export default (dependencies) => {
             scenario,
           );
         } else if (length === 1) {
-          const [child] = children;
-          await runChildAsync(child, env, configuration);
+          const [configuration] = configurations;
+          await runConfigurationAsync(configuration, env);
         } else {
           logInfo("Spawning %j processes sequentially", length);
           const summary = [];
@@ -113,7 +101,7 @@ export default (dependencies) => {
             if (!interrupted) {
               logInfo("%j/%j", index + 1, length);
               summary.push(
-                await runChildAsync(children[index], env, configuration),
+                await runConfigurationAsync(configurations[index], env),
               );
             }
           }

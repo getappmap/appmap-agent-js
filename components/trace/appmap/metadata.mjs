@@ -73,13 +73,6 @@ export default (dependencies) => {
     };
   };
 
-  const makeRecorder = (recorder) => {
-    if (recorder === null) {
-      recorder = "anonymous";
-    }
-    return { name: recorder };
-  };
-
   return {
     compileMetadata: (
       {
@@ -107,7 +100,7 @@ export default (dependencies) => {
       },
       frameworks,
       client: makeClient(agent),
-      recorder: makeRecorder(recorder),
+      recorder: { name: recorder },
       recording: makeRecording(recording),
       git: makeHistory(repository),
       test_status: makeTestStatus(termination),

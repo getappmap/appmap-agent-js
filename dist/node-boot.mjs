@@ -11,9 +11,8 @@ import log$info from "./../components/log/info/index.mjs";
 import log$off from "./../components/log/off/index.mjs";
 import log$warning from "./../components/log/warning/index.mjs";
 import specifier$default from "./../components/specifier/default/index.mjs";
-import repository$node from "./../components/repository/node/index.mjs";
-import child$default from "./../components/child/default/index.mjs";
 import engine$node from "./../components/engine/node/index.mjs";
+import repository$node from "./../components/repository/node/index.mjs";
 import configuration$default from "./../components/configuration/default/index.mjs";
 import boot$node from "./../components/boot/node/index.mjs";
 
@@ -53,9 +52,8 @@ export default (blueprint) => {
           throw new Error("invalid instance for component log");
         })();
   dependencies["specifier"] = specifier$default(dependencies);
-  dependencies["repository"] = repository$node(dependencies);
-  dependencies["child"] = child$default(dependencies);
   dependencies["engine"] = engine$node(dependencies);
+  dependencies["repository"] = repository$node(dependencies);
   dependencies["configuration"] = configuration$default(dependencies);
   dependencies["boot"] = boot$node(dependencies);
   return dependencies["boot"];
