@@ -16,9 +16,9 @@ npx appmap-agent-js
 Table of contents:
 1. [Requirements](#requirements)
 2. [Automated Recording](#automated-recording)
-    1. [Scenario](#scenario)
-    2. [CLI](#cli)
-    3. [Local Recording](#local-recording)
+    1. [CLI](#cli)
+    2. [Process Recording](#process-recording)
+    3. [Mocha Test Case Recording](#mocha-test-case-recording)
     4. [Remote Recording](#remote-recording)
 3. [Manual Recording](#manual-recording)
 4. [Configuration](#configuration)
