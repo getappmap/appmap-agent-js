@@ -23,8 +23,9 @@ import spawn$node from "./../components/spawn/node/index.mjs";
 import uuid$random from "./../components/uuid/random/index.mjs";
 import service$default from "./../components/service/default/index.mjs";
 import http$node_http from "./../components/http/node-http/index.mjs";
-import receptor$file from "./../components/receptor/file/index.mjs";
-import receptor$http from "./../components/receptor/http/index.mjs";
+import receptor_http$http from "./../components/receptor-http/http/index.mjs";
+import receptor_file$file from "./../components/receptor-file/file/index.mjs";
+import receptor$default from "./../components/receptor/default/index.mjs";
 import batch$default from "./../components/batch/default/index.mjs";
 
 export default (blueprint) => {
@@ -84,17 +85,9 @@ export default (blueprint) => {
   dependencies["uuid"] = uuid$random(dependencies);
   dependencies["service"] = service$default(dependencies);
   dependencies["http"] = http$node_http(dependencies);
-  if (!("receptor" in blueprint)) {
-    throw new Error("missing instance for component receptor");
-  }
-  dependencies["receptor"] =
-    blueprint["receptor"] === "http"
-      ? receptor$http(dependencies)
-      : blueprint["receptor"] === "file"
-      ? receptor$file(dependencies)
-      : (() => {
-          throw new Error("invalid instance for component receptor");
-        })();
+  dependencies["receptor-http"] = receptor_http$http(dependencies);
+  dependencies["receptor-file"] = receptor_file$file(dependencies);
+  dependencies["receptor"] = receptor$default(dependencies);
   dependencies["batch"] = batch$default(dependencies);
   return dependencies["batch"];
 };

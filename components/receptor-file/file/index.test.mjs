@@ -16,8 +16,12 @@ const {
 const { createConfiguration, extendConfiguration } =
   await buildTestComponentAsync("configuration");
 
-const { openReceptorAsync, getReceptorTracePort, closeReceptorAsync } =
-  Receptor(await buildTestDependenciesAsync(import.meta.url));
+const {
+  openReceptorAsync,
+  adaptReceptorConfiguration,
+  minifyReceptorConfiguration,
+  closeReceptorAsync,
+} = Receptor(await buildTestDependenciesAsync(import.meta.url));
 
 const repository = `${tmpdir()}/${Math.random().toString(36).substring(2)}`;
 const configuration = extendConfiguration(
@@ -30,11 +34,15 @@ const configuration = extendConfiguration(
   },
   repository,
 );
-const receptor = await openReceptorAsync(configuration);
+const receptor = await openReceptorAsync(
+  minifyReceptorConfiguration(configuration),
+);
 
 {
   const socket = new Socket();
-  socket.connect(getReceptorTracePort(receptor));
+  socket.connect(
+    adaptReceptorConfiguration(receptor, configuration)["trace-port"],
+  );
   await new Promise((resolve) => {
     socket.on("connect", resolve);
   });
@@ -59,7 +67,9 @@ const receptor = await openReceptorAsync(configuration);
 
 {
   const socket = new Socket();
-  socket.connect(getReceptorTracePort(receptor));
+  socket.connect(
+    adaptReceptorConfiguration(receptor, configuration)["trace-port"],
+  );
   await new Promise((resolve) => {
     socket.on("connect", resolve);
   });

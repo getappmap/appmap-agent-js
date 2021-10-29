@@ -3,13 +3,12 @@ const _undefined = undefined;
 
 export default (dependencies) => {
   const {
-    util: { constant },
+    util: { constant, returnSecond },
   } = dependencies;
   return {
+    minifyReceptorConfiguration: constant({}),
     openReceptorAsync: constant(_Promise.resolve(_undefined)),
-    getReceptorTracePort: constant(0),
-    getReceptorTrackPort: constant(0),
-    getReceptorDefaultRecorder: constant("process"),
+    adaptReceptorConfiguration: returnSecond,
     closeReceptorAsync: constant(_Promise.resolve(_undefined)),
   };
 };

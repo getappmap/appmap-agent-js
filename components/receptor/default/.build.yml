@@ -1,0 +1,4 @@
+branches: [node]
+dependencies:
+  - receptor-http
+  - receptor-file

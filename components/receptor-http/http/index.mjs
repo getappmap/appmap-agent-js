@@ -7,7 +7,7 @@ const { parse: parseJSON } = JSON;
 
 export default (dependencies) => {
   const {
-    util: { constant },
+    util: { assert },
     http: { generateRespond },
     log: { logInfo, logError },
     service: { openServiceAsync, closeServiceAsync, getServicePort },
@@ -19,6 +19,7 @@ export default (dependencies) => {
       getBackendTrackIterator,
       takeBackendTrace,
     },
+    configuration: { extendConfiguration },
   } = dependencies;
   const disconnection = {
     status: 1,
@@ -31,10 +32,21 @@ export default (dependencies) => {
     ],
   };
   return {
+    minifyReceptorConfiguration: ({
+      recorder,
+      "trace-port": trace_port,
+      "track-port": track_port,
+    }) => ({
+      recorder,
+      "trace-port": trace_port,
+      "track-port": track_port,
+    }),
     openReceptorAsync: async ({
+      recorder,
       "track-port": track_port,
       "trace-port": trace_port,
     }) => {
+      assert(recorder === "remote", "invalid recorder for receptor-http");
       const trace_server = createTCPServer();
       const track_server = createHTTPServer();
       const backends = new _Map();
@@ -159,9 +171,18 @@ export default (dependencies) => {
       logInfo("Track port: %j", getServicePort(track_service));
       return { trace_service, track_service };
     },
-    getReceptorDefaultRecorder: constant("remote"),
-    getReceptorTracePort: ({ trace_service }) => getServicePort(trace_service),
-    getReceptorTrackPort: ({ track_service }) => getServicePort(track_service),
+    adaptReceptorConfiguration: (
+      { trace_service, track_service },
+      configuration,
+    ) =>
+      extendConfiguration(
+        configuration,
+        {
+          "trace-port": getServicePort(trace_service),
+          "track-port": getServicePort(track_service),
+        },
+        null,
+      ),
     closeReceptorAsync: async ({ trace_service, track_service }) => {
       await closeServiceAsync(trace_service);
       await closeServiceAsync(track_service);

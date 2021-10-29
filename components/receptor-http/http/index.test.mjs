@@ -19,8 +19,8 @@ const { createConfiguration, extendConfiguration } =
 
 const {
   openReceptorAsync,
-  getReceptorTracePort,
-  getReceptorTrackPort,
+  adaptReceptorConfiguration,
+  minifyReceptorConfiguration,
   closeReceptorAsync,
 } = Receptor(await buildTestDependenciesAsync(import.meta.url));
 
@@ -31,13 +31,15 @@ const configuration = extendConfiguration(
   },
   null,
 );
-const receptor = await openReceptorAsync(configuration);
+const receptor = await openReceptorAsync(
+  minifyReceptorConfiguration(configuration),
+);
 
 const assertRequestAsync = async (method, path, body, response) => {
   assertDeepEqual(
     await requestAsync(
       "localhost",
-      getReceptorTrackPort(receptor),
+      adaptReceptorConfiguration(receptor, configuration)["track-port"],
       method,
       path,
       body,
@@ -68,7 +70,9 @@ await assertRequestAsync("GET", "/_appmap/track", null, {
   const socket = new Socket();
   await new Promise((resolve) => {
     socket.on("connect", resolve);
-    socket.connect(getReceptorTracePort(receptor));
+    socket.connect(
+      adaptReceptorConfiguration(receptor, configuration)["trace-port"],
+    );
   });
   socket.write(createMessage("session"));
   socket.write(
@@ -87,7 +91,9 @@ await assertRequestAsync("GET", "/_appmap/track", null, {
   const socket = new Socket();
   await new Promise((resolve) => {
     socket.on("connect", resolve);
-    socket.connect(getReceptorTracePort(receptor));
+    socket.connect(
+      adaptReceptorConfiguration(receptor, configuration)["trace-port"],
+    );
   });
   socket.write(createMessage("session"));
   socket.write(

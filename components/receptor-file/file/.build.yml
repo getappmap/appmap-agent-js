@@ -1,7 +1,8 @@
-branches: [node]
+branches: [node, test]
 dependencies:
   - util
   - expect
   - service
   - backend
   - log
+  - configuration

@@ -9,7 +9,8 @@ const _Set = Set;
 
 export default (dependencies) => {
   const {
-    util: { constant, getDirectory },
+    configuration: { extendConfiguration },
+    util: { assert, getDirectory },
     log: { logInfo, logError },
     expect: { expect },
     service: { openServiceAsync, closeServiceAsync, getServicePort },
@@ -86,10 +87,24 @@ export default (dependencies) => {
     ],
   };
   return {
+    minifyReceptorConfiguration: ({
+      recorder,
+      "trace-port": trace_port,
+      output: { directory },
+    }) => ({
+      recorder,
+      "trace-port": trace_port,
+      output: { directory },
+    }),
     openReceptorAsync: async ({
+      recorder,
       "trace-port": trace_port,
       output: { directory },
     }) => {
+      assert(
+        recorder === "mocha" || recorder === "process",
+        "invalid recorder for receptor-file",
+      );
       await createDirectoryAsync(directory);
       const server = createServer();
       const paths = new _Set();
@@ -132,9 +147,14 @@ export default (dependencies) => {
       logInfo("Trace port: %j", getServicePort(trace_service));
       return trace_service;
     },
-    getReceptorDefaultRecorder: constant("process"),
-    getReceptorTracePort: getServicePort,
-    getReceptorTrackPort: constant(0),
+    adaptReceptorConfiguration: (service, configuration) =>
+      extendConfiguration(
+        configuration,
+        {
+          "trace-port": getServicePort(service),
+        },
+        null,
+      ),
     closeReceptorAsync: closeServiceAsync,
   };
 };

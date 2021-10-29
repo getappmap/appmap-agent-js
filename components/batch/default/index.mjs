@@ -1,4 +1,6 @@
 const _RegExp = RegExp;
+const _Map = Map;
+const { stringify: stringifyJSON } = JSON;
 
 export default (dependencies) => {
   const {
@@ -6,12 +8,12 @@ export default (dependencies) => {
     expect: { expectSuccessAsync, expectSuccess },
     log: { logDebug, logInfo, logWarning },
     spawn: { spawn },
-    configuration: { extendConfiguration, compileCommandConfiguration },
+    configuration: { compileCommandConfiguration },
     receptor: {
       openReceptorAsync,
       closeReceptorAsync,
-      getReceptorTracePort,
-      getReceptorTrackPort,
+      adaptReceptorConfiguration,
+      minifyReceptorConfiguration,
     },
   } = dependencies;
   const isCommandNonNull = ({ command }) => command !== null;
@@ -38,16 +40,19 @@ export default (dependencies) => {
           subprocess.kill("SIGINT");
         }
       });
-      const receptor = await openReceptorAsync(configuration);
-      configuration = extendConfiguration(
-        configuration,
-        {
-          "trace-port": getReceptorTracePort(receptor),
-          "track-port": getReceptorTrackPort(receptor),
-        },
-        null,
-      );
+      const receptors = new _Map();
+      const createReceptorAsync = async (configuration) => {
+        const receptor_configuration =
+          minifyReceptorConfiguration(configuration);
+        const key = stringifyJSON(receptor_configuration);
+        if (!receptors.has(key)) {
+          receptors.set(key, await openReceptorAsync(receptor_configuration));
+        }
+        return receptors.get(key);
+      };
       const runConfigurationAsync = async (configuration, env) => {
+        const receptor = await createReceptorAsync(configuration);
+        configuration = adaptReceptorConfiguration(receptor, configuration);
         const { command: description } = configuration;
         logInfo("%s ...", description);
         const { command, options } = compileCommandConfiguration(
@@ -87,10 +92,7 @@ export default (dependencies) => {
       const { length } = configurations;
       try {
         if (length === 0) {
-          logWarning(
-            "No processes found to spawn in available scenarios for %j",
-            scenario,
-          );
+          logWarning("Could not find any command to spawn.");
         } else if (length === 1) {
           const [configuration] = configurations;
           await runConfigurationAsync(configuration, env);
@@ -113,7 +115,9 @@ export default (dependencies) => {
           }
         }
       } finally {
-        await closeReceptorAsync(receptor);
+        for (const receptor of receptors.values()) {
+          await closeReceptorAsync(receptor);
+        }
       }
     },
   };
