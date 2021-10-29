@@ -1,3 +1,10 @@
+# [6.1.0](https://github.com/applandinc/appmap-agent-js/compare/v6.0.0...v6.1.0) (2021-10-29)
+
+
+### Features
+
+* remove constraint to share recorder accross selected scenario ([aa0f0c7](https://github.com/applandinc/appmap-agent-js/commit/aa0f0c786fcbdcb59efe359d15959c2677786f7c))
+
 # [6.0.0](https://github.com/applandinc/appmap-agent-js/compare/v5.2.2...v6.0.0) (2021-10-28)
 
 
