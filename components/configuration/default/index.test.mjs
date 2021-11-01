@@ -71,7 +71,19 @@ const extend = (name, value1, nullable_directory) => {
 assertDeepEqual(
   getConfigurationPackage(
     createConfiguration("/repository").packages,
-    "/directory/foo",
+    "data:,FOO",
+  ),
+  {
+    enabled: true,
+    shallow: false,
+    exclude: [],
+    "inline-source": null,
+  },
+);
+assertDeepEqual(
+  getConfigurationPackage(
+    createConfiguration("/repository").packages,
+    "file:///directory/foo",
   ),
   {
     enabled: false,
@@ -89,7 +101,7 @@ assertDeepEqual(
       },
       "/directory",
     ).packages,
-    "/directory/foo",
+    "file:///directory/foo",
   ),
   {
     enabled: true,

@@ -10,7 +10,7 @@ import SourceOuter from "./index.mjs";
 const { deepEqual: assertDeepEqual } = Assert;
 
 const { getSources } = await buildTestComponentAsync("source");
-const { extractSourceMap, extractSourceMapAsync } = SourceOuter(
+const { extractSourceMap } = SourceOuter(
   await buildTestDependenciesAsync(import.meta.url),
 );
 
@@ -20,7 +20,6 @@ const { extractSourceMap, extractSourceMapAsync } = SourceOuter(
     content: "123;",
   };
   assertDeepEqual(getSources(extractSourceMap(file)), [file]);
-  assertDeepEqual(getSources(await extractSourceMapAsync(file)), [file]);
 }
 
 {
@@ -35,7 +34,6 @@ const { extractSourceMap, extractSourceMapAsync } = SourceOuter(
     { url: `file://${directory}/source2.js`, content: "456;" },
   ];
   assertDeepEqual(getSources(extractSourceMap(file)), [file]);
-  assertDeepEqual(getSources(await extractSourceMapAsync(file)), [file]);
   await writeFileAsync(
     `${directory}/source.map`,
     JSON.stringify({
@@ -48,8 +46,6 @@ const { extractSourceMap, extractSourceMapAsync } = SourceOuter(
     "utf8",
   );
   assertDeepEqual(getSources(extractSourceMap(file)), [file]);
-  assertDeepEqual(getSources(await extractSourceMapAsync(file)), [file]);
   await writeFileAsync(`${directory}/source2.js`, "456;", "utf8");
   assertDeepEqual(getSources(extractSourceMap(file)), sources);
-  assertDeepEqual(getSources(await extractSourceMapAsync(file)), sources);
 }

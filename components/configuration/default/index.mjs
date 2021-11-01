@@ -1,5 +1,8 @@
+/* globals URL */
+
 import { parse as parseShell } from "shell-quote";
 
+const _URL = URL;
 const { stringify: stringifyJSON } = JSON;
 const { isArray } = Array;
 const { ownKeys } = Reflect;
@@ -14,7 +17,7 @@ export default (dependencies) => {
       toAbsolutePath,
       hasOwnProperty,
     },
-    log: { logInfo, logGuardWarning },
+    log: { logInfo, logGuardWarning, logWarning },
     expect: { expect },
     validate: { validateConfig },
     specifier: { matchSpecifier },
@@ -30,6 +33,13 @@ export default (dependencies) => {
   ////////////
   // Extend //
   ////////////
+
+  const default_package_specifier = {
+    enabled: true,
+    "inline-source": null,
+    shallow: false,
+    exclude: [],
+  };
 
   const assign = (value1, value2) => ({ ...value1, ...value2 });
 
@@ -512,7 +522,22 @@ export default (dependencies) => {
     //       .filter(filterEnvironmentPair)
     //       .map(mapEnvironmentPair),
     //   ),
-    getConfigurationPackage: getSpecifierValue,
+    getConfigurationPackage: (packages, url) => {
+      const { protocol, pathname } = new _URL(url);
+      if (protocol === "data:") {
+        logWarning(
+          "Could not apply 'packages' configuration field on package url because it is a data url, got: %j.",
+          url,
+        );
+        return default_package_specifier;
+      }
+      expect(
+        protocol === "file:",
+        "Expected package url protocol to be either 'data:' or 'file:', got: %j",
+        url,
+      );
+      return getSpecifierValue(packages, pathname);
+    },
     isConfigurationEnabled: ({ processes, main }) => {
       const enabled = main === null || getSpecifierValue(processes, main);
       logInfo(`%s %s`, enabled ? "recording" : "bypassing", main);

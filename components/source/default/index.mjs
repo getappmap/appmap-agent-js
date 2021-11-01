@@ -5,15 +5,24 @@ const _URL = URL;
 
 export default (dependencies) => {
   const {
-    expect: { expectSuccess },
+    expect: { expect, expectSuccess },
     util: { assert, toAbsolutePath, getDirectory, coalesce },
     validate: { validateSourceMap },
     "source-inner": { compileSourceMap, mapSource },
   } = dependencies;
 
   const normalizeURL = (url, relative_url) => {
-    if (/^[a-z]+:\/\//u.test(relative_url)) {
+    if (/^[a-z]+:/u.test(relative_url)) {
       return relative_url;
+    }
+    if (url.startsWith("data:")) {
+      expect(
+        relative_url[0] === "/",
+        "Expected an absolute path because the reference url is a data url, got %j relative to %j",
+        relative_url,
+        url,
+      );
+      return `file://${relative_url}`;
     }
     const url_object = new _URL(url);
     const { pathname: path } = url_object;

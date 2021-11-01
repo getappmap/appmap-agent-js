@@ -14,7 +14,7 @@ export default (dependencies) => {
     util: { assert },
     frontend: { instrument },
     emitter: { sendEmitter },
-    "source-outer": { extractSourceMapAsync },
+    "source-outer": { extractSourceMap },
   } = dependencies;
   return {
     unhookNativeModule: (enabled) => {
@@ -54,7 +54,7 @@ export default (dependencies) => {
             const { content: content2, messages } = instrument(
               frontend,
               file,
-              await extractSourceMapAsync(file),
+              extractSourceMap(file),
             );
             for (const message of messages) {
               sendEmitter(emitter, message);

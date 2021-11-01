@@ -1,11 +1,8 @@
-/* globals URL */
-
 import { generate as generateEstree } from "escodegen";
 import { parse as parseEstree } from "acorn";
 
 import Visit from "./visit.mjs";
 
-const _URL = URL;
 const _Set = Set;
 
 export default (dependencies) => {
@@ -53,13 +50,12 @@ export default (dependencies) => {
       let sources = getSources(mapping);
       sources = sources
         .map(({ url, content }) => {
-          const { pathname: path } = new _URL(url);
           const {
             enabled,
             shallow,
             exclude,
             "inline-source": inline,
-          } = getConfigurationPackage(packages, path);
+          } = getConfigurationPackage(packages, url);
           return {
             head: enabled,
             body: {

@@ -1,6 +1,7 @@
 import { readFileSync as readFile } from "fs";
-import { readFile as readFileAsync } from "fs/promises";
 
+const _Buffer = Buffer;
+const _decodeURIComponent = decodeURIComponent;
 const _URL = URL;
 
 export default (dependencies) => {
@@ -8,29 +9,31 @@ export default (dependencies) => {
     util: { makeLeft, makeRight },
     expect: { expect },
   } = dependencies;
-  const extractFilePath = (url) => {
-    const { protocol, pathname } = new _URL(url);
-    expect(
-      protocol === "file:",
-      "Expected file protocol in url but got: %j",
-      url,
-    );
-    return pathname;
+  const parseDataPath = (path) => {
+    const parts = /^([^,]*),(.*)$/u.exec(path);
+    expect(parts !== null, "Invalid data url pathname: %j.", path);
+    const [, head, body] = parts;
+    if (head.endsWith(";base64")) {
+      expect(
+        head.toLowerCase().endsWith(";charset=utf-8;base64"),
+        "Only utf-8 encoding is currently supported, got: %j.",
+        path,
+      );
+      return _Buffer.from(body, "base64").toString("utf8");
+    }
+    return _decodeURIComponent(body);
   };
   return {
-    readFileAsync: async (url) => {
-      const path = extractFilePath(url);
-      try {
-        return makeRight({
-          url,
-          content: await readFileAsync(path, "utf8"),
-        });
-      } catch ({ message }) {
-        return makeLeft(message);
-      }
-    },
     readFile: (url) => {
-      const path = extractFilePath(url);
+      const { protocol, pathname: path } = new _URL(url);
+      if (protocol === "data:") {
+        return makeRight({ url, content: parseDataPath(path) });
+      }
+      expect(
+        protocol === "file:",
+        "Expected url protocol to be either 'data:' or 'file:', got: %j.",
+        url,
+      );
       try {
         return makeRight({
           url,
