@@ -1,3 +1,10 @@
+# [6.2.0](https://github.com/applandinc/appmap-agent-js/compare/v6.1.0...v6.2.0) (2021-11-01)
+
+
+### Features
+
+* support for data url in source maps ([ea52da2](https://github.com/applandinc/appmap-agent-js/commit/ea52da2758d0190ac652a5c06a69070265912885))
+
 # [6.1.0](https://github.com/applandinc/appmap-agent-js/compare/v6.0.0...v6.1.0) (2021-10-29)
 
 
