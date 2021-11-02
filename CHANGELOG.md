@@ -1,3 +1,10 @@
+# [6.3.0](https://github.com/applandinc/appmap-agent-js/compare/v6.2.0...v6.3.0) (2021-11-02)
+
+
+### Features
+
+* check mocha version before yielding control to mocha cli ([3bfb515](https://github.com/applandinc/appmap-agent-js/commit/3bfb515564c28e39b5671c0333e4849f7e60f101))
+
 # [6.2.0](https://github.com/applandinc/appmap-agent-js/compare/v6.1.0...v6.2.0) (2021-11-01)
 
 
