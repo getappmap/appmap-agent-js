@@ -531,11 +531,6 @@ export default (dependencies) => {
         );
         return default_package_specifier;
       }
-      expect(
-        protocol === "file:",
-        "Expected package url protocol to be either 'data:' or 'file:', got: %j",
-        url,
-      );
       return getSpecifierValue(packages, pathname);
     },
     isConfigurationEnabled: ({ processes, main }) => {
