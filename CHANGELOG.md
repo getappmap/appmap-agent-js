@@ -1,3 +1,11 @@
+## [6.3.1](https://github.com/applandinc/appmap-agent-js/compare/v6.3.0...v6.3.1) (2021-11-02)
+
+
+### Bug Fixes
+
+* no longer crash on package url other than 'data:' or 'file:' ([6233055](https://github.com/applandinc/appmap-agent-js/commit/623305553fd6718898955d3e26fcb8d2f4e86103))
+* warning instead of failing upon http activity after closing ([bbc3aca](https://github.com/applandinc/appmap-agent-js/commit/bbc3aca85f6ffc9df7697f5d1f1a211c81091e38))
+
 # [6.3.0](https://github.com/applandinc/appmap-agent-js/compare/v6.2.0...v6.3.0) (2021-11-02)
 
 
