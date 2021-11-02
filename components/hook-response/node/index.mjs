@@ -5,6 +5,7 @@ import { EventEmitter } from "events";
 const { nextTick } = process;
 const { apply, construct } = Reflect;
 const _Proxy = Proxy;
+const _Set = Set;
 const _undefined = undefined;
 const {
   prototype: { emit: _emit },
@@ -13,6 +14,7 @@ const {
 export default (dependencies) => {
   const {
     util: { constant, assert, coalesce, assignProperty },
+    log: { logWarning },
     expect: { expect },
     patch: { patch },
     frontend: {
@@ -95,12 +97,12 @@ export default (dependencies) => {
     };
     // jump //
     let jump_index = null;
-    let closed = 0;
+    let closed = new _Set();
     request.on("close", () => {
-      closed += 1;
+      closed.add("request");
     });
     response.on("close", () => {
-      closed += 1;
+      closed.add("response");
     });
     begin();
     return {
@@ -109,24 +111,37 @@ export default (dependencies) => {
           jump_index === null,
           "cannot pause http response because we are in jump state",
         );
-        if (closed === 2) {
-          end();
+        if (closed.has("request") && closed.has("response")) {
+          if (!closed.has("cycle")) {
+            closed.add("cycle");
+            end();
+          }
         } else {
           jump_index = incrementEventCounter(frontend);
           sendEmitter(emitter, recordBeforeJump(frontend, jump_index, null));
         }
       },
       resume: () => {
-        expect(
-          closed < 2,
-          "received event after closing both request and response",
-        );
-        assert(
-          jump_index !== null,
-          "cannot resume http response because we are not in a jump state",
-        );
-        sendEmitter(emitter, recordAfterJump(frontend, jump_index, null));
-        jump_index = null;
+        if (closed.has("request") && closed.has("response")) {
+          assert(
+            closed.has("cycle"),
+            "upon resuming closed request and response, the cycle should be closed as well",
+          );
+          assert(
+            jump_index === null,
+            "upon resuming closed request and response, we should not be in a jump state",
+          );
+          logWarning(
+            "HTTP activity detected after closing both the request and the response.",
+          );
+        } else {
+          assert(
+            jump_index !== null,
+            "cannot resume http response because we are not in a jump state",
+          );
+          sendEmitter(emitter, recordAfterJump(frontend, jump_index, null));
+          jump_index = null;
+        }
       },
     };
   };

@@ -29,6 +29,16 @@ const listenAsync = (server, port) =>
     server.listen(port);
   });
 
+const promiseCycleClosing = async (request, response) =>
+  await Promise.all([
+    new Promise((resolve) => {
+      response.on("close", resolve);
+    }),
+    new Promise((resolve) => {
+      response.on("close", resolve);
+    }),
+  ]);
+
 const closeAsync = (server) =>
   new Promise((resolve, reject) => {
     server.on("error", reject);
@@ -121,6 +131,11 @@ assertDeepEqual(
             });
           });
           server.on("request", app);
+          // Manufacture activity after closing both request and response
+          server.on("request", async (request, response) => {
+            await promiseCycleClosing(request, response);
+            response.emit("foo");
+          });
           const port = await listenAsync(server, 0);
           const request = get(
             `http://localhost:${String(port)}/route/foo/bar/qux`,
@@ -132,9 +147,7 @@ assertDeepEqual(
           response.on("data", (data) => {
             body += data.toString("utf8");
           });
-          await new Promise((resolve) => {
-            response.on("end", resolve);
-          });
+          await promiseCycleClosing(request, response);
           assertDeepEqual(JSON.parse(body), {
             0: "foo",
             param1: "bar",
