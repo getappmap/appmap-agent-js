@@ -1,0 +1,4 @@
+branches: [node, test, browser]
+dependencies:
+  - expect
+  - util

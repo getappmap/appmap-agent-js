@@ -595,7 +595,9 @@ export default (dependencies) => {
             // abomination: https://github.com/mochajs/mocha/issues/4720
             `--require=${directory}/lib/abomination.js`,
             `--experimental-loader=${directory}/lib/${
-              recorder === "mocha" ? "loader" : `recorder-${recorder}`
+              recorder === "mocha"
+                ? "node-mocha-loader"
+                : `recorder-${recorder}`
             }.mjs`,
           ].join(" "),
         };

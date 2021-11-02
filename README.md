@@ -34,7 +34,8 @@ Table of contents:
 * unix-like os
 * git
 * node 14, 16, 17, or 18
-* [mocha recorder only]: mocha >= 8.0.0 (because of root hooks)
+* [mocha recorder only]: mocha >= 8.0.0 (because of root hooks).
+  <!-- Also, since `mocha@6.1.4`, `lib/cli/cli` is used instead of trouble-causing extension-less binary: `bin/_mocha`. cf: https://github.com/mochajs/mocha/commit/9ea45e7557a193c4b69816085397a6655fb5bc06#diff-91c989b6425dcbfe95dbe6f7dc3727d8376c98d8acd8a30a78a6d6adc34f4f0b. -->
 
 <!--
 TODO: sql libraries requirements

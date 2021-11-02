@@ -1,28 +1,11 @@
-import Mocha from "mocha";
-
-const _undefined = undefined;
-
 export default (dependencies) => {
   const {
     uuid: { getUUID },
     log: { logInfo },
     configuration: { isConfigurationEnabled },
-    util: { assert, coalesce, matchVersion },
-    expect: { expect },
+    util: { assert },
     agent: { openAgent, closeAgent, startTrack, stopTrack },
   } = dependencies;
-  const prototype = coalesce(Mocha, "prototype", _undefined);
-  const version = coalesce(prototype, "version", _undefined);
-  expect(
-    typeof version === "string",
-    "mocha.prototype.version should be a string but got: %o",
-    version,
-  );
-  expect(
-    matchVersion(version, "8.0.0"),
-    "expected mocha.prototype.version >= 8.0.0 but got: %o",
-    version,
-  );
   return {
     createMochaHooks: (process, configuration) => {
       logInfo("Recorder 'mocha' caught process %j", process.pid);

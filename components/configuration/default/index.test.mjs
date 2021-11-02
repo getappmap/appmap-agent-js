@@ -348,7 +348,7 @@ assertDeepEqual(
             `--require=${getAgentDirectory("/cwd1")}/lib/abomination.js`,
             `--experimental-loader=${getAgentDirectory(
               "/cwd1",
-            )}/lib/loader.mjs`,
+            )}/lib/node-mocha-loader.mjs`,
           ].join(" "),
         },
       },

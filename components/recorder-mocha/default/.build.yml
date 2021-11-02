@@ -3,6 +3,5 @@ dependencies:
   - log
   - uuid
   - util
-  - expect
   - agent
   - configuration
