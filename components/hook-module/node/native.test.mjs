@@ -5,7 +5,6 @@ import {
 } from "../../build.mjs";
 import Native from "./native.mjs";
 
-const { from } = Buffer;
 const _eval = eval;
 const {
   // ok: assert,
@@ -17,7 +16,7 @@ const {
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
 const { testHookAsync } = await buildTestComponentAsync("hook");
 const { hookNativeModule, unhookNativeModule } = Native(dependencies);
-global.APPMAP_TRANSFORM_SOURCE_ASYNC = null;
+global.APPMAP_TRANSFORM_MODULE_ASYNC = null;
 assertDeepEqual(
   await testHookAsync(
     hookNativeModule,
@@ -34,13 +33,7 @@ assertDeepEqual(
     async () => {
       assertEqual(
         _eval(
-          (
-            await global.APPMAP_TRANSFORM_SOURCE_ASYNC(
-              from("123;", "utf8"),
-              { format: "module", ...import.meta },
-              (code) => code,
-            )
-          ).toString("utf8"),
+          await global.APPMAP_TRANSFORM_MODULE_ASYNC(import.meta.url, "123;"),
         ),
         123,
       );

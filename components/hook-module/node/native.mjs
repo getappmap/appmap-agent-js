@@ -1,4 +1,4 @@
-/* globals APPMAP_TRANSFORM_SOURCE_ASYNC:writable */
+/* globals APPMAP_TRANSFORM_MODULE_ASYNC:writable */
 
 // TODO: detect if preloaded with `--experimental-loader`
 // NB: since 15.x we can use module.preloading
@@ -6,8 +6,6 @@
 // preloaded ? : {hookESM: (instrumentAsync) => {
 //   throw new Error("lib/emitter/hook/esm.js must be preloaded with --experimental loader");
 // }};
-
-const { from: toBuffer } = Buffer;
 
 export default (dependencies) => {
   const {
@@ -20,52 +18,37 @@ export default (dependencies) => {
     unhookNativeModule: (enabled) => {
       if (enabled) {
         assert(
-          typeof APPMAP_TRANSFORM_SOURCE_ASYNC === "function",
+          typeof APPMAP_TRANSFORM_MODULE_ASYNC === "function",
           "native modules are not currently hooked",
         );
-        APPMAP_TRANSFORM_SOURCE_ASYNC = null;
+        APPMAP_TRANSFORM_MODULE_ASYNC = null;
       }
     },
     hookNativeModule: (emitter, frontend, { hooks: { esm } }) => {
       if (esm) {
         assert(
-          typeof APPMAP_TRANSFORM_SOURCE_ASYNC !== "undefined",
+          typeof APPMAP_TRANSFORM_MODULE_ASYNC !== "undefined",
           "the agent was not setup to hook native modules; the node executable should have been given: '--experimental-loader=main/loader.mjs'",
         );
         assert(
-          APPMAP_TRANSFORM_SOURCE_ASYNC === null,
+          APPMAP_TRANSFORM_MODULE_ASYNC === null,
           "native modules are already hooked",
         );
-        APPMAP_TRANSFORM_SOURCE_ASYNC = async (
-          content1,
-          context,
-          transformSourceAsync,
-        ) => {
-          const { format, url } = context;
-          if (format === "module") {
-            if (typeof content1 !== "string") {
-              content1 = toBuffer(content1).toString("utf8");
-            }
-            const file = {
-              url,
-              content: content1,
-              type: "module",
-            };
-            const { content: content2, messages } = instrument(
-              frontend,
-              file,
-              extractSourceMap(file),
-            );
-            for (const message of messages) {
-              sendEmitter(emitter, message);
-            }
-            content1 = content2;
-          }
-          return await transformSourceAsync(
-            content1,
-            context,
-            transformSourceAsync,
+        APPMAP_TRANSFORM_MODULE_ASYNC = async (url, content1) => {
+          const file = {
+            url,
+            content: content1,
+            type: "module",
+          };
+          const { content: content2, messages } = instrument(
+            frontend,
+            file,
+            extractSourceMap(file),
           );
+          for (const message of messages) {
+            sendEmitter(emitter, message);
+          }
+          return content2;
         };
       }
       return esm;
