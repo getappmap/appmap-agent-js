@@ -444,17 +444,17 @@ Remote recording requests can be delivered to two possible end points:
 <!-- ### Mode
 
 The functionalities of the agent is split in two main parts.
-The *backend* buffers the trace and eventually post-processes it and stores it.
-The *frontend* contains all the other functionalities of the agent which should always be located on the recorded process -- eg: intercepting http traffic.
-The `mode` configuration option defines where the backend is located:
-* `"local"`: the backend is executed by the recorded process.
-* `"remote"`: the backend is executed by another node process. 
+- The *backend* buffers the trace and eventually post-processes it and stores it.
+- The *frontend* contains all the other functionalities of the agent which should always be located on the recorded process -- eg: intercepting http traffic.
+- The `mode` configuration option defines where the backend is located:
+  - `"local"`: the backend is executed by the recorded process.
+  - `"remote"`: the backend is executed by another node process. 
 
 Advantages of the remote mode over the local mode:
-* Appmap storage will always happen, regardless of how the recorded process is terminated.
-  For instance, in the local mode, killing the recorded process with `SIGKILL` or performing `process.removeAllListeners("exit")` will preclude appmap storage.
-* The backend process manages multiple recorded processes and prevents accidental overwriting of appmap files.
-* Lower memory footprint of the agent on the recorded process because it contains less functionalities and no trace. -->
+- Appmap storage will always happen, regardless of how the recorded process is terminated.
+  - For instance, in the local mode, killing the recorded process with `SIGKILL` or performing `process.removeAllListeners("exit")` will preclude appmap storage.
+- The backend process manages multiple recorded processes and prevents accidental overwriting of appmap files.
+- Lower memory footprint of the agent on the recorded process because it contains less functionalities and no trace. -->
 
 ## Manual Recording
 
@@ -498,81 +498,80 @@ The actual format requirements for configuration can be found as a json-schema [
 
 The agent filter files based on a format called `Specifier`.
 A specifier can be any of:
-* `<RegexpSecifier>` Filter files based on a regular expression.
-    * `regexp <string>` The regular expression's source.
-    * `flags <string>` The regular expression's flags. *Default*: `"u"`.
-* `<GlobSpecifier>` Filter files based on a glob expression
-    * `glob <string>` The glob expression
-* `<PathSpecifier>` Filter files based on a path
-    * `path <string>` Path to a file or a directory (without trailing `/`).
-    * `recursive <boolean>` Indicates whether to whitelist files within nested directories. *Default*: `true`.
-* `<DistSpecifier>` Filter files based on a npm package name.
-    * `dist <string>` Relative path that starts with a npm package name. For instance: `"package/lib"`.
-    * `recursive <boolean>`: indicates whether to whitelist files within nested directories. *Default*: `true`.
-    * `external <boolean>` Indicates whether to whitelist dependencies outside of the repository. *Default*: `false`.
+- `<RegexpSecifier>` Filter files based on a regular expression.
+  - `regexp <string>` The regular expression's source.
+  - `flags <string>` The regular expression's flags. *Default*: `"u"`.
+- `<GlobSpecifier>` Filter files based on a glob expression
+  - `glob <string>` The glob expression
+- `<PathSpecifier>` Filter files based on a path
+  - `path <string>` Path to a file or a directory (without trailing `/`).
+  - `recursive <boolean>` Indicates whether to whitelist files within nested directories. *Default*: `true`.
+- `<DistSpecifier>` Filter files based on a npm package name.
+  - `dist <string>` Relative path that starts with a npm package name. For instance: `"package/lib"`.
+  - `recursive <boolean>`: indicates whether to whitelist files within nested directories. *Default*: `true`.
+  - `external <boolean>` Indicates whether to whitelist dependencies outside of the repository. *Default*: `false`.
 
 <!-- * `hidden-identifier <string>` The prefix of hidden variables used by the agent. The instrumentation will fail if variables from the program under recording starts with this prefix. *Default*: `"APPMAP"`.
-* `function-name-placeholder <string>` The placeholder name for classmap function elements. *Default* `"()"`. 
-* `mode: "local" | "remote"` Defines whether the backend should be executed on the recorded process or on a remote process. *Default*: `"local"` for the API and `"remote"` for the CLI.
-* `protocol "tcp" | "http1" | "http2"` Defines the communication protocol between frontend and backend. Only applicable in remote mode. `"tcp"` refers to a simple messaging protocol directly built on top of tcp and is the fastest option. *Default*: `"tcp"`.
-* `port <number> | <string>` Defines the communication port between frontend and backend. Only applicable in remote mode. A string indicates a path to a unix domain socket which is faster. *Default*: `0` which will use a random available port.
-* `validate <boolean> | <object>` Validation options which are useful to debug the agent.
-  * `<boolean>` Shorthand, `true` is the same as `{message: true, appmap:true}` and `false` is the same as `{message:true, appmap:true}`.
-  * `<object>`
-      * `message <boolean>` Indicates whether to validate trace elements as they are buffered. This is useful to help diagnose the root cause of some bugs. *Default* `false`.
-      * `appmap <boolean>` Indicates whether to validate the appmap before writting it to a file. *Default* `false`. -->
+- `function-name-placeholder <string>` The placeholder name for classmap function elements. *Default* `"()"`. 
+- `mode: "local" | "remote"` Defines whether the backend should be executed on the recorded process or on a remote process. *Default*: `"local"` for the API and `"remote"` for the CLI.
+- `protocol "tcp" | "http1" | "http2"` Defines the communication protocol between frontend and backend. Only applicable in remote mode. `"tcp"` refers to a simple messaging protocol directly built on top of tcp and is the fastest option. *Default*: `"tcp"`.
+- `port <number> | <string>` Defines the communication port between frontend and backend. Only applicable in remote mode. A string indicates a path to a unix domain socket which is faster. *Default*: `0` which will use a random available port.
+- `validate <boolean> | <object>` Validation options which are useful to debug the agent.
+  - `<boolean>` Shorthand, `true` is the same as `{message: true, appmap:true}` and `false` is the same as `{message:true, appmap:true}`.
+  - `<object>`
+    - `message <boolean>` Indicates whether to validate trace elements as they are buffered. This is useful to help diagnose the root cause of some bugs. *Default* `false`.
+    - `appmap <boolean>` Indicates whether to validate the appmap before writting it to a file. *Default* `false`. -->
 
 ### Automated Recording Configuration Fields
 
-* `mode "local" | "remote"`
-* `recorder "process" | "remote"` Defines the main algorithm used for recording. *Default* `"process"`.
-    * `"process"` Generate a single appmap which spans over the entire lifetime of the process.
-    * `"mocha"` Generate an appmap for each test case (ie `it` calls) of the entire test suite (ie every `describe` calls on every test file).
-* `track-port <number> | null`: Port in the backend process for serving remote recording HTTP requests. *Default*: `0` A random port will be used.
-* `intercept-track-port <number> | null`: Port in the frontend process for intercepting remote recording HTTP requests. *Default*: `null` No interception.
-* `processes <boolean> | <string> | <EnabledSpecifier> | <EnabledSpecifier[]>` Whitelist files to decide whether a node process should be instrumented based on the path of its main module. An `EnabledSpecifier` can be any of
-    * `<boolean>` Shorthand, `true` is the same as `{regexp:"^", enabled:true}` and `false` is the same as `{regexp:"^", enabled:false}`.
-    * `<string>` Shorthand, `"test/**/*.mjs"` is the same as `{glob:"test/**/*.mjs", enabled:true}`.
-    * `<object>`
-        * `enabled <boolean>` Indicates whether whitelisted files are enabled or not. *Default*: `true`.
-        * `... <Specifier>` Extends from any specifier format. 
+- `mode "local" | "remote"`
+- `recorder "process" | "remote"` Defines the main algorithm used for recording. *Default* `"process"`.
+   - `"process"` Generate a single appmap which spans over the entire lifetime of the process.
+   - `"mocha"` Generate an appmap for each test case (ie `it` calls) of the entire test suite (ie every `describe` calls on every test file).
+- `track-port <number> | null`: Port in the backend process for serving remote recording HTTP requests. *Default*: `0` A random port will be used.
+- `intercept-track-port <number> | null`: Port in the frontend process for intercepting remote recording HTTP requests. *Default*: `null` No interception.
+- `processes <boolean> | <string> | <EnabledSpecifier> | <EnabledSpecifier[]>` Whitelist files to decide whether a node process should be instrumented based on the path of its main module. An `EnabledSpecifier` can be any of
+  - `<boolean>` Shorthand, `true` is the same as `{regexp:"^", enabled:true}` and `false` is the same as `{regexp:"^", enabled:false}`.
+  - `<string>` Shorthand, `"test/**/*.mjs"` is the same as `{glob:"test/**/*.mjs", enabled:true}`.
+  - `<object>`
+    - `enabled <boolean>` Indicates whether whitelisted files are enabled or not. *Default*: `true`.
+    - `... <Specifier>` Extends from any specifier format. 
   *Default*: `[]` -- ie: the agent will be enabled for every process whose entry script resides in the repository directory.
-* `scenario <string>` A regular expression to select scenarios for execution. *Default*: `"anonymous"` (the name of the scenario provided by command line argument).
-* `scenarios <object>` An object whose values are either a single scenario or a list of scenarios. A scenario can be any of:
-      * `<string>` Command which gets converted in the `spawn` format. For instance: `"exec argv0"` is the same as `{type: "spawn", exec: "/bin/sh", argv: ["-c", "exec argv0"]}`.
-      * `<string[]>` Parsed command which gets converted in the `spawn` format. For instance: `["exec", "argv0"]` is the same as `{type: "spawn", exec: "exec", argv: ["argv0"]}`.
-      * `<SpawnScenario>` The spawn scenario format which is inspired from [child_process#spawn](https://nodejs.org/api/child_process.html#child_process_child_process_spawn_command_args_options):
-          * `type "spawn"`
-          * `exec <string>` Executable to run, paths should be relative to `options.cwd`.
-          * `argv <string[]>` List of command line arguments to pass to the executable.
-          * `options <object>` Options object
-              * `cwd <string>` Current working directory of the child process. *Default*: the directory of the configuration file.
-              * `env <object>` Environment variables. Note that Unlike for the [child_process#spawn](https://nodejs.org/api/child_process.html#child_process_child_process_spawn_command_args_options), the environment variables from the parent process will always be included.
-        *Default*: `{}` -- ie: the environment variables from the parent process.
-              * `stdio <string> | <string[]>` Stdio configuration, only `"ignore"` and `"inherit"` are supported.
-              * `encoding "utf8" | "utf16le" | "latin1"` Encoding of all the child's stdio streams.
-              * `timeout <number>` The maximum number of millisecond the child process is allowed to run before being killed. *Default*: `0` (no timeout).
-              * `killSignal <string>` The signal used to kill the child process when it runs out of time. *Default*: `"SIGTERM"`.
-          * `configuration <Configuration>`: Extension of the parent configuration.
-          *Default*: `{}` -- ie: reuse the parent configuration.
-      * `<ForkScenario>` The spawn scenario format which is inspired from [child_process#fork][https://nodejs.org/api/child_process.html#child_process_child_process_fork_modulepath_args_options]
-          * `type "fork"`
-          * `globbing <boolean>` Indicates whether the `exec` property should be interpreted as a glob or a path. *Default*: `true`.
-          * `exec <string>` Path to the main module relative to `options.cwd`.
-          * `argv <string[]>` List of command line arguments to pass to the main module.
-          * `options <Object>`
-              * `execPath` Path to a node executable
-              * `execArgv` List of command line arguments to pass to the node executable.
-              * `... <SpawnScenario.options>` Any option from the `spawn` format is also supported.
-          * `configuration <Configuration>` Extension of the parent configuration. *Default*: `{}` -- ie: reuse the parent configuration.
-* `output <string> | <object>` Options to store appmap files.
-    * `null` Shorthand for `{target:"http"}`.
-    * `<string>` Shorthand, `"tmp/appmap"` is the same as `{target: "file", directory: "tmp/appmap"}`.
-    * `<object>`
-        * `target "file" | "http"` Either write appmaps in files or serve through HTTP.
-        * `directory <string>` Directory to write appmap files.
-        * `basename null | <string>` Basename of the future appmap file. Indexing will be appended to prevent accidental overwriting of appmap files within a single run. *Default*: `null` the agent will look at the `name` configuration field, if it is `null` as well, `"anonymous"` will be used.
-        * `extension <string>` Extension to append after the basename. *Default*: `".appmap.json"`.
+- `scenario <string>` A regular expression to select scenarios for execution. *Default*: `"anonymous"` (the name of the scenario provided by command line argument).
+- `scenarios <object>` An object whose values are either a single scenario or a list of scenarios. A scenario can be any of:
+  - `<string>` Command which gets converted in the `spawn` format. For instance: `"exec argv0"` is the same as `{type: "spawn", exec: "/bin/sh", argv: ["-c", "exec argv0"]}`.
+  - `<string[]>` Parsed command which gets converted in the `spawn` format. For instance: `["exec", "argv0"]` is the same as `{type: "spawn", exec: "exec", argv: ["argv0"]}`.
+  - `<SpawnScenario>` The spawn scenario format which is inspired from [child_process#spawn](https://nodejs.org/api/child_process.html#child_process_child_process_spawn_command_args_options):
+    - `type "spawn"`
+    - `exec <string>` Executable to run, paths should be relative to `options.cwd`.
+    - `argv <string[]>` List of command line arguments to pass to the executable.
+    - `options <object>` Options object
+      - `cwd <string>` Current working directory of the child process. *Default*: the directory of the configuration file.
+      - `env <object>` Environment variables. Note that unlike for the [child_process#spawn](https://nodejs.org/api/child_process.html#child_process_child_process_spawn_command_args_options)
+, the environment variables from the parent process will always be included. *Default*: `{}` -- ie: the environment variables from the parent process.
+        - `stdio <string> | <string[]>` Stdio configuration, only `"ignore"` and `"inherit"` are supported.
+        - `encoding "utf8" | "utf16le" | "latin1"` Encoding of all the child's stdio streams.
+        - `timeout <number>` The maximum number of millisecond the child process is allowed to run before being killed. *Default*: `0` (no timeout).
+        - `killSignal <string>` The signal used to kill the child process when it runs out of time. *Default*: `"SIGTERM"`.
+  - `configuration <Configuration>`: Extension of the parent configuration.
+        *Default*: `{}` -- ie: reuse the parent configuration.
+  - `<ForkScenario>` The spawn scenario format which is inspired from [child_process#fork](https://nodejs.org/api/child_process.html#child_process_child_process_fork_modulepath_args_options)
+    - `type "fork"`
+    - `globbing <boolean>` Indicates whether the `exec` property should be interpreted as a glob or a path. *Default*: `true`.
+    - `exec <string>` Path to the main module relative to `options.cwd`.
+    - `argv <string[]>` List of command line arguments to pass to the main module.
+    - `options <Object>`
+      - `execPath` Path to a node executable
+      - `execArgv` List of command line arguments to pass to the node executable.
+      - `... <SpawnScenario.options>` Any option from the `spawn` format is also supported.
+- `output <string> | <object>` Options to store appmap files.
+  - `null` Shorthand for `{target:"http"}`.
+  - `<string>` Shorthand, `"tmp/appmap"` is the same as `{target: "file", directory: "tmp/appmap"}`.
+  - `<object>`
+    - `target "file" | "http"` Either write appmaps in files or serve through HTTP.
+    - `directory <string>` Directory to write appmap files.
+    - `basename null | <string>` Basename of the future appmap file. Indexing will be appended to prevent accidental overwriting of appmap files within a single run. *Default*: `null` the agent will look at the `name` configuration field, if it is `null` as well, `"anonymous"` will be used.
+    - `extension <string>` Extension to append after the basename. *Default*: `".appmap.json"`.
 
 ### Common Options
 
