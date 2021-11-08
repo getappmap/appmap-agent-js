@@ -115,48 +115,49 @@ assertDeepEqual(
     makeEvent("before", index, 0, "jump", null),
     makeEvent("after", index, 0, "jump", null),
   ];
-  assertDeepEqual(
-    (
-      await testHookAsync(
-        hookResponse,
-        unhookResponse,
-        { hooks: { http: true } },
-        async () => {
-          const server = Http.createServer();
-          const app = createApp();
-          app.get("/route/*/:param1/:param2", function (req, res) {
-            req.on("data", () => {});
-            req.on("end", () => {
-              res.send(JSON.stringify(req.params));
-            });
+  const events = (
+    await testHookAsync(
+      hookResponse,
+      unhookResponse,
+      { hooks: { http: true } },
+      async () => {
+        const server = Http.createServer();
+        const app = createApp();
+        app.get("/route/*/:param1/:param2", function (req, res) {
+          req.on("data", () => {});
+          req.on("end", () => {
+            res.send(JSON.stringify(req.params));
           });
-          server.on("request", app);
-          // Manufacture activity after closing both request and response
-          server.on("request", async (request, response) => {
-            await promiseCycleClosing(request, response);
-            response.emit("foo");
-          });
-          const port = await listenAsync(server, 0);
-          const request = get(
-            `http://localhost:${String(port)}/route/foo/bar/qux`,
-          );
-          const response = await new Promise((resolve) => {
-            request.on("response", resolve);
-          });
-          let body = "";
-          response.on("data", (data) => {
-            body += data.toString("utf8");
-          });
+        });
+        server.on("request", app);
+        // Manufacture activity after closing both request and response
+        server.on("request", async (request, response) => {
           await promiseCycleClosing(request, response);
-          assertDeepEqual(JSON.parse(body), {
-            0: "foo",
-            param1: "bar",
-            param2: "qux",
-          });
-          await closeAsync(server);
-        },
-      )
-    ).events.map(cleanupHeaders),
+          response.emit("foo");
+        });
+        const port = await listenAsync(server, 0);
+        const request = get(
+          `http://localhost:${String(port)}/route/foo/bar/qux`,
+        );
+        const response = await new Promise((resolve) => {
+          request.on("response", resolve);
+        });
+        let body = "";
+        response.on("data", (data) => {
+          body += data.toString("utf8");
+        });
+        await promiseCycleClosing(request, response);
+        assertDeepEqual(JSON.parse(body), {
+          0: "foo",
+          param1: "bar",
+          param2: "qux",
+        });
+        await closeAsync(server);
+      },
+    )
+  ).events.map(cleanupHeaders);
+  assertDeepEqual(
+    [...events.slice(0, 4), events[events.length - 1]],
     [
       makeEvent("begin", 1, 0, "response", {
         protocol: "HTTP/1.1",
@@ -174,11 +175,6 @@ assertDeepEqual(
         route: "/route/*/:param1/:param2",
       }),
       makeJump(2)[1],
-      ...makeJump(3),
-      ...makeJump(4),
-      ...makeJump(5),
-      ...makeJump(6),
-      ...makeJump(7),
       makeEvent("end", 1, 0, "response", {
         status: 200,
         message: "OK",
