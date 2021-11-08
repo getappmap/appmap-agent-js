@@ -1,3 +1,10 @@
+## [6.3.2](https://github.com/applandinc/appmap-agent-js/compare/v6.3.1...v6.3.2) (2021-11-02)
+
+
+### Bug Fixes
+
+* valid urls for manufactured events ([95eb0b7](https://github.com/applandinc/appmap-agent-js/commit/95eb0b7210eae5e0e7dc28b5ddaa6eff805b0dbf))
+
 ## [6.3.1](https://github.com/applandinc/appmap-agent-js/compare/v6.3.0...v6.3.1) (2021-11-02)
 
 
