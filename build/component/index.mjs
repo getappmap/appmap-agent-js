@@ -1,30 +1,27 @@
 import { writeEntryPointAsync } from "./static.mjs";
 
-const automated_recorder_options = {
-  blueprint: {
-    emitter: ["remote-node-posix"],
-    violation: ["exit"],
-  },
+const generateWriteAsync = (branch) => async (component, blueprint) => {
+  await writeEntryPointAsync(branch, component, { blueprint });
 };
 
-const manual_recorder_options = {
-  blueprint: {
-    emitter: ["local"],
-    violation: ["error"],
-  },
-};
+const writeNodeAsync = generateWriteAsync("node");
 
-const other_options = {
-  blueprint: {
-    violation: ["exit"],
-  },
-};
+const posix_emitter = { emitter: ["remote-node-posix"] };
+const local_emitter = { emitter: ["local"] };
 
-writeEntryPointAsync("node", "boot", { blueprint: {} });
-writeEntryPointAsync("node", "recorder-process", automated_recorder_options);
-writeEntryPointAsync("node", "recorder-mocha", automated_recorder_options);
-writeEntryPointAsync("node", "recorder-remote", automated_recorder_options);
-writeEntryPointAsync("node", "recorder-manual", manual_recorder_options);
-writeEntryPointAsync("node", "batch", other_options);
-writeEntryPointAsync("node", "setup", other_options);
-writeEntryPointAsync("node", "entry-validate-mocha", other_options);
+const exit_violation = { violation: ["exit"] };
+const error_violation = { violation: ["error"] };
+
+await Promise.all([
+  writeNodeAsync("boot", {}),
+  writeNodeAsync("recorder-process", { ...posix_emitter, ...exit_violation }),
+  writeNodeAsync("recorder-mocha", { ...posix_emitter, ...exit_violation }),
+  writeNodeAsync("recorder-remote", { ...posix_emitter, ...exit_violation }),
+  writeNodeAsync("recorder-manual", { ...local_emitter, ...error_violation }),
+  writeNodeAsync("batch", exit_violation),
+  writeNodeAsync("boot", exit_violation),
+  writeNodeAsync("setup", exit_violation),
+  writeNodeAsync("validate-mocha", exit_violation),
+  writeNodeAsync("loader", exit_violation),
+  writeNodeAsync("load-environment-configuration", exit_violation),
+]);

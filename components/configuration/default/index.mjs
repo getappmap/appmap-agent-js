@@ -535,8 +535,24 @@ export default (dependencies) => {
     },
     isConfigurationEnabled: ({ processes, main }) => {
       const enabled = main === null || getSpecifierValue(processes, main);
-      logInfo(`%s %s`, enabled ? "recording" : "bypassing", main);
+      logInfo(`%s %s.`, enabled ? "Recording" : "Bypassing", main);
       return enabled;
+    },
+    extendProcessConfiguration: (configuration, { version, argv, cwd }) => {
+      assert(argv.length >= 2, "expected at least two argv");
+      const [, main] = argv;
+      assert(version.startsWith("v"), "expected version to start with v");
+      return extendConfiguration(
+        configuration,
+        {
+          engine: {
+            name: "node",
+            version: version.substring(1),
+          },
+          main: toAbsolutePath(cwd(), main),
+        },
+        null,
+      );
     },
     compileCommandConfiguration: (configuration, env) => {
       let { command } = configuration;
@@ -559,7 +575,10 @@ export default (dependencies) => {
       if (recursive || recorder === "mocha") {
         if (recorder === "mocha") {
           let tokens = parseShell(command, env);
-          const hook = ["--require", `${directory}/lib/recorder-mocha.mjs`];
+          const hook = [
+            "--require",
+            `${directory}/lib/node/recorder-mocha.mjs`,
+          ];
           if (tokens.length > 0 && tokens[0] === "mocha") {
             tokens = ["mocha", ...hook, ...tokens.slice(1)];
           } else if (
@@ -588,11 +607,9 @@ export default (dependencies) => {
           NODE_OPTIONS: [
             coalesce(env, "NODE_OPTIONS", ""),
             // abomination: https://github.com/mochajs/mocha/issues/4720
-            `--require=${directory}/lib/abomination.js`,
-            `--experimental-loader=${directory}/lib/${
-              recorder === "mocha"
-                ? "node-mocha-loader"
-                : `recorder-${recorder}`
+            `--require=${directory}/lib/node/abomination.js`,
+            `--experimental-loader=${directory}/lib/node/${
+              recorder === "mocha" ? "mocha-loader" : `recorder-${recorder}`
             }.mjs`,
           ].join(" "),
         };
@@ -611,7 +628,7 @@ export default (dependencies) => {
         command = [
           tokens[0],
           "--experimental-loader",
-          `${directory}/lib/recorder-${recorder}.mjs`,
+          `${directory}/lib/node/recorder-${recorder}.mjs`,
           ...tokens.slice(1),
         ]
           .map(quote)

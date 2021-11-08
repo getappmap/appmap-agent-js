@@ -2,13 +2,14 @@ export default (dependencies) => {
   const {
     uuid: { getUUID },
     log: { logInfo },
-    configuration: { isConfigurationEnabled },
+    configuration: { isConfigurationEnabled, extendProcessConfiguration },
     util: { assert },
     agent: { openAgent, closeAgent, startTrack, stopTrack },
   } = dependencies;
   return {
     createMochaHooks: (process, configuration) => {
       logInfo("Recorder 'mocha' caught process %j", process.pid);
+      configuration = extendProcessConfiguration(configuration, process);
       const { recorder } = configuration;
       assert(recorder === "mocha", "expected mocha recorder");
       if (!isConfigurationEnabled(configuration)) {

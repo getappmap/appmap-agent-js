@@ -1,0 +1,25 @@
+const { parse: parseJSON } = JSON;
+
+export default (dependencies) => {
+  const {
+    util: { hasOwnProperty },
+    validate: { validateConfiguration },
+    expect: { expect, expectSuccess },
+  } = dependencies;
+
+  return {
+    loadEnvironmentConfiguration: (env) => {
+      expect(
+        hasOwnProperty(env, "APPMAP_CONFIGURATION"),
+        "Missing 'APPMAP_CONFIGURATION' environment variable.",
+      );
+      const { APPMAP_CONFIGURATION: content } = env;
+      const configuration = expectSuccess(
+        () => parseJSON(content),
+        "failed to parse 'APPMAP_CONFIGURATION' environment variable >> %e",
+      );
+      validateConfiguration(configuration);
+      return configuration;
+    },
+  };
+};

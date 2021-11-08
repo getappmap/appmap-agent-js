@@ -21,7 +21,11 @@ const { createConfiguration, extendConfiguration } =
 const configuration = createConfiguration("/repository");
 
 {
-  const emitter = new EventEmitter();
+  const emitter = Object.assign(new EventEmitter(), {
+    cwd: () => "/cwd",
+    argv: ["node", "main.mjs"],
+    version: "v1.2.3",
+  });
   main(
     emitter,
     extendConfiguration(

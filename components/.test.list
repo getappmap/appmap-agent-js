@@ -7,6 +7,7 @@
 - validate
 - * validate-message
   * validate-appmap
+  * validate-mocha
 - patch
 - * uuid
   * file
@@ -48,4 +49,5 @@
 - batch
 - questionnaire
 - setup
-- entry-validate-mocha
+- load-environment-configuration
+- loader

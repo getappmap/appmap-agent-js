@@ -10,9 +10,9 @@ if (methods.includes(process.argv[2])) {
 }
 
 if (method === "batch") {
-  import("../lib/batch.mjs");
+  import("../lib/node/batch.mjs");
 } else if (method === "setup") {
-  import("../lib/setup.mjs");
+  import("../lib/node/setup.mjs");
 } else {
   throw new Error("This should never happen");
 }

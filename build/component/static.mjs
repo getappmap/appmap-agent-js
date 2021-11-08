@@ -106,8 +106,8 @@ const visitComponentAsync = async (component, context) => {
 export const writeEntryPointAsync = async (branch, component, options) => {
   const context = {
     root: `${__dirname}/../../components`,
-    directory: `${__dirname}/../../dist`,
-    filename: `${branch}-${component}.mjs`,
+    directory: `${__dirname}/../../dist/${branch}`,
+    filename: `${component}.mjs`,
     conf: ".build.yml",
     main: "index.mjs",
     blueprint: {},

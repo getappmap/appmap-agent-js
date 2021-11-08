@@ -178,6 +178,7 @@ assertDeepEqual(
       ...makeJump(4),
       ...makeJump(5),
       ...makeJump(6),
+      ...makeJump(7),
       makeEvent("end", 1, 0, "response", {
         status: 200,
         message: "OK",

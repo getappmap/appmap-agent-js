@@ -20,19 +20,28 @@ const { createConfiguration, extendConfiguration } =
 
 const configuration = createConfiguration("/repository");
 
-createMochaHooks(
-  new EventEmitter(),
-  extendConfiguration(
-    configuration,
-    { recorder: "mocha", processes: false, main: "foo.js" },
-    "/cwd",
-  ),
-);
+{
+  const emitter = Object.assign(new EventEmitter(), {
+    cwd: () => "/cwd",
+    argv: ["node", "main.mjs"],
+    version: "v1.2.3",
+  });
+  createMochaHooks(
+    emitter,
+    extendConfiguration(
+      configuration,
+      { recorder: "mocha", processes: false, main: "foo.js" },
+      "/cwd",
+    ),
+  );
+}
 
 {
-  const emitter = new EventEmitter();
-  emitter.cwd = () => "/cwd";
-  emitter.argv = ["node", "main.mjs"];
+  const emitter = Object.assign(new EventEmitter(), {
+    cwd: () => "/cwd",
+    argv: ["node", "main.mjs"],
+    version: "v1.2.3",
+  });
   const { beforeEach, afterEach } = createMochaHooks(
     emitter,
     extendConfiguration(

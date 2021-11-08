@@ -2,7 +2,7 @@ import { tmpdir } from "os";
 import { strict as Assert } from "assert";
 import { createRequire } from "module";
 import { mkdir, symlink, writeFile, realpath } from "fs/promises";
-import { createAppmap } from "../../lib/recorder-manual.mjs";
+import { createAppmap } from "../../lib/node/recorder-manual.mjs";
 
 Error.stackTraceLimit = Infinity;
 

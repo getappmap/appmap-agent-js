@@ -21,6 +21,7 @@ const {
   getConfigurationPackage,
   isConfigurationEnabled,
   compileCommandConfiguration,
+  extendProcessConfiguration,
 } = Configuration(await buildTestDependenciesAsync(import.meta.url));
 
 const { validateConfiguration } = await buildTestComponentAsync("validate");
@@ -267,10 +268,10 @@ assertDeepEqual(
     env: {
       NODE_OPTIONS: [
         "--node-key=node-value",
-        `--require=${getAgentDirectory("/cwd1")}/lib/abomination.js`,
+        `--require=${getAgentDirectory("/cwd1")}/lib/node/abomination.js`,
         `--experimental-loader=${getAgentDirectory(
           "/cwd1",
-        )}/lib/recorder-process.mjs`,
+        )}/lib/node/recorder-process.mjs`,
       ].join(" "),
       VAR1: "VAL1-1",
       VAR2: "VAL2",
@@ -304,7 +305,7 @@ assertDeepEqual(
     command: [
       "'node'",
       "'--experimental-loader'",
-      `'${getAgentDirectory("/cwd1")}/lib/recorder-process.mjs'`,
+      `'${getAgentDirectory("/cwd1")}/lib/node/recorder-process.mjs'`,
       "*",
       "'VAL1-1'",
       ">",
@@ -339,16 +340,16 @@ assertDeepEqual(
           ...(npx ? ["'npx'", "'--always-spawn'"] : []),
           "'mocha'",
           "'--require'",
-          `'${getAgentDirectory("/cwd1")}/lib/recorder-mocha.mjs'`,
+          `'${getAgentDirectory("/cwd1")}/lib/node/recorder-mocha.mjs'`,
           "'argv1'",
         ].join(" "),
         env: {
           NODE_OPTIONS: [
             "",
-            `--require=${getAgentDirectory("/cwd1")}/lib/abomination.js`,
+            `--require=${getAgentDirectory("/cwd1")}/lib/node/abomination.js`,
             `--experimental-loader=${getAgentDirectory(
               "/cwd1",
-            )}/lib/node-mocha-loader.mjs`,
+            )}/lib/node/mocha-loader.mjs`,
           ].join(" "),
         },
       },
@@ -370,3 +371,6 @@ assertDeepEqual(
     );
   }, /^AppmapError/);
 }
+
+// extendProcessConfiguration //
+extendProcessConfiguration(createConfiguration("cwd"), process);
