@@ -1,3 +1,10 @@
+## [6.3.3](https://github.com/applandinc/appmap-agent-js/compare/v6.3.2...v6.3.3) (2021-11-08)
+
+
+### Bug Fixes
+
+* support for new node module loader hooks ([99f0d9e](https://github.com/applandinc/appmap-agent-js/commit/99f0d9ebd0613c000f4f56b676988fa97ed7e859))
+
 ## [6.3.2](https://github.com/applandinc/appmap-agent-js/compare/v6.3.1...v6.3.2) (2021-11-02)
 
 
