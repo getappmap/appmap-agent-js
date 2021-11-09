@@ -11,8 +11,6 @@ import log$warning from "./../../components/log/warning/index.mjs";
 import time$performance_node from "./../../components/time/performance-node/index.mjs";
 import validate$ajv from "./../../components/validate/ajv/index.mjs";
 import specifier$default from "./../../components/specifier/default/index.mjs";
-import engine$node from "./../../components/engine/node/index.mjs";
-import repository$node from "./../../components/repository/node/index.mjs";
 import configuration$default from "./../../components/configuration/default/index.mjs";
 import configuration_helper$default from "./../../components/configuration-helper/default/index.mjs";
 import uuid$random from "./../../components/uuid/random/index.mjs";
@@ -68,8 +66,6 @@ export default (blueprint) => {
   dependencies["time"] = time$performance_node(dependencies);
   dependencies["validate"] = validate$ajv(dependencies);
   dependencies["specifier"] = specifier$default(dependencies);
-  dependencies["engine"] = engine$node(dependencies);
-  dependencies["repository"] = repository$node(dependencies);
   dependencies["configuration"] = configuration$default(dependencies);
   dependencies["configuration-helper"] =
     configuration_helper$default(dependencies);

@@ -46,6 +46,21 @@ const { createConfiguration, extendConfiguration } =
 
 const configuration = createConfiguration("/repository");
 
+// const configuration = extendConfiguration(
+//   createConfiguration("/repository"),
+//   {
+//     agent: {
+//       directory: "/agent",
+//       package: {
+//         name: "appmap-agent-js",
+//         version: "1.2.3",
+//         homepage: null,
+//       },
+//     },
+//   },
+//   null,
+// );
+
 // no child
 {
   const emitter = new EventEmitter();

@@ -10,8 +10,6 @@ import log$off from "./../../components/log/off/index.mjs";
 import log$warning from "./../../components/log/warning/index.mjs";
 import validate$ajv from "./../../components/validate/ajv/index.mjs";
 import specifier$default from "./../../components/specifier/default/index.mjs";
-import engine$node from "./../../components/engine/node/index.mjs";
-import repository$node from "./../../components/repository/node/index.mjs";
 import configuration$default from "./../../components/configuration/default/index.mjs";
 import validate_message$off from "./../../components/validate-message/off/index.mjs";
 import validate_message$on from "./../../components/validate-message/on/index.mjs";
@@ -27,6 +25,7 @@ import http$node_http from "./../../components/http/node-http/index.mjs";
 import receptor_http$http from "./../../components/receptor-http/http/index.mjs";
 import receptor_file$file from "./../../components/receptor-file/file/index.mjs";
 import receptor$default from "./../../components/receptor/default/index.mjs";
+import repository$node from "./../../components/repository/node/index.mjs";
 import batch$default from "./../../components/batch/default/index.mjs";
 
 export default (blueprint) => {
@@ -55,8 +54,6 @@ export default (blueprint) => {
         })();
   dependencies["validate"] = validate$ajv(dependencies);
   dependencies["specifier"] = specifier$default(dependencies);
-  dependencies["engine"] = engine$node(dependencies);
-  dependencies["repository"] = repository$node(dependencies);
   dependencies["configuration"] = configuration$default(dependencies);
   if (!("validate-message" in blueprint)) {
     throw new Error("missing instance for component validate-message");
@@ -91,6 +88,7 @@ export default (blueprint) => {
   dependencies["receptor-http"] = receptor_http$http(dependencies);
   dependencies["receptor-file"] = receptor_file$file(dependencies);
   dependencies["receptor"] = receptor$default(dependencies);
+  dependencies["repository"] = repository$node(dependencies);
   dependencies["batch"] = batch$default(dependencies);
   return dependencies["batch"];
 };

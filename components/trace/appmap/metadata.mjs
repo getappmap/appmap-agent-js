@@ -8,14 +8,29 @@ export default (dependencies) => {
   /* c8 ignore start */
   const getName = ({ name }) => name;
 
-  const makeClient = ({ package: { name, version, homepage } }) => ({
-    name,
-    version,
-    url:
-      homepage === null
-        ? "https://github.com/applandinc/appmap-agent-js"
-        : homepage,
-  });
+  const makeClient = (agent) => {
+    if (agent === null) {
+      agent = {
+        directory: null,
+        package: {
+          name: "@appland/appmap-agent-js",
+          version: "???",
+          homepage: null,
+        },
+      };
+    }
+    const {
+      package: { name, version, homepage },
+    } = agent;
+    return {
+      name,
+      version,
+      url:
+        homepage === null
+          ? "https://github.com/applandinc/appmap-agent-js"
+          : homepage,
+    };
+  };
 
   /* c8 ignore stop */
 

@@ -3,5 +3,3 @@ dependencies:
   - util
   - validate
   - specifier
-  - engine
-  - repository

@@ -52,6 +52,14 @@ const extend = (
   assertEqual(matchSpecifier(specifier, "/cwd/src/foo.js"), false);
 }
 
+// scenarios //
+assertDeepEqual(extend("scenarios", [{ command: "node main.js" }], "/cwd"), [
+  {
+    cwd: "/cwd",
+    value: { command: "node main.js" },
+  },
+]);
+
 // command-options //
 assertDeepEqual(
   extend("command-options", { env: { FOO: "BAR" }, timeout: 123 }),

@@ -155,9 +155,6 @@ assertDeepEqual(
 //   ],
 // });
 
-const getAgentDirectory = (cwd) =>
-  `${cwd}/node_modules/@appland/appmap-agent-js`;
-
 const stripEnvironmentConfiguration = ({
   command,
   options: {
@@ -172,6 +169,14 @@ assertDeepEqual(
       extendConfiguration(
         createConfiguration("/cwd1"),
         {
+          agent: {
+            directory: "/agent",
+            package: {
+              name: "@appmap-agent-js",
+              version: "1.2.3",
+              homepage: null,
+            },
+          },
           "recursive-process-recording": true,
           command: "exec argv1 $VAR1",
           recorder: "process",
@@ -192,10 +197,8 @@ assertDeepEqual(
     env: {
       NODE_OPTIONS: [
         "--node-key=node-value",
-        `--require=${getAgentDirectory("/cwd1")}/lib/node/abomination.js`,
-        `--experimental-loader=${getAgentDirectory(
-          "/cwd1",
-        )}/lib/node/recorder-process.mjs`,
+        "--require=/agent/lib/node/abomination.js",
+        "--experimental-loader=/agent/lib/node/recorder-process.mjs",
       ].join(" "),
       VAR1: "VAL1-1",
       VAR2: "VAL2",
@@ -210,6 +213,14 @@ assertDeepEqual(
       extendConfiguration(
         createConfiguration("/cwd1"),
         {
+          agent: {
+            directory: "/agent",
+            package: {
+              name: "@appmap-agent-js",
+              version: "1.2.3",
+              homepage: null,
+            },
+          },
           "recursive-process-recording": false,
           command: "node * $VAR1 > $VAR2",
           recorder: "process",
@@ -229,7 +240,7 @@ assertDeepEqual(
     command: [
       "'node'",
       "'--experimental-loader'",
-      `'${getAgentDirectory("/cwd1")}/lib/node/recorder-process.mjs'`,
+      "'/agent/lib/node/recorder-process.mjs'",
       "*",
       "'VAL1-1'",
       ">",
@@ -251,6 +262,14 @@ assertDeepEqual(
           extendConfiguration(
             createConfiguration("/cwd1"),
             {
+              agent: {
+                directory: "/agent",
+                package: {
+                  name: "@appmap-agent-js",
+                  version: "1.2.3",
+                  homepage: null,
+                },
+              },
               command: [...(npx ? ["npx"] : []), "mocha", "argv1"].join(" "),
               recorder: "mocha",
             },
@@ -264,16 +283,14 @@ assertDeepEqual(
           ...(npx ? ["'npx'", "'--always-spawn'"] : []),
           "'mocha'",
           "'--require'",
-          `'${getAgentDirectory("/cwd1")}/lib/node/recorder-mocha.mjs'`,
+          "'/agent/lib/node/recorder-mocha.mjs'",
           "'argv1'",
         ].join(" "),
         env: {
           NODE_OPTIONS: [
             "",
-            `--require=${getAgentDirectory("/cwd1")}/lib/node/abomination.js`,
-            `--experimental-loader=${getAgentDirectory(
-              "/cwd1",
-            )}/lib/node/mocha-loader.mjs`,
+            "--require=/agent/lib/node/abomination.js",
+            "--experimental-loader=/agent/lib/node/mocha-loader.mjs",
           ].join(" "),
         },
       },
@@ -286,6 +303,14 @@ assertDeepEqual(
       extendConfiguration(
         createConfiguration("/cwd1"),
         {
+          agent: {
+            directory: "/agent",
+            package: {
+              name: "@appmap-agent-js",
+              version: "1.2.3",
+              homepage: null,
+            },
+          },
           command: "foo",
           recorder: "mocha",
         },

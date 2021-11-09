@@ -3,21 +3,8 @@ const { ownKeys } = Reflect;
 
 export default (dependencies) => {
   const {
-    util: {
-      generateDeadcode,
-      coalesce,
-      assert,
-      identity,
-      toAbsolutePath,
-      hasOwnProperty,
-    },
+    util: { coalesce, assert, identity, toAbsolutePath, hasOwnProperty },
     validate: { validateConfig },
-    engine: { getEngine },
-    repository: {
-      extractRepositoryHistory,
-      extractRepositoryPackage,
-      extractRepositoryDependency,
-    },
     specifier: { createSpecifier },
   } = dependencies;
 
@@ -58,6 +45,17 @@ export default (dependencies) => {
       value: command,
       cwd: nullable_directory,
     };
+  };
+
+  const normalizeScenarios = (scenarios, nullable_directory) => {
+    assert(
+      nullable_directory !== null,
+      "cannot normalize scenarios without reference directory",
+    );
+    return scenarios.map((scenario) => ({
+      cwd: nullable_directory,
+      value: scenario,
+    }));
   };
 
   const normalizePort = (port, nullable_directory) => {
@@ -181,13 +179,21 @@ export default (dependencies) => {
   ////////////
 
   const fields = {
+    agent: {
+      extend: overwrite,
+      normalize: identity,
+    },
+    repository: {
+      extend: overwrite,
+      normalize: identity,
+    },
     scenario: {
       extend: overwrite,
       normalize: identity,
     },
     scenarios: {
-      extend: generateDeadcode("scenarios should be manually extended"),
-      normalize: generateDeadcode("scenarios should be manually normalized"),
+      extend: prepend,
+      normalize: normalizeScenarios,
     },
     "recursive-process-recording": {
       extend: overwrite,
@@ -340,33 +346,8 @@ export default (dependencies) => {
   // export //
   ////////////
 
-  const extendConfiguration = (configuration, config, nullable_directory) => {
-    configuration = { ...configuration };
-    validateConfig(config);
-    for (let key of ownKeys(config)) {
-      if (key !== "scenarios") {
-        const { normalize, extend } = fields[key];
-        configuration[key] = extend(
-          configuration[key],
-          normalize(config[key], nullable_directory),
-        );
-      }
-    }
-    const parent_configuration = {
-      ...configuration,
-      scenarios: [],
-    };
-    configuration.scenarios = [
-      ...configuration.scenarios,
-      ...coalesce(config, "scenarios", []).map((config) =>
-        extendConfiguration(parent_configuration, config, nullable_directory),
-      ),
-    ];
-    return configuration;
-  };
-
   return {
-    createConfiguration: (directory) => ({
+    createConfiguration: (home) => ({
       scenarios: [],
       scenario: "^",
       "recursive-process-recording": true,
@@ -378,15 +359,14 @@ export default (dependencies) => {
         timeout: 0,
         killSignal: "SIGTERM",
       },
-      // defined at initialization (cannot be overwritten)
-      agent: extractRepositoryDependency(directory, "@appland/appmap-agent-js"),
-      repository: {
-        directory,
-        history: extractRepositoryHistory(directory),
-        package: extractRepositoryPackage(directory),
-      },
-      engine: getEngine(),
       // overwritten by the agent
+      agent: null,
+      repository: {
+        directory: home,
+        history: null,
+        package: null,
+      },
+      engine: null,
       labels: [],
       feature: null,
       "feature-group": null,
@@ -408,14 +388,14 @@ export default (dependencies) => {
       },
       log: "info",
       output: {
-        directory: `${directory}/tmp/appmap`,
+        directory: `${home}/tmp/appmap`,
         basename: null,
         extension: ".appmap.json",
       },
       processes: [
         [
           {
-            cwd: directory,
+            cwd: home,
             source: "^",
             flags: "u",
           },
@@ -448,7 +428,7 @@ export default (dependencies) => {
       packages: [
         [
           {
-            cwd: directory,
+            cwd: home,
             source: "(^\\.\\.)|((^|/)node_modules/)",
             flags: "u",
           },
@@ -461,7 +441,7 @@ export default (dependencies) => {
         ],
         [
           {
-            cwd: directory,
+            cwd: home,
             source: "^",
             flags: "u",
           },
@@ -478,6 +458,17 @@ export default (dependencies) => {
       app: null,
       name: null,
     }),
-    extendConfiguration,
+    extendConfiguration: (configuration, config, nullable_directory) => {
+      configuration = { ...configuration };
+      validateConfig(config);
+      for (let key of ownKeys(config)) {
+        const { normalize, extend } = fields[key];
+        configuration[key] = extend(
+          configuration[key],
+          normalize(config[key], nullable_directory),
+        );
+      }
+      return configuration;
+    },
   };
 };

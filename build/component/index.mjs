@@ -13,15 +13,15 @@ const exit_violation = { violation: ["exit"] };
 const error_violation = { violation: ["error"] };
 
 await Promise.all([
-  writeNodeAsync("boot", {}),
+  writeNodeAsync("configuration", error_violation),
+  writeNodeAsync("configuration-environment", exit_violation),
+  writeNodeAsync("configuration-process", exit_violation),
   writeNodeAsync("recorder-process", { ...posix_emitter, ...exit_violation }),
   writeNodeAsync("recorder-mocha", { ...posix_emitter, ...exit_violation }),
   writeNodeAsync("recorder-remote", { ...posix_emitter, ...exit_violation }),
   writeNodeAsync("recorder-manual", { ...local_emitter, ...error_violation }),
   writeNodeAsync("batch", exit_violation),
-  writeNodeAsync("boot", exit_violation),
   writeNodeAsync("setup", exit_violation),
   writeNodeAsync("validate-mocha", exit_violation),
   writeNodeAsync("loader", exit_violation),
-  writeNodeAsync("load-environment-configuration", exit_violation),
 ]);

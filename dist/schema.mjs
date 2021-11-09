@@ -430,10 +430,55 @@ export const schema = [
     ],
   },
   {
+    $id: "agent",
+    type: "object",
+    additionalProperties: false,
+    required: ["directory", "package"],
+    properties: {
+      directory: {
+        $ref: "absolute-path",
+      },
+      package: {
+        $ref: "package",
+      },
+    },
+  },
+  {
+    $id: "repository",
+    type: "object",
+    additionalProperties: false,
+    required: ["directory", "history", "package"],
+    properties: {
+      directory: {
+        $ref: "absolute-path",
+      },
+      history: {
+        type: "object",
+        nullable: true,
+      },
+      package: {
+        anyOf: [
+          {
+            const: null,
+          },
+          {
+            $ref: "package",
+          },
+        ],
+      },
+    },
+  },
+  {
     $id: "config",
     type: "object",
     additionalProperties: false,
     properties: {
+      agent: {
+        $ref: "agent",
+      },
+      repository: {
+        $ref: "repository",
+      },
       scenarios: {
         type: "array",
         items: {
@@ -682,7 +727,16 @@ export const schema = [
       scenarios: {
         type: "array",
         items: {
-          $ref: "configuration",
+          type: "object",
+          required: ["value", "cwd"],
+          properties: {
+            value: {
+              $ref: "config",
+            },
+            cwd: {
+              $ref: "absolute-path",
+            },
+          },
         },
       },
       "recursive-process-recording": {
@@ -716,42 +770,18 @@ export const schema = [
           },
         },
       },
-      repository: {
-        type: "object",
-        additionalProperties: false,
-        required: ["directory", "history", "package"],
-        properties: {
-          directory: {
-            $ref: "absolute-path",
-          },
-          history: {
-            type: "object",
-            nullable: true,
-          },
-          package: {
-            anyOf: [
-              {
-                const: null,
-              },
-              {
-                $ref: "package",
-              },
-            ],
-          },
-        },
-      },
       agent: {
-        type: "object",
-        additionalProperties: false,
-        required: ["directory", "package"],
-        properties: {
-          directory: {
-            $ref: "absolute-path",
+        anyOf: [
+          {
+            const: null,
           },
-          package: {
-            $ref: "package",
+          {
+            $ref: "agent",
           },
-        },
+        ],
+      },
+      repository: {
+        $ref: "repository",
       },
       log: {
         $ref: "log-level",

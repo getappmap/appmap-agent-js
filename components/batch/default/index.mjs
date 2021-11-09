@@ -8,7 +8,13 @@ export default (dependencies) => {
     expect: { expectSuccessAsync, expectSuccess },
     log: { logDebug, logInfo, logWarning },
     spawn: { spawn },
+    configuration: { extendConfiguration },
     "configuration-helper": { compileCommandConfiguration },
+    repository: {
+      extractRepositoryDependency,
+      extractRepositoryHistory,
+      extractRepositoryPackage,
+    },
     receptor: {
       openReceptorAsync,
       closeReceptorAsync,
@@ -17,8 +23,29 @@ export default (dependencies) => {
     },
   } = dependencies;
   const isCommandNonNull = ({ command }) => command !== null;
+  const initializeConfiguration = (configuration) => {
+    const {
+      repository: { directory },
+    } = configuration;
+    return extendConfiguration(
+      configuration,
+      {
+        agent: extractRepositoryDependency(
+          directory,
+          "@appland/appmap-agent-js",
+        ),
+        repository: {
+          directory,
+          history: extractRepositoryHistory(directory),
+          package: extractRepositoryPackage(directory),
+        },
+      },
+      null,
+    );
+  };
   return {
     mainAsync: async (process, configuration) => {
+      configuration = initializeConfiguration(configuration);
       const { env } = process;
       let interrupted = false;
       let subprocess = null;
@@ -89,7 +116,11 @@ export default (dependencies) => {
       );
       const configurations = [
         configuration,
-        ...scenarios.filter(({ name }) => regexp.test(name)),
+        ...scenarios
+          .map(({ cwd, value }) =>
+            extendConfiguration(configuration, value, cwd),
+          )
+          .filter(({ name }) => regexp.test(name)),
       ].filter(isCommandNonNull);
       const { length } = configurations;
       try {

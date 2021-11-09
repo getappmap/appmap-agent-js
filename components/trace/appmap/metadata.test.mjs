@@ -20,6 +20,20 @@ const { compileMetadata } = Metadata(dependencies);
 const test = (conf, cwd, termination = { errors: [], status: 0 }) => {
   let configuration = createConfiguration(cwd);
   configuration = extendConfiguration(configuration, conf, cwd);
+  configuration = extendConfiguration(
+    configuration,
+    {
+      agent: {
+        directory: "/agent",
+        package: {
+          name: "appmap-agent-js",
+          version: "1.2.3",
+          homepage: "http://homepage",
+        },
+      },
+    },
+    null,
+  );
   // console.log(configuration);
   return compileMetadata(configuration, termination);
 };
@@ -28,12 +42,12 @@ const default_meta_data = {
   name: null,
   app: null,
   labels: [],
-  language: { name: "ecmascript", version: "2020", engine: "engine@0.0.0" },
+  language: { name: "ecmascript", version: "2020", engine: null },
   frameworks: [],
   client: {
-    name: "@appland/appmap-agent-js",
-    version: "0.0.0",
-    url: "https://github.com/applandinc/appmap-agent-js",
+    name: "appmap-agent-js",
+    version: "1.2.3",
+    url: "http://homepage",
   },
   recorder: { name: "process" },
   recording: null,

@@ -3,8 +3,5 @@ dependencies:
   - configuration
   - util
   - log
-  - validate
   - specifier
-  - engine
-  - repository
   - expect

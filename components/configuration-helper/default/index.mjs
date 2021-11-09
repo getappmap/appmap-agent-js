@@ -107,11 +107,16 @@ export default (dependencies) => {
       );
     },
     compileCommandConfiguration: (configuration, env) => {
+      assert(configuration.agent !== null, "missing agent in configuration");
+      assert(
+        configuration.command !== null,
+        "missing command in configuration",
+      );
       let {
-        command: { value: command, cwd },
+        command: { value: command },
       } = configuration;
-      assert(command !== null, "missing command in configuration");
       const {
+        command: { cwd },
         recorder,
         "command-options": options,
         "recursive-process-recording": recursive,

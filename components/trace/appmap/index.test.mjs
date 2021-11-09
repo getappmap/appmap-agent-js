@@ -19,6 +19,14 @@ const { compileTrace } = Trace(dependencies);
 const configuration = extendConfiguration(
   createConfiguration("/cwd"),
   {
+    agent: {
+      directory: "/agent",
+      package: {
+        name: "agent",
+        version: "1.2.3",
+        homepage: null,
+      },
+    },
     pruning: true,
     "function-name-placeholder": "$",
   },
@@ -79,13 +87,13 @@ assertDeepEqual(
       language: {
         name: "ecmascript",
         version: "2020",
-        engine: "engine@0.0.0",
+        engine: null,
       },
       frameworks: [],
       client: {
-        name: "@appland/appmap-agent-js",
+        name: "agent",
         url: "https://github.com/applandinc/appmap-agent-js",
-        version: "0.0.0",
+        version: "1.2.3",
       },
       recorder: { name: "process" },
       recording: null,
