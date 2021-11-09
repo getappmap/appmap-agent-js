@@ -26,15 +26,11 @@ jobs:
         - npm run lint
     - stage: test
       node_js: 14
-      services:
-        - postgresql
       script:
         - npm run test-unit
         - npm run test-integration
     - stage: test
       node_js: 16
-      services:
-        - postgresql
       script:
         - npm run test-unit
         - npm run test-integration
