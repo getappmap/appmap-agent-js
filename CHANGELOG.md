@@ -1,3 +1,10 @@
+# [6.5.0](https://github.com/applandinc/appmap-agent-js/compare/v6.4.0...v6.5.0) (2021-11-09)
+
+
+### Features
+
+* add default recorder ([4e38676](https://github.com/applandinc/appmap-agent-js/commit/4e38676c2a942665ef09d05ef38d8ce5682ea631))
+
 # [6.4.0](https://github.com/applandinc/appmap-agent-js/compare/v6.3.3...v6.4.0) (2021-11-09)
 
 
