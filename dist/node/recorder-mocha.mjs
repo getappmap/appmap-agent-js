@@ -15,6 +15,7 @@ import specifier$default from "./../../components/specifier/default/index.mjs";
 import engine$node from "./../../components/engine/node/index.mjs";
 import repository$node from "./../../components/repository/node/index.mjs";
 import configuration$default from "./../../components/configuration/default/index.mjs";
+import configuration_helper$default from "./../../components/configuration-helper/default/index.mjs";
 import source_inner$mozilla from "./../../components/source-inner/mozilla/index.mjs";
 import source$default from "./../../components/source/default/index.mjs";
 import instrumentation$default from "./../../components/instrumentation/default/index.mjs";
@@ -65,6 +66,8 @@ export default (blueprint) => {
   dependencies["engine"] = engine$node(dependencies);
   dependencies["repository"] = repository$node(dependencies);
   dependencies["configuration"] = configuration$default(dependencies);
+  dependencies["configuration-helper"] =
+    configuration_helper$default(dependencies);
   dependencies["source-inner"] = source_inner$mozilla(dependencies);
   dependencies["source"] = source$default(dependencies);
   dependencies["instrumentation"] = instrumentation$default(dependencies);

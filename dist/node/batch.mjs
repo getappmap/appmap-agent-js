@@ -20,6 +20,7 @@ import validate_appmap$on from "./../../components/validate-appmap/on/index.mjs"
 import trace$appmap from "./../../components/trace/appmap/index.mjs";
 import backend$default from "./../../components/backend/default/index.mjs";
 import spawn$node from "./../../components/spawn/node/index.mjs";
+import configuration_helper$default from "./../../components/configuration-helper/default/index.mjs";
 import uuid$random from "./../../components/uuid/random/index.mjs";
 import service$default from "./../../components/service/default/index.mjs";
 import http$node_http from "./../../components/http/node-http/index.mjs";
@@ -82,6 +83,8 @@ export default (blueprint) => {
   dependencies["trace"] = trace$appmap(dependencies);
   dependencies["backend"] = backend$default(dependencies);
   dependencies["spawn"] = spawn$node(dependencies);
+  dependencies["configuration-helper"] =
+    configuration_helper$default(dependencies);
   dependencies["uuid"] = uuid$random(dependencies);
   dependencies["service"] = service$default(dependencies);
   dependencies["http"] = http$node_http(dependencies);

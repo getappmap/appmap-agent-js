@@ -8,7 +8,7 @@ export default (dependencies) => {
     expect: { expectSuccessAsync, expectSuccess },
     log: { logDebug, logInfo, logWarning },
     spawn: { spawn },
-    configuration: { compileCommandConfiguration },
+    "configuration-helper": { compileCommandConfiguration },
     receptor: {
       openReceptorAsync,
       closeReceptorAsync,

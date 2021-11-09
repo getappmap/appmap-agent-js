@@ -1,7 +1,7 @@
 branches: [test, node, browser]
 dependencies:
   - log
-  - configuration
+  - configuration-helper
   - util
   - expect
   - uuid

@@ -4,14 +4,14 @@ export default (dependencies) => {
   const {
     util: { assert },
     log: { logInfo },
-    configuration: { isConfigurationEnabled, extendProcessConfiguration },
+    "configuration-helper": { isConfigurationEnabled, extendConfigurationNode },
     agent: { openAgent, closeAgent, requestRemoteAgentAsync },
     http: { generateRespond },
   } = dependencies;
   return {
     main: (process, configuration) => {
       logInfo("Recorder 'remote' caught process %j", process.pid);
-      configuration = extendProcessConfiguration(configuration, process);
+      configuration = extendConfigurationNode(configuration, process);
       const { recorder, "frontend-track-port": port } = configuration;
       assert(recorder === "remote", "expected remote recorder");
       if (isConfigurationEnabled(configuration)) {

@@ -4,14 +4,14 @@ import violation$exit from "./../../components/violation/exit/index.mjs";
 import expect_inner$default from "./../../components/expect-inner/default/index.mjs";
 import expect$default from "./../../components/expect/default/index.mjs";
 import validate$ajv from "./../../components/validate/ajv/index.mjs";
+import specifier$default from "./../../components/specifier/default/index.mjs";
+import engine$node from "./../../components/engine/node/index.mjs";
 import log_inner$write_sync from "./../../components/log-inner/write-sync/index.mjs";
 import log$debug from "./../../components/log/debug/index.mjs";
 import log$error from "./../../components/log/error/index.mjs";
 import log$info from "./../../components/log/info/index.mjs";
 import log$off from "./../../components/log/off/index.mjs";
 import log$warning from "./../../components/log/warning/index.mjs";
-import specifier$default from "./../../components/specifier/default/index.mjs";
-import engine$node from "./../../components/engine/node/index.mjs";
 import repository$node from "./../../components/repository/node/index.mjs";
 import configuration$default from "./../../components/configuration/default/index.mjs";
 import boot$node from "./../../components/boot/node/index.mjs";
@@ -33,6 +33,8 @@ export default (blueprint) => {
   dependencies["expect-inner"] = expect_inner$default(dependencies);
   dependencies["expect"] = expect$default(dependencies);
   dependencies["validate"] = validate$ajv(dependencies);
+  dependencies["specifier"] = specifier$default(dependencies);
+  dependencies["engine"] = engine$node(dependencies);
   dependencies["log-inner"] = log_inner$write_sync(dependencies);
   if (!("log" in blueprint)) {
     throw new Error("missing instance for component log");
@@ -51,8 +53,6 @@ export default (blueprint) => {
       : (() => {
           throw new Error("invalid instance for component log");
         })();
-  dependencies["specifier"] = specifier$default(dependencies);
-  dependencies["engine"] = engine$node(dependencies);
   dependencies["repository"] = repository$node(dependencies);
   dependencies["configuration"] = configuration$default(dependencies);
   dependencies["boot"] = boot$node(dependencies);

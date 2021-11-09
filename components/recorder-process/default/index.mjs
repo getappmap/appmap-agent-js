@@ -4,13 +4,13 @@ export default (dependencies) => {
     log: { logInfo },
     expect: { expect },
     util: { assert },
-    configuration: { isConfigurationEnabled, extendProcessConfiguration },
+    "configuration-helper": { isConfigurationEnabled, extendConfigurationNode },
     agent: { openAgent, closeAgent, startTrack, stopTrack },
   } = dependencies;
   return {
     main: (process, configuration) => {
       logInfo("Recorder 'process' caught process %j", process.pid);
-      configuration = extendProcessConfiguration(configuration, process);
+      configuration = extendConfigurationNode(configuration, process);
       const { recorder } = configuration;
       assert(recorder === "process", "expected process recorder");
       if (isConfigurationEnabled(configuration)) {

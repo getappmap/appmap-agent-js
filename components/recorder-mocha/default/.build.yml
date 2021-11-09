@@ -4,4 +4,4 @@ dependencies:
   - uuid
   - util
   - agent
-  - configuration
+  - configuration-helper

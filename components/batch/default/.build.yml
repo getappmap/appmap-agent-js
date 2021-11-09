@@ -5,5 +5,5 @@ dependencies:
   - expect
   - spawn
   - log
-  - configuration
+  - configuration-helper
   - receptor

@@ -1,7 +1,10 @@
 branches: [test, node, browser]
 dependencies:
+  - configuration
   - util
+  - log
   - validate
   - specifier
   - engine
   - repository
+  - expect
