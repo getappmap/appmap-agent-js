@@ -32,6 +32,19 @@ export default (dependencies) => {
     );
   };
 
+  const quote = (arg) => `'${arg.replace(/'/gu, "\\'")}'`;
+
+  const extractConfig = (argv) => {
+    let { _: positional, ...config } = minimist(argv.slice(2));
+    if (positional.length > 0) {
+      config = {
+        ...config,
+        command: positional.map(quote).join(" "),
+      };
+    }
+    return config;
+  };
+
   return {
     loadProcessConfiguration: ({ env, argv, cwd }) => {
       const path = coalesce(
@@ -39,20 +52,17 @@ export default (dependencies) => {
         "APPMAP_CONFIGURATION_PATH",
         `${cwd()}/appmap.yml`,
       );
-      /* eslint-disable no-unused-vars */
-      const { _: positional, ...config } = minimist(argv.slice(2));
-      /* eslint-enabled no-unused-vars */
-      let configuration;
-      configuration = createConfiguration(
-        coalesce(env, "APPMAP_REPOSITORY_DIRECTORY", cwd()),
+      return extendConfiguration(
+        extendConfiguration(
+          createConfiguration(
+            coalesce(env, "APPMAP_REPOSITORY_DIRECTORY", cwd()),
+          ),
+          loadConfigFile(path),
+          getDirectory(path),
+        ),
+        extractConfig(argv),
+        cwd(),
       );
-      configuration = extendConfiguration(
-        configuration,
-        loadConfigFile(path),
-        getDirectory(path),
-      );
-      configuration = extendConfiguration(configuration, config, cwd());
-      return configuration;
     },
   };
 };
