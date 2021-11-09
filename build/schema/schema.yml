@@ -261,9 +261,9 @@
 - $id: cooked-specifier
   type: object
   additionalProperties: false
-  required: [basedir, source, flags]
+  required: [cwd, source, flags]
   properties:
-    basedir: {$ref: absolute-path}
+    cwd: {$ref: absolute-path}
     source: {type: string}
     flags: {type: string}
 
@@ -272,7 +272,6 @@
   additionalProperties: false
   properties:
     encoding: {$ref: encoding}
-    cwd: {$ref: path}
     env: {$ref: env}
     stdio: {$ref: stdio}
     timeout:
@@ -284,7 +283,7 @@
   allOf:
     - $ref: command-options
     - type: object
-      required: [encoding, cwd, env, stdio, timeout, killSignal]
+      required: [encoding, env, stdio, timeout, killSignal]
 
 #################
 # Configuration #
@@ -403,8 +402,11 @@
       items: {$ref: configuration}
     recursive-process-recording: {type: boolean}
     command:
-      type: string
+      type: object
       nullable: true
+      properties:
+        value: {type: string}
+        cwd: {$ref: absolute-path}
     command-options: {$ref: cooked-command-options}
     validate:
       type: object

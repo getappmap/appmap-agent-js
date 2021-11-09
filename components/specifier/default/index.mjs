@@ -21,7 +21,7 @@ export default (dependencies) => {
   // const sanitizeForGlob = (string) => string.replace(/[*?[\]]/g, escape);
 
   return {
-    createSpecifier: (basedir, options) => {
+    createSpecifier: (cwd, options) => {
       const { glob, path, dist, regexp, flags, recursive, external } = {
         glob: null,
         path: null,
@@ -35,7 +35,7 @@ export default (dependencies) => {
       };
       if (regexp !== null) {
         return {
-          basedir,
+          cwd,
           source: regexp,
           flags,
         };
@@ -43,7 +43,7 @@ export default (dependencies) => {
       if (glob !== null) {
         const { source, flags } = new MinimatchClass(glob).makeRe();
         return {
-          basedir,
+          cwd,
           source,
           flags,
         };
@@ -54,7 +54,7 @@ export default (dependencies) => {
           "directory path should not end with '/'",
         );
         return {
-          basedir,
+          cwd,
           source: `^${sanitizeForRegExp(path)}($|/${
             recursive ? "" : "[^/]*$"
           })`,
@@ -74,7 +74,7 @@ export default (dependencies) => {
           source = `${source}[^/]*$`;
         }
         return {
-          basedir,
+          cwd,
           source,
           flags: "",
         };
@@ -82,7 +82,7 @@ export default (dependencies) => {
       assert(false, "invalid specifier options");
     },
     matchSpecifier: (specifier, path) => {
-      const { basedir, source, flags } = specifier;
+      const { cwd, source, flags } = specifier;
       const key = `/${source}/${flags}`;
       let regexp = regexps.get(key);
       if (regexp === _undefined) {
@@ -93,7 +93,7 @@ export default (dependencies) => {
         );
         regexps.set(key, regexp);
       }
-      return regexp.test(toRelativePath(basedir, path));
+      return regexp.test(toRelativePath(cwd, path));
     },
   };
 };

@@ -49,6 +49,17 @@ export default (dependencies) => {
   // Normalize //
   ///////////////
 
+  const normalizeCommand = (command, nullable_directory) => {
+    assert(
+      nullable_directory !== null,
+      "cannot normalize command without directory",
+    );
+    return {
+      value: command,
+      cwd: nullable_directory,
+    };
+  };
+
   const normalizePort = (port, nullable_directory) => {
     if (typeof port === "string") {
       port = toAbsolutePath(nullable_directory, port);
@@ -184,7 +195,7 @@ export default (dependencies) => {
     },
     command: {
       extend: overwrite,
-      normalize: identity,
+      normalize: normalizeCommand,
     },
     "command-options": {
       extend: extendCommandOptions,
@@ -362,7 +373,6 @@ export default (dependencies) => {
       command: null,
       "command-options": {
         encoding: "utf8",
-        cwd: directory, // NB: defines cwd for exec
         env: {},
         stdio: "inherit",
         timeout: 0,
@@ -405,7 +415,7 @@ export default (dependencies) => {
       processes: [
         [
           {
-            basedir: directory,
+            cwd: directory,
             source: "^",
             flags: "u",
           },
@@ -438,7 +448,7 @@ export default (dependencies) => {
       packages: [
         [
           {
-            basedir: directory,
+            cwd: directory,
             source: "(^\\.\\.)|((^|/)node_modules/)",
             flags: "u",
           },
@@ -451,7 +461,7 @@ export default (dependencies) => {
         ],
         [
           {
-            basedir: directory,
+            cwd: directory,
             source: "^",
             flags: "u",
           },

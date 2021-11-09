@@ -29,13 +29,13 @@ const {
 assertEqual(
   Reflect.get(
     extendConfigurationJSON(
-      createConfiguration("/cwd"),
-      JSON.stringify({ command: "node main.js" }),
+      createConfiguration("/home"),
+      JSON.stringify({ log: "error" }),
       null,
     ),
-    "command",
+    "log",
   ),
-  "node main.js",
+  "error",
 );
 
 ////////////////////////////

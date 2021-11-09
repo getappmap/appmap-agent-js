@@ -1,5 +1,3 @@
-/* eslint-env node */
-
 import { strict as Assert } from "assert";
 import {
   buildTestDependenciesAsync,
@@ -7,7 +5,6 @@ import {
 } from "../../build.mjs";
 import Configuration from "./index.mjs";
 
-const { cwd } = process;
 const {
   deepEqual: assertDeepEqual,
   equal: assertEqual,
@@ -22,13 +19,16 @@ const { createConfiguration, extendConfiguration } = Configuration(
   await buildTestDependenciesAsync(import.meta.url),
 );
 
-const configuration = createConfiguration(cwd());
+validateConfiguration(createConfiguration("/home"));
 
-validateConfiguration(configuration);
-
-const extend = (name, value1, nullable_directory) => {
+const extend = (
+  name,
+  value1,
+  nullable_directory = null,
+  home_directory = "/home",
+) => {
   const extended_configuration = extendConfiguration(
-    configuration,
+    createConfiguration(home_directory),
     { [name]: value1 },
     nullable_directory,
   );
@@ -40,24 +40,23 @@ const extend = (name, value1, nullable_directory) => {
 // packages //
 
 {
-  const [specifier, value] = extend("packages", "lib/*.js", "/base")[0];
+  const [specifier, value] = extend("packages", "lib/*.js", "/cwd")[0];
   assertDeepEqual(value, {
     "inline-source": null,
     enabled: true,
     exclude: [],
     shallow: false,
   });
-  assertEqual(matchSpecifier(specifier, "/base/lib/foo.js"), true);
-  assertEqual(matchSpecifier(specifier, "/base/lib/foo.mjs"), false);
-  assertEqual(matchSpecifier(specifier, "/base/src/foo.js"), false);
+  assertEqual(matchSpecifier(specifier, "/cwd/lib/foo.js"), true);
+  assertEqual(matchSpecifier(specifier, "/cwd/lib/foo.mjs"), false);
+  assertEqual(matchSpecifier(specifier, "/cwd/src/foo.js"), false);
 }
 
 // command-options //
 assertDeepEqual(
-  extend("command-options", { env: { FOO: "BAR" }, timeout: 123 }, "/base"),
+  extend("command-options", { env: { FOO: "BAR" }, timeout: 123 }),
   {
     encoding: "utf8",
-    cwd: cwd(),
     env: { FOO: "BAR" },
     stdio: "inherit",
     timeout: 123,
@@ -67,13 +66,13 @@ assertDeepEqual(
 
 // main //
 
-assertDeepEqual(extend("main", "foo.js", "/base"), "/base/foo.js");
+assertDeepEqual(extend("main", "foo.js", "/cwd"), "/cwd/foo.js");
 
 // port //
 
 assertDeepEqual(
-  extend("trace-port", "unix-domain-socket", "/base"),
-  "/base/unix-domain-socket",
+  extend("trace-port", "unix-domain-socket", "/cwd"),
+  "/cwd/unix-domain-socket",
 );
 
 // language //
@@ -106,19 +105,19 @@ assertDeepEqual(extend("frameworks", ["foo@bar"], null), [
 
 // output //
 
-assertDeepEqual(extend("output", "directory", "/base"), {
-  directory: "/base/directory",
+assertDeepEqual(extend("output", "directory", "/cwd"), {
+  directory: "/cwd/directory",
   basename: null,
   extension: ".appmap.json",
 });
 
 // processes //
 
-assertDeepEqual(extend("processes", true, "/base"), [
-  [{ basedir: "/base", source: "^", flags: "u" }, true],
+assertDeepEqual(extend("processes", true, "/cwd", "/home"), [
+  [{ cwd: "/cwd", source: "^", flags: "u" }, true],
   [
     {
-      basedir: cwd(),
+      cwd: "/home",
       source: "^",
       flags: "u",
     },
@@ -126,11 +125,11 @@ assertDeepEqual(extend("processes", true, "/base"), [
   ],
 ]);
 
-assertDeepEqual(extend("processes", "/foo", "/base"), [
-  [{ basedir: "/base", source: "^(?:\\/foo)$", flags: "" }, true],
+assertDeepEqual(extend("processes", "/foo", "/cwd", "/home"), [
+  [{ cwd: "/cwd", source: "^(?:\\/foo)$", flags: "" }, true],
   [
     {
-      basedir: cwd(),
+      cwd: "/home",
       source: "^",
       flags: "u",
     },
@@ -144,4 +143,11 @@ assertDeepEqual(extend("serialization", "toString", null), {
   method: "toString",
   "maximum-length": 96,
   "include-constructor-name": true,
+});
+
+// command //
+
+assertDeepEqual(extend("command", "node main.js", "/cwd"), {
+  value: "node main.js",
+  cwd: "/cwd",
 });

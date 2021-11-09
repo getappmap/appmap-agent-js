@@ -53,7 +53,9 @@ export default (dependencies) => {
       const runConfigurationAsync = async (configuration, env) => {
         const receptor = await createReceptorAsync(configuration);
         configuration = adaptReceptorConfiguration(receptor, configuration);
-        const { command: description } = configuration;
+        const {
+          command: { value: description },
+        } = configuration;
         logInfo("%s ...", description);
         const { command, options } = compileCommandConfiguration(
           configuration,

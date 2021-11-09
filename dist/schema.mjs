@@ -381,9 +381,9 @@ export const schema = [
     $id: "cooked-specifier",
     type: "object",
     additionalProperties: false,
-    required: ["basedir", "source", "flags"],
+    required: ["cwd", "source", "flags"],
     properties: {
-      basedir: {
+      cwd: {
         $ref: "absolute-path",
       },
       source: {
@@ -401,9 +401,6 @@ export const schema = [
     properties: {
       encoding: {
         $ref: "encoding",
-      },
-      cwd: {
-        $ref: "path",
       },
       env: {
         $ref: "env",
@@ -428,7 +425,7 @@ export const schema = [
       },
       {
         type: "object",
-        required: ["encoding", "cwd", "env", "stdio", "timeout", "killSignal"],
+        required: ["encoding", "env", "stdio", "timeout", "killSignal"],
       },
     ],
   },
@@ -692,8 +689,16 @@ export const schema = [
         type: "boolean",
       },
       command: {
-        type: "string",
+        type: "object",
         nullable: true,
+        properties: {
+          value: {
+            type: "string",
+          },
+          cwd: {
+            $ref: "absolute-path",
+          },
+        },
       },
       "command-options": {
         $ref: "cooked-command-options",

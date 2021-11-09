@@ -107,7 +107,9 @@ export default (dependencies) => {
       );
     },
     compileCommandConfiguration: (configuration, env) => {
-      let { command } = configuration;
+      let {
+        command: { value: command, cwd },
+      } = configuration;
       assert(command !== null, "missing command in configuration");
       const {
         recorder,
@@ -190,6 +192,7 @@ export default (dependencies) => {
         command,
         options: {
           ...options,
+          cwd,
           env,
         },
       };
