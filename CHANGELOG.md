@@ -1,3 +1,18 @@
+# [6.4.0](https://github.com/applandinc/appmap-agent-js/compare/v6.3.3...v6.4.0) (2021-11-09)
+
+
+### Bug Fixes
+
+* cwd is now attached to command rather than command-options ([add102f](https://github.com/applandinc/appmap-agent-js/commit/add102f56e2dc6f0d8d412d27d6c62dd2fd17bac))
+* tweak default configuration fields ([7eff84c](https://github.com/applandinc/appmap-agent-js/commit/7eff84c8514b61946e974c3c54b9b7cc200178eb))
+
+
+### Features
+
+* intercept-track-port now accepts a regular expression ([92c583e](https://github.com/applandinc/appmap-agent-js/commit/92c583e8679065cad46073cbe63963187d1a6a77))
+* support input command as positional arguments ([80b365a](https://github.com/applandinc/appmap-agent-js/commit/80b365aa6c84aaab888e60b0f77758e228cbd647))
+* warning instead of failure on missing sql npm package ([2c5e5eb](https://github.com/applandinc/appmap-agent-js/commit/2c5e5eb3011607f55192acbaa243331c2c6b4429))
+
 ## [6.3.3](https://github.com/applandinc/appmap-agent-js/compare/v6.3.2...v6.3.3) (2021-11-08)
 
 
