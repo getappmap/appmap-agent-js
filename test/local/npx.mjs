@@ -8,6 +8,7 @@ await runAsync(
   null,
   {
     command: "npx --always-spawn bin",
+    pruning: false,
     name: "name",
     processes: { path: "node_modules/.bin/bin" },
     packages: "bin.cjs",

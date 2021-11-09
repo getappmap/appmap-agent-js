@@ -545,14 +545,7 @@ export const schema = [
         const: "HTTP/1.1",
       },
       "intercept-track-port": {
-        anyOf: [
-          {
-            const: null,
-          },
-          {
-            $ref: "port",
-          },
-        ],
+        type: "string",
       },
       "intercept-track-protocol": {
         const: "HTTP/1.1",
@@ -826,14 +819,7 @@ export const schema = [
         const: "HTTP/1.1",
       },
       "intercept-track-port": {
-        anyOf: [
-          {
-            const: null,
-          },
-          {
-            $ref: "absolute-port",
-          },
-        ],
+        type: "string",
       },
       "intercept-track-protocol": {
         const: "HTTP/1.1",

@@ -344,10 +344,7 @@
         - const: 0
         - $ref: port
     track-protocol: {const: "HTTP/1.1"}
-    intercept-track-port:
-      anyOf:
-        - const: null
-        - $ref: port
+    intercept-track-port: {type: string}
     intercept-track-protocol: {const: "HTTP/1.1"}
     # client
     recorder: {$ref: recorder}
@@ -465,10 +462,7 @@
         - const: 0
         - $ref: absolute-port
     track-protocol: {const: "HTTP/1.1"}
-    intercept-track-port:
-      anyOf:
-        - const: null
-        - $ref: absolute-port
+    intercept-track-port: {type: string}
     intercept-track-protocol: {const: "HTTP/1.1"}
     recorder: {$ref: recorder}
     inline-source: {type: boolean}

@@ -2,6 +2,7 @@ import Http from "http";
 import Https from "https";
 import { EventEmitter } from "events";
 
+const _RegExp = RegExp;
 const { nextTick } = process;
 const { apply, construct } = Reflect;
 const _Proxy = Proxy;
@@ -13,9 +14,9 @@ const {
 
 export default (dependencies) => {
   const {
-    util: { constant, assert, coalesce, assignProperty },
+    util: { assert, coalesce, assignProperty },
     log: { logWarning },
-    expect: { expect },
+    expect: { expect, expectSuccess },
     patch: { patch },
     frontend: {
       incrementEventCounter,
@@ -27,32 +28,32 @@ export default (dependencies) => {
     emitter: { requestRemoteEmitterAsync, sendEmitter },
     http: { generateRespond },
   } = dependencies;
+  // TODO: improve test coverage
+  /* c8 ignore start */
   const getPort = (server) => {
     const address = server.address();
-    /* c8 ignore start */
     return typeof address === "string" ? address : address.port;
-    /* c8 ignore stop */
   };
-  const interceptTrackTraffic = (
-    { emitter, intercept_track_port },
+  const interceptTraffic = (
+    { emitter, recorder, regexp },
     server,
     request,
     response,
   ) => {
     if (
-      getPort(server) !== intercept_track_port ||
-      !request.url.startsWith("/_appmap/")
+      recorder === "remote" &&
+      request.url.startsWith("/_appmap/") &&
+      regexp.test(getPort(server))
     ) {
-      return false;
+      request.url = request.url.substring("/_appmap".length);
+      generateRespond((method, path, body) =>
+        requestRemoteEmitterAsync(emitter, method, path, body),
+      )(request, response);
+      return true;
     }
-    /* c8 ignore start */
-    request.url = request.url.substring("/_appmap".length);
-    generateRespond((method, path, body) =>
-      requestRemoteEmitterAsync(emitter, method, path, body),
-    )(request, response);
-    return true;
-    /* c8 ignore stop */
+    return false;
   };
+  /* c8 ignore stop */
   const beforeRequest = ({ frontend, emitter }, request, response) => {
     // bundle //
     const bundle_index = incrementEventCounter(frontend);
@@ -181,7 +182,7 @@ export default (dependencies) => {
   };
   const forwardTraffic = (state, server, request, response) =>
     apply(_emit, server, ["request", request, response]);
-  const spyServer = (state, server, interceptTraffic, handleTraffic) => {
+  const spyServer = (state, server, handleTraffic) => {
     const emit = patch(server, "emit", function emit(name, ...args) {
       if (name !== "request") {
         return apply(_emit, this, [name, ...args]);
@@ -205,13 +206,15 @@ export default (dependencies) => {
     hookResponse: (
       emitter,
       frontend,
-      { "intercept-track-port": intercept_track_port, hooks: { http } },
+      {
+        recorder,
+        "intercept-track-port": intercept_track_port,
+        hooks: { http },
+      },
     ) => {
-      if (!http && intercept_track_port === null) {
+      if (!http && recorder !== "remote") {
         return [];
       }
-      const interceptTraffic =
-        intercept_track_port === null ? constant(false) : interceptTrackTraffic;
       const handleTraffic = http ? spyTraffic : forwardTraffic;
       const backup = [Http, Https].flatMap((object) =>
         ["Server", "createServer"].map((key) => ({
@@ -220,17 +223,26 @@ export default (dependencies) => {
           value: object[key],
         })),
       );
-      const state = { emitter, frontend, intercept_track_port };
+      const state = {
+        emitter,
+        frontend,
+        recorder,
+        regexp: expectSuccess(
+          () => new _RegExp(intercept_track_port, "u"),
+          "Failed to compile the 'intercept-track-port' configuration field %j as regexp >> %e",
+          intercept_track_port,
+        ),
+      };
       const traps = {
         __proto__: null,
         apply: (target, context, values) => {
           const server = apply(target, context, values);
-          spyServer(state, server, interceptTraffic, handleTraffic);
+          spyServer(state, server, handleTraffic);
           return server;
         },
         construct: (target, values, newtarget) => {
           const server = construct(target, values, newtarget);
-          spyServer(state, server, interceptTraffic, handleTraffic);
+          spyServer(state, server, handleTraffic);
           return server;
         },
       };

@@ -241,7 +241,7 @@ export default (dependencies) => {
     },
     "intercept-track-port": {
       extend: overwrite,
-      normalize: normalizePort,
+      normalize: identity,
     },
     "intercept-track-protocol": {
       extend: overwrite,
@@ -380,7 +380,7 @@ export default (dependencies) => {
       "trace-protocol": "TCP",
       "track-port": 0, // possibly overwritten by the agent
       "track-protocol": "HTTP/1.1",
-      "intercept-track-port": null,
+      "intercept-track-port": "^",
       "intercept-track-protocol": "HTTP/1.1",
       validate: {
         appmap: false,

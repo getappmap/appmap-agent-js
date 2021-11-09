@@ -78,7 +78,10 @@ assertDeepEqual(
   await testHookAsync(
     hookResponse,
     unhookResponse,
-    { hooks: { http: false }, "intercept-track-port": null },
+    {
+      recorder: "process",
+      hooks: { http: false },
+    },
     async () => {
       const server = Http.createServer();
       server.on("request", async (request, response) => {
@@ -119,7 +122,7 @@ assertDeepEqual(
     await testHookAsync(
       hookResponse,
       unhookResponse,
-      { hooks: { http: true } },
+      { recorder: "process", hooks: { http: true } },
       async () => {
         const server = Http.createServer();
         const app = createApp();
@@ -191,7 +194,11 @@ assertDeepEqual(
     await testHookAsync(
       hookResponse,
       unhookResponse,
-      { hooks: { http: false }, "intercept-track-port": port },
+      {
+        recorder: "remote",
+        hooks: { http: false },
+        "intercept-track-port": "^",
+      },
       async () => {
         const server = new Http.Server();
         server.on("request", async (request, response) => {

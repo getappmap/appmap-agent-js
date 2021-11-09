@@ -9,6 +9,7 @@ await runAsync(
   {
     packages: { glob: "*" },
     command: "node ./main.mjs",
+    ordering: "chronological",
     name: "name",
     hooks: {
       esm: false,

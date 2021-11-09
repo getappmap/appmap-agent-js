@@ -8,6 +8,7 @@ await runAsync(
   null,
   {
     command: "node ./main.mjs",
+    pruning: false,
     packages: { glob: "*" },
     hooks: {
       esm: true,
