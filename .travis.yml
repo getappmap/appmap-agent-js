@@ -1,4 +1,4 @@
-arch: arm64
+arch: amd64
 os: linux
 dist: focal
 language: node_js
