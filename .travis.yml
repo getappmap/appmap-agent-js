@@ -25,15 +25,15 @@ jobs:
         - npm run format
         - npm run lint
     - stage: test
-      node_js: 14
-      script:
-        - npm run test-unit
-        - npm run test-integration
-    - stage: test
       node_js: 16
       script:
         - npm run test-unit
         - npm run test-integration
+    # - stage: test
+    #   node_js: 16
+    #   script:
+    #     - npm run test-unit
+    #     - npm run test-integration
     - stage: deploy
       node_js: 16
       script: npm run deploy
