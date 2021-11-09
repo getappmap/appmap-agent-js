@@ -22,7 +22,7 @@ To record application processes or tests when they run, they must be started by 
 Supported platforms:
 * Unix-like os, tested on Linux and macOS; Windows is currently not supported
 * Node.js 14, 16, 17, or 18
-* Express.js is required
+* Express.js
 * git is highly recommended 
 * mocha >= 8.0.0 is requried for recording AppMaps from test cases (earlier versions do not support required root hooks)
 
@@ -61,9 +61,9 @@ Once `appmap.yml` is configured for your project, you're ready to record AppMaps
 ### Recording mocha test cases:
 
 1. Validate that the tests run prior to recording AppMaps
-2. Run `appmap-agent-js` with the mocha command and its parameters wrapped in quotes as the `--command` parameter. Example:
+2. Run `appmap-agent-js` with the mocha command and its parameters following the `--` delimiter, example:
 ```sh
-npx appmap-agent-js --command="mocha --recursive test/**/*.ts"
+npx appmap-agent-js -- mocha --recursive test/**/*.ts
 ```
 3. Tests will run now. When they complete, the AppMaps will be stored in the default output directory `tmp/appmap`.
 
@@ -71,23 +71,41 @@ npx appmap-agent-js --command="mocha --recursive test/**/*.ts"
 ### Recording Node.js processes with remote recording:
 
 1. Shut down the application if already running
-2. Run the `appmap-agent-js` with the application start command and its parameters wrapped in quotes as the `--command` parameter. Example:
+2. Run the `appmap-agent-js` with the application start command and its parameters following the `--` delimiter, example:
 ```sh
-npx appmap-agent-js --command="app/main.js -param1 -param2=hello"
+npx appmap-agent-js -- node app/main.js -param1 hello --param2=world
 ```
-3. When the application runs the AppMap agent will inject itself in the http stack and will listen for [remote recording commands](https://appland.com/docs/reference/remote-recording) on the app's http port.
+3. When the application runs, the AppMap agent will inject itself in the http stack and will listen for [remote recording commands](https://appland.com/docs/reference/remote-recording) on the app's http port.
     - See [instructions for remote recording in JetBrains IDEs](/docs/reference/remote-recording#jetbrains-intellij-pycharm-rubymine)
     - See [instructions for remote recording in VSCode](/docs/reference/remote-recording#visual-studio-code)
 4. Interact with your application or service to exercise code whitelisted in `appmap.yml`
 5. Stop the recording and save the new AppMap to disk.
 
-
 ## Viewing AppMaps
 
-Follow the documentation for your IDE:
+Follow the documentation for your IDE to open and interact with recorded`.appmap.json` files:
 - [AppMap for JetBrains](https://appland.com/docs/reference/jetbrains)
 - [AppMap for VSCode](https://appland.com/docs/reference/vscode)
 
+## Basic parameters
+
+The commonly used `appmap-agent-js` parameters are:
+- `--recorder=[mocha|remote|process]` : selected recoder 
+  - default recorder is inferred from the start command parameter
+    - `mocha` if the the command contains `mocha`
+    - `remote` in all other cases
+  - `process` recorder records entire processes, start to finish - it can lead to very large and noisy AppMaps
+- `--command=_start command_` : alternate way of specifying the start command
+- `--log-level=[debug|info|warning|error]` : log level, default `info`
+- `--appmap-config=_path_to_appmap.yml_` : location of `appmap.yml`, default `appmap.yml`
+- `--output-dir=_directory_` : location of recorded AppMap files, default `tmp/appmap`
+- `--app-port=_one of app's http ports_` : whitelist a single app http port for remote recording (for apps listening on multiple ports)
+
+### Example
+
+```
+npx appmap-agent-js --recorder=mocha --command="mocha --recursive test/**/*.ts" --log-level=error
+``` 
 
 ## Next steps
 
