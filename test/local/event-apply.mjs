@@ -7,6 +7,7 @@ const { deepEqual: assertDeepEqual } = Assert;
 await runAsync(
   null,
   {
+    recorder: "process",
     packages: { glob: "*" },
     command: "node ./main.mjs",
     name: "name",

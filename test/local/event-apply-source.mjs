@@ -14,6 +14,7 @@ const {
 await runAsync(
   null,
   {
+    recorder: "process",
     command: "node ./script.js",
     packages: { glob: "*" },
     name: "name",

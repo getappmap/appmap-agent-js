@@ -7,6 +7,7 @@ const { equal: assertEqual, deepEqual: assertDeepEqual } = Assert;
 await runAsync(
   { name: "app", version: "1.2.3" },
   {
+    recorder: "process",
     command: "node ./main.mjs",
     name: "name",
     hooks: {
