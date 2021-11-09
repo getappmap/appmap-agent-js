@@ -1,16 +1,24 @@
 const _Map = Map;
 
 export default (dependencies) => {
+  const {
+    util: { assert },
+  } = dependencies;
   const recorders = new _Map([
     ["remote", "receptor-http"],
     ["process", "receptor-file"],
     ["mocha", "receptor-file"],
   ]);
   return {
-    minifyReceptorConfiguration: (configuration) =>
-      dependencies[
+    minifyReceptorConfiguration: (configuration) => {
+      assert(
+        configuration.recorder !== null,
+        "undefined recorder in configuration",
+      );
+      return dependencies[
         recorders.get(configuration.recorder)
-      ].minifyReceptorConfiguration(configuration),
+      ].minifyReceptorConfiguration(configuration);
+    },
     openReceptorAsync: async (configuration) => ({
       recorder: configuration.recorder,
       receptor: await dependencies[

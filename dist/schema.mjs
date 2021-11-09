@@ -825,7 +825,14 @@ export const schema = [
         const: "HTTP/1.1",
       },
       recorder: {
-        $ref: "recorder",
+        anyOf: [
+          {
+            const: null,
+          },
+          {
+            $ref: "recorder",
+          },
+        ],
       },
       "inline-source": {
         type: "boolean",

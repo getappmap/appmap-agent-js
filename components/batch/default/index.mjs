@@ -78,6 +78,20 @@ export default (dependencies) => {
         return receptors.get(key);
       };
       const runConfigurationAsync = async (configuration, env) => {
+        const { recorder } = configuration;
+        // TODO: Do something about this ugly heuristic :(
+        if (recorder === null) {
+          const {
+            command: { value: command },
+          } = configuration;
+          configuration = extendConfiguration(
+            configuration,
+            /* c8 ignore start */
+            { recorder: command.includes("mocha") ? "mocha" : "remote" },
+            /* c8 ignore stop */
+            null,
+          );
+        }
         const receptor = await createReceptorAsync(configuration);
         configuration = adaptReceptorConfiguration(receptor, configuration);
         const {

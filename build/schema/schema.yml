@@ -464,7 +464,10 @@
     track-protocol: {const: "HTTP/1.1"}
     intercept-track-port: {type: string}
     intercept-track-protocol: {const: "HTTP/1.1"}
-    recorder: {$ref: recorder}
+    recorder:
+      anyOf:
+        - const: null
+        - $ref: recorder
     inline-source: {type: boolean}
     hooks:
       type: object

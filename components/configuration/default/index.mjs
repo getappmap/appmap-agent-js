@@ -402,7 +402,7 @@ export default (dependencies) => {
           true,
         ],
       ],
-      recorder: "process",
+      recorder: null,
       "inline-source": false,
       hooks: {
         apply: true,

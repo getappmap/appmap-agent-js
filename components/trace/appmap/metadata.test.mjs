@@ -49,7 +49,7 @@ const default_meta_data = {
     version: "1.2.3",
     url: "http://homepage",
   },
-  recorder: { name: "process" },
+  recorder: { name: "default" },
   recording: null,
   git: null,
   test_status: "succeeded",
@@ -57,6 +57,12 @@ const default_meta_data = {
 };
 
 assertDeepEqual(test({}, "/cwd"), default_meta_data);
+
+// recorder //
+assertDeepEqual(test({ recorder: "process" }, "/cwd"), {
+  ...default_meta_data,
+  recorder: { name: "process" },
+});
 
 // termination //
 

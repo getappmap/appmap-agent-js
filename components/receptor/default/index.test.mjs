@@ -8,7 +8,8 @@ import {
 
 import Receptor from "./index.mjs";
 
-const { createConfiguration } = await buildTestComponentAsync("configuration");
+const { createConfiguration, extendConfiguration } =
+  await buildTestComponentAsync("configuration");
 
 const {
   openReceptorAsync,
@@ -19,7 +20,11 @@ const {
 
 const directory = `${tmpdir()}/${Math.random().toString(36).substring(2)}`;
 await mkdirAsync(directory);
-const configuration = createConfiguration(directory);
+const configuration = extendConfiguration(
+  createConfiguration(directory),
+  { recorder: "process" },
+  null,
+);
 
 const receptor = await openReceptorAsync(
   minifyReceptorConfiguration(configuration),

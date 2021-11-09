@@ -21,16 +21,16 @@ global.GLOBAL_SPY_SPAWN = (exec, argv, options) => {
   assertEqual(argv.length, 2);
   assertEqual(argv[0], "-c");
   const command = argv[1];
-  if (command === "success") {
+  if (command.startsWith("success")) {
     setTimeout(() => {
       emitter.emit("close", 0, null);
     }, 0);
-  } else if (command === "failure") {
+  } else if (command.startsWith("failure")) {
     setTimeout(() => {
       emitter.emit("close", 1, null);
     }, 0);
   } else {
-    assertEqual(command, "sleep");
+    assertEqual(command.startsWith("sleep"), true);
   }
   return emitter;
 };
@@ -97,9 +97,8 @@ const configuration = createConfiguration("/repository");
     extendConfiguration(
       configuration,
       {
-        recorder: "process",
         scenario: "^",
-        scenarios: [{ command: "sleep" }, { command: "sleep" }],
+        scenarios: [{ command: "sleep remote" }, { command: "sleep mocha" }],
       },
       "/directory",
     ),

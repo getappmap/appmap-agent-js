@@ -115,7 +115,7 @@ export default (dependencies) => {
       },
       frameworks,
       client: makeClient(agent),
-      recorder: { name: recorder },
+      recorder: { name: recorder === null ? "default" : recorder },
       recording: makeRecording(recording),
       git: makeHistory(repository),
       test_status: makeTestStatus(termination),
