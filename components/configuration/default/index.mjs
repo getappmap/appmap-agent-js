@@ -413,7 +413,7 @@ export default (dependencies) => {
         sqlite3: false,
         pg: false,
       },
-      ordering: "chronological",
+      ordering: "causal",
       "function-name-placeholder": "()",
       serialization: {
         "maximum-length": 96,
@@ -454,7 +454,7 @@ export default (dependencies) => {
         ],
       ],
       exclude: [],
-      pruning: false,
+      pruning: true,
       app: null,
       name: null,
     }),
