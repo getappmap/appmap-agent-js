@@ -1,5 +1,6 @@
 branches: [test, node]
 dependencies:
+  - log
   - util
   - frontend
   - emitter

@@ -1,4 +1,4 @@
-import { createRequire } from "module";
+import Require from "./require.mjs";
 
 const { isArray } = Array;
 const { assign } = Object;
@@ -92,6 +92,7 @@ export default (dependencies) => {
     },
     emitter: { sendEmitter },
   } = dependencies;
+  const { requireMaybe } = Require(dependencies);
   return {
     unhookSqlite3: (backup) => {
       backup.forEach(assignProperty);
@@ -101,12 +102,12 @@ export default (dependencies) => {
       frontend,
       { repository: { directory }, hooks: { sqlite3 } },
     ) => {
-      if (!sqlite3) {
+      const Sqlite3 = requireMaybe(sqlite3, directory, "sqlite3");
+      if (Sqlite3 === null) {
         return [];
       }
       const empty = getSerializationEmptyValue(frontend);
-      const require = createRequire(`${directory}/dummy.js`);
-      const { Database } = require("sqlite3");
+      const { Database } = Sqlite3;
       const { prototype: database_prototype } = Database;
       const backup = ["run", "get", "all", "each", "prepare"].map((key) => ({
         object: database_prototype,

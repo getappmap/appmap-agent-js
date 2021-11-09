@@ -1,4 +1,4 @@
-import { createRequire } from "module";
+import Require from "./require.mjs";
 
 const _undefined = undefined;
 const { apply } = Reflect;
@@ -18,6 +18,7 @@ export default (dependencies) => {
     },
     emitter: { sendEmitter },
   } = dependencies;
+  const { requireMaybe } = Require(dependencies);
   return {
     unhookPg: (backup) => {
       backup.forEach(assignProperty);
@@ -27,12 +28,12 @@ export default (dependencies) => {
       frontend,
       { repository: { directory }, hooks: { pg } },
     ) => {
-      if (!pg) {
+      const Postgres = requireMaybe(pg, directory, "pg");
+      if (Postgres === null) {
         return [];
       }
       const empty = getSerializationEmptyValue(frontend);
-      const require = createRequire(`${directory}/dummy.js`);
-      const { Client, Query } = require("pg");
+      const { Client, Query } = Postgres;
       const { prototype } = Client;
       const { query: original } = prototype;
       const { query } = {

@@ -1,4 +1,4 @@
-import { createRequire } from "module";
+import Require from "./require.mjs";
 
 const { apply } = Reflect;
 
@@ -15,6 +15,7 @@ export default (dependencies) => {
     },
     emitter: { sendEmitter },
   } = dependencies;
+  const { requireMaybe } = Require(dependencies);
   return {
     unhookMysql: (backup) => {
       backup.forEach(assignProperty);
@@ -24,12 +25,11 @@ export default (dependencies) => {
       frontend,
       { repository: { directory }, hooks: { mysql } },
     ) => {
-      if (!mysql) {
+      const Mysql = requireMaybe(mysql, directory, "mysql");
+      if (Mysql === null) {
         return [];
       }
       const empty = getSerializationEmptyValue(frontend);
-      const require = createRequire(`${directory}/dummy.js`);
-      const Mysql = require("mysql");
       const { createConnection, createQuery } = Mysql;
       const { __proto__: prototype } = createConnection({});
       const { query: original } = prototype;
