@@ -56,7 +56,7 @@ await runAsync(
   },
   async (directory) => {
     assertDeepEqual(
-      new Set(await readdir(`${directory}/tmp/appmap`)),
+      new Set(await readdir(`${directory}/tmp/appmap/mocha`)),
       new Set([
         "suite.appmap.json",
         "suite-1.appmap.json",
