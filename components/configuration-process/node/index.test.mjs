@@ -22,11 +22,13 @@ const { loadProcessConfiguration } = ConfigurationProcess(
     cwd: () => "/cwd",
   });
   await writeFile(path, JSON.stringify({ app: "app", name: "name1" }), "utf8");
-  const { app, name, command } = loadProcessConfiguration({
+  const { app, name, command, log } = loadProcessConfiguration({
     env: { APPMAP_CONFIGURATION_PATH: path },
     argv: [
       "node",
       "agent.mjs",
+      "--log-level",
+      "error",
       "--name",
       "name2",
       "--command",
@@ -37,9 +39,10 @@ const { loadProcessConfiguration } = ConfigurationProcess(
     cwd: () => "/cwd",
   });
   assertDeepEqual(
-    { app, name, command },
+    { app, name, command, log },
     {
       app: "app",
+      log: "error",
       name: "name2",
       command: {
         value: "'command2'",

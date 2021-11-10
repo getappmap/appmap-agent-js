@@ -5,6 +5,7 @@ import YAML from "yaml";
 const _Map = Map;
 const { parse: parseYAML } = YAML;
 const { parse: parseJSON } = JSON;
+const { ownKeys } = Reflect;
 
 export default (dependencies) => {
   const {
@@ -49,13 +50,21 @@ export default (dependencies) => {
 
   const quote = (arg) => `'${arg.replace(/'/gu, "\\'")}'`;
 
+  const aliases = new _Map([
+    ["log-level", "log"],
+    ["output-dir", "output"],
+  ]);
+
   const extractConfig = (argv) => {
     let { _: positional, ...config } = minimist(argv.slice(2));
+    for (const key of ownKeys(config)) {
+      if (aliases.has(key)) {
+        config[aliases.get(key)] = config[key];
+        delete config[key];
+      }
+    }
     if (positional.length > 0) {
-      config = {
-        ...config,
-        command: positional.map(quote).join(" "),
-      };
+      config.command = positional.map(quote).join(" ");
     }
     return config;
   };
