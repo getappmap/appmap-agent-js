@@ -388,7 +388,7 @@ export default (dependencies) => {
       },
       log: "info",
       output: {
-        directory: `${home}/tmp/appmap`,
+        directory: null,
         basename: null,
         extension: ".appmap.json",
       },
@@ -402,7 +402,7 @@ export default (dependencies) => {
           true,
         ],
       ],
-      recorder: "heuristic",
+      recorder: null,
       "inline-source": false,
       hooks: {
         apply: true,

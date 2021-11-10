@@ -149,25 +149,39 @@ export default (dependencies) => {
         null,
       );
     },
-    resolveRecorderConfiguration: (configuration) => {
-      const { recorder } = configuration;
-      if (recorder === "heuristic") {
+    resolveConfigurationRecorder: (configuration) => {
+      if (configuration.recorder === null) {
         assert(
           configuration.command !== null,
           "cannot resolve recorder because command is missing",
         );
-        const {
-          command: { value: command },
-        } = configuration;
         configuration = extendConfiguration(
           configuration,
-          { recorder: command.includes("mocha") ? "mocha" : "remote" },
+          {
+            recorder: configuration.command.value.includes("mocha")
+              ? "mocha"
+              : "remote",
+          },
           null,
+        );
+      }
+      if (configuration.output.directory === null) {
+        configuration = extendConfiguration(
+          configuration,
+          {
+            output: {
+              directory:
+                configuration.recorder === "mocha"
+                  ? "tmp/appmap/mocha"
+                  : "tmp/appmap",
+            },
+          },
+          configuration.repository.directory,
         );
       }
       return configuration;
     },
-    compileCommandConfiguration: (configuration, env) => {
+    compileConfigurationCommand: (configuration, env) => {
       assert(configuration.agent !== null, "missing agent in configuration");
       assert(
         configuration.command !== null,

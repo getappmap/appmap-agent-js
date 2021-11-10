@@ -36,7 +36,6 @@
     - mocha
     - manual
     - remote
-    - heuristic
 
 - $id: serialization-method
   enum:
@@ -465,7 +464,10 @@
     track-protocol: {const: "HTTP/1.1"}
     intercept-track-port: {type: string}
     intercept-track-protocol: {const: "HTTP/1.1"}
-    recorder: {$ref: recorder}
+    recorder:
+      anyOf:
+        - const: null
+        - $ref: recorder
     inline-source: {type: boolean}
     hooks:
       type: object
@@ -540,7 +542,10 @@
       additionalProperties: false
       required: [directory, basename, extension]
       properties:
-        directory: {$ref: absolute-path}
+        directory:
+          anyOf:
+            - const: null
+            - $ref: absolute-path
         basename:
           anyOf:
             - const: null

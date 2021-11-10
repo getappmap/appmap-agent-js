@@ -21,9 +21,9 @@ const {
   isConfigurationEnabled,
   getConfigurationPackage,
   extendConfigurationNode,
-  compileCommandConfiguration,
+  compileConfigurationCommand,
   resolveConfigurationPort,
-  resolveRecorderConfiguration,
+  resolveConfigurationRecorder,
 } = ConfigurationHelper(await buildTestDependenciesAsync(import.meta.url));
 
 /////////////////////////////////
@@ -101,16 +101,15 @@ assertEqual(
 );
 
 //////////////////////////////////
-// resolveRecorderConfiguration //
+// resolveConfigurationRecorder //
 //////////////////////////////////
 
 assertEqual(
   Reflect.get(
-    resolveRecorderConfiguration(
+    resolveConfigurationRecorder(
       extendConfiguration(
         createConfiguration("/home"),
         {
-          recorder: "heuristic",
           command: "npx mocha",
         },
         "/cwd",
@@ -123,11 +122,10 @@ assertEqual(
 
 assertEqual(
   Reflect.get(
-    resolveRecorderConfiguration(
+    resolveConfigurationRecorder(
       extendConfiguration(
         createConfiguration("/home"),
         {
-          recorder: "heuristic",
           command: "node main.js",
         },
         "/cwd",
@@ -265,7 +263,7 @@ const stripEnvironmentConfiguration = ({
 // recursive-process-recording: true //
 assertDeepEqual(
   stripEnvironmentConfiguration(
-    compileCommandConfiguration(
+    compileConfigurationCommand(
       extendConfiguration(
         createConfiguration("/cwd1"),
         {
@@ -309,7 +307,7 @@ assertDeepEqual(
 // recursive-process-recording: false //
 assertDeepEqual(
   stripEnvironmentConfiguration(
-    compileCommandConfiguration(
+    compileConfigurationCommand(
       extendConfiguration(
         createConfiguration("/cwd1"),
         {
@@ -358,7 +356,7 @@ assertDeepEqual(
   const testMocha = (npx) => {
     assertDeepEqual(
       stripEnvironmentConfiguration(
-        compileCommandConfiguration(
+        compileConfigurationCommand(
           extendConfiguration(
             createConfiguration("/cwd1"),
             {
@@ -399,7 +397,7 @@ assertDeepEqual(
   testMocha(true);
   testMocha(false);
   assertThrows(() => {
-    compileCommandConfiguration(
+    compileConfigurationCommand(
       extendConfiguration(
         createConfiguration("/cwd1"),
         {

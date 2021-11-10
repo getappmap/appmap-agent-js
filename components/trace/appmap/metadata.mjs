@@ -77,10 +77,7 @@ export default (dependencies) => {
   });
 
   const makeRecorder = (recorder) => {
-    assert(
-      recorder !== "heuristic",
-      "heuristic recorder should have been resolved earlier",
-    );
+    assert(recorder !== null, "recorder should have been resolved earlier");
     return { name: recorder };
   };
 

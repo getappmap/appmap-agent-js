@@ -105,6 +105,7 @@ export default (dependencies) => {
         recorder === "mocha" || recorder === "process",
         "invalid recorder for receptor-file",
       );
+      assert(directory !== null, "output directory should have been resolved");
       await createDirectoryAsync(directory);
       const server = createServer();
       const paths = new _Set();

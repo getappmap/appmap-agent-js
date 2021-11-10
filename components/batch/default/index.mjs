@@ -11,8 +11,8 @@ export default (dependencies) => {
     "configuration-accessor": {
       getConfigurationScenarios,
       initializeConfiguration,
-      compileCommandConfiguration,
-      resolveRecorderConfiguration,
+      compileConfigurationCommand,
+      resolveConfigurationRecorder,
     },
     repository: {
       extractRepositoryDependency,
@@ -73,14 +73,14 @@ export default (dependencies) => {
         return receptors.get(key);
       };
       const runConfigurationAsync = async (configuration, env) => {
-        configuration = resolveRecorderConfiguration(configuration);
+        configuration = resolveConfigurationRecorder(configuration);
         const receptor = await createReceptorAsync(configuration);
         configuration = adaptReceptorConfiguration(receptor, configuration);
         const {
           command: { value: description },
         } = configuration;
         logInfo("%s ...", description);
-        const { command, options } = compileCommandConfiguration(
+        const { command, options } = compileConfigurationCommand(
           configuration,
           env,
         );
