@@ -33,7 +33,7 @@ Table of contents:
 
 * unix-like os
 * git
-* node 14, 16, 17, or 18
+* node 14, 16, or 17
 * [mocha recorder only]: mocha >= 8.0.0 (because of root hooks).
   <!-- Also, since `mocha@6.1.4`, `lib/cli/cli` is used instead of trouble-causing extension-less binary: `bin/_mocha`. cf: https://github.com/mochajs/mocha/commit/9ea45e7557a193c4b69816085397a6655fb5bc06#diff-91c989b6425dcbfe95dbe6f7dc3727d8376c98d8acd8a30a78a6d6adc34f4f0b. -->
 
@@ -57,6 +57,17 @@ The configuration format is detailed [here](#configuration).
   For instance:
   ```sh
   npx appmap-agent-js --name my-appmap-name --app my-app-name
+  ```
+  Aliases:
+  | Alias          | Corresponding Name |
+  |----------------|--------------------|
+  | `--log-level`  | `--log`            |
+  | `--output-dir` | `--output`         |
+  In addition, the command can be encoded as positional argument.
+  For instance, these commands have the same effect:
+  ```sh
+  npx appmap-agent-js -- node main.js
+  npx appmap-agent-js --command: 'node main.js'
   ```
 * *Environment variables*
     * `APPMAP_CONFIGURATION_PATH`: path to the configuration file, default: `./appmap.yml`.
@@ -144,8 +155,8 @@ appmap.start(track, {
   name: "my-appmap-name",
   pruning: true,
   recording: {
-    defined-class: "defined-class",
-    method-id: "method-id",
+    "defined-class": "defined-class",
+    "method-id": "method-id",
   },
 });
 appmap.recordScript(
@@ -194,20 +205,20 @@ A specifier can be any of:
 ### Automated Recording Configuration Fields
 
 * `command <string>` The command to record.
-* `command-options <object>` Options to run the command, inspired by node's `child_process` library
-    * `cwd <string>` Current working directory of the child process. *Default*: the directory of the configuration file.
+* `command-options <object>` Options to run the command, inspired by node's `child_process` library.
     * `env <object>` Environment variables. Note that Unlike for the [child_process#spawn](https://nodejs.org/api/child_process.html#child_process_child_process_spawn_command_args_options), the environment variables from the parent process will always be included.
     *Default*: `{}` -- ie: the environment variables from the parent process.
     * `stdio <string> | <string[]>` Stdio configuration, only `"ignore"` and `"inherit"` are supported.
     * `encoding "utf8" | "utf16le" | "latin1"` Encoding of all the child's stdio streams.
     * `timeout <number>` The maximum number of millisecond the child process is allowed to run before being killed. *Default*: `0` (no timeout).
     * `killSignal <string>` The signal used to kill the child process when it runs out of time. *Default*: `"SIGTERM"`.
-* `recorder "process" | "remote" | "mocha"` Defines the main algorithm used for recording. *Default* `"process"`.
+* `recorder "process" | "remote" | "mocha"` Defines the main algorithm used for recording. *Default* `null`.
+    * `null` Will pick between `"remote"` and `"mocha"` based on the content of the command.
     * `"process"` Generate a single appmap which spans over the entire lifetime of the process.
     * `"mocha"` Generate an appmap for each test case (ie `it` calls) of the entire test suite (ie every `describe` calls on every test file).
     * `"remote"` Generate appmap on demand via HTTP requests.
-* `track-port <number> | null`: Port in the backend process for serving remote recording HTTP requests. *Default*: `0` A random port will be used.
-* `intercept-track-port <number> | null`: Port in the frontend process for intercepting remote recording HTTP requests. *Default*: `null` No interception.
+* `track-port <number> | <string>`: Port in the backend process for serving remote recording HTTP requests. *Default*: `0` A random port will be used.
+* `intercept-track-port <string>`: Regular expression to whitelist the ports in the frontend process for intercepting remote recording HTTP requests. *Default*: `"^"` Every detected HTTP ports will be spied upon.
 * `processes <boolean> | <string> | <EnabledSpecifier> | <EnabledSpecifier[]>` Whitelist files to decide whether a node process should be instrumented based on the path of its main module. An `EnabledSpecifier` can be any of
     * `<boolean>` Shorthand, `true` is the same as `{regexp:"^", enabled:true}` and `false` is the same as `{regexp:"^", enabled:false}`.
     * `<string>` Shorthand, `"test/**/*.mjs"` is the same as `{glob:"test/**/*.mjs", enabled:true}`.
@@ -216,11 +227,11 @@ A specifier can be any of:
         * `... <Specifier>` Extends from any specifier format. 
   *Default*: `[]` -- ie: the agent will be enabled for every process whose entry script resides in the repository directory.
 * `scenarios <Configuration[]>` An array of child configuration.
-* `scenario <string>` A regular expression to select scenarios for execution. If the root configuration contains a command, it will always be executed. *Default*: `"^"` (every scenario will be executed).
+* `scenario <string>` A regular expression to whitelist scenarios for execution. If the root configuration contains a command, it will always be executed. *Default*: `"^"` (every scenario will be executed).
 * `output <string> | <object>` Options to store appmap files.
     * `<string>` Shorthand, `"tmp/appmap"` is the same as `{directory: "tmp/appmap"}`.
     * `<object>`
-        * `directory <string>` Directory to write appmap files.
+        * `directory <string>` Directory to write appmap files. *Default*: `null` the agent will choose between `"tmp/appmap/mocha"` and `"tmp/appmap"` based on the `recorder` field.
         * `basename null | <string>` Basename of the future appmap file. Indexing will be appended to prevent accidental overwriting of appmap files within a single run. *Default*: `null` the agent will look at the `name` configuration field, if it is `null` as well, `"anonymous"` will be used.
         * `extension <string>` Extension to append after the basename. *Default*: `".appmap.json"`.
 
@@ -241,13 +252,13 @@ A specifier can be any of:
     * `esm <boolean>` Indicates whether native modules should be instrumented to record function applications. *Default*: `true` for the CLI and `false` for the API.
     * `group <boolean>` Indicates whether asynchronous resources should be monitored to infer causality link between events. This provides more accurate appmaps but comes at the price of performance overhead. *Default*: `true`.
     * `http <boolean>` Indicates whether [`http`](https://nodejs.org/api/http.html) should be monkey patched to monitor http traffic. *Default*: `true`.
-    * `mysql <boolean>` Indicates whether [`mysql`](https://www.npmjs.com/package/mysql) should be monkey patched to monitor sql queries. The agent will crash if the `mysql` package is not available. *Default*: `false`.
-    * `pg <boolean>` Indicates whether [`pg`](https://www.npmjs.com/pg) should be monkey patched to monitor sql queries. The agent will crash if the `pg` package is not available. *Default*: `false`.
-    * `sqlite3 <boolean>` Indicates whether [`sqlite3`](https://www.npmjs.com/sqlite3) should be monkey patched to monitor sql queries. The agent will crash if the `sqlite3` package is not available. *Default*: `false`.
-* `ordering "chronological" | "causal"` 
-* `app null | <string>` Name of the recorded application. *Default*: `name` value found in `package.json` (`null` if `package.json` is missing).
-* `name null | <string>` Name of the appmap. *Default*: `null`.
-* `pruning <boolean>` Remove elements of the classmap which did not trigger any function application event. *Default*: `false`.
+    * `mysql <boolean>` Indicates whether [`mysql`](https://www.npmjs.com/package/mysql) should be monkey patched to monitor sql queries. The agent will crash if the `mysql` package is not available. *Default*: `true`.
+    * `pg <boolean>` Indicates whether [`pg`](https://www.npmjs.com/pg) should be monkey patched to monitor sql queries. The agent will crash if the `pg` package is not available. *Default*: `true`.
+    * `sqlite3 <boolean>` Indicates whether [`sqlite3`](https://www.npmjs.com/sqlite3) should be monkey patched to monitor sql queries. The agent will crash if the `sqlite3` package is not available. *Default*: `true`.
+* `ordering "chronological" | "causal"` *Default*: `"causal"`.
+* `app <string>` Name of the recorded application. *Default*: `null` the value found in `package.json` if any.
+* `name <string>` Name of the appmap. *Default*: `null` the agent will do its best to come up with a meaningful name.
+* `pruning <boolean>` Remove elements of the classmap which did not trigger any function application event. *Default*: `true`.
 * `serialization <string> | <object>` Serialization options.
     * `<string>` Shorthand, `"toString"` is the same as `{method: "toString"}`.
     * `<object>`
