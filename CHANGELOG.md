@@ -1,3 +1,10 @@
+# [6.7.0](https://github.com/applandinc/appmap-agent-js/compare/v6.6.0...v6.7.0) (2021-11-10)
+
+
+### Features
+
+* more lenient source map data url parsing ([fb57927](https://github.com/applandinc/appmap-agent-js/commit/fb579274d46a748dfa4cdc35bc162d63d5f3e2f2))
+
 # [6.6.0](https://github.com/applandinc/appmap-agent-js/compare/v6.5.0...v6.6.0) (2021-11-10)
 
 
