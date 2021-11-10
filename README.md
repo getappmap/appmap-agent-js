@@ -5,12 +5,12 @@
 
 ## Introduction
  
-`appmap-agent-js` records AppMaps from Node.js processes when they are run. There are two recommended strategies for recording AppMaps when getting started:
+`appmap-agent-js` records AppMaps from Node.js processes when they run. There are two recommended strategies for recording AppMaps when getting started:
 
-1. recording `mocha` test cases when they are run
-2. recording Node.js processes using start/stop controls via http calls to web endpoints implemented by the agent that let users control the recording remotely
+1. Record `mocha` test cases when they run.
+2. Record Node.js processes using start/stop controls via http calls to web endpoints. These are implemented by the AppMap agent to let users control the recording remotely.
 
-`appmap-agent-js` starts test and application processes to be recorded.
+`appmap-agent-js` starts the test and application processes that will be recorded.
 
 
 ## Installation and setup
@@ -33,15 +33,15 @@ Run this command in your Node.js project folder (where `package.json` is located
 npm install @appland/appmap-agent-js
 ```
 
-We recommend installing the AppMap extension for popular code editors for remote recording, viewing and interacting with recorded AppMaps:
+To use remote recording, and view and interact with recorded AppMaps, we recommend installing the AppMap extension for popular code editors:
 - [AppMap in VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=appland.appmap)
-- [AppMap in JetBtains Marketplace](https://plugins.jetbrains.com/plugin/16701-appmap)
+- [AppMap in JetBrains Marketplace](https://plugins.jetbrains.com/plugin/16701-appmap)
 
 ### Initial configuration
 
 The agent requires a valid configuration in `appmap.yml` file:
-1. Create a new file called `appmap.yml` in the project folder (where `package.json` is located)
-2. Add your application name and a list of directories with sources that will be recorded. Example:
+1. Create a new file called `appmap.yml` in the project folder (where `package.json` is located).
+2. Add your application name and a list of directories with sources that will be recorded. For example:
 
 ```yaml
 name: MyApp
@@ -61,17 +61,17 @@ Once `appmap.yml` is configured for your project, you're ready to record AppMaps
 
 ### Recording mocha test cases:
 
-1. Validate that the tests run prior to recording AppMaps
-2. Run `appmap-agent-js` with the `mocha` command and its parameters following the `--` delimiter (all glob expressions should be wrapped in quotes), example:
+1. Validate that the tests run prior to recording AppMaps.
+2. Run `appmap-agent-js` with the `mocha` command and its parameters following the `--` delimiter (all glob expressions should be wrapped in quotes). For example:
 ```sh
 npx appmap-agent-js -- mocha --recursive 'test/**/*.ts'
 ```
-3. `appmap-agent-js` will run the tests. When they complete, the AppMaps will be stored in the default output directory `tmp/appmap/mocha`.
+3. `appmap-agent-js` will run the tests. When the tests are complete, the AppMaps will be stored in the default output directory `tmp/appmap/mocha`.
 
 
 ### Recording Node.js processes with remote recording:
 
-1. Run `appmap-agent-js` with the application-starting command and its parameters following the `--` delimiter (all glob expressions should be wrapped in quotes), example:
+1. Run `appmap-agent-js` with the application-starting command and its parameters following the `--` delimiter (all glob expressions should be wrapped in quotes). For example:
 ```sh
 npx appmap-agent-js -- node app/main.js -param1 hello --param2=world
 ```
@@ -102,7 +102,7 @@ The most frequently used `appmap-agent-js` parameters are:
     - `remote` in all other cases
   - `mocha` recorder records AppMaps from test cases automatically
   - `remote` recorder has to be started and stopped manually with http requests
-  - `process` recorder records entire processes automatically, from start to finish. 
+  - `process` recorder records entire processes automatically, from start to finish 
     - **Warning:** AppMaps recorded with the `process` recorder can be excessively large and noisy.
 - `--command="_start command_"` : alternate method of specifying the app- or tests-starting command, wrapped in quotes
 - `--log-level=[debug|info|warning|error]` :  defaults to `info`
