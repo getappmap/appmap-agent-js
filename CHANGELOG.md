@@ -1,3 +1,11 @@
+# [6.6.0](https://github.com/applandinc/appmap-agent-js/compare/v6.5.0...v6.6.0) (2021-11-10)
+
+
+### Features
+
+* add aliases to CLI ([e2ea710](https://github.com/applandinc/appmap-agent-js/commit/e2ea7100dd8940e93d5b781d2b9e448824939f5c))
+* dynamic default value for output directory ([1300f84](https://github.com/applandinc/appmap-agent-js/commit/1300f84b62dd4c072bffdea3ce4a9861fcaff098))
+
 # [6.5.0](https://github.com/applandinc/appmap-agent-js/compare/v6.4.0...v6.5.0) (2021-11-09)
 
 
