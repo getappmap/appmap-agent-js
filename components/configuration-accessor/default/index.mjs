@@ -59,7 +59,7 @@ export default (dependencies) => {
     //       .filter(filterEnvironmentPair)
     //       .map(mapEnvironmentPair),
     //   ),
-    getConfigurationPackage: (packages, url) => {
+    getConfigurationPackage: ({ packages }, url) => {
       const { protocol, pathname } = new _URL(url);
       if (protocol === "data:") {
         logWarning(

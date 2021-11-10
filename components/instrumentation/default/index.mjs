@@ -19,31 +19,14 @@ export default (dependencies) => {
   const getBody = generateGet("body");
   const getURL = generateGet("url");
   return {
-    createInstrumentation: ({
-      language: { version },
-      "hidden-identifier": identifier,
-      exclude: default_exclude,
-      packages,
-      "inline-source": default_inline,
-    }) => ({
-      version,
-      packages,
-      default_exclude,
-      default_inline,
-      runtime: `${identifier}${getUUID()}`,
+    createInstrumentation: (configuration) => ({
+      configuration,
+      runtime: `${configuration["hidden-identifier"]}${getUUID()}`,
       done: new _Set(),
     }),
     getInstrumentationIdentifier: ({ runtime }) => runtime,
     instrument: (
-      {
-        version,
-        packages,
-        default_exclude,
-        default_inline,
-        runtime,
-        counter,
-        done,
-      },
+      { configuration, runtime, done },
       { type, url, content },
       mapping,
     ) => {
@@ -55,7 +38,7 @@ export default (dependencies) => {
             shallow,
             exclude,
             "inline-source": inline,
-          } = getConfigurationPackage(packages, url);
+          } = getConfigurationPackage(configuration, url);
           return {
             head: enabled,
             body: {
@@ -63,9 +46,9 @@ export default (dependencies) => {
               content,
               shallow,
               /* c8 ignore start */
-              inline: inline === null ? default_inline : inline,
+              inline: inline === null ? configuration["inline-source"] : inline,
               /* c8 ignore stop */
-              exclude: [...default_exclude, ...exclude],
+              exclude: [...configuration.exclude, ...exclude],
             },
           };
         })
@@ -89,7 +72,7 @@ export default (dependencies) => {
                 parseEstree(content, {
                   allowHashBang: true,
                   sourceType: type,
-                  ecmaVersion: version,
+                  ecmaVersion: configuration.language.version,
                   locations: true,
                 }),
               "failed to parse file %j >> %e",

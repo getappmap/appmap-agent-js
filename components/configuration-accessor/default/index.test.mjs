@@ -171,10 +171,7 @@ assertEqual(
 /////////////////////////////
 
 assertDeepEqual(
-  getConfigurationPackage(
-    createConfiguration("/repository").packages,
-    "data:,FOO",
-  ),
+  getConfigurationPackage(createConfiguration("/repository"), "data:,FOO"),
   {
     enabled: true,
     shallow: false,
@@ -184,12 +181,12 @@ assertDeepEqual(
 );
 assertDeepEqual(
   getConfigurationPackage(
-    createConfiguration("/repository").packages,
+    createConfiguration("/repository"),
     "file:///directory/foo",
   ),
   {
     enabled: false,
-    shallow: true,
+    shallow: false,
     exclude: [],
     "inline-source": null,
   },
@@ -202,7 +199,7 @@ assertDeepEqual(
         packages: "*",
       },
       "/directory",
-    ).packages,
+    ),
     "file:///directory/foo",
   ),
   {

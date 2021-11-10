@@ -426,19 +426,19 @@ export default (dependencies) => {
         version: "2020",
       },
       packages: [
-        [
-          {
-            cwd: home,
-            source: "(^\\.\\.)|((^|/)node_modules/)",
-            flags: "u",
-          },
-          {
-            enabled: false,
-            shallow: true,
-            exclude: [],
-            "inline-source": null,
-          },
-        ],
+        // [
+        //   {
+        //     cwd: home,
+        //     source: "(^\\.\\.)|((^|/)node_modules/)",
+        //     flags: "u",
+        //   },
+        //   {
+        //     enabled: false,
+        //     shallow: true,
+        //     exclude: [],
+        //     "inline-source": null,
+        //   },
+        // ],
         [
           {
             cwd: home,
@@ -446,7 +446,7 @@ export default (dependencies) => {
             flags: "u",
           },
           {
-            enabled: true,
+            enabled: false,
             shallow: false,
             exclude: [],
             "inline-source": null,
