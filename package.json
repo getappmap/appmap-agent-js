@@ -1,6 +1,6 @@
 {
   "name": "@appland/appmap-agent-js",
-  "version": "6.7.0",
+  "version": "7.0.0",
   "bin": {
     "appmap-agent-js": "bin/bin.mjs"
   },

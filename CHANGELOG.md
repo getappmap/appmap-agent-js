@@ -1,3 +1,15 @@
+# [7.0.0](https://github.com/applandinc/appmap-agent-js/compare/v6.7.0...v7.0.0) (2021-11-10)
+
+
+### Bug Fixes
+
+* standardized some configuration fields ([f8b2c35](https://github.com/applandinc/appmap-agent-js/commit/f8b2c35da3e0fa47df45857f0def10513f3fb936))
+
+
+### BREAKING CHANGES
+
+* Configuration fields `app` and `name` are respectively renamed to `name` and `map-name`.
+
 # [6.7.0](https://github.com/applandinc/appmap-agent-js/compare/v6.6.0...v6.7.0) (2021-11-10)
 
 
