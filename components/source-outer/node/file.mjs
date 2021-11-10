@@ -6,6 +6,7 @@ const _URL = URL;
 
 export default (dependencies) => {
   const {
+    log: { logGuardWarning },
     util: { makeLeft, makeRight },
     expect: { expect },
   } = dependencies;
@@ -14,9 +15,9 @@ export default (dependencies) => {
     expect(parts !== null, "Invalid data url pathname: %j.", path);
     const [, head, body] = parts;
     if (head.endsWith(";base64")) {
-      expect(
-        head.toLowerCase().endsWith(";charset=utf-8;base64"),
-        "Only utf-8 encoding is currently supported, got: %j.",
+      logGuardWarning(
+        !head.toLowerCase().includes(";charset=utf-8;"),
+        "Data url for source map is encoded as base64 and does not declare UTF-8 as its character encoding, will try to use UTF-8 anyway >> %s",
         path,
       );
       return _Buffer.from(body, "base64").toString("utf8");
