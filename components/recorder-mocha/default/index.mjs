@@ -40,7 +40,7 @@ export default (dependencies) => {
           startTrack(agent, track, {
             path: null,
             data: {
-              name: this.currentTest.parent.fullTitle(),
+              "map-name": this.currentTest.parent.fullTitle(),
             },
           });
         },

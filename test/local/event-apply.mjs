@@ -10,7 +10,9 @@ await runAsync(
     recorder: "process",
     packages: { glob: "*" },
     command: "node ./main.mjs",
-    name: "name",
+    output: {
+      basename: "basename",
+    },
     hooks: {
       esm: true,
       cjs: true,
@@ -48,7 +50,7 @@ await runAsync(
   },
   async (directory) => {
     const appmap = JSON.parse(
-      await readFile(`${directory}/tmp/appmap/name.appmap.json`, "utf8"),
+      await readFile(`${directory}/tmp/appmap/basename.appmap.json`, "utf8"),
     );
     const { events } = appmap;
     assertDeepEqual(

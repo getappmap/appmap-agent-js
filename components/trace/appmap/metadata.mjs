@@ -50,12 +50,12 @@ export default (dependencies) => {
 
   const makeHistory = ({ history }) => history;
 
-  const makeApp = (app, { package: _package }) =>
-    app === null ? mapMaybe(_package, getName) : app;
+  const makeAppName = (app_name, { package: _package }) =>
+    app_name === null ? mapMaybe(_package, getName) : app_name;
 
-  const makeName = (name, { basename }, main) => {
-    if (name !== null) {
-      return name;
+  const makeMapName = (map_name, { basename }, main) => {
+    if (map_name !== null) {
+      return map_name;
     }
     if (basename !== null) {
       return basename;
@@ -96,8 +96,8 @@ export default (dependencies) => {
   return {
     compileMetadata: (
       {
-        app,
-        name,
+        name: app_name,
+        "map-name": map_name,
         repository,
         labels,
         frameworks,
@@ -111,8 +111,8 @@ export default (dependencies) => {
       },
       termination,
     ) => ({
-      name: makeName(name, output, main),
-      app: makeApp(app, repository),
+      name: makeMapName(map_name, output, main),
+      app: makeAppName(app_name, repository),
       labels,
       language: {
         ...makeLanguage(language),

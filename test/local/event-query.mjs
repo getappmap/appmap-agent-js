@@ -17,7 +17,9 @@ await runAsync(
       http: false,
       sqlite3: true,
     },
-    name: "name",
+    output: {
+      basename: "basename",
+    },
   },
   async (repository) => {
     await symlink(
@@ -37,7 +39,7 @@ await runAsync(
   },
   async (directory) => {
     const appmap = JSON.parse(
-      await readFile(`${directory}/tmp/appmap/name.appmap.json`, "utf8"),
+      await readFile(`${directory}/tmp/appmap/basename.appmap.json`, "utf8"),
     );
     const { events } = appmap;
     /* eslint-disable no-unused-vars */

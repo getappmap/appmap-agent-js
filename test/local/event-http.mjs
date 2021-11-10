@@ -11,7 +11,9 @@ await runAsync(
     packages: { glob: "*" },
     command: "node ./main.mjs",
     ordering: "chronological",
-    name: "name",
+    output: {
+      basename: "basename",
+    },
     hooks: {
       esm: false,
       cjs: false,
@@ -50,7 +52,7 @@ await runAsync(
   },
   async (directory) => {
     const appmap = JSON.parse(
-      await readFile(`${directory}/tmp/appmap/name.appmap.json`, "utf8"),
+      await readFile(`${directory}/tmp/appmap/basename.appmap.json`, "utf8"),
     );
     let { events } = appmap;
     /* eslint-disable no-unused-vars */

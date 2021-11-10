@@ -401,8 +401,8 @@
             directory: {$ref: path}
             basename: {$ref: basename}
             extension: {$ref: extension}
-    app: {type: string}
     name: {type: string}
+    map-name: {type: string}
     feature: {type: string}
     feature-group: {type: string}
     labels:
@@ -551,10 +551,10 @@
             - const: null
             - $ref: basename
         extension: {$ref: extension}
-    app:
+    name:
       type: string
       nullable: true
-    name:
+    map-name:
       type: string
       nullable: true
     feature:

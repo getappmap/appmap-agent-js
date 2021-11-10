@@ -35,7 +35,7 @@ const runAsync = async (answers) => {
 // {recorder:"process"} //
 assertDeepEqual(
   await runAsync([
-    ({ format }) => format("app"),
+    ({ format }) => format("app-name"),
     ({ choices }) => choices[0].value,
     ({ format }) => format("command"),
     ({ format }) => format("output-directory"),
@@ -47,7 +47,7 @@ assertDeepEqual(
     ({ choices }) => choices[0].value,
   ]),
   {
-    app: "app",
+    name: "app-name",
     recorder: "process",
     command: "command",
     output: {

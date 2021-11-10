@@ -60,7 +60,7 @@ export const forkAsync = async (host, port) => {
   assertDeepEqual(
     await requestAsync(host, port, "POST", "/_appmap/record", {
       path: null,
-      data: { name: "name2" },
+      data: { "map-name": "map-name-2" },
     }),
     { code: 200, body: null },
   );
@@ -74,7 +74,7 @@ export const forkAsync = async (host, port) => {
   const {
     code,
     body: {
-      metadata: { name, test_status, exception },
+      metadata: { name:map_name, test_status, exception },
     },
   } = await requestAsync(host, port, "DELETE", "/_appmap/record", {
     status: 1,
@@ -87,10 +87,10 @@ export const forkAsync = async (host, port) => {
     ],
   });
   assertDeepEqual(
-    { code, name, test_status, exception },
+    { code, map_name, test_status, exception },
     {
       code: 200,
-      name: "name2",
+      map_name: "map-name-2",
       test_status: "failed",
       exception: { class: "Foo", message: "Bar" },
     },

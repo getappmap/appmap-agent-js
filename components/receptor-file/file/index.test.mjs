@@ -107,7 +107,7 @@ const receptor = await openReceptorAsync(
       JSON.stringify([
         "start",
         "record3",
-        { path: null, data: { name: "name" } },
+        { path: null, data: { "map-name": "map-name" } },
       ]),
     ),
   );
@@ -118,5 +118,5 @@ const receptor = await openReceptorAsync(
   await closeReceptorAsync(receptor);
   await readFile(`${repository}/directory/anonymous.appmap.json`);
   await readFile(`${repository}/directory/anonymous-1.appmap.json`);
-  await readFile(`${repository}/directory/name.appmap.json`);
+  await readFile(`${repository}/directory/map-name.appmap.json`);
 }

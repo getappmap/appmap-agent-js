@@ -9,7 +9,9 @@ await runAsync(
   {
     command: "npx --always-spawn bin",
     pruning: false,
-    name: "name",
+    output: {
+      basename: "basename",
+    },
     processes: { path: "node_modules/.bin/bin" },
     packages: "bin.cjs",
     recorder: "process",
@@ -24,7 +26,7 @@ await runAsync(
   },
   async (directory) => {
     const appmap = JSON.parse(
-      await readFile(`${directory}/tmp/appmap/name.appmap.json`, "utf8"),
+      await readFile(`${directory}/tmp/appmap/basename.appmap.json`, "utf8"),
     );
     const { classMap: classmap } = appmap;
     assertDeepEqual(classmap, [

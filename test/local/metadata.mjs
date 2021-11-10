@@ -9,7 +9,8 @@ await runAsync(
   {
     recorder: "process",
     command: "node ./main.mjs",
-    name: "name",
+    name: "app-name",
+    "map-name": "map-name",
     hooks: {
       esm: false,
       cjs: false,
@@ -34,8 +35,8 @@ await runAsync(
     assertDeepEqual(
       { name, app, recorder, test_status, exception },
       {
-        name: "name",
-        app: "app",
+        name: "map-name",
+        app: "app-name",
         recorder: { name: "process" },
         test_status: "succeeded",
         exception: null,

@@ -47,7 +47,7 @@ export default (dependencies) => {
         "What is the name of your app?",
         "Skip to let us pick a meaningful a name",
       ],
-      format: (app) => (app === "" ? {} : { app }),
+      format: (app_name) => (app_name === "" ? {} : { name: app_name }),
     }),
     // Recorder //
     constant({

@@ -40,8 +40,8 @@ const test = (conf, cwd, termination = { errors: [], status: 0 }) => {
 };
 
 const default_meta_data = {
-  name: null,
   app: null,
+  name: null,
   labels: [],
   language: { name: "ecmascript", version: "2020", engine: null },
   frameworks: [],
@@ -86,16 +86,16 @@ assertDeepEqual(
 
 // app //
 
-assertDeepEqual(test({ app: "app" }, "/cwd"), {
+assertDeepEqual(test({ name: "app-name" }, "/cwd"), {
   ...default_meta_data,
-  app: "app",
+  app: "app-name",
 });
 
 // name //
 
-assertDeepEqual(test({ name: "name" }, "/cwd"), {
+assertDeepEqual(test({ "map-name": "map-name" }, "/cwd"), {
   ...default_meta_data,
-  name: "name",
+  name: "map-name",
 });
 
 assertDeepEqual(test({ output: { basename: "basename" } }, "/cwd"), {

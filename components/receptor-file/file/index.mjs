@@ -58,13 +58,13 @@ export default (dependencies) => {
     {
       head: {
         output: { basename, extension },
-        name,
+        "map-name": map_name,
       },
       body: trace,
     },
   ) => {
     if (basename === null) {
-      basename = name === null ? "anonymous" : name;
+      basename = map_name === null ? "anonymous" : map_name;
     }
     let path = `${directory}/${basename}${extension}`;
     let counter = 0;

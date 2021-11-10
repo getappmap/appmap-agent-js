@@ -17,7 +17,9 @@ await runAsync(
       apply: false,
       http: false,
     },
-    name: "name",
+    output: {
+      basename: "basename",
+    },
     "function-name-placeholder": "placeholder",
   },
   async (repository) => {
@@ -39,7 +41,7 @@ await runAsync(
   },
   async (directory) => {
     const appmap = JSON.parse(
-      await readFile(`${directory}/tmp/appmap/name.appmap.json`, "utf8"),
+      await readFile(`${directory}/tmp/appmap/basename.appmap.json`, "utf8"),
     );
     const { classMap: classmap } = appmap;
     assertDeepEqual(classmap, [

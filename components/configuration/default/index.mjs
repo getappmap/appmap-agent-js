@@ -311,11 +311,11 @@ export default (dependencies) => {
       extend: assign,
       normalize: normalizeOutput,
     },
-    app: {
+    name: {
       extend: overwrite,
       normalize: identity,
     },
-    name: {
+    "map-name": {
       extend: overwrite,
       normalize: identity,
     },
@@ -455,8 +455,8 @@ export default (dependencies) => {
       ],
       exclude: [],
       pruning: true,
-      app: null,
       name: null,
+      "map-name": null,
     }),
     extendConfiguration: (configuration, config, nullable_directory) => {
       configuration = { ...configuration };

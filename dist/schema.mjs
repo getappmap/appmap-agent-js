@@ -682,10 +682,10 @@ export const schema = [
           },
         ],
       },
-      app: {
+      name: {
         type: "string",
       },
-      name: {
+      "map-name": {
         type: "string",
       },
       feature: {
@@ -1008,11 +1008,11 @@ export const schema = [
           },
         },
       },
-      app: {
+      name: {
         type: "string",
         nullable: true,
       },
-      name: {
+      "map-name": {
         type: "string",
         nullable: true,
       },
