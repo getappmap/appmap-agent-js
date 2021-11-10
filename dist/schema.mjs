@@ -17,7 +17,7 @@ export const schema = [
   },
   {
     $id: "recorder",
-    enum: ["process", "mocha", "manual", "remote"],
+    enum: ["process", "mocha", "manual", "remote", "heuristic"],
   },
   {
     $id: "serialization-method",
@@ -825,14 +825,7 @@ export const schema = [
         const: "HTTP/1.1",
       },
       recorder: {
-        anyOf: [
-          {
-            const: null,
-          },
-          {
-            $ref: "recorder",
-          },
-        ],
+        $ref: "recorder",
       },
       "inline-source": {
         type: "boolean",

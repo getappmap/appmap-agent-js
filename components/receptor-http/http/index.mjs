@@ -19,7 +19,7 @@ export default (dependencies) => {
       getBackendTrackIterator,
       takeBackendTrace,
     },
-    configuration: { extendConfiguration },
+    "configuration-accessor": { resolveConfigurationPort },
   } = dependencies;
   const disconnection = {
     status: 1,
@@ -175,13 +175,10 @@ export default (dependencies) => {
       { trace_service, track_service },
       configuration,
     ) =>
-      extendConfiguration(
+      resolveConfigurationPort(
         configuration,
-        {
-          "trace-port": getServicePort(trace_service),
-          "track-port": getServicePort(track_service),
-        },
-        null,
+        getServicePort(trace_service),
+        getServicePort(track_service),
       ),
     closeReceptorAsync: async ({ trace_service, track_service }) => {
       await closeServiceAsync(trace_service);

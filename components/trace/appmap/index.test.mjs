@@ -19,6 +19,7 @@ const { compileTrace } = Trace(dependencies);
 const configuration = extendConfiguration(
   createConfiguration("/cwd"),
   {
+    recorder: "process",
     agent: {
       directory: "/agent",
       package: {
@@ -95,7 +96,7 @@ assertDeepEqual(
         url: "https://github.com/applandinc/appmap-agent-js",
         version: "1.2.3",
       },
-      recorder: { name: "default" },
+      recorder: { name: "process" },
       recording: null,
       git: null,
       test_status: "succeeded",

@@ -1,17 +1,14 @@
 /* globals URL */
 
-import YAML from "yaml";
 import { parse as parseShell } from "shell-quote";
 
-const { parse: parseYAML } = YAML;
-const { parse: parseJSON } = JSON;
 const _URL = URL;
 const { stringify: stringifyJSON } = JSON;
 
 export default (dependencies) => {
   const {
     log: { logInfo, logGuardWarning, logWarning },
-    expect: { expect, expectSuccess },
+    expect: { expect },
     specifier: { matchSpecifier },
     configuration: { extendConfiguration },
     util: { assert, coalesce, toAbsolutePath },
@@ -23,16 +20,6 @@ export default (dependencies) => {
     shallow: false,
     exclude: [],
   };
-
-  const generateExtend = (parse) => (configuration, content, path) =>
-    extendConfiguration(
-      configuration,
-      expectSuccess(
-        () => parse(content),
-        "Could not parse configuration string >> %e",
-      ),
-      path,
-    );
 
   // const filterEnvironmentPair = ([key, value]) =>
   //   key.toLowerCase().startsWith("appmap_");
@@ -83,13 +70,69 @@ export default (dependencies) => {
       }
       return getSpecifierValue(packages, pathname);
     },
+    getConfigurationScenarios: (configuration) => {
+      const { scenarios } = configuration;
+      return scenarios.map(({ cwd, value }) =>
+        extendConfiguration(configuration, { scenarios: [], ...value }, cwd),
+      );
+    },
+    initializeConfiguration: (configuration, agent, repository) => {
+      assert(
+        configuration.agent === null,
+        "duplicate configuration initialization",
+      );
+      assert(
+        configuration.repository.directory === repository.directory,
+        "repository directory mismatch",
+      );
+      return extendConfiguration(configuration, { agent, repository }, null);
+    },
+    sanitizeConfigurationManual: (configuration) => {
+      const {
+        recorder,
+        hooks: { esm },
+      } = configuration;
+      logGuardWarning(
+        recorder !== "manual",
+        "Manual recorder expected configuration field 'recorder' to be %s and got %j.",
+        "manual",
+        recorder,
+      );
+      logGuardWarning(
+        esm,
+        "Manual recorder does not support native module recording and configuration field 'hooks.esm' is enabled.",
+      );
+      return extendConfiguration(configuration, {
+        recorder: "manual",
+        hooks: {
+          esm: false,
+        },
+      });
+    },
+    resolveConfigurationPort: (configuration, trace_port, track_port) => {
+      for (const [key, value1] of [
+        ["trace-port", trace_port],
+        ["track-port", track_port],
+      ]) {
+        const { [key]: value2 } = configuration;
+        if (value2 === 0) {
+          assert(typeof value1 === "number", "expected a port number");
+          configuration = extendConfiguration(
+            configuration,
+            { [key]: value1 },
+            null,
+          );
+        } else {
+          assert(value1 === value2, "port mismatch");
+        }
+      }
+      return configuration;
+    },
     isConfigurationEnabled: ({ processes, main }) => {
       const enabled = main === null || getSpecifierValue(processes, main);
       logInfo(`%s %s.`, enabled ? "Recording" : "Bypassing", main);
       return enabled;
     },
-    extendConfigurationJSON: generateExtend(parseJSON),
-    extendConfigurationYAML: generateExtend(parseYAML),
     extendConfigurationNode: (configuration, { version, argv, cwd }) => {
       assert(argv.length >= 2, "expected at least two argv");
       const [, main] = argv;
@@ -105,6 +148,24 @@ export default (dependencies) => {
         },
         null,
       );
+    },
+    resolveRecorderConfiguration: (configuration) => {
+      const { recorder } = configuration;
+      if (recorder === "heuristic") {
+        assert(
+          configuration.command !== null,
+          "cannot resolve recorder because command is missing",
+        );
+        const {
+          command: { value: command },
+        } = configuration;
+        configuration = extendConfiguration(
+          configuration,
+          { recorder: command.includes("mocha") ? "mocha" : "remote" },
+          null,
+        );
+      }
+      return configuration;
     },
     compileCommandConfiguration: (configuration, env) => {
       assert(configuration.agent !== null, "missing agent in configuration");

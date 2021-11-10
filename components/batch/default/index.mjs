@@ -8,8 +8,12 @@ export default (dependencies) => {
     expect: { expectSuccessAsync, expectSuccess },
     log: { logDebug, logInfo, logWarning },
     spawn: { spawn },
-    configuration: { extendConfiguration },
-    "configuration-helper": { compileCommandConfiguration },
+    "configuration-accessor": {
+      getConfigurationScenarios,
+      initializeConfiguration,
+      compileCommandConfiguration,
+      resolveRecorderConfiguration,
+    },
     repository: {
       extractRepositoryDependency,
       extractRepositoryHistory,
@@ -23,29 +27,20 @@ export default (dependencies) => {
     },
   } = dependencies;
   const isCommandNonNull = ({ command }) => command !== null;
-  const initializeConfiguration = (configuration) => {
-    const {
-      repository: { directory },
-    } = configuration;
-    return extendConfiguration(
-      configuration,
-      {
-        agent: extractRepositoryDependency(
-          directory,
-          "@appland/appmap-agent-js",
-        ),
-        repository: {
+  return {
+    mainAsync: async (process, configuration) => {
+      const {
+        repository: { directory },
+      } = configuration;
+      configuration = initializeConfiguration(
+        configuration,
+        extractRepositoryDependency(directory, "@appland/appmap-agent-js"),
+        {
           directory,
           history: extractRepositoryHistory(directory),
           package: extractRepositoryPackage(directory),
         },
-      },
-      null,
-    );
-  };
-  return {
-    mainAsync: async (process, configuration) => {
-      configuration = initializeConfiguration(configuration);
+      );
       const { env } = process;
       let interrupted = false;
       let subprocess = null;
@@ -78,20 +73,7 @@ export default (dependencies) => {
         return receptors.get(key);
       };
       const runConfigurationAsync = async (configuration, env) => {
-        const { recorder } = configuration;
-        // TODO: Do something about this ugly heuristic :(
-        if (recorder === null) {
-          const {
-            command: { value: command },
-          } = configuration;
-          configuration = extendConfiguration(
-            configuration,
-            /* c8 ignore start */
-            { recorder: command.includes("mocha") ? "mocha" : "remote" },
-            /* c8 ignore stop */
-            null,
-          );
-        }
+        configuration = resolveRecorderConfiguration(configuration);
         const receptor = await createReceptorAsync(configuration);
         configuration = adaptReceptorConfiguration(receptor, configuration);
         const {
@@ -122,7 +104,7 @@ export default (dependencies) => {
         }
         return { description, signal, status };
       };
-      const { scenario, scenarios } = configuration;
+      const { scenario } = configuration;
       const regexp = expectSuccess(
         () => new _RegExp(scenario, "u"),
         "Scenario configuration field is not a valid regexp: %j >> %e",
@@ -130,11 +112,9 @@ export default (dependencies) => {
       );
       const configurations = [
         configuration,
-        ...scenarios
-          .map(({ cwd, value }) =>
-            extendConfiguration(configuration, value, cwd),
-          )
-          .filter(({ name }) => regexp.test(name)),
+        ...getConfigurationScenarios(configuration).filter(({ name }) =>
+          regexp.test(name),
+        ),
       ].filter(isCommandNonNull);
       const { length } = configurations;
       try {

@@ -2,7 +2,7 @@ const _String = String;
 
 export default (dependencies) => {
   const {
-    util: { getFilename, mapMaybe },
+    util: { assert, getFilename, mapMaybe },
   } = dependencies;
 
   /* c8 ignore start */
@@ -76,6 +76,14 @@ export default (dependencies) => {
     version: _String(version),
   });
 
+  const makeRecorder = (recorder) => {
+    assert(
+      recorder !== "heuristic",
+      "heuristic recorder should have been resolved earlier",
+    );
+    return { name: recorder };
+  };
+
   const makeException = ({ errors }) => {
     const { length } = errors;
     if (length === 0) {
@@ -115,7 +123,7 @@ export default (dependencies) => {
       },
       frameworks,
       client: makeClient(agent),
-      recorder: { name: recorder === null ? "default" : recorder },
+      recorder: makeRecorder(recorder),
       recording: makeRecording(recording),
       git: makeHistory(repository),
       test_status: makeTestStatus(termination),

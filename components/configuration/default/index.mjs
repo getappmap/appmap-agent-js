@@ -192,7 +192,7 @@ export default (dependencies) => {
       normalize: identity,
     },
     scenarios: {
-      extend: prepend,
+      extend: overwrite,
       normalize: normalizeScenarios,
     },
     "recursive-process-recording": {
@@ -402,7 +402,7 @@ export default (dependencies) => {
           true,
         ],
       ],
-      recorder: null,
+      recorder: "heuristic",
       "inline-source": false,
       hooks: {
         apply: true,

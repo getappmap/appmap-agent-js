@@ -9,7 +9,7 @@ export default (dependencies) => {
   const {
     log: { logDebug },
     util: { generateGet },
-    "configuration-helper": { getConfigurationPackage },
+    "configuration-accessor": { getConfigurationPackage },
     uuid: { getUUID },
     expect: { expectSuccess },
     source: { getSources },

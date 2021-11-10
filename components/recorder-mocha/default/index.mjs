@@ -2,7 +2,10 @@ export default (dependencies) => {
   const {
     uuid: { getUUID },
     log: { logInfo },
-    "configuration-helper": { isConfigurationEnabled, extendConfigurationNode },
+    "configuration-accessor": {
+      isConfigurationEnabled,
+      extendConfigurationNode,
+    },
     util: { assert },
     agent: { openAgent, closeAgent, startTrack, stopTrack },
   } = dependencies;

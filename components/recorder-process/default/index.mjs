@@ -4,7 +4,10 @@ export default (dependencies) => {
     log: { logInfo },
     expect: { expect },
     util: { assert },
-    "configuration-helper": { isConfigurationEnabled, extendConfigurationNode },
+    "configuration-accessor": {
+      isConfigurationEnabled,
+      extendConfigurationNode,
+    },
     agent: { openAgent, closeAgent, startTrack, stopTrack },
   } = dependencies;
   return {

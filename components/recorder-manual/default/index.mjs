@@ -5,8 +5,7 @@ export default (dependencies) => {
     util: { assert },
     expect: { expect },
     uuid: { getUUID },
-    configuration: { extendConfiguration },
-    log: { logGuardWarning },
+    "configuration-accessor": { sanitizeConfigurationManual },
     "source-outer": { extractSourceMap },
     agent: {
       openAgent,
@@ -24,29 +23,7 @@ export default (dependencies) => {
         !global_running,
         "Two appmap instances cannot be active concurrently.",
       );
-      {
-        const {
-          recorder,
-          hooks: { esm },
-        } = configuration;
-        logGuardWarning(
-          recorder !== "manual",
-          "Manual recorder expected configuration field 'recorder' to be \"manual\" and got %j.",
-          recorder,
-        );
-        logGuardWarning(
-          esm,
-          "Manual recorder does not support native module recording and configuration field 'hooks.esm' is enabled.",
-        );
-      }
-      this.agent = openAgent(
-        extendConfiguration(configuration, {
-          recorder: "manual",
-          hooks: {
-            esm: false,
-          },
-        }),
-      );
+      this.agent = openAgent(sanitizeConfigurationManual(configuration));
       this.tracks = new _Set();
       this.running = true;
       global_running = true;

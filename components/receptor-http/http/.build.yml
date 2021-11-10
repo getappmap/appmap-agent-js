@@ -5,4 +5,4 @@ dependencies:
   - backend
   - log
   - util
-  - configuration
+  - configuration-accessor

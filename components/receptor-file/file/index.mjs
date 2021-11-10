@@ -9,7 +9,7 @@ const _Set = Set;
 
 export default (dependencies) => {
   const {
-    configuration: { extendConfiguration },
+    "configuration-accessor": { resolveConfigurationPort },
     util: { assert, getDirectory },
     log: { logInfo, logError },
     expect: { expect },
@@ -148,12 +148,10 @@ export default (dependencies) => {
       return trace_service;
     },
     adaptReceptorConfiguration: (service, configuration) =>
-      extendConfiguration(
+      resolveConfigurationPort(
         configuration,
-        {
-          "trace-port": getServicePort(service),
-        },
-        null,
+        getServicePort(service),
+        configuration["track-port"],
       ),
     closeReceptorAsync: closeServiceAsync,
   };

@@ -15,12 +15,90 @@ const { createConfiguration, extendConfiguration } =
   await buildTestComponentAsync("configuration");
 
 const {
+  getConfigurationScenarios,
+  initializeConfiguration,
+  sanitizeConfigurationManual,
   isConfigurationEnabled,
   getConfigurationPackage,
   extendConfigurationNode,
   compileCommandConfiguration,
+  resolveConfigurationPort,
   resolveRecorderConfiguration,
 } = ConfigurationHelper(await buildTestDependenciesAsync(import.meta.url));
+
+/////////////////////////////////
+// sanitizeConfigurationManual //
+/////////////////////////////////
+
+assertEqual(
+  Reflect.get(
+    sanitizeConfigurationManual(createConfiguration("/home")),
+    "recorder",
+  ),
+  "manual",
+);
+
+///////////////////////////////
+// getConfigurationScenarios //
+///////////////////////////////
+
+assertDeepEqual(
+  getConfigurationScenarios(
+    extendConfiguration(
+      createConfiguration("/home"),
+      {
+        scenarios: [{}],
+      },
+      "/cwd",
+    ),
+  ),
+  [createConfiguration("/home")],
+);
+
+/////////////////////////////
+// initializeConfiguration //
+/////////////////////////////
+
+{
+  const agent = {
+    directory: "/agent",
+    package: { name: "agent", version: "1.2.3", homepage: null },
+  };
+  assertDeepEqual(
+    Reflect.get(
+      initializeConfiguration(createConfiguration("/home"), agent, {
+        directory: "/home",
+        history: null,
+        package: null,
+      }),
+      "agent",
+    ),
+    agent,
+  );
+}
+
+//////////////////////////////
+// resolveConfigurationPort //
+//////////////////////////////
+
+assertEqual(
+  Reflect.get(
+    resolveConfigurationPort(
+      extendConfiguration(
+        createConfiguration("/home"),
+        {
+          "trace-port": 0,
+          "track-port": 8000,
+        },
+        null,
+      ),
+      8080,
+      8000,
+    ),
+    "trace-port",
+  ),
+  8080,
+);
 
 //////////////////////////////////
 // resolveRecorderConfiguration //

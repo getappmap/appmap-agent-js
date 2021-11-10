@@ -12,7 +12,7 @@ import time$performance_node from "./../../components/time/performance-node/inde
 import validate$ajv from "./../../components/validate/ajv/index.mjs";
 import specifier$default from "./../../components/specifier/default/index.mjs";
 import configuration$default from "./../../components/configuration/default/index.mjs";
-import configuration_helper$default from "./../../components/configuration-helper/default/index.mjs";
+import configuration_accessor$default from "./../../components/configuration-accessor/default/index.mjs";
 import uuid$random from "./../../components/uuid/random/index.mjs";
 import source_inner$mozilla from "./../../components/source-inner/mozilla/index.mjs";
 import source$default from "./../../components/source/default/index.mjs";
@@ -67,8 +67,8 @@ export default (blueprint) => {
   dependencies["validate"] = validate$ajv(dependencies);
   dependencies["specifier"] = specifier$default(dependencies);
   dependencies["configuration"] = configuration$default(dependencies);
-  dependencies["configuration-helper"] =
-    configuration_helper$default(dependencies);
+  dependencies["configuration-accessor"] =
+    configuration_accessor$default(dependencies);
   dependencies["uuid"] = uuid$random(dependencies);
   dependencies["source-inner"] = source_inner$mozilla(dependencies);
   dependencies["source"] = source$default(dependencies);

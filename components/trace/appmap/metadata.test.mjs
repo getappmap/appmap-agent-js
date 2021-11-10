@@ -23,6 +23,7 @@ const test = (conf, cwd, termination = { errors: [], status: 0 }) => {
   configuration = extendConfiguration(
     configuration,
     {
+      recorder: "process",
       agent: {
         directory: "/agent",
         package: {
@@ -49,7 +50,7 @@ const default_meta_data = {
     version: "1.2.3",
     url: "http://homepage",
   },
-  recorder: { name: "default" },
+  recorder: { name: "process" },
   recording: null,
   git: null,
   test_status: "succeeded",

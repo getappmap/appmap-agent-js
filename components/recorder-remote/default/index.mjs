@@ -4,7 +4,10 @@ export default (dependencies) => {
   const {
     util: { assert },
     log: { logInfo },
-    "configuration-helper": { isConfigurationEnabled, extendConfigurationNode },
+    "configuration-accessor": {
+      isConfigurationEnabled,
+      extendConfigurationNode,
+    },
     agent: { openAgent, closeAgent, requestRemoteAgentAsync },
     http: { generateRespond },
   } = dependencies;

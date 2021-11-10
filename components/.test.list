@@ -20,7 +20,7 @@
 - engine
 - repository
 - configuration
-- configuration-helper
+- configuration-accessor
 - configuration-process
 - configuration-environment
 - trace
