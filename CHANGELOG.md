@@ -1,3 +1,10 @@
+## [7.1.1](https://github.com/applandinc/appmap-agent-js/compare/v7.1.0...v7.1.1) (2021-11-10)
+
+
+### Bug Fixes
+
+* files are not instrumented if not listed in packages ([ef7d9a0](https://github.com/applandinc/appmap-agent-js/commit/ef7d9a07c01e2492d046675782cf1a2385920bc7))
+
 # [7.1.0](https://github.com/applandinc/appmap-agent-js/compare/v7.0.0...v7.1.0) (2021-11-10)
 
 
