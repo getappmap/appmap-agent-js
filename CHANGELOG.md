@@ -1,3 +1,11 @@
+## [7.3.1](https://github.com/applandinc/appmap-agent-js/compare/v7.3.0...v7.3.1) (2021-11-11)
+
+
+### Bug Fixes
+
+* avoid npx to launch test-turtle ([13a350e](https://github.com/applandinc/appmap-agent-js/commit/13a350eb23c1a026937f1f57aece0f19a56207d7))
+* node requirement ([cc8466e](https://github.com/applandinc/appmap-agent-js/commit/cc8466e44419a6d3d0c66ca4f4a5ee2201e073a3))
+
 # [7.3.0](https://github.com/applandinc/appmap-agent-js/compare/v7.2.0...v7.3.0) (2021-11-11)
 
 
