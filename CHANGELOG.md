@@ -1,3 +1,10 @@
+## [7.1.2](https://github.com/applandinc/appmap-agent-js/compare/v7.1.1...v7.1.2) (2021-11-11)
+
+
+### Bug Fixes
+
+* now executable help prints help instead of version ([923fadc](https://github.com/applandinc/appmap-agent-js/commit/923fadcecc2190e0f204599d67d07651525b7958))
+
 ## [7.1.1](https://github.com/applandinc/appmap-agent-js/compare/v7.1.0...v7.1.1) (2021-11-10)
 
 
