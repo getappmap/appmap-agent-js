@@ -5,7 +5,7 @@ const routes = new Map(
     ["setup", "../lib/node/setup.mjs"],
     ["run", "../lib/node/batch.mjs"],
     ["version", "../lib/node/version.mjs"],
-    ["help", "../lib/node/version.mjs"],
+    ["help", "../lib/node/help.mjs"],
   ],
 );
 
