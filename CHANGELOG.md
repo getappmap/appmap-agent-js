@@ -1,3 +1,10 @@
+# [7.2.0](https://github.com/applandinc/appmap-agent-js/compare/v7.1.2...v7.2.0) (2021-11-11)
+
+
+### Features
+
+* support --help and --version aliases ([0bd7f74](https://github.com/applandinc/appmap-agent-js/commit/0bd7f74b1f1fd12e16ef89a2a062334606bd942e))
+
 ## [7.1.2](https://github.com/applandinc/appmap-agent-js/compare/v7.1.1...v7.1.2) (2021-11-11)
 
 
