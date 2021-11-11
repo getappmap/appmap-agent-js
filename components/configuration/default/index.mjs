@@ -1,5 +1,6 @@
 const { isArray } = Array;
 const { ownKeys } = Reflect;
+const { entries: toEntries } = Object;
 
 export default (dependencies) => {
   const {
@@ -52,9 +53,10 @@ export default (dependencies) => {
       nullable_directory !== null,
       "cannot normalize scenarios without reference directory",
     );
-    return scenarios.map((scenario) => ({
+    return toEntries(scenarios).map(([key, value]) => ({
       cwd: nullable_directory,
-      value: scenario,
+      key,
+      value,
     }));
   };
 

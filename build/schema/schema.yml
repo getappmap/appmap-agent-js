@@ -319,8 +319,10 @@
     agent: {$ref: agent}
     repository: {$ref: repository}
     scenarios:
-      type: array
-      items: {$ref: config}
+      type: object
+      additionalProperties: false
+      patternProperties:
+        "^": {$ref: config}
     scenario: {type: string}
     recursive-process-recording: {type: boolean}
     command: {type: string}
@@ -422,8 +424,9 @@
       type: array
       items:
         type: object
-        required: [value, cwd]
+        required: [key, value, cwd]
         properties:
+          key: {type: string}
           value: {$ref: config}
           cwd: {$ref: absolute-path}
     recursive-process-recording: {type: boolean}

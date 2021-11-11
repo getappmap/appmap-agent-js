@@ -53,12 +53,16 @@ const extend = (
 }
 
 // scenarios //
-assertDeepEqual(extend("scenarios", [{ command: "node main.js" }], "/cwd"), [
-  {
-    cwd: "/cwd",
-    value: { command: "node main.js" },
-  },
-]);
+assertDeepEqual(
+  extend("scenarios", { key: { command: "node main.js" } }, "/cwd"),
+  [
+    {
+      cwd: "/cwd",
+      key: "key",
+      value: { command: "node main.js" },
+    },
+  ],
+);
 
 // command-options //
 assertDeepEqual(

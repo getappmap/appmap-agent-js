@@ -98,7 +98,10 @@ const configuration = createConfiguration("/repository");
       configuration,
       {
         scenario: "^",
-        scenarios: [{ command: "sleep remote" }, { command: "sleep mocha" }],
+        scenarios: {
+          key1: { command: "sleep remote" },
+          key2: { command: "sleep mocha" },
+        },
       },
       "/directory",
     ),
@@ -116,7 +119,7 @@ const configuration = createConfiguration("/repository");
       {
         recorder: "process",
         scenario: "^",
-        scenarios: [{ command: "success" }],
+        scenarios: { key: { command: "success" } },
       },
       "/directory",
     ),
@@ -134,7 +137,10 @@ const configuration = createConfiguration("/repository");
       {
         recorder: "process",
         scenario: "^",
-        scenarios: [{ command: "success" }, { command: "failure" }],
+        scenarios: {
+          key1: { command: "success" },
+          key2: { command: "failure" },
+        },
       },
       "/directory",
     ),

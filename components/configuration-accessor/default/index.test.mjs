@@ -47,12 +47,19 @@ assertDeepEqual(
     extendConfiguration(
       createConfiguration("/home"),
       {
-        scenarios: [{}],
+        scenario: "^f",
+        scenarios: { foo: { name: "foo" }, bar: { name: "bar" } },
       },
       "/cwd",
     ),
   ),
-  [createConfiguration("/home")],
+  [
+    extendConfiguration(
+      createConfiguration("/home"),
+      { scenario: "^f", name: "foo" },
+      null,
+    ),
+  ],
 );
 
 /////////////////////////////

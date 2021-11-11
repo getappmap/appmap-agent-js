@@ -1,11 +1,10 @@
-const _RegExp = RegExp;
 const _Map = Map;
 const { stringify: stringifyJSON } = JSON;
 
 export default (dependencies) => {
   const {
     util: { assert },
-    expect: { expectSuccessAsync, expectSuccess },
+    expect: { expectSuccessAsync },
     log: { logDebug, logInfo, logWarning },
     spawn: { spawn },
     "configuration-accessor": {
@@ -104,17 +103,9 @@ export default (dependencies) => {
         }
         return { description, signal, status };
       };
-      const { scenario } = configuration;
-      const regexp = expectSuccess(
-        () => new _RegExp(scenario, "u"),
-        "Scenario configuration field is not a valid regexp: %j >> %e",
-        scenario,
-      );
       const configurations = [
         configuration,
-        ...getConfigurationScenarios(configuration).filter(({ name }) =>
-          regexp.test(name),
-        ),
+        ...getConfigurationScenarios(configuration),
       ].filter(isCommandNonNull);
       const { length } = configurations;
       try {

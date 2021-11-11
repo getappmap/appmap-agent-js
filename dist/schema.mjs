@@ -480,9 +480,12 @@ export const schema = [
         $ref: "repository",
       },
       scenarios: {
-        type: "array",
-        items: {
-          $ref: "config",
+        type: "object",
+        additionalProperties: false,
+        patternProperties: {
+          "^": {
+            $ref: "config",
+          },
         },
       },
       scenario: {
@@ -721,8 +724,11 @@ export const schema = [
         type: "array",
         items: {
           type: "object",
-          required: ["value", "cwd"],
+          required: ["key", "value", "cwd"],
           properties: {
+            key: {
+              type: "string",
+            },
             value: {
               $ref: "config",
             },

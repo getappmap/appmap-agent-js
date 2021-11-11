@@ -3,12 +3,13 @@
 import { parse as parseShell } from "shell-quote";
 
 const _URL = URL;
+const _RegExp = RegExp;
 const { stringify: stringifyJSON } = JSON;
 
 export default (dependencies) => {
   const {
     log: { logInfo, logGuardWarning, logWarning },
-    expect: { expect },
+    expect: { expect, expectSuccess },
     specifier: { matchSpecifier },
     configuration: { extendConfiguration },
     util: { assert, coalesce, toAbsolutePath },
@@ -71,10 +72,17 @@ export default (dependencies) => {
       return getSpecifierValue(packages, pathname);
     },
     getConfigurationScenarios: (configuration) => {
-      const { scenarios } = configuration;
-      return scenarios.map(({ cwd, value }) =>
-        extendConfiguration(configuration, { scenarios: [], ...value }, cwd),
+      const { scenarios, scenario } = configuration;
+      const regexp = expectSuccess(
+        () => new _RegExp(scenario, "u"),
+        "Scenario configuration field is not a valid regexp: %j >> %e",
+        scenario,
       );
+      return scenarios
+        .filter(({ key }) => regexp.test(key))
+        .map(({ cwd, value }) =>
+          extendConfiguration(configuration, { scenarios: {}, ...value }, cwd),
+        );
     },
     initializeConfiguration: (configuration, agent, repository) => {
       assert(
