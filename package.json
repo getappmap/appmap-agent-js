@@ -48,7 +48,7 @@
     "minimatch": "^3.0.4",
     "minimist": "^1.2.5",
     "net-socket-messaging": "^0.1.6",
-    "posix-socket": "^1.1.1",
+    "posix-socket": "^1.1.2",
     "posix-socket-messaging": "0.0.1",
     "prompts": "^2.4.2",
     "shell-quote": "^1.7.3",
