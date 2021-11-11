@@ -57,7 +57,10 @@ await runAsync(
     const {
       events: [{ lineno }],
     } = JSON.parse(
-      await readFileAsync(`${directory}/tmp/appmap/basename.appmap.json`, "utf8"),
+      await readFileAsync(
+        `${directory}/tmp/appmap/basename.appmap.json`,
+        "utf8",
+      ),
     );
     assertEqual(lineno, 2);
   },

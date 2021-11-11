@@ -6,10 +6,11 @@ const _Map = Map;
 const { parse: parseYAML } = YAML;
 const { parse: parseJSON } = JSON;
 const { ownKeys } = Reflect;
+const { isArray } = Array;
 
 export default (dependencies) => {
   const {
-    util: { getDirectory, coalesce, getExtension },
+    util: { hasOwnProperty, getDirectory, coalesce, getExtension },
     expect: { expect, expectSuccess },
     configuration: { createConfiguration, extendConfiguration },
   } = dependencies;
@@ -53,18 +54,50 @@ export default (dependencies) => {
   const aliases = new _Map([
     ["log-level", "log"],
     ["output-dir", "output"],
+    ["app-port", "intercept-track-port"],
+    ["alt-remote-port", "track-port"],
+    ["package", "packages"],
+    ["process", "processes"],
   ]);
+
+  const wrapArray = (value) => (isArray(value) ? value : [value]);
+
+  const transformers = new _Map([
+    ["packages", wrapArray],
+    ["processes", wrapArray],
+  ]);
+
+  const addOption = (options, key, value) => {
+    if (hasOwnProperty(options, key)) {
+      let existing_value = options[key];
+      if (!isArray(existing_value)) {
+        existing_value = [existing_value];
+      }
+      if (!isArray(value)) {
+        value = [value];
+      }
+      options[key] = [...existing_value, ...value];
+    } else {
+      options[key] = value;
+    }
+  };
 
   const extractConfig = (argv) => {
     let { _: positional, ...config } = minimist(argv.slice(2));
+    if (positional.length > 0) {
+      addOption(config, "command", positional.map(quote).join(" "));
+    }
     for (const key of ownKeys(config)) {
       if (aliases.has(key)) {
-        config[aliases.get(key)] = config[key];
+        const value = config[key];
         delete config[key];
+        addOption(config, aliases.get(key), value);
       }
     }
-    if (positional.length > 0) {
-      config.command = positional.map(quote).join(" ");
+    for (const key of ownKeys(config)) {
+      if (transformers.has(key)) {
+        config[key] = transformers.get(key)(config[key]);
+      }
     }
     return config;
   };

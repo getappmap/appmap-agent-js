@@ -7,7 +7,7 @@ import ConfigurationProcess from "./index.mjs";
 const {
   deepEqual: assertDeepEqual,
   // fail: assertFail,
-  // equal: assertEqual,
+  equal: assertEqual,
 } = Assert;
 
 const { loadProcessConfiguration } = ConfigurationProcess(
@@ -30,31 +30,35 @@ const { loadProcessConfiguration } = ConfigurationProcess(
     name: app_name,
     "map-name": map_name,
     command,
+    packages,
+    processes,
     log,
+    "track-port": track_port,
   } = loadProcessConfiguration({
     env: { APPMAP_CONFIGURATION_PATH: path },
     argv: [
-      "node",
-      "agent.mjs",
-      "--log-level",
-      "error",
-      "--map-name",
-      "name2",
-      "--command",
-      "command1",
-      "--",
-      "command2",
-    ],
+      ["node", "agent.mjs"],
+      ["--track-port", "8080"],
+      ["--log-level", "error"],
+      ["--map-name", "name2"],
+      ["--packages", "'lib/*.js'"],
+      ["--package", "'test/*.js'"],
+      ["--process", "'*'"],
+      ["--", "exec", "arg1", "arg2"],
+    ].flat(),
     cwd: () => "/cwd",
   });
+  assertEqual(packages.length, 3);
+  assertEqual(processes.length, 2);
   assertDeepEqual(
-    { app_name, map_name, command, log },
+    { app_name, map_name, command, log, track_port },
     {
+      track_port: 8080,
       app_name: "app",
       log: "error",
       map_name: "name2",
       command: {
-        value: "'command2'",
+        value: "'exec' 'arg1' 'arg2'",
         cwd: "/cwd",
       },
     },

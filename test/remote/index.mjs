@@ -74,7 +74,7 @@ export const forkAsync = async (host, port) => {
   const {
     code,
     body: {
-      metadata: { name:map_name, test_status, exception },
+      metadata: { name: map_name, test_status, exception },
     },
   } = await requestAsync(host, port, "DELETE", "/_appmap/record", {
     status: 1,

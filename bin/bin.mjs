@@ -1,15 +1,13 @@
 #!/usr/bin/env node
 
-const routes = new Map(
-  [
-    ["setup", "../lib/node/setup.mjs"],
-    ["run", "../lib/node/batch.mjs"],
-    ["version", "../lib/node/version.mjs"],
-    ["--version", "../lib/node/version.mjs"],
-    ["help", "../lib/node/help.mjs"],
-    ["--help", "../lib/node/help.mjs"],
-  ],
-);
+const routes = new Map([
+  ["setup", "../lib/node/setup.mjs"],
+  ["run", "../lib/node/batch.mjs"],
+  ["version", "../lib/node/version.mjs"],
+  ["--version", "../lib/node/version.mjs"],
+  ["help", "../lib/node/help.mjs"],
+  ["--help", "../lib/node/help.mjs"],
+]);
 
 let verb = "run";
 
