@@ -105,6 +105,13 @@ export default (dependencies) => {
     return entities.filter(isEntityCalled).map(filterCalledEntityChildren);
   };
 
+  const cleanupEntity = (entity) => {
+    const children = entity.children.flatMap(cleanupEntity);
+    return entity.type === "function" || children.length > 0
+      ? [{ ...entity, children }]
+      : [];
+  };
+
   const compileEntityArray = (
     entities,
     { placeholder, path, inline, content },
@@ -153,7 +160,16 @@ export default (dependencies) => {
       pruning,
     }),
     addClassmapSource: (
-      { closures, urls, naming, directory, root, placeholder, sources },
+      {
+        pruning,
+        closures,
+        urls,
+        naming,
+        directory,
+        root,
+        placeholder,
+        sources,
+      },
       { url, content, inline, exclude, shallow },
     ) => {
       assert(!urls.has(url), "duplicate source url");
@@ -163,11 +179,14 @@ export default (dependencies) => {
       const context = { url, path, shallow, inline, content, placeholder };
       const exclusion = createExclusion(exclude);
       const excluded = [];
-      const entities = extractEstreeEntityArray(path, content, naming).flatMap(
+      let entities = extractEstreeEntityArray(path, content, naming).flatMap(
         (entity) => excludeEntity(entity, null, exclusion, excluded),
       );
       registerExcludedEntityArray(excluded, context, closures);
       registerEntityArray(entities, context, closures);
+      if (pruning) {
+        entities = entities.flatMap(cleanupEntity);
+      }
       sources.push({ context, entities });
     },
     getClassmapClosure: ({ closures }, url) => {
@@ -201,35 +220,39 @@ export default (dependencies) => {
         );
         sources = sources.map(({ context, entities }) => ({
           context,
-          entities: filterCalledEntityArray(entities, context, urls),
+          entities: filterCalledEntityArray(entities, context, urls).flatMap(
+            cleanupEntity,
+          ),
         }));
       }
       const directories = new Set();
       const root = [];
       for (const { context, entities } of sources.values()) {
-        const dirnames = context.path.split("/");
-        const filename = dirnames.pop();
-        let children = root;
-        for (const dirname of dirnames) {
-          let child = children.find(
-            (child) => child.name === dirname && directories.has(child),
-          );
-          if (child === _undefined) {
-            child = {
-              type: "package",
-              name: dirname,
-              children: [],
-            };
-            directories.add(child);
-            children.push(child);
+        if (!pruning || entities.length > 0) {
+          const dirnames = context.path.split("/");
+          const filename = dirnames.pop();
+          let children = root;
+          for (const dirname of dirnames) {
+            let child = children.find(
+              (child) => child.name === dirname && directories.has(child),
+            );
+            if (child === _undefined) {
+              child = {
+                type: "package",
+                name: dirname,
+                children: [],
+              };
+              directories.add(child);
+              children.push(child);
+            }
+            ({ children } = child);
           }
-          ({ children } = child);
+          children.push({
+            type: "package",
+            name: filename,
+            children: compileEntityArray(entities, context),
+          });
         }
-        children.push({
-          type: "package",
-          name: filename,
-          children: compileEntityArray(entities, context),
-        });
       }
       return root;
     },
