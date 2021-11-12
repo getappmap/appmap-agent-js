@@ -1,3 +1,10 @@
+## [8.1.1](https://github.com/applandinc/appmap-agent-js/compare/v8.1.0...v8.1.1) (2021-11-12)
+
+
+### Bug Fixes
+
+* support for relative paths in source map data url ([8b2c082](https://github.com/applandinc/appmap-agent-js/commit/8b2c082831758cb74454a9a3886973aa2ea92b09))
+
 # [8.1.0](https://github.com/applandinc/appmap-agent-js/compare/v8.0.1...v8.1.0) (2021-11-12)
 
 
