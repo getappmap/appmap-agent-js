@@ -28,8 +28,7 @@ export default (dependencies) => {
         dist: null,
         regexp: null,
         flags: "",
-        recursive: false,
-        nested: false,
+        recursive: true,
         external: false,
         ...options,
       };

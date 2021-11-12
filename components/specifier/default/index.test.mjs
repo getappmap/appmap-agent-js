@@ -85,7 +85,7 @@ const testAsync = async () => {
 
   assertEqual(
     matchSpecifier(
-      createSpecifier("/foo", { path: "bar" }),
+      createSpecifier("/foo", { path: "bar", recursive: false }),
       "/foo/bar/qux/buz.js",
     ),
     false,
@@ -117,7 +117,7 @@ const testAsync = async () => {
 
   assertEqual(
     matchSpecifier(
-      createSpecifier("/foo", { dist: "bar" }),
+      createSpecifier("/foo", { dist: "bar", recursive: false }),
       "/foo/node_modules/bar/qux/buz.js",
     ),
     false,
