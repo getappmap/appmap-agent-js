@@ -1,3 +1,10 @@
+## [8.0.1](https://github.com/applandinc/appmap-agent-js/compare/v8.0.0...v8.0.1) (2021-11-12)
+
+
+### Bug Fixes
+
+* only print ignore message when loader is enabled ([86b36c4](https://github.com/applandinc/appmap-agent-js/commit/86b36c4d3664a86c09fba6519322da8155b01cd8))
+
 # [8.0.0](https://github.com/applandinc/appmap-agent-js/compare/v7.3.1...v8.0.0) (2021-11-11)
 
 
