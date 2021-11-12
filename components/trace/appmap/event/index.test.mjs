@@ -83,6 +83,26 @@ const { compileEventTrace } = Event(dependencies);
           index: 1,
           time: 10,
         },
+        {
+          type: "begin",
+          index: 3,
+          time: 0,
+          data: {
+            type: "query",
+            database: "database",
+            version: "version",
+            sql: "sql",
+            parameters: [],
+          },
+        },
+        {
+          type: "end",
+          index: 3,
+          time: 0,
+          data: {
+            type: "query",
+          },
+        },
       ],
       classmap,
     ),
@@ -124,6 +144,25 @@ const { compileEventTrace } = Event(dependencies);
           value: "result",
         },
         exceptions: null,
+      },
+      {
+        event: "call",
+        id: 3,
+        message: [],
+        sql_query: {
+          database_type: "database",
+          explain_sql: null,
+          server_version: "version",
+          sql: "sql",
+        },
+        thread_id: 0,
+      },
+      {
+        elapsed: 0,
+        event: "return",
+        id: 4,
+        parent_id: 3,
+        thread_id: 0,
       },
     ],
   );

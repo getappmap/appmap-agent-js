@@ -5,7 +5,9 @@ import Exclusion from "./exclusion.mjs";
 
 const _Set = Set;
 const _Map = Map;
+const _URL = URL;
 const _undefined = undefined;
+const { from: toArray } = Array;
 
 export default (dependencies) => {
   const {
@@ -20,6 +22,7 @@ export default (dependencies) => {
   } = dependencies;
   const { createExclusion, isExcluded } = Exclusion(dependencies);
   const printCommentArray = (comments) => {
+    /* c8 ignore start */
     const { length } = comments;
     if (length === 0) {
       return null;
@@ -27,85 +30,109 @@ export default (dependencies) => {
     if (length === 1) {
       return comments[0];
     }
-    /* c8 ignore start */
     return comments.join("\n");
     /* c8 ignore stop */
   };
   const { extractEstreeEntityArray } = Estree(dependencies);
-  const default_closure_information = {
-    excluded: true,
-    shallow: true,
-    parameters: [],
-    link: null,
-  };
-  const transformEntity = (entity, parent, context) => {
-    const { type, name, children } = entity;
-    const transformChildEntity = (child) =>
-      transformEntity(child, entity, context);
-    if (type === "class") {
-      return {
-        type,
-        name,
-        children: children.map(transformChildEntity),
-      };
+  const generateCutContent =
+    (content) =>
+    ([start, end]) =>
+      content.substring(start, end);
+  const excludeEntity = (entity, parent, exclusion, excluded) => {
+    if (isExcluded(exclusion, entity, parent)) {
+      excluded.push(entity);
+      return [];
     }
-    if (type === "function") {
-      const {
-        closures,
-        cutContent,
-        placeholder,
-        shallow,
-        path,
-        url,
-        exclusion,
-        inline,
-      } = context;
-      const {
-        parameters,
-        labels,
-        static: _static,
-        comments,
-        range,
-        line,
-        column,
-      } = entity;
-      closures.set(stringifyLocation(makeLocation(url, line, column)), {
-        parameters: parameters.map(cutContent),
-        shallow,
-        excluded: isExcluded(
-          exclusion,
-          parent !== null && parent.type === "class"
-            ? `${parent.name}${_static ? "#" : "."}${name}`
-            : name,
+    return [
+      {
+        ...entity,
+        children: entity.children.flatMap((child) =>
+          excludeEntity(child, entity, exclusion, excluded),
         ),
-        link: {
-          method_id: placeholder,
-          path,
-          lineno: line,
-          defined_class: name,
-          static: _static,
-        },
-      });
-      return {
-        type: "class",
-        name,
-        children: [
-          {
-            type: "function",
-            name: placeholder,
-            location: `${path}:${line}`,
+      },
+    ];
+  };
+  const registerExcludedEntityArray = (entities, { url }, closures) => {
+    const registerExcludedEntity = (entity) => {
+      const { type, children } = entity;
+      if (type === "function") {
+        const { line, column } = entity;
+        closures.set(stringifyLocation(makeLocation(url, line, column)), null);
+      }
+      children.forEach(registerExcludedEntity);
+    };
+    entities.forEach(registerExcludedEntity);
+  };
+  const registerEntityArray = (
+    entities,
+    { content, shallow, placeholder, path, url },
+    closures,
+  ) => {
+    const cutContent = generateCutContent(content);
+    const registerEntity = (entity) => {
+      const { type, children } = entity;
+      if (type === "function") {
+        const { line, column, parameters, name, static: _static } = entity;
+        closures.set(stringifyLocation(makeLocation(url, line, column)), {
+          parameters: parameters.map(cutContent),
+          shallow: shallow,
+          link: {
+            method_id: placeholder,
+            path: path,
+            lineno: line,
+            defined_class: name,
             static: _static,
-            source: inline ? cutContent(range) : null,
-            comment: printCommentArray(comments),
-            labels,
           },
-          ...children.map(transformChildEntity),
-        ],
-      };
-    }
-    /* c8 ignore start */
-    assert(false, "invalid entity type");
-    /* c8 ignore stop */
+        });
+      }
+      children.forEach(registerEntity);
+    };
+    entities.forEach(registerEntity);
+  };
+
+  const filterCalledEntityArray = (entities, { url }, callees) => {
+    const isEntityCalled = (entity) =>
+      entity.type !== "function" ||
+      callees.has(
+        stringifyLocation(makeLocation(url, entity.line, entity.column)),
+      );
+    const filterCalledEntityChildren = (entity) => ({
+      ...entity,
+      children: entity.children
+        .filter(isEntityCalled)
+        .map(filterCalledEntityChildren),
+    });
+    return entities.filter(isEntityCalled).map(filterCalledEntityChildren);
+  };
+
+  const compileEntityArray = (
+    entities,
+    { placeholder, path, inline, content },
+  ) => {
+    const cutContent = generateCutContent(content);
+    const compileEntity = (entity) =>
+      entity.type === "function"
+        ? {
+            type: "class",
+            name: entity.name,
+            children: [
+              {
+                type: "function",
+                name: placeholder,
+                location: `${path}:${entity.line}`,
+                static: entity.static,
+                source: inline ? cutContent(entity.range) : null,
+                comment: printCommentArray(entity.comments),
+                labels: entity.labels,
+              },
+              ...entity.children.map(compileEntity),
+            ],
+          }
+        : {
+            ...entity,
+            children: entity.children.map(compileEntity),
+          };
+    return entities.map(compileEntity);
   };
 
   return {
@@ -131,26 +158,17 @@ export default (dependencies) => {
     ) => {
       assert(!urls.has(url), "duplicate source url");
       urls.add(url);
-      let { pathname: path } = new URL(url);
-      path = toRelativePath(directory, path);
-      const cutContent = ([start, end]) => content.substring(start, end);
-      sources.push({
-        url,
-        path,
-        entities: extractEstreeEntityArray(path, content, naming).map(
-          (entity) =>
-            transformEntity(entity, null, {
-              closures,
-              exclusion: createExclusion(exclude),
-              shallow,
-              inline,
-              url,
-              path,
-              placeholder,
-              cutContent,
-            }),
-        ),
-      });
+      const { pathname } = new _URL(url);
+      const path = toRelativePath(directory, pathname);
+      const context = { url, path, shallow, inline, content, placeholder };
+      const exclusion = createExclusion(exclude);
+      const excluded = [];
+      const entities = extractEstreeEntityArray(path, content, naming).flatMap(
+        (entity) => excludeEntity(entity, null, exclusion, excluded),
+      );
+      registerExcludedEntityArray(excluded, context, closures);
+      registerEntityArray(entities, context, closures);
+      sources.push({ context, entities });
     },
     getClassmapClosure: ({ closures }, url) => {
       if (closures.has(url)) {
@@ -161,27 +179,35 @@ export default (dependencies) => {
       );
       if (closures.has(next_url)) {
         logDebug(
-          "Had to increase column by to fetch closure information at %j",
+          "Had to increase column by one to fetch closure information at %j",
           url,
         );
         return closures.get(next_url);
       }
-      logWarning("Missing file information for closure at %s", url);
-      return default_closure_information;
+      logWarning(
+        "Missing file information for closure at %s, threating it as excluded.",
+        url,
+      );
+      return null;
     },
-    compileClassmap: ({ sources, pruning }, urls) => {
+    compileClassmap: ({ sources, pruning, closures }, urls) => {
       if (pruning) {
-        const whitelist = new Set();
-        for (const url of urls) {
-          const { protocol, host, pathname } = new URL(url);
-          whitelist.add(`${protocol}//${host}${pathname}`);
-        }
-        sources = sources.filter(({ url }) => whitelist.has(url));
+        urls = new Set(
+          toArray(urls).map((url) =>
+            closures.has(url)
+              ? url
+              : stringifyLocation(incrementLocationColumn(parseLocation(url))),
+          ),
+        );
+        sources = sources.map(({ context, entities }) => ({
+          context,
+          entities: filterCalledEntityArray(entities, context, urls),
+        }));
       }
       const directories = new Set();
       const root = [];
-      for (const { path, entities } of sources.values()) {
-        const dirnames = path.split("/");
+      for (const { context, entities } of sources.values()) {
+        const dirnames = context.path.split("/");
         const filename = dirnames.pop();
         let children = root;
         for (const dirname of dirnames) {
@@ -202,7 +228,7 @@ export default (dependencies) => {
         children.push({
           type: "package",
           name: filename,
-          children: entities,
+          children: compileEntityArray(entities, context),
         });
       }
       return root;

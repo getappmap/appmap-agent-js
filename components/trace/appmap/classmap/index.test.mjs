@@ -7,10 +7,7 @@ import Classmap from "./index.mjs";
 
 Error.stackTraceLimit = Infinity;
 
-const {
-  deepEqual: assertDeepEqual,
-  // equal: assertEqual,
-} = Assert;
+const { deepEqual: assertDeepEqual, equal: assertEqual } = Assert;
 
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
 const { createConfiguration, extendConfiguration } =
@@ -26,72 +23,118 @@ const cwd = "/cwd";
 
 const placeholder = "$";
 
-const classmap = createClassmap(
-  extendConfiguration(
-    createConfiguration(cwd),
-    { pruning: true, "function-name-placeholder": placeholder },
-    cwd,
-  ),
-);
+{
+  const classmap = createClassmap(
+    extendConfiguration(
+      createConfiguration(cwd),
+      { pruning: true, "function-name-placeholder": placeholder },
+      cwd,
+    ),
+  );
 
-addClassmapSource(classmap, {
-  url: `file://${cwd}/directory/function.js`,
-  content: "// comment\n function f (x) {}",
-  inline: true,
-  exclude: ["^"],
-  shallow: true,
-});
-
-getClassmapClosure(classmap, `file://${cwd}/directory/function.js#0-0`);
-
-assertDeepEqual(
-  getClassmapClosure(classmap, `file://${cwd}/directory/function.js#2-1`),
-  {
-    excluded: true,
-    parameters: ["x"],
+  addClassmapSource(classmap, {
+    url: `file://${cwd}/directory/function.js`,
+    content: "const o = { f: \n function (x) {} , g: \n function (y) {} };",
+    inline: false,
+    exclude: ["o.g"],
     shallow: true,
-    link: {
-      defined_class: "f",
-      method_id: placeholder,
-      path: "directory/function.js",
-      lineno: 2,
-      static: false,
+  });
+
+  assertEqual(
+    getClassmapClosure(classmap, `file://${cwd}/directory/function.js#1-1`),
+    null,
+  );
+
+  assertDeepEqual(
+    getClassmapClosure(classmap, `file://${cwd}/directory/function.js#2-1`),
+    {
+      parameters: ["x"],
+      shallow: true,
+      link: {
+        defined_class: "f",
+        method_id: placeholder,
+        path: "directory/function.js",
+        lineno: 2,
+        static: false,
+      },
     },
-  },
-);
+  );
 
-assertDeepEqual(
-  getClassmapClosure(classmap, `file://${cwd}/directory/function.js#2-0`),
-  getClassmapClosure(classmap, `file://${cwd}/directory/function.js#2-1`),
-);
+  assertDeepEqual(
+    getClassmapClosure(classmap, `file://${cwd}/directory/function.js#3-1`),
+    null,
+  );
 
-addClassmapSource(classmap, {
-  url: `file://${cwd}/directory/class.js`,
-  content: "class c {static m1 () {}};\nconst o = { m2 () {} };",
-  inline: false,
-  exclude: ["c#m1"],
-  shallow: false,
-});
+  assertDeepEqual(
+    getClassmapClosure(classmap, `file://${cwd}/directory/function.js#2-0`),
+    getClassmapClosure(classmap, `file://${cwd}/directory/function.js#2-1`),
+  );
 
-assertDeepEqual(
-  getClassmapClosure(classmap, `file://${cwd}/directory/class.js#1-19`),
-  {
-    excluded: true,
-    parameters: [],
+  assertDeepEqual(
+    compileClassmap(
+      classmap,
+      new Set([
+        `file://${cwd}/directory/function.js#2-0`,
+        `file://${cwd}/directory/function.js#2-1`,
+      ]),
+    ),
+    [
+      {
+        type: "package",
+        name: "directory",
+        children: [
+          {
+            type: "package",
+            name: "function.js",
+            children: [
+              {
+                type: "class",
+                name: "o",
+                children: [
+                  {
+                    type: "class",
+                    name: "f",
+                    children: [
+                      {
+                        type: "function",
+                        name: placeholder,
+                        comment: null,
+                        labels: [],
+                        source: null,
+                        static: false,
+                        location: "directory/function.js:2",
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  );
+}
+
+{
+  const classmap = createClassmap(
+    extendConfiguration(
+      createConfiguration(cwd),
+      { pruning: false, "function-name-placeholder": placeholder },
+      cwd,
+    ),
+  );
+
+  addClassmapSource(classmap, {
+    url: `file://${cwd}/directory/function.js`,
+    content:
+      "function f () {} /* comment1 */ \n function g () {} /* comment2 */ /* comment3 */ \n function h () {}",
+    inline: true,
+    exclude: [],
     shallow: false,
-    link: {
-      defined_class: "m1",
-      method_id: placeholder,
-      path: "directory/class.js",
-      lineno: 1,
-      static: true,
-    },
-  },
-);
+  });
 
-assertDeepEqual(
-  compileClassmap(classmap, [`file://${cwd}/directory/function.js#2-0`]),
-  [
+  assertDeepEqual(compileClassmap(classmap, new Set([])), [
     {
       type: "package",
       name: "directory",
@@ -107,11 +150,41 @@ assertDeepEqual(
                 {
                   type: "function",
                   name: placeholder,
-                  comment: "// comment",
+                  comment: null,
                   labels: [],
-                  source: "function f (x) {}",
+                  source: "function f () {}",
+                  static: false,
+                  location: "directory/function.js:1",
+                },
+              ],
+            },
+            {
+              type: "class",
+              name: "g",
+              children: [
+                {
+                  type: "function",
+                  name: placeholder,
+                  comment: "/* comment1 */",
+                  labels: [],
+                  source: "function g () {}",
                   static: false,
                   location: "directory/function.js:2",
+                },
+              ],
+            },
+            {
+              type: "class",
+              name: "h",
+              children: [
+                {
+                  type: "function",
+                  name: placeholder,
+                  comment: "/* comment2 */\n/* comment3 */",
+                  labels: [],
+                  source: "function h () {}",
+                  static: false,
+                  location: "directory/function.js:3",
                 },
               ],
             },
@@ -119,5 +192,5 @@ assertDeepEqual(
         },
       ],
     },
-  ],
-);
+  ]);
+}
