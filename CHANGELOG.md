@@ -1,3 +1,12 @@
+# [8.1.0](https://github.com/applandinc/appmap-agent-js/compare/v8.0.1...v8.1.0) (2021-11-12)
+
+
+### Features
+
+* improved exclusion mechanism ([b14e965](https://github.com/applandinc/appmap-agent-js/commit/b14e965baf1645762c9bd16a57c6be655274ec98))
+* path package specifier is now recursive by default ([cbf6b34](https://github.com/applandinc/appmap-agent-js/commit/cbf6b341946a742cadab680b804615f03003ed42))
+* remove setup command from help message ([669fc75](https://github.com/applandinc/appmap-agent-js/commit/669fc754b8bd68e3820896d348b65f67a18ca210))
+
 ## [8.0.1](https://github.com/applandinc/appmap-agent-js/compare/v8.0.0...v8.0.1) (2021-11-12)
 
 
