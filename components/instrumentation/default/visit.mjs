@@ -200,6 +200,7 @@ export default (dependencies) => {
     util: { assert, hasOwnProperty, coalesce },
     source: { mapSource },
     log: { logGuardWarning },
+    location: { stringifyLocation, getLocationFileURL },
   } = dependencies;
 
   const isEstreeKey = (key) =>
@@ -498,7 +499,7 @@ export default (dependencies) => {
           line,
           column,
         );
-        return location !== null && whitelist.has(location.url)
+        return location !== null && whitelist.has(getLocationFileURL(location))
           ? compileFunction(
               node,
               parent.type === "MethodDefinition" &&
@@ -506,9 +507,7 @@ export default (dependencies) => {
                 grand_parent.superClass !== null,
               visit(node.params, node, parent, true, context),
               visit(node.body, node, parent, true, context),
-              `${location.url}#${_String(location.line)}-${_String(
-                location.column,
-              )}`,
+              stringifyLocation(location),
               context.runtime,
             )
           : visitGeneric(node, parent, false, context);

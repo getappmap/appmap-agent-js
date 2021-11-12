@@ -23,6 +23,7 @@
 - configuration-accessor
 - configuration-process
 - configuration-environment
+- location
 - trace
 - backend
 - source-inner

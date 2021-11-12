@@ -5,6 +5,7 @@ import { SourceMap } from "module";
 export default (dependencies) => {
   const {
     util: { hasOwnProperty },
+    location: { makeLocation },
   } = dependencies;
   return {
     compileSourceMap: (payload) => new SourceMap(payload),
@@ -18,11 +19,7 @@ export default (dependencies) => {
         originalLine: line2,
         originalColumn: column2,
       } = entry;
-      return {
-        url: url2,
-        line: line2 + 1, // 0-indexed line
-        column: column2,
-      };
+      return makeLocation(url2, line2 + 1, column2); // 0-indexed line
     },
   };
 };

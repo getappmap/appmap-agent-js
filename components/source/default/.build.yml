@@ -4,3 +4,4 @@ dependencies:
   - expect
   - validate
   - source-inner
+  - location

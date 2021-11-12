@@ -3,16 +3,20 @@
 import Estree from "./estree/index.mjs";
 import Exclusion from "./exclusion.mjs";
 
-const { parseInt } = Number;
 const _Set = Set;
 const _Map = Map;
 const _undefined = undefined;
-const _String = String;
 
 export default (dependencies) => {
   const {
     util: { assert, createCounter, toRelativePath },
     log: { logWarning, logDebug },
+    location: {
+      makeLocation,
+      parseLocation,
+      stringifyLocation,
+      incrementLocationColumn,
+    },
   } = dependencies;
   const { createExclusion, isExcluded } = Exclusion(dependencies);
   const printCommentArray = (comments) => {
@@ -65,7 +69,7 @@ export default (dependencies) => {
         line,
         column,
       } = entity;
-      closures.set(`${url}#${_String(line)}-${_String(column)}`, {
+      closures.set(stringifyLocation(makeLocation(url, line, column)), {
         parameters: parameters.map(cutContent),
         shallow,
         excluded: isExcluded(
@@ -152,12 +156,9 @@ export default (dependencies) => {
       if (closures.has(url)) {
         return closures.get(url);
       }
-      const parts = /^([^#]+)#([0-9]+)-([0-9]+)$/u.exec(url);
-      assert(parts !== null, "invalid location url format");
-      const [, prefix, line_string, column_string] = parts;
-      const next_url = `${prefix}#${line_string}-${_String(
-        parseInt(column_string) + 1,
-      )}`;
+      const next_url = stringifyLocation(
+        incrementLocationColumn(parseLocation(url)),
+      );
       if (closures.has(next_url)) {
         logDebug(
           "Had to increase column by to fetch closure information at %j",

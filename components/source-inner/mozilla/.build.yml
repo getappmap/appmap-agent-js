@@ -1,3 +1,4 @@
 branches: [node, test, browser]
 dependencies:
   - util
+  - location

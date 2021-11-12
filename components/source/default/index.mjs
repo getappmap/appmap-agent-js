@@ -9,6 +9,7 @@ export default (dependencies) => {
     util: { assert, toAbsolutePath, getDirectory, coalesce },
     validate: { validateSourceMap },
     "source-inner": { compileSourceMap, mapSource },
+    location: { makeLocation },
   } = dependencies;
 
   const normalizeURL = (url, relative_url) => {
@@ -80,7 +81,7 @@ export default (dependencies) => {
       const { mirrored } = mapping;
       if (mirrored) {
         const { url } = mapping;
-        return { url, line, column };
+        return makeLocation(url, line, column);
       } else {
         const { map } = mapping;
         return mapSource(map, line, column);

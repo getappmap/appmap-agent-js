@@ -14,6 +14,7 @@ import specifier$default from "./../../components/specifier/default/index.mjs";
 import configuration$default from "./../../components/configuration/default/index.mjs";
 import configuration_accessor$default from "./../../components/configuration-accessor/default/index.mjs";
 import uuid$random from "./../../components/uuid/random/index.mjs";
+import location$default from "./../../components/location/default/index.mjs";
 import source_inner$mozilla from "./../../components/source-inner/mozilla/index.mjs";
 import source$default from "./../../components/source/default/index.mjs";
 import instrumentation$default from "./../../components/instrumentation/default/index.mjs";
@@ -70,6 +71,7 @@ export default (blueprint) => {
   dependencies["configuration-accessor"] =
     configuration_accessor$default(dependencies);
   dependencies["uuid"] = uuid$random(dependencies);
+  dependencies["location"] = location$default(dependencies);
   dependencies["source-inner"] = source_inner$mozilla(dependencies);
   dependencies["source"] = source$default(dependencies);
   dependencies["instrumentation"] = instrumentation$default(dependencies);

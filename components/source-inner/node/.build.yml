@@ -1,3 +1,4 @@
 branches: []
 dependencies:
   - util
+  - location

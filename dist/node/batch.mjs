@@ -15,6 +15,7 @@ import validate_message$off from "./../../components/validate-message/off/index.
 import validate_message$on from "./../../components/validate-message/on/index.mjs";
 import validate_appmap$off from "./../../components/validate-appmap/off/index.mjs";
 import validate_appmap$on from "./../../components/validate-appmap/on/index.mjs";
+import location$default from "./../../components/location/default/index.mjs";
 import trace$appmap from "./../../components/trace/appmap/index.mjs";
 import backend$default from "./../../components/backend/default/index.mjs";
 import spawn$node from "./../../components/spawn/node/index.mjs";
@@ -77,6 +78,7 @@ export default (blueprint) => {
       : (() => {
           throw new Error("invalid instance for component validate-appmap");
         })();
+  dependencies["location"] = location$default(dependencies);
   dependencies["trace"] = trace$appmap(dependencies);
   dependencies["backend"] = backend$default(dependencies);
   dependencies["spawn"] = spawn$node(dependencies);

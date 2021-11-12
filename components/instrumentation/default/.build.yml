@@ -6,3 +6,4 @@ dependencies:
   - expect
   - uuid
   - source
+  - location

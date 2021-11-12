@@ -1,6 +1,9 @@
 import { SourceMapConsumer } from "source-map";
 
 export default (dependencies) => {
+  const {
+    location: { makeLocation },
+  } = dependencies;
   return {
     compileSourceMap: (payload) => new SourceMapConsumer(payload),
     mapSource: (mapping, line1, column1) => {
@@ -12,11 +15,7 @@ export default (dependencies) => {
       if (url2 === null || line2 === null || column2 === null) {
         return null;
       }
-      return {
-        url: url2,
-        line: line2,
-        column: column2,
-      };
+      return makeLocation(url2, line2, column2);
     },
   };
 };
