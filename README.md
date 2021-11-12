@@ -62,18 +62,18 @@ Once `appmap.yml` is configured for your project, you're ready to record AppMaps
 ### Recording mocha test cases:
 
 1. Validate that the tests run prior to recording AppMaps.
-2. Run `appmap-agent-js` with the `mocha` command and its parameters following the `--` delimiter (all glob expressions should be wrapped in quotes). For example:
+2. Run `appmap-agent-js` with the `mocha` command and its parameters following the `--` delimiter. For example:
 ```sh
-npx appmap-agent-js -- mocha --recursive 'test/**/*.ts'
+npx appmap-agent-js -- mocha test/**/*.ts
 ```
 3. `appmap-agent-js` will run the tests. When the tests are complete, the AppMaps will be stored in the default output directory `tmp/appmap/mocha`.
 
 
 ### Recording Node.js processes with remote recording:
 
-1. Run `appmap-agent-js` with the application-starting command and its parameters following the `--` delimiter (all glob expressions should be wrapped in quotes). For example:
+1. Run `appmap-agent-js` with the application-starting command and its parameters following the `--` delimiter. For example:
 ```sh
-npx appmap-agent-js -- node app/main.js -param1 hello --param2=world
+npx appmap-agent-js -- node app/main.js --param1 hello --param2=world
 ```
 2. `appmap-agent-js` will start the app and inject itself in its http stack. It will listen for [remote recording requests](https://appland.com/docs/reference/remote-recording) on all http ports of the application.
 3. Start the remote recording:
@@ -112,7 +112,7 @@ The most frequently used `appmap-agent-js` parameters are:
 ### Example
 
 ```
-npx appmap-agent-js --recorder=mocha --command="mocha --recursive test/**/*.ts" --log-level=error
+npx appmap-agent-js --recorder=mocha --command="mocha test/**/*.ts" --log-level=error
 ``` 
 
 ## Next steps
