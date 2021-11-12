@@ -1,3 +1,10 @@
+## [8.2.1](https://github.com/applandinc/appmap-agent-js/compare/v8.2.0...v8.2.1) (2021-11-12)
+
+
+### Bug Fixes
+
+* tweak some shell commands ([e9fd83d](https://github.com/applandinc/appmap-agent-js/commit/e9fd83dcc4bb25f8973069304d2f09dd1e19cc4a))
+
 # [8.2.0](https://github.com/applandinc/appmap-agent-js/compare/v8.1.1...v8.2.0) (2021-11-12)
 
 
