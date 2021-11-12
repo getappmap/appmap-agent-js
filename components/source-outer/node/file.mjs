@@ -25,10 +25,10 @@ export default (dependencies) => {
     return _decodeURIComponent(body);
   };
   return {
-    readFile: (url) => {
+    readFile: (url, reference_url) => {
       const { protocol, pathname: path } = new _URL(url);
       if (protocol === "data:") {
-        return makeRight({ url, content: parseDataPath(path) });
+        return makeRight({ url: reference_url, content: parseDataPath(path) });
       }
       expect(
         protocol === "file:",

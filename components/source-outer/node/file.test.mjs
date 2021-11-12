@@ -16,18 +16,20 @@ const { isLeft, makeRight } = await buildTestComponentAsync("util");
 // data //
 //////////
 
-{
-  const url = `data:text/plain;charset=utf-8;base64,${Buffer.from(
-    "\n",
-    "utf8",
-  ).toString("base64")}`;
-  assertDeepEqual(readFile(url), makeRight({ url, content: "\n" }));
-}
+assertDeepEqual(
+  readFile(
+    `data:text/plain;charset=utf-8;base64,${Buffer.from("\n", "utf8").toString(
+      "base64",
+    )}`,
+    "file:///path",
+  ),
+  makeRight({ url: "file:///path", content: "\n" }),
+);
 
-{
-  const url = `data:,${encodeURIComponent("\n")}`;
-  assertDeepEqual(readFile(url), makeRight({ url, content: "\n" }));
-}
+assertDeepEqual(
+  readFile(`data:,${encodeURIComponent("\n")}`, "file:///path"),
+  makeRight({ url: "file:///path", content: "\n" }),
+);
 
 //////////
 // file //
