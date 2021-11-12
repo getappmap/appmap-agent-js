@@ -41,17 +41,33 @@ To use remote recording, and view and interact with recorded AppMaps, we recomme
 
 The agent requires a valid configuration in `appmap.yml` file:
 1. Create a new file called `appmap.yml` in the project folder (where `package.json` is located).
-2. Add your application name and a list of directories with sources that will be recorded. For example:
+2. Add your application name and a list of directories that will be recorded. For example:
+
+**For projects with JavaScript source maps**: add paths to sources to be recorded. For example:
 
 ```yaml
 name: MyApp
 packages:
-  - path: controllers
-  - path: data
-  - path: lib
-  - path: models
-  - path: routes
+  - path: src/server/controllers
+  - path: src/server/data
+  - path: src/server/lib
+  - path: src/server/models
+  - path: src/server/routes
 ```
+
+**For projects without JavaScript source maps**: include build folders. For example:
+
+```yaml
+name: MyApp
+packages:
+  - path: dist/controllers
+  - path: dist/data
+  - path: dist/lib
+  - path: dist/models
+  - path: dist/routes
+```
+
+If you aren't sure which option to take, start with both source and build folders and optimize the `appmap.yml` file later. 
 
 
 ## Recording AppMaps
@@ -80,7 +96,7 @@ npx appmap-agent-js -- node app/main.js -param1 hello --param2=world
     - [in VS Code](https://appland.com//docs/reference/remote-recording#visual-studio-code)
     - [in JetBrains IDEs](https://appland.com/docs/reference/remote-recording#jetbrains-intellij-pycharm-rubymine)
     - [with curl](https://appland.com/docs/reference/remote-recording.html#remote-recording-api)
-4. Interact with your application or service to exercise code whitelisted in `appmap.yml`
+4. Interact with your application or service to exercise code included in `appmap.yml`
 5. Stop the recording and save the new AppMap to disk.
 
 
