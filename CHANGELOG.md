@@ -1,3 +1,15 @@
+# [8.0.0](https://github.com/applandinc/appmap-agent-js/compare/v7.3.1...v8.0.0) (2021-11-11)
+
+
+### Features
+
+* scenario now discriminate against dedicated key rather than name ([f2ff33b](https://github.com/applandinc/appmap-agent-js/commit/f2ff33bb95c0e258e98994c56616f75456aac003))
+
+
+### BREAKING CHANGES
+
+* Scenarios are now entered as an object rather than an array. The scenario configuration field is a regular expression that is tested agaisnt the keys of this object. Before it was tested against the name of the app (the name configuration field recently became the name of the app instead of the name of the appmap) which did not make much sense.
+
 ## [7.3.1](https://github.com/applandinc/appmap-agent-js/compare/v7.3.0...v7.3.1) (2021-11-11)
 
 
