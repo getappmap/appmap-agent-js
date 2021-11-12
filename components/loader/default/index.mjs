@@ -47,11 +47,11 @@ export default (dependencies) => {
       // Hence, we must check if the global marker variable is already defined.
       const enabled = typeof APPMAP_TRANSFORM_MODULE_ASYNC === "undefined";
       if (enabled) {
+        logInfo(
+          "Please, ignore node's deprecated warning about outdated transformSource loader hook (if present).",
+        );
         runScript("let APPMAP_TRANSFORM_MODULE_ASYNC = null;");
       }
-      logInfo(
-        "Please, ignore node's deprecated warning about outdated transformSource loader hook (if present).",
-      );
       return {
         stringifyModule, // for testing
         transformSourceAsync: async (content, context, transformAsync) => {
