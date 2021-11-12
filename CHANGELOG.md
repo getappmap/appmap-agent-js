@@ -1,3 +1,10 @@
+# [8.2.0](https://github.com/applandinc/appmap-agent-js/compare/v8.1.1...v8.2.0) (2021-11-12)
+
+
+### Features
+
+* pruning now acts on classes and packages. ([23c2207](https://github.com/applandinc/appmap-agent-js/commit/23c2207041bc84af348c3fa4feb5d531243d2a8b))
+
 ## [8.1.1](https://github.com/applandinc/appmap-agent-js/compare/v8.1.0...v8.1.1) (2021-11-12)
 
 
