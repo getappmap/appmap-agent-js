@@ -1,3 +1,10 @@
+## [8.2.2](https://github.com/applandinc/appmap-agent-js/compare/v8.2.1...v8.2.2) (2021-11-15)
+
+
+### Bug Fixes
+
+* add sometimes missing function in classmap ([696741e](https://github.com/applandinc/appmap-agent-js/commit/696741e85e7b93c93618882697ee2de88ea6ca7c))
+
 ## [8.2.1](https://github.com/applandinc/appmap-agent-js/compare/v8.2.0...v8.2.1) (2021-11-12)
 
 
