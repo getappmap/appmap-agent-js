@@ -91,18 +91,28 @@ export default (dependencies) => {
   };
 
   const filterCalledEntityArray = (entities, { url }, callees) => {
-    const isEntityCalled = (entity) =>
-      entity.type !== "function" ||
-      callees.has(
-        stringifyLocation(makeLocation(url, entity.line, entity.column)),
-      );
-    const filterCalledEntityChildren = (entity) => ({
-      ...entity,
-      children: entity.children
-        .filter(isEntityCalled)
-        .map(filterCalledEntityChildren),
-    });
-    return entities.filter(isEntityCalled).map(filterCalledEntityChildren);
+    const filterCalledEntity = (entity) => {
+      const children = entity.children.flatMap(filterCalledEntity);
+      return entity.type === "function" &&
+        children.length === 0 &&
+        !callees.has(
+          stringifyLocation(makeLocation(url, entity.line, entity.column)),
+        ) &&
+        !callees.has(
+          stringifyLocation(makeLocation(url, entity.line, entity.column + 1)),
+        ) &&
+        !callees.has(
+          stringifyLocation(makeLocation(url, entity.line, entity.column - 1)),
+        )
+        ? []
+        : [
+            {
+              ...entity,
+              children,
+            },
+          ];
+    };
+    return entities.flatMap(filterCalledEntity);
   };
 
   const cleanupEntity = (entity) => {

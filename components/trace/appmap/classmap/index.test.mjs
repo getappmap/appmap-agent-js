@@ -35,7 +35,7 @@ const placeholder = "$";
   addClassmapSource(classmap, {
     url: `file://${cwd}/directory/function.js`,
     content:
-      "const o = { f: \n function (x) {} , g: \n function (y) {} }; const p = {};",
+      "const o = { f: \n function (x) {} , g: \n function (y) {} , h: \n function (z) {} }; const p = {};",
     inline: false,
     exclude: ["o.g"],
     shallow: true,
