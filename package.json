@@ -1,6 +1,6 @@
 {
   "name": "@appland/appmap-agent-js",
-  "version": "8.2.2",
+  "version": "8.2.3",
   "bin": {
     "appmap-agent-js": "bin/bin.mjs"
   },
@@ -9,6 +9,7 @@
     "linux",
     "darwin"
   ],
+  "license": "MIT",
   "engine": {
     "node": ">= 14.0.0"
   },
