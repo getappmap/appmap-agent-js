@@ -1,3 +1,10 @@
+## [8.2.3](https://github.com/applandinc/appmap-agent-js/compare/v8.2.2...v8.2.3) (2021-11-16)
+
+
+### Bug Fixes
+
+* add license field ([1d00be9](https://github.com/applandinc/appmap-agent-js/commit/1d00be997d75c37ff6999b23f48d3517111555fa))
+
 ## [8.2.2](https://github.com/applandinc/appmap-agent-js/compare/v8.2.1...v8.2.2) (2021-11-15)
 
 
