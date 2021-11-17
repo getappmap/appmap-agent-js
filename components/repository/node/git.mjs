@@ -58,7 +58,12 @@ export default (dependencies) => {
 
   const parseDescription = (stdout) => {
     const parts = /^([^-]*)-([0-9]+)-/u.exec(stdout);
-    expect(parts !== null, `failed to parse git description >> %s`, stdout);
+    /* c8 ignore start */
+    if (parts === null) {
+      logWarning("Failed to parse git description %j", stdout);
+      return 0;
+    }
+    /* c8 ignore stop */
     return _parseInt(parts[2], 10);
   };
 
