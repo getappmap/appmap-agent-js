@@ -1,3 +1,4 @@
+
 import { writeEntryPointAsync } from "./static.mjs";
 
 const generateWriteAsync = (branch) => async (component, blueprint) => {
