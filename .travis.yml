@@ -6,9 +6,10 @@ cache: npm
 
 install:
   - npm install
+  - npm run build
 
 stages:
-  - build
+  - lint
   - test
   - deploy
 
@@ -18,11 +19,9 @@ script:
 
 jobs:
   include:
-    - stage: build
+    - stage: lint
       node_js: 16
       script:
-        - npm run build
-        - npm run format
         - npm run lint
     - stage: test
       node_js: 14
@@ -36,5 +35,7 @@ jobs:
         - npm run test-integration
     - stage: deploy
       node_js: 16
-      script: npm run deploy
+      script:
+        - npm run format
+        - npm run deploy
       branches: main
