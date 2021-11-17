@@ -1,3 +1,10 @@
+## [8.2.4](https://github.com/applandinc/appmap-agent-js/compare/v8.2.3...v8.2.4) (2021-11-17)
+
+
+### Bug Fixes
+
+* warn instead of crash when fail to parse git description ([431ca41](https://github.com/applandinc/appmap-agent-js/commit/431ca415cc189e6c158034223dc2cbdb4b1b4dbe))
+
 ## [8.2.3](https://github.com/applandinc/appmap-agent-js/compare/v8.2.2...v8.2.3) (2021-11-16)
 
 
