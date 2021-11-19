@@ -153,12 +153,7 @@ export default (dependencies) => {
   };
 
   return {
-    createClassmap: ({
-      "function-name-placeholder": placeholder,
-      repository: { directory },
-      pruning,
-    }) => ({
-      placeholder,
+    createClassmap: (configuration) => ({
       closures: new _Map(),
       sources: [],
       urls: new _Set(),
@@ -166,18 +161,19 @@ export default (dependencies) => {
         counter: createCounter(0),
         separator: "-",
       },
-      directory,
-      pruning,
+      configuration,
     }),
     addClassmapSource: (
       {
-        pruning,
         closures,
         urls,
         naming,
-        directory,
         root,
-        placeholder,
+        configuration: {
+          pruning,
+          "function-name-placeholder": placeholder,
+          repository: { directory },
+        },
         sources,
       },
       { url, content, inline, exclude, shallow },
@@ -219,7 +215,14 @@ export default (dependencies) => {
       );
       return null;
     },
-    compileClassmap: ({ sources, pruning, closures }, urls) => {
+    compileClassmap: (
+      {
+        sources,
+        configuration: { pruning, "collapse-package-hierachy": collapse },
+        closures,
+      },
+      urls,
+    ) => {
       if (pruning) {
         urls = new Set(
           toArray(urls).map((url) =>
@@ -237,31 +240,49 @@ export default (dependencies) => {
       }
       const directories = new Set();
       const root = [];
-      for (const { context, entities } of sources.values()) {
-        if (!pruning || entities.length > 0) {
-          const dirnames = context.path.split("/");
-          const filename = dirnames.pop();
-          let children = root;
-          for (const dirname of dirnames) {
-            let child = children.find(
-              (child) => child.name === dirname && directories.has(child),
-            );
-            if (child === _undefined) {
-              child = {
-                type: "package",
-                name: dirname,
-                children: [],
-              };
-              directories.add(child);
-              children.push(child);
-            }
-            ({ children } = child);
+      if (collapse) {
+        for (const { context, entities } of sources.values()) {
+          if (
+            /* c8 ignore start */ !pruning ||
+            entities.length > 0 /* c8 ignore stop */
+          ) {
+            root.push({
+              type: "package",
+              name: context.path,
+              children: compileEntityArray(entities, context),
+            });
           }
-          children.push({
-            type: "package",
-            name: filename,
-            children: compileEntityArray(entities, context),
-          });
+        }
+      } else {
+        for (const { context, entities } of sources.values()) {
+          if (
+            /* c8 ignore start */ !pruning ||
+            entities.length > 0 /* c8 ignore stop */
+          ) {
+            const dirnames = context.path.split("/");
+            const filename = dirnames.pop();
+            let children = root;
+            for (const dirname of dirnames) {
+              let child = children.find(
+                (child) => child.name === dirname && directories.has(child),
+              );
+              if (child === _undefined) {
+                child = {
+                  type: "package",
+                  name: dirname,
+                  children: [],
+                };
+                directories.add(child);
+                children.push(child);
+              }
+              ({ children } = child);
+            }
+            children.push({
+              type: "package",
+              name: filename,
+              children: compileEntityArray(entities, context),
+            });
+          }
         }
       }
       return root;

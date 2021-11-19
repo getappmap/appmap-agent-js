@@ -380,6 +380,7 @@
     exclude: {$ref: exclude}
     # recording
     function-name-placeholder: {type: string}
+    collapse-package-hierachy: {type: boolean}
     recording: {$ref: recording}
     serialization:
       anyOf:
@@ -524,6 +525,7 @@
     exclude: {$ref: exclude}
     # recording
     function-name-placeholder: {type: string}
+    collapse-package-hierachy: {type: boolean}
     recording:
       anyOf:
         - const: null

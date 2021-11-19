@@ -27,7 +27,11 @@ const placeholder = "$";
   const classmap = createClassmap(
     extendConfiguration(
       createConfiguration(cwd),
-      { pruning: true, "function-name-placeholder": placeholder },
+      {
+        pruning: true,
+        "function-name-placeholder": placeholder,
+        "collapse-package-hierachy": true,
+      },
       cwd,
     ),
   );
@@ -82,30 +86,24 @@ const placeholder = "$";
     [
       {
         type: "package",
-        name: "directory",
+        name: "directory/function.js",
         children: [
           {
-            type: "package",
-            name: "function.js",
+            type: "class",
+            name: "o",
             children: [
               {
                 type: "class",
-                name: "o",
+                name: "f",
                 children: [
                   {
-                    type: "class",
-                    name: "f",
-                    children: [
-                      {
-                        type: "function",
-                        name: placeholder,
-                        comment: null,
-                        labels: [],
-                        source: null,
-                        static: false,
-                        location: "directory/function.js:2",
-                      },
-                    ],
+                    type: "function",
+                    name: placeholder,
+                    comment: null,
+                    labels: [],
+                    source: null,
+                    static: false,
+                    location: "directory/function.js:2",
                   },
                 ],
               },
@@ -121,7 +119,11 @@ const placeholder = "$";
   const classmap = createClassmap(
     extendConfiguration(
       createConfiguration(cwd),
-      { pruning: false, "function-name-placeholder": placeholder },
+      {
+        pruning: false,
+        "function-name-placeholder": placeholder,
+        "collapse-package-hierachy": false,
+      },
       cwd,
     ),
   );

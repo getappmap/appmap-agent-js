@@ -168,17 +168,6 @@ A specifier can be any of:
     * `recursive <boolean>`: indicates whether to whitelist files within nested directories. *Default*: `true`.
     * `external <boolean>` Indicates whether to whitelist dependencies outside of the repository. *Default*: `false`.
 
-<!-- * `hidden-identifier <string>` The prefix of hidden variables used by the agent. The instrumentation will fail if variables from the program under recording starts with this prefix. *Default*: `"APPMAP"`.
-* `function-name-placeholder <string>` The placeholder name for classmap function elements. *Default* `"()"`. 
-* `mode: "local" | "remote"` Defines whether the backend should be executed on the recorded process or on a remote process. *Default*: `"local"` for the API and `"remote"` for the CLI.
-* `protocol "tcp" | "http1" | "http2"` Defines the communication protocol between frontend and backend. Only applicable in remote mode. `"tcp"` refers to a simple messaging protocol directly built on top of tcp and is the fastest option. *Default*: `"tcp"`.
-* `port <number> | <string>` Defines the communication port between frontend and backend. Only applicable in remote mode. A string indicates a path to a unix domain socket which is faster. *Default*: `0` which will use a random available port.
-* `validate <boolean> | <object>` Validation options which are useful to debug the agent.
-  * `<boolean>` Shorthand, `true` is the same as `{message: true, appmap:true}` and `false` is the same as `{message:true, appmap:true}`.
-  * `<object>`
-      * `message <boolean>` Indicates whether to validate trace elements as they are buffered. This is useful to help diagnose the root cause of some bugs. *Default* `false`.
-      * `appmap <boolean>` Indicates whether to validate the appmap before writting it to a file. *Default* `false`. -->
-
 ### Automated Recording Configuration Fields
 
 * `command <string>` The command to record.
@@ -194,6 +183,7 @@ A specifier can be any of:
     * `"process"` Generate a single appmap which spans over the entire lifetime of the process.
     * `"mocha"` Generate an appmap for each test case (ie `it` calls) of the entire test suite (ie every `describe` calls on every test file).
     * `"remote"` Generate appmap on demand via HTTP requests.
+* `trace-port <number> | <string>` Defines the communication port between frontend and backend. A string indicates a path to a unix domain socket which is faster. *Default*: `0` which will use a random available port.
 * `track-port <number> | <string>`: Port in the backend process for serving remote recording HTTP requests. *Default*: `0` A random port will be used.
 * `intercept-track-port <string>`: Regular expression to whitelist the ports in the frontend process for intercepting remote recording HTTP requests. *Default*: `"^"` Every detected HTTP ports will be spied upon.
 * `processes <boolean> | <string> | <EnabledSpecifier> | <EnabledSpecifier[]>` Whitelist files to decide whether a node process should be instrumented based on the path of its main module. An `EnabledSpecifier` can be any of
@@ -242,6 +232,14 @@ A specifier can be any of:
         * `method "toString" | "Object.prototype.toString"`: the name of the algorithm that should be used to print object runtime values (not `null` nor functions). `"toString"` will use the printing method provided by the object. Note that there is no guarantee that this method is side-effect free. By opposition `"Object.prototype.toString"` is always guaranteed to be side-effect free but provide a very vague description of the object. For instance: `/foo/g.toString()` is `"/foo/g"` whereas `Object.prototype.toString.call(/foo/g)` is `"[object RegExp]"`. *Default* `"toString"`.
         * `include-constructor-name <boolean>`: indicates whether or not to fetch the constructor name of runtime values. Fetching constructor name for every intercepted runtime value can add up to some performance overhead. Also, fetching constructor name can trigger code from the application being recorded if it uses [proxies](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy). *Default* `true`.
         * `maximum-length <number>` the maximum length of the string representation of runtime values. *Default* `96`.
+* `hidden-identifier <string>` The prefix of hidden variables used by the agent. The instrumentation will fail if variables from the program under recording starts with this prefix. *Default*: `"APPMAP"`.
+* `function-name-placeholder <string>` The placeholder name for classmap function elements. *Default* `"()"`.
+* `collapse-package-hiearchy <boolean>` Indicates whether packages should organized as a tree which mirrors the structure of the file system or if they should be flatten into a list. *Default*: `true`.
+* `validate <boolean> | <object>` Validation options which are useful to debug the agent.
+    * `<boolean>` Shorthand, `true` is the same as `{message: true, appmap:true}` and `false` is the same as `{message:true, appmap:true}`.
+    * `<object>`
+        * `message <boolean>` Indicates whether to validate trace elements as they are buffered. This is useful to help diagnose the root cause of some bugs. *Default* `false`.
+        * `appmap <boolean>` Indicates whether to validate the appmap before writting it to a file. *Default* `false`.
 
 ## Application Representation
 

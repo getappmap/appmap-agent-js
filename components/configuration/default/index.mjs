@@ -277,6 +277,10 @@ export default (dependencies) => {
       extend: overwrite,
       normalize: identity,
     },
+    "collapse-package-hierachy": {
+      extend: overwrite,
+      normalize: identity,
+    },
     serialization: {
       extend: assign,
       normalize: normalizeSerialization,
@@ -417,6 +421,7 @@ export default (dependencies) => {
       },
       ordering: "causal",
       "function-name-placeholder": "()",
+      "collapse-package-hierachy": true,
       serialization: {
         "maximum-length": 96,
         "include-constructor-name": true,
