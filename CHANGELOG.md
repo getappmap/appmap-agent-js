@@ -1,3 +1,10 @@
+## [8.2.5](https://github.com/applandinc/appmap-agent-js/compare/v8.2.4...v8.2.5) (2021-11-17)
+
+
+### Bug Fixes
+
+* build now start from scratch dist folder ([2520cf7](https://github.com/applandinc/appmap-agent-js/commit/2520cf7d0fef6d0f5f9b533e930fc4eca5c16050))
+
 ## [8.2.4](https://github.com/applandinc/appmap-agent-js/compare/v8.2.3...v8.2.4) (2021-11-17)
 
 
