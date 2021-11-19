@@ -1,3 +1,10 @@
+# [8.3.0](https://github.com/applandinc/appmap-agent-js/compare/v8.2.5...v8.3.0) (2021-11-19)
+
+
+### Features
+
+* add collapse-package-hierarchy configuration field ([1b07687](https://github.com/applandinc/appmap-agent-js/commit/1b07687ee4a6f4c130084ebf115dbead8cc7cec2))
+
 ## [8.2.5](https://github.com/applandinc/appmap-agent-js/compare/v8.2.4...v8.2.5) (2021-11-17)
 
 
