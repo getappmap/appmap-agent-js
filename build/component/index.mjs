@@ -22,8 +22,9 @@ await Promise.all([
   writeNodeAsync("recorder-remote", { ...posix_emitter, ...exit_violation }),
   writeNodeAsync("recorder-manual", { ...local_emitter, ...error_violation }),
   writeNodeAsync("batch", exit_violation),
-  writeNodeAsync("init", exit_violation),
   writeNodeAsync("setup", exit_violation),
   writeNodeAsync("validate-mocha", exit_violation),
   writeNodeAsync("loader", exit_violation),
+  writeNodeAsync("init", exit_violation),
+  writeNodeAsync("status", exit_violation),
 ]);
