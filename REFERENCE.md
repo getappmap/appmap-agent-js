@@ -2,7 +2,7 @@
 
 JavaScript agent for the AppMap framework.
 
-To install and configure `appmap-agent-js`, see [Getting started][README.md].
+To install and configure `appmap-agent-js`, see [Getting started](README.md).
 
 Table of contents:
 - [appmap-agent-js reference](#appmap-agent-js-reference)
