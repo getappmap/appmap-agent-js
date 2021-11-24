@@ -1,3 +1,11 @@
+# [8.4.0](https://github.com/applandinc/appmap-agent-js/compare/v8.3.0...v8.4.0) (2021-11-24)
+
+
+### Features
+
+* Add init subcommand ([7db6b3e](https://github.com/applandinc/appmap-agent-js/commit/7db6b3e808b8dbdc00ec48533fa8651e21032b75))
+* Add status subcommand ([04eea09](https://github.com/applandinc/appmap-agent-js/commit/04eea0987fbc9661521acb2869cfa9ea5e9aa5ae))
+
 # [8.3.0](https://github.com/applandinc/appmap-agent-js/compare/v8.2.5...v8.3.0) (2021-11-19)
 
 
