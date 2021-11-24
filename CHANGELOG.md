@@ -1,3 +1,10 @@
+## [8.4.1](https://github.com/applandinc/appmap-agent-js/compare/v8.4.0...v8.4.1) (2021-11-24)
+
+
+### Bug Fixes
+
+* Make the status subcommand available ([ea2d3b5](https://github.com/applandinc/appmap-agent-js/commit/ea2d3b529c4dac64d47bace411bdec831b3f88f7))
+
 # [8.4.0](https://github.com/applandinc/appmap-agent-js/compare/v8.3.0...v8.4.0) (2021-11-24)
 
 
