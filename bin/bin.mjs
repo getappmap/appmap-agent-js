@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 const routes = new Map([
+  ["init", "../lib/node/init.mjs"],
   ["setup", "../lib/node/setup.mjs"],
   ["run", "../lib/node/batch.mjs"],
   ["version", "../lib/node/version.mjs"],

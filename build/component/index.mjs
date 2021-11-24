@@ -25,4 +25,6 @@ await Promise.all([
   writeNodeAsync("setup", exit_violation),
   writeNodeAsync("validate-mocha", exit_violation),
   writeNodeAsync("loader", exit_violation),
+  writeNodeAsync("init", exit_violation),
+  writeNodeAsync("status", exit_violation),
 ]);
