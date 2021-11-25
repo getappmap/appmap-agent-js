@@ -8,7 +8,7 @@ const routes = new Map([
   ["--version", "../lib/node/version.mjs"],
   ["help", "../lib/node/help.mjs"],
   ["--help", "../lib/node/help.mjs"],
-  ["status", "../lib/node/init.mjs"],
+  ["status", "../lib/node/status.mjs"],
 ]);
 
 let verb = "run";
