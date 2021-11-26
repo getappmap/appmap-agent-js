@@ -19,8 +19,10 @@ export const externals = {
     }
   },
 
-  showResults(s) {
-    process.stdout.write(s);
+  async showResults(s) {
+    return new Promise((resolve) => {
+      process.stdout.end(s, () => resolve());
+    });
   },
 
   getPlatform() {
@@ -78,9 +80,9 @@ export default (dependencies) => {
   return {
     run,
 
-    main: (root) => {
+    main: async (root) => {
       const json = run(root);
-      externals.showResults(json);
+      await externals.showResults(json);
       return true;
     },
   };
