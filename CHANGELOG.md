@@ -1,3 +1,10 @@
+## [8.4.3](https://github.com/applandinc/appmap-agent-js/compare/v8.4.2...v8.4.3) (2021-11-26)
+
+
+### Bug Fixes
+
+* Ensure full result gets written ([0692a2e](https://github.com/applandinc/appmap-agent-js/commit/0692a2ea6b34c251adfd7a76a4adf54d7bfcbd19))
+
 ## [8.4.2](https://github.com/applandinc/appmap-agent-js/compare/v8.4.1...v8.4.2) (2021-11-25)
 
 
