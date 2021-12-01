@@ -23,6 +23,11 @@ export default (dependencies) => {
         return false;
       }
 
+      // Don't descend into node_modules
+      if (basename(item.path) === 'node_modules') {
+        return true;
+      }
+
       if (
         glob.sync(pattern, { cwd: item.path, strict: false, silent: true })
           .length !== 0
@@ -66,13 +71,13 @@ export default (dependencies) => {
       }
     });
 
-    return Array.from(paths);
+    return paths;
   };
 
   const run = (root) => {
-    const dirs = findDirsWithFiles(root, "*.map").concat(
-      findDirsWithFiles(root, "+(*.[tj]s|*.[cm]js)"),
-    );
+    const dirsWithSrc = findDirsWithFiles(root, "*.map");
+    findDirsWithFiles(root, "+(*.[tj]s|*.[cm]js)").forEach((v) => dirsWithSrc.add(v))
+    const dirs = Array.from(dirsWithSrc);
 
     const root_len = root.length;
     const config = {
