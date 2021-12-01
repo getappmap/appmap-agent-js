@@ -30,8 +30,10 @@ Supported platforms:
 
 Run this command in your Node.js project folder (where `package.json` is located): 
 ```sh
-npm install @appland/appmap-agent-js
+npx @appland/appmap install
 ```
+
+You will be guided through a series of steps for installing and configuring the agent.
 
 To use remote recording, and view and interact with recorded AppMaps, we recommend installing the AppMap extension for popular code editors:
 - [AppMap in VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=appland.appmap)
@@ -39,9 +41,9 @@ To use remote recording, and view and interact with recorded AppMaps, we recomme
 
 ### Initial configuration
 
-The agent requires a valid configuration in `appmap.yml` file:
-1. Create a new file called `appmap.yml` in the project folder (where `package.json` is located).
-2. Add your application name and a list of directories that will be recorded. For example:
+The agent requires a valid configuration in `appmap.yml` file. The `install` command creates a default `appmap.yml` 
+file by scanning the project directories. We recommend that you review the generated `appmap.yml` file
+and confirm your application name and a list of directories that will be recorded.
 
 **For projects with JavaScript source maps**: add paths to sources to be recorded. For example:
 
