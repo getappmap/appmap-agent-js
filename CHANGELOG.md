@@ -1,3 +1,10 @@
+# [8.5.0](https://github.com/applandinc/appmap-agent-js/compare/v8.4.4...v8.5.0) (2021-12-02)
+
+
+### Features
+
+* add labels to functions in classmap ([f4a2939](https://github.com/applandinc/appmap-agent-js/commit/f4a2939cbb6cdef1a742d62474639459ae25ea11))
+
 ## [8.4.4](https://github.com/applandinc/appmap-agent-js/compare/v8.4.3...v8.4.4) (2021-12-02)
 
 
