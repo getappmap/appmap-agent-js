@@ -58,23 +58,30 @@ assertDeepEqual(test("({k:{}});", "@", ["comment"]), [
   },
 ]);
 
-assertDeepEqual(test("class c { static m (x) { } }", "@", ["comment"]), [
-  {
-    type: "class",
-    name: "c",
-    children: [
-      {
-        type: "function",
-        name: "m",
-        line: 1,
-        column: 19,
-        static: true,
-        comments: ["comment"],
-        range: [19, 26],
-        parameters: [[20, 21]],
-        labels: [],
-        children: [],
-      },
-    ],
-  },
-]);
+assertDeepEqual(
+  test("class c { static m (x) { } }", "@", [
+    " @label-1 foo @label-2 ",
+    "@label-3",
+    "bar",
+  ]),
+  [
+    {
+      type: "class",
+      name: "c",
+      children: [
+        {
+          type: "function",
+          name: "m",
+          line: 1,
+          column: 19,
+          static: true,
+          comments: [" @label-1 foo @label-2 ", "@label-3", "bar"],
+          range: [19, 26],
+          parameters: [[20, 21]],
+          labels: ["@label-1", "@label-2", "@label-3"],
+          children: [],
+        },
+      ],
+    },
+  ],
+);

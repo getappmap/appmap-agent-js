@@ -8,6 +8,11 @@ export default (dependencies) => {
     util: { hasOwnProperty },
   } = dependencies;
 
+  const extractCommentLabelArray = (comment) => {
+    const labels = comment.match(/@\S+(?=(\s|$))/gu);
+    return labels === null ? [] : labels;
+  };
+
   const { getName } = Naming(dependencies);
 
   const isMaybeNodeKey = (key) =>
@@ -77,6 +82,7 @@ export default (dependencies) => {
           },
         } = node;
         const { naming, getLeadingCommentArray } = context;
+        const comments = getLeadingCommentArray(node);
         return {
           head: {
             type: "function",
@@ -86,12 +92,12 @@ export default (dependencies) => {
               ...concatResult(visit(node.body, node, parent, context)),
             ],
             parameters: node.params.map(({ start, end }) => [start, end]),
-            labels: [],
             static: parent.type === "MethodDefinition" && parent.static,
-            comments: getLeadingCommentArray(node),
             range: [start, end],
             line,
             column,
+            comments,
+            labels: comments.flatMap(extractCommentLabelArray),
           },
           body: [],
         };
