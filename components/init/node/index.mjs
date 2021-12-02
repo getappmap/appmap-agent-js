@@ -9,8 +9,10 @@ const GLOB = "!(node_modules)/";
 
 /* c8 ignore start */
 export const externals = {
-  showResults(str) {
-    process.stdout.write(str);
+  async showResults(s) {
+    return new Promise((resolve) => {
+      process.stdout.end(s, () => resolve());
+    });
   },
 };
 /* c8 ignore stop */
@@ -21,6 +23,11 @@ export default (dependencies) => {
     const hasMatch = (item) => {
       if (!item.stats.isDirectory()) {
         return false;
+      }
+
+      // Don't descend into node_modules
+      if (basename(item.path) === 'node_modules') {
+        return true;
       }
 
       if (
@@ -66,13 +73,13 @@ export default (dependencies) => {
       }
     });
 
-    return Array.from(paths);
+    return paths;
   };
 
   const run = (root) => {
-    const dirs = findDirsWithFiles(root, "*.map").concat(
-      findDirsWithFiles(root, "+(*.[tj]s|*.[cm]js)"),
-    );
+    const dirsWithSrc = findDirsWithFiles(root, "*.map");
+    findDirsWithFiles(root, "+(*.[tj]s|*.[cm]js)").forEach((v) => dirsWithSrc.add(v))
+    const dirs = Array.from(dirsWithSrc);
 
     const root_len = root.length;
     const config = {
@@ -91,9 +98,9 @@ export default (dependencies) => {
   return {
     run,
 
-    main: (root) => {
+    main: async (root) => {
       const json = run(root);
-      externals.showResults(json);
+      await externals.showResults(json);
       return true;
     },
   };
