@@ -26,7 +26,7 @@ export default (dependencies) => {
       }
 
       // Don't descend into node_modules
-      if (basename(item.path) === 'node_modules') {
+      if (basename(item.path) === "node_modules") {
         return true;
       }
 
@@ -78,7 +78,9 @@ export default (dependencies) => {
 
   const run = (root) => {
     const dirsWithSrc = findDirsWithFiles(root, "*.map");
-    findDirsWithFiles(root, "+(*.[tj]s|*.[cm]js)").forEach((v) => dirsWithSrc.add(v))
+    findDirsWithFiles(root, "+(*.[tj]s|*.[cm]js)").forEach((v) =>
+      dirsWithSrc.add(v),
+    );
     const dirs = Array.from(dirsWithSrc);
 
     const root_len = root.length;
