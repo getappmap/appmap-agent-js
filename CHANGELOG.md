@@ -1,3 +1,11 @@
+## [8.4.4](https://github.com/applandinc/appmap-agent-js/compare/v8.4.3...v8.4.4) (2021-12-02)
+
+
+### Bug Fixes
+
+* Correct default config ([af9916c](https://github.com/applandinc/appmap-agent-js/commit/af9916c807aa2602dfe8c1cb4030f7edf42bb7b7))
+* Honor backpressure in init ([82466c2](https://github.com/applandinc/appmap-agent-js/commit/82466c21ed6729c908d97d29497f84d8835d3d53))
+
 ## [8.4.3](https://github.com/applandinc/appmap-agent-js/compare/v8.4.2...v8.4.3) (2021-11-26)
 
 
