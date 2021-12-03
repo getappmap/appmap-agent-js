@@ -1,3 +1,11 @@
+# [8.6.0](https://github.com/applandinc/appmap-agent-js/compare/v8.5.0...v8.6.0) (2021-12-03)
+
+
+### Features
+
+* more advanced function filtering ([448d80f](https://github.com/applandinc/appmap-agent-js/commit/448d80f014ca01d7cea8a353ea81fb758fb37de3))
+* switch default collapse-package-hiearchy to false ([a82dcae](https://github.com/applandinc/appmap-agent-js/commit/a82dcaed2494d688d5f220f211ea64ab44b4e630))
+
 # [8.5.0](https://github.com/applandinc/appmap-agent-js/compare/v8.4.4...v8.5.0) (2021-12-02)
 
 
