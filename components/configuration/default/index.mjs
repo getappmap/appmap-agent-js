@@ -451,7 +451,7 @@ export default (dependencies) => {
       },
       ordering: "causal",
       "function-name-placeholder": "()",
-      "collapse-package-hierachy": true,
+      "collapse-package-hierachy": false,
       serialization: {
         "maximum-length": 96,
         "include-constructor-name": true,
