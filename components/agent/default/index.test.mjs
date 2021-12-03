@@ -50,7 +50,7 @@ assertDeepEqual(
       {
         url: "file:///main.js",
         content: "123;",
-        exclude: [],
+        exclude: createConfiguration("/dummy").exclude,
         shallow: false,
         inline: false,
       },

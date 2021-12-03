@@ -13,6 +13,23 @@ const { createConfiguration, extendConfiguration } =
 const { createInstrumentation, instrument, getInstrumentationIdentifier } =
   Instrumentation(await buildTestDependenciesAsync(import.meta.url));
 
+const and_exclusion = {
+  combinator: "and",
+  name: true,
+  "qualified-name": true,
+  "every-label": true,
+  "some-label": true,
+  excluded: false,
+  recursive: false,
+};
+
+const makeExclusion = (name) => ({
+  ...and_exclusion,
+  "qualified-name": name,
+  excluded: true,
+  recursive: true,
+});
+
 const instrumentation = createInstrumentation(
   extendConfiguration(
     createConfiguration("/"),
@@ -61,7 +78,11 @@ assertEqual(getInstrumentationIdentifier(instrumentation), "$uuid");
           content: "123;",
           shallow: true,
           inline: true,
-          exclude: ["qux", "foo"],
+          exclude: [
+            makeExclusion("foo"),
+            makeExclusion("qux"),
+            ...createConfiguration("/base").exclude,
+          ],
         },
       ],
     },

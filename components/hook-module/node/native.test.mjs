@@ -15,6 +15,7 @@ const {
 
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
 const { testHookAsync } = await buildTestComponentAsync("hook");
+const { createConfiguration } = await buildTestComponentAsync("configuration");
 const { hookNativeModule, unhookNativeModule } = Native(dependencies);
 global.APPMAP_TRANSFORM_MODULE_ASYNC = null;
 assertDeepEqual(
@@ -45,7 +46,7 @@ assertDeepEqual(
         url: import.meta.url,
         content: "123;",
         shallow: true,
-        exclude: [],
+        exclude: createConfiguration("/dummy").exclude,
         inline: false,
       },
     ],

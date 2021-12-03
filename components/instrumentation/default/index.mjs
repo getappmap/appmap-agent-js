@@ -48,7 +48,7 @@ export default (dependencies) => {
               /* c8 ignore start */
               inline: inline === null ? configuration["inline-source"] : inline,
               /* c8 ignore stop */
-              exclude: [...configuration.exclude, ...exclude],
+              exclude: [...exclude, ...configuration.exclude],
             },
           };
         })

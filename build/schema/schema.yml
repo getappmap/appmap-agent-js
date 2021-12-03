@@ -63,12 +63,13 @@
 
 # primitive #
 
+- $id: separator
+  type: string
+  pattern: "^\\P{ID_Continue}$"
+
 - $id: url
   type: string
   pattern: "^[a-z]+://"
-
-- $id: exclusion
-  type: string
 
 - $id: regular-identifier
   type: string
@@ -147,6 +148,51 @@
     - $ref: recording-string
     - $ref: recording-object
 
+# exclusion #
+
+- $id: criteria
+  anyOf:
+    - type: boolean
+    - type: string
+
+- $id: combinator
+  enum:
+    - and
+    - or
+
+- $id: exclude
+  type: array
+  items: {$ref: exclusion}
+
+- $id: exclusion
+  anyOf:
+    - type: string
+    - type: object
+      properties:
+        combinator: {$ref: combinator}
+        qualified-name: {$ref: criteria}
+        name: {$ref: criteria}
+        every-label: {$ref: criteria}
+        some-label: {$ref: criteria}
+        excluded: {type: boolean}
+        recursive: {type: boolean}
+
+- $id: cooked-exclude
+  type: array
+  items: {$ref: cooked-exclusion}
+
+- $id: cooked-exclusion
+  type: object
+  required: [combinator, qualified-name, name, every-label, some-label, excluded, recursive]
+  properties:
+    combinator: {$ref: combinator}
+    qualified-name: {$ref: criteria}
+    name: {$ref: criteria}
+    every-label: {$ref: criteria}
+    some-label: {$ref: criteria}
+    excluded: {type: boolean}
+    recursive: {type: boolean}
+
 # other #
 
 - $id: package
@@ -159,10 +205,6 @@
     homepage:
       type: string
       nullable: true
-
-- $id: exclude
-  type: array
-  items: {$ref: exclusion}
 
 - $id: stdio
   anyOf:
@@ -379,6 +421,7 @@
           items: {$ref: package-specifier}
     exclude: {$ref: exclude}
     # recording
+    anonymous-name-separator: {$ref: separator}
     function-name-placeholder: {type: string}
     collapse-package-hierachy: {type: boolean}
     recording: {$ref: recording}
@@ -521,9 +564,10 @@
               inline-source:
                 type: boolean
                 nullable: true
-              exclude: {$ref: exclude}
-    exclude: {$ref: exclude}
+              exclude: {$ref: cooked-exclude}
+    exclude: {$ref: cooked-exclude}
     # recording
+    anonymous-name-separator: {$ref: separator}
     function-name-placeholder: {type: string}
     collapse-package-hierachy: {type: boolean}
     recording:
@@ -621,7 +665,7 @@
     inline: {type: boolean}
     exclude:
       type: array
-      items: {type: string}
+      items: {$ref: cooked-exclusion}
 
 - $id: message
   anyOf:

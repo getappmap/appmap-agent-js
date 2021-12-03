@@ -2,6 +2,8 @@ const { isArray } = Array;
 const { ownKeys } = Reflect;
 const { entries: toEntries } = Object;
 
+const ANONYMOUS_NAME_SEPARATOR = "-";
+
 export default (dependencies) => {
   const {
     util: { coalesce, assert, identity, toAbsolutePath, hasOwnProperty },
@@ -36,6 +38,29 @@ export default (dependencies) => {
   ///////////////
   // Normalize //
   ///////////////
+
+  const normalizeExclusion = (exclusion, nullable_directory) => {
+    if (typeof exclusion === "string") {
+      exclusion = {
+        "qualified-name": exclusion,
+        recursive: true,
+      };
+    }
+    const default_value = coalesce(exclusion, "combinator", "and") === "and";
+    return {
+      combinator: "and",
+      "qualified-name": default_value,
+      name: default_value,
+      "every-label": default_value,
+      "some-label": default_value,
+      excluded: true,
+      recursive: false,
+      ...exclusion,
+    };
+  };
+
+  const normalizeExclude = (exclusions, nullable_directory) =>
+    exclusions.map(normalizeExclusion);
 
   const normalizeCommand = (command, nullable_directory) => {
     assert(
@@ -137,7 +162,12 @@ export default (dependencies) => {
     };
     return [
       createSpecifier(nullable_directory, rest),
-      { enabled, "inline-source": inline, shallow, exclude },
+      {
+        enabled,
+        "inline-source": inline,
+        shallow,
+        exclude: exclude.map(normalizeExclusion),
+      },
     ];
   };
 
@@ -307,7 +337,7 @@ export default (dependencies) => {
     },
     exclude: {
       extend: prepend,
-      normalize: identity,
+      normalize: normalizeExclude,
     },
     recording: {
       extend: overwrite,
@@ -433,19 +463,6 @@ export default (dependencies) => {
         version: "2020",
       },
       packages: [
-        // [
-        //   {
-        //     cwd: home,
-        //     source: "(^\\.\\.)|((^|/)node_modules/)",
-        //     flags: "u",
-        //   },
-        //   {
-        //     enabled: false,
-        //     shallow: true,
-        //     exclude: [],
-        //     "inline-source": null,
-        //   },
-        // ],
         [
           {
             cwd: home,
@@ -460,7 +477,27 @@ export default (dependencies) => {
           },
         ],
       ],
-      exclude: [],
+      "anonymous-name-separator": ANONYMOUS_NAME_SEPARATOR,
+      exclude: [
+        {
+          combinator: "and",
+          name: ANONYMOUS_NAME_SEPARATOR,
+          "qualified-name": true,
+          "every-label": true,
+          "some-label": "^",
+          excluded: true,
+          recursive: false,
+        },
+        {
+          combinator: "or",
+          name: true,
+          "qualified-name": true,
+          "every-label": true,
+          "some-label": true,
+          excluded: false,
+          recursive: false,
+        },
+      ],
       pruning: true,
       name: null,
       "map-name": null,

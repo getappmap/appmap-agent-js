@@ -1,7 +1,7 @@
 /* globals URL */
 
 import Estree from "./estree/index.mjs";
-import Exclusion from "./exclusion.mjs";
+import ExclusionList from "./exclusion-list.mjs";
 
 const _Set = Set;
 const _Map = Map;
@@ -20,7 +20,8 @@ export default (dependencies) => {
       incrementLocationColumn,
     },
   } = dependencies;
-  const { createExclusion, isExcluded } = Exclusion(dependencies);
+  const { compileExclusionList, matchExclusionList } =
+    ExclusionList(dependencies);
   const printCommentArray = (comments) => {
     /* c8 ignore start */
     const { length } = comments;
@@ -38,31 +39,35 @@ export default (dependencies) => {
     (content) =>
     ([start, end]) =>
       content.substring(start, end);
-  const excludeEntity = (entity, parent, exclusion, excluded) => {
-    if (isExcluded(exclusion, entity, parent)) {
-      excluded.push(entity);
+  const excludeEntity = (entity, parent, exclusions, excluded_entities) => {
+    const { excluded, recursive } = matchExclusionList(
+      exclusions,
+      entity,
+      parent,
+    );
+    if (excluded && recursive) {
+      const exclude = (entity) => {
+        excluded_entities.push(entity);
+        entity.children.forEach(exclude);
+      };
+      exclude(entity);
+      return [];
+    }
+    const children = entity.children.flatMap((child) =>
+      excludeEntity(child, entity, exclusions, excluded_entities),
+    );
+    if (excluded && children.length === 0) {
+      excluded_entities.push(entity);
       return [];
     }
     return [
       {
         ...entity,
-        children: entity.children.flatMap((child) =>
-          excludeEntity(child, entity, exclusion, excluded),
-        ),
+        children,
       },
     ];
   };
-  const registerExcludedEntityArray = (entities, { url }, closures) => {
-    const registerExcludedEntity = (entity) => {
-      const { type, children } = entity;
-      if (type === "function") {
-        const { line, column } = entity;
-        closures.set(stringifyLocation(makeLocation(url, line, column)), null);
-      }
-      children.forEach(registerExcludedEntity);
-    };
-    entities.forEach(registerExcludedEntity);
-  };
+
   const registerEntityArray = (
     entities,
     { content, shallow, placeholder, path, url },
@@ -183,12 +188,21 @@ export default (dependencies) => {
       const { pathname } = new _URL(url);
       const path = toRelativePath(directory, pathname);
       const context = { url, path, shallow, inline, content, placeholder };
-      const exclusion = createExclusion(exclude);
-      const excluded = [];
+      const exclusions = compileExclusionList(exclude);
+      const excluded_entities = [];
       let entities = extractEstreeEntityArray(path, content, naming).flatMap(
-        (entity) => excludeEntity(entity, null, exclusion, excluded),
+        (entity) => excludeEntity(entity, null, exclusions, excluded_entities),
       );
-      registerExcludedEntityArray(excluded, context, closures);
+      for (const entity of excluded_entities) {
+        const { type } = entity;
+        if (type === "function") {
+          const { line, column } = entity;
+          closures.set(
+            stringifyLocation(makeLocation(url, line, column)),
+            null,
+          );
+        }
+      }
       registerEntityArray(entities, context, closures);
       if (pruning) {
         entities = entities.flatMap(cleanupEntity);

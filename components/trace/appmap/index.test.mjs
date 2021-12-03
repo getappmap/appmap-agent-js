@@ -47,7 +47,17 @@ assertDeepEqual(
         url: "file:///cwd/filename.js",
         content: "function f (x) {}",
         shallow: false,
-        exclude: [],
+        exclude: [
+          {
+            combinator: "or",
+            "every-label": true,
+            "some-label": true,
+            "qualified-name": true,
+            name: true,
+            excluded: false,
+            recursive: true,
+          },
+        ],
         inline: false,
       },
     ],

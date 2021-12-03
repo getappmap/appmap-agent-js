@@ -61,7 +61,7 @@ assertEqual(
         {
           url: "file://filename.js",
           content: "123;",
-          exclude: [],
+          exclude: createConfiguration("/bar").exclude,
           shallow: false,
           inline: false,
         },

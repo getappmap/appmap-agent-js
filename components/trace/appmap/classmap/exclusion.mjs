@@ -1,17 +1,16 @@
 const _Map = Map;
-const _Set = Set;
 const _RegExp = RegExp;
+
+const { from: toArray } = Array;
 
 const cache = new _Map();
 
-const regexp =
-  /^(\p{ID_Start}\p{ID_Continue}*[#.])?\p{ID_Start}\p{ID_Continue}*$/u;
-
 export default (dependencies) => {
   const {
-    util: { assert },
+    util: { assert, generateGet },
   } = dependencies;
-  const getName = (entity, parent) => {
+
+  const getQualifiedName = (entity, parent) => {
     if (entity.type === "class") {
       return entity.name;
     }
@@ -26,33 +25,58 @@ export default (dependencies) => {
     }
     assert(false, "getName called on invalid entity");
   };
+  const criteria = new _Map([
+    ["name", (pattern, { name }, parent) => cache.get(pattern)(name)],
+    [
+      "qualified-name",
+      (pattern, entity, parent) =>
+        cache.get(pattern)(getQualifiedName(entity, parent)),
+    ],
+    [
+      "some-label",
+      (pattern, { type, labels }, parent) =>
+        type !== "function" || labels.some(cache.get(pattern)),
+    ],
+    [
+      "every-label",
+      (pattern, { type, labels }, parent) =>
+        type !== "function" || labels.every(cache.get(pattern)),
+    ],
+  ]);
+  const criteria_name_array = toArray(criteria.keys());
   return {
-    createExclusion: (inputs) => {
-      const names = new _Set();
-      const regexps = new _Set();
-      for (let input of inputs) {
-        if (regexp.test(input)) {
-          names.add(input);
-        } else {
-          if (!cache.has(input)) {
-            cache.set(input, new _RegExp(input, "u"));
+    compileExclusion: (exclusion) => {
+      for (const name of criteria_name_array) {
+        const pattern = exclusion[name];
+        if (typeof pattern === "string") {
+          if (!cache.has(pattern)) {
+            const regexp = new _RegExp(pattern, "u");
+            cache.set(pattern, (target) => regexp.test(target));
           }
-          regexps.add(cache.get(input));
         }
       }
-      return { names, regexps };
+      return exclusion;
     },
-    isExcluded: ({ names, regexps }, entity, parent) => {
-      const name = getName(entity, parent);
-      if (names.has(name)) {
-        return true;
-      }
-      for (const regexp of regexps) {
-        if (regexp.test(name)) {
-          return true;
+    isExclusionMatched: (exclusion, entity, parent) => {
+      const isCriterionSatisfied = (name) => {
+        const pattern = exclusion[name];
+        if (typeof pattern === "boolean") {
+          return pattern;
         }
+        if (typeof pattern === "string") {
+          return criteria.get(name)(pattern, entity, parent);
+        }
+        assert(false, "invalid pattern type");
+      };
+      if (exclusion.combinator === "and") {
+        return criteria_name_array.every(isCriterionSatisfied);
       }
-      return false;
+      if (exclusion.combinator === "or") {
+        return criteria_name_array.some(isCriterionSatisfied);
+      }
+      assert(false, "invalid exclusion combinator");
     },
+    isExcluded: generateGet("excluded"),
+    isRecursivelyExclued: generateGet("recursive"),
   };
 };

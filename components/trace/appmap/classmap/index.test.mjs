@@ -23,6 +23,26 @@ const cwd = "/cwd";
 
 const placeholder = "$";
 
+const and_exclude = {
+  combinator: "and",
+  "qualified-name": true,
+  name: true,
+  "every-label": true,
+  "some-label": true,
+  excluded: false,
+  recursive: false,
+};
+
+// const or_exclude = {
+//   combinator: "or",
+//   "qualified-name": false,
+//   name: false,
+//   "every-label": false,
+//   "some-label": false,
+//   excluded: false,
+//   recursive: false,
+// };
+
 {
   const classmap = createClassmap(
     extendConfiguration(
@@ -39,9 +59,23 @@ const placeholder = "$";
   addClassmapSource(classmap, {
     url: `file://${cwd}/directory/function.js`,
     content:
-      "const o = { f: \n function (x) {} , g: \n function (y) {} , h: \n function (z) {} }; const p = {};",
+      "const o = { f: \n function (x) {} , g: \n function (y) {} , h: \n function (z) {} , i : \n function (t) { function j () {} } }; const p = {};",
     inline: false,
-    exclude: ["o.g"],
+    exclude: [
+      {
+        ...and_exclude,
+        "qualified-name": "^o\\.g$",
+        excluded: true,
+        recursive: false,
+      },
+      {
+        ...and_exclude,
+        "qualified-name": "^o\\.i$",
+        excluded: true,
+        recursive: true,
+      },
+      and_exclude,
+    ],
     shallow: true,
   });
 
@@ -133,7 +167,7 @@ const placeholder = "$";
     content:
       "function f () {} /* comment1 */ \n function g () {} /* comment2 */ /* comment3 */ \n function h () {}",
     inline: true,
-    exclude: [],
+    exclude: [and_exclude],
     shallow: false,
   });
 

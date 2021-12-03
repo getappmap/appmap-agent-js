@@ -20,6 +20,7 @@ const {
 } = Assert;
 
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
+const { createConfiguration } = await buildTestComponentAsync("configuration");
 const { testHookAsync } = await buildTestComponentAsync("hook");
 const { hookCommonModule, unhookCommonModule } = Common(dependencies);
 const require = createRequire(`${cwd()}/dummy.js`);
@@ -68,7 +69,7 @@ assertDeepEqual(
       {
         url: `file://${resolved_path}`,
         content: "module.exports = 123;",
-        exclude: [],
+        exclude: createConfiguration("/dummy").exclude,
         shallow: true,
         inline: false,
       },

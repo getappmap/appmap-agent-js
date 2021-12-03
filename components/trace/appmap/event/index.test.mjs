@@ -27,7 +27,17 @@ const { compileEventTrace } = Event(dependencies);
     url: "file:///cwd/filename.js",
     content: "function f (x) {}",
     inline: false,
-    exclude: [],
+    exclude: [
+      {
+        combinator: "or",
+        "every-label": true,
+        "some-label": true,
+        "qualified-name": true,
+        name: true,
+        excluded: false,
+        recursive: true,
+      },
+    ],
     shallow: true,
   });
   const begin_apply_event = {

@@ -163,3 +163,18 @@ assertDeepEqual(extend("command", "node main.js", "/cwd"), {
   value: "node main.js",
   cwd: "/cwd",
 });
+
+// exclude //
+
+assertDeepEqual(extend("exclude", ["foo\\.bar"], null), [
+  {
+    combinator: "and",
+    "every-label": true,
+    "some-label": true,
+    name: true,
+    "qualified-name": "foo\\.bar",
+    excluded: true,
+    recursive: true,
+  },
+  ...createConfiguration("/base").exclude,
+]);
