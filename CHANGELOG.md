@@ -1,3 +1,10 @@
+## [8.6.3](https://github.com/applandinc/appmap-agent-js/compare/v8.6.2...v8.6.3) (2021-12-04)
+
+
+### Bug Fixes
+
+* log instead of crash on location url which contain hash ([5dd1c4b](https://github.com/applandinc/appmap-agent-js/commit/5dd1c4b3b28a8baaf52ecb36437636d9f5d543df))
+
 ## [8.6.2](https://github.com/applandinc/appmap-agent-js/compare/v8.6.1...v8.6.2) (2021-12-04)
 
 
