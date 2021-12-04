@@ -4,150 +4,143 @@ import Specifier from "./index.mjs";
 
 const { equal: assertEqual, throws: assertThrows } = Assert;
 
-const testAsync = async () => {
-  const { createSpecifier, matchSpecifier } = Specifier(
-    await buildTestDependenciesAsync(import.meta.url),
-  );
+const { createSpecifier, matchSpecifier } = Specifier(
+  await buildTestDependenciesAsync(import.meta.url),
+);
 
-  assertThrows(
-    () => createSpecifier("/foo", {}),
-    /^AssertionError: invalid specifier options/,
-  );
+assertThrows(
+  () => createSpecifier("/foo", {}),
+  /^AssertionError: invalid specifier options/,
+);
 
-  ////////////
-  // regexp //
-  ////////////
+////////////
+// regexp //
+////////////
 
-  assertEqual(
-    matchSpecifier(createSpecifier("/foo", { regexp: "^bar" }), "/foo/bar.js"),
-    true,
-  );
+assertEqual(
+  matchSpecifier(createSpecifier("/foo", { regexp: "^bar" }), "/foo/bar.js"),
+  true,
+);
 
-  assertEqual(
-    matchSpecifier(createSpecifier("/foo", { regexp: "^bar" }), "/qux/bar"),
-    false,
-  );
+assertEqual(
+  matchSpecifier(createSpecifier("/foo", { regexp: "^bar" }), "/qux/bar"),
+  false,
+);
 
-  //////////
-  // glob //
-  //////////
+//////////
+// glob //
+//////////
 
-  // normal //
+// normal //
 
-  assertEqual(
-    matchSpecifier(createSpecifier("/foo", { glob: "*.js" }), "/foo/bar.js"),
-    true,
-  );
+assertEqual(
+  matchSpecifier(createSpecifier("/foo", { glob: "*.js" }), "/foo/bar.js"),
+  true,
+);
 
-  assertEqual(
-    matchSpecifier(
-      createSpecifier("/foo", { glob: "*.js" }),
-      "/foo/bar/qux.js",
-    ),
-    false,
-  );
+assertEqual(
+  matchSpecifier(createSpecifier("/foo", { glob: "*.js" }), "/foo/bar/qux.js"),
+  false,
+);
 
-  assertEqual(
-    matchSpecifier(
-      createSpecifier("/foo", { glob: "**/*.js" }),
-      "/foo/bar/qux.js",
-    ),
-    true,
-  );
+assertEqual(
+  matchSpecifier(
+    createSpecifier("/foo", { glob: "**/*.js" }),
+    "/foo/bar/qux.js",
+  ),
+  true,
+);
 
-  assertEqual(
-    matchSpecifier(
-      createSpecifier("/foo", { glob: "**/*.js" }),
-      "/foo/../bar.js",
-    ),
-    false,
-  );
+assertEqual(
+  matchSpecifier(
+    createSpecifier("/foo", { glob: "**/*.js" }),
+    "/foo/../bar.js",
+  ),
+  false,
+);
 
-  //////////
-  // Path //
-  //////////
+//////////
+// Path //
+//////////
 
-  // file //
+// file //
 
-  assertEqual(
-    matchSpecifier(createSpecifier("/foo", { path: "bar.js" }), "/foo/bar.js"),
-    true,
-  );
+assertEqual(
+  matchSpecifier(createSpecifier("/foo", { path: "bar.js" }), "/foo/bar.js"),
+  true,
+);
 
-  // directory //
+// directory //
 
-  assertEqual(
-    matchSpecifier(createSpecifier("/foo", { path: "bar" }), "/foo/bar/qux.js"),
-    true,
-  );
+assertEqual(
+  matchSpecifier(createSpecifier("/foo", { path: "bar" }), "/foo/bar/qux.js"),
+  true,
+);
 
-  // recursive //
+// recursive //
 
-  assertEqual(
-    matchSpecifier(
-      createSpecifier("/foo", { path: "bar", recursive: false }),
-      "/foo/bar/qux/buz.js",
-    ),
-    false,
-  );
+assertEqual(
+  matchSpecifier(
+    createSpecifier("/foo", { path: "bar", recursive: false }),
+    "/foo/bar/qux/buz.js",
+  ),
+  false,
+);
 
-  assertEqual(
-    matchSpecifier(
-      createSpecifier("/foo", { path: "bar", recursive: true }),
-      "/foo/bar/qux/buz.js",
-    ),
-    true,
-  );
+assertEqual(
+  matchSpecifier(
+    createSpecifier("/foo", { path: "bar", recursive: true }),
+    "/foo/bar/qux/buz.js",
+  ),
+  true,
+);
 
-  //////////
-  // Dist //
-  //////////
+//////////
+// Dist //
+//////////
 
-  // normal //
+// normal //
 
-  assertEqual(
-    matchSpecifier(
-      createSpecifier("/foo", { dist: "bar" }),
-      "/foo/node_modules/bar/qux.js",
-    ),
-    true,
-  );
+assertEqual(
+  matchSpecifier(
+    createSpecifier("/foo", { dist: "bar" }),
+    "/foo/node_modules/bar/qux.js",
+  ),
+  true,
+);
 
-  // recursive //
+// recursive //
 
-  assertEqual(
-    matchSpecifier(
-      createSpecifier("/foo", { dist: "bar", recursive: false }),
-      "/foo/node_modules/bar/qux/buz.js",
-    ),
-    false,
-  );
+assertEqual(
+  matchSpecifier(
+    createSpecifier("/foo", { dist: "bar", recursive: false }),
+    "/foo/node_modules/bar/qux/buz.js",
+  ),
+  false,
+);
 
-  assertEqual(
-    matchSpecifier(
-      createSpecifier("/foo", { dist: "bar", recursive: true }),
-      "/foo/node_modules/bar/qux/buz.js",
-    ),
-    true,
-  );
+assertEqual(
+  matchSpecifier(
+    createSpecifier("/foo", { dist: "bar", recursive: true }),
+    "/foo/node_modules/bar/qux/buz.js",
+  ),
+  true,
+);
 
-  // external //
+// external //
 
-  assertEqual(
-    matchSpecifier(
-      createSpecifier("/foo", { dist: "bar" }),
-      "/node_modules/bar/qux.js",
-    ),
-    false,
-  );
+assertEqual(
+  matchSpecifier(
+    createSpecifier("/foo", { dist: "bar" }),
+    "/node_modules/bar/qux.js",
+  ),
+  false,
+);
 
-  assertEqual(
-    matchSpecifier(
-      createSpecifier("/foo", { dist: "bar", external: true }),
-      "/node_modules/bar/qux.js",
-    ),
-    true,
-  );
-};
-
-testAsync();
+assertEqual(
+  matchSpecifier(
+    createSpecifier("/foo", { dist: "bar", external: true }),
+    "/node_modules/bar/qux.js",
+  ),
+  true,
+);

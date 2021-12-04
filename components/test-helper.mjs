@@ -6,7 +6,6 @@ import glob from "glob";
 
 import Mocha from "mocha";
 
-
 export default (meta_url) => {
   // Instantiate a Mocha with options
   const mocha = new Mocha({
@@ -21,5 +20,8 @@ export default (meta_url) => {
   mocha
     .loadFilesAsync()
     .then(() => mocha.run((failures) => (process.exitCode = failures ? 1 : 0)))
-    .catch((e) => {console.error(e); process.exitCode = 1});
+    .catch((e) => {
+      console.error(e);
+      process.exitCode = 1;
+    });
 };

@@ -1,4 +1,8 @@
-import { readFile as readFileAsync, writeFile as writeFileAsync, mkdir as mkdirAsync } from "fs/promises";
+import {
+  readFile as readFileAsync,
+  writeFile as writeFileAsync,
+  mkdir as mkdirAsync,
+} from "fs/promises";
 import { fileURLToPath } from "url";
 import { dirname as getDirname } from "path";
 import YAML from "yaml";
@@ -15,7 +19,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = getDirname(__filename);
 
 await new Promise((resolve, reject) => {
-  const child = spawn("rm", ["-rf", "./dist"], {stdio:"inherit"});
+  const child = spawn("rm", ["-rf", "./dist"], { stdio: "inherit" });
   child.on("error", reject);
   child.on("exit", (code, signal) => {
     if (signal !== null) {
@@ -32,7 +36,9 @@ await mkdirAsync("./dist");
 
 await mkdirAsync("./dist/node");
 
-const schema = parseYAML(await readFileAsync(`${__dirname}/schema.yml`, "utf8"));
+const schema = parseYAML(
+  await readFileAsync(`${__dirname}/schema.yml`, "utf8"),
+);
 
 const ajv = new Ajv({ code: { source: true }, verbose: true });
 // {code:{source:true}, verbose:true}

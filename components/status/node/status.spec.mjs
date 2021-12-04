@@ -19,7 +19,9 @@ describe("the status command", () => {
 
     // Make sure we got them all, notCalled will be undefined if the function
     // hasn't been replaced.
-    Object.keys(externals).forEach((k) => { assert(externals[k].notCalled, `${k} unstubbed`) })
+    Object.keys(externals).forEach((k) => {
+      assert(externals[k].notCalled, `${k} unstubbed`);
+    });
   });
 
   afterEach(() => {
@@ -58,7 +60,7 @@ describe("the status command", () => {
         message: `Unsupported node version ${node_version}`,
       });
     });
-    
+
     describe("mocha support", () => {
       it("calls lsPackage, handles missing mocha", () => {
         externals.lsPackage = sinon.stub().returns("{}");

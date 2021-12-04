@@ -12,19 +12,15 @@ const {
   deepEqual: assertDeepEqual,
 } = Assert;
 
-const testAsync = async () => {
-  const dependencies = await buildTestDependenciesAsync(import.meta.url);
-  const { testHookAsync } = await buildTestComponentAsync("hook");
-  const { hookQuery, unhookQuery } = HookModule(dependencies);
-  assertDeepEqual(
-    await testHookAsync(
-      hookQuery,
-      unhookQuery,
-      { hooks: { cjs: false, esm: false } },
-      async (frontend) => null,
-    ),
-    { sources: [], events: [] },
-  );
-};
-
-testAsync();
+const dependencies = await buildTestDependenciesAsync(import.meta.url);
+const { testHookAsync } = await buildTestComponentAsync("hook");
+const { hookQuery, unhookQuery } = HookModule(dependencies);
+assertDeepEqual(
+  await testHookAsync(
+    hookQuery,
+    unhookQuery,
+    { hooks: { cjs: false, esm: false } },
+    async (frontend) => null,
+  ),
+  { sources: [], events: [] },
+);

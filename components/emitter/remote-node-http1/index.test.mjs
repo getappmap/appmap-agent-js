@@ -32,70 +32,66 @@ const testCaseAsync = async (port, respond, runAsync) => {
   });
 };
 
-const testAsync = async () => {
-  const { createClient, executeClientAsync, interruptClient, traceClient } =
-    Client(await buildTestDependenciesAsync(import.meta.url));
-  // happy path (unix-domain-socket) //
-  {
-    let buffer = [];
-    await testCaseAsync(
-      `${tmpdir()}/${Math.random().toString("36").substring(2)}`,
-      (body, response) => {
-        buffer.push(body);
-        response.writeHead(200);
-        response.end();
-      },
-      async (port) => {
-        const client = createClient({ host: "localhost", port });
-        setTimeout(() => {
-          traceClient(client, 123);
-          interruptClient(client);
-        });
-        await executeClientAsync(client);
-      },
-    );
-    assertDeepEqual(buffer, [{ head: "uuid", body: 123 }]);
-  }
-  // http echec status //
+const { createClient, executeClientAsync, interruptClient, traceClient } =
+  Client(await buildTestDependenciesAsync(import.meta.url));
+// happy path (unix-domain-socket) //
+{
+  let buffer = [];
   await testCaseAsync(
-    0,
+    `${tmpdir()}/${Math.random().toString("36").substring(2)}`,
     (body, response) => {
-      response.writeHead(400);
+      buffer.push(body);
+      response.writeHead(200);
       response.end();
     },
     async (port) => {
       const client = createClient({ host: "localhost", port });
       setTimeout(() => {
         traceClient(client, 123);
+        interruptClient(client);
       });
-      try {
-        await executeClientAsync(client);
-        assertFail();
-      } catch ({ message }) {
-        assertEqual(message, "http1 echec status code: 400");
-      }
+      await executeClientAsync(client);
     },
   );
-  // non-empty response body //
-  await testCaseAsync(
-    0,
-    (body, response) => {
-      response.writeHead(200);
-      response.end("foo", "utf8");
-    },
-    async (port) => {
-      const client = createClient({ host: "localhost", port });
-      setTimeout(() => {
-        traceClient(client, 123);
-      });
-      try {
-        await executeClientAsync(client);
-        assertFail();
-      } catch ({ message }) {
-        assertEqual(message, "non empty http1 response body");
-      }
-    },
-  );
-};
-
-testAsync();
+  assertDeepEqual(buffer, [{ head: "uuid", body: 123 }]);
+}
+// http echec status //
+await testCaseAsync(
+  0,
+  (body, response) => {
+    response.writeHead(400);
+    response.end();
+  },
+  async (port) => {
+    const client = createClient({ host: "localhost", port });
+    setTimeout(() => {
+      traceClient(client, 123);
+    });
+    try {
+      await executeClientAsync(client);
+      assertFail();
+    } catch ({ message }) {
+      assertEqual(message, "http1 echec status code: 400");
+    }
+  },
+);
+// non-empty response body //
+await testCaseAsync(
+  0,
+  (body, response) => {
+    response.writeHead(200);
+    response.end("foo", "utf8");
+  },
+  async (port) => {
+    const client = createClient({ host: "localhost", port });
+    setTimeout(() => {
+      traceClient(client, 123);
+    });
+    try {
+      await executeClientAsync(client);
+      assertFail();
+    } catch ({ message }) {
+      assertEqual(message, "non empty http1 response body");
+    }
+  },
+);

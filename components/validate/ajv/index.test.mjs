@@ -4,16 +4,12 @@ import Validation from "./index.mjs";
 
 const { throws: assertThrows } = Assert;
 
-const testAsync = async () => {
-  const { validateConfig } = Validation(
-    await buildTestDependenciesAsync(import.meta.url),
-  );
-  assertThrows(() => {
-    validateConfig({ mode: "invalid-mode" });
-  }, /^AppmapError: invalid configuration\n/u);
-  assertThrows(() => {
-    validateConfig({ engine: "invalid-engine-format" });
-  }, /^AppmapError: invalid configuration\n/u);
-};
-
-testAsync();
+const { validateConfig } = Validation(
+  await buildTestDependenciesAsync(import.meta.url),
+);
+assertThrows(() => {
+  validateConfig({ mode: "invalid-mode" });
+}, /^AppmapError: invalid configuration\n/u);
+assertThrows(() => {
+  validateConfig({ engine: "invalid-engine-format" });
+}, /^AppmapError: invalid configuration\n/u);

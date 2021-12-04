@@ -32,71 +32,67 @@ const testCaseAsync = async (port, respond, runAsync) => {
   });
 };
 
-const testAsync = async () => {
-  const { createClient, executeClientAsync, interruptClient, traceClient } =
-    Client(await buildTestDependenciesAsync(import.meta.url));
-  // happy path (unix-domain-socket) //
-  {
-    let buffer = [];
-    await testCaseAsync(
-      `${tmpdir()}/${Math.random().toString("36").substring(2)}`,
-      (body, stream) => {
-        buffer.push(body);
-        stream.respond({ ":status": 200 });
-        stream.end();
-      },
-      async (port) => {
-        const client = createClient({ host: "localhost", port });
-        setTimeout(() => {
-          traceClient(client, 123);
-          interruptClient(client);
-        });
-        await executeClientAsync(client);
-      },
-    );
-    assertDeepEqual(buffer, [123]);
-  }
-  // http echec status //
+const { createClient, executeClientAsync, interruptClient, traceClient } =
+  Client(await buildTestDependenciesAsync(import.meta.url));
+// happy path (unix-domain-socket) //
+{
+  let buffer = [];
   await testCaseAsync(
-    0,
+    `${tmpdir()}/${Math.random().toString("36").substring(2)}`,
     (body, stream) => {
-      stream.respond({ ":status": 400 });
-      stream.end();
-    },
-    async (port) => {
-      const client = createClient({ host: "localhost", port });
-      setTimeout(() => {
-        traceClient(client, 123);
-      });
-      try {
-        await executeClientAsync(client);
-        assertFail();
-      } catch ({ message }) {
-        assertEqual(message, "http2 echec status code: 400");
-      }
-    },
-  );
-  // non-empty response body //
-  await testCaseAsync(
-    0,
-    (body, stream) => {
+      buffer.push(body);
       stream.respond({ ":status": 200 });
-      stream.write("unwanted-response-body", "utf8");
       stream.end();
     },
     async (port) => {
       const client = createClient({ host: "localhost", port });
       setTimeout(() => {
         traceClient(client, 123);
+        interruptClient(client);
       });
-      try {
-        await executeClientAsync(client);
-        assertFail();
-      } catch ({ message }) {
-        assertEqual(message, "non empty http2 response body");
-      }
+      await executeClientAsync(client);
     },
   );
-};
-
-testAsync();
+  assertDeepEqual(buffer, [123]);
+}
+// http echec status //
+await testCaseAsync(
+  0,
+  (body, stream) => {
+    stream.respond({ ":status": 400 });
+    stream.end();
+  },
+  async (port) => {
+    const client = createClient({ host: "localhost", port });
+    setTimeout(() => {
+      traceClient(client, 123);
+    });
+    try {
+      await executeClientAsync(client);
+      assertFail();
+    } catch ({ message }) {
+      assertEqual(message, "http2 echec status code: 400");
+    }
+  },
+);
+// non-empty response body //
+await testCaseAsync(
+  0,
+  (body, stream) => {
+    stream.respond({ ":status": 200 });
+    stream.write("unwanted-response-body", "utf8");
+    stream.end();
+  },
+  async (port) => {
+    const client = createClient({ host: "localhost", port });
+    setTimeout(() => {
+      traceClient(client, 123);
+    });
+    try {
+      await executeClientAsync(client);
+      assertFail();
+    } catch ({ message }) {
+      assertEqual(message, "non empty http2 response body");
+    }
+  },
+);

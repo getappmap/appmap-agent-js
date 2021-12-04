@@ -178,58 +178,54 @@ const proceedAsync = async () => {
   }
 };
 
-const testAsync = async () => {
-  if (Reflect.getOwnPropertyDescriptor(process.env, "TRAVIS")) {
-    proceedAsync();
-  } else {
-    assertDeepEqual(
-      await promiseTermination(
-        spawn(
-          "initdb",
-          [
-            "--no-locale",
-            "--encoding",
-            "UTF-8",
-            "--pgdata",
-            path,
-            "--username",
-            user,
-          ],
-          { stdio: "inherit" },
-        ),
+if (Reflect.getOwnPropertyDescriptor(process.env, "TRAVIS")) {
+  proceedAsync();
+} else {
+  assertDeepEqual(
+    await promiseTermination(
+      spawn(
+        "initdb",
+        [
+          "--no-locale",
+          "--encoding",
+          "UTF-8",
+          "--pgdata",
+          path,
+          "--username",
+          user,
+        ],
+        { stdio: "inherit" },
       ),
-      { signal: null, status: 0 },
-    );
-    const child = spawn("postgres", ["-D", path, "-p", String(port)], {
-      stdio: "inherit",
+    ),
+    { signal: null, status: 0 },
+  );
+  const child = spawn("postgres", ["-D", path, "-p", String(port)], {
+    stdio: "inherit",
+  });
+  const termination = promiseTermination(child);
+  while (
+    /* eslint-disable no-constant-condition */ true /* eslint-enable no-constant-condition */
+  ) {
+    await new Promise((resolve) => {
+      setTimeout(resolve, 1000);
     });
-    const termination = promiseTermination(child);
-    while (
-      /* eslint-disable no-constant-condition */ true /* eslint-enable no-constant-condition */
-    ) {
-      await new Promise((resolve) => {
-        setTimeout(resolve, 1000);
-      });
-      const { status, signal } = await promiseTermination(
-        spawn(
-          "pg_isready",
-          ["-U", user, "-p", String(port), "-d", "postgres", "-t", "0"],
-          { stdio: "inherit" },
-        ),
-      );
-      assertEqual(signal, null);
-      if (status === 0) {
-        break;
-      }
-    }
-    try {
-      await proceedAsync();
-    } finally {
-      child.kill("SIGTERM");
-      await termination;
-      await promiseTermination(spawn("/bin/sh", ["-c", `rm -rf ${path}$`]));
+    const { status, signal } = await promiseTermination(
+      spawn(
+        "pg_isready",
+        ["-U", user, "-p", String(port), "-d", "postgres", "-t", "0"],
+        { stdio: "inherit" },
+      ),
+    );
+    assertEqual(signal, null);
+    if (status === 0) {
+      break;
     }
   }
-};
-
-testAsync();
+  try {
+    await proceedAsync();
+  } finally {
+    child.kill("SIGTERM");
+    await termination;
+    await promiseTermination(spawn("/bin/sh", ["-c", `rm -rf ${path}$`]));
+  }
+}

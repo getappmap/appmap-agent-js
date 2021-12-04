@@ -50,7 +50,10 @@ describe("the init command", () => {
       assert.notEqual(config.packages, undefined);
       assert(typeof config.packages, "array");
       config.packages.sort((a, b) => a.path.localeCompare(b.path));
-      assert.deepEqual(config.packages, [{ path: "lib/sub1" }, { path: "src" }]);
+      assert.deepEqual(config.packages, [
+        { path: "lib/sub1" },
+        { path: "src" },
+      ]);
     });
 
     it("doesn't descend past directory containing a source file", () => {
