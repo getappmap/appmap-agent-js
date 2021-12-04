@@ -20,7 +20,6 @@ Table of contents:
     - [Classmap](#classmap)
     - [Qualified Name](#qualified-name)
 
-
 ## Automated Recording
 
 The agent provides a CLI to spawn and record node processes.
@@ -165,8 +164,24 @@ A specifier can be any of:
     * `recursive <boolean>` Indicates whether to whitelist files within nested directories. *Default*: `true`.
 * `<DistSpecifier>` Filter files based on a npm package name.
     * `dist <string>` Relative path that starts with a npm package name. For instance: `"package/lib"`.
-    * `recursive <boolean>`: indicates whether to whitelist files within nested directories. *Default*: `true`.
+    * `recursive <boolean>` Indicates whether to whitelist files within nested directories. *Default*: `true`.
     * `external <boolean>` Indicates whether to whitelist dependencies outside of the repository. *Default*: `false`.
+
+### Prelude: Exclusion Format
+
+The agent filter code objects (functions or objects/classes) based on a format called `Exclusion`. Which can be either a string or an object:
+* `<string>` Shorthand, `"foo\\.bar"` is the same as `{"qualified-name":"foo\\.bar"}`
+* `<object>`
+    * `combinator "and" | "or"` Indicates whether the four criteria -- ie: `name`, `qualified-name`, `some-label`, and `every-label` -- should all be satisfied or if at least one should be satisfied. These criterion has two form: the pattern form which is a string or the static boolean form. If `combinator` is `"and"` then the default value for these criterion is `true`. If the combinator is `"or"` then the default value for these criterion is `false`.
+      *Default*: "and".
+    * `name <string> | <boolean>` A pattern to match against the name of the code object. The agent will assign static names to code object with an algorithm that resemble the [ECMAScript function naming algorithm](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/name).
+    * `qualified-name <string> | <boolean>` A pattern to match against the qualified name of the code object. For classes/objects, the qualified name is the same as the name. For functions which are methods, the name of their enclosing object/class are prepended. For instance: `foo#bar` for a static method named `bar` defined on an object named `foo`.
+    * `some-label <string> | <boolean>` A pattern that should match at least one label of the function. This criterion is not applicable to classes/objects. The only way for a function without labels to satisfy this criterion is to use the boolean form.
+    * `every-label <string> | <boolean>` A pattern that should match all labels of the function. This criterion is not applicable to classes/objects. The only way for a function without labels to not satisfy this criterion is to use the boolean form.
+    * `excluded <boolean>` Indicates whether the matching code object should be excluded or not.
+      *Default*: `true`.
+    * `recursive <boolean>` If `excluded` is `true`, this indicates whether the children of the matched code object should be excluded as well.
+      *Default*: `true`.
 
 ### Automated Recording Configuration Fields
 
@@ -210,9 +225,9 @@ A specifier can be any of:
     * `<object>`
         * `enabled <boolean>` Indicates whether the filtered file should be instrumented or not. *Default*: `true`.
         * `shallow <boolean>` Indicates whether the filtered file should 
-        * `exclude <string[]>` List of [qualified name](#qualified-name) to exclude from instrumentation. Regular expression are supported.
+        * `exclude <Exclusion[]>` Additional code object filtering for the matched file.
         * `... <Specifier>` Extends from any specifier format.
-* `exclude <string[]>` List of [qualified name](#qualified-name) to always exclude from instrumentation. Regular expression are supported.
+* `exclude <Exclusion[]>` Code object filtering to apply to every file.
 * `source <boolean>` Indicates whether to include source code in the appmap file. *Default* `false`. 
 * `hooks <object>` Flags controlling what the agent intercepts.
     * `cjs <boolean>` Indicates whether commonjs modules should be instrumented to record function applications. *Default*: `true`.
