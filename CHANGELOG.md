@@ -1,3 +1,10 @@
+## [8.6.2](https://github.com/applandinc/appmap-agent-js/compare/v8.6.1...v8.6.2) (2021-12-04)
+
+
+### Bug Fixes
+
+* log instead of crashing on unrecoverable parsing error ([3b16f41](https://github.com/applandinc/appmap-agent-js/commit/3b16f41f513bb652626c0d344a5f3ac90489f580))
+
 ## [8.6.1](https://github.com/applandinc/appmap-agent-js/compare/v8.6.0...v8.6.1) (2021-12-04)
 
 
