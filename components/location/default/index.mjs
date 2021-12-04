@@ -4,13 +4,15 @@ const { parseInt } = Number;
 export default (dependencies) => {
   const {
     util: { assert },
+    log: { logGuardWarning },
   } = dependencies;
   return {
     makeLocation: (url, line, column) => ({ url, line, column }),
     stringifyLocation: ({ url, line, column }) => {
-      assert(
-        !url.includes("#"),
-        "location file url should not already contain a hash segment",
+      logGuardWarning(
+        url.includes("#"),
+        "Location file url should not already contain a hash segment, got: %j",
+        url,
       );
       return `${url}#${_String(line)}-${_String(column)}`;
     },
