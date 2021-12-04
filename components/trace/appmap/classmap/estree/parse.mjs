@@ -5,8 +5,7 @@ const { parse: parseBabel } = BabelParser;
 export default (dependencies) => {
   const {
     util: { assert, coalesce },
-    expect: { expectSuccess },
-    log: { logWarning },
+    log: { logWarning, logError },
   } = dependencies;
 
   // const getPredecessorComment = (code, index, comments) => {
@@ -52,17 +51,19 @@ export default (dependencies) => {
         plugins = ["flow"];
       }
       plugins.push("estree", "jsx");
-      const { errors, program: node } = expectSuccess(
-        () =>
-          parseBabel(content, {
-            plugins,
-            sourceType: source_type,
-            errorRecovery: true,
-            attachComment: true,
-          }),
-        "Unrecoverable parsing error at file %j >> %e",
-        path,
-      );
+      let result;
+      try {
+        result = parseBabel(content, {
+          plugins,
+          sourceType: source_type,
+          errorRecovery: true,
+          attachComment: true,
+        });
+      } catch (error) {
+        logError("Unrecoverable parsing error at file %j >> %e", path, error);
+        return { type: "Program", body: [], sourceType: "script" };
+      }
+      const { errors, program: node } = result;
       for (const error of errors) {
         logWarning("Recoverable parsing error at file %j >> %e", path, error);
       }
