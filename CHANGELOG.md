@@ -1,3 +1,10 @@
+## [8.6.1](https://github.com/applandinc/appmap-agent-js/compare/v8.6.0...v8.6.1) (2021-12-04)
+
+
+### Bug Fixes
+
+* consistent default import of commonjs modules ([8c237b2](https://github.com/applandinc/appmap-agent-js/commit/8c237b234d9e3501750bcaaa645933df298c8e7b))
+
 # [8.6.0](https://github.com/applandinc/appmap-agent-js/compare/v8.5.0...v8.6.0) (2021-12-03)
 
 
