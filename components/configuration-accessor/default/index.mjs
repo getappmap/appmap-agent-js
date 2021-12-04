@@ -1,6 +1,8 @@
 /* globals URL */
 
-import { parse as parseShell } from "shell-quote";
+import ShellQuote from "shell-quote";
+
+const { parse: parseShell } = ShellQuote;
 
 const _URL = URL;
 const _RegExp = RegExp;

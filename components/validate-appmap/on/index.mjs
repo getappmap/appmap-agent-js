@@ -1,4 +1,6 @@
-import { validate as validateAppmap } from "@appland/appmap-validate";
+import AppmapValidate from "@appland/appmap-validate";
+
+const { validate: validateAppmap } = AppmapValidate;
 
 export default (dependencies) => {
   const {

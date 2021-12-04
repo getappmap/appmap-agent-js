@@ -1,6 +1,8 @@
 import { connect } from "net";
-import { createMessage } from "net-socket-messaging";
+import NetSocketMessaging from "net-socket-messaging";
 import { writeSync } from "fs";
+
+const { createMessage } = NetSocketMessaging;
 
 const STATE0 = 0;
 const STATE1 = 1;

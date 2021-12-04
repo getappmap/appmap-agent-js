@@ -2,7 +2,9 @@
 import { buildTestDependenciesAsync } from "../../build.mjs";
 
 import { strict as Assert } from "assert";
-import { JSDOM } from "jsdom";
+import JsDom from "jsdom";
+
+const { JSDOM } = JsDom;
 
 const { window } = new JSDOM("", {
   runScripts: "dangerously",

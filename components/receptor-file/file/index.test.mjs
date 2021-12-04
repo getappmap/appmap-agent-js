@@ -2,12 +2,14 @@ import { tmpdir } from "os";
 import { readFile } from "fs/promises";
 import { strict as Assert } from "assert";
 import { Socket } from "net";
-import { createMessage } from "net-socket-messaging";
+import NetSocketMessaging from "net-socket-messaging";
 import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
 } from "../../build.mjs";
 import Receptor from "./index.mjs";
+
+const { createMessage } = NetSocketMessaging;
 
 const {
   // equal:assertEqual,

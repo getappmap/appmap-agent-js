@@ -2,12 +2,14 @@ import { createServer as createTCPServer } from "net";
 import { createServer as createHTTPServer } from "http";
 import { tmpdir } from "os";
 import { strict as Assert } from "assert";
-import { patch } from "net-socket-messaging";
+import NetSocketMessaging from "net-socket-messaging";
 import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
 } from "../../build.mjs";
 import Emitter from "./index.mjs";
+
+const { patch: patchSocket } = NetSocketMessaging;
 
 const { createConfiguration, extendConfiguration } =
   await buildTestComponentAsync("configuration");
@@ -41,7 +43,7 @@ const { openEmitter, closeEmitter, sendEmitter, requestRemoteEmitterAsync } =
     const server = createTCPServer();
     const buffer = [];
     server.on("connection", (socket) => {
-      patch(socket);
+      patchSocket(socket);
       socket.on("message", (message) => {
         buffer.push(message);
       });

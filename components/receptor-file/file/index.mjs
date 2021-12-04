@@ -1,7 +1,9 @@
 import { lstat, mkdir } from "fs/promises";
 import { writeFileSync } from "fs";
 import { createServer } from "net";
-import { patch } from "net-socket-messaging";
+import NetSocketMessaging from "net-socket-messaging";
+
+const { patch: patchSocket } = NetSocketMessaging;
 
 const { parse: parseJSON, stringify: stringifyJSON } = JSON;
 const _String = String;
@@ -110,7 +112,7 @@ export default (dependencies) => {
       const server = createServer();
       const paths = new _Set();
       server.on("connection", (socket) => {
-        patch(socket);
+        patchSocket(socket);
         socket.on("message", (session) => {
           socket.removeAllListeners("message");
           socket.on("message", (content) => {

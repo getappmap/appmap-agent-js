@@ -1,4 +1,6 @@
-import { parse as parseBabel } from "@babel/parser";
+import BabelParser from "@babel/parser";
+
+const { parse: parseBabel } = BabelParser;
 
 export default (dependencies) => {
   const {

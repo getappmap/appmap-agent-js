@@ -1,6 +1,8 @@
 import { createServer as createTCPServer } from "net";
 import { createServer as createHTTPServer } from "http";
-import { patch } from "net-socket-messaging";
+import NetSocketMessaging from "net-socket-messaging";
+
+const { patch: patchSocket } = NetSocketMessaging;
 
 const _Map = Map;
 const { parse: parseJSON } = JSON;
@@ -137,7 +139,7 @@ export default (dependencies) => {
         }),
       );
       trace_server.on("connection", (socket) => {
-        patch(socket);
+        patchSocket(socket);
         socket.on("message", (session) => {
           socket.removeAllListeners("message");
           socket.on("message", (content) => {

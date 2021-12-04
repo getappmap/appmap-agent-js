@@ -1,11 +1,14 @@
 import { strict as Assert } from "assert";
-import { parse } from "acorn";
-import { generate } from "escodegen";
+import * as Acorn from "acorn";
+import Escodegen from "escodegen";
 import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
 } from "../../build.mjs";
 import Visit from "./visit.mjs";
+
+const { parse } = Acorn;
+const { generate } = Escodegen;
 
 Error.stackTraceLimit = Infinity;
 

@@ -1,10 +1,12 @@
 import { strict as Assert } from "assert";
-import { parse as parseAcorn } from "acorn";
+import * as Acorn from "acorn";
 import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
 } from "../../../../build.mjs";
 import Visit from "./visit.mjs";
+
+const { parse: parseAcorn } = Acorn;
 
 Error.stackTraceLimit = Infinity;
 
