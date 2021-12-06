@@ -9,12 +9,18 @@ export default (dependencies) => {
   return {
     makeLocation: (url, line, column) => ({ url, line, column }),
     stringifyLocation: ({ url, line, column }) => {
+      const segments = url.split("#");
       logGuardWarning(
-        url.includes("#"),
-        "Location file url should not already contain a hash segment, got: %j",
+        segments.length === 2,
+        "Disregarding hash segment of file location url, got: %j",
         url,
       );
-      return `${url}#${_String(line)}-${_String(column)}`;
+      logGuardWarning(
+        segments.length > 2,
+        "Location file url is invalid because it contains multiple hash characters, disregarding everything after the first hash segment, got: %j",
+        url,
+      );
+      return `${segments[0]}#${_String(line)}-${_String(column)}`;
     },
     parseLocation: (location) => {
       const parts = /^([^#]+)#([0-9]+)-([0-9]+)$/u.exec(location);
