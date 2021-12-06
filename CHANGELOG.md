@@ -1,3 +1,10 @@
+## [8.6.4](https://github.com/applandinc/appmap-agent-js/compare/v8.6.3...v8.6.4) (2021-12-06)
+
+
+### Bug Fixes
+
+* better handle location urls which already have a hash segment ([6374195](https://github.com/applandinc/appmap-agent-js/commit/6374195113e87587a64a720979f0002b737af410))
+
 ## [8.6.3](https://github.com/applandinc/appmap-agent-js/compare/v8.6.2...v8.6.3) (2021-12-04)
 
 
