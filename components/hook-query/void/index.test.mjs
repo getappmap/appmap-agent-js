@@ -19,7 +19,7 @@ assertDeepEqual(
   await testHookAsync(
     hookQuery,
     unhookQuery,
-    { hooks: { cjs: false, esm: false } },
+    { hooks: { mysql: false, sqlite3: false, pg: false } },
     async (frontend) => null,
   ),
   { sources: [], events: [] },
