@@ -9,6 +9,7 @@ import Visit from "./visit.mjs";
 
 const { parse } = Acorn;
 const { generate } = Escodegen;
+const { stringify: stringifyJSON } = JSON;
 
 Error.stackTraceLimit = Infinity;
 
@@ -16,6 +17,9 @@ const { equal: assertEqual } = Assert;
 
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
 const { visit } = Visit(dependencies);
+const { makeLocation, stringifyLocation } = await buildTestComponentAsync(
+  "location",
+);
 const { createMirrorSourceMap } = await buildTestComponentAsync("source");
 
 const normalize = (code, source) =>
@@ -54,7 +58,9 @@ assertEqual(
     (async ($_ARGUMENT_0, $_ARGUMENT_1, ...$_ARGUMENT_2) => {
       var
         $_APPLY_ID = $.recordBeginApply(
-          'file:///script.js#1-1',
+          ${stringifyJSON(
+            stringifyLocation(makeLocation("file:///script.js", 1, 1)),
+          )},
           $.empty,
           [$_ARGUMENT_0, $_ARGUMENT_1, $_ARGUMENT_2],
         ),
@@ -110,7 +116,9 @@ for (const [code1, code2] of [
       function* f () {
         var
           $_APPLY_ID = $.recordBeginApply(
-            'file:///script.js#1-0',
+            ${stringifyJSON(
+              stringifyLocation(makeLocation("file:///script.js", 1, 0)),
+            )},
             this,
             []
           ),
@@ -169,7 +177,9 @@ assertEqual(
         constructor () {
           var
             $_APPLY_ID = $.recordBeginApply(
-              'file:///script.js#2-0',
+              ${stringifyJSON(
+                stringifyLocation(makeLocation("file:///script.js", 2, 0)),
+              )},
               $.empty,
               [],
             ),
