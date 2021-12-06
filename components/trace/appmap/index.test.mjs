@@ -15,6 +15,9 @@ const {
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
 const { createConfiguration, extendConfiguration } =
   await buildTestComponentAsync("configuration", "test");
+const { makeLocation, stringifyLocation } = await buildTestComponentAsync(
+  "location",
+);
 const { compileTrace } = Trace(dependencies);
 const configuration = extendConfiguration(
   createConfiguration("/cwd"),
@@ -68,7 +71,9 @@ assertDeepEqual(
         time: 0,
         data: {
           type: "apply",
-          function: "file:///cwd/filename.js#1-0",
+          function: stringifyLocation(
+            makeLocation("file:///cwd/filename.js", 1, 0),
+          ),
           this: { type: "string", print: "this-print" },
           arguments: [{ type: "string", print: "arg-print" }],
         },

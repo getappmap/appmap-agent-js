@@ -15,6 +15,9 @@ const {
 
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
 const { createClassmap, addClassmapSource } = Classmap(dependencies);
+const { makeLocation, stringifyLocation } = await buildTestComponentAsync(
+  "location",
+);
 const { createConfiguration } = await buildTestComponentAsync(
   "configuration",
   "test",
@@ -46,7 +49,9 @@ const { compileEventTrace } = Event(dependencies);
     time: 0,
     data: {
       type: "apply",
-      function: "file:///cwd/filename.js#1-0",
+      function: stringifyLocation(
+        makeLocation("file:///cwd/filename.js", 1, 0),
+      ),
       this: {
         type: "string",
         print: "this",

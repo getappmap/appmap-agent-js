@@ -10,8 +10,11 @@ Error.stackTraceLimit = Infinity;
 const { deepEqual: assertDeepEqual, equal: assertEqual } = Assert;
 
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
+const { stringifyLocation, makeLocation } = await buildTestComponentAsync(
+  "location",
+);
 const { createConfiguration, extendConfiguration } =
-  await buildTestComponentAsync("configuration", "test");
+  await buildTestComponentAsync("configuration");
 const {
   createClassmap,
   addClassmapSource,
@@ -80,12 +83,22 @@ const and_exclude = {
   });
 
   assertEqual(
-    getClassmapClosure(classmap, `file://${cwd}/directory/function.js#1-1`),
+    getClassmapClosure(
+      classmap,
+      stringifyLocation(
+        makeLocation(`file://${cwd}/directory/function.js`, 1, 1),
+      ),
+    ),
     null,
   );
 
   assertDeepEqual(
-    getClassmapClosure(classmap, `file://${cwd}/directory/function.js#2-1`),
+    getClassmapClosure(
+      classmap,
+      stringifyLocation(
+        makeLocation(`file://${cwd}/directory/function.js`, 2, 1),
+      ),
+    ),
     {
       parameters: ["x"],
       shallow: true,
@@ -100,21 +113,40 @@ const and_exclude = {
   );
 
   assertDeepEqual(
-    getClassmapClosure(classmap, `file://${cwd}/directory/function.js#3-1`),
+    getClassmapClosure(
+      classmap,
+      stringifyLocation(
+        makeLocation(`file://${cwd}/directory/function.js`, 3, 1),
+      ),
+    ),
     null,
   );
 
   assertDeepEqual(
-    getClassmapClosure(classmap, `file://${cwd}/directory/function.js#2-0`),
-    getClassmapClosure(classmap, `file://${cwd}/directory/function.js#2-1`),
+    getClassmapClosure(
+      classmap,
+      stringifyLocation(
+        makeLocation(`file://${cwd}/directory/function.js`, 2, 0),
+      ),
+    ),
+    getClassmapClosure(
+      classmap,
+      stringifyLocation(
+        makeLocation(`file://${cwd}/directory/function.js`, 2, 1),
+      ),
+    ),
   );
 
   assertDeepEqual(
     compileClassmap(
       classmap,
       new Set([
-        `file://${cwd}/directory/function.js#2-0`,
-        `file://${cwd}/directory/function.js#2-1`,
+        stringifyLocation(
+          makeLocation(`file://${cwd}/directory/function.js`, 2, 0),
+        ),
+        stringifyLocation(
+          makeLocation(`file://${cwd}/directory/function.js`, 2, 1),
+        ),
       ]),
     ),
     [
