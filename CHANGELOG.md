@@ -1,3 +1,15 @@
+# [8.7.0](https://github.com/applandinc/appmap-agent-js/compare/v8.6.4...v8.7.0) (2021-12-06)
+
+
+### Bug Fixes
+
+* more robust source location serialization via JSON ([8e04712](https://github.com/applandinc/appmap-agent-js/commit/8e047128239f77ecbf4f1bffa7a91ca303f01bc3))
+
+
+### Features
+
+* enable all hooks by default ([04a9940](https://github.com/applandinc/appmap-agent-js/commit/04a99408da8233d760f35f89daead4b805cfd453))
+
 ## [8.6.4](https://github.com/applandinc/appmap-agent-js/compare/v8.6.3...v8.6.4) (2021-12-06)
 
 
