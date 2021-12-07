@@ -1,3 +1,10 @@
+## [8.7.1](https://github.com/applandinc/appmap-agent-js/compare/v8.7.0...v8.7.1) (2021-12-07)
+
+
+### Bug Fixes
+
+* sanitize basename before writting files ([5f93d3e](https://github.com/applandinc/appmap-agent-js/commit/5f93d3e33ff28c7a7a9223f25eb35a7be27ea82c))
+
 # [8.7.0](https://github.com/applandinc/appmap-agent-js/compare/v8.6.4...v8.7.0) (2021-12-06)
 
 
