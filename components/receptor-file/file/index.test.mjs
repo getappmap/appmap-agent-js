@@ -1,5 +1,5 @@
 import { tmpdir } from "os";
-import { readFile } from "fs/promises";
+import { readFile as readFileAsync } from "fs/promises";
 import { strict as Assert } from "assert";
 import { Socket } from "net";
 import NetSocketMessaging from "net-socket-messaging";
@@ -109,7 +109,7 @@ const receptor = await openReceptorAsync(
       JSON.stringify([
         "start",
         "record3",
-        { path: null, data: { "map-name": "map-name" } },
+        { path: null, data: { "map-name": " map / name " } },
       ]),
     ),
   );
@@ -118,7 +118,7 @@ const receptor = await openReceptorAsync(
     socket.end();
   });
   await closeReceptorAsync(receptor);
-  await readFile(`${repository}/directory/anonymous.appmap.json`);
-  await readFile(`${repository}/directory/anonymous-1.appmap.json`);
-  await readFile(`${repository}/directory/map-name.appmap.json`);
+  await readFileAsync(`${repository}/directory/anonymous.appmap.json`);
+  await readFileAsync(`${repository}/directory/anonymous-1.appmap.json`);
+  await readFileAsync(`${repository}/directory/map-name.appmap.json`);
 }

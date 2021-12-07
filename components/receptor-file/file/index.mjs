@@ -68,6 +68,7 @@ export default (dependencies) => {
     if (basename === null) {
       basename = map_name === null ? "anonymous" : map_name;
     }
+    basename = basename.replace(/\//gu, "-").replace(/[\t\n ]/gu, "");
     let path = `${directory}/${basename}${extension}`;
     let counter = 0;
     while (paths.has(path)) {
