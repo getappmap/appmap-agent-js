@@ -1,5 +1,6 @@
-import { request as createRequest } from "http";
+import Http from "http";
 
+const { request: createRequest } = Http;
 const { from: toBuffer, concat: concatBuffer } = Buffer;
 const _Promise = Promise;
 const { parse: parseJSON, stringify: stringifyJSON } = JSON;
