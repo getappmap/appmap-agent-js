@@ -1,3 +1,10 @@
+## [8.8.1](https://github.com/applandinc/appmap-agent-js/compare/v8.8.0...v8.8.1) (2021-12-08)
+
+
+### Bug Fixes
+
+* avoid recording some http requests from the agent ([d769574](https://github.com/applandinc/appmap-agent-js/commit/d769574fc9841d8f8468de4b9d5322c3e15c0ea4))
+
 # [8.8.0](https://github.com/applandinc/appmap-agent-js/compare/v8.7.1...v8.8.0) (2021-12-08)
 
 
