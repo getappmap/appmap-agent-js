@@ -203,16 +203,29 @@ assertDeepEqual(
     extendConfiguration(
       createConfiguration("/repository"),
       {
-        packages: "*",
+        packages: [
+          { glob: "*", exclude: ["exclude1"] },
+          { glob: "**/*", exclude: ["exclude2"] },
+        ],
       },
       "/directory",
     ),
-    "file:///directory/foo",
+    "file:///directory/foo/bar",
   ),
   {
     enabled: true,
     shallow: false,
-    exclude: [],
+    exclude: [
+      {
+        "every-label": true,
+        "qualified-name": "exclude2",
+        "some-label": true,
+        combinator: "and",
+        excluded: true,
+        name: true,
+        recursive: true,
+      },
+    ],
     "inline-source": null,
   },
 );

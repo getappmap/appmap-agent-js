@@ -58,10 +58,13 @@ export default (dependencies) => {
         .filter(getHead)
         .map(getBody);
       if (sources.length === 0) {
-        logDebug("Not instrumenting %j", url);
+        logDebug(
+          "Not instrumenting file %j because it has no allowed sources.",
+          url,
+        );
         return { url, content, sources: [] };
       }
-      logDebug("Instrumenting %j", url);
+      logDebug("Instrumenting generated file %j", url);
       sources = sources.filter(({ url }) => !done.has(url));
       for (const { url } of sources) {
         done.add(url);

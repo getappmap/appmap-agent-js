@@ -10,7 +10,7 @@ const { stringify: stringifyJSON } = JSON;
 
 export default (dependencies) => {
   const {
-    log: { logInfo, logGuardWarning, logWarning },
+    log: { logDebug, logInfo, logGuardWarning, logWarning },
     expect: { expect, expectSuccess },
     specifier: { matchSpecifier },
     configuration: { extendConfiguration },
@@ -33,8 +33,18 @@ export default (dependencies) => {
   // ];
 
   const getSpecifierValue = (pairs, key) => {
-    for (const [specifier, value] of pairs) {
-      if (matchSpecifier(specifier, key)) {
+    for (let index = 0; index < pairs.length; index += 1) {
+      const [specifier, value] = pairs[index];
+      const matched = matchSpecifier(specifier, key);
+      logDebug(
+        "Specifier #%j (ie: key = %j, value = %j) %s %j",
+        index,
+        specifier,
+        value,
+        matched ? "matched" : "did not match",
+        key,
+      );
+      if (matched) {
         return value;
       }
     }
@@ -71,7 +81,13 @@ export default (dependencies) => {
         );
         return default_package_specifier;
       }
-      return getSpecifierValue(packages, pathname);
+      const options = getSpecifierValue(packages, pathname);
+      logInfo(
+        "%s source file %j",
+        options.enabled ? "Instrumenting" : "Not instrumenting",
+        url,
+      );
+      return options;
     },
     getConfigurationScenarios: (configuration) => {
       const { scenarios, scenario } = configuration;
