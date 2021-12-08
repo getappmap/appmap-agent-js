@@ -1,3 +1,10 @@
+# [8.8.0](https://github.com/applandinc/appmap-agent-js/compare/v8.7.1...v8.8.0) (2021-12-08)
+
+
+### Features
+
+* additional logging for diagnosing instrumentation filtering ([d73d39a](https://github.com/applandinc/appmap-agent-js/commit/d73d39a7d91d69ed43f79c952318570e9d507656))
+
 ## [8.7.1](https://github.com/applandinc/appmap-agent-js/compare/v8.7.0...v8.7.1) (2021-12-07)
 
 
