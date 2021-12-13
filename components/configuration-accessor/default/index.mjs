@@ -36,13 +36,16 @@ export default (dependencies) => {
     for (let index = 0; index < pairs.length; index += 1) {
       const [specifier, value] = pairs[index];
       const matched = matchSpecifier(specifier, key);
+      // TODO: this breaks encapsulation
+      const { cwd, pattern, flags } = specifier;
       logDebug(
-        "Specifier #%j (ie: key = %j, value = %j) %s %j",
+        "Specifier #%j (pattern = %j, flags = %j) %s path $j relative to %j.",
         index,
-        specifier,
-        value,
+        pattern,
+        flags,
         matched ? "matched" : "did not match",
         key,
+        cwd,
       );
       if (matched) {
         return value;
