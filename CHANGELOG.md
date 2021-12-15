@@ -1,3 +1,10 @@
+## [8.8.2](https://github.com/applandinc/appmap-agent-js/compare/v8.8.1...v8.8.2) (2021-12-15)
+
+
+### Bug Fixes
+
+* default exclusion list ([fde422f](https://github.com/applandinc/appmap-agent-js/commit/fde422ffe5ef70b552c255a2843748baf3591e1f))
+
 ## [8.8.1](https://github.com/applandinc/appmap-agent-js/compare/v8.8.0...v8.8.1) (2021-12-08)
 
 
