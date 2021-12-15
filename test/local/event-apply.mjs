@@ -44,6 +44,7 @@ await runAsync(
           console.log(await iterateAsync.next());
         };
         mainAsync();
+        ((() => {}) ());
       `,
       "utf8",
     );

@@ -480,12 +480,12 @@ export default (dependencies) => {
       "anonymous-name-separator": ANONYMOUS_NAME_SEPARATOR,
       exclude: [
         {
-          combinator: "and",
-          name: ANONYMOUS_NAME_SEPARATOR,
-          "qualified-name": true,
-          "every-label": true,
+          combinator: "or",
+          name: `^[^${ANONYMOUS_NAME_SEPARATOR}]*$`,
+          "qualified-name": false,
+          "every-label": false,
           "some-label": "^",
-          excluded: true,
+          excluded: false,
           recursive: false,
         },
         {
@@ -494,7 +494,7 @@ export default (dependencies) => {
           "qualified-name": true,
           "every-label": true,
           "some-label": true,
-          excluded: false,
+          excluded: true,
           recursive: false,
         },
       ],
