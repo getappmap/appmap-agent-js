@@ -52,8 +52,11 @@ export default (dependencies) => {
           if (data_type === "apply") {
             assert(type === "begin", "invalid envent type for apply data type");
             const { function: location } = data;
-            const info = getClassmapClosure(classmap, location);
-            /* c8 ignore start */ if (info === null) {
+            // location is null in the case of a manufactured begin apply event.
+            /* c8 ignore start */
+            const info =
+              location === null ? null : getClassmapClosure(classmap, location);
+            if (info === null) {
               stack.push({ time, shallow: null, id: null });
             } /* c8 ignore stop */ else {
               const { shallow, ...options } = info;
