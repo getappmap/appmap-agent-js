@@ -5,10 +5,6 @@
     "appmap-agent-js": "bin/bin.mjs"
   },
   "main": "lib/node/recorder-manual.mjs",
-  "os": [
-    "linux",
-    "darwin"
-  ],
   "license": "MIT",
   "engine": {
     "node": ">= 14.0.0"
