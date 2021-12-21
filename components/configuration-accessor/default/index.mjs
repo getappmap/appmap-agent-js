@@ -85,7 +85,7 @@ export default (dependencies) => {
         return default_package_specifier;
       }
       const options = getSpecifierValue(packages, pathname);
-      logInfo(
+      logDebug(
         "%s source file %j",
         options.enabled ? "Instrumenting" : "Not instrumenting",
         url,
