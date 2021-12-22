@@ -10,7 +10,8 @@ const { isArray } = Array;
 
 export default (dependencies) => {
   const {
-    util: { hasOwnProperty, getDirectory, coalesce, getExtension },
+    util: { hasOwnProperty, coalesce },
+    path: { getDirectory, getExtension },
     expect: { expect, expectSuccess },
     configuration: { createConfiguration, extendConfiguration },
   } = dependencies;

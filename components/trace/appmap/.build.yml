@@ -1,5 +1,6 @@
 branches: [node, browser]
 dependencies:
+  - path
   - util
   - expect
   - validate-appmap

@@ -1,6 +1,8 @@
 import { strict as Assert } from "assert";
 import { tmpdir } from "os";
 import { writeFile as writeFileAsync } from "fs/promises";
+import { join as joinPath } from "path";
+import { pathToFileURL } from "url";
 import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
@@ -35,8 +37,8 @@ assertDeepEqual(
 // file //
 //////////
 
-const path = `${tmpdir()}/${Math.random().toString(36).substring(2)}`;
-const url = `file://${path}`;
+const path = joinPath(tmpdir(), Math.random().toString(36).substring(2));
+const url = pathToFileURL(path).toString();
 assert(isLeft(readFile(url)));
 
 await writeFileAsync(path, "foo", "utf8");

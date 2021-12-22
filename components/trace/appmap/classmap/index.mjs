@@ -11,7 +11,8 @@ const { from: toArray } = Array;
 
 export default (dependencies) => {
   const {
-    util: { assert, createCounter, toRelativePath },
+    util: { assert, createCounter },
+    path: { toRelativePath },
     log: { logWarning, logDebug },
     location: {
       makeLocation,

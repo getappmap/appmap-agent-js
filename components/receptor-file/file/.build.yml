@@ -1,6 +1,7 @@
 branches: [node, test]
 dependencies:
   - util
+  - path
   - expect
   - service
   - backend

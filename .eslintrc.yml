@@ -12,6 +12,7 @@ rules:
   #   - error
   #   - devDependencies: true
   no-empty-pattern: off
+  no-control-regex: off
   no-debugger:
     - warn
   no-console:

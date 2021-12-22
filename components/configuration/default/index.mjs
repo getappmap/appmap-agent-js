@@ -6,7 +6,8 @@ const ANONYMOUS_NAME_SEPARATOR = "-";
 
 export default (dependencies) => {
   const {
-    util: { coalesce, assert, identity, toAbsolutePath, hasOwnProperty },
+    util: { coalesce, assert, identity, hasOwnProperty },
+    path: { toAbsolutePath },
     validate: { validateConfig },
     specifier: { createSpecifier },
   } = dependencies;

@@ -1,4 +1,6 @@
 - util
+- platform
+- path
 - violation
 - expect-inner
 - expect

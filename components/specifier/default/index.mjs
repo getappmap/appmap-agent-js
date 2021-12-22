@@ -7,7 +7,8 @@ const { Minimatch: MinimatchClass } = Minimatch;
 
 export default (dependencies) => {
   const {
-    util: { assert, toRelativePath },
+    util: { assert },
+    path: { toRelativePath },
     expect: { expectSuccess },
   } = dependencies;
 

@@ -6,7 +6,7 @@ const { parse } = JSON;
 
 export default (dependencies) => {
   const {
-    util: { getDirectory },
+    path: { getDirectory },
     expect: { expectSuccess, expect },
     log: { logWarning },
   } = dependencies;

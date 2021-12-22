@@ -51,15 +51,15 @@ assertEqual(
   true,
 );
 {
-  const file = { url: "file://filename.js", content: "123;", type: "script" };
+  const file = { url: "file:///filename.js", content: "123;", type: "script" };
   assertDeepEqual(instrument(frontend, file, createMirrorSourceMap(file)), {
-    url: "file://filename.js",
+    url: "file:///filename.js",
     content: "123;",
     messages: [
       [
         "source",
         {
-          url: "file://filename.js",
+          url: "file:///filename.js",
           content: "123;",
           exclude: createConfiguration("/bar").exclude,
           shallow: false,

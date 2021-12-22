@@ -2,6 +2,7 @@ import { tmpdir } from "os";
 import { readFile as readFileAsync } from "fs/promises";
 import { strict as Assert } from "assert";
 import { Socket } from "net";
+import { join as joinPath } from "path";
 import NetSocketMessaging from "net-socket-messaging";
 import {
   buildTestDependenciesAsync,
@@ -25,7 +26,7 @@ const {
   closeReceptorAsync,
 } = Receptor(await buildTestDependenciesAsync(import.meta.url));
 
-const repository = `${tmpdir()}/${Math.random().toString(36).substring(2)}`;
+const repository = joinPath(tmpdir(), Math.random().toString(36).substring(2));
 const configuration = extendConfiguration(
   createConfiguration("/root"),
   {
@@ -118,7 +119,13 @@ const receptor = await openReceptorAsync(
     socket.end();
   });
   await closeReceptorAsync(receptor);
-  await readFileAsync(`${repository}/directory/anonymous.appmap.json`);
-  await readFileAsync(`${repository}/directory/anonymous-1.appmap.json`);
-  await readFileAsync(`${repository}/directory/map-name.appmap.json`);
+  await readFileAsync(
+    joinPath(repository, "directory", "anonymous.appmap.json"),
+  );
+  await readFileAsync(
+    joinPath(repository, "directory", "anonymous-1.appmap.json"),
+  );
+  await readFileAsync(
+    joinPath(repository, "directory", "map-name.appmap.json"),
+  );
 }

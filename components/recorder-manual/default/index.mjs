@@ -30,7 +30,11 @@ export default (dependencies) => {
     }
     recordScript(url, content) {
       if (!/^[a-z]:\/\//u.test(url)) {
-        expect(url[0] === "/", "expected an absolute path but got: %j", url);
+        expect(
+          url[0] === "/",
+          "expected an absolute unix path but got: %j",
+          url,
+        );
         url = `file://${url}`;
       }
       const file = { url, content };

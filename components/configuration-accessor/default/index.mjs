@@ -14,7 +14,8 @@ export default (dependencies) => {
     expect: { expect, expectSuccess },
     specifier: { matchSpecifier },
     configuration: { extendConfiguration },
-    util: { assert, coalesce, toAbsolutePath },
+    util: { assert, coalesce },
+    path: { toAbsolutePath },
   } = dependencies;
 
   const default_package_specifier = {

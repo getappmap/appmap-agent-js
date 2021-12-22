@@ -2,7 +2,8 @@ const _String = String;
 
 export default (dependencies) => {
   const {
-    util: { assert, getFilename, mapMaybe },
+    util: { assert, mapMaybe },
+    path: { getBasename },
   } = dependencies;
 
   /* c8 ignore start */
@@ -61,7 +62,7 @@ export default (dependencies) => {
       return basename;
     }
     if (main !== null) {
-      return getFilename(main).split(".")[0];
+      return getBasename(main);
     }
     return null;
   };

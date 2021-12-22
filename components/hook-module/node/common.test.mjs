@@ -2,6 +2,7 @@ import { strict as Assert } from "assert";
 import { createRequire } from "module";
 import { writeFile } from "fs/promises";
 import { tmpdir } from "os";
+import { pathToFileURL } from "url";
 import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
@@ -67,7 +68,7 @@ assertDeepEqual(
   {
     sources: [
       {
-        url: `file://${resolved_path}`,
+        url: pathToFileURL(resolved_path).toString(),
         content: "module.exports = 123;",
         exclude: createConfiguration("/dummy").exclude,
         shallow: true,

@@ -10,7 +10,8 @@ export default (dependencies) => {
   const {
     validate: { validateConfig },
     questionnaire: { questionConfigAsync },
-    util: { assert, toAbsolutePath, hasOwnProperty },
+    util: { assert, hasOwnProperty },
+    path: { toAbsolutePath, joinPath },
     prompts: { prompts },
   } = dependencies;
   const generateLog = (prefix, writable) => (message) => {
@@ -21,7 +22,7 @@ export default (dependencies) => {
       const logSuccess = generateLog(chalkGreen("\u2714"), stdout);
       const logWarning = generateLog(chalkYellow("\u26A0"), stderr);
       const logFailure = generateLog(chalkRed("\u2716"), stderr);
-      let conf_path = `${cwd()}/appmap.yml`;
+      let conf_path = joinPath(cwd(), "appmap.yml");
       if (hasOwnProperty(env, "APPMAP_CONFIGURATION_PATH")) {
         conf_path = toAbsolutePath(cwd(), env.APPMAP_CONFIGURATION_PATH);
       }
@@ -103,7 +104,7 @@ export default (dependencies) => {
       }
       // appmap-agent-js //
       {
-        const { resolve } = createRequire(`${repo_path}/dummy.js`);
+        const { resolve } = createRequire(joinPath(repo_path, "dummy.js"));
         try {
           resolve("@appland/appmap-agent-js");
         } catch ({ message }) {
@@ -116,7 +117,7 @@ export default (dependencies) => {
       {
         let success = true;
         try {
-          await readdir(`${repo_path}/.git`);
+          await readdir(joinPath(repo_path, ".git"));
         } catch ({ message }) {
           success = false;
           logWarning(
@@ -133,7 +134,7 @@ export default (dependencies) => {
       {
         let success = true;
         try {
-          await readFile(`${repo_path}/package.json`, "utf8");
+          await readFile(joinPath(repo_path, "package.json"), "utf8");
         } catch ({ code, message }) {
           success = false;
           if (code === "ENOENT") {

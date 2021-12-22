@@ -1,15 +1,14 @@
 import { createServer as createTCPServer } from "net";
-import { tmpdir } from "os";
 import NetSocketMessaging from "net-socket-messaging";
-import Module from "module";
-import { buildTestDependenciesAsync } from "../../build.mjs";
-import { testAsync } from "./__fixture__.mjs";
 
 const { patch: patchSocket } = NetSocketMessaging;
 
 export const testAsync = async (port, runAsync) => {
   const server = createTCPServer();
   const buffer = [];
+  const termination = new Promise((resolve) => {
+    server.on("close", resolve);
+  });
   server.on("connection", (socket) => {
     patchSocket(socket);
     socket.on("message", (message) => {
@@ -24,9 +23,6 @@ export const testAsync = async (port, runAsync) => {
     server.on("listening", resolve);
   });
   await runAsync(port === 0 ? server.address().port : port);
-  // server.close();
-  await new Promise((resolve) => {
-    server.on("close", resolve);
-  });
+  await termination;
   return buffer;
 };

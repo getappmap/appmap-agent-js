@@ -1,6 +1,7 @@
 import { lstat, mkdir } from "fs/promises";
 import { writeFileSync } from "fs";
 import { createServer } from "net";
+import { join as joinPath } from "path";
 import NetSocketMessaging from "net-socket-messaging";
 
 const { patch: patchSocket } = NetSocketMessaging;
@@ -12,7 +13,8 @@ const _Set = Set;
 export default (dependencies) => {
   const {
     "configuration-accessor": { resolveConfigurationPort },
-    util: { assert, getDirectory },
+    util: { assert },
+    path: { sanitizeFilename, getDirectory },
     log: { logInfo, logError },
     expect: { expect },
     service: { openServiceAsync, closeServiceAsync, getServicePort },
@@ -50,7 +52,12 @@ export default (dependencies) => {
       directory,
     );
     if (status === null) {
-      await createDirectoryAsync(getDirectory(directory));
+      const parent_directory = getDirectory(directory);
+      expect(
+        parent_directory !== directory,
+        "could not find any existing directory in the hiearchy of the storage directory",
+      );
+      await createDirectoryAsync(parent_directory);
       await mkdir(directory);
     }
   };
@@ -68,12 +75,12 @@ export default (dependencies) => {
     if (basename === null) {
       basename = map_name === null ? "anonymous" : map_name;
     }
-    basename = basename.replace(/\//gu, "-").replace(/[\t\n ]/gu, "");
-    let path = `${directory}/${basename}${extension}`;
+    basename = sanitizeFilename(basename, "-").replace(/[\t\n ]/gu, "");
+    let path = joinPath(directory, `${basename}${extension}`);
     let counter = 0;
     while (paths.has(path)) {
       counter += 1;
-      path = `${directory}/${basename}-${_String(counter)}${extension}`;
+      path = joinPath(directory, `${basename}-${_String(counter)}${extension}`);
     }
     paths.add(path);
     writeFileSync(path, stringifyJSON(trace), "utf8");

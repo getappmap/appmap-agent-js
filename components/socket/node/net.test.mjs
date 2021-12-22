@@ -9,12 +9,10 @@ const { deepEqual: assertDeepEqual } = Assert;
 const { openSocket, closeSocket, sendSocket } = NetSocket(
   await buildTestDependenciesAsync(import.meta.url),
 );
-
 const sleepAsync = (ms) =>
   new Promise((resolve) => {
-    setTimeout(resolve, 1000);
+    setTimeout(resolve, ms);
   });
-
 const runAsync = async (port) => {
   const socket = openSocket("localhost", port);
   sendSocket(socket, "message1");
@@ -24,9 +22,7 @@ const runAsync = async (port) => {
   await sleepAsync(1000);
   sendSocket(socket, "message3");
 };
-
 assertDeepEqual(await testAsync(0, runAsync), ["message1", "message2"]);
-
 assertDeepEqual(
   await testAsync(
     `${tmpdir()}/${Math.random().toString(36).substring(2)}`,

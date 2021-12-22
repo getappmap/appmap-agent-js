@@ -1,4 +1,5 @@
 import Module from "module";
+import { pathToFileURL } from "url";
 
 const { apply } = Reflect;
 const { prototype } = Module;
@@ -6,7 +7,8 @@ const { cwd } = process;
 
 export default (dependencies) => {
   const {
-    util: { assignProperty, toAbsolutePath },
+    util: { assignProperty },
+    path: { toAbsolutePath },
     frontend: { instrument },
     emitter: { sendEmitter },
     "source-outer": { extractSourceMap },
@@ -26,7 +28,7 @@ export default (dependencies) => {
       const { _compile: original } = prototype;
       prototype._compile = function _compile(content1, path) {
         const file = {
-          url: `file://${toAbsolutePath(cwd(), path)}`,
+          url: pathToFileURL(toAbsolutePath(cwd(), path)).toString(),
           content: content1,
           type: "script",
         };

@@ -14,7 +14,7 @@ import {
 export default (dependencies) => {
   const {
     log: { logInfo },
-    util: { getExtension, toAbsolutePath, getDirectory },
+    path: { getExtension, toAbsolutePath, getDirectory },
     expect: { expectSuccessAsync, expect },
   } = dependencies;
   const readMaybeLinkAsync = async (link) => {

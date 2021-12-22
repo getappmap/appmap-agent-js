@@ -1,6 +1,8 @@
 import { strict as Assert } from "assert";
 import { tmpdir } from "os";
 import { writeFile as writeFileAsync, mkdir as mkdirAsync } from "fs/promises";
+import { join as joinPath } from "path";
+import { pathToFileURL } from "url";
 import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
@@ -23,19 +25,25 @@ const { extractSourceMap } = SourceOuter(
 }
 
 {
-  const directory = `${tmpdir()}/${Math.random().toString(36).substring(2)}`;
+  const directory = joinPath(tmpdir(), Math.random().toString(36).substring(2));
   await mkdirAsync(directory);
   const file = {
-    url: `file://${directory}/script.js`,
+    url: pathToFileURL(joinPath(directory, "script.js")).toString(),
     content: "789; //# sourceMappingURL=source.map",
   };
   const sources = [
-    { url: `file://${directory}/source1.js`, content: "123;" },
-    { url: `file://${directory}/source2.js`, content: "456;" },
+    {
+      url: pathToFileURL(joinPath(directory, "source1.js")).toString(),
+      content: "123;",
+    },
+    {
+      url: pathToFileURL(joinPath(directory, "source2.js")).toString(),
+      content: "456;",
+    },
   ];
   assertDeepEqual(getSources(extractSourceMap(file)), [file]);
   await writeFileAsync(
-    `${directory}/source.map`,
+    joinPath(directory, "source.map"),
     JSON.stringify({
       version: 3,
       sources: ["source1.js", "source2.js"],
@@ -46,6 +54,6 @@ const { extractSourceMap } = SourceOuter(
     "utf8",
   );
   assertDeepEqual(getSources(extractSourceMap(file)), [file]);
-  await writeFileAsync(`${directory}/source2.js`, "456;", "utf8");
+  await writeFileAsync(joinPath(directory, "source2.js"), "456;", "utf8");
   assertDeepEqual(getSources(extractSourceMap(file)), sources);
 }

@@ -26,6 +26,14 @@ assertEqual(
 
 assertEqual(
   extractSourceMapURL({
+    url: "file:///directory/filename1",
+    content: "//# sourceMappingURL=/filename2",
+  }),
+  "file:///filename2",
+);
+
+assertEqual(
+  extractSourceMapURL({
     url: "data:application/json;charset=utf-8,{}",
     content: "//# sourceMappingURL=/directory/filename2",
   }),

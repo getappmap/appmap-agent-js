@@ -2,9 +2,7 @@ import { fileURLToPath } from "url";
 
 export default (dependencies) => {
   const {
-    util: { getDirectory },
-  } = dependencies;
-  const {
+    path: { getDirectory },
     configuration: { createConfiguration, extendConfiguration },
     frontend: { createFrontend },
     emitter: { openEmitter, closeEmitter, sendEmitter, takeLocalEmitterTrace },
