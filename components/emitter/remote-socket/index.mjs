@@ -1,15 +1,3 @@
-import PosixSocket from "posix-socket";
-import PosixSocketMessaging from "posix-socket-messaging";
-
-const {
-  AF_INET,
-  AF_UNIX,
-  SOCK_STREAM,
-  socket: createSocket,
-  connect: connectSocket,
-  close: closeSocket,
-} = PosixSocket;
-const { send: sendSocket } = PosixSocketMessaging;
 const { stringify: stringifyJSON } = JSON;
 
 export default (dependencies) => {
@@ -18,6 +6,7 @@ export default (dependencies) => {
     log: { logWarning },
     uuid: { getUUID },
     http: { requestAsync },
+    socket: { openSocket, closeSocket, sendSocket },
   } = dependencies;
   return {
     openEmitter: (configuration) => {
@@ -33,31 +22,21 @@ export default (dependencies) => {
       if (host === "localhost") {
         host = "127.0.0.1";
       }
-      const fd = createSocket(
-        typeof trace_port === "number" ? AF_INET : AF_UNIX,
-        SOCK_STREAM,
-        0,
-      );
-      connectSocket(
-        fd,
-        typeof trace_port === "number"
-          ? { sin_family: AF_INET, sin_port: trace_port, sin_addr: host }
-          : { sun_family: AF_UNIX, sun_path: trace_port },
-      );
-      sendSocket(fd, session);
-      sendSocket(fd, stringifyJSON(configuration));
-      return { fd, session, host, track_port, closed: createBox(false) };
+      const socket = openSocket(host, trace_port);
+      sendSocket(socket, session);
+      sendSocket(socket, stringifyJSON(configuration));
+      return { socket, session, host, track_port, closed: createBox(false) };
     },
-    closeEmitter: ({ fd, closed }) => {
+    closeEmitter: ({ socket, closed }) => {
       assert(!getBox(closed), "emitter has already been closed");
       setBox(closed, true);
-      closeSocket(fd);
+      closeSocket(socket);
     },
-    sendEmitter: ({ fd, closed }, message) => {
+    sendEmitter: ({ socket, closed }, message) => {
       if (getBox(closed)) {
         logWarning("message lost: %j", message);
       } else {
-        sendSocket(fd, stringifyJSON(message));
+        sendSocket(socket, stringifyJSON(message));
       }
     },
     takeLocalEmitterTrace: generateDeadcode(

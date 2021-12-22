@@ -1,3 +1,2 @@
 * local
-* remote-node-tcp
-* remote-node-posix
+* remote-socket

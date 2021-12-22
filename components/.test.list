@@ -33,6 +33,7 @@
   * interpretation
   * serialization
 - frontend
+- socket
 - emitter
 - hook
 - * hook-apply

@@ -6,7 +6,7 @@ const generateWriteAsync = (branch) => async (component, blueprint) => {
 
 const writeNodeAsync = generateWriteAsync("node");
 
-const posix_emitter = { emitter: ["remote-node-posix"] };
+const socket_emitter = { emitter: ["remote-socket"] };
 const local_emitter = { emitter: ["local"] };
 
 const exit_violation = { violation: ["exit"] };
@@ -16,9 +16,9 @@ await Promise.all([
   writeNodeAsync("configuration", error_violation),
   writeNodeAsync("configuration-environment", exit_violation),
   writeNodeAsync("configuration-process", exit_violation),
-  writeNodeAsync("recorder-process", { ...posix_emitter, ...exit_violation }),
-  writeNodeAsync("recorder-mocha", { ...posix_emitter, ...exit_violation }),
-  writeNodeAsync("recorder-remote", { ...posix_emitter, ...exit_violation }),
+  writeNodeAsync("recorder-process", { ...socket_emitter, ...exit_violation }),
+  writeNodeAsync("recorder-mocha", { ...socket_emitter, ...exit_violation }),
+  writeNodeAsync("recorder-remote", { ...socket_emitter, ...exit_violation }),
   writeNodeAsync("recorder-manual", { ...local_emitter, ...error_violation }),
   writeNodeAsync("batch", exit_violation),
   writeNodeAsync("setup", exit_violation),
