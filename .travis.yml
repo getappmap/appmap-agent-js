@@ -8,42 +8,36 @@ node_js: 16
 install:
   - npm install
   - npm run build
+  - npm run lint
 
 stages:
   - lint
   - test
   - deploy
 
-script:
-  - npm run test-unit
-  - npm run test-integration
-
 jobs:
   include:
-    - stage: lint
-      script:
-        - npm run lint
     - stage: test
       node_js: 14
       script:
-        - npm run test-unit
+        - npm run test-unit-unix
         - npm run test-integration
     - stage: test
       node_js: 16
       script:
-        - npm run test-unit
+        - npm run test-unit-unix
         - npm run test-integration
     - stage: test
       os: windows
       node_js: 14
       script:
-        - npm run test-unit
+        - npm run test-unit-windows
         - npm run test-integration
     - stage: test
       os: windows
       node_js: 16
       script:
-        - npm run test-unit
+        - npm run test-unit-windows
         - npm run test-integration
     - stage: deploy
       script:

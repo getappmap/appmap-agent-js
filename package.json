@@ -26,14 +26,14 @@
     "url": "https://github.com/applandinc/appmap-agent-js.git"
   },
   "scripts": {
-    "tt": "node ./node_modules/.bin/test-turtle --layout alongside 'npx eslint $1 $2 && npx prettier -w $1 $2 && node --unhandled-rejections=strict $2 && npx c8 --include $1 --check-coverage --branches 100 --functions 100 -- node --unhandled-rejections=strict $2'",
+    "tt": "npx test-turtle --layout alongside -- /bin/sh test/unit-full.sh",
     "lint": "npx eslint '**/*.@(mjs|js|cjs)'",
     "format": "npx prettier -w '**/*.@(mjs|js|cjs)'",
     "build": "node build/index.mjs",
-    "test-unit-raw": "for test in $(find build components -name '*.test.mjs'); do echo \"$test ...\" && (node \"$test\" || echo \"> Failure $?\"); done",
-    "test-unit": "node ./node_modules/.bin/test-turtle --layout alongside 'npx c8 --include $1 --check-coverage --branches 100 --functions 100 -- node --unhandled-rejections=strict $2'",
-    "test-integration": "node --unhandled-rejections=strict test/index.mjs",
-    "deploy": "npx semantic-release"
+    "deploy": "npx semantic-release",
+    "test-unit-unix": "npx test-turtle --layout alongside -- /bin/sh test/unit.sh",
+    "test-unit-windows": "npx test-turtle --layout alongside -- cmd.exe test/unit.bat",
+    "test-integration": "node --unhandled-rejections=strict test/index.mjs"
   },
   "optionalDependencies": {
     "posix-socket": "^1.1.3",
@@ -75,7 +75,7 @@
     "sqlite3": "^5.0.2",
     "tap": "^15.0.10",
     "tape": "^5.2.2",
-    "test-turtle": "^4.0.2"
+    "test-turtle": "^5.0.0"
   },
   "publishConfig": {
     "cache": "~/.npm",
