@@ -26,14 +26,14 @@
     "url": "https://github.com/applandinc/appmap-agent-js.git"
   },
   "scripts": {
-    "tt": "npx test-turtle --layout alongside -- /bin/sh test/unit-full.sh",
-    "lint": "npx eslint '**/*.@(mjs|js|cjs)'",
-    "format": "npx prettier -w '**/*.@(mjs|js|cjs)'",
+    "tt": "npx test-turtle --layout alongside -- /bin/sh test/turtle/tt.sh",
     "build": "node build/index.mjs",
-    "deploy": "npx semantic-release",
-    "test-unit-unix": "npx test-turtle --layout alongside -- /bin/sh test/unit.sh",
-    "test-unit-windows": "npx test-turtle --layout alongside -- cmd.exe test/unit.bat",
-    "test-integration": "node --unhandled-rejections=strict test/index.mjs"
+    "lint": "npx eslint '**/*.@(mjs|js|cjs)'",
+    "test-unit-coverage": "npx test-turtle --layout alongside -- /bin/sh test/turtle/coverage.sh",
+    "test-unit": "npx test-turtle --layout alongside -- node test/turtle/unit.mjs",
+    "test-integration": "node --unhandled-rejections=strict test/index.mjs",
+    "format": "npx prettier -w '**/*.@(mjs|js|cjs)'",
+    "deploy": "npx semantic-release"
   },
   "optionalDependencies": {
     "posix-socket": "^1.1.3",

@@ -1,15 +1,16 @@
+import { join as joinPath } from "path";
+import { writeFile } from "fs/promises";
+import { tmpdir } from "os";
+import { request as createRequest } from "http";
+import { strict as Assert } from "assert";
+import { runAsync } from "../__fixture__.mjs";
+
 // Travis is taking too long for these timer to works.
 // I'm disabling this test for now.
 // It might be worthwhile to synchronize between node processes to avoid timers.
 if (Reflect.getOwnPropertyDescriptor(process.env, "TRAVIS") !== undefined) {
   process.exit(0);
 }
-
-import { writeFile } from "fs/promises";
-import { tmpdir } from "os";
-import { request as createRequest } from "http";
-import { strict as Assert } from "assert";
-import { runAsync } from "../__fixture__.mjs";
 
 const {
   deepEqual: assertDeepEqual,
@@ -102,7 +103,7 @@ const testAsync = async (port_key, port, main) => {
     null,
     {
       recorder: "remote",
-      command: "node ./main.mjs",
+      command: "node main.mjs",
       packages: { glob: "*" },
       [port_key]: port,
       log: "info",
@@ -116,7 +117,7 @@ const testAsync = async (port_key, port, main) => {
       ordering: "causal",
     },
     async (repository) => {
-      await writeFile(`${repository}/main.mjs`, main, "utf8");
+      await writeFile(joinPath(repository, "main.mjs"), main, "utf8");
       forkAsync("localhost", port).catch((error) => {
         stdout.write(`Fork Caught: ${error.message}${"\n"}`);
         throw error;
@@ -130,7 +131,7 @@ stdout.write("\ntrack-port\n");
 
 await testAsync(
   "track-port",
-  `${tmpdir()}/${Math.random().toString(36).substring(2)}`,
+  joinPath(tmpdir(), Math.random().toString(36).substring(2)),
   `
     const interval = setInterval(function heartbeat () {}, 100);
     setTimeout(() => {
@@ -142,7 +143,7 @@ await testAsync(
 stdout.write("\nintercept-track-port\n");
 
 {
-  const port = `${tmpdir()}/${Math.random().toString(36).substring(2)}`;
+  const port = joinPath(tmpdir(), Math.random().toString(36).substring(2));
   await testAsync(
     "intercept-track-port",
     port,

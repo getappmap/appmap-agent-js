@@ -1,17 +1,10 @@
-import { strict as Assert } from "assert";
+import { assertDeepEqual } from "../../../__fixture__.mjs";
 import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
 } from "../../../build.mjs";
 import Classmap from "../classmap/index.mjs";
 import Event from "./index.mjs";
-
-Error.stackTraceLimit = Infinity;
-
-const {
-  deepEqual: assertDeepEqual,
-  // equal: assertEqual,
-} = Assert;
 
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
 const { createClassmap, addClassmapSource } = Classmap(dependencies);

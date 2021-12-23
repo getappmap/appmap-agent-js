@@ -1,16 +1,10 @@
-import { strict as Assert } from "assert";
+import { assertEqual } from "../../__fixture__.mjs";
 import { EventEmitter } from "events";
 import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
 } from "../../build.mjs";
 import Batch from "./index.mjs";
-
-const {
-  equal: assertEqual,
-  // fail: assertFail,
-  // deepEqual: assertDeepEqual
-} = Assert;
 
 global.GLOBAL_SPY_SPAWN = (exec, argv, options) => {
   const emitter = new EventEmitter();

@@ -5,30 +5,22 @@ import {
   readlink as readLinkAsync,
 } from "fs/promises";
 import { buildTestDependenciesAsync } from "../../build.mjs";
-import { tmpdir } from "os";
-import { strict as Assert } from "assert";
+import { getFreshTemporaryPath, assertEqual } from "../../__fixture__.mjs";
+import { basename as getBasename } from "path";
 import Abomination from "./index.mjs";
-
-const { equal: assertEqual } = Assert;
 
 const { addLinkExtensionAsync } = Abomination(
   await buildTestDependenciesAsync(import.meta.url),
 );
 
-const filename1 = Math.random().toString(36).substring(2);
-const filename2 = Math.random().toString(36).substring(2);
+const path1 = getFreshTemporaryPath();
+const path2 = getFreshTemporaryPath();
 
-await writeFileAsync(`${tmpdir()}/${filename1}`, "123;", "utf8");
-await symlinkAsync(filename1, `${tmpdir()}/${filename2}`);
+await writeFileAsync(path1, "123;", "utf8");
+await symlinkAsync(getBasename(path1), path2);
 
-await addLinkExtensionAsync(`${tmpdir()}/${filename2}`);
-assertEqual(
-  await readLinkAsync(`${tmpdir()}/${filename2}`),
-  `${filename1}.cjs`,
-);
-assertEqual(
-  await readFileAsync(`${tmpdir()}/${filename1}.cjs`, "utf8"),
-  "123;",
-);
+await addLinkExtensionAsync(path2);
+assertEqual(await readLinkAsync(path2), `${getBasename(path1)}.cjs`);
+assertEqual(await readFileAsync(`${path1}.cjs`, "utf8"), "123;");
 
-await addLinkExtensionAsync(`${tmpdir()}/${filename1}.cjs`);
+await addLinkExtensionAsync(`${path1}.cjs`);

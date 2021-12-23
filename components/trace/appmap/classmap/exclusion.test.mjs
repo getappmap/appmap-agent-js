@@ -1,8 +1,6 @@
-import { strict as Assert } from "assert";
+import { assertEqual, assertThrow } from "../../../__fixture__.mjs";
 import { buildTestDependenciesAsync } from "../../../build.mjs";
 import Exclusion from "./exclusion.mjs";
-
-const { equal: assertEqual, throws: assertThrows } = Assert;
 
 const { compileExclusion, isExclusionMatched } = Exclusion(
   await buildTestDependenciesAsync(import.meta.url),
@@ -33,7 +31,7 @@ const and_exclusion = {
 
 // Invalid //
 
-assertThrows(() => {
+assertThrow(() => {
   testExclusion(
     {
       ...and_exclusion,
@@ -44,7 +42,7 @@ assertThrows(() => {
   );
 });
 
-assertThrows(() => {
+assertThrow(() => {
   testExclusion(
     {
       ...and_exclusion,
@@ -55,7 +53,7 @@ assertThrows(() => {
   );
 });
 
-assertThrows(() => {
+assertThrow(() => {
   testExclusion(
     {
       ...and_exclusion,
@@ -66,7 +64,7 @@ assertThrows(() => {
   );
 });
 
-assertThrows(() => {
+assertThrow(() => {
   testExclusion(
     {
       ...and_exclusion,

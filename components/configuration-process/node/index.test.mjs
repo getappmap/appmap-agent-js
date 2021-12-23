@@ -1,21 +1,18 @@
 import { writeFile } from "fs/promises";
-import { tmpdir } from "os";
-import { strict as Assert } from "assert";
+import {
+  assertDeepEqual,
+  assertEqual,
+  getFreshTemporaryPath,
+} from "../../__fixture__.mjs";
 import { buildTestDependenciesAsync } from "../../build.mjs";
 import ConfigurationProcess from "./index.mjs";
-
-const {
-  deepEqual: assertDeepEqual,
-  // fail: assertFail,
-  equal: assertEqual,
-} = Assert;
 
 const { loadProcessConfiguration } = ConfigurationProcess(
   await buildTestDependenciesAsync(import.meta.url),
 );
 
 {
-  const path = `${tmpdir()}/${Math.random().toString(36).substring(2)}.json`;
+  const path = `${getFreshTemporaryPath()}.json`;
   loadProcessConfiguration({
     env: { APPMAP_CONFIGURATION_PATH: path },
     argv: ["node", "main.mjs"],

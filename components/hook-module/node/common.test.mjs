@@ -1,4 +1,4 @@
-import { strict as Assert } from "assert";
+import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
 import { createRequire } from "module";
 import { writeFile } from "fs/promises";
 import { tmpdir } from "os";
@@ -9,16 +9,8 @@ import {
 } from "../../build.mjs";
 import Common from "./common.mjs";
 
-Error.stackTraceLimit = Infinity;
-
 const { cwd } = process;
 const { random } = Math;
-const {
-  // ok: assert,
-  equal: assertEqual,
-  // notEqual: assertNotEqual,
-  deepEqual: assertDeepEqual,
-} = Assert;
 
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
 const { createConfiguration } = await buildTestComponentAsync("configuration");

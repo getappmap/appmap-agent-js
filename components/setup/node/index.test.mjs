@@ -1,16 +1,13 @@
-import { tmpdir } from "os";
-import { strict as Assert } from "assert";
+import { assertEqual, getFreshTemporaryPath } from "../../__fixture__.mjs";
 import { join as joinPath } from "path";
 import { mkdir, writeFile, symlink } from "fs/promises";
 import { buildTestDependenciesAsync } from "../../build.mjs";
 import Setup from "./index.mjs";
 
-const { equal: assertEqual } = Assert;
-
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
 const { mainAsync } = Setup(dependencies);
 
-const directory = joinPath(tmpdir(), Math.random().toString(36).substring(2));
+const directory = getFreshTemporaryPath();
 const cwd = () => directory;
 await mkdir(directory);
 

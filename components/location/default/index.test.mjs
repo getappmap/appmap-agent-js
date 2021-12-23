@@ -1,8 +1,6 @@
-import { strict as Assert } from "assert";
+import { assertDeepEqual, assertEqual } from "../../__fixture__.mjs";
 import { buildTestDependenciesAsync } from "../../build.mjs";
 import Location from "./index.mjs";
-
-const { deepEqual: assertDeepEqual, equal: assertEqual } = Assert;
 
 const {
   makeLocation,

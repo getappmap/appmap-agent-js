@@ -1,10 +1,11 @@
-import { tmpdir } from "os";
-import { strict as Assert } from "assert";
+import {
+  getFreshTemporaryPath,
+  assertDeepEqual,
+  assertEqual,
+} from "../../__fixture__.mjs";
 import Module from "module";
 import { buildTestDependenciesAsync } from "../../build.mjs";
 import { testAsync } from "./__fixture__.mjs";
-
-const { deepEqual: assertDeepEqual, equal: assertEqual } = Assert;
 
 const { createRequire } = Module;
 let require = null;
@@ -34,10 +35,6 @@ const runAsync = async (port) => {
 
 assertDeepEqual(await testAsync(0, runAsync), ["message"]);
 
-assertDeepEqual(
-  await testAsync(
-    `${tmpdir()}/${Math.random().toString(36).substring(2)}`,
-    runAsync,
-  ),
-  ["message"],
-);
+assertDeepEqual(await testAsync(getFreshTemporaryPath(), runAsync), [
+  "message",
+]);

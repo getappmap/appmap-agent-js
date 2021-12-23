@@ -1,13 +1,6 @@
-import { strict as Assert } from "assert";
+import { assertDeepEqual } from "../../../../__fixture__.mjs";
 import { buildTestDependenciesAsync } from "../../../../build.mjs";
 import Parse from "./parse.mjs";
-
-Error.stackTraceLimit = Infinity;
-
-const {
-  deepEqual: assertDeepEqual,
-  // equal: assertEqual,
-} = Assert;
 
 const { parse, getLeadingCommentArray } = Parse(
   await buildTestDependenciesAsync(import.meta.url),

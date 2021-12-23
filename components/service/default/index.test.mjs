@@ -1,12 +1,7 @@
-import { strict as Assert } from "assert";
 import { createServer, Socket } from "net";
 
 import { buildTestDependenciesAsync } from "../../build.mjs";
 import Service from "./index.mjs";
-
-const {
-  // equal:assertEqual,
-} = Assert;
 
 const { openServiceAsync, closeServiceAsync, getServicePort } = Service(
   await buildTestDependenciesAsync(import.meta.url),

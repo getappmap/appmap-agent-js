@@ -1,17 +1,9 @@
-import { strict as Assert } from "assert";
+import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
 import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
 } from "../../build.mjs";
 import Backend from "./index.mjs";
-
-Error.stackTraceLimit = Infinity;
-
-const {
-  equal: assertEqual,
-  deepEqual: assertDeepEqual,
-  // throws: assertThrows
-} = Assert;
 
 // const filterObject = (object, keys) => {
 //   const result = {};

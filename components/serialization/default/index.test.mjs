@@ -1,11 +1,9 @@
-import { strict as Assert } from "assert";
+import { assertDeepEqual, assertEqual } from "../../__fixture__.mjs";
 import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
 } from "../../build.mjs";
 import Serialization from "./index.mjs";
-
-const { deepEqual: assertDeepEqual, equal: assertEqual } = Assert;
 
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
 const { createConfiguration, extendConfiguration } =

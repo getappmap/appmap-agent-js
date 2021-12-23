@@ -1,9 +1,7 @@
 /* eslint-env node */
-import { strict as Assert } from "assert";
+import { assertDeepEqual } from "../../__fixture__.mjs";
 import { buildTestDependenciesAsync } from "../../build.mjs";
 import Repository from "./index.mjs";
-
-const { deepEqual: assertDeepEqual } = Assert;
 
 const { extractRepositoryDependency } = Repository(
   await buildTestDependenciesAsync(import.meta.url),

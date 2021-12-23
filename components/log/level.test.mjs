@@ -1,9 +1,7 @@
-import { strict as Assert } from "assert";
+import { assertDeepEqual, assertThrow } from "../__fixture__.mjs";
 import { levelLog } from "./level.mjs";
 
-const { deepEqual: assertDeepEqual, throws: assertThrows } = Assert;
-
-assertThrows(() => levelLog({}, "logMissing"), /^Error: missing map key/);
+assertThrow(() => levelLog({}, "logMissing"), /^Error: missing map key/);
 
 const trace = [];
 

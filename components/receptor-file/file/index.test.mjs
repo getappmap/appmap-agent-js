@@ -1,6 +1,5 @@
-import { tmpdir } from "os";
 import { readFile as readFileAsync } from "fs/promises";
-import { strict as Assert } from "assert";
+import { getFreshTemporaryPath } from "../../__fixture__.mjs";
 import { Socket } from "net";
 import { join as joinPath } from "path";
 import NetSocketMessaging from "net-socket-messaging";
@@ -12,10 +11,6 @@ import Receptor from "./index.mjs";
 
 const { createMessage } = NetSocketMessaging;
 
-const {
-  // equal:assertEqual,
-} = Assert;
-
 const { createConfiguration, extendConfiguration } =
   await buildTestComponentAsync("configuration");
 
@@ -26,7 +21,7 @@ const {
   closeReceptorAsync,
 } = Receptor(await buildTestDependenciesAsync(import.meta.url));
 
-const repository = joinPath(tmpdir(), Math.random().toString(36).substring(2));
+const repository = getFreshTemporaryPath();
 const configuration = extendConfiguration(
   createConfiguration("/root"),
   {

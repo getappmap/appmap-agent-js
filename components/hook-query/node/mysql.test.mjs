@@ -3,9 +3,12 @@ if (Reflect.getOwnPropertyDescriptor(process.env, "TRAVIS") !== undefined) {
   process.exit(0);
 }
 
-import { strict as Assert } from "assert";
+import {
+  getFreshTemporaryPath,
+  assertEqual,
+  assertDeepEqual,
+} from "../../__fixture__.mjs";
 import { spawn } from "child_process";
-import { tmpdir } from "os";
 import Mysql from "mysql";
 import {
   buildTestDependenciesAsync,
@@ -14,8 +17,6 @@ import {
 
 const { default: HookMysql } = await import("./mysql.mjs");
 
-const { equal: assertEqual, deepEqual: assertDeepEqual } = Assert;
-
 const promiseTermination = (child) =>
   new Promise((resolve, reject) => {
     child.on("exit", (status, signal) => resolve({ status, signal }));
@@ -23,7 +24,7 @@ const promiseTermination = (child) =>
   });
 
 const port = 3306;
-const path = `${tmpdir()}/${Math.random().toString(36).substring(2)}`;
+const path = getFreshTemporaryPath();
 
 const proceedAsync = async () => {
   const dependencies = await buildTestDependenciesAsync(import.meta.url);

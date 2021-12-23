@@ -1,8 +1,6 @@
-import { strict as Assert } from "assert";
+import { assertEqual } from "../../__fixture__.mjs";
 import { buildTestDependenciesAsync } from "../../build.mjs";
 import OperatingSystem from "os";
-
-const { equal: assertEqual } = Assert;
 
 let platform = null;
 OperatingSystem.platform = () => platform;

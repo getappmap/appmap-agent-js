@@ -1,8 +1,8 @@
-import { strict as Assert } from "assert";
+import { assertEqual, assertFail, assertThrow } from "../../__fixture__.mjs";
 
 process.exit = () => {};
 global.setTimeout = (closure, timer) => {
-  Assert.throws(closure);
+  assertThrow(closure);
 };
 
 const { default: Violation } = await import("./index.mjs");
@@ -14,28 +14,28 @@ const {
 } = Violation({});
 try {
   throwViolation("foo");
-  Assert.fail();
+  assertFail();
 } catch ({ message }) {
-  Assert.equal(message, "Violation notification >> foo");
+  assertEqual(message, "Violation notification >> foo");
 }
 try {
   await throwViolationAsync("foo");
-  Assert.fail();
+  assertFail();
 } catch ({ message }) {
-  Assert.equal(message, "Asynchronous violation notification >> foo");
+  assertEqual(message, "Asynchronous violation notification >> foo");
 }
-Assert.equal(
+assertEqual(
   catchViolation(
     () => 123,
     () => {
-      Assert.fail();
+      assertFail();
     },
   ),
   123,
 );
-Assert.equal(
+assertEqual(
   await catchViolationAsync(Promise.resolve(123), () => {
-    Assert.fail();
+    assertFail();
   }),
   123,
 );

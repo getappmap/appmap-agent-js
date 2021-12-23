@@ -1,26 +1,25 @@
+import { spawn } from "child_process";
+import Pg from "pg";
+import {
+  getFreshTemporaryPath,
+  assertEqual,
+  assertDeepEqual,
+  assertFail,
+  assertMatch,
+} from "../../__fixture__.mjs";
+import {
+  buildTestDependenciesAsync,
+  buildTestComponentAsync,
+} from "../../build.mjs";
+
 // TODO investigate why this fails on travis.
 if (Reflect.getOwnPropertyDescriptor(process.env, "TRAVIS") !== undefined) {
   process.exit(0);
 }
 
-import { spawn } from "child_process";
-import { tmpdir } from "os";
-import Pg from "pg";
-import { strict as Assert } from "assert";
-import {
-  buildTestDependenciesAsync,
-  buildTestComponentAsync,
-} from "../../build.mjs";
 const { default: HookPg } = await import("./pg.mjs");
 
 const { Client, Query } = Pg;
-
-const {
-  equal: assertEqual,
-  deepEqual: assertDeepEqual,
-  fail: assertFail,
-  match: assertMatch,
-} = Assert;
 
 const promiseTermination = (child) =>
   new Promise((resolve, reject) => {
@@ -30,7 +29,7 @@ const promiseTermination = (child) =>
 
 const port = 5432;
 const user = "postgres";
-const path = `${tmpdir()}/${Math.random().toString(36).substring(2)}`;
+const path = getFreshTemporaryPath();
 
 const proceedAsync = async () => {
   const dependencies = await buildTestDependenciesAsync(import.meta.url);

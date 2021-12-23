@@ -1,5 +1,4 @@
-import { strict as Assert } from "assert";
-import { tmpdir } from "os";
+import { getFreshTemporaryPath, assertDeepEqual } from "../../__fixture__.mjs";
 import { writeFile as writeFileAsync, mkdir as mkdirAsync } from "fs/promises";
 import { join as joinPath } from "path";
 import { pathToFileURL } from "url";
@@ -8,8 +7,6 @@ import {
   buildTestComponentAsync,
 } from "../../build.mjs";
 import SourceOuter from "./index.mjs";
-
-const { deepEqual: assertDeepEqual } = Assert;
 
 const { getSources } = await buildTestComponentAsync("source");
 const { extractSourceMap } = SourceOuter(
@@ -25,7 +22,7 @@ const { extractSourceMap } = SourceOuter(
 }
 
 {
-  const directory = joinPath(tmpdir(), Math.random().toString(36).substring(2));
+  const directory = getFreshTemporaryPath();
   await mkdirAsync(directory);
   const file = {
     url: pathToFileURL(joinPath(directory, "script.js")).toString(),

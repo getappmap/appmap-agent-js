@@ -1,15 +1,13 @@
-import { strict as Assert } from "assert";
+import {
+  assertDeepEqual,
+  assertEqual,
+  assertThrow,
+} from "../../__fixture__.mjs";
 import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
 } from "../../build.mjs";
 import ConfigurationHelper from "./index.mjs";
-
-const {
-  deepEqual: assertDeepEqual,
-  equal: assertEqual,
-  throws: assertThrows,
-} = Assert;
 
 const { createConfiguration, extendConfiguration } =
   await buildTestComponentAsync("configuration");
@@ -413,7 +411,7 @@ assertDeepEqual(
   };
   testMocha(true);
   testMocha(false);
-  assertThrows(() => {
+  assertThrow(() => {
     compileConfigurationCommand(
       extendConfiguration(
         createConfiguration("/cwd1"),

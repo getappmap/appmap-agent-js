@@ -1,15 +1,9 @@
-import { strict as Assert } from "assert";
 import { EventEmitter } from "events";
 import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
 } from "../../build.mjs";
 import RecorderMocha from "./index.mjs";
-
-const {
-  // equal: assertEqual,
-  // deepEqual: assertDeepEqual,
-} = Assert;
 
 const { createMochaHooks } = RecorderMocha(
   await buildTestDependenciesAsync(import.meta.url),

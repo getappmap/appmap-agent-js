@@ -1,10 +1,8 @@
-import { strict as Assert } from "assert";
+import { assertEqual } from "../../__fixture__.mjs";
 import { buildTestDependenciesAsync } from "../../build.mjs";
-import _Assert from "./index.mjs";
+import Expect from "./index.mjs";
 
-const { equal: assertEqual } = Assert;
-
-const { expect, expectSuccess, expectSuccessAsync } = _Assert(
+const { expect, expectSuccess, expectSuccessAsync } = Expect(
   await buildTestDependenciesAsync(import.meta.url),
 );
 assertEqual(expect(true, "%s", "foo"), undefined);

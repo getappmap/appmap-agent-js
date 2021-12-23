@@ -1,16 +1,9 @@
-import { strict as Assert } from "assert";
+import { assertDeepEqual } from "../../../../__fixture__.mjs";
 import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
 } from "../../../../build.mjs";
 import Estree from "./index.mjs";
-
-Error.stackTraceLimit = Infinity;
-
-const {
-  deepEqual: assertDeepEqual,
-  // equal: assertEqual,
-} = Assert;
 
 const { extractEstreeEntityArray } = Estree(
   await buildTestDependenciesAsync(import.meta.url),

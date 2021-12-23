@@ -1,21 +1,13 @@
-import { strict as Assert } from "assert";
+import { getFreshTemporaryPath, assertEqual } from "../../__fixture__.mjs";
 import { mkdir as mkdirAsync, writeFile as writeFileAsync } from "fs/promises";
-import { tmpdir } from "os";
 import { buildTestDependenciesAsync } from "../../build.mjs";
 import Require from "./require.mjs";
-
-const {
-  // ok: assert,
-  equal: assertEqual,
-  // notEqual: assertNotEqual,
-  // deepEqual: assertDeepEqual,
-} = Assert;
 
 const { requireMaybe } = Require(
   await buildTestDependenciesAsync(import.meta.url),
 );
 
-const directory = `${tmpdir()}/${Math.random().toString(36).substring(2)}`;
+const directory = getFreshTemporaryPath();
 
 await mkdirAsync(directory);
 

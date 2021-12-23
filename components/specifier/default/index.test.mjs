@@ -1,14 +1,12 @@
-import { strict as Assert } from "assert";
+import { assertEqual, assertThrow } from "../../__fixture__.mjs";
 import { buildTestDependenciesAsync } from "../../build.mjs";
 import Specifier from "./index.mjs";
-
-const { equal: assertEqual, throws: assertThrows } = Assert;
 
 const { createSpecifier, matchSpecifier } = Specifier(
   await buildTestDependenciesAsync(import.meta.url),
 );
 
-assertThrows(
+assertThrow(
   () => createSpecifier("/foo", {}),
   /^AssertionError: invalid specifier options/,
 );

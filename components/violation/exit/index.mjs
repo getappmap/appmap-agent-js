@@ -12,7 +12,6 @@ export default (dependencies) => {
       throw new _Error(`Timeout violation notification >> ${message}`);
     }, 0);
   };
-
   return {
     throwViolation: (message) => {
       signalViolation(message);

@@ -1,10 +1,8 @@
-import { strict as Assert } from "assert";
+import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
 import { fileURLToPath } from "url";
-import { dirname } from "path";
+import { dirname as getDirectory } from "path";
 import { buildTestDependenciesAsync } from "../../build.mjs";
 import Repository from "./index.mjs";
-
-const { deepEqual: assertDeepEqual, equal: assertEqual } = Assert;
 
 const { url } = import.meta;
 
@@ -13,7 +11,7 @@ const { extractRepositoryPackage, extractRepositoryDependency } = Repository(
 );
 let path = fileURLToPath(url);
 while (!path.endsWith("appmap-agent-js")) {
-  path = dirname(path);
+  path = getDirectory(path);
 }
 assertDeepEqual(extractRepositoryPackage(`${path}/lib`), null);
 {

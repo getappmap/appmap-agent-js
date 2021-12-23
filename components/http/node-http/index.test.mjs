@@ -1,16 +1,13 @@
-import { strict as Assert } from "assert";
+import {
+  assert,
+  assertReject,
+  assertDeepEqual,
+  assertEqual,
+} from "../../__fixture__.mjs";
 import { createServer, request as createRequest } from "http";
 import { tmpdir } from "os";
 import { buildTestDependenciesAsync } from "../../build.mjs";
 import Request from "./index.mjs";
-
-const {
-  ok: assert,
-  rejects: assertRejects,
-  deepEqual: assertDeepEqual,
-  equal: assertEqual,
-  // fail: assertFail,
-} = Assert;
 
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
 
@@ -90,7 +87,7 @@ const closeServerAsync = (server) =>
     response.end("foo", "utf8");
   });
   await listenServerAsync(server, 0);
-  await assertRejects(async () => {
+  await assertReject(async () => {
     await requestAsync(
       "localhost",
       server.address().port,

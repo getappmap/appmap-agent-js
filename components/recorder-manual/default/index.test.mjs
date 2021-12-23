@@ -1,11 +1,9 @@
-import { strict as Assert } from "assert";
+import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
 import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
 } from "../../build.mjs";
 import RecorderManual from "./index.mjs";
-
-const { equal: assertEqual, deepEqual: assertDeepEqual } = Assert;
 
 const { Appmap } = RecorderManual(
   await buildTestDependenciesAsync(import.meta.url),

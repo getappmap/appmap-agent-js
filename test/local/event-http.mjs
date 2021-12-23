@@ -1,5 +1,6 @@
 import { writeFile, readFile } from "fs/promises";
 import { strict as Assert } from "assert";
+import { join as joinPath } from "path";
 import { runAsync } from "../__fixture__.mjs";
 
 const { deepEqual: assertDeepEqual } = Assert;
@@ -9,7 +10,7 @@ await runAsync(
   {
     recorder: "process",
     packages: { glob: "*" },
-    command: "node ./main.mjs",
+    command: "node main.mjs",
     ordering: "chronological",
     output: {
       basename: "basename",
@@ -23,7 +24,7 @@ await runAsync(
   },
   async (repository) => {
     await writeFile(
-      `${repository}/main.mjs`,
+      joinPath(repository, "main.mjs"),
       `
         import Http from "http";
         const server = Http.createServer();
@@ -52,7 +53,10 @@ await runAsync(
   },
   async (directory) => {
     const appmap = JSON.parse(
-      await readFile(`${directory}/tmp/appmap/basename.appmap.json`, "utf8"),
+      await readFile(
+        joinPath(directory, "tmp", "appmap", "basename.appmap.json"),
+        "utf8",
+      ),
     );
     let { events } = appmap;
     /* eslint-disable no-unused-vars */

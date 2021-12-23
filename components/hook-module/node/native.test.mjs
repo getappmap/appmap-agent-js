@@ -1,4 +1,4 @@
-import { strict as Assert } from "assert";
+import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
 import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
@@ -6,12 +6,6 @@ import {
 import Native from "./native.mjs";
 
 const _eval = eval;
-const {
-  // ok: assert,
-  equal: assertEqual,
-  // notEqual: assertNotEqual,
-  deepEqual: assertDeepEqual,
-} = Assert;
 
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
 const { testHookAsync } = await buildTestComponentAsync("hook");

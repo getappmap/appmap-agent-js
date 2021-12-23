@@ -1,12 +1,5 @@
-import { strict as Assert } from "assert";
 import { buildTestDependenciesAsync } from "../../build.mjs";
 import Request from "./index.mjs";
-
-const {
-  // deepEqual: assertDeepEqual,
-  // equal: assertEqual,
-  // fail: assertFail,
-} = Assert;
 
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
 

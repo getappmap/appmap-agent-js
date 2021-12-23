@@ -1,15 +1,9 @@
-import { strict as Assert } from "assert";
+import { assertDeepEqual, assertEqual } from "../../__fixture__.mjs";
 import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
 } from "../../build.mjs";
 import Configuration from "./index.mjs";
-
-const {
-  deepEqual: assertDeepEqual,
-  equal: assertEqual,
-  // throws: assertThrows,
-} = Assert;
 
 const { validateConfiguration } = await buildTestComponentAsync("validate");
 

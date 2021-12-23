@@ -1,4 +1,4 @@
-import { strict as Assert } from "assert";
+import { assertDeepEqual } from "../../__fixture__.mjs";
 import Http from "http";
 import {
   buildTestDependenciesAsync,
@@ -7,11 +7,6 @@ import {
 import HookRequest from "./index.mjs";
 
 const { createServer } = Http;
-
-const {
-  // equal: assertEqual,
-  deepEqual: assertDeepEqual,
-} = Assert;
 
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
 const { testHookAsync, makeEvent } = await buildTestComponentAsync("hook");

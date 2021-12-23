@@ -1,22 +1,23 @@
 import { mkdir } from "fs/promises";
 import { execSync } from "child_process";
-import { strict as Assert } from "assert";
-import { tmpdir } from "os";
+import {
+  assertEqual,
+  assertThrow,
+  getFreshTemporaryPath,
+} from "../../__fixture__.mjs";
 import { buildTestDependenciesAsync } from "../../build.mjs";
 import Git from "./git.mjs";
 
-const { equal: assertEqual, throws: assertThrows } = Assert;
 const { isArray } = Array;
-const { random } = Math;
 
 const { extractGitInformation } = Git(
   await buildTestDependenciesAsync(import.meta.url),
 );
 
 const url = "https://github.com/lachrist/sample.git";
-const path = `${tmpdir()}/${random().toString(36).substring(2)}`;
+const path = getFreshTemporaryPath();
 
-assertThrows(() => extractGitInformation(path), /^AppmapError:.*ENOENT/);
+assertThrow(() => extractGitInformation(path), /^AppmapError:.*ENOENT/);
 await mkdir(path);
 assertEqual(extractGitInformation(path), null);
 execSync(`git clone ${url} ${path}`, {

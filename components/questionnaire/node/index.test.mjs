@@ -1,4 +1,4 @@
-import { strict as Assert } from "assert";
+import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
 import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
@@ -6,8 +6,6 @@ import {
 import Questionnaire from "./index.mjs";
 
 const BREAK = {};
-
-const { deepEqual: assertDeepEqual, equal: assertEqual } = Assert;
 
 const { validateConfig } = await buildTestComponentAsync("validate");
 

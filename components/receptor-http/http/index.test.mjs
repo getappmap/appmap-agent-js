@@ -1,4 +1,4 @@
-import { strict as Assert } from "assert";
+import { assertDeepEqual } from "../../__fixture__.mjs";
 import { Socket } from "net";
 import NetSocketMessaging from "net-socket-messaging";
 import {
@@ -8,11 +8,6 @@ import {
 import Receptor from "./index.mjs";
 
 const { createMessage } = NetSocketMessaging;
-
-const {
-  // equal:assertEqual,
-  deepEqual: assertDeepEqual,
-} = Assert;
 
 const { requestAsync } = await buildTestComponentAsync("http");
 

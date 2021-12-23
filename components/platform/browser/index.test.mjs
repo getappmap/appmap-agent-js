@@ -1,8 +1,6 @@
-import { strict as Assert } from "assert";
+import { assertEqual } from "../../__fixture__.mjs";
 import { buildTestDependenciesAsync } from "../../build.mjs";
 import Platform from "./index.mjs";
-
-const { equal: assertEqual } = Assert;
 
 const { getPathSeparator, isAbsolutePath, sanitizeFilename } = Platform(
   await buildTestDependenciesAsync(import.meta.url),

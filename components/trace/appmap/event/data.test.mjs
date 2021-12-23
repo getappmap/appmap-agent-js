@@ -1,14 +1,6 @@
-import { strict as Assert } from "assert";
+import { assertDeepEqual } from "../../../__fixture__.mjs";
 import { buildTestDependenciesAsync } from "../../../build.mjs";
 import Data from "./data.mjs";
-
-Error.stackTraceLimit = Infinity;
-
-const {
-  deepEqual: assertDeepEqual,
-  // throws: assertThrows,
-  // equal: assertEqual,
-} = Assert;
 
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
 const {

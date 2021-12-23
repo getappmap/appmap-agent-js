@@ -1,15 +1,9 @@
-import { strict as Assert } from "assert";
 import { EventEmitter } from "events";
 import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
 } from "../../build.mjs";
 import RecorderProcess from "./index.mjs";
-
-const {
-  // equal: assertEqual,
-  // deepEqual: assertDeepEqual,
-} = Assert;
 
 const { main } = RecorderProcess(
   await buildTestDependenciesAsync(import.meta.url),

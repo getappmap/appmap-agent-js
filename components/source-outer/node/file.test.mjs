@@ -1,15 +1,15 @@
-import { strict as Assert } from "assert";
-import { tmpdir } from "os";
+import {
+  getFreshTemporaryPath,
+  assert,
+  assertDeepEqual,
+} from "../../__fixture__.mjs";
 import { writeFile as writeFileAsync } from "fs/promises";
-import { join as joinPath } from "path";
 import { pathToFileURL } from "url";
 import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
 } from "../../build.mjs";
 import File from "./file.mjs";
-
-const { deepEqual: assertDeepEqual, ok: assert } = Assert;
 
 const { readFile } = File(await buildTestDependenciesAsync(import.meta.url));
 const { isLeft, makeRight } = await buildTestComponentAsync("util");
@@ -37,7 +37,7 @@ assertDeepEqual(
 // file //
 //////////
 
-const path = joinPath(tmpdir(), Math.random().toString(36).substring(2));
+const path = getFreshTemporaryPath();
 const url = pathToFileURL(path).toString();
 assert(isLeft(readFile(url)));
 

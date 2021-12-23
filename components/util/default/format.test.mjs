@@ -1,16 +1,14 @@
-import { strict as Assert } from "assert";
+import { assertEqual, assertThrow } from "../../__fixture__.mjs";
 import { format } from "./format.mjs";
 
-const { equal: assertEqual, throws: assertThrows } = Assert;
-
-assertThrows(
+assertThrow(
   () => format("%x", [123]),
   /^AssertionError: invalid format marker/u,
 );
 
-assertThrows(() => format("%s", []), /^AssertionError: missing format value/u);
+assertThrow(() => format("%s", []), /^AssertionError: missing format value/u);
 
-assertThrows(() =>
+assertThrow(() =>
   format("foo", ["bar"], /^AssertionError: missing format marker/u),
 );
 
@@ -20,7 +18,7 @@ assertEqual(format("%%", []), "%");
 
 assertEqual(format("%s", ["foo"]), "foo");
 
-assertThrows(() => format("%s", [123]), /^AssertionError: expected a string/u);
+assertThrow(() => format("%s", [123]), /^AssertionError: expected a string/u);
 
 // %j //
 
@@ -34,17 +32,14 @@ assertEqual(format("%o", [() => {}]), "[object Function]");
 
 assertEqual(format("%e", [new Error("foo")]), "foo");
 
-assertThrows(
-  () => format("%e", [null]),
-  /^AssertionError: expected an object/u,
-);
+assertThrow(() => format("%e", [null]), /^AssertionError: expected an object/u);
 
-assertThrows(
+assertThrow(
   () => format("%e", [{}]),
   /^AssertionError: missing 'message' property/u,
 );
 
-assertThrows(
+assertThrow(
   () => format("%e", [{ message: 123 }]),
   /^AssertionError: expected 'message' property value to be a string/u,
 );

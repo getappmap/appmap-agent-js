@@ -1,7 +1,6 @@
 /* eslint-env node */
+import { assertEqual } from "../../__fixture__.mjs";
 import { buildTestDependenciesAsync } from "../../build.mjs";
-
-import { strict as Assert } from "assert";
 import JsDom from "jsdom";
 
 const { JSDOM } = JsDom;
@@ -14,5 +13,5 @@ const { default: Interpretation } = await import("./index.mjs");
 const { runScript } = Interpretation(
   await buildTestDependenciesAsync(import.meta.url),
 );
-Assert.equal(runScript("var x = 123;", "file:///script.js"), undefined);
-Assert.equal(window.x, 123);
+assertEqual(runScript("var x = 123;", "file:///script.js"), undefined);
+assertEqual(window.x, 123);

@@ -1,5 +1,6 @@
 import { writeFile, readFile } from "fs/promises";
 import { strict as Assert } from "assert";
+import { join as joinPath } from "path";
 import { runAsync } from "../__fixture__.mjs";
 
 const { deepEqual: assertDeepEqual } = Assert;
@@ -8,7 +9,7 @@ await runAsync(
   null,
   {
     recorder: "process",
-    command: "node ./main.mjs",
+    command: "node main.mjs",
     pruning: false,
     packages: { glob: "*" },
     hooks: {
@@ -32,16 +33,23 @@ await runAsync(
       `,
       "utf8",
     );
-    await writeFile(`${repository}/common.js`, `function common () {}`, "utf8");
     await writeFile(
-      `${repository}/native.mjs`,
+      joinPath(repository, "common.js"),
+      `function common () {}`,
+      "utf8",
+    );
+    await writeFile(
+      joinPath(repository, "native.mjs"),
       `function native () {}`,
       "utf8",
     );
   },
   async (directory) => {
     const appmap = JSON.parse(
-      await readFile(`${directory}/tmp/appmap/basename.appmap.json`, "utf8"),
+      await readFile(
+        joinPath(directory, "tmp", "appmap", "basename.appmap.json"),
+        "utf8",
+      ),
     );
     const { classMap: classmap } = appmap;
     assertDeepEqual(classmap, [

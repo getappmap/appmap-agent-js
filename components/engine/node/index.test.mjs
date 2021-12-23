@@ -1,6 +1,5 @@
-import { strict as Assert } from "assert";
+import { assertEqual } from "../../__fixture__.mjs";
 import Engine from "./index.mjs";
-const { equal: assertEqual } = Assert;
 const { getEngine } = Engine({});
 const { name } = getEngine();
 assertEqual(name, "node");
