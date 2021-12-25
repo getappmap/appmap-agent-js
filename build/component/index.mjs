@@ -1,3 +1,4 @@
+import { mkdir as mkdirAsync } from "fs/promises";
 import { writeEntryPointAsync } from "./static.mjs";
 
 const generateWriteAsync = (branch) => async (component, blueprint) => {
@@ -11,6 +12,8 @@ const local_emitter = { emitter: ["local"] };
 
 const exit_violation = { violation: ["exit"] };
 const error_violation = { violation: ["error"] };
+
+await mkdirAsync("dist/node");
 
 await Promise.all([
   writeNodeAsync("configuration", error_violation),
