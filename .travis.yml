@@ -1,50 +1,10 @@
 arch: amd64
-os: linux
-dist: focal
+os: windows
 language: node_js
 cache: npm
 node_js: 16
-
 install:
   - npm install
   - npm run build
-
-stages:
-  - lint
-  - test
-  - deploy
-
-jobs:
-  include:
-    # - stage: lint
-    #   script:
-    #     - npm run lint
-    # - stage: test
-    #   os: linux
-    #   node_js: 16
-    #   script:
-    #     - npm run test-unit-coverage
-    #     - npm run test-integration
-    # - stage: test
-    #   os: linux
-    #   node_js: 14
-    #   script:
-    #     - npm run test-unit
-    #     - npm run test-integration
-    - stage: test
-      os: windows
-      node_js: 16
-      script:
-        - npm run test-unit
-        - npm run test-integration
-    # - stage: test
-    #   os: windows
-    #   node_js: 14
-    #   script:
-    #     - npm run test-unit
-    #     - npm run test-integration
-    # - stage: deploy
-    #   script:
-    #     - npm run format
-    #     - npm run deploy
-    #   branches: main
+scripts:
+  - npm run test-unit
