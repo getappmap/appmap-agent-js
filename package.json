@@ -75,7 +75,7 @@
     "sqlite3": "^5.0.2",
     "tap": "^15.0.10",
     "tape": "^5.2.2",
-    "test-turtle": "^5.0.0"
+    "test-turtle": "^5.1.0"
   },
   "publishConfig": {
     "cache": "~/.npm",
