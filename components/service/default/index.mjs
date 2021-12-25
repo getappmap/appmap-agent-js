@@ -1,5 +1,7 @@
-import { tmpdir } from "os";
+import { tmpdir as getTemporaryDirectory, platform as getPlatform } from "os";
 import { join as joinPath } from "path";
+
+const { cwd } = process;
 
 const _Promise = Promise;
 const _Set = Set;
@@ -30,7 +32,14 @@ export default (dependencies) => {
           server.removeListener("error", reject);
           resolve({ server, sockets });
         });
-        server.listen(port === "" ? joinPath(tmpdir(), getUUID()) : port);
+        if (port === "") {
+          /* c8 ignore start */ if (getPlatform() === "win32") {
+            port = joinPath("\\\\?\\pipe", cwd(), getUUID());
+          } /* c8 ignore stop */ else {
+            port = joinPath(getTemporaryDirectory(), getUUID());
+          }
+        }
+        server.listen(port);
       });
     },
     getServicePort: ({ server }) => {
