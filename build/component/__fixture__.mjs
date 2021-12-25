@@ -1,9 +1,18 @@
 /* c8 ignore start */
 import { strict as Assert } from "assert";
-import { pathToFileURL } from "url";
+import { pathToFileURL, fileURLToPath } from "url";
+import {
+  sep as path_separator,
+  dirname as getDirectory,
+  join as joinPath,
+  relative as toRelativePath,
+} from "path";
 import { writeFile, mkdir, rm } from "fs/promises";
 import YAML from "yaml";
 import { tmpdir } from "os";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = getDirectory(__filename);
 
 const { deepEqual: assertDeepEqual } = Assert;
 const { stringify: stringifyYAML } = YAML;
@@ -15,30 +24,30 @@ const writeInstanceAsync = async (
   { root, conf, main },
   config,
 ) => {
-  const directory = `${root}/${component}/${instance}`;
+  const directory = joinPath(root, component, instance);
   await mkdir(directory);
-  await writeFile(`${directory}/${conf}`, stringifyYAML(config), "utf8");
+  await writeFile(joinPath(directory, conf), stringifyYAML(config), "utf8");
   await writeFile(
-    `${directory}/${main}`,
+    joinPath(directory, main),
     `export default (dependencies) => ["${component}", "${instance}", {__proto__:null, ...dependencies}];`,
     "utf8",
   );
 };
 
 export const testAsync = async (type, module) => {
-  const root = `${tmpdir()}/${random().toString(36).substring(2)}`;
+  const root = joinPath(tmpdir(), random().toString(36).substring(2));
   const main = "foo.mjs";
   const conf = "bar.yml";
   const options = { root, main, conf };
   try {
     // Setup //
     await mkdir(root);
-    await mkdir(`${root}/component1`);
+    await mkdir(joinPath(root, "component1"));
     await writeInstanceAsync("component1", "instance", options, {
       branches: ["branch1", "branch2"],
       dependencies: ["component2"],
     });
-    await mkdir(`${root}/component2`);
+    await mkdir(joinPath(root, "component2"));
     await writeInstanceAsync("component2", "instance1", options, {
       branches: ["branch1", "branch2"],
       dependencies: [],
@@ -74,7 +83,7 @@ export const testAsync = async (type, module) => {
       assertDeepEqual(
         await buildDependenciesAsync(
           "branch2",
-          pathToFileURL(`${root}/component1/instance`),
+          pathToFileURL(joinPath(root, "component1", "instance")),
           {},
           options,
         ),
@@ -88,7 +97,11 @@ export const testAsync = async (type, module) => {
           filename: "main1.mjs",
           ...options,
         });
-        const { default: Component1 } = await import(`${root}/main1.mjs`);
+        const { default: Component1 } = await import(
+          joinPath(toRelativePath(__dirname, root), "main1.mjs")
+            .split(path_separator)
+            .join("/")
+        );
         assertDeepEqual(Component1({ component2: "instance1" }), [
           "component1",
           "instance",
@@ -102,7 +115,11 @@ export const testAsync = async (type, module) => {
           filename: "main2.mjs",
           ...options,
         });
-        const { default: Component1 } = await import(`${root}/main2.mjs`);
+        const { default: Component1 } = await import(
+          joinPath(toRelativePath(__dirname, root), "main2.mjs")
+            .split(path_separator)
+            .join("/")
+        );
         assertDeepEqual(Component1({}), [
           "component1",
           "instance",

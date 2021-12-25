@@ -1,7 +1,10 @@
-import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
+import {
+  assertEqual,
+  assertDeepEqual,
+  getFreshTemporaryPath,
+} from "../../__fixture__.mjs";
 import { createRequire } from "module";
 import { writeFile } from "fs/promises";
-import { tmpdir } from "os";
 import { pathToFileURL } from "url";
 import {
   buildTestDependenciesAsync,
@@ -10,7 +13,6 @@ import {
 import Common from "./common.mjs";
 
 const { cwd } = process;
-const { random } = Math;
 
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
 const { createConfiguration } = await buildTestComponentAsync("configuration");
@@ -18,7 +20,7 @@ const { testHookAsync } = await buildTestComponentAsync("hook");
 const { hookCommonModule, unhookCommonModule } = Common(dependencies);
 const require = createRequire(`${cwd()}/dummy.js`);
 const { resolve } = require;
-const path = `${tmpdir()}/${random().toString(36).substring(2)}.js`;
+const path = getFreshTemporaryPath();
 await writeFile(path, "module.exports = 123;", "utf8");
 const resolved_path = resolve(path);
 assertDeepEqual(

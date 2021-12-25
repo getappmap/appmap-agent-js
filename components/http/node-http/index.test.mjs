@@ -3,9 +3,9 @@ import {
   assertReject,
   assertDeepEqual,
   assertEqual,
+  getFreshTemporaryPath,
 } from "../../__fixture__.mjs";
 import { createServer, request as createRequest } from "http";
-import { tmpdir } from "os";
 import { buildTestDependenciesAsync } from "../../build.mjs";
 import Request from "./index.mjs";
 
@@ -65,7 +65,7 @@ const closeServerAsync = (server) =>
       body: null,
     })),
   );
-  const port = `${tmpdir()}/${Math.random().toString(36).substring(2)}`;
+  const port = getFreshTemporaryPath();
   await listenServerAsync(server, port);
   assertDeepEqual(await requestAsync("localhost", port, "GET", "/path", null), {
     code: 200,

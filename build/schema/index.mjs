@@ -3,7 +3,7 @@ import {
   writeFile as writeFileAsync,
 } from "fs/promises";
 import { fileURLToPath } from "url";
-import { dirname as getDirname } from "path";
+import { dirname as getDirectory } from "path";
 import YAML from "yaml";
 import Ajv from "ajv";
 import GenerateStandaloneCode from "ajv/dist/standalone/index.js";
@@ -14,7 +14,7 @@ const { stringify: stringifyJSON } = JSON;
 const { parse: parseYAML } = YAML;
 
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = getDirname(__filename);
+const __dirname = getDirectory(__filename);
 
 const schema = parseYAML(
   await readFileAsync(`${__dirname}/schema.yml`, "utf8"),

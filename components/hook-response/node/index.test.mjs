@@ -1,5 +1,4 @@
-import { assertDeepEqual } from "../../__fixture__.mjs";
-import { tmpdir } from "os";
+import { assertDeepEqual, getFreshTemporaryPath } from "../../__fixture__.mjs";
 import Http from "http";
 import createApp from "express";
 import {
@@ -184,7 +183,7 @@ assertDeepEqual(
 
 // Track Port && http.Server //
 {
-  const port = `${tmpdir()}/${Math.random().toString(36).substring(2)}`;
+  const port = getFreshTemporaryPath();
   assertDeepEqual(
     await testHookAsync(
       hookResponse,

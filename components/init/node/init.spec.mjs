@@ -1,6 +1,6 @@
 import fs from "fs";
+import { basename, join } from "path";
 import { tmpdir } from "os";
-import { basename } from "path";
 import { strict as assert } from "assert";
 import { mkdir /*, writeFile, symlink*/ } from "fs/promises";
 import { buildTestDependenciesAsync } from "../../build.mjs";
@@ -17,7 +17,7 @@ describe("the init command", () => {
   let directory;
   let cwd;
   beforeEach(async () => {
-    directory = `${tmpdir()}/${Math.random().toString(36).substring(2)}`;
+    directory = join(tmpdir(), Math.random().toString(36).substring(2));
     await mkdir(directory);
     externals.showResults = sinon.stub();
     cwd = process.cwd();

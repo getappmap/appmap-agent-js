@@ -1,4 +1,6 @@
 import { tmpdir } from "os";
+import { join as joinPath } from "path";
+
 const _Promise = Promise;
 const _Set = Set;
 const _setTimeout = setTimeout;
@@ -28,7 +30,7 @@ export default (dependencies) => {
           server.removeListener("error", reject);
           resolve({ server, sockets });
         });
-        server.listen(port === "" ? `${tmpdir()}/${getUUID()}` : port);
+        server.listen(port === "" ? joinPath(tmpdir(), getUUID()) : port);
       });
     },
     getServicePort: ({ server }) => {
