@@ -20,26 +20,28 @@ jobs:
       script:
         - npm run lint
     - stage: test
-      node_js: 14
-      script:
-        - npm run test-unit-unix
-        - npm run test-integration
-    - stage: test
+      os: linux
       node_js: 16
       script:
-        - npm run test-unit-unix
+        - npm run test-unit-coverage
         - npm run test-integration
     - stage: test
-      os: windows
+      os: linux
       node_js: 14
       script:
-        - npm run test-unit-windows
+        - npm run test-unit
         - npm run test-integration
     - stage: test
       os: windows
       node_js: 16
       script:
-        - npm run test-unit-windows
+        - npm run test-unit
+        - npm run test-integration
+    - stage: test
+      os: windows
+      node_js: 14
+      script:
+        - npm run test-unit
         - npm run test-integration
     - stage: deploy
       script:
