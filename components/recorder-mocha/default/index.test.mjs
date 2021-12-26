@@ -3,6 +3,7 @@ import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
 } from "../../build.mjs";
+import { makeAbsolutePath } from "../../__fixture__.mjs";
 import RecorderMocha from "./index.mjs";
 
 const { createMochaHooks } = RecorderMocha(
@@ -12,11 +13,11 @@ const { createMochaHooks } = RecorderMocha(
 const { createConfiguration, extendConfiguration } =
   await buildTestComponentAsync("configuration");
 
-const configuration = createConfiguration("/repository");
+const configuration = createConfiguration(makeAbsolutePath("repository"));
 
 {
   const emitter = Object.assign(new EventEmitter(), {
-    cwd: () => "/cwd",
+    cwd: () => makeAbsolutePath("cwd"),
     argv: ["node", "main.mjs"],
     version: "v1.2.3",
   });
@@ -25,14 +26,14 @@ const configuration = createConfiguration("/repository");
     extendConfiguration(
       configuration,
       { recorder: "mocha", processes: false, main: "foo.js" },
-      "/cwd",
+      makeAbsolutePath("cwd"),
     ),
   );
 }
 
 {
   const emitter = Object.assign(new EventEmitter(), {
-    cwd: () => "/cwd",
+    cwd: () => makeAbsolutePath("cwd"),
     argv: ["node", "main.mjs"],
     version: "v1.2.3",
   });
@@ -44,7 +45,7 @@ const configuration = createConfiguration("/repository");
         recorder: "mocha",
         hooks: { cjs: false, esm: false, apply: false, http: false },
       },
-      "/directory",
+      makeAbsolutePath("directory"),
     ),
   );
   beforeEach.call({

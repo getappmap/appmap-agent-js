@@ -2,6 +2,7 @@ import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
 } from "../../build.mjs";
+import { makeAbsolutePath } from "../../__fixture__.mjs";
 import Emitter from "./index.mjs";
 
 const { createConfiguration, extendConfiguration } =
@@ -12,7 +13,7 @@ const { openEmitter, closeEmitter, sendEmitter } = Emitter(
 );
 
 const configuration = extendConfiguration(
-  createConfiguration("/cwd"),
+  createConfiguration(makeAbsolutePath("cwd")),
   {
     host: "localhost",
   },

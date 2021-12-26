@@ -1,4 +1,8 @@
-import { assertDeepEqual, assertEqual } from "../../__fixture__.mjs";
+import {
+  assertDeepEqual,
+  assertEqual,
+  makeAbsolutePath,
+} from "../../__fixture__.mjs";
 import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
@@ -30,7 +34,7 @@ const makeExclusion = (name) => ({
 
 const instrumentation = createInstrumentation(
   extendConfiguration(
-    createConfiguration("/"),
+    createConfiguration(makeAbsolutePath()),
     {
       "hidden-identifier": "$",
       language: { name: "ecmascript", version: "2020" },
@@ -53,7 +57,7 @@ const instrumentation = createInstrumentation(
       ],
       exclude: ["qux"],
     },
-    "/cwd",
+    makeAbsolutePath("cwd"),
   ),
 );
 
@@ -79,7 +83,7 @@ assertEqual(getInstrumentationIdentifier(instrumentation), "$uuid");
           exclude: [
             makeExclusion("foo"),
             makeExclusion("qux"),
-            ...createConfiguration("/base").exclude,
+            ...createConfiguration(makeAbsolutePath("base")).exclude,
           ],
         },
       ],

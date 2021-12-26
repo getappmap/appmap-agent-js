@@ -3,6 +3,7 @@ import {
   assertDeepEqual,
   assertEqual,
   getFreshTemporaryPath,
+  makeAbsolutePath,
 } from "../../__fixture__.mjs";
 import { buildTestDependenciesAsync } from "../../build.mjs";
 import ConfigurationProcess from "./index.mjs";
@@ -16,7 +17,7 @@ const { loadProcessConfiguration } = ConfigurationProcess(
   loadProcessConfiguration({
     env: { APPMAP_CONFIGURATION_PATH: path },
     argv: ["node", "main.mjs"],
-    cwd: () => "/cwd",
+    cwd: () => makeAbsolutePath("cwd"),
   });
   await writeFile(
     path,
@@ -43,7 +44,7 @@ const { loadProcessConfiguration } = ConfigurationProcess(
       ["--process", "'*'"],
       ["--", "exec", "arg1", "arg2"],
     ].flat(),
-    cwd: () => "/cwd",
+    cwd: () => makeAbsolutePath("cwd"),
   });
   assertEqual(packages.length, 3);
   assertEqual(processes.length, 2);
@@ -56,7 +57,7 @@ const { loadProcessConfiguration } = ConfigurationProcess(
       map_name: "name2",
       command: {
         value: "'exec' 'arg1' 'arg2'",
-        cwd: "/cwd",
+        cwd: makeAbsolutePath("cwd"),
       },
     },
   );

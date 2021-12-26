@@ -1,4 +1,8 @@
-import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
+import {
+  assertEqual,
+  assertDeepEqual,
+  makeAbsolutePath,
+} from "../../__fixture__.mjs";
 import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
@@ -17,7 +21,7 @@ const {
   instrument,
 } = Frontend(dependencies);
 const configuration = extendConfiguration(
-  createConfiguration("/"),
+  createConfiguration(makeAbsolutePath()),
   {
     packages: [
       {
@@ -25,7 +29,7 @@ const configuration = extendConfiguration(
       },
     ],
   },
-  "/",
+  makeAbsolutePath(),
 );
 const { "hidden-identifier": identifier } = configuration;
 const frontend = createFrontend(configuration);
@@ -59,7 +63,7 @@ assertEqual(
         {
           url: "file:///filename.js",
           content: "123;",
-          exclude: createConfiguration("/bar").exclude,
+          exclude: createConfiguration(makeAbsolutePath("bar")).exclude,
           shallow: false,
           inline: false,
         },

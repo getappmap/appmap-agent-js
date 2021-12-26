@@ -1,4 +1,8 @@
-import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
+import {
+  assertEqual,
+  assertDeepEqual,
+  makeAbsolutePath,
+} from "../../__fixture__.mjs";
 import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
@@ -13,20 +17,23 @@ const { createConfiguration, extendConfiguration } =
   await buildTestComponentAsync("configuration");
 
 const configuration = extendConfiguration(
-  createConfiguration("/repository"),
+  createConfiguration(makeAbsolutePath("repository")),
   {
     name: "name1",
     recorder: "manual",
     packages: ["*"],
     hooks: { cjs: false, esm: false, apply: false, http: false },
   },
-  "/repository",
+  makeAbsolutePath("repository"),
 );
 
 const appmap = new Appmap(configuration);
 
 const track = appmap.startTrack(null, { path: null, data: { name: "name2" } });
-assertEqual(appmap.recordScript("/repository/main.js", "123;"), 123);
+assertEqual(
+  appmap.recordScript(makeAbsolutePath("repository", "main.js"), "123;"),
+  123,
+);
 assertDeepEqual(appmap.stopTrack(track, { status: 123, errors: [] }), {
   configuration: {
     ...configuration,
@@ -36,7 +43,7 @@ assertDeepEqual(appmap.stopTrack(track, { status: 123, errors: [] }), {
     {
       url: "file:///repository/main.js",
       content: "123;",
-      exclude: createConfiguration("/dummy").exclude,
+      exclude: createConfiguration(makeAbsolutePath("dummy")).exclude,
       shallow: false,
       inline: false,
     },

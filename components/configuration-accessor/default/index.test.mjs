@@ -2,6 +2,7 @@ import {
   assertDeepEqual,
   assertEqual,
   assertThrow,
+  makeAbsolutePath,
 } from "../../__fixture__.mjs";
 import {
   buildTestDependenciesAsync,
@@ -30,7 +31,7 @@ const {
 
 assertEqual(
   Reflect.get(
-    sanitizeConfigurationManual(createConfiguration("/home")),
+    sanitizeConfigurationManual(createConfiguration(makeAbsolutePath("home"))),
     "recorder",
   ),
   "manual",
@@ -43,17 +44,17 @@ assertEqual(
 assertDeepEqual(
   getConfigurationScenarios(
     extendConfiguration(
-      createConfiguration("/home"),
+      createConfiguration(makeAbsolutePath("home")),
       {
         scenario: "^f",
         scenarios: { foo: { name: "foo" }, bar: { name: "bar" } },
       },
-      "/cwd",
+      makeAbsolutePath("cwd"),
     ),
   ),
   [
     extendConfiguration(
-      createConfiguration("/home"),
+      createConfiguration(makeAbsolutePath("home")),
       { scenario: "^f", name: "foo" },
       null,
     ),
@@ -66,16 +67,20 @@ assertDeepEqual(
 
 {
   const agent = {
-    directory: "/agent",
+    directory: makeAbsolutePath("agent"),
     package: { name: "agent", version: "1.2.3", homepage: null },
   };
   assertDeepEqual(
     Reflect.get(
-      initializeConfiguration(createConfiguration("/home"), agent, {
-        directory: "/home",
-        history: null,
-        package: null,
-      }),
+      initializeConfiguration(
+        createConfiguration(makeAbsolutePath("home")),
+        agent,
+        {
+          directory: makeAbsolutePath("home"),
+          history: null,
+          package: null,
+        },
+      ),
       "agent",
     ),
     agent,
@@ -90,7 +95,7 @@ assertEqual(
   Reflect.get(
     resolveConfigurationPort(
       extendConfiguration(
-        createConfiguration("/home"),
+        createConfiguration(makeAbsolutePath("home")),
         {
           "trace-port": 0,
           "track-port": 8000,
@@ -113,11 +118,11 @@ assertEqual(
   Reflect.get(
     resolveConfigurationRecorder(
       extendConfiguration(
-        createConfiguration("/home"),
+        createConfiguration(makeAbsolutePath("home")),
         {
           command: "npx mocha",
         },
-        "/cwd",
+        makeAbsolutePath("cwd"),
       ),
     ),
     "recorder",
@@ -129,11 +134,11 @@ assertEqual(
   Reflect.get(
     resolveConfigurationRecorder(
       extendConfiguration(
-        createConfiguration("/home"),
+        createConfiguration(makeAbsolutePath("home")),
         {
           command: "node main.js",
         },
-        "/cwd",
+        makeAbsolutePath("cwd"),
       ),
     ),
     "recorder",
@@ -146,10 +151,14 @@ assertEqual(
 ////////////////////////////
 
 {
-  const configuration = createConfiguration("/repository");
+  const configuration = createConfiguration(makeAbsolutePath("repository"));
   assertEqual(
     isConfigurationEnabled(
-      extendConfiguration(configuration, { main: "main.js" }, "/repository"),
+      extendConfiguration(
+        configuration,
+        { main: "main.js" },
+        makeAbsolutePath("repository"),
+      ),
     ),
     true,
   );
@@ -164,7 +173,7 @@ assertEqual(
           },
           main: "main.js",
         },
-        "/directory",
+        makeAbsolutePath("directory"),
       ),
     ),
     false,
@@ -176,7 +185,10 @@ assertEqual(
 /////////////////////////////
 
 assertDeepEqual(
-  getConfigurationPackage(createConfiguration("/repository"), "data:,FOO"),
+  getConfigurationPackage(
+    createConfiguration(makeAbsolutePath("repository")),
+    "data:,FOO",
+  ),
   {
     enabled: true,
     shallow: false,
@@ -186,7 +198,7 @@ assertDeepEqual(
 );
 assertDeepEqual(
   getConfigurationPackage(
-    createConfiguration("/repository"),
+    createConfiguration(makeAbsolutePath("repository")),
     "file:///directory/foo",
   ),
   {
@@ -199,14 +211,14 @@ assertDeepEqual(
 assertDeepEqual(
   getConfigurationPackage(
     extendConfiguration(
-      createConfiguration("/repository"),
+      createConfiguration(makeAbsolutePath("repository")),
       {
         packages: [
           { glob: "*", exclude: ["exclude1"] },
           { glob: "**/*", exclude: ["exclude2"] },
         ],
       },
-      "/directory",
+      makeAbsolutePath("directory"),
     ),
     "file:///directory/foo/bar",
   ),
@@ -246,7 +258,7 @@ assertDeepEqual(
 
 // scenarios //
 
-// assertDeepEqual(extend("scenarios", { name: ["exec", "argv0"] }, "/base"), {
+// assertDeepEqual(extend("scenarios", { name: ["exec", "argv0"] }, makeAbsolutePath("base")), {
 //   name: [
 //     {
 //       fork: null,
@@ -254,11 +266,11 @@ assertDeepEqual(
 //       argv: ["argv0"],
 //       configuration: {
 //         data: {},
-//         directory: "/base",
+//         directory: makeAbsolutePath("base"),
 //       },
 //       options: {
 //         encoding: "utf8",
-//         cwd: "/base",
+//         cwd: makeAbsolutePath("base"),
 //         env: {},
 //         stdio: "inherit",
 //         timeout: 0,
@@ -280,10 +292,10 @@ assertDeepEqual(
   stripEnvironmentConfiguration(
     compileConfigurationCommand(
       extendConfiguration(
-        createConfiguration("/cwd1"),
+        createConfiguration(makeAbsolutePath("cwd1")),
         {
           agent: {
-            directory: "/agent",
+            directory: makeAbsolutePath("agent"),
             package: {
               name: "@appmap-agent-js",
               version: "1.2.3",
@@ -297,7 +309,7 @@ assertDeepEqual(
             env: { VAR1: "VAL1-1", NODE_OPTIONS: "--node-key=node-value" },
           },
         },
-        "/cwd2",
+        makeAbsolutePath("cwd2"),
       ),
       {
         VAR1: "VAL1-2",
@@ -324,10 +336,10 @@ assertDeepEqual(
   stripEnvironmentConfiguration(
     compileConfigurationCommand(
       extendConfiguration(
-        createConfiguration("/cwd1"),
+        createConfiguration(makeAbsolutePath("cwd1")),
         {
           agent: {
-            directory: "/agent",
+            directory: makeAbsolutePath("agent"),
             package: {
               name: "@appmap-agent-js",
               version: "1.2.3",
@@ -341,7 +353,7 @@ assertDeepEqual(
             env: { VAR1: "VAL1-1" },
           },
         },
-        "/cwd2",
+        makeAbsolutePath("cwd2"),
       ),
       {
         VAR1: "VAL1-2",
@@ -373,10 +385,10 @@ assertDeepEqual(
       stripEnvironmentConfiguration(
         compileConfigurationCommand(
           extendConfiguration(
-            createConfiguration("/cwd1"),
+            createConfiguration(makeAbsolutePath("cwd1")),
             {
               agent: {
-                directory: "/agent",
+                directory: makeAbsolutePath("agent"),
                 package: {
                   name: "@appmap-agent-js",
                   version: "1.2.3",
@@ -386,7 +398,7 @@ assertDeepEqual(
               command: [...(npx ? ["npx"] : []), "mocha", "argv1"].join(" "),
               recorder: "mocha",
             },
-            "/cwd2",
+            makeAbsolutePath("cwd2"),
           ),
           {},
         ),
@@ -414,10 +426,10 @@ assertDeepEqual(
   assertThrow(() => {
     compileConfigurationCommand(
       extendConfiguration(
-        createConfiguration("/cwd1"),
+        createConfiguration(makeAbsolutePath("cwd1")),
         {
           agent: {
-            directory: "/agent",
+            directory: makeAbsolutePath("agent"),
             package: {
               name: "@appmap-agent-js",
               version: "1.2.3",
@@ -427,7 +439,7 @@ assertDeepEqual(
           command: "foo",
           recorder: "mocha",
         },
-        "/cwd2",
+        makeAbsolutePath("cwd2"),
       ),
       {},
     );
@@ -441,5 +453,5 @@ assertDeepEqual(
 extendConfigurationNode(createConfiguration("cwd"), {
   version: "v1.2.3",
   argv: ["node", "main.js"],
-  cwd: () => "/cwd",
+  cwd: () => makeAbsolutePath("cwd"),
 });

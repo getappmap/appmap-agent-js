@@ -1,4 +1,8 @@
-import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
+import {
+  assertEqual,
+  assertDeepEqual,
+  makeAbsolutePath,
+} from "../../__fixture__.mjs";
 import { SourceMapGenerator } from "source-map";
 import { buildTestDependenciesAsync } from "../../build.mjs";
 import SourceInner from "./index.mjs";
@@ -15,7 +19,7 @@ generator.addMapping({
   original: { line: 10, column: 20 },
   generated: { line: 30, column: 40 },
 });
-generator.setSourceContent("/original.ts", "123;");
+generator.setSourceContent(makeAbsolutePath("original.ts"), "123;");
 
 const source_map = compileSourceMap(JSON.parse(generator.toString()));
 

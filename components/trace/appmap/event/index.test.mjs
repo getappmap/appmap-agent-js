@@ -1,4 +1,4 @@
-import { assertDeepEqual } from "../../../__fixture__.mjs";
+import { assertDeepEqual, makeAbsolutePath } from "../../../__fixture__.mjs";
 import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
@@ -18,7 +18,7 @@ const { createConfiguration } = await buildTestComponentAsync(
 const { compileEventTrace } = Event(dependencies);
 
 {
-  const classmap = createClassmap(createConfiguration("/cwd"));
+  const classmap = createClassmap(createConfiguration(makeAbsolutePath("cwd")));
   addClassmapSource(classmap, {
     url: "file:///cwd/filename.js",
     content: "function f (x) {}",

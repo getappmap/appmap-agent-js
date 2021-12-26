@@ -1,4 +1,8 @@
-import { assertDeepEqual, assertEqual } from "../../../__fixture__.mjs";
+import {
+  assertDeepEqual,
+  assertEqual,
+  makeAbsolutePath,
+} from "../../../__fixture__.mjs";
 import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
@@ -18,7 +22,7 @@ const {
   getClassmapClosure,
 } = Classmap(dependencies);
 
-const cwd = "/cwd";
+const cwd = makeAbsolutePath("cwd");
 
 const placeholder = "$";
 

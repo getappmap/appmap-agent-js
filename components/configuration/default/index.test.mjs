@@ -1,4 +1,8 @@
-import { assertDeepEqual, assertEqual } from "../../__fixture__.mjs";
+import {
+  assertDeepEqual,
+  assertEqual,
+  makeAbsolutePath,
+} from "../../__fixture__.mjs";
 import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
@@ -13,13 +17,13 @@ const { createConfiguration, extendConfiguration } = Configuration(
   await buildTestDependenciesAsync(import.meta.url),
 );
 
-validateConfiguration(createConfiguration("/home"));
+validateConfiguration(createConfiguration(makeAbsolutePath("home")));
 
 const extend = (
   name,
   value1,
   nullable_directory = null,
-  home_directory = "/home",
+  home_directory = makeAbsolutePath("home"),
 ) => {
   const extended_configuration = extendConfiguration(
     createConfiguration(home_directory),
@@ -34,24 +38,41 @@ const extend = (
 // packages //
 
 {
-  const [specifier, value] = extend("packages", "lib/*.js", "/cwd")[0];
+  const [specifier, value] = extend(
+    "packages",
+    "lib/*.js",
+    makeAbsolutePath("cwd"),
+  )[0];
   assertDeepEqual(value, {
     "inline-source": null,
     enabled: true,
     exclude: [],
     shallow: false,
   });
-  assertEqual(matchSpecifier(specifier, "/cwd/lib/foo.js"), true);
-  assertEqual(matchSpecifier(specifier, "/cwd/lib/foo.mjs"), false);
-  assertEqual(matchSpecifier(specifier, "/cwd/src/foo.js"), false);
+  assertEqual(
+    matchSpecifier(specifier, makeAbsolutePath("cwd", "lib", "foo.js")),
+    true,
+  );
+  assertEqual(
+    matchSpecifier(specifier, makeAbsolutePath("cwd", "lib", "foo.mjs")),
+    false,
+  );
+  assertEqual(
+    matchSpecifier(specifier, makeAbsolutePath("cwd", "src", "foo.js")),
+    false,
+  );
 }
 
 // scenarios //
 assertDeepEqual(
-  extend("scenarios", { key: { command: "node main.js" } }, "/cwd"),
+  extend(
+    "scenarios",
+    { key: { command: "node main.js" } },
+    makeAbsolutePath("cwd"),
+  ),
   [
     {
-      cwd: "/cwd",
+      cwd: makeAbsolutePath("cwd"),
       key: "key",
       value: { command: "node main.js" },
     },
@@ -72,13 +93,16 @@ assertDeepEqual(
 
 // main //
 
-assertDeepEqual(extend("main", "foo.js", "/cwd"), "/cwd/foo.js");
+assertDeepEqual(
+  extend("main", "foo.js", makeAbsolutePath("cwd")),
+  makeAbsolutePath("cwd", "foo.js"),
+);
 
 // port //
 
 assertDeepEqual(
-  extend("trace-port", "unix-domain-socket", "/cwd"),
-  "/cwd/unix-domain-socket",
+  extend("trace-port", "unix-domain-socket", makeAbsolutePath("cwd")),
+  makeAbsolutePath("cwd", "unix-domain-socket"),
 );
 
 // language //
@@ -111,37 +135,48 @@ assertDeepEqual(extend("frameworks", ["foo@bar"], null), [
 
 // output //
 
-assertDeepEqual(extend("output", "directory", "/cwd"), {
-  directory: "/cwd/directory",
+assertDeepEqual(extend("output", "directory", makeAbsolutePath("cwd")), {
+  directory: makeAbsolutePath("cwd", "directory"),
   basename: null,
   extension: ".appmap.json",
 });
 
 // processes //
 
-assertDeepEqual(extend("processes", true, "/cwd", "/home"), [
-  [{ cwd: "/cwd", source: "^", flags: "u" }, true],
+assertDeepEqual(
+  extend("processes", true, makeAbsolutePath("cwd"), makeAbsolutePath("home")),
   [
-    {
-      cwd: "/home",
-      source: "^",
-      flags: "u",
-    },
-    true,
+    [{ cwd: makeAbsolutePath("cwd"), source: "^", flags: "u" }, true],
+    [
+      {
+        cwd: makeAbsolutePath("home"),
+        source: "^",
+        flags: "u",
+      },
+      true,
+    ],
   ],
-]);
+);
 
-assertDeepEqual(extend("processes", "/foo", "/cwd", "/home"), [
-  [{ cwd: "/cwd", source: "^(?:\\/foo)$", flags: "" }, true],
+assertDeepEqual(
+  extend(
+    "processes",
+    makeAbsolutePath("foo"),
+    makeAbsolutePath("cwd"),
+    makeAbsolutePath("home"),
+  ),
   [
-    {
-      cwd: "/home",
-      source: "^",
-      flags: "u",
-    },
-    true,
+    [{ cwd: makeAbsolutePath("cwd"), source: "^(?:\\/foo)$", flags: "" }, true],
+    [
+      {
+        cwd: makeAbsolutePath("home"),
+        source: "^",
+        flags: "u",
+      },
+      true,
+    ],
   ],
-]);
+);
 
 // serialization //
 
@@ -153,9 +188,9 @@ assertDeepEqual(extend("serialization", "toString", null), {
 
 // command //
 
-assertDeepEqual(extend("command", "node main.js", "/cwd"), {
+assertDeepEqual(extend("command", "node main.js", makeAbsolutePath("cwd")), {
   value: "node main.js",
-  cwd: "/cwd",
+  cwd: makeAbsolutePath("cwd"),
 });
 
 // exclude //
@@ -170,5 +205,5 @@ assertDeepEqual(extend("exclude", ["foo\\.bar"], null), [
     excluded: true,
     recursive: true,
   },
-  ...createConfiguration("/base").exclude,
+  ...createConfiguration(makeAbsolutePath("base")).exclude,
 ]);

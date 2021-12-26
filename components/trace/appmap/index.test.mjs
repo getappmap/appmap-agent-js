@@ -1,4 +1,4 @@
-import { assertDeepEqual } from "../../__fixture__.mjs";
+import { assertDeepEqual, makeAbsolutePath } from "../../__fixture__.mjs";
 import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
@@ -13,11 +13,11 @@ const { makeLocation, stringifyLocation } = await buildTestComponentAsync(
 );
 const { compileTrace } = Trace(dependencies);
 const configuration = extendConfiguration(
-  createConfiguration("/cwd"),
+  createConfiguration(makeAbsolutePath("cwd")),
   {
     recorder: "process",
     agent: {
-      directory: "/agent",
+      directory: makeAbsolutePath("agent"),
       package: {
         name: "agent",
         version: "1.2.3",
@@ -27,7 +27,7 @@ const configuration = extendConfiguration(
     pruning: true,
     "function-name-placeholder": "$",
   },
-  "/cwd",
+  makeAbsolutePath("cwd"),
 );
 const indexes = {
   file: 1,

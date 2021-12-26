@@ -1,5 +1,9 @@
 /* eslint-env node */
-import { assertDeepEqual, assertEqual } from "../../__fixture__.mjs";
+import {
+  assertDeepEqual,
+  assertEqual,
+  makeAbsolutePath,
+} from "../../__fixture__.mjs";
 import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
@@ -19,7 +23,7 @@ const {
 } = Agent(dependencies);
 const agent = openAgent(
   extendConfiguration(
-    createConfiguration("/"),
+    createConfiguration(makeAbsolutePath()),
     {
       packages: ["*"],
       hooks: {
@@ -30,7 +34,7 @@ const agent = openAgent(
         http: false,
       },
     },
-    "/",
+    makeAbsolutePath(),
   ),
 );
 startTrack(agent, "record", { path: null, data: {} });
@@ -48,7 +52,7 @@ assertDeepEqual(
       {
         url: "file:///main.js",
         content: "123;",
-        exclude: createConfiguration("/dummy").exclude,
+        exclude: createConfiguration(makeAbsolutePath("dummy")).exclude,
         shallow: false,
         inline: false,
       },

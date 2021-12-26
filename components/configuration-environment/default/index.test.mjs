@@ -1,3 +1,4 @@
+import { makeAbsolutePath } from "../../__fixture__.mjs";
 import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
@@ -11,5 +12,7 @@ const { loadEnvironmentConfiguration } = LoadEnvironmentConfiguration(
 );
 
 loadEnvironmentConfiguration({
-  APPMAP_CONFIGURATION: JSON.stringify(createConfiguration("/cwd")),
+  APPMAP_CONFIGURATION: JSON.stringify(
+    createConfiguration(makeAbsolutePath("cwd")),
+  ),
 });

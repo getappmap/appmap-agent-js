@@ -1,4 +1,8 @@
-import { assertDeepEqual, assertEqual } from "../../__fixture__.mjs";
+import {
+  assertDeepEqual,
+  assertEqual,
+  makeAbsolutePath,
+} from "../../__fixture__.mjs";
 import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
@@ -17,7 +21,7 @@ const {
   recordBeforeQuery,
   recordAfterQuery,
 } = Recording(dependencies);
-const configuration = createConfiguration("/");
+const configuration = createConfiguration(makeAbsolutePath());
 const recording = createRecording(configuration);
 assertEqual(typeof incrementEventCounter({ recording }), "number");
 assertEqual(typeof getSerializationEmptyValue({ recording }), "symbol");

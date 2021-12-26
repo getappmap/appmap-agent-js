@@ -1,4 +1,8 @@
-import { assertDeepEqual, getFreshTemporaryPath } from "../../__fixture__.mjs";
+import {
+  assertDeepEqual,
+  getFreshTemporaryPath,
+  makeAbsolutePath,
+} from "../../__fixture__.mjs";
 import Http from "http";
 import createApp from "express";
 import {
@@ -84,11 +88,14 @@ assertDeepEqual(
         response.end();
       });
       const port = await listenAsync(server, 0);
-      assertDeepEqual(await requestAsync(Http.get({ port, path: "/path" })), {
-        code: 200,
-        message: "ok",
-        body: "",
-      });
+      assertDeepEqual(
+        await requestAsync(Http.get({ port, path: makeAbsolutePath("path") })),
+        {
+          code: 200,
+          message: "ok",
+          body: "",
+        },
+      );
       await closeAsync(server);
     },
   ),

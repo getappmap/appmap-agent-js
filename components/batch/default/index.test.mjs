@@ -1,4 +1,4 @@
-import { assertEqual } from "../../__fixture__.mjs";
+import { assertEqual, makeAbsolutePath } from "../../__fixture__.mjs";
 import { EventEmitter } from "events";
 import {
   buildTestDependenciesAsync,
@@ -38,13 +38,13 @@ const { mainAsync } = Batch(
 const { createConfiguration, extendConfiguration } =
   await buildTestComponentAsync("configuration");
 
-const configuration = createConfiguration("/repository");
+const configuration = createConfiguration(makeAbsolutePath("repository"));
 
 // const configuration = extendConfiguration(
-//   createConfiguration("/repository"),
+//   createConfiguration(makeAbsolutePath("repository")),
 //   {
 //     agent: {
-//       directory: "/agent",
+//       directory: makeAbsolutePath("agent"),
 //       package: {
 //         name: "appmap-agent-js",
 //         version: "1.2.3",
@@ -74,7 +74,7 @@ const configuration = createConfiguration("/repository");
 //         scenario: "foo",
 //         scenarios: { foo: ["success"], bar: ["failure"] },
 //       },
-//       "/directory",
+//       makeAbsolutePath("directory"),
 //     ),
 //   );
 // }
@@ -97,7 +97,7 @@ const configuration = createConfiguration("/repository");
           key2: { command: "sleep mocha" },
         },
       },
-      "/directory",
+      makeAbsolutePath("directory"),
     ),
   );
 }
@@ -115,7 +115,7 @@ const configuration = createConfiguration("/repository");
         scenario: "^",
         scenarios: { key: { command: "success" } },
       },
-      "/directory",
+      makeAbsolutePath("directory"),
     ),
   );
 }
@@ -136,7 +136,7 @@ const configuration = createConfiguration("/repository");
           key2: { command: "failure" },
         },
       },
-      "/directory",
+      makeAbsolutePath("directory"),
     ),
   );
 }

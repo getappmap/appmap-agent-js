@@ -1,5 +1,5 @@
 import { readFile as readFileAsync } from "fs/promises";
-import { getFreshTemporaryPath } from "../../__fixture__.mjs";
+import { getFreshTemporaryPath, makeAbsolutePath } from "../../__fixture__.mjs";
 import { Socket } from "net";
 import { join as joinPath } from "path";
 import NetSocketMessaging from "net-socket-messaging";
@@ -23,7 +23,7 @@ const {
 
 const repository = getFreshTemporaryPath();
 const configuration = extendConfiguration(
-  createConfiguration("/root"),
+  createConfiguration(makeAbsolutePath("root")),
   {
     recorder: "process",
     output: {
@@ -49,7 +49,7 @@ const receptor = await openReceptorAsync(
     createMessage(
       JSON.stringify(
         extendConfiguration(
-          createConfiguration("/root"),
+          createConfiguration(makeAbsolutePath("root")),
           {
             recorder: "remote",
           },
@@ -76,7 +76,7 @@ const receptor = await openReceptorAsync(
     createMessage(
       JSON.stringify(
         extendConfiguration(
-          createConfiguration("/root"),
+          createConfiguration(makeAbsolutePath("root")),
           {
             recorder: "process",
           },

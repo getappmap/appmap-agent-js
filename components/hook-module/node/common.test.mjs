@@ -2,6 +2,7 @@ import {
   assertEqual,
   assertDeepEqual,
   getFreshTemporaryPath,
+  makeAbsolutePath,
 } from "../../__fixture__.mjs";
 import { createRequire } from "module";
 import { writeFile } from "fs/promises";
@@ -64,7 +65,7 @@ assertDeepEqual(
       {
         url: pathToFileURL(resolved_path).toString(),
         content: "module.exports = 123;",
-        exclude: createConfiguration("/dummy").exclude,
+        exclude: createConfiguration(makeAbsolutePath("dummy")).exclude,
         shallow: true,
         inline: false,
       },
