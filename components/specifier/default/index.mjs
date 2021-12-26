@@ -8,7 +8,7 @@ const { Minimatch: MinimatchClass } = Minimatch;
 export default (dependencies) => {
   const {
     util: { assert },
-    path: { toRelativePath },
+    path: { toRelativePath, joinPath },
     expect: { expectSuccess },
   } = dependencies;
 
@@ -33,6 +33,9 @@ export default (dependencies) => {
         external: false,
         ...options,
       };
+      // Hacky way to get the platform-sepecific path separator...
+      // But I want to encourage using path methods by not exposing the path separator.
+      const path_separator = joinPath("", "");
       if (regexp !== null) {
         return {
           cwd,
@@ -50,28 +53,29 @@ export default (dependencies) => {
       }
       if (path !== null) {
         assert(
-          path[path.length - 1] !== "/",
-          "directory path should not end with '/'",
+          path[path.length - 1] !== path_separator,
+          "directory path should not end with a path separator",
         );
         return {
           cwd,
-          source: `^${sanitizeForRegExp(path)}($|/${
-            recursive ? "" : "[^/]*$"
+          source: `^${sanitizeForRegExp(path)}($|\\${path_separator}${
+            recursive ? "" : `[^\\${path_separator}]*$`
           })`,
           flags: "",
         };
       }
       if (dist !== null) {
         assert(
-          dist[dist.length - 1] !== "/",
-          "package path should not end with '/'",
+          dist[dist.length - 1] !== path_separator,
+          "package path should not end with a path separator",
         );
-        let source = `node_modules/${sanitizeForRegExp(dist)}/`;
+        let source = joinPath("node_modules", sanitizeForRegExp(dist));
+        source = joinPath(source, "");
         if (!external) {
           source = `^${source}`;
         }
         if (!recursive) {
-          source = `${source}[^/]*$`;
+          source = `${source}[^\\${path_separator}]*$`;
         }
         return {
           cwd,
