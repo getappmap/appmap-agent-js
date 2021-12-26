@@ -9,10 +9,16 @@ const { default: Platform } = await import("./index.mjs");
 
 {
   platform = "win32";
-  const { getPathSeparator, isAbsolutePath, sanitizeFilename } = Platform(
-    await buildTestDependenciesAsync(import.meta.url),
-  );
+  const {
+    getPathSeparator,
+    isAbsolutePath,
+    sanitizeFilename,
+    getPathSplitter,
+  } = Platform(await buildTestDependenciesAsync(import.meta.url));
   assertEqual(getPathSeparator(), "\\");
+  assertEqual(getPathSplitter().test("\\"), true);
+  assertEqual(getPathSplitter().test("/"), true);
+  assertEqual(getPathSplitter().test(":"), false);
   assertEqual(isAbsolutePath("C:\\foo"), true);
   assertEqual(isAbsolutePath("foo"), false);
   assertEqual(sanitizeFilename("foo/bar\\qux\u0000", "_"), "foo_bar_qux_");
@@ -20,10 +26,14 @@ const { default: Platform } = await import("./index.mjs");
 
 {
   platform = "darwin";
-  const { getPathSeparator, isAbsolutePath, sanitizeFilename } = Platform(
-    await buildTestDependenciesAsync(import.meta.url),
-  );
+  const {
+    getPathSeparator,
+    isAbsolutePath,
+    sanitizeFilename,
+    getPathSplitter,
+  } = Platform(await buildTestDependenciesAsync(import.meta.url));
   assertEqual(getPathSeparator(), "/");
+  assertEqual(getPathSplitter(), "/");
   assertEqual(isAbsolutePath("/foo"), true);
   assertEqual(isAbsolutePath("foo"), false);
   assertEqual(sanitizeFilename("foo/bar\u0000", "_"), "foo_bar_");

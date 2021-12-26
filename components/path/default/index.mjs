@@ -3,10 +3,16 @@ const _RegExp = RegExp;
 export default (dependencies) => {
   const {
     util: { assert, identity },
-    platform: { getPathSeparator, isAbsolutePath, sanitizeFilename },
+    platform: {
+      getPathSeparator,
+      getPathSplitter,
+      isAbsolutePath,
+      sanitizeFilename,
+    },
   } = dependencies;
 
   const separator = getPathSeparator();
+  const splitter = getPathSplitter();
 
   const assertAbsolutePath = (path) => {
     assert(isAbsolutePath(path), "expected an absolute path");
@@ -34,13 +40,13 @@ export default (dependencies) => {
   };
 
   const normalizePath = (path) =>
-    normalizeSegments(path.split(separator)).join(separator);
+    normalizeSegments(path.split(splitter)).join(separator);
 
   const toRelativePath = (path1, path2) => {
     assertAbsolutePath(path1);
     assertAbsolutePath(path2);
-    const segments1 = normalizeSegments(path1.split(separator));
-    const segments2 = normalizeSegments(path2.split(separator));
+    const segments1 = normalizeSegments(path1.split(splitter));
+    const segments2 = normalizeSegments(path2.split(splitter));
     if (segments1.join(separator) === segments2.join(separator)) {
       return ".";
     }
@@ -76,13 +82,13 @@ export default (dependencies) => {
     );
     assertAbsolutePath(nullable_directory);
     return normalizeSegments([
-      ...nullable_directory.split(separator),
-      ...path.split(separator),
+      ...nullable_directory.split(splitter),
+      ...path.split(splitter),
     ]).join(separator);
   };
 
   const getFilename = (path) => {
-    const segments = path.split(separator);
+    const segments = path.split(splitter);
     return segments[segments.length - 1];
   };
 
@@ -92,7 +98,7 @@ export default (dependencies) => {
     getFilename(path).split(".").slice(1).join(".");
 
   const getDirectory = (path) => {
-    const segments = path.split(separator);
+    const segments = path.split(splitter);
     if (isAbsolutePath(path) && segments.length === 2) {
       return path;
     } else {
