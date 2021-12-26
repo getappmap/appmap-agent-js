@@ -8,7 +8,7 @@ const { Minimatch: MinimatchClass } = Minimatch;
 export default (dependencies) => {
   const {
     util: { assert },
-    path: { toRelativePath, joinPath },
+    path: { toRelativePath, toForwardSlashPath },
     expect: { expectSuccess },
   } = dependencies;
 
@@ -33,9 +33,6 @@ export default (dependencies) => {
         external: false,
         ...options,
       };
-      // Hacky way to get the platform-sepecific path separator...
-      // But I want to encourage using path methods by not exposing the path separator.
-      const path_separator = joinPath("", "");
       if (regexp !== null) {
         return {
           cwd,
@@ -53,29 +50,28 @@ export default (dependencies) => {
       }
       if (path !== null) {
         assert(
-          path[path.length - 1] !== path_separator,
+          path[path.length - 1] !== "/",
           "directory path should not end with a path separator",
         );
         return {
           cwd,
-          source: `^${sanitizeForRegExp(path)}($|\\${path_separator}${
-            recursive ? "" : `[^\\${path_separator}]*$`
+          source: `^${sanitizeForRegExp(path)}($|/${
+            recursive ? "" : "[^/]*$"
           })`,
           flags: "",
         };
       }
       if (dist !== null) {
         assert(
-          dist[dist.length - 1] !== path_separator,
+          dist[dist.length - 1] !== "/",
           "package path should not end with a path separator",
         );
-        let source = joinPath("node_modules", sanitizeForRegExp(dist));
-        source = joinPath(source, "");
+        let source = `node_modules/${sanitizeForRegExp(dist)}/`;
         if (!external) {
           source = `^${source}`;
         }
         if (!recursive) {
-          source = `${source}[^\\${path_separator}]*$`;
+          source = `${source}[^/]*$`;
         }
         return {
           cwd,
@@ -97,7 +93,7 @@ export default (dependencies) => {
         );
         regexps.set(key, regexp);
       }
-      return regexp.test(toRelativePath(cwd, path));
+      return regexp.test(toForwardSlashPath(toRelativePath(cwd, path)));
     },
   };
 };

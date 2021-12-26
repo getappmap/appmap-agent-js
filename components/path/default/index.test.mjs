@@ -17,6 +17,8 @@ const testAsync = async (root, sep) => {
     getBasename,
     getExtension,
     joinPath,
+    fromForwardSlashPath,
+    toForwardSlashPath,
   } = Path(await buildTestDependenciesAsync(import.meta.url));
   // normalizePath //
   assertEqual(normalizePath(`${root}foo`), `${root}foo`);
@@ -71,6 +73,11 @@ const testAsync = async (root, sep) => {
   assertEqual(getDirectory(`${root}`), `${root}`);
   // joinPath //
   assertEqual(joinPath(`foo${sep}bar`, "qux"), `foo${sep}bar${sep}qux`);
+  // fromForwardSlashPath && toForwardSlashPath //
+  assertEqual(
+    fromForwardSlashPath(toForwardSlashPath(`${root}foo${sep}bar`)),
+    `${root}foo${sep}bar`,
+  );
 };
 
 platform = "darwin";

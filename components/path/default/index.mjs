@@ -1,6 +1,8 @@
+const _RegExp = RegExp;
+
 export default (dependencies) => {
   const {
-    util: { assert },
+    util: { assert, identity },
     platform: { getPathSeparator, isAbsolutePath, sanitizeFilename },
   } = dependencies;
 
@@ -56,6 +58,14 @@ export default (dependencies) => {
     ]).join(separator);
   };
 
+  let toForwardSlashPath = identity;
+  let fromForwardSlashPath = identity;
+  if (separator !== "/") {
+    const regexp = new _RegExp(`\\${separator}`, "gu");
+    toForwardSlashPath = (path) => path.replace(regexp, "/");
+    fromForwardSlashPath = (path) => path.replace(/\//gu, separator);
+  }
+
   const toAbsolutePath = (nullable_directory, path) => {
     if (isAbsolutePath(path)) {
       return normalizePath(path);
@@ -95,6 +105,8 @@ export default (dependencies) => {
     `${directory}${separator}${filename}`;
 
   return {
+    toForwardSlashPath,
+    fromForwardSlashPath,
     isAbsolutePath,
     normalizePath,
     toRelativePath,
