@@ -5,9 +5,13 @@ import {
   assertEqual,
   getFreshTemporaryPath,
 } from "../../__fixture__.mjs";
+import { join as joinPath } from "path";
+import { platform as getPlatform } from "os";
 import { createServer, request as createRequest } from "http";
 import { buildTestDependenciesAsync } from "../../build.mjs";
 import Request from "./index.mjs";
+
+const { cwd } = process;
 
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
 
@@ -65,7 +69,10 @@ const closeServerAsync = (server) =>
       body: null,
     })),
   );
-  const port = getFreshTemporaryPath();
+  const port =
+    getPlatform() === "win32"
+      ? joinPath(`\\\\?\\pipe`, cwd(), Math.random().toString(36).substring(2))
+      : getFreshTemporaryPath();
   await listenServerAsync(server, port);
   assertDeepEqual(await requestAsync("localhost", port, "GET", "/path", null), {
     code: 200,
