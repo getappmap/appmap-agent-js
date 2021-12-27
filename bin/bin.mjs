@@ -18,4 +18,4 @@ if (routes.has(process.argv[2])) {
   process.argv = [process.argv[0], process.argv[1], ...process.argv.slice(3)];
 }
 
-await import(routes.get(verb));
+import(routes.get(verb));
