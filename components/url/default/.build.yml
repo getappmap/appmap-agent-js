@@ -1,2 +1,2 @@
 branches: [node, test, browser]
-dependencies: [util, platform]
+dependencies: [path]
