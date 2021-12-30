@@ -1,8 +1,4 @@
-import {
-  assertDeepEqual,
-  assertEqual,
-  makeAbsolutePath,
-} from "../../__fixture__.mjs";
+import { assertDeepEqual, assertEqual } from "../../__fixture__.mjs";
 import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
@@ -16,7 +12,7 @@ const { createSerialization, getSerializationEmptyValue, serialize } =
   Serialization(dependencies);
 const setupSerialization = (config) =>
   createSerialization(
-    extendConfiguration(createConfiguration(makeAbsolutePath("cwd")), {
+    extendConfiguration(createConfiguration("file:///home"), {
       serialization: config,
     }),
   );

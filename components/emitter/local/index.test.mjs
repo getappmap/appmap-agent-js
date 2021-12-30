@@ -1,6 +1,6 @@
 /* eslint-env node */
 
-import { assertDeepEqual, makeAbsolutePath } from "../../__fixture__.mjs";
+import { assertDeepEqual } from "../../__fixture__.mjs";
 import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
@@ -12,7 +12,7 @@ const { createConfiguration } = await buildTestComponentAsync("configuration");
 const { openEmitter, closeEmitter, sendEmitter, takeLocalEmitterTrace } =
   Emitter(dependencies);
 
-const configuration = createConfiguration(makeAbsolutePath("root"));
+const configuration = createConfiguration("file:///home");
 
 const emitter = openEmitter(configuration);
 sendEmitter(emitter, ["start", "record1", { data: {}, path: null }]);

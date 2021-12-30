@@ -1,6 +1,6 @@
 branches: [test]
 dependencies:
-  - path
+  - url
   - configuration
   - frontend
   - emitter

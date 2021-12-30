@@ -1,4 +1,5 @@
 import Module from "module";
+import { fileURLToPath } from "url";
 const require = Module.createRequire(import.meta.url);
 
 export default (dependencies) => {
@@ -37,7 +38,7 @@ export default (dependencies) => {
           fd,
           typeof port === "number"
             ? { sin_family: AF_INET, sin_port: port, sin_addr: host }
-            : { sun_family: AF_UNIX, sun_path: port },
+            : { sun_family: AF_UNIX, sun_path: fileURLToPath(port) },
         );
         return fd;
       },

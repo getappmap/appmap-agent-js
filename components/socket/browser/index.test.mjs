@@ -23,12 +23,12 @@ const { openSocket, sendSocket, closeSocket } = Socket(
   await buildTestDependenciesAsync(import.meta.url),
 );
 
-const socket = openSocket("host", "port");
+const socket = openSocket("host", 8080);
 sendSocket(socket, "message");
 closeSocket(socket);
 
 assertDeepEqual(trace, [
-  ["open", "wss://host:port"],
+  ["open", "wss://host:8080"],
   ["send", "message"],
   ["close"],
 ]);

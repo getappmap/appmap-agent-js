@@ -1,8 +1,4 @@
-import {
-  assertEqual,
-  assertDeepEqual,
-  makeAbsolutePath,
-} from "../../__fixture__.mjs";
+import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
 import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
@@ -23,7 +19,7 @@ const {
 } = Backend(dependencies);
 
 const configuration = extendConfiguration(
-  createConfiguration(makeAbsolutePath("cwd")),
+  createConfiguration("file:///home"),
   { name: "name1" },
   null,
 );

@@ -1,5 +1,5 @@
 import {
-  getFreshTemporaryPath,
+  getFreshTemporaryURL,
   assertDeepEqual,
   assertEqual,
 } from "../../__fixture__.mjs";
@@ -35,6 +35,4 @@ const runAsync = async (port) => {
 
 assertDeepEqual(await testAsync(0, runAsync), ["message"]);
 
-assertDeepEqual(await testAsync(getFreshTemporaryPath(), runAsync), [
-  "message",
-]);
+assertDeepEqual(await testAsync(getFreshTemporaryURL(), runAsync), ["message"]);

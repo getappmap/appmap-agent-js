@@ -1,4 +1,5 @@
 import { connect } from "net";
+import { fileURLToPath } from "url";
 import { writeSync } from "fs";
 import NetSocketMessaging from "net-socket-messaging";
 
@@ -14,7 +15,9 @@ export default (dependencies) => {
   return {
     openSocket: (host, port) => {
       const socket =
-        typeof port === "string" ? connect(port) : connect(port, host);
+        typeof port === "string"
+          ? connect(fileURLToPath(port))
+          : connect(port, host);
       const messages = [];
       socket.on("connect", () => {
         for (const message of messages) {

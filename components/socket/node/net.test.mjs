@@ -1,4 +1,4 @@
-import { assertDeepEqual, getFreshTemporaryPath } from "../../__fixture__.mjs";
+import { assertDeepEqual, getFreshTemporaryURL } from "../../__fixture__.mjs";
 
 import { buildTestDependenciesAsync } from "../../build.mjs";
 import NetSocket from "./net.mjs";
@@ -21,7 +21,7 @@ const runAsync = async (port) => {
   sendSocket(socket, "message3");
 };
 assertDeepEqual(await testAsync(0, runAsync), ["message1", "message2"]);
-assertDeepEqual(await testAsync(getFreshTemporaryPath(), runAsync), [
+assertDeepEqual(await testAsync(getFreshTemporaryURL(), runAsync), [
   "message1",
   "message2",
 ]);

@@ -1,10 +1,9 @@
 import {
-  getFreshTemporaryPath,
+  getFreshTemporaryURL,
   assert,
   assertDeepEqual,
 } from "../../__fixture__.mjs";
 import { writeFile as writeFileAsync } from "fs/promises";
-import { pathToFileURL } from "url";
 import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
@@ -37,11 +36,10 @@ assertDeepEqual(
 // file //
 //////////
 
-const path = getFreshTemporaryPath();
-const url = pathToFileURL(path).toString();
+const url = getFreshTemporaryURL();
 assert(isLeft(readFile(url)));
 
-await writeFileAsync(path, "foo", "utf8");
+await writeFileAsync(new URL(url), "foo", "utf8");
 assertDeepEqual(
   readFile(url),
   makeRight({

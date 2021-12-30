@@ -1,8 +1,4 @@
-import {
-  assertDeepEqual,
-  assertEqual,
-  makeAbsolutePath,
-} from "../../__fixture__.mjs";
+import { assertDeepEqual, assertEqual } from "../../__fixture__.mjs";
 import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
@@ -34,7 +30,7 @@ const makeExclusion = (name) => ({
 
 const instrumentation = createInstrumentation(
   extendConfiguration(
-    createConfiguration(makeAbsolutePath()),
+    createConfiguration("file:///home"),
     {
       "hidden-identifier": "$",
       language: { name: "ecmascript", version: "2020" },
@@ -57,7 +53,7 @@ const instrumentation = createInstrumentation(
       ],
       exclude: ["qux"],
     },
-    makeAbsolutePath("cwd"),
+    "file:///base",
   ),
 );
 
@@ -65,25 +61,25 @@ assertEqual(getInstrumentationIdentifier(instrumentation), "$uuid");
 
 {
   const file = {
-    url: "file:///cwd/foo.js",
+    url: "file:///base/foo.js",
     content: "123;",
     type: "script",
   };
   assertDeepEqual(
     instrument(instrumentation, file, createMirrorSourceMap(file)),
     {
-      url: "file:///cwd/foo.js",
+      url: "file:///base/foo.js",
       content: "123;",
       sources: [
         {
-          url: "file:///cwd/foo.js",
+          url: "file:///base/foo.js",
           content: "123;",
           shallow: true,
           inline: true,
           exclude: [
             makeExclusion("foo"),
             makeExclusion("qux"),
-            ...createConfiguration(makeAbsolutePath("base")).exclude,
+            ...createConfiguration("file:///home").exclude,
           ],
         },
       ],
@@ -93,14 +89,14 @@ assertEqual(getInstrumentationIdentifier(instrumentation), "$uuid");
 
 {
   const file = {
-    url: "file:///cwd/bar.js",
+    url: "file:///base/bar.js",
     content: "456;",
     type: "script",
   };
   assertDeepEqual(
     instrument(instrumentation, file, createMirrorSourceMap(file)),
     {
-      url: "file:///cwd/bar.js",
+      url: "file:///base/bar.js",
       content: "456;",
       sources: [],
     },
