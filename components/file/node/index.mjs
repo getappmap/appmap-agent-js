@@ -1,6 +1,5 @@
 import { readFileSync as readFile } from "fs";
 import { readFile as readFileAsync } from "fs/promises";
-import { URL } from "url";
 
 const _URL = URL;
 
