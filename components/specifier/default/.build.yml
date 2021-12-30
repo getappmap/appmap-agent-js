@@ -2,4 +2,4 @@ branches: [test, node, browser]
 dependencies:
   - util
   - expect
-  - path
+  - url
