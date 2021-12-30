@@ -1,9 +1,9 @@
-import { mkdir } from "fs/promises";
+import { mkdir as mkdirAsync } from "fs/promises";
 import { execSync } from "child_process";
 import {
   assertEqual,
   assertThrow,
-  getFreshTemporaryPath,
+  getFreshTemporaryURL,
 } from "../../__fixture__.mjs";
 import { buildTestDependenciesAsync } from "../../build.mjs";
 import Git from "./git.mjs";
@@ -14,19 +14,20 @@ const { extractGitInformation } = Git(
   await buildTestDependenciesAsync(import.meta.url),
 );
 
-const url = "https://github.com/lachrist/sample.git";
-const path = getFreshTemporaryPath();
+const origin_url = "https://github.com/lachrist/sample.git";
+const url = getFreshTemporaryURL();
 
-assertThrow(() => extractGitInformation(path), /^AppmapError:.*ENOENT/);
-await mkdir(path);
-assertEqual(extractGitInformation(path), null);
-execSync(`git clone ${url} ${path}`, {
+assertThrow(() => extractGitInformation(url), /^AppmapError:.*ENOENT/);
+await mkdirAsync(new URL(url));
+assertEqual(extractGitInformation(url), null);
+execSync(`git clone ${origin_url} .`, {
+  cwd: new URL(url),
   stdio: "ignore",
 });
 
 {
-  const infos = extractGitInformation(path);
-  assertEqual(infos.repository, url);
+  const infos = extractGitInformation(url);
+  assertEqual(infos.repository, origin_url);
   assertEqual(infos.branch, "main");
   assertEqual(typeof infos.commit, "string");
   assertEqual(isArray(infos.status), true);

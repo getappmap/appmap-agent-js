@@ -1,19 +1,21 @@
 import { createRequire } from "module";
 import { readFileSync, readdirSync } from "fs";
+import { pathToFileURL } from "url";
 import Git from "./git.mjs";
 
+const _URL = URL;
 const { parse } = JSON;
 
 export default (dependencies) => {
   const {
-    path: { getDirectory, joinPath },
     expect: { expectSuccess, expect },
+    url: { appendURLSegment },
     log: { logWarning },
   } = dependencies;
   const { extractGitInformation } = Git(dependencies);
-  const hasPackageJSON = (directory) => {
+  const hasPackageJSON = (url) => {
     try {
-      readFileSync(joinPath(directory, "package.json"), "utf8");
+      readFileSync(new _URL(appendURLSegment(url, "package.json")), "utf8");
       return true;
     } catch (error) {
       const { code } = { code: null, ...error };
@@ -25,17 +27,17 @@ export default (dependencies) => {
       return false;
     }
   };
-  const createPackage = (directory) => {
+  const createPackage = (url) => {
     if (
       !expectSuccess(
-        () => readdirSync(directory),
+        () => readdirSync(new _URL(url)),
         "could not read repository directory %j >> %e",
-        directory,
+        url,
       ).includes("package.json")
     ) {
       logWarning(
         "No 'package.json' file found at repository directory %s",
-        directory,
+        url,
       );
       return null;
     }
@@ -47,52 +49,60 @@ export default (dependencies) => {
         () =>
           parse(
             expectSuccess(
-              () => readFileSync(joinPath(directory, "package.json"), "utf8"),
+              () =>
+                readFileSync(
+                  new _URL(appendURLSegment(url, "package.json")),
+                  "utf8",
+                ),
               "could not read 'package.json' file from %j >> %e",
-              directory,
+              url,
             ),
           ),
         "could not parse 'package.json' file from %j >> %e",
-        directory,
+        url,
       ),
     };
     expect(
       name !== null,
       "missing name property in 'package.json' file from %j",
-      directory,
+      url,
     );
     expect(
       version !== null,
       "missing version property in 'package.json' file from %j",
-      directory,
+      url,
     );
     return { name, version, homepage };
   };
   return {
     extractRepositoryHistory: extractGitInformation,
     extractRepositoryPackage: createPackage,
-    extractRepositoryDependency: (repository, name) => {
-      const { resolve } = createRequire(joinPath(repository, "dummy.js"));
-      const path = expectSuccess(
-        () => resolve(name),
-        "could not resolve %j from %j >> %e",
-        name,
-        repository,
+    extractRepositoryDependency: (home, name) => {
+      const { resolve } = createRequire(
+        new _URL(appendURLSegment(home, "dummy.js")),
       );
-      let directory = getDirectory(path);
-      while (!hasPackageJSON(directory)) {
-        const parent_directory = getDirectory(directory);
+      let url = pathToFileURL(
+        expectSuccess(
+          () => resolve(name),
+          "could not resolve %j from %j >> %e",
+          name,
+          home,
+        ),
+      );
+      url = appendURLSegment(url, "..");
+      while (!hasPackageJSON(url)) {
+        const parent_url = appendURLSegment(url, "..");
         expect(
-          parent_directory !== directory,
+          parent_url !== url,
           "failed to find package.json file from module %j in repository %j",
           name,
-          repository,
+          home,
         );
-        directory = parent_directory;
+        url = parent_url;
       }
       return {
-        directory,
-        package: createPackage(directory),
+        directory: url,
+        package: createPackage(url),
       };
     },
   };

@@ -1,6 +1,6 @@
 branches: [node]
 dependencies:
   - util
-  - path
+  - url
   - expect
   - log

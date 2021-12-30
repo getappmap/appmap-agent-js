@@ -1,2 +1,2 @@
 branches: [test]
-dependencies: [util, path]
+dependencies: [util, url]

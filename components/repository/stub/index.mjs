@@ -1,13 +1,13 @@
 export default (dependencies) => {
   const {
     util: { constant },
-    path: { joinPath },
+    url: { appendURLSegmentArray },
   } = dependencies;
   return {
     extractRepositoryHistory: constant(null),
     extractRepositoryPackage: constant(null),
-    extractRepositoryDependency: (directory, name) => ({
-      directory: joinPath(joinPath(directory, "node_modules"), name),
+    extractRepositoryDependency: (url, name) => ({
+      directory: appendURLSegmentArray(url, ["node_modules", name]),
       package: {
         name,
         version: "0.0.0",
