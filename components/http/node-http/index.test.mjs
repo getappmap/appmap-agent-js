@@ -3,15 +3,13 @@ import {
   assertReject,
   assertDeepEqual,
   assertEqual,
-  getFreshTemporaryPath,
+  getFreshTemporaryURL,
 } from "../../__fixture__.mjs";
-import { join as joinPath } from "path";
+import { fileURLToPath } from "url";
 import { platform as getPlatform } from "os";
 import { createServer, request as createRequest } from "http";
 import { buildTestDependenciesAsync } from "../../build.mjs";
 import Request from "./index.mjs";
-
-const { cwd } = process;
 
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
 
@@ -20,7 +18,7 @@ const { generateRespond, requestAsync } = Request(dependencies);
 const listenServerAsync = (server, port) =>
   new Promise((resolve) => {
     server.on("listening", resolve);
-    server.listen(port);
+    server.listen(typeof port === "string" ? fileURLToPath(port) : port);
   });
 
 const closeServerAsync = (server) =>
@@ -71,8 +69,8 @@ const closeServerAsync = (server) =>
   );
   const port =
     getPlatform() === "win32"
-      ? joinPath(`\\\\?\\pipe`, cwd(), Math.random().toString(36).substring(2))
-      : getFreshTemporaryPath();
+      ? `file:////%3F/pipe/${Math.random().toString(36).substring(2)}`
+      : getFreshTemporaryURL();
   await listenServerAsync(server, port);
   assertDeepEqual(await requestAsync("localhost", port, "GET", "/path", null), {
     code: 200,
