@@ -1,4 +1,4 @@
-import { assertDeepEqual, makeAbsolutePath } from "../../__fixture__.mjs";
+import { assertDeepEqual } from "../../__fixture__.mjs";
 import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
@@ -10,15 +10,15 @@ const { createConfiguration, extendConfiguration } =
   await buildTestComponentAsync("configuration", "test");
 const { compileMetadata } = Metadata(dependencies);
 
-const test = (conf, cwd, termination = { errors: [], status: 0 }) => {
-  let configuration = createConfiguration(cwd);
-  configuration = extendConfiguration(configuration, conf, cwd);
+const test = (conf, url, termination = { errors: [], status: 0 }) => {
+  let configuration = createConfiguration(url);
+  configuration = extendConfiguration(configuration, conf, url);
   configuration = extendConfiguration(
     configuration,
     {
       recorder: "process",
       agent: {
-        directory: makeAbsolutePath("agent"),
+        directory: "file:///agent",
         package: {
           name: "appmap-agent-js",
           version: "1.2.3",
@@ -50,10 +50,10 @@ const default_meta_data = {
   exception: null,
 };
 
-assertDeepEqual(test({}, makeAbsolutePath("cwd")), default_meta_data);
+assertDeepEqual(test({}, "file:///cwd"), default_meta_data);
 
 // recorder //
-assertDeepEqual(test({ recorder: "process" }, makeAbsolutePath("cwd")), {
+assertDeepEqual(test({ recorder: "process" }, "file:///cwd"), {
   ...default_meta_data,
   recorder: { name: "process" },
 });
@@ -61,7 +61,7 @@ assertDeepEqual(test({ recorder: "process" }, makeAbsolutePath("cwd")), {
 // termination //
 
 assertDeepEqual(
-  test({}, makeAbsolutePath("cwd"), {
+  test({}, "file:///cwd", {
     errors: [
       {
         name: "error-name",
@@ -79,33 +79,27 @@ assertDeepEqual(
 
 // app //
 
-assertDeepEqual(test({ name: "app-name" }, makeAbsolutePath("cwd")), {
+assertDeepEqual(test({ name: "app-name" }, "file:///cwd"), {
   ...default_meta_data,
   app: "app-name",
 });
 
 // name //
 
-assertDeepEqual(test({ "map-name": "map-name" }, makeAbsolutePath("cwd")), {
+assertDeepEqual(test({ "map-name": "map-name" }, "file:///cwd"), {
   ...default_meta_data,
   name: "map-name",
 });
 
-assertDeepEqual(
-  test({ output: { basename: "basename" } }, makeAbsolutePath("cwd")),
-  {
-    ...default_meta_data,
-    name: "basename",
-  },
-);
+assertDeepEqual(test({ output: { basename: "basename" } }, "file:///cwd"), {
+  ...default_meta_data,
+  name: "basename",
+});
 
-assertDeepEqual(
-  test({ main: "/directory/filename.js" }, makeAbsolutePath("cwd")),
-  {
-    ...default_meta_data,
-    name: "filename",
-  },
-);
+assertDeepEqual(test({ main: "/directory/filename.js" }, "file:///cwd"), {
+  ...default_meta_data,
+  name: "filename",
+});
 
 // recording //
 
@@ -117,7 +111,7 @@ assertDeepEqual(
         "method-id": "method-id",
       },
     },
-    makeAbsolutePath("cwd"),
+    "file:///cwd",
   ),
   {
     ...default_meta_data,
@@ -130,7 +124,7 @@ assertDeepEqual(
 assertDeepEqual(
   test(
     { engine: { name: "engine-name", version: "engine-version" } },
-    makeAbsolutePath("cwd"),
+    "file:///cwd",
   ),
   {
     ...default_meta_data,
@@ -142,10 +136,7 @@ assertDeepEqual(
 );
 
 assertDeepEqual(
-  test(
-    { engine: { name: "engine-name", version: "1.2.3" } },
-    makeAbsolutePath("cwd"),
-  ),
+  test({ engine: { name: "engine-name", version: "1.2.3" } }, "file:///cwd"),
   {
     ...default_meta_data,
     language: {

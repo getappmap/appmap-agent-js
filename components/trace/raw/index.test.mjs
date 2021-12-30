@@ -1,4 +1,4 @@
-import { assertDeepEqual, makeAbsolutePath } from "../../__fixture__.mjs";
+import { assertDeepEqual } from "../../__fixture__.mjs";
 import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
@@ -14,7 +14,7 @@ const dependencies = await buildTestDependenciesAsync(import.meta.url);
 
 const { compileTrace } = Trace(dependencies);
 
-const configuration = createConfiguration(makeAbsolutePath("root"));
+const configuration = createConfiguration("file:///home");
 const termination = { status: 0, errors: [] };
 
 assertDeepEqual(compileTrace(configuration, [], [], termination), {

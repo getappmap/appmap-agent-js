@@ -3,14 +3,13 @@ import ExclusionList from "./exclusion-list.mjs";
 
 const _Set = Set;
 const _Map = Map;
-const _URL = URL;
 const _undefined = undefined;
 const { from: toArray } = Array;
 
 export default (dependencies) => {
   const {
     util: { assert, createCounter },
-    path: { toRelativePath },
+    url: { pathifyURL },
     log: { logWarning, logDebug },
     location: {
       makeLocation,
@@ -184,8 +183,7 @@ export default (dependencies) => {
     ) => {
       assert(!urls.has(url), "duplicate source url");
       urls.add(url);
-      const { pathname } = new _URL(url);
-      const path = toRelativePath(directory, pathname);
+      const path = pathifyURL(url, directory);
       const context = { url, path, shallow, inline, content, placeholder };
       const exclusions = compileExclusionList(exclude);
       const excluded_entities = [];

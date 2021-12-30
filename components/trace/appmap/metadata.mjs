@@ -3,7 +3,7 @@ const _String = String;
 export default (dependencies) => {
   const {
     util: { assert, mapMaybe },
-    path: { getBasename },
+    url: { getLastURLSegment },
   } = dependencies;
 
   /* c8 ignore start */
@@ -62,7 +62,7 @@ export default (dependencies) => {
       return basename;
     }
     if (main !== null) {
-      return getBasename(main);
+      return getLastURLSegment(main).split(".")[0];
     }
     return null;
   };

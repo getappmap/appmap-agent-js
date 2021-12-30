@@ -1,4 +1,4 @@
-import { assertDeepEqual, makeAbsolutePath } from "../../__fixture__.mjs";
+import { assertDeepEqual } from "../../__fixture__.mjs";
 import { buildTestDependenciesAsync } from "../../build.mjs";
 import Erratum from "./erratum.mjs";
 
@@ -17,7 +17,7 @@ assertDeepEqual(
         protocol: `HTTP/1.1`,
         method: "GET",
         headers: {},
-        url: makeAbsolutePath("val"),
+        url: "/val",
         route: null,
       },
     },
@@ -30,8 +30,8 @@ assertDeepEqual(
         protocol: `HTTP/1.1`,
         method: "GET",
         headers: {},
-        url: makeAbsolutePath("val"),
-        route: makeAbsolutePath(":key"),
+        url: "/val",
+        route: "/:key",
       },
     },
   ]),
@@ -45,8 +45,8 @@ assertDeepEqual(
         protocol: `HTTP/1.1`,
         method: "GET",
         headers: {},
-        url: makeAbsolutePath("val"),
-        route: makeAbsolutePath(":key"),
+        url: "/val",
+        route: "/:key",
       },
     },
   ],

@@ -1,4 +1,3 @@
-/* globals URL, URLSearchParams */
 const _URL = URL;
 const _URLSearchParams = URLSearchParams;
 const _String = String;
