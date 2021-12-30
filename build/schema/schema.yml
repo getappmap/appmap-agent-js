@@ -78,9 +78,8 @@
 - $id: path
   type: string
 
-- $id: absolute-path
+- $id: regexp
   type: string
-  pattern: "^/"
 
 - $id: basename
   type: string
@@ -102,13 +101,17 @@
 
 - $id: port
   anyOf:
+    - const: 0
+    - const: ""
+    - $ref: port-number
     - $ref: path
-    - $ref: port-number
 
-- $id: absolute-port
+- $id: cooked-port
   anyOf:
-    - $ref: absolute-path
+    - const: 0
+    - const: ""
     - $ref: port-number
+    - $ref: url
 
 # name-version #
 
@@ -233,10 +236,8 @@
       additionalProperties: false
       required: [regexp]
       properties:
-        regexp:
-          type: string
-        flags:
-          type: string
+        regexp: {$ref: regexp}
+        flags: {type: string}
         enabled: {type: boolean}
         shallow: {type: boolean}
         exclude: {$ref: exclude}
@@ -303,9 +304,9 @@
 - $id: cooked-specifier
   type: object
   additionalProperties: false
-  required: [cwd, source, flags]
+  required: [base, source, flags]
   properties:
-    cwd: {$ref: absolute-path}
+    base: {$ref: url}
     source: {type: string}
     flags: {type: string}
 
@@ -336,7 +337,7 @@
   additionalProperties: false
   required: [directory, package]
   properties:
-    directory: {$ref: absolute-path}
+    directory: {$ref: url}
     package: {$ref: package}
 
 - $id: repository
@@ -344,7 +345,7 @@
   additionalProperties: false
   required: [directory, history, package]
   properties:
-    directory: {$ref: absolute-path}
+    directory: {$ref: url}
     history:
       type: object
       nullable: true
@@ -365,7 +366,7 @@
       additionalProperties: false
       patternProperties:
         "^": {$ref: config}
-    scenario: {type: string}
+    scenario: {$ref: regexp}
     recursive-process-recording: {type: boolean}
     command: {type: string}
     command-options: {$ref: command-options}
@@ -378,17 +379,11 @@
     log: {$ref: log-level}
     host: {const: localhost}
     session: {$ref: basename}
-    trace-port:
-      anyOf:
-        - const: 0
-        - $ref: port
+    trace-port: {$ref: port}
     trace-protocol: {const: TCP}
-    track-port:
-      anyOf:
-        - const: 0
-        - $ref: port
+    track-port: {$ref: port}
     track-protocol: {const: "HTTP/1.1"}
-    intercept-track-port: {type: string}
+    intercept-track-port: {$ref: regexp}
     intercept-track-protocol: {const: "HTTP/1.1"}
     # client
     recorder: {$ref: recorder}
@@ -463,23 +458,23 @@
   additionalProperties: false
   minProperties: 39
   properties:
-    scenario: {type: string}
+    scenario: {$ref: regexp}
     scenarios:
       type: array
       items:
         type: object
-        required: [key, value, cwd]
+        required: [key, value, base]
         properties:
           key: {type: string}
           value: {$ref: config}
-          cwd: {$ref: absolute-path}
+          base: {$ref: url}
     recursive-process-recording: {type: boolean}
     command:
       type: object
       nullable: true
       properties:
         value: {type: string}
-        cwd: {$ref: absolute-path}
+        base: {$ref: url}
     command-options: {$ref: cooked-command-options}
     validate:
       type: object
@@ -499,17 +494,11 @@
       anyOf:
         - const: null
         - $ref: basename
-    trace-port:
-      anyOf:
-        - const: 0
-        - $ref: absolute-port
+    trace-port: {$ref: cooked-port}
     trace-protocol: {const: TCP}
-    track-port:
-      anyOf:
-        - const: 0
-        - $ref: absolute-port
+    track-port: {$ref: cooked-port}
     track-protocol: {const: "HTTP/1.1"}
-    intercept-track-port: {type: string}
+    intercept-track-port: {$ref: regexp}
     intercept-track-protocol: {const: "HTTP/1.1"}
     recorder:
       anyOf:
@@ -542,7 +531,7 @@
     main:
       anyOf:
         - const: null
-        - $ref: absolute-path
+        - $ref: url
     engine:
       anyOf:
         - const: null
@@ -594,7 +583,7 @@
         directory:
           anyOf:
             - const: null
-            - $ref: absolute-path
+            - $ref: url
         basename:
           anyOf:
             - const: null
@@ -631,7 +620,7 @@
     path:
       anyOf:
         - const: null
-        - $ref: absolute-path
+        - $ref: url
     data: {$ref: config}
 
 - $id: termination

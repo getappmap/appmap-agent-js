@@ -1,8 +1,4 @@
-import {
-  assertDeepEqual,
-  assertEqual,
-  makeAbsolutePath,
-} from "../../__fixture__.mjs";
+import { assertDeepEqual, assertEqual } from "../../__fixture__.mjs";
 import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
@@ -17,62 +13,45 @@ const { createConfiguration, extendConfiguration } = Configuration(
   await buildTestDependenciesAsync(import.meta.url),
 );
 
-validateConfiguration(createConfiguration(makeAbsolutePath("home")));
+validateConfiguration(createConfiguration("file:///home"));
 
 const extend = (
   name,
   value1,
-  nullable_directory = null,
-  home_directory = makeAbsolutePath("home"),
+  base = "file:///dummy",
+  home = "file:///dummy",
 ) => {
-  const extended_configuration = extendConfiguration(
-    createConfiguration(home_directory),
+  const configuration = extendConfiguration(
+    createConfiguration(home),
     { [name]: value1 },
-    nullable_directory,
+    base,
   );
-  validateConfiguration(extended_configuration);
-  const { [name]: value2 } = extended_configuration;
+  validateConfiguration(configuration);
+  const { [name]: value2 } = configuration;
   return value2;
 };
 
 // packages //
 
 {
-  const [specifier, value] = extend(
-    "packages",
-    "lib/*.js",
-    makeAbsolutePath("cwd"),
-  )[0];
+  const [specifier, value] = extend("packages", "lib/*.js", "file:///base")[0];
   assertDeepEqual(value, {
     "inline-source": null,
     enabled: true,
     exclude: [],
     shallow: false,
   });
-  assertEqual(
-    matchSpecifier(specifier, makeAbsolutePath("cwd", "lib", "foo.js")),
-    true,
-  );
-  assertEqual(
-    matchSpecifier(specifier, makeAbsolutePath("cwd", "lib", "foo.mjs")),
-    false,
-  );
-  assertEqual(
-    matchSpecifier(specifier, makeAbsolutePath("cwd", "src", "foo.js")),
-    false,
-  );
+  assertEqual(matchSpecifier(specifier, "file:///base/lib/foo.js"), true);
+  assertEqual(matchSpecifier(specifier, "file:///base/lib/foo.mjs"), false);
+  assertEqual(matchSpecifier(specifier, "file:///base/src/foo.js"), false);
 }
 
 // scenarios //
 assertDeepEqual(
-  extend(
-    "scenarios",
-    { key: { command: "node main.js" } },
-    makeAbsolutePath("cwd"),
-  ),
+  extend("scenarios", { key: { command: "node main.js" } }, "file:///base"),
   [
     {
-      cwd: makeAbsolutePath("cwd"),
+      base: "file:///base",
       key: "key",
       value: { command: "node main.js" },
     },
@@ -94,39 +73,43 @@ assertDeepEqual(
 // main //
 
 assertDeepEqual(
-  extend("main", "foo.js", makeAbsolutePath("cwd")),
-  makeAbsolutePath("cwd", "foo.js"),
+  extend("main", "foo.js", "file:///base"),
+  "file:///base/foo.js",
 );
 
 // port //
 
 assertDeepEqual(
-  extend("trace-port", "unix-domain-socket", makeAbsolutePath("cwd")),
-  makeAbsolutePath("cwd", "unix-domain-socket"),
+  extend("trace-port", "unix-domain-socket", "file:///base"),
+  "file:///base/unix-domain-socket",
 );
+
+assertDeepEqual(extend("trace-port", "", "file:///base"), "");
+
+assertDeepEqual(extend("trace-port", 8080, "file:///base"), 8080);
 
 // language //
 
-assertDeepEqual(extend("language", "foo@bar", null), {
+assertDeepEqual(extend("language", "foo@bar"), {
   name: "foo",
   version: "bar",
 });
 
-assertDeepEqual(extend("language", { name: "foo", version: "bar" }, null), {
+assertDeepEqual(extend("language", { name: "foo", version: "bar" }), {
   name: "foo",
   version: "bar",
 });
 
 // recording //
 
-assertDeepEqual(extend("recording", "foo.bar", null), {
+assertDeepEqual(extend("recording", "foo.bar"), {
   "defined-class": "foo",
   "method-id": "bar",
 });
 
 // frameworks //
 
-assertDeepEqual(extend("frameworks", ["foo@bar"], null), [
+assertDeepEqual(extend("frameworks", ["foo@bar"]), [
   {
     name: "foo",
     version: "bar",
@@ -135,48 +118,37 @@ assertDeepEqual(extend("frameworks", ["foo@bar"], null), [
 
 // output //
 
-assertDeepEqual(extend("output", "directory", makeAbsolutePath("cwd")), {
-  directory: makeAbsolutePath("cwd", "directory"),
+assertDeepEqual(extend("output", "directory", "file:///base"), {
+  directory: "file:///base/directory",
   basename: null,
   extension: ".appmap.json",
 });
 
 // processes //
 
-assertDeepEqual(
-  extend("processes", true, makeAbsolutePath("cwd"), makeAbsolutePath("home")),
+assertDeepEqual(extend("processes", true, "file:///base", "file:///home"), [
+  [{ base: "file:///base", source: "^", flags: "u" }, true],
   [
-    [{ cwd: makeAbsolutePath("cwd"), source: "^", flags: "u" }, true],
-    [
-      {
-        cwd: makeAbsolutePath("home"),
-        source: "^",
-        flags: "u",
-      },
-      true,
-    ],
+    {
+      base: "file:///home",
+      source: "^",
+      flags: "u",
+    },
+    true,
   ],
-);
+]);
 
-assertDeepEqual(
-  extend(
-    "processes",
-    makeAbsolutePath("foo"),
-    makeAbsolutePath("cwd"),
-    makeAbsolutePath("home"),
-  ),
+assertDeepEqual(extend("processes", "/foo", "file:///base", "file:///home"), [
+  [{ base: "file:///base", source: "^(?:\\/foo)$", flags: "" }, true],
   [
-    [{ cwd: makeAbsolutePath("cwd"), source: "^(?:\\/foo)$", flags: "" }, true],
-    [
-      {
-        cwd: makeAbsolutePath("home"),
-        source: "^",
-        flags: "u",
-      },
-      true,
-    ],
+    {
+      base: "file:///home",
+      source: "^",
+      flags: "u",
+    },
+    true,
   ],
-);
+]);
 
 // serialization //
 
@@ -188,14 +160,14 @@ assertDeepEqual(extend("serialization", "toString", null), {
 
 // command //
 
-assertDeepEqual(extend("command", "node main.js", makeAbsolutePath("cwd")), {
+assertDeepEqual(extend("command", "node main.js", "file:///base"), {
   value: "node main.js",
-  cwd: makeAbsolutePath("cwd"),
+  base: "file:///base",
 });
 
 // exclude //
 
-assertDeepEqual(extend("exclude", ["foo\\.bar"], null), [
+assertDeepEqual(extend("exclude", ["foo\\.bar"]), [
   {
     combinator: "and",
     "every-label": true,
@@ -205,5 +177,5 @@ assertDeepEqual(extend("exclude", ["foo\\.bar"], null), [
     excluded: true,
     recursive: true,
   },
-  ...createConfiguration(makeAbsolutePath("base")).exclude,
+  ...createConfiguration("file:///home").exclude,
 ]);

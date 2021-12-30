@@ -1,6 +1,6 @@
 branches: [test, node, browser]
 dependencies:
   - util
-  - path
+  - url
   - validate
   - specifier
