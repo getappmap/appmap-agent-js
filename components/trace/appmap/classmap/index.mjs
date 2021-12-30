@@ -1,5 +1,3 @@
-/* globals URL */
-
 import Estree from "./estree/index.mjs";
 import ExclusionList from "./exclusion-list.mjs";
 
