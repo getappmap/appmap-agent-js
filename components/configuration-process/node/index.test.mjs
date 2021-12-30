@@ -1,9 +1,10 @@
-import { writeFile } from "fs/promises";
+import { writeFile as writeFileAsync } from "fs/promises";
+import { fileURLToPath } from "url";
 import {
+  assertThrow,
   assertDeepEqual,
   assertEqual,
-  getFreshTemporaryPath,
-  makeAbsolutePath,
+  getFreshTemporaryURL,
 } from "../../__fixture__.mjs";
 import { buildTestDependenciesAsync } from "../../build.mjs";
 import ConfigurationProcess from "./index.mjs";
@@ -12,15 +13,25 @@ const { loadProcessConfiguration } = ConfigurationProcess(
   await buildTestDependenciesAsync(import.meta.url),
 );
 
+assertThrow(
+  () =>
+    loadProcessConfiguration({
+      env: { APPMAP_CONFIGURATION_PATH: "foo" },
+      argv: ["node", "main.mjs"],
+      cwd: () => "cwd",
+    }),
+  /^AppmapError: Unsupported configuration file extension/,
+);
+
 {
-  const path = `${getFreshTemporaryPath()}.json`;
+  const url = getFreshTemporaryURL(".json");
   loadProcessConfiguration({
-    env: { APPMAP_CONFIGURATION_PATH: path },
+    env: { APPMAP_CONFIGURATION_PATH: fileURLToPath(url) },
     argv: ["node", "main.mjs"],
-    cwd: () => makeAbsolutePath("cwd"),
+    cwd: () => "cwd",
   });
-  await writeFile(
-    path,
+  await writeFileAsync(
+    new URL(url),
     JSON.stringify({ name: "app", "map-name": "name1" }),
     "utf8",
   );
@@ -33,7 +44,7 @@ const { loadProcessConfiguration } = ConfigurationProcess(
     log,
     "track-port": track_port,
   } = loadProcessConfiguration({
-    env: { APPMAP_CONFIGURATION_PATH: path },
+    env: { APPMAP_CONFIGURATION_PATH: fileURLToPath(url) },
     argv: [
       ["node", "agent.mjs"],
       ["--track-port", "8080"],
@@ -44,7 +55,7 @@ const { loadProcessConfiguration } = ConfigurationProcess(
       ["--process", "'*'"],
       ["--", "exec", "arg1", "arg2"],
     ].flat(),
-    cwd: () => makeAbsolutePath("cwd"),
+    cwd: () => "cwd",
   });
   assertEqual(packages.length, 3);
   assertEqual(processes.length, 2);
@@ -57,7 +68,7 @@ const { loadProcessConfiguration } = ConfigurationProcess(
       map_name: "name2",
       command: {
         value: "'exec' 'arg1' 'arg2'",
-        cwd: makeAbsolutePath("cwd"),
+        base: "file:///cwd",
       },
     },
   );

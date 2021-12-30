@@ -4,7 +4,7 @@ import { pathToFileURL } from "url";
 
 Error.stackTraceLimit = Infinity;
 
-export const getFreshTemporaryURL = () => `${pathToFileURL(getTemporaryDirectory())}/${Math.random().toString(36).substring(2)}`;
+export const getFreshTemporaryURL = (extension = "") => `${pathToFileURL(getTemporaryDirectory())}/${Math.random().toString(36).substring(2)}${extension}`;
 
 export const {
   ok: assert,
