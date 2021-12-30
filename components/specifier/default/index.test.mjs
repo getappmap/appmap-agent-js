@@ -192,3 +192,9 @@ assertEqual(
   ),
   true,
 );
+
+// constant //
+
+assertEqual(matchSpecifier(true, "file:///file.ext"), true);
+
+assertEqual(matchSpecifier(false, "file:///file.ext"), false);

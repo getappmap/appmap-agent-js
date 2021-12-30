@@ -410,16 +410,7 @@ export default (dependencies) => {
         basename: null,
         extension: ".appmap.json",
       },
-      processes: [
-        [
-          {
-            base: home,
-            source: "^",
-            flags: "u",
-          },
-          true,
-        ],
-      ],
+      processes: [[true, true]],
       recorder: null,
       "inline-source": false,
       hooks: {
@@ -446,11 +437,7 @@ export default (dependencies) => {
       },
       packages: [
         [
-          {
-            base: home,
-            source: "^",
-            flags: "u",
-          },
+          true,
           {
             enabled: false,
             shallow: false,

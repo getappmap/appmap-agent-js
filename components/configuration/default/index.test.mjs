@@ -128,26 +128,12 @@ assertDeepEqual(extend("output", "directory", "file:///base"), {
 
 assertDeepEqual(extend("processes", true, "file:///base", "file:///home"), [
   [{ base: "file:///base", source: "^", flags: "u" }, true],
-  [
-    {
-      base: "file:///home",
-      source: "^",
-      flags: "u",
-    },
-    true,
-  ],
+  [true, true],
 ]);
 
 assertDeepEqual(extend("processes", "/foo", "file:///base", "file:///home"), [
   [{ base: "file:///base", source: "^(?:\\/foo)$", flags: "" }, true],
-  [
-    {
-      base: "file:///home",
-      source: "^",
-      flags: "u",
-    },
-    true,
-  ],
+  [true, true],
 ]);
 
 // serialization //

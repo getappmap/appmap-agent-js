@@ -6,6 +6,7 @@ const { Minimatch: MinimatchClass } = Minimatch;
 
 export default (dependencies) => {
   const {
+    log: { logDebug },
     util: { assert },
     url: { pathifyURL },
     expect: { expectSuccess },
@@ -97,11 +98,31 @@ export default (dependencies) => {
       assert(false, "invalid specifier options");
     },
     matchSpecifier: (specifier, url) => {
-      const { base, source, flags } = specifier;
-      const maybe_path = pathifyURL(url, base);
-      return maybe_path === null
-        ? false
-        : makeRegExp(source, flags).test(maybe_path);
+      if (typeof specifier === "boolean") {
+        logDebug(
+          "url %j %s constant specifier",
+          url,
+          specifier ? "matched" : "did not match",
+        );
+        return specifier;
+      } else {
+        const { base, source, flags } = specifier;
+        const maybe_path = pathifyURL(url, base);
+        const matched =
+          maybe_path === null
+            ? false
+            : makeRegExp(source, flags).test(maybe_path);
+        logDebug(
+          "url %j which resolves to %j relatively to %j %s regexp specifier %j with flags %j",
+          url,
+          maybe_path,
+          base,
+          matched ? "matched" : "did not match",
+          source,
+          flags,
+        );
+        return matched;
+      }
     },
   };
 };

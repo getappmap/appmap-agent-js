@@ -302,13 +302,15 @@
               required: [exclude]
 
 - $id: cooked-specifier
-  type: object
-  additionalProperties: false
-  required: [base, source, flags]
-  properties:
-    base: {$ref: url}
-    source: {type: string}
-    flags: {type: string}
+  anyOf:
+    - type: boolean
+    - type: object
+      additionalProperties: false
+      required: [base, source, flags]
+      properties:
+        base: {$ref: url}
+        source: {type: string}
+        flags: {type: string}
 
 - $id: command-options
   type: object
