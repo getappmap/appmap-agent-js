@@ -77,15 +77,15 @@ export default (dependencies) => {
   return {
     extractRepositoryHistory: extractGitInformation,
     extractRepositoryPackage: createPackage,
-    extractRepositoryDependency: (home, name) => {
+    extractRepositoryDependency: (home, segments) => {
       const { resolve } = createRequire(
         new _URL(appendURLSegment(home, "dummy.js")),
       );
       let url = pathToFileURL(
         expectSuccess(
-          () => resolve(name),
+          () => resolve(segments.join("/")),
           "could not resolve %j from %j >> %e",
-          name,
+          segments,
           home,
         ),
       );
@@ -95,7 +95,7 @@ export default (dependencies) => {
         expect(
           parent_url !== url,
           "failed to find package.json file from module %j in repository %j",
-          name,
+          segments,
           home,
         );
         url = parent_url;

@@ -6,10 +6,10 @@ export default (dependencies) => {
   return {
     extractRepositoryHistory: constant(null),
     extractRepositoryPackage: constant(null),
-    extractRepositoryDependency: (url, name) => ({
-      directory: appendURLSegmentArray(url, ["node_modules", name]),
+    extractRepositoryDependency: (url, segments) => ({
+      directory: appendURLSegmentArray(url, ["node_modules", ...segments]),
       package: {
-        name,
+        name: segments.join("/"),
         version: "0.0.0",
         homepage: null,
       },

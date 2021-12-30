@@ -6,10 +6,10 @@ import Repository from "./index.mjs";
 const { extractRepositoryDependency } = Repository(
   await buildTestDependenciesAsync(import.meta.url),
 );
-assertDeepEqual(extractRepositoryDependency("file:///home", "bar"), {
-  directory: "file:///home/node_modules/bar",
+assertDeepEqual(extractRepositoryDependency("file:///home", ["foo", "bar"]), {
+  directory: "file:///home/node_modules/foo/bar",
   package: {
-    name: "bar",
+    name: "foo/bar",
     version: "0.0.0",
     homepage: null,
   },

@@ -32,7 +32,7 @@ assertDeepEqual(extractRepositoryPackage(`${url}/lib`), null);
   const {
     directory,
     package: { name, version },
-  } = extractRepositoryDependency(url, "acorn");
+  } = extractRepositoryDependency(url, ["acorn"]);
   assertEqual(name, "acorn");
   assertEqual(typeof directory, "string");
   assertEqual(typeof version, "string");
