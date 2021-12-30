@@ -1,4 +1,5 @@
 import Http from "http";
+import { fileURLToPath } from "url";
 
 const { request: createRequest } = Http;
 const { from: toBuffer, concat: concatBuffer } = Buffer;
@@ -48,7 +49,7 @@ export default (dependencies) => {
         const request = createRequest({
           host,
           port: typeof port === "number" ? port : null,
-          socketPath: typeof port === "string" ? port : null,
+          socketPath: typeof port === "string" ? fileURLToPath(port) : null,
           method,
           path,
           headers: createHeaders(buffer),
