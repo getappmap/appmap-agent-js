@@ -3,8 +3,9 @@ extends:
   - eslint:recommended
   - plugin:import/recommended
 globals:
-  URL: readonly
   console: readonly
+  URL: readonly
+  URLSearchParams: readonly
 env:
   es6: true
   es2017: true
