@@ -109,8 +109,8 @@ assertEqual(
 
 assertEqual(
   matchSpecifier(
-    createSpecifier({ path: "*" }, "file:///base"),
-    "file:///base/*",
+    createSpecifier({ path: "][" }, "file:///base"),
+    "file:///base/%5D%5B",
   ),
   true,
 );
