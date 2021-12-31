@@ -31,6 +31,7 @@
     "lint": "npx eslint '**/*.@(mjs|js|cjs)'",
     "test-unit-coverage": "npx test-turtle --layout alongside -- /bin/sh test/turtle/coverage.sh",
     "test-unit": "npx test-turtle --layout alongside -- node test/turtle/unit.mjs",
+    "test-unit-success": "npx test-turtle --layout alongside -- node test/turtle/unit-success.mjs",
     "test-integration": "node --unhandled-rejections=strict test/index.mjs",
     "format": "npx prettier -w '**/*.@(mjs|js|cjs)'",
     "deploy": "npx semantic-release"

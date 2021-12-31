@@ -8,4 +8,4 @@ install:
   - npm run build
 scripts:
   # - node windows.mjs
-  - npm run test-unit
+  - npm run test-unit-success

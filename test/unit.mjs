@@ -12,10 +12,11 @@ const loop = async (path) => {
       path,
     ]);
     if (signal !== null) {
-      throw new Error(`Killed by ${signal}`);
-    }
-    if (status !== 0) {
-      throw new Error(`Exit code ${String(status)}`);
+      stdout.write(`Killed by ${signal}${"\n"}`);
+    } else if (status !== 0) {
+      stdout.write(`Exit code ${String(status)}${"\n"}`);
+    } else {
+      stdout.write("Success\n");
     }
   } else if ((await lstatAsync(path)).isDirectory()) {
     for (const filename of await readdirAsync(path)) {
@@ -25,4 +26,4 @@ const loop = async (path) => {
 };
 
 await loop("./build");
-await loop("./components.mjs");
+await loop("./components");
