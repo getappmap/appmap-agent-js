@@ -1,5 +1,5 @@
 import { createServer as createTCPServer } from "net";
-import {fileURLToPath} from "url";
+import { fileURLToPath } from "url";
 import NetSocketMessaging from "net-socket-messaging";
 
 const { patch: patchSocket } = NetSocketMessaging;

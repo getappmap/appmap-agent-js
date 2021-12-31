@@ -2,6 +2,7 @@ import ShellQuote from "shell-quote";
 
 const { parse: parseShell } = ShellQuote;
 
+const _URL = URL;
 const _RegExp = RegExp;
 const { entries: toEntries } = Object;
 const { stringify: stringifyJSON } = JSON;
@@ -9,7 +10,7 @@ const { stringify: stringifyJSON } = JSON;
 export default (dependencies) => {
   const {
     util: { assert, coalesce },
-    url: { urlifyPath },
+    url: { pathifyURL, urlifyPath, appendURLSegmentArray },
     expect: { expect, expectSuccess },
     log: { logDebug, logInfo, logGuardWarning },
     repository: {
@@ -195,7 +196,7 @@ export default (dependencies) => {
         command: { value: command },
       } = configuration;
       const {
-        command: { cwd },
+        command: { base },
         recorder,
         "command-options": options,
         "recursive-process-recording": recursive,
@@ -215,7 +216,14 @@ export default (dependencies) => {
           let tokens = parseShell(command, env);
           const hook = [
             "--require",
-            `${directory}/lib/node/recorder-mocha.mjs`,
+            pathifyURL(
+              appendURLSegmentArray(directory, [
+                "lib",
+                "node",
+                "recorder-mocha.mjs",
+              ]),
+              base,
+            ),
           ];
           if (tokens.length > 0 && tokens[0] === "mocha") {
             tokens = ["mocha", ...hook, ...tokens.slice(1)];
@@ -245,10 +253,24 @@ export default (dependencies) => {
           NODE_OPTIONS: [
             coalesce(env, "NODE_OPTIONS", ""),
             // abomination: https://github.com/mochajs/mocha/issues/4720
-            `--require=${directory}/lib/node/abomination.js`,
-            `--experimental-loader=${directory}/lib/node/${
-              recorder === "mocha" ? "mocha-loader" : `recorder-${recorder}`
-            }.mjs`,
+            `--require=${pathifyURL(
+              appendURLSegmentArray(directory, [
+                "lib",
+                "node",
+                "abomination.js",
+              ]),
+              base,
+            )}`,
+            `--experimental-loader=${pathifyURL(
+              appendURLSegmentArray(directory, [
+                "lib",
+                "node",
+                recorder === "mocha"
+                  ? "mocha-loader.mjs"
+                  : `recorder-${recorder}.mjs`,
+              ]),
+              base,
+            )}`,
           ].join(" "),
         };
       } else {
@@ -266,7 +288,14 @@ export default (dependencies) => {
         command = [
           tokens[0],
           "--experimental-loader",
-          `${directory}/lib/node/recorder-${recorder}.mjs`,
+          pathifyURL(
+            appendURLSegmentArray(directory, [
+              "lib",
+              "node",
+              `recorder-${recorder}.mjs`,
+            ]),
+            base,
+          ),
           ...tokens.slice(1),
         ]
           .map(quote)
@@ -276,7 +305,7 @@ export default (dependencies) => {
         command,
         options: {
           ...options,
-          cwd,
+          cwd: new _URL(base),
           env,
         },
       };

@@ -1,10 +1,13 @@
 import { strict as Assert } from "assert";
-import { tmpdir as getTemporaryDirectory, platform as getPlatform } from "os";
+import { tmpdir as getTemporaryDirectory } from "os";
 import { pathToFileURL } from "url";
 
 Error.stackTraceLimit = Infinity;
 
-export const getFreshTemporaryURL = (extension = "") => `${pathToFileURL(getTemporaryDirectory())}/${Math.random().toString(36).substring(2)}${extension}`;
+export const getFreshTemporaryURL = (extension = "") =>
+  `${pathToFileURL(getTemporaryDirectory())}/${Math.random()
+    .toString(36)
+    .substring(2)}${extension}`;
 
 export const {
   ok: assert,
