@@ -1,4 +1,4 @@
-import { tmpdir as getTemporaryDirectory, platform as getPlatform } from "os";
+import { tmpdir as getTemporaryDirectory } from "os";
 import { pathToFileURL, fileURLToPath } from "url";
 
 const _Promise = Promise;
@@ -8,6 +8,8 @@ const _setTimeout = setTimeout;
 export default (dependencies) => {
   const {
     log: { logWarning },
+    url: { appendURLSegment },
+    path: { toIPCPath, fromIPCPath },
     uuid: { getUUID },
   } = dependencies;
   return {
@@ -31,22 +33,21 @@ export default (dependencies) => {
           resolve({ server, sockets });
         });
         if (port === "") {
-          /* c8 ignore start */ if (getPlatform() === "win32") {
-            port = `file:////?/pipe/${getUUID()}`;
-          } /* c8 ignore stop */ else {
-            port = `file:///${getTemporaryDirectory()}/${getUUID()}`;
-          }
+          port = appendURLSegment(
+            pathToFileURL(getTemporaryDirectory()),
+            getUUID(),
+          );
         }
-        server.listen(typeof port === "string" ? fileURLToPath(port) : port);
+        server.listen(
+          typeof port === "string" ? toIPCPath(fileURLToPath(port)) : port,
+        );
       });
     },
     getServicePort: ({ server }) => {
       const address = server.address();
-      if (typeof address === "string") {
-        return pathToFileURL(address).toString();
-      }
-      const { port } = address;
-      return port;
+      return typeof address === "string"
+        ? pathToFileURL(fromIPCPath(address)).toString()
+        : address.port;
     },
     closeServiceAsync: ({ server, sockets }) =>
       new Promise((resolve, reject) => {

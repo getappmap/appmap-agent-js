@@ -4,7 +4,8 @@ language: node_js
 cache: npm
 node_js: 16
 install:
-  - npm install
+  - npm ci
   - npm run build
 scripts:
+  # - node windows.mjs
   - npm run test-unit

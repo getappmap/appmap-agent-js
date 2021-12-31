@@ -11,12 +11,17 @@ export default (dependencies) => {
   const {
     util: { assert },
   } = dependencies;
-  const makeComponent = ({ separator, splitter, root, forbidden }) => {
+  const makeComponent = ({ ipc, separator, splitter, root, forbidden }) => {
     const assertSegmentValidity = (segment) => {
       forbidden.lastIndex = 0;
       assert(!forbidden.test(segment), "invalid file name");
     };
     return {
+      toIPCPath: (path) => `${ipc}${path}`,
+      fromIPCPath: (path) => {
+        assert(path.startsWith(ipc), "invalid ipc path");
+        return path.substring(ipc.length);
+      },
       makeSegment: (string, replace) => {
         forbidden.lastIndex = 0;
         return string.replace(forbidden, replace);
@@ -40,6 +45,7 @@ export default (dependencies) => {
   };
   if (getPlatform() === "win32") {
     return makeComponent({
+      ipc: "\\\\.\\pipe\\",
       separator: "\\",
       splitter: /[\\/]/gu,
       root: /^([a-zA-Z]:[\\/]|[\\/][\\/])/u,
@@ -47,6 +53,7 @@ export default (dependencies) => {
     });
   } else {
     return makeComponent({
+      ipc: "",
       separator: "/",
       splitter: "/",
       root: "/",

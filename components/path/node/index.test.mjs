@@ -10,6 +10,8 @@ const { default: Path } = await import("./index.mjs");
 {
   platform = "win32";
   const {
+    toIPCPath,
+    fromIPCPath,
     makeSegment,
     encodeSegment,
     decodeSegment,
@@ -17,6 +19,7 @@ const { default: Path } = await import("./index.mjs");
     splitPath,
     isAbsolutePath,
   } = Path(await buildTestDependenciesAsync(import.meta.url));
+  assertEqual(fromIPCPath(toIPCPath("C:\\foo")), "C:\\foo");
   assertEqual(makeSegment("foo\\bar/qux", "-"), "foo-bar-qux");
   assertThrow(() => encodeSegment("foo\\bar"));
   assertThrow(() => encodeSegment("foo/bar"));
@@ -30,6 +33,8 @@ const { default: Path } = await import("./index.mjs");
 {
   platform = "darwin";
   const {
+    toIPCPath,
+    fromIPCPath,
     makeSegment,
     encodeSegment,
     decodeSegment,
@@ -37,6 +42,7 @@ const { default: Path } = await import("./index.mjs");
     splitPath,
     isAbsolutePath,
   } = Path(await buildTestDependenciesAsync(import.meta.url));
+  assertEqual(fromIPCPath(toIPCPath("/foo")), "/foo");
   assertEqual(makeSegment("foo\\bar/qux", "-"), "foo\\bar-qux");
   assertThrow(() => encodeSegment("foo/bar"));
   assertEqual(decodeSegment(encodeSegment("foo\\bar")), "foo\\bar");

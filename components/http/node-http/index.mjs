@@ -12,6 +12,7 @@ const INVALID_HEADERS_MESSAGE =
 export default (dependencies) => {
   const {
     util: { noop, hasOwnProperty },
+    path: { toIPCPath },
   } = dependencies;
   const parse = (body) => {
     if (body === "") {
@@ -49,7 +50,8 @@ export default (dependencies) => {
         const request = createRequest({
           host,
           port: typeof port === "number" ? port : null,
-          socketPath: typeof port === "string" ? fileURLToPath(port) : null,
+          socketPath:
+            typeof port === "string" ? toIPCPath(fileURLToPath(port)) : null,
           method,
           path,
           headers: createHeaders(buffer),
