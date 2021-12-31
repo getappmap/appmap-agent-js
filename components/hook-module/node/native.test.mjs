@@ -1,8 +1,4 @@
-import {
-  assertEqual,
-  assertDeepEqual,
-  makeAbsolutePath,
-} from "../../__fixture__.mjs";
+import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
 import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
@@ -44,7 +40,7 @@ assertDeepEqual(
         url: import.meta.url,
         content: "123;",
         shallow: true,
-        exclude: createConfiguration(makeAbsolutePath("dummy")).exclude,
+        exclude: createConfiguration("file:///home").exclude,
         inline: false,
       },
     ],

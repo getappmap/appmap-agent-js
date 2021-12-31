@@ -1,4 +1,4 @@
-import { assertDeepEqual, makeAbsolutePath } from "../../__fixture__.mjs";
+import { assertDeepEqual } from "../../__fixture__.mjs";
 import { Socket } from "net";
 import NetSocketMessaging from "net-socket-messaging";
 import {
@@ -22,11 +22,11 @@ const {
 } = Receptor(await buildTestDependenciesAsync(import.meta.url));
 
 const configuration = extendConfiguration(
-  createConfiguration(makeAbsolutePath("root")),
+  createConfiguration("file:///home"),
   {
     recorder: "remote",
   },
-  null,
+  "file:///base",
 );
 const receptor = await openReceptorAsync(
   minifyReceptorConfiguration(configuration),
@@ -50,7 +50,7 @@ const assertRequestAsync = async (method, path, body, response) => {
   );
 };
 
-await assertRequestAsync("GET", makeAbsolutePath("invalid-path"), null, {
+await assertRequestAsync("GET", "/invalid-path", null, {
   code: 400,
   message: "Bad Request",
 });

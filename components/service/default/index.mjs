@@ -1,7 +1,5 @@
 import { tmpdir as getTemporaryDirectory, platform as getPlatform } from "os";
-import { join as joinPath } from "path";
-
-const { cwd } = process;
+import { pathToFileURL, fileURLToPath } from "url";
 
 const _Promise = Promise;
 const _Set = Set;
@@ -34,18 +32,18 @@ export default (dependencies) => {
         });
         if (port === "") {
           /* c8 ignore start */ if (getPlatform() === "win32") {
-            port = joinPath("\\\\?\\pipe", cwd(), getUUID());
+            port = `file:////?/pipe/${getUUID()}`;
           } /* c8 ignore stop */ else {
-            port = joinPath(getTemporaryDirectory(), getUUID());
+            port = `file:///${getTemporaryDirectory()}/${getUUID()}`;
           }
         }
-        server.listen(port);
+        server.listen(typeof port === "string" ? fileURLToPath(port) : port);
       });
     },
     getServicePort: ({ server }) => {
       const address = server.address();
       if (typeof address === "string") {
-        return address;
+        return pathToFileURL(address).toString();
       }
       const { port } = address;
       return port;

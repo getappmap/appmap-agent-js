@@ -1,10 +1,8 @@
-import {
-  assertDeepEqual,
-  getFreshTemporaryPath,
-  makeAbsolutePath,
-} from "../../__fixture__.mjs";
 import Http from "http";
+import { fileURLToPath } from "url";
+import { platform as getPlatform } from "os";
 import createApp from "express";
+import { assertDeepEqual, getFreshTemporaryURL } from "../../__fixture__.mjs";
 import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
@@ -21,10 +19,9 @@ const listenAsync = (server, port) =>
   new Promise((resolve, reject) => {
     server.on("error", reject);
     server.on("listening", () => {
-      const address = server.address();
-      resolve(typeof address === "string" ? address : address.port);
+      resolve(port === 0 ? server.address().port : port);
     });
-    server.listen(port);
+    server.listen(typeof port === "string" ? fileURLToPath(port) : port);
   });
 
 const promiseCycleClosing = async (request, response) =>
@@ -88,14 +85,11 @@ assertDeepEqual(
         response.end();
       });
       const port = await listenAsync(server, 0);
-      assertDeepEqual(
-        await requestAsync(Http.get({ port, path: makeAbsolutePath("path") })),
-        {
-          code: 200,
-          message: "ok",
-          body: "",
-        },
-      );
+      assertDeepEqual(await requestAsync(Http.get({ port, path: "/path" })), {
+        code: 200,
+        message: "ok",
+        body: "",
+      });
       await closeAsync(server);
     },
   ),
@@ -190,7 +184,10 @@ assertDeepEqual(
 
 // Track Port && http.Server //
 {
-  const port = getFreshTemporaryPath();
+  const port =
+    getPlatform() === "win32"
+      ? `file:////?/pipe/${Math.random().toString(36).substring(2)}`
+      : getFreshTemporaryURL();
   assertDeepEqual(
     await testHookAsync(
       hookResponse,
@@ -224,7 +221,7 @@ assertDeepEqual(
         assertDeepEqual(
           await requestAsync(
             Http.get({
-              socketPath: port,
+              socketPath: fileURLToPath(port),
               path: "/foo/bar",
             }),
           ),

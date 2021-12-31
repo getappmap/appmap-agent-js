@@ -1,20 +1,21 @@
-import { lstat, mkdir } from "fs/promises";
+import { lstat as lstatAsync, mkdir as mkdirAsync } from "fs/promises";
 import { writeFileSync } from "fs";
 import { createServer } from "net";
-import { join as joinPath } from "path";
 import NetSocketMessaging from "net-socket-messaging";
 
 const { patch: patchSocket } = NetSocketMessaging;
 
 const { parse: parseJSON, stringify: stringifyJSON } = JSON;
+const _URL = URL;
 const _String = String;
 const _Set = Set;
 
 export default (dependencies) => {
   const {
-    "configuration-accessor": { resolveConfigurationPort },
+    "configuration-accessor": { extendConfigurationPort },
+    path: { makeSegment },
+    url: { appendURLSegment },
     util: { assert },
-    path: { sanitizeFilename, getDirectory },
     log: { logInfo, logError },
     expect: { expect },
     service: { openServiceAsync, closeServiceAsync, getServicePort },
@@ -28,7 +29,7 @@ export default (dependencies) => {
   } = dependencies;
   const isDirectoryAsync = async (directory) => {
     try {
-      return (await lstat(directory)).isDirectory();
+      return (await lstatAsync(new _URL(directory))).isDirectory();
     } catch (error) {
       const { code } = error;
       expect(
@@ -41,28 +42,25 @@ export default (dependencies) => {
     }
   };
   const createDirectoryAsync = async (directory) => {
-    expect(
-      directory !== "",
-      "could not find any existing directory in the hiearchy of the storage directory",
-    );
-    const status = await isDirectoryAsync(directory);
-    expect(
-      status !== false,
-      "cannot create directory %j because it is a file",
-      directory,
-    );
-    if (status === null) {
-      const parent_directory = getDirectory(directory);
+    const is_directory = await isDirectoryAsync(directory);
+    if (is_directory === null) {
+      const parent_directory = appendURLSegment(directory, "..");
       expect(
         parent_directory !== directory,
         "could not find any existing directory in the hiearchy of the storage directory",
       );
       await createDirectoryAsync(parent_directory);
-      await mkdir(directory);
+      await mkdirAsync(new _URL(directory));
+    } else {
+      expect(
+        is_directory,
+        "cannot create directory %j because it is a file",
+        directory,
+      );
     }
   };
   const store = (
-    paths,
+    urls,
     directory,
     {
       head: {
@@ -75,16 +73,22 @@ export default (dependencies) => {
     if (basename === null) {
       basename = map_name === null ? "anonymous" : map_name;
     }
-    basename = sanitizeFilename(basename, "-").replace(/[\t\n ]/gu, "");
-    let path = joinPath(directory, `${basename}${extension}`);
+    basename = basename.replace(/[\t\n ]/gu, "");
+    let url = appendURLSegment(
+      directory,
+      makeSegment(`${basename}${extension}`, "-"),
+    );
     let counter = 0;
-    while (paths.has(path)) {
+    while (urls.has(url)) {
       counter += 1;
-      path = joinPath(directory, `${basename}-${_String(counter)}${extension}`);
+      url = appendURLSegment(
+        directory,
+        makeSegment(`${basename}-${_String(counter)}${extension}`),
+      );
     }
-    paths.add(path);
-    writeFileSync(path, stringifyJSON(trace), "utf8");
-    logInfo("Trace written at: %s", path);
+    urls.add(url);
+    writeFileSync(new URL(url), stringifyJSON(trace), "utf8");
+    logInfo("Trace written at: %s", url);
   };
   const disconnection = {
     status: 1,
@@ -118,7 +122,7 @@ export default (dependencies) => {
       assert(directory !== null, "output directory should have been resolved");
       await createDirectoryAsync(directory);
       const server = createServer();
-      const paths = new _Set();
+      const urls = new _Set();
       server.on("connection", (socket) => {
         patchSocket(socket);
         socket.on("message", (session) => {
@@ -140,13 +144,13 @@ export default (dependencies) => {
                   sendBackend(backend, ["stop", key, disconnection]);
                 }
                 for (const key of getBackendTraceIterator(backend)) {
-                  store(paths, directory, takeBackendTrace(backend, key));
+                  store(urls, directory, takeBackendTrace(backend, key));
                 }
               });
               socket.on("message", (content) => {
                 if (sendBackend(backend, parseJSON(content))) {
                   for (const key of getBackendTraceIterator(backend)) {
-                    store(paths, directory, takeBackendTrace(backend, key));
+                    store(urls, directory, takeBackendTrace(backend, key));
                   }
                 }
               });
@@ -159,11 +163,10 @@ export default (dependencies) => {
       return trace_service;
     },
     adaptReceptorConfiguration: (service, configuration) =>
-      resolveConfigurationPort(
-        configuration,
-        getServicePort(service),
-        configuration["track-port"],
-      ),
+      extendConfigurationPort(configuration, {
+        "trace-port": getServicePort(service),
+        "track-port": configuration["track-port"],
+      }),
     closeReceptorAsync: closeServiceAsync,
   };
 };

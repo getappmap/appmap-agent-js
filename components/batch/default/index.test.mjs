@@ -1,4 +1,4 @@
-import { assertEqual, makeAbsolutePath } from "../../__fixture__.mjs";
+import { assertEqual } from "../../__fixture__.mjs";
 import { EventEmitter } from "events";
 import {
   buildTestDependenciesAsync,
@@ -38,22 +38,7 @@ const { mainAsync } = Batch(
 const { createConfiguration, extendConfiguration } =
   await buildTestComponentAsync("configuration");
 
-const configuration = createConfiguration(makeAbsolutePath("repository"));
-
-// const configuration = extendConfiguration(
-//   createConfiguration(makeAbsolutePath("repository")),
-//   {
-//     agent: {
-//       directory: makeAbsolutePath("agent"),
-//       package: {
-//         name: "appmap-agent-js",
-//         version: "1.2.3",
-//         homepage: null,
-//       },
-//     },
-//   },
-//   null,
-// );
+const configuration = createConfiguration("file:///home");
 
 // no child
 {
@@ -61,23 +46,6 @@ const configuration = createConfiguration(makeAbsolutePath("repository"));
   emitter.env = {};
   await mainAsync(emitter, configuration);
 }
-
-// // single success child
-// {
-//   const emitter = new EventEmitter();
-//   emitter.env = {};
-//   await mainAsync(
-//     emitter,
-//     extendConfiguration(
-//       configuration,
-//       {
-//         scenario: "foo",
-//         scenarios: { foo: ["success"], bar: ["failure"] },
-//       },
-//       makeAbsolutePath("directory"),
-//     ),
-//   );
-// }
 
 // single killed child
 {
@@ -97,7 +65,7 @@ const configuration = createConfiguration(makeAbsolutePath("repository"));
           key2: { command: "sleep mocha" },
         },
       },
-      makeAbsolutePath("directory"),
+      "file:///base",
     ),
   );
 }
@@ -115,7 +83,7 @@ const configuration = createConfiguration(makeAbsolutePath("repository"));
         scenario: "^",
         scenarios: { key: { command: "success" } },
       },
-      makeAbsolutePath("directory"),
+      "file:///base",
     ),
   );
 }
@@ -136,7 +104,7 @@ const configuration = createConfiguration(makeAbsolutePath("repository"));
           key2: { command: "failure" },
         },
       },
-      makeAbsolutePath("directory"),
+      "file:///base",
     ),
   );
 }

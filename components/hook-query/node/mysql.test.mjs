@@ -1,19 +1,20 @@
-// TODO investigate why this fails on travis.
-if (Reflect.getOwnPropertyDescriptor(process.env, "TRAVIS") !== undefined) {
-  process.exit(0);
-}
-
+import { spawn } from "child_process";
+import { fileURLToPath } from "url";
+import Mysql from "mysql";
 import {
-  getFreshTemporaryPath,
+  getFreshTemporaryURL,
   assertEqual,
   assertDeepEqual,
 } from "../../__fixture__.mjs";
-import { spawn } from "child_process";
-import Mysql from "mysql";
 import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
 } from "../../build.mjs";
+
+// TODO investigate why this fails on travis.
+if (Reflect.getOwnPropertyDescriptor(process.env, "TRAVIS") !== undefined) {
+  process.exit(0);
+}
 
 const { default: HookMysql } = await import("./mysql.mjs");
 
@@ -24,7 +25,7 @@ const promiseTermination = (child) =>
   });
 
 const port = 3306;
-const path = getFreshTemporaryPath();
+const url = getFreshTemporaryURL();
 
 const proceedAsync = async () => {
   const dependencies = await buildTestDependenciesAsync(import.meta.url);
@@ -110,7 +111,7 @@ if (Reflect.getOwnPropertyDescriptor(process.env, "TRAVIS") !== undefined) {
           "--initialize-insecure",
           "--default-authentication-plugin=mysql_native_password",
           "--datadir",
-          path,
+          fileURLToPath(url),
         ],
         { stdio: "inherit" },
       ),
@@ -119,7 +120,7 @@ if (Reflect.getOwnPropertyDescriptor(process.env, "TRAVIS") !== undefined) {
   );
   const child = spawn(
     "/usr/local/mysql/bin/mysqld",
-    ["--port", String(port), "--datadir", path],
+    ["--port", String(port), "--datadir", fileURLToPath(url)],
     { stdio: "inherit" },
   );
   const termination = promiseTermination(child);
@@ -155,6 +156,8 @@ if (Reflect.getOwnPropertyDescriptor(process.env, "TRAVIS") !== undefined) {
     // SIGKILL will leave stuff in /tmp which prevent next mysqld to run
     child.kill("SIGTERM");
     await termination;
-    await promiseTermination(spawn("/bin/sh", ["-c", `rm -rf ${path}$`]));
+    await promiseTermination(
+      spawn("/bin/sh", ["-c", `rm -rf ${fileURLToPath(url)}$`]),
+    );
   }
 }

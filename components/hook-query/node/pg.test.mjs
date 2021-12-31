@@ -1,7 +1,8 @@
 import { spawn } from "child_process";
 import Pg from "pg";
+import { fileURLToPath } from "url";
 import {
-  getFreshTemporaryPath,
+  getFreshTemporaryURL,
   assertEqual,
   assertDeepEqual,
   assertFail,
@@ -29,7 +30,7 @@ const promiseTermination = (child) =>
 
 const port = 5432;
 const user = "postgres";
-const path = getFreshTemporaryPath();
+const url = getFreshTemporaryURL();
 
 const proceedAsync = async () => {
   const dependencies = await buildTestDependenciesAsync(import.meta.url);
@@ -189,7 +190,7 @@ if (Reflect.getOwnPropertyDescriptor(process.env, "TRAVIS")) {
           "--encoding",
           "UTF-8",
           "--pgdata",
-          path,
+          fileURLToPath(url),
           "--username",
           user,
         ],
@@ -198,9 +199,13 @@ if (Reflect.getOwnPropertyDescriptor(process.env, "TRAVIS")) {
     ),
     { signal: null, status: 0 },
   );
-  const child = spawn("postgres", ["-D", path, "-p", String(port)], {
-    stdio: "inherit",
-  });
+  const child = spawn(
+    "postgres",
+    ["-D", fileURLToPath(url), "-p", String(port)],
+    {
+      stdio: "inherit",
+    },
+  );
   const termination = promiseTermination(child);
   while (
     /* eslint-disable no-constant-condition */ true /* eslint-enable no-constant-condition */
@@ -225,6 +230,8 @@ if (Reflect.getOwnPropertyDescriptor(process.env, "TRAVIS")) {
   } finally {
     child.kill("SIGTERM");
     await termination;
-    await promiseTermination(spawn("/bin/sh", ["-c", `rm -rf ${path}$`]));
+    await promiseTermination(
+      spawn("/bin/sh", ["-c", `rm -rf ${fileURLToPath(url)}$`]),
+    );
   }
 }

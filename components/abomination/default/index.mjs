@@ -14,7 +14,6 @@ import {
 import {
   extname as getExtension,
   dirname as getDirectory,
-  basename as getBasename,
   resolve as resolvePath,
 } from "path";
 

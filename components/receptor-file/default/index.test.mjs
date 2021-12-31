@@ -1,7 +1,6 @@
 import { readFile as readFileAsync } from "fs/promises";
-import { getFreshTemporaryPath, makeAbsolutePath } from "../../__fixture__.mjs";
+import { getFreshTemporaryURL } from "../../__fixture__.mjs";
 import { Socket } from "net";
-import { join as joinPath } from "path";
 import NetSocketMessaging from "net-socket-messaging";
 import {
   buildTestDependenciesAsync,
@@ -21,16 +20,16 @@ const {
   closeReceptorAsync,
 } = Receptor(await buildTestDependenciesAsync(import.meta.url));
 
-const repository = getFreshTemporaryPath();
+const url = getFreshTemporaryURL();
 const configuration = extendConfiguration(
-  createConfiguration(makeAbsolutePath("root")),
+  createConfiguration("file:///home"),
   {
     recorder: "process",
     output: {
       directory: "directory",
     },
   },
-  repository,
+  url,
 );
 const receptor = await openReceptorAsync(
   minifyReceptorConfiguration(configuration),
@@ -49,7 +48,7 @@ const receptor = await openReceptorAsync(
     createMessage(
       JSON.stringify(
         extendConfiguration(
-          createConfiguration(makeAbsolutePath("root")),
+          createConfiguration("file:///home"),
           {
             recorder: "remote",
           },
@@ -76,7 +75,7 @@ const receptor = await openReceptorAsync(
     createMessage(
       JSON.stringify(
         extendConfiguration(
-          createConfiguration(makeAbsolutePath("root")),
+          createConfiguration("file:///home"),
           {
             recorder: "process",
           },
@@ -114,13 +113,7 @@ const receptor = await openReceptorAsync(
     socket.end();
   });
   await closeReceptorAsync(receptor);
-  await readFileAsync(
-    joinPath(repository, "directory", "anonymous.appmap.json"),
-  );
-  await readFileAsync(
-    joinPath(repository, "directory", "anonymous-1.appmap.json"),
-  );
-  await readFileAsync(
-    joinPath(repository, "directory", "map-name.appmap.json"),
-  );
+  await readFileAsync(new URL(`${url}/directory/anonymous.appmap.json`));
+  await readFileAsync(new URL(`${url}/directory/anonymous-1.appmap.json`));
+  await readFileAsync(new URL(`${url}/directory/map-name.appmap.json`));
 }

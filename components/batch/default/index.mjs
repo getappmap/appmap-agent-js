@@ -9,14 +9,9 @@ export default (dependencies) => {
     spawn: { spawn },
     "configuration-accessor": {
       getConfigurationScenarios,
-      initializeConfiguration,
+      resolveConfigurationRepository,
       compileConfigurationCommand,
-      resolveConfigurationRecorder,
-    },
-    repository: {
-      extractRepositoryDependency,
-      extractRepositoryHistory,
-      extractRepositoryPackage,
+      resolveConfigurationAutomatedRecorder,
     },
     receptor: {
       openReceptorAsync,
@@ -28,18 +23,7 @@ export default (dependencies) => {
   const isCommandNonNull = ({ command }) => command !== null;
   return {
     mainAsync: async (process, configuration) => {
-      const {
-        repository: { directory },
-      } = configuration;
-      configuration = initializeConfiguration(
-        configuration,
-        extractRepositoryDependency(directory, "@appland/appmap-agent-js"),
-        {
-          directory,
-          history: extractRepositoryHistory(directory),
-          package: extractRepositoryPackage(directory),
-        },
-      );
+      configuration = resolveConfigurationRepository(configuration);
       const { env } = process;
       let interrupted = false;
       let subprocess = null;
@@ -72,7 +56,7 @@ export default (dependencies) => {
         return receptors.get(key);
       };
       const runConfigurationAsync = async (configuration, env) => {
-        configuration = resolveConfigurationRecorder(configuration);
+        configuration = resolveConfigurationAutomatedRecorder(configuration);
         const receptor = await createReceptorAsync(configuration);
         configuration = adaptReceptorConfiguration(receptor, configuration);
         const {

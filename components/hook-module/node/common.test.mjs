@@ -1,29 +1,24 @@
 import {
   assertEqual,
   assertDeepEqual,
-  getFreshTemporaryPath,
-  makeAbsolutePath,
+  getFreshTemporaryURL,
 } from "../../__fixture__.mjs";
 import { createRequire } from "module";
-import { writeFile } from "fs/promises";
-import { pathToFileURL } from "url";
+import { writeFile as writeFileAsync } from "fs/promises";
+import { pathToFileURL, fileURLToPath } from "url";
 import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
 } from "../../build.mjs";
 import Common from "./common.mjs";
 
-const { cwd } = process;
-
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
 const { createConfiguration } = await buildTestComponentAsync("configuration");
 const { testHookAsync } = await buildTestComponentAsync("hook");
 const { hookCommonModule, unhookCommonModule } = Common(dependencies);
-const require = createRequire(`${cwd()}/dummy.js`);
-const { resolve } = require;
-const path = getFreshTemporaryPath();
-await writeFile(path, "module.exports = 123;", "utf8");
-const resolved_path = resolve(path);
+const require = createRequire(new URL(import.meta.url));
+const url = getFreshTemporaryURL();
+await writeFileAsync(new URL(url), "module.exports = 123;", "utf8");
 assertDeepEqual(
   await testHookAsync(
     hookCommonModule,
@@ -37,12 +32,12 @@ assertDeepEqual(
       ],
     },
     async () => {
-      assertEqual(require(path), 123);
+      assertEqual(require(fileURLToPath(url)), 123);
     },
   ),
   { sources: [], events: [] },
 );
-delete require.cache[resolved_path];
+delete require.cache[require.resolve(fileURLToPath(url))];
 assertDeepEqual(
   await testHookAsync(
     hookCommonModule,
@@ -57,15 +52,15 @@ assertDeepEqual(
       ],
     },
     async () => {
-      assertEqual(require(path), 123);
+      assertEqual(require(fileURLToPath(url)), 123);
     },
   ),
   {
     sources: [
       {
-        url: pathToFileURL(resolved_path).toString(),
+        url: pathToFileURL(require.resolve(fileURLToPath(url))).toString(),
         content: "module.exports = 123;",
-        exclude: createConfiguration(makeAbsolutePath("dummy")).exclude,
+        exclude: createConfiguration("file:///home").exclude,
         shallow: true,
         inline: false,
       },

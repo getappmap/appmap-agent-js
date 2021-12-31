@@ -3,7 +3,6 @@ import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
 } from "../../build.mjs";
-import { makeAbsolutePath } from "../../__fixture__.mjs";
 import RecorderProcess from "./index.mjs";
 
 const { main } = RecorderProcess(
@@ -13,11 +12,11 @@ const { main } = RecorderProcess(
 const { createConfiguration, extendConfiguration } =
   await buildTestComponentAsync("configuration");
 
-const configuration = createConfiguration(makeAbsolutePath("repository"));
+const configuration = createConfiguration("file:///home");
 
 {
   const emitter = Object.assign(new EventEmitter(), {
-    cwd: () => makeAbsolutePath("cwd"),
+    cwd: () => "cwd",
     argv: ["node", "main.mjs"],
     version: "v1.2.3",
   });
@@ -29,7 +28,7 @@ const configuration = createConfiguration(makeAbsolutePath("repository"));
         recorder: "process",
         hooks: { cjs: false, esm: false, apply: false, http: false },
       },
-      makeAbsolutePath("directory"),
+      "file:///base",
     ),
   );
   emitter.emit("uncaughtExceptionMonitor", new Error("BOUM"));

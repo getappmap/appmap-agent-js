@@ -1,11 +1,13 @@
 const _Set = Set;
+const _String = String;
+const _URL = URL;
 
 export default (dependencies) => {
   const {
     util: { assert },
-    expect: { expect },
+    expect: { expect, expectSuccess },
     uuid: { getUUID },
-    "configuration-accessor": { sanitizeConfigurationManual },
+    "configuration-accessor": { resolveConfigurationManualRecorder },
     "source-outer": { extractSourceMap },
     agent: {
       openAgent,
@@ -23,20 +25,19 @@ export default (dependencies) => {
         !global_running,
         "Two appmap instances cannot be active concurrently.",
       );
-      this.agent = openAgent(sanitizeConfigurationManual(configuration));
+      this.agent = openAgent(resolveConfigurationManualRecorder(configuration));
       this.tracks = new _Set();
       this.running = true;
       global_running = true;
     }
-    recordScript(url, content) {
-      if (!/^[a-z]:\/\//u.test(url)) {
-        expect(
-          url[0] === "/",
-          "expected an absolute unix path but got: %j",
-          url,
-        );
-        url = `file://${url}`;
-      }
+    recordScript(content, url = "file:///") {
+      content = _String(content);
+      url = _String(url);
+      expectSuccess(
+        () => new _URL(url),
+        "the second argument of appmap.recordScript should be a valid url, got: %j >> %e",
+        url,
+      );
       const file = { url, content };
       return recordAgentScript(this.agent, file, extractSourceMap(file));
     }
