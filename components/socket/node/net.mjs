@@ -1,42 +1,51 @@
 import { connect } from "net";
 import { fileURLToPath } from "url";
-import { writeSync } from "fs";
+import { Buffer } from "buffer";
 import NetSocketMessaging from "net-socket-messaging";
 
+const { concat: concatBuffer } = Buffer;
 const { createMessage } = NetSocketMessaging;
 
 export default (dependencies) => {
   const {
-    log: { logWarning },
+    path: { toIPCPath },
+    log: { logGuardWarning, logWarning },
   } = dependencies;
-  const send = (socket, message) => {
-    writeSync(socket._handle.fd, createMessage(message));
+  const flush = (socket, messages) => {
+    if (socket.writable) {
+      socket.write(concatBuffer(messages.map(createMessage)));
+      messages.length = 0;
+    }
   };
   return {
-    openSocket: (host, port) => {
+    openSocket: (host, port, { heartbeat, threshold }) => {
       const socket =
         typeof port === "string"
-          ? connect(fileURLToPath(port))
+          ? connect(toIPCPath(fileURLToPath(port)))
           : connect(port, host);
       const messages = [];
       socket.on("connect", () => {
-        for (const message of messages) {
-          send(socket, message);
-        }
-        messages.length = 0;
+        flush(socket, messages);
+        const timer = setInterval(flush, heartbeat, socket, messages);
+        socket.on("close", () => {
+          logGuardWarning(messages.length > 0, "Lost messages >> %j", messages);
+          messages.length = 0;
+          clearInterval(timer);
+        });
       });
-      return { messages, socket };
+      return { messages, socket, threshold };
     },
     closeSocket: ({ socket }) => {
       socket.end();
     },
-    sendSocket: ({ socket, messages }, message) => {
-      if (socket.readyState === "open" || socket.readyState === "readOnly") {
-        send(socket, message);
-      } else if (socket.readyState === "opening") {
-        messages.push(message);
-      } else {
+    sendSocket: ({ socket, messages, threshold }, message) => {
+      if (socket.destroyed) {
         logWarning("Lost message >> %s", message);
+      } else {
+        messages.push(message);
+        if (messages.length > threshold) {
+          flush(socket, messages);
+        }
       }
     },
   };

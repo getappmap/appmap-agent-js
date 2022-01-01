@@ -12,7 +12,10 @@ const sleepAsync = (ms) =>
     setTimeout(resolve, ms);
   });
 const runAsync = async (port) => {
-  const socket = openSocket("localhost", port);
+  const socket = openSocket("localhost", port, {
+    heartbeat: 10000,
+    threshold: 0,
+  });
   sendSocket(socket, "message1");
   await sleepAsync(1000);
   sendSocket(socket, "message2");
