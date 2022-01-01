@@ -34,6 +34,31 @@ platform = "darwin";
     pathifyURL("http://localhost/foo/bar/qux", "http://localhost//foo/bar/buz"),
     "../qux",
   );
+  // pathifyURL UNC //
+  assertEqual(
+    pathifyURL("file:////host/shared/foo/bar/qux", "file:////host/shared/foo"),
+    "bar/qux",
+  );
+  assertEqual(
+    pathifyURL(
+      "file:////host1/shared/foo/bar/qux",
+      "file:////host2/shared/foo",
+    ),
+    null,
+  );
+  assertEqual(
+    pathifyURL(
+      "file:////host/shared1/foo/bar/qux",
+      "file:////host/shared2/foo",
+    ),
+    null,
+  );
+  // pathifyURL Windows Drive //
+  assertEqual(
+    pathifyURL("file:///C:/foo/bar/qux", "file:///C:/foo"),
+    "bar/qux",
+  );
+  assertEqual(pathifyURL("file:///C:/foo/bar/qux", "file:////D:/foo"), null);
   // urlifyPath //
   assertEqual(
     urlifyPath("foo/bar", "http://localhost/qux"),
@@ -79,41 +104,17 @@ platform = "darwin";
 
 platform = "win32";
 {
-  const { pathifyURL, urlifyPath } = URL(
-    await buildTestDependenciesAsync(import.meta.url),
-  );
-  // pathifyURL UNC //
+  const { urlifyPath } = URL(await buildTestDependenciesAsync(import.meta.url));
   assertEqual(
-    pathifyURL("file:////host/shared/foo/bar/qux", "file:////host/shared/foo"),
-    "bar\\qux",
+    urlifyPath("foo\\bar", "file://host/qux"),
+    "file://host/qux/foo/bar",
   );
   assertEqual(
-    pathifyURL(
-      "file:////host1/shared/foo/bar/qux",
-      "file:////host2/shared/foo",
-    ),
-    null,
+    urlifyPath("\\\\server\\label\\foo", "file://host/bar"),
+    "file://host//server/label/foo",
   );
   assertEqual(
-    pathifyURL(
-      "file:////host/shared1/foo/bar/qux",
-      "file:////host/shared2/foo",
-    ),
-    null,
-  );
-  // pathifyURL Windows Drive //
-  assertEqual(
-    pathifyURL("file:///C:/foo/bar/qux", "file:///C:/foo"),
-    "bar\\qux",
-  );
-  assertEqual(pathifyURL("file:///C:/foo/bar/qux", "file:////D:/foo"), null);
-  // urlifyPath //
-  assertEqual(
-    urlifyPath("C:/foo\\bar", "file://host/qux"),
-    "file://host/C:/foo/bar",
-  );
-  assertEqual(
-    urlifyPath("C:\\foo/bar", "file://host/qux"),
+    urlifyPath("C:\\foo\\bar", "file://host/qux"),
     "file://host/C:/foo/bar",
   );
 }

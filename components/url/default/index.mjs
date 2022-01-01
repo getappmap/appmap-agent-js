@@ -3,7 +3,7 @@ const _URL = URL;
 
 export default (dependencies) => {
   const {
-    path: { encodeSegment, decodeSegment, splitPath, joinPath, isAbsolutePath },
+    path: { encodeSegment, decodeSegment, splitPath, isAbsolutePath },
   } = dependencies;
 
   const isNotEmptyString = (any) => any !== "";
@@ -105,7 +105,7 @@ export default (dependencies) => {
       if (segments.length === 0) {
         segments.push(".");
       }
-      return joinPath(segments);
+      return segments.join("/");
     }
   };
 

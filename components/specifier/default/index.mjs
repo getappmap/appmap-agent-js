@@ -7,7 +7,6 @@ const { Minimatch: MinimatchClass } = Minimatch;
 export default (dependencies) => {
   const {
     log: { logDebug },
-    path: { splitPath },
     util: { assert },
     url: { pathifyURL },
     expect: { expectSuccess },
@@ -112,7 +111,7 @@ export default (dependencies) => {
         const matched =
           maybe_path === null
             ? false
-            : makeRegExp(source, flags).test(splitPath(maybe_path).join("/"));
+            : makeRegExp(source, flags).test(maybe_path);
         logDebug(
           "url %j which resolves to %j relatively to %j %s regexp specifier %j with flags %j",
           url,
