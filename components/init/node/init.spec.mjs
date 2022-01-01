@@ -51,7 +51,7 @@ describe("the init command", () => {
       assert(typeof config.packages, "array");
       config.packages.sort((a, b) => a.path.localeCompare(b.path));
       assert.deepEqual(config.packages, [
-        { path: "lib/sub1" },
+        { path: join("lib", "sub1") },
         { path: "src" },
       ]);
     });
