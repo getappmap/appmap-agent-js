@@ -4,7 +4,6 @@ import {
   readdir as readdirAsync,
 } from "fs/promises";
 import { createRequire } from "module";
-import { pathToFileURL } from "url";
 import YAML from "yaml";
 import Chalk from "chalk";
 
@@ -17,6 +16,7 @@ export default (dependencies) => {
     validate: { validateConfig },
     questionnaire: { questionConfigAsync },
     util: { assert, hasOwnProperty },
+    url: { urlifyPath, appendURLSegment },
     prompts: { prompts },
   } = dependencies;
   const generateLog = (prefix, writable) => (message) => {
@@ -24,24 +24,18 @@ export default (dependencies) => {
   };
   return {
     mainAsync: async ({ version, platform, cwd, env, stdout, stderr }) => {
-      const url = pathToFileURL(cwd()).toString();
+      const url = urlifyPath(cwd(), "file:///");
       const logSuccess = generateLog(chalkGreen("\u2714"), stdout);
       const logWarning = generateLog(chalkYellow("\u26A0"), stderr);
       const logFailure = generateLog(chalkRed("\u2716"), stderr);
-      let conf_url = `${url}/appmap.yml`;
+      let conf_url = appendURLSegment(url, "appmap.yml");
       if (hasOwnProperty(env, "APPMAP_CONFIGURATION_PATH")) {
-        conf_url = pathToFileURL(env.APPMAP_CONFIGURATION_PATH);
+        conf_url = urlifyPath(env.APPMAP_CONFIGURATION_PATH, url);
       }
       let repo_url = url;
       if (hasOwnProperty(env, "APPMAP_REPOSITORY_DIRECTORY")) {
-        repo_url = pathToFileURL(env.APPMAP_REPOSITORY_DIRECTORY);
+        repo_url = urlifyPath(env.APPMAP_REPOSITORY_DIRECTORY, url);
       }
-      // os //
-      if (platform === "win32") {
-        logFailure("unfortunately, windows is not currently supported");
-        return false;
-      }
-      logSuccess(`unix-like os: ${platform}`);
       // node //
       {
         const parts = /^v([0-9][0-9])\./u.exec(version);
@@ -110,7 +104,9 @@ export default (dependencies) => {
       }
       // appmap-agent-js //
       {
-        const { resolve } = createRequire(new _URL(`${repo_url}/dummy.js`));
+        const { resolve } = createRequire(
+          new _URL(appendURLSegment(repo_url, "dummy.js")),
+        );
         try {
           resolve("@appland/appmap-agent-js");
         } catch ({ message }) {
@@ -123,7 +119,7 @@ export default (dependencies) => {
       {
         let success = true;
         try {
-          await readdirAsync(new _URL(`${repo_url}/.git`));
+          await readdirAsync(new _URL(appendURLSegment(repo_url, ".git")));
         } catch ({ message }) {
           success = false;
           logWarning(
@@ -140,7 +136,10 @@ export default (dependencies) => {
       {
         let success = true;
         try {
-          await readFileAsync(new URL(`${repo_url}/package.json`), "utf8");
+          await readFileAsync(
+            new URL(appendURLSegment(repo_url, "package.json")),
+            "utf8",
+          );
         } catch ({ code, message }) {
           success = false;
           if (code === "ENOENT") {

@@ -15,9 +15,6 @@ const directory = getFreshTemporaryURL();
 const cwd = () => fileURLToPath(directory);
 await mkdirAsync(new URL(directory));
 
-assertEqual(await mainAsync({ ...process, platform: "win32" }), false);
-process.stdout.write("\n");
-
 assertEqual(await mainAsync({ ...process, version: "v12.34.56" }), false);
 process.stdout.write("\n");
 
