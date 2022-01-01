@@ -1,9 +1,5 @@
 import { fileURLToPath } from "url";
-import {
-  mkdir as mkdirAsync,
-  writeFile as writeFileAsync,
-  symlink as symlinkAsync,
-} from "fs/promises";
+import { mkdir as mkdirAsync, writeFile as writeFileAsync } from "fs/promises";
 import { assertEqual, getFreshTemporaryURL } from "../../__fixture__.mjs";
 import { buildTestDependenciesAsync } from "../../build.mjs";
 import Setup from "./index.mjs";
@@ -58,9 +54,16 @@ process.stdout.write("\n");
 
 await mkdirAsync(new URL(`${directory}/node_modules`));
 await mkdirAsync(new URL(`${directory}/node_modules/@appland`));
-await symlinkAsync(
-  process.cwd(),
-  new URL(`${directory}/node_modules/@appland/appmap-agent-js`),
+await mkdirAsync(new URL(`${directory}/node_modules/@appland/appmap-agent-js`));
+await writeFileAsync(
+  new URL(`${directory}/node_modules/@appland/appmap-agent-js/index.js`),
+  "",
+  "utf8",
+);
+await writeFileAsync(
+  new URL(`${directory}/node_modules/@appland/appmap-agent-js/package.json`),
+  JSON.stringify({ name: "appmap-agent-js", version: "1.2.3" }),
+  "utf8",
 );
 assertEqual(await mainAsync({ ...process, cwd }), true);
 process.stdout.write("\n");
