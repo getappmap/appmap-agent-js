@@ -10,13 +10,11 @@ export default (dependencies) => {
       if (!enabled) {
         return null;
       }
-      const require = createRequire(
-        new URL(appendURLSegment(directory, "dummy.js")),
-      );
+      const url = new URL(appendURLSegment(directory, "dummy.js"));
       try {
-        return require(name);
+        return createRequire(url)(name);
       } catch (error) {
-        logWarning("Could not load %j from %j", name, directory);
+        logWarning("Could not load %j from %j >> %e", name, directory, error);
         return null;
       }
     },
