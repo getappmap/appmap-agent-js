@@ -1,4 +1,5 @@
 import { spawn } from "child_process";
+import { rm as rmAsync } from "fs/promises";
 import { fileURLToPath } from "url";
 import Mysql from "mysql";
 import {
@@ -156,8 +157,6 @@ if (Reflect.getOwnPropertyDescriptor(process.env, "TRAVIS") !== undefined) {
     // SIGKILL will leave stuff in /tmp which prevent next mysqld to run
     child.kill("SIGTERM");
     await termination;
-    await promiseTermination(
-      spawn("/bin/sh", ["-c", `rm -rf ${fileURLToPath(url)}$`]),
-    );
+    await rmAsync(new URL(url), { recursive: true });
   }
 }

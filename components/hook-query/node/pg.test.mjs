@@ -1,4 +1,5 @@
 import { spawn } from "child_process";
+import { rm as rmAsync } from "fs/promises";
 import Pg from "pg";
 import { fileURLToPath } from "url";
 import {
@@ -230,8 +231,6 @@ if (Reflect.getOwnPropertyDescriptor(process.env, "TRAVIS")) {
   } finally {
     child.kill("SIGTERM");
     await termination;
-    await promiseTermination(
-      spawn("/bin/sh", ["-c", `rm -rf ${fileURLToPath(url)}$`]),
-    );
+    await rmAsync(new URL(url), { recursive: true });
   }
 }

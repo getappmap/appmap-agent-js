@@ -1,7 +1,12 @@
-
 import { tmpdir } from "os";
 import { join as joinPath } from "path";
-import { mkdir as mkdirAsync, symlink as symlinkAsync, writeFile as writeFileAsync, realpath as realpathAsync } from "fs/promises";
+import {
+  rm as rmAsync,
+  mkdir as mkdirAsync,
+  symlink as symlinkAsync,
+  writeFile as writeFileAsync,
+  realpath as realpathAsync,
+} from "fs/promises";
 import YAML from "yaml";
 import { spawnAsync } from "./spawn.mjs";
 
@@ -47,5 +52,5 @@ export const runAsync = async (_package, config, beforeAsync, afterAsync) => {
     stdio: "inherit",
   });
   await afterAsync(directory);
-  await spawnAsync("/bin/sh", ["rm", "-rf", directory], {});
+  await rmAsync(directory, { recursive: true });
 };
