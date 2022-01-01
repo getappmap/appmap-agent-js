@@ -65,7 +65,7 @@ describe("the init command", () => {
       const result = JSON.parse(run(directory));
       const config = YAML.parse(result.configuration.contents);
       config.packages.sort((a, b) => a.path.localeCompare(b.path));
-      assert.deepEqual(config.packages, [{ path: "lib/sub1" }]);
+      assert.deepEqual(config.packages, [{ path: join("lib", "sub1") }]);
     });
 
     it("isn't confused by inaccessible directories", () => {
