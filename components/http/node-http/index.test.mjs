@@ -1,26 +1,18 @@
+import { createServer, request as createRequest } from "http";
 import {
   assert,
   assertReject,
   assertDeepEqual,
   assertEqual,
   getFreshTemporaryURL,
+  convertPort,
 } from "../../__fixture__.mjs";
-import { platform as getPlatform } from "os";
-import { fileURLToPath } from "url";
-import { createServer, request as createRequest } from "http";
 import { buildTestDependenciesAsync } from "../../build.mjs";
 import Request from "./index.mjs";
 
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
 
 const { generateRespond, requestAsync } = Request(dependencies);
-
-const convertPort = (port) =>
-  typeof port === "string"
-    ? `${getPlatform() === "win32" ? "\\\\.\\pipe\\" : ""}${fileURLToPath(
-        port,
-      )}`
-    : port;
 
 const listenServerAsync = (server, port) =>
   new Promise((resolve) => {

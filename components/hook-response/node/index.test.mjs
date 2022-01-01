@@ -1,8 +1,10 @@
 import Http from "http";
-import { fileURLToPath } from "url";
-import { platform as getPlatform } from "os";
 import createApp from "express";
-import { assertDeepEqual, getFreshTemporaryURL } from "../../__fixture__.mjs";
+import {
+  assertDeepEqual,
+  getFreshTemporaryURL,
+  convertPort,
+} from "../../__fixture__.mjs";
 import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
@@ -21,7 +23,7 @@ const listenAsync = (server, port) =>
     server.on("listening", () => {
       resolve(port === 0 ? server.address().port : port);
     });
-    server.listen(typeof port === "string" ? fileURLToPath(port) : port);
+    server.listen(convertPort(port));
   });
 
 const promiseCycleClosing = async (request, response) =>
@@ -184,10 +186,7 @@ assertDeepEqual(
 
 // Track Port && http.Server //
 {
-  const port =
-    getPlatform() === "win32"
-      ? `file:////?/pipe/${Math.random().toString(36).substring(2)}`
-      : getFreshTemporaryURL();
+  const port = getFreshTemporaryURL();
   assertDeepEqual(
     await testHookAsync(
       hookResponse,
@@ -221,7 +220,7 @@ assertDeepEqual(
         assertDeepEqual(
           await requestAsync(
             Http.get({
-              socketPath: fileURLToPath(port),
+              socketPath: convertPort(port),
               path: "/foo/bar",
             }),
           ),

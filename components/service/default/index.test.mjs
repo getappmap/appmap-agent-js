@@ -1,20 +1,11 @@
 import { createServer, Socket } from "net";
-import { platform as getPlatform } from "os";
-import { fileURLToPath } from "url";
-
+import { convertPort } from "../../__fixture__.mjs";
 import { buildTestDependenciesAsync } from "../../build.mjs";
 import Service from "./index.mjs";
 
 const { openServiceAsync, closeServiceAsync, getServicePort } = Service(
   await buildTestDependenciesAsync(import.meta.url),
 );
-
-const convertPort = (port) =>
-  typeof port === "string"
-    ? `${getPlatform() === "win32" ? "\\\\.\\pipe\\" : ""}${fileURLToPath(
-        port,
-      )}`
-    : port;
 
 {
   const service = await openServiceAsync(createServer(), 0);

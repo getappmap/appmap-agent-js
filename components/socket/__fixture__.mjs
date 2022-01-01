@@ -1,5 +1,5 @@
 import { createServer as createTCPServer } from "net";
-import { fileURLToPath } from "url";
+import { convertPort } from "../__fixture__.mjs";
 import NetSocketMessaging from "net-socket-messaging";
 
 const { patch: patchSocket } = NetSocketMessaging;
@@ -19,7 +19,7 @@ export const testAsync = async (port, runAsync) => {
       server.close();
     });
   });
-  server.listen(typeof port === "number" ? port : fileURLToPath(port));
+  server.listen(convertPort(port));
   await new Promise((resolve) => {
     server.on("listening", resolve);
   });
