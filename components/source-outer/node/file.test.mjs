@@ -54,3 +54,9 @@ assertDeepEqual(
     content: "foo",
   }),
 );
+
+/////////////
+// Invalid //
+/////////////
+
+assert(isLeft(readFile("http://localhost/foo")));

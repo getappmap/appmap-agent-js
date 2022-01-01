@@ -1,4 +1,5 @@
 import { readFileSync as readFile } from "fs";
+import { fileURLToPath } from "url";
 
 const _Buffer = Buffer;
 const _decodeURIComponent = decodeURIComponent;
@@ -25,23 +26,25 @@ export default (dependencies) => {
     return _decodeURIComponent(body);
   };
   return {
-    readFile: (url, reference_url) => {
+    readFile: (url, base) => {
       const { protocol, pathname: path } = new _URL(url);
       if (protocol === "data:") {
-        return makeRight({ url: reference_url, content: parseDataPath(path) });
-      }
-      expect(
-        protocol === "file:",
-        "Expected url protocol to be either 'data:' or 'file:', got: %j.",
-        url,
-      );
-      try {
-        return makeRight({
-          url,
-          content: readFile(path, "utf8"),
-        });
-      } catch ({ message }) {
-        return makeLeft(message);
+        return makeRight({ url: base, content: parseDataPath(path) });
+      } else if (protocol === "file:") {
+        try {
+          return makeRight({
+            url,
+            content: readFile(fileURLToPath(url), "utf8"),
+          });
+        } catch ({ message }) {
+          return makeLeft(message);
+        }
+      } else {
+        return makeLeft(
+          `Cannot read file url with a protocol different than 'data:' or 'file:', got: ${JSON.stringify(
+            url,
+          )}`,
+        );
       }
     },
   };
