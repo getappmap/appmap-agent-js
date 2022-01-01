@@ -219,14 +219,14 @@ assertDeepEqual(
 
 assertEqual(
   Reflect.get(
-    extendConfigurationNode("file:///home", {
+    extendConfigurationNode(createConfiguration("file:///home"), {
       version: "v1.2.3",
       argv: ["node", "main.js"],
-      cwd: () => "//unc/lab/dir",
+      cwd: () => "cwd",
     }),
     "main",
   ),
-  "file:////unc/lab/dir/main.js",
+  "file:///home/cwd/main.js",
 );
 
 /////////////////////////////////

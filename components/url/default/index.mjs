@@ -14,11 +14,6 @@ export default (dependencies) => {
     return decodeSegment(encoded_segments[encoded_segments.length - 1]);
   };
 
-  // TODO: investigate whether is it worth detecting going to far into the
-  // hiearchy of UNC paths. Normally the last two segments should remain
-  // intact as ":C" file urls:
-  // new URL("file:///C:/foo/../../").toString() >> 'file:///C:/'
-  // new URL("file:////host/label/foo/../../").toString() >> 'file:////host/'
   const appendURLPathname = (url, pathname) => {
     const url_object = new _URL(url);
     url_object.pathname += `${
@@ -42,10 +37,22 @@ export default (dependencies) => {
   const getWindowsDrive = (pathname) =>
     /^\/[a-zA-Z]:/u.test(pathname) ? pathname[1] : null;
 
-  const getUNCAddress = (pathname) => {
-    const parts = /^(\/\/[^/]+\/[^/]+\/)/u.exec(pathname);
-    return parts === null ? null : parts[1];
-  };
+  // TODO: investigate whether is it worth detecting going to far into the
+  // hiearchy of UNC paths. Normally the last two segments should remain
+  // intact as ":C" file urls:
+  // new URL("file:///C:/foo/../../").toString() >> 'file:///C:/'
+  // new URL("file:////host/label/foo/../../").toString() >> 'file:////host/'
+  //
+  // Lets drop support for UNC file urls.
+  // In node@14 file:////foo//bar is resolved as file:///foo//bar
+  // So it seems that leading slashes are collpased on file urls.
+  // This is not the case in node@16.
+  //
+  // const getUNCAddress = (pathname) => {
+  //   const parts = /^(\/\/[^/]+\/[^/]+\/)/u.exec(pathname);
+  //   return parts === null ? null : parts[1];
+  // };
+  // getUNCAddress(pathname) !== getUNCAddress(base_pathname)))
 
   const urlifyPath = (path, base_url) => {
     const segments = splitPath(path);
@@ -82,8 +89,7 @@ export default (dependencies) => {
       protocol !== base_protocol ||
       host !== base_host ||
       (protocol === "file:" &&
-        (getWindowsDrive(pathname) !== getWindowsDrive(base_pathname) ||
-          getUNCAddress(pathname) !== getUNCAddress(base_pathname)))
+        getWindowsDrive(pathname) !== getWindowsDrive(base_pathname))
     ) {
       return null;
     } else {

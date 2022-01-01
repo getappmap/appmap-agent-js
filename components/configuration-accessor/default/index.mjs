@@ -138,7 +138,7 @@ export default (dependencies) => {
           },
           main,
         },
-        urlifyPath(cwd(), `file:///`),
+        urlifyPath(cwd(), configuration.repository.directory),
       );
     },
     extendConfigurationPort: (configuration, ports) => {
