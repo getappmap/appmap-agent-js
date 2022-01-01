@@ -11,20 +11,16 @@ global.GLOBAL_SPY_SPAWN = (exec, argv, options) => {
   emitter.kill = (signal) => {
     emitter.emit("close", null, signal);
   };
-  assertEqual(exec, "/bin/sh");
-  assertEqual(argv.length, 2);
-  assertEqual(argv[0], "-c");
-  const command = argv[1];
-  if (command.startsWith("success")) {
+  if (exec === "success") {
     setTimeout(() => {
       emitter.emit("close", 0, null);
     }, 0);
-  } else if (command.startsWith("failure")) {
+  } else if (exec === "failure") {
     setTimeout(() => {
       emitter.emit("close", 1, null);
     }, 0);
   } else {
-    assertEqual(command.startsWith("sleep"), true);
+    assertEqual(exec, "sleep");
   }
   return emitter;
 };
@@ -61,8 +57,8 @@ const configuration = createConfiguration("file:///home");
       {
         scenario: "^",
         scenarios: {
-          key1: { command: "sleep remote" },
-          key2: { command: "sleep mocha" },
+          key1: { command: ["sleep"] },
+          key2: { command: ["sleep"] },
         },
       },
       "file:///base",
@@ -81,7 +77,7 @@ const configuration = createConfiguration("file:///home");
       {
         recorder: "process",
         scenario: "^",
-        scenarios: { key: { command: "success" } },
+        scenarios: { key: { command: ["success"] } },
       },
       "file:///base",
     ),
@@ -100,8 +96,8 @@ const configuration = createConfiguration("file:///home");
         recorder: "process",
         scenario: "^",
         scenarios: {
-          key1: { command: "success" },
-          key2: { command: "failure" },
+          key1: { command: ["success"] },
+          key2: { command: ["failure"] },
         },
       },
       "file:///base",

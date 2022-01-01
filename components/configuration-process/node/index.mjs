@@ -56,8 +56,6 @@ export default (dependencies) => {
     );
   };
 
-  const quote = (arg) => `'${arg.replace(/'/gu, "\\'")}'`;
-
   const aliases = new _Map([
     ["log-level", "log"],
     ["output-dir", "output"],
@@ -91,8 +89,12 @@ export default (dependencies) => {
 
   const extractConfig = (argv) => {
     let { _: positional, ...config } = minimist(argv.slice(2));
+    expect(
+      !hasOwnProperty(config, "command"),
+      "command should be provided as positional argument",
+    );
     if (positional.length > 0) {
-      addOption(config, "command", positional.map(quote).join(" "));
+      addOption(config, "command", positional);
     }
     for (const key of ownKeys(config)) {
       if (aliases.has(key)) {

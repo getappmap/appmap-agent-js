@@ -1,3 +1,4 @@
+const { parse: parseJSON } = JSON;
 const { parseInt } = Number;
 const { assign } = Object;
 
@@ -104,10 +105,14 @@ export default (dependencies) => {
             name: "value",
             message: [
               "What command should be executed and recorded when running `npx appmap-agent-js`?",
-              "Skip to provide an inline command -- eg: `npx appmap-agent-js --command 'node path/to/main.js'",
+              "The command should be provided as a JSON array of strings.",
+              'For instance: ["node", "path/to/main.js"]',
+              "Skip to provide the command as positional argument.",
+              "For instance: `npx appmap-agent-js -- node path/to/main.js",
             ],
             initial: "",
-            format: (input) => (input === "" ? {} : { command: input }),
+            format: (input) =>
+              input === "" ? {} : { command: parseJSON(input) },
           },
     // Remote Recording //
     ({ recorder }) =>

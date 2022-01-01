@@ -67,7 +67,8 @@ assertThrow(
       log: "error",
       map_name: "name2",
       command: {
-        value: "'exec' 'arg1' 'arg2'",
+        exec: "exec",
+        argv: ["arg1", "arg2"],
         base: "file:///cwd",
       },
     },

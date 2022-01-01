@@ -48,12 +48,16 @@ const extend = (
 
 // scenarios //
 assertDeepEqual(
-  extend("scenarios", { key: { command: "node main.js" } }, "file:///base"),
+  extend(
+    "scenarios",
+    { key: { command: ["node", "main.js"] } },
+    "file:///base",
+  ),
   [
     {
       base: "file:///base",
       key: "key",
-      value: { command: "node main.js" },
+      value: { command: ["node", "main.js"] },
     },
   ],
 );
@@ -146,8 +150,9 @@ assertDeepEqual(extend("serialization", "toString", null), {
 
 // command //
 
-assertDeepEqual(extend("command", "node main.js", "file:///base"), {
-  value: "node main.js",
+assertDeepEqual(extend("command", ["node", "main.js"], "file:///base"), {
+  exec: "node",
+  argv: ["main.js"],
   base: "file:///base",
 });
 

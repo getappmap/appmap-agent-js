@@ -20,6 +20,7 @@ export default (dependencies) => {
       minifyReceptorConfiguration,
     },
   } = dependencies;
+  const getCommandDescription = ({ exec, argv }) => ({ exec, argv });
   const isCommandNonNull = ({ command }) => command !== null;
   return {
     mainAsync: async (process, configuration) => {
@@ -59,16 +60,10 @@ export default (dependencies) => {
         configuration = resolveConfigurationAutomatedRecorder(configuration);
         const receptor = await createReceptorAsync(configuration);
         configuration = adaptReceptorConfiguration(receptor, configuration);
-        const {
-          command: { value: description },
-        } = configuration;
-        logInfo("%s ...", description);
-        const { command, options } = compileConfigurationCommand(
-          configuration,
-          env,
-        );
-        logDebug("spawn child command = %j, options = %j", command, options);
-        subprocess = spawn("/bin/sh", ["-c", command], options);
+        const description = getCommandDescription(configuration.command);
+        const command = compileConfigurationCommand(configuration, env);
+        logDebug("spawn child command = %j", command);
+        subprocess = spawn(command.exec, command.argv, command.options);
         const { signal, status } = await expectSuccessAsync(
           new Promise((resolve, reject) => {
             subprocess.on("error", reject);
@@ -76,7 +71,7 @@ export default (dependencies) => {
               resolve({ signal, status });
             });
           }),
-          "child error %s >> %e",
+          "child error %j >> %e",
           description,
         );
         subprocess = null;
@@ -112,7 +107,7 @@ export default (dependencies) => {
           logInfo("Summary:");
           for (const { description, signal, status } of summary) {
             /* c8 ignore start */
-            logInfo("%s >> %j", description, signal === null ? status : signal);
+            logInfo("%j >> %j", description, signal === null ? status : signal);
             /* c8 ignore stop */
           }
         }

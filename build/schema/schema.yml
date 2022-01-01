@@ -389,7 +389,10 @@
         "^": {$ref: config}
     scenario: {$ref: regexp}
     recursive-process-recording: {type: boolean}
-    command: {type: string}
+    command:
+      type: array
+      minItems: 1
+      items: {type: string}
     command-options: {$ref: command-options}
     validate:
       type: object
@@ -500,7 +503,10 @@
       type: object
       nullable: true
       properties:
-        value: {type: string}
+        exec: {type: string}
+        argv:
+          type: array
+          items: {type: string}
         base: {$ref: url}
     command-options: {$ref: cooked-command-options}
     validate:

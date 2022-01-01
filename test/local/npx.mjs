@@ -8,7 +8,7 @@ const { deepEqual: assertDeepEqual } = Assert;
 await runAsync(
   null,
   {
-    command: "npx --always-spawn bin",
+    command: ["npx", "--always-spawn", "bin"],
     pruning: false,
     output: {
       basename: "basename",

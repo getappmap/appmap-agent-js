@@ -10,7 +10,7 @@ await runAsync(
   {
     recorder: "process",
     packages: { glob: "*" },
-    command: "node main.mjs",
+    command: ["node", "main.mjs"],
     ordering: "chronological",
     output: {
       basename: "basename",

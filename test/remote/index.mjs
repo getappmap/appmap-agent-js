@@ -103,7 +103,7 @@ const testAsync = async (port_key, port, main) => {
     null,
     {
       recorder: "remote",
-      command: "node main.mjs",
+      command: ["node", "main.mjs"],
       packages: { glob: "*" },
       [port_key]: port,
       log: "info",

@@ -1,7 +1,3 @@
-import ShellQuote from "shell-quote";
-
-const { parse: parseShell } = ShellQuote;
-
 const _URL = URL;
 const _RegExp = RegExp;
 const { entries: toEntries } = Object;
@@ -33,20 +29,6 @@ export default (dependencies) => {
     /* c8 ignore stop */
   };
 
-  /* c8 ignore start */
-  const quote = (token) => {
-    if (typeof token === "object") {
-      const { op } = token;
-      if (op === "glob") {
-        const { pattern } = token;
-        return pattern;
-      }
-      return op;
-    }
-    return `'${token.replace(/'/gu, "\\'")}'`;
-  };
-  /* c8 ignore stop */
-
   return {
     resolveConfigurationRepository: (configuration) => {
       assert(configuration.agent === null, "duplicate respository resolution");
@@ -76,9 +58,13 @@ export default (dependencies) => {
         configuration = extendConfiguration(
           configuration,
           {
-            recorder: configuration.command.value.includes("mocha")
-              ? "mocha"
-              : "remote",
+            recorder:
+              configuration.command.exec === "mocha" ||
+              (configuration.command.exec === "npx" &&
+                configuration.command.argv.length > 0 &&
+                configuration.command.argv[0] === "mocha")
+                ? "mocha"
+                : "remote",
           },
           configuration.repository.directory,
         );
@@ -184,8 +170,6 @@ export default (dependencies) => {
           extendConfiguration(configuration, { scenarios: {}, ...value }, base),
         );
     },
-    // TODO Use portable execution (ie not bash)
-    /* c8 ignore start */
     compileConfigurationCommand: (configuration, env) => {
       assert(configuration.agent !== null, "missing agent in configuration");
       assert(
@@ -193,7 +177,7 @@ export default (dependencies) => {
         "missing command in configuration",
       );
       let {
-        command: { value: command },
+        command: { exec, argv },
       } = configuration;
       const {
         command: { base },
@@ -213,7 +197,6 @@ export default (dependencies) => {
       );
       if (recursive || recorder === "mocha") {
         if (recorder === "mocha") {
-          let tokens = parseShell(command, env);
           const hook = [
             "--require",
             pathifyURL(
@@ -225,28 +208,18 @@ export default (dependencies) => {
               base,
             ),
           ];
-          if (tokens.length > 0 && tokens[0] === "mocha") {
-            tokens = ["mocha", ...hook, ...tokens.slice(1)];
-          } else if (
-            tokens.length > 1 &&
-            tokens[0] === "npx" &&
-            tokens[1] === "mocha"
-          ) {
-            tokens = [
-              "npx",
-              "--always-spawn",
-              "mocha",
-              ...hook,
-              ...tokens.slice(2),
-            ];
+          if (exec === "mocha") {
+            argv = [...hook, ...argv];
+          } else if (exec === "npx" && argv.length > 0 && argv[0] === "mocha") {
+            argv = ["--always-spawn", argv[0], ...hook, ...argv.slice(1)];
           } else {
             expect(
               false,
-              "The mocha recorder expected the command to start by either 'mocha' or 'npx mocha', got %j.",
-              tokens,
+              "The mocha recorder expected the command to start by either 'mocha' or 'npx mocha', got %j %j.",
+              exec,
+              argv,
             );
           }
-          command = tokens.map(quote).join(" ");
         }
         env = {
           ...env,
@@ -274,19 +247,12 @@ export default (dependencies) => {
           ].join(" "),
         };
       } else {
-        const tokens = parseShell(command, env);
-        expect(
-          tokens.length > 0,
-          "Could not find executable from command: %j.",
-          command,
-        );
         logGuardWarning(
-          tokens[0] !== "node",
+          exec !== "node",
           "Assuming %j is a node executable, recording will *not* happens if this is not the case.",
-          tokens[0],
+          exec,
         );
-        command = [
-          tokens[0],
+        argv = [
           "--experimental-loader",
           pathifyURL(
             appendURLSegmentArray(directory, [
@@ -296,13 +262,12 @@ export default (dependencies) => {
             ]),
             base,
           ),
-          ...tokens.slice(1),
-        ]
-          .map(quote)
-          .join(" ");
+          ...argv,
+        ];
       }
       return {
-        command,
+        exec,
+        argv,
         options: {
           ...options,
           cwd: new _URL(base),
@@ -310,6 +275,5 @@ export default (dependencies) => {
         },
       };
     },
-    /* c8 ignore stop */
   };
 };

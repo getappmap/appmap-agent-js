@@ -9,7 +9,7 @@ await runAsync(
   { name: "app", version: "1.2.3" },
   {
     recorder: "process",
-    command: "node main.mjs",
+    command: ["node", "main.mjs"],
     name: "app-name",
     "map-name": "map-name",
     hooks: {

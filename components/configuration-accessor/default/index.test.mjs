@@ -1,4 +1,8 @@
-import { assertDeepEqual, assertEqual } from "../../__fixture__.mjs";
+import {
+  assertDeepEqual,
+  assertEqual,
+  assertThrow,
+} from "../../__fixture__.mjs";
 import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
@@ -17,7 +21,7 @@ const {
   isConfigurationEnabled,
   getConfigurationPackage,
   getConfigurationScenarios,
-  // compileConfigurationCommand,
+  compileConfigurationCommand,
 } = ConfigurationAccessor(await buildTestDependenciesAsync(import.meta.url));
 
 ////////////////////////////////////////
@@ -97,7 +101,7 @@ assertEqual(
       extendConfiguration(
         createConfiguration("file:///home"),
         {
-          command: "npx mocha",
+          command: ["npx", "mocha"],
         },
         "file:///base",
       ),
@@ -113,7 +117,7 @@ assertEqual(
       extendConfiguration(
         createConfiguration("file:///home"),
         {
-          command: "node main.js",
+          command: ["node", "main.js"],
         },
         "file:///base",
       ),
@@ -233,168 +237,163 @@ assertEqual(
 // compilConfigurationeCommand //
 /////////////////////////////////
 
-// const stripEnvironmentConfiguration = ({
-//   command,
-//   options: {
-//     env: { APPMAP_CONFIGURATION, ...env },
-//   },
-// }) => ({ command, env });
-//
-// // recursive-process-recording: true //
-// assertDeepEqual(
-//   stripEnvironmentConfiguration(
-//     compileConfigurationCommand(
-//       extendConfiguration(
-//         createConfiguration("file:///home"),
-//         {
-//           agent: {
-//             directory: "file:///agent",
-//             package: {
-//               name: "@appmap-agent-js",
-//               version: "1.2.3",
-//               homepage: null,
-//             },
-//           },
-//           "recursive-process-recording": true,
-//           command: "exec argv1 $VAR1",
-//           recorder: "process",
-//           "command-options": {
-//             env: { VAR1: "VAL1-1", NODE_OPTIONS: "--node-key=node-value" },
-//           },
-//         },
-//         "file:///base",
-//       ),
-//       {
-//         VAR1: "VAL1-2",
-//         VAR2: "VAL2",
-//       },
-//     ),
-//   ),
-//   {
-//     command: "exec argv1 $VAR1",
-//     env: {
-//       NODE_OPTIONS: [
-//         "--node-key=node-value",
-//         "--require=/agent/lib/node/abomination.js",
-//         "--experimental-loader=/agent/lib/node/recorder-process.mjs",
-//       ].join(" "),
-//       VAR1: "VAL1-1",
-//       VAR2: "VAL2",
-//     },
-//   },
-// );
-//
-// // recursive-process-recording: false //
-// assertDeepEqual(
-//   stripEnvironmentConfiguration(
-//     compileConfigurationCommand(
-//       extendConfiguration(
-//         createConfiguration("file:///home"),
-//         {
-//           agent: {
-//             directory: "file:///agent",
-//             package: {
-//               name: "@appmap-agent-js",
-//               version: "1.2.3",
-//               homepage: null,
-//             },
-//           },
-//           "recursive-process-recording": false,
-//           command: "node * $VAR1 > $VAR2",
-//           recorder: "process",
-//           "command-options": {
-//             env: { VAR1: "VAL1-1" },
-//           },
-//         },
-//         "file:///base",
-//       ),
-//       {
-//         VAR1: "VAL1-2",
-//         VAR2: "VAL2",
-//       },
-//     ),
-//   ),
-//   {
-//     command: [
-//       "'node'",
-//       "'--experimental-loader'",
-//       "'/agent/lib/node/recorder-process.mjs'",
-//       "*",
-//       "'VAL1-1'",
-//       ">",
-//       "'VAL2'",
-//     ].join(" "),
-//     env: {
-//       VAR1: "VAL1-1",
-//       VAR2: "VAL2",
-//     },
-//   },
-// );
-//
-// // mocha //
-// {
-//   const testMocha = (npx) => {
-//     assertDeepEqual(
-//       stripEnvironmentConfiguration(
-//         compileConfigurationCommand(
-//           extendConfiguration(
-//             createConfiguration("file:///home"),
-//             {
-//               agent: {
-//                 directory: "file:///agent",
-//                 package: {
-//                   name: "@appmap-agent-js",
-//                   version: "1.2.3",
-//                   homepage: null,
-//                 },
-//               },
-//               command: [...(npx ? ["npx"] : []), "mocha", "argv1"].join(" "),
-//               recorder: "mocha",
-//             },
-//             "file:///base",
-//           ),
-//           {},
-//         ),
-//       ),
-//       {
-//         command: [
-//           ...(npx ? ["'npx'", "'--always-spawn'"] : []),
-//           "'mocha'",
-//           "'--require'",
-//           "'/agent/lib/node/recorder-mocha.mjs'",
-//           "'argv1'",
-//         ].join(" "),
-//         env: {
-//           NODE_OPTIONS: [
-//             "",
-//             "--require=/agent/lib/node/abomination.js",
-//             "--experimental-loader=/agent/lib/node/mocha-loader.mjs",
-//           ].join(" "),
-//         },
-//       },
-//     );
-//   };
-//   testMocha(true);
-//   testMocha(false);
-//   assertThrow(() => {
-//     compileConfigurationCommand(
-//       extendConfiguration(
-//         createConfiguration("file:///home"),
-//         {
-//           agent: {
-//             directory: "file:///agent",
-//             package: {
-//               name: "@appmap-agent-js",
-//               version: "1.2.3",
-//               homepage: null,
-//             },
-//           },
-//           command: "foo",
-//           recorder: "mocha",
-//         },
-//         "file:///base",
-//       ),
-//       {},
-//     );
-//   }, /^AppmapError/);
-// }
+const stripEnvironmentConfiguration = ({
+  exec,
+  argv,
+  options: {
+    cwd,
+    env: { APPMAP_CONFIGURATION, ...env },
+  },
+}) => ({ exec, argv, cwd, env });
+
+// recursive-process-recording: true //
+assertDeepEqual(
+  stripEnvironmentConfiguration(
+    compileConfigurationCommand(
+      extendConfiguration(
+        createConfiguration("file:///home"),
+        {
+          agent: {
+            directory: "file:///agent",
+            package: {
+              name: "@appmap-agent-js",
+              version: "1.2.3",
+              homepage: null,
+            },
+          },
+          "recursive-process-recording": true,
+          command: ["exec", "argv1"],
+          recorder: "process",
+          "command-options": {
+            env: { VAR1: "VAL1", NODE_OPTIONS: "--node-key=node-value" },
+          },
+        },
+        "file:///base",
+      ),
+      {
+        VAR2: "VAL2",
+      },
+    ),
+  ),
+  {
+    exec: "exec",
+    argv: ["argv1"],
+    cwd: new URL("file:///base"),
+    env: {
+      NODE_OPTIONS: [
+        "--node-key=node-value",
+        "--require=../agent/lib/node/abomination.js",
+        "--experimental-loader=../agent/lib/node/recorder-process.mjs",
+      ].join(" "),
+      VAR1: "VAL1",
+      VAR2: "VAL2",
+    },
+  },
+);
+
+// recursive-process-recording: false //
+assertDeepEqual(
+  stripEnvironmentConfiguration(
+    compileConfigurationCommand(
+      extendConfiguration(
+        createConfiguration("file:///home"),
+        {
+          agent: {
+            directory: "file:///agent",
+            package: {
+              name: "@appmap-agent-js",
+              version: "1.2.3",
+              homepage: null,
+            },
+          },
+          "recursive-process-recording": false,
+          command: ["node", "main.js", "argv1"],
+          recorder: "process",
+        },
+        "file:///base",
+      ),
+      {},
+    ),
+  ),
+  {
+    exec: "node",
+    argv: [
+      "--experimental-loader",
+      "../agent/lib/node/recorder-process.mjs",
+      "main.js",
+      "argv1",
+    ],
+    cwd: new URL("file:///base"),
+    env: {},
+  },
+);
+
+// mocha //
+{
+  const testMocha = (npx) => {
+    assertDeepEqual(
+      stripEnvironmentConfiguration(
+        compileConfigurationCommand(
+          extendConfiguration(
+            createConfiguration("file:///home"),
+            {
+              agent: {
+                directory: "file:///agent",
+                package: {
+                  name: "@appmap-agent-js",
+                  version: "1.2.3",
+                  homepage: null,
+                },
+              },
+              command: [...(npx ? ["npx"] : []), "mocha", "argv1"],
+              recorder: "mocha",
+            },
+            "file:///base",
+          ),
+          {},
+        ),
+      ),
+      {
+        exec: npx ? "npx" : "mocha",
+        argv: [
+          ...(npx ? ["--always-spawn", "mocha"] : []),
+          "--require",
+          "../agent/lib/node/recorder-mocha.mjs",
+          "argv1",
+        ],
+        cwd: new URL("file:///base"),
+        env: {
+          NODE_OPTIONS: [
+            "",
+            "--require=../agent/lib/node/abomination.js",
+            "--experimental-loader=../agent/lib/node/mocha-loader.mjs",
+          ].join(" "),
+        },
+      },
+    );
+  };
+  testMocha(true);
+  testMocha(false);
+}
+
+assertThrow(() => {
+  compileConfigurationCommand(
+    extendConfiguration(
+      createConfiguration("file:///home"),
+      {
+        agent: {
+          directory: "file:///agent",
+          package: {
+            name: "@appmap-agent-js",
+            version: "1.2.3",
+            homepage: null,
+          },
+        },
+        command: ["exec"],
+        recorder: "mocha",
+      },
+      "file:///base",
+    ),
+    {},
+  );
+}, /^AppmapError/);

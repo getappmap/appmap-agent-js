@@ -60,9 +60,10 @@ export default (dependencies) => {
   const normalizeExclude = (exclusions, base) =>
     exclusions.map(normalizeExclusion);
 
-  const normalizeCommand = (command, base) => {
+  const normalizeCommand = ([exec, ...argv], base) => {
     return {
-      value: command,
+      exec,
+      argv,
       base,
     };
   };

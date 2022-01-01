@@ -1,6 +1,6 @@
 import { strict as Assert } from "assert";
-import { tmpdir as getTemporaryDirectory , platform as getPlatform } from "os";
-import { pathToFileURL , fileURLToPath } from "url";
+import { tmpdir as getTemporaryDirectory, platform as getPlatform } from "os";
+import { pathToFileURL, fileURLToPath } from "url";
 
 Error.stackTraceLimit = Infinity;
 
@@ -10,7 +10,6 @@ export const convertPort = (port) =>
         port,
       )}`
     : port;
-
 
 export const getFreshTemporaryURL = (extension = "") =>
   `${pathToFileURL(getTemporaryDirectory())}/${Math.random()
