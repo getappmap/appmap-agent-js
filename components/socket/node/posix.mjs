@@ -5,6 +5,7 @@ const require = Module.createRequire(import.meta.url);
 export default (dependencies) => {
   const {
     log: { logDebug },
+    path: { toIPCPath },
   } = dependencies;
   const tryRequire = (name) => {
     try {
@@ -28,7 +29,7 @@ export default (dependencies) => {
     } = PosixSocket;
     const { send: sendSocket } = PosixSocketMessaging;
     return {
-      openSocket: (host, port) => {
+      openSocket: (host, port, options) => {
         const fd = createSocket(
           typeof port === "number" ? AF_INET : AF_UNIX,
           SOCK_STREAM,
@@ -38,7 +39,7 @@ export default (dependencies) => {
           fd,
           typeof port === "number"
             ? { sin_family: AF_INET, sin_port: port, sin_addr: host }
-            : { sun_family: AF_UNIX, sun_path: fileURLToPath(port) },
+            : { sun_family: AF_UNIX, sun_path: toIPCPath(fileURLToPath(port)) },
         );
         return fd;
       },
