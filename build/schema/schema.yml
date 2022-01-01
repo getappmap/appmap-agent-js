@@ -5,6 +5,11 @@
 
 # enumeration #
 
+- $id: socket
+  enum:
+    - unix
+    - net
+
 - $id: encoding
   enum:
     - buffer
@@ -89,10 +94,24 @@
   type: string
   pattern: "^\\.[^/]+$"
 
-- $id: index
+- $id: natural
   type: integer
   minimum: 0
   maximum: 9007199254740991
+
+- $id: nullable-natural
+  anyOf:
+    - const: null
+    - $ref: natural
+
+- $id: index
+  $ref: natural
+
+- $id: heartbeat
+  $ref: nullable-natural
+
+- $id: threshold
+  $ref: nullable-natural
 
 - $id: port-number
   type: integer
@@ -388,6 +407,9 @@
     intercept-track-port: {$ref: regexp}
     intercept-track-protocol: {const: "HTTP/1.1"}
     # client
+    socket: {$ref: socket}
+    heartbeat: {$ref: heartbeat}
+    threshold: {$ref: threshold}
     recorder: {$ref: recorder}
     inline-source: {type: boolean}
     hooks:
@@ -458,8 +480,11 @@
 - $id: configuration
   type: object
   additionalProperties: false
-  minProperties: 39
+  minProperties: 41
   properties:
+    socket: {$ref: socket}
+    heartbeat: {$ref: heartbeat}
+    threshold: {$ref: threshold}
     scenario: {$ref: regexp}
     scenarios:
       type: array

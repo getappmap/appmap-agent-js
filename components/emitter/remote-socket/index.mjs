@@ -22,7 +22,7 @@ export default (dependencies) => {
       if (host === "localhost") {
         host = "127.0.0.1";
       }
-      const socket = openSocket(host, trace_port);
+      const socket = openSocket(host, trace_port, configuration);
       sendSocket(socket, session);
       sendSocket(socket, stringifyJSON(configuration));
       return { socket, session, host, track_port, closed: createBox(false) };

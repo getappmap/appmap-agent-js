@@ -9,10 +9,11 @@ const { createMessage } = NetSocketMessaging;
 export default (dependencies) => {
   const {
     path: { toIPCPath },
+    util: { mapMaybe },
     log: { logGuardWarning, logWarning },
   } = dependencies;
   const flush = (socket, messages) => {
-    if (socket.writable) {
+    if (socket.writable && messages.length > 0) {
       socket.write(concatBuffer(messages.map(createMessage)));
       messages.length = 0;
     }
@@ -23,10 +24,16 @@ export default (dependencies) => {
         typeof port === "string"
           ? connect(toIPCPath(fileURLToPath(port)))
           : connect(port, host);
+      socket.unref();
       const messages = [];
       socket.on("connect", () => {
         flush(socket, messages);
-        const timer = setInterval(flush, heartbeat, socket, messages);
+        const timer = mapMaybe(heartbeat, () =>
+          setInterval(flush, heartbeat, socket, messages),
+        );
+        mapMaybe(timer, (timer) => {
+          timer.unref();
+        });
         socket.on("close", () => {
           logGuardWarning(messages.length > 0, "Lost messages >> %j", messages);
           messages.length = 0;
@@ -35,7 +42,10 @@ export default (dependencies) => {
       });
       return { messages, socket, threshold };
     },
-    closeSocket: ({ socket }) => {
+    closeSocket: ({ socket, messages }) => {
+      // TODO: investigate how to make this flush is done synchronously
+      // because closeSocket is often called on process exit event.
+      flush(socket, messages);
       socket.end();
     },
     sendSocket: ({ socket, messages, threshold }, message) => {
@@ -43,7 +53,7 @@ export default (dependencies) => {
         logWarning("Lost message >> %s", message);
       } else {
         messages.push(message);
-        if (messages.length > threshold) {
+        if (threshold !== null && messages.length > threshold) {
           flush(socket, messages);
         }
       }

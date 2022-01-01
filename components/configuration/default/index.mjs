@@ -193,6 +193,18 @@ export default (dependencies) => {
   ////////////
 
   const fields = {
+    socket: {
+      extend: overwrite,
+      normalize: identity,
+    },
+    heartbeat: {
+      extend: overwrite,
+      normalize: identity,
+    },
+    threshold: {
+      extend: overwrite,
+      normalize: identity,
+    },
     agent: {
       extend: overwrite,
       normalize: identity,
@@ -392,6 +404,9 @@ export default (dependencies) => {
       main: null,
       recording: null,
       // provided by the user
+      socket: "unix",
+      heartbeat: 1000,
+      threshold: 100,
       host: "localhost",
       session: null,
       "trace-port": 0, // possibly overwritten by the agent

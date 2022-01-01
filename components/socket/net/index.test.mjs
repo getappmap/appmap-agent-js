@@ -1,10 +1,10 @@
 import { assertDeepEqual, getFreshTemporaryURL } from "../../__fixture__.mjs";
 
 import { buildTestDependenciesAsync } from "../../build.mjs";
-import NetSocket from "./net.mjs";
-import { testAsync } from "./__fixture__.mjs";
+import Socket from "./index.mjs";
+import { testAsync } from "../__fixture__.mjs";
 
-const { openSocket, closeSocket, sendSocket } = NetSocket(
+const { openSocket, closeSocket, sendSocket } = Socket(
   await buildTestDependenciesAsync(import.meta.url),
 );
 const sleepAsync = (ms) =>
