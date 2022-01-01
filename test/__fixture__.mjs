@@ -1,7 +1,7 @@
-// import * as Path from 'path';
+
 import { tmpdir } from "os";
 import { join as joinPath } from "path";
-import { mkdir, symlink, writeFile, realpath } from "fs/promises";
+import { mkdir as mkdirAsync, symlink as symlinkAsync, writeFile as writeFileAsync, realpath as realpathAsync } from "fs/promises";
 import YAML from "yaml";
 import { spawnAsync } from "./spawn.mjs";
 
@@ -11,18 +11,19 @@ const { stringify: stringifyJSON } = JSON;
 
 export const runAsync = async (_package, config, beforeAsync, afterAsync) => {
   const directory = joinPath(
-    await realpath(tmpdir()),
+    await realpathAsync(tmpdir()),
     Math.random().toString(36).substring(2),
   );
-  await mkdir(directory);
-  await mkdir(joinPath(directory, "node_modules"));
-  await mkdir(joinPath(directory, "node_modules", ".bin"));
-  await mkdir(joinPath(directory, "node_modules", "@appland"));
-  await symlink(
+  await mkdirAsync(directory);
+  await mkdirAsync(joinPath(directory, "node_modules"));
+  await mkdirAsync(joinPath(directory, "node_modules", ".bin"));
+  await mkdirAsync(joinPath(directory, "node_modules", "@appland"));
+  await symlinkAsync(
     cwd(),
     joinPath(directory, "node_modules", "@appland", "appmap-agent-js"),
+    "dir",
   );
-  await writeFile(
+  await writeFileAsync(
     joinPath(directory, "package.json"),
     stringifyJSON({
       name: "package",
@@ -30,7 +31,7 @@ export const runAsync = async (_package, config, beforeAsync, afterAsync) => {
       ..._package,
     }),
   );
-  await writeFile(
+  await writeFileAsync(
     joinPath(directory, "appmap.yml"),
     stringifyYAML({
       validate: {
