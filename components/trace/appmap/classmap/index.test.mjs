@@ -1,5 +1,4 @@
 import { assertDeepEqual, assertEqual } from "../../../__fixture__.mjs";
-import { sep } from "path";
 import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
@@ -100,7 +99,7 @@ const and_exclude = {
       link: {
         defined_class: "f",
         method_id: placeholder,
-        path: ["directory", "function.js"].join(sep),
+        path: "directory/function.js",
         lineno: 2,
         static: false,
       },

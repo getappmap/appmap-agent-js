@@ -9,6 +9,7 @@ const { from: toArray } = Array;
 export default (dependencies) => {
   const {
     util: { assert, createCounter },
+    path: { splitPath },
     url: { pathifyURL },
     log: { logWarning, logDebug },
     location: {
@@ -183,7 +184,7 @@ export default (dependencies) => {
     ) => {
       assert(!urls.has(url), "duplicate source url");
       urls.add(url);
-      const path = pathifyURL(url, directory);
+      const path = splitPath(pathifyURL(url, directory)).join("/");
       const context = { url, path, shallow, inline, content, placeholder };
       const exclusions = compileExclusionList(exclude);
       const excluded_entities = [];
