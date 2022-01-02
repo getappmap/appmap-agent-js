@@ -3,6 +3,7 @@ import {
   symlink as symlinkAsync,
   readFile as readFileAsync,
 } from "fs/promises";
+import { platform as getPlatform } from "os";
 import { strict as Assert } from "assert";
 import { join as joinPath } from "path";
 import { runAsync } from "../__fixture__.mjs";
@@ -12,7 +13,7 @@ const { deepEqual: assertDeepEqual } = Assert;
 await runAsync(
   null,
   {
-    command: ["npx", "--always-spawn", "bin"],
+    command: [getPlatform() === "win32" ? "npx.cmd" : "npx", "--always-spawn", "bin"],
     pruning: false,
     output: {
       basename: "basename",

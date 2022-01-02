@@ -4,6 +4,7 @@ import {
   realpath as realpathAsync,
   readdir as readdirAsync,
 } from "fs/promises";
+import { platform as getPlatform} from "os";
 import { strict as Assert } from "assert";
 import { join as joinPath } from "path";
 import { runAsync } from "../__fixture__.mjs";
@@ -15,9 +16,8 @@ const { deepEqual: assertDeepEqual } = Assert;
 await runAsync(
   null,
   {
-    command: ["npx", "mocha", "main.test.mjs"],
+    command: [getPlatform() === "win32" ? "npx.cmd" : "npx", "mocha", "main.test.mjs"],
     recorder: "mocha",
-    log: "info",
     packages: { path: "index.js" },
     hooks: {
       esm: false,

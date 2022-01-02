@@ -71,7 +71,7 @@ export default (dependencies) => {
               resolve({ signal, status });
             });
           }),
-          "child error %j >> %e",
+          "Child error %j >> %e",
           description,
         );
         subprocess = null;

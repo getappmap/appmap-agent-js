@@ -101,7 +101,7 @@ assertEqual(
       extendConfiguration(
         createConfiguration("file:///home"),
         {
-          command: ["npx", "mocha"],
+          command: ["npx.cmd", "mocha.cmd"],
         },
         "file:///base",
       ),

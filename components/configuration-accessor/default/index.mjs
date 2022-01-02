@@ -29,6 +29,12 @@ export default (dependencies) => {
     /* c8 ignore stop */
   };
 
+  const isMocha = ({ exec }) => exec.split(".")[0] === "mocha";
+  const isNpxMocha = ({ exec, argv }) =>
+    exec.split(".")[0] === "npx" &&
+    argv.length > 0 &&
+    argv[0].split(".")[0] === "mocha";
+
   return {
     resolveConfigurationRepository: (configuration) => {
       assert(configuration.agent === null, "duplicate respository resolution");
@@ -59,10 +65,8 @@ export default (dependencies) => {
           configuration,
           {
             recorder:
-              configuration.command.exec === "mocha" ||
-              (configuration.command.exec === "npx" &&
-                configuration.command.argv.length > 0 &&
-                configuration.command.argv[0] === "mocha")
+              isMocha(configuration.command) ||
+              isNpxMocha(configuration.command)
                 ? "mocha"
                 : "remote",
           },
@@ -176,16 +180,14 @@ export default (dependencies) => {
         configuration.command !== null,
         "missing command in configuration",
       );
-      let {
-        command: { exec, argv },
-      } = configuration;
       const {
-        command: { base },
+        command,
         recorder,
         "command-options": options,
         "recursive-process-recording": recursive,
         agent: { directory },
       } = configuration;
+      let { base, exec, argv } = command;
       env = {
         ...env,
         ...options.env,
@@ -208,9 +210,9 @@ export default (dependencies) => {
               base,
             ),
           ];
-          if (exec === "mocha") {
+          if (isMocha(command)) {
             argv = [...hook, ...argv];
-          } else if (exec === "npx" && argv.length > 0 && argv[0] === "mocha") {
+          } else if (isNpxMocha(command)) {
             argv = ["--always-spawn", argv[0], ...hook, ...argv.slice(1)];
           } else {
             expect(
