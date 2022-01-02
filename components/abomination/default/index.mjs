@@ -52,7 +52,7 @@ export default (dependencies) => {
             (async () => {
               await copyFileAsync(absolute_path, `${absolute_path}.cjs`);
               await unlinkAsync(link);
-              await symlinkAsync(`${path}.cjs`, link);
+              await symlinkAsync(`${path}.cjs`, link, "file");
             })(),
             "Something went wrong when resolving the missing file extension issue >> %e",
           );

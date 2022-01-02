@@ -18,7 +18,7 @@ const path1 = fileURLToPath(getFreshTemporaryURL());
 const path2 = fileURLToPath(getFreshTemporaryURL());
 
 await writeFileAsync(path1, "123;", "utf8");
-await symlinkAsync(getBasename(path1), path2);
+await symlinkAsync(getBasename(path1), path2, "file");
 
 await addLinkExtensionAsync(path2);
 assertEqual(await readLinkAsync(path2), `${getBasename(path1)}.cjs`);

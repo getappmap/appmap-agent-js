@@ -1,4 +1,7 @@
-import { writeFile, readFile } from "fs/promises";
+import {
+  writeFile as writeFileAsync,
+  readFile as readFileAsync,
+} from "fs/promises";
 import { strict as Assert } from "assert";
 import { join as joinPath } from "path";
 import { runAsync } from "../__fixture__.mjs";
@@ -23,7 +26,7 @@ await runAsync(
     },
   },
   async (repository) => {
-    await writeFile(
+    await writeFileAsync(
       joinPath(repository, "main.mjs"),
       `
         import Http from "http";
@@ -53,7 +56,7 @@ await runAsync(
   },
   async (directory) => {
     const appmap = JSON.parse(
-      await readFile(
+      await readFileAsync(
         joinPath(directory, "tmp", "appmap", "basename.appmap.json"),
         "utf8",
       ),

@@ -2,7 +2,7 @@ import fs from "fs";
 import { basename, join } from "path";
 import { tmpdir } from "os";
 import { strict as assert } from "assert";
-import { mkdir /*, writeFile, symlink*/ } from "fs/promises";
+import { mkdir } from "fs/promises";
 import { buildTestDependenciesAsync } from "../../build.mjs";
 import YAML from "yaml";
 import { afterEach, beforeEach, describe, it } from "mocha";

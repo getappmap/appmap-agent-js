@@ -1,4 +1,9 @@
-import { writeFile, symlink, realpath, readdir } from "fs/promises";
+import {
+  writeFile as writeFileAsync,
+  symlink as symlinkAsync,
+  realpath as realpathAsync,
+  readdir as readdirAsync,
+} from "fs/promises";
 import { strict as Assert } from "assert";
 import { join as joinPath } from "path";
 import { runAsync } from "../__fixture__.mjs";
@@ -22,11 +27,12 @@ await runAsync(
     },
   },
   async (repository) => {
-    await symlink(
-      await realpath(joinPath(cwd(), "node_modules", ".bin", "mocha")),
+    await symlinkAsync(
+      await realpathAsync(joinPath(cwd(), "node_modules", ".bin", "mocha")),
       joinPath(repository, "node_modules", ".bin", "mocha"),
+      "dir",
     );
-    await writeFile(
+    await writeFileAsync(
       joinPath(repository, "main.mjs"),
       `
         export const main = () => "main";
@@ -34,7 +40,7 @@ await runAsync(
       `,
       "utf8",
     );
-    await writeFile(
+    await writeFileAsync(
       joinPath(repository, "main.test.mjs"),
       `
         import {strict as Assert} from "assert";
@@ -57,7 +63,9 @@ await runAsync(
   },
   async (directory) => {
     assertDeepEqual(
-      new Set(await readdir(joinPath(directory, "tmp", "appmap", "mocha"))),
+      new Set(
+        await readdirAsync(joinPath(directory, "tmp", "appmap", "mocha")),
+      ),
       new Set([
         "suite.appmap.json",
         "suite-1.appmap.json",

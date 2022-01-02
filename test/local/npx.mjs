@@ -1,4 +1,8 @@
-import { writeFile, symlink, readFile } from "fs/promises";
+import {
+  writeFile as writeFileAsync,
+  symlink as symlinkAsync,
+  readFile as readFileAsync,
+} from "fs/promises";
 import { strict as Assert } from "assert";
 import { join as joinPath } from "path";
 import { runAsync } from "../__fixture__.mjs";
@@ -19,18 +23,23 @@ await runAsync(
     hooks: { esm: false, cjs: true, apply: false, http: false },
   },
   async (repository) => {
-    await writeFile(joinPath(repository, "bin"), "#!/usr/bin/env node\n123;", {
-      encoding: "utf8",
-      mode: 0o777,
-    });
-    await symlink(
+    await writeFileAsync(
+      joinPath(repository, "bin"),
+      "#!/usr/bin/env node\n123;",
+      {
+        encoding: "utf8",
+        mode: 0o777,
+      },
+    );
+    await symlinkAsync(
       joinPath("..", "..", "bin"),
       joinPath(repository, "node_modules", ".bin", "bin"),
+      "dir",
     );
   },
   async (directory) => {
     const appmap = JSON.parse(
-      await readFile(
+      await readFileAsync(
         joinPath(directory, "tmp", "appmap", "basename.appmap.json"),
         "utf8",
       ),
