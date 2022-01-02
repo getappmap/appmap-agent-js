@@ -21,13 +21,6 @@ const runAsyncInner = async (_package, config, beforeAsync, afterAsync) => {
   );
   await mkdirAsync(directory);
   await mkdirAsync(joinPath(directory, "node_modules"));
-  await mkdirAsync(joinPath(directory, "node_modules", ".bin"));
-  await mkdirAsync(joinPath(directory, "node_modules", "@appland"));
-  await symlinkAsync(
-    cwd(),
-    joinPath(directory, "node_modules", "@appland", "appmap-agent-js"),
-    "dir",
-  );
   await writeFileAsync(
     joinPath(directory, "package.json"),
     stringifyJSON({
@@ -35,6 +28,13 @@ const runAsyncInner = async (_package, config, beforeAsync, afterAsync) => {
       version: "1.2.3",
       ..._package,
     }),
+  );
+  await beforeAsync(directory);
+  await mkdirAsync(joinPath(directory, "node_modules", "@appland"));
+  await symlinkAsync(
+    cwd(),
+    joinPath(directory, "node_modules", "@appland", "appmap-agent-js"),
+    "dir",
   );
   await writeFileAsync(
     joinPath(directory, "appmap.yml"),
@@ -46,7 +46,6 @@ const runAsyncInner = async (_package, config, beforeAsync, afterAsync) => {
       ...config,
     }),
   );
-  await beforeAsync(directory);
   await spawnAsync("node", [joinPath(cwd(), "bin", "bin.mjs")], {
     cwd: directory,
     stdio: "inherit",

@@ -2,6 +2,7 @@ import {
   writeFile as writeFileAsync,
   symlink as symlinkAsync,
   readFile as readFileAsync,
+  mkdir as mkdirAsync,
 } from "fs/promises";
 import { platform as getPlatform } from "os";
 import { strict as Assert } from "assert";
@@ -25,6 +26,7 @@ getPlatform() === "win32" || await runAsync(
     hooks: { esm: false, cjs: true, apply: false, http: false },
   },
   async (repository) => {
+    await mkdirAsync(joinPath(repository, "node_modules", ".bin"));
     if (getPlatform() === "win32") {
       await writeFileAsync(
         joinPath(repository, "bin.cjs"),

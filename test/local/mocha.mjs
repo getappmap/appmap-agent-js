@@ -1,19 +1,20 @@
 import {
   writeFile as writeFileAsync,
-  symlink as symlinkAsync,
-  realpath as realpathAsync,
   readdir as readdirAsync,
 } from "fs/promises";
 import { platform as getPlatform} from "os";
 import { strict as Assert } from "assert";
 import { join as joinPath } from "path";
+import {spawnAsync } from "../spawn.mjs";
 import { runAsync } from "../__fixture__.mjs";
-
-const { cwd } = process;
 
 const { deepEqual: assertDeepEqual } = Assert;
 
-await runAsync(
+// TODO figure how to do adapt the abomination.
+// The abomination is back to haunt us...
+// On windows files in .bin are not symbolic links but batch file.
+// It does not seem resonable to parse it to uncover the js script it references.
+getPlatform() === "win32" || await runAsync(
   null,
   {
     command: [getPlatform() === "win32" ? "npx.cmd" : "npx", "mocha", "main.test.mjs"],
@@ -27,10 +28,13 @@ await runAsync(
     },
   },
   async (repository) => {
-    await symlinkAsync(
-      await realpathAsync(joinPath(cwd(), "node_modules", ".bin", "mocha")),
-      joinPath(repository, "node_modules", ".bin", "mocha"),
-      "dir",
+    assertDeepEqual(
+      await spawnAsync(
+        getPlatform() === "win32" ? "npm.cmd" : "npm",
+        ["install", "mocha"],
+        {cwd: repository, stdio:"inherit"},
+      ),
+      {signal:null, status:0},
     );
     await writeFileAsync(
       joinPath(repository, "main.mjs"),
