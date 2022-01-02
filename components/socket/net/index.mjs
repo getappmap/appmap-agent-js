@@ -35,8 +35,12 @@ export default (dependencies) => {
         };
         process.once("beforeExit", flushBind);
         flushBind();
-        const timer = mapMaybe(heartbeat, () => setInterval(flushBind, heartbeat));
-        mapMaybe(timer, (timer) => { timer.unref(); });
+        const timer = mapMaybe(heartbeat, () =>
+          setInterval(flushBind, heartbeat),
+        );
+        mapMaybe(timer, (timer) => {
+          timer.unref();
+        });
         socket.on("close", () => {
           process.off("beforeExit", flushBind);
           logGuardWarning(messages.length > 0, "Lost messages >> %j", messages);
