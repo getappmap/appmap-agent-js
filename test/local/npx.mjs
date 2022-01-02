@@ -10,7 +10,8 @@ import { runAsync } from "../__fixture__.mjs";
 
 const { deepEqual: assertDeepEqual } = Assert;
 
-await runAsync(
+// TODO Figure out how to emulate npm-installed bin on windows
+getPlatform() === "win32" || await runAsync(
   null,
   {
     command: [getPlatform() === "win32" ? "npx.cmd" : "npx", "--always-spawn", "bin"],
@@ -18,25 +19,38 @@ await runAsync(
     output: {
       basename: "basename",
     },
-    processes: { path: joinPath("node_modules", ".bin", "bin") },
+    processes: { regexp: "^../", enabled: false },
     packages: "bin.cjs",
     recorder: "process",
     hooks: { esm: false, cjs: true, apply: false, http: false },
   },
   async (repository) => {
-    await writeFileAsync(
-      joinPath(repository, "bin"),
-      "#!/usr/bin/env node\n123;",
-      {
-        encoding: "utf8",
-        mode: 0o777,
-      },
-    );
-    await symlinkAsync(
-      joinPath("..", "..", "bin"),
-      joinPath(repository, "node_modules", ".bin", "bin"),
-      "dir",
-    );
+    if (getPlatform() === "win32") {
+      await writeFileAsync(
+        joinPath(repository, "bin.cjs"),
+        "123;",
+        "utf8",
+      );
+      await writeFileAsync(
+        joinPath(repository, "node_modules", ".bin", "bin.cmd"),
+        `node ${joinPath(repository, "bin.cjs")}`,
+        "utf8",
+      );
+    } else {
+      await writeFileAsync(
+        joinPath(repository, "bin"),
+        "#!/usr/bin/env node\n123;",
+        {
+          encoding: "utf8",
+          mode: 0o777,
+        },
+      );
+      await symlinkAsync(
+        joinPath("..", "..", "bin"),
+        joinPath(repository, "node_modules", ".bin", "bin"),
+        "dir",
+      );
+    }
   },
   async (directory) => {
     const appmap = JSON.parse(
