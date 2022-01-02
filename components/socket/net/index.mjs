@@ -14,8 +14,11 @@ export default (dependencies) => {
   } = dependencies;
   const flush = (socket, messages) => {
     if (socket.writable && messages.length > 0) {
-      socket.write(concatBuffer(messages.map(createMessage)));
+      const buffers = messages.map(createMessage);
+      // Socket.write registers asynchronous resources hence synchronous
+      // message writtting so we need to empty the messages array before
       messages.length = 0;
+      socket.write(concatBuffer(buffers));
     }
   };
   return {
@@ -27,14 +30,15 @@ export default (dependencies) => {
       socket.unref();
       const messages = [];
       socket.on("connect", () => {
-        flush(socket, messages);
-        const timer = mapMaybe(heartbeat, () =>
-          setInterval(flush, heartbeat, socket, messages),
-        );
-        mapMaybe(timer, (timer) => {
-          timer.unref();
-        });
+        const flushBind = () => {
+          flush(socket, messages);
+        };
+        process.once("beforeExit", flushBind);
+        flushBind();
+        const timer = mapMaybe(heartbeat, () => setInterval(flushBind, heartbeat));
+        mapMaybe(timer, (timer) => { timer.unref(); });
         socket.on("close", () => {
+          process.off("beforeExit", flushBind);
           logGuardWarning(messages.length > 0, "Lost messages >> %j", messages);
           messages.length = 0;
           clearInterval(timer);
