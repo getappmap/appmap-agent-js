@@ -31,9 +31,12 @@ export default (dependencies) => {
 
   const isMocha = ({ exec }) => exec.split(".")[0] === "mocha";
   const isNpxMocha = ({ exec, argv }) =>
-    exec.split(".")[0] === "npx" &&
-    argv.length > 0 &&
-    argv[0].split(".")[0] === "mocha";
+    exec.split(".")[0] === "npx" && argv.length > 0 && argv[0] === "mocha";
+  const isNpmMocha = ({ exec, argv }) =>
+    exec.split(".")[0] === "npm" &&
+    argv.length > 1 &&
+    argv[0] === "exec" &&
+    argv[1] === "mocha";
 
   return {
     resolveConfigurationRepository: (configuration) => {
@@ -66,7 +69,8 @@ export default (dependencies) => {
           {
             recorder:
               isMocha(configuration.command) ||
-              isNpxMocha(configuration.command)
+              isNpxMocha(configuration.command) ||
+              isNpmMocha(configuration.command)
                 ? "mocha"
                 : "remote",
           },
@@ -214,10 +218,12 @@ export default (dependencies) => {
             argv = [...hook, ...argv];
           } else if (isNpxMocha(command)) {
             argv = ["--always-spawn", argv[0], ...hook, ...argv.slice(1)];
+          } else if (isNpmMocha(command)) {
+            argv = [argv[0], argv[1], ...hook, ...argv.slice(2)];
           } else {
             expect(
               false,
-              "The mocha recorder expected the command to start by either 'mocha' or 'npx mocha', got %j %j.",
+              "The mocha recorder expected the command to start by either 'mocha' or 'npx mocha' or 'npm exec mocha', got %j %j.",
               exec,
               argv,
             );

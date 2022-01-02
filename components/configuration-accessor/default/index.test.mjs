@@ -101,7 +101,39 @@ assertEqual(
       extendConfiguration(
         createConfiguration("file:///home"),
         {
-          command: ["npx.cmd", "mocha.cmd"],
+          command: ["mocha.ext"],
+        },
+        "file:///base",
+      ),
+    ),
+    "recorder",
+  ),
+  "mocha",
+);
+
+assertEqual(
+  Reflect.get(
+    resolveConfigurationAutomatedRecorder(
+      extendConfiguration(
+        createConfiguration("file:///home"),
+        {
+          command: ["npx.ext", "mocha"],
+        },
+        "file:///base",
+      ),
+    ),
+    "recorder",
+  ),
+  "mocha",
+);
+
+assertEqual(
+  Reflect.get(
+    resolveConfigurationAutomatedRecorder(
+      extendConfiguration(
+        createConfiguration("file:///home"),
+        {
+          command: ["npm.ext", "exec", "mocha"],
         },
         "file:///base",
       ),
@@ -330,7 +362,7 @@ assertDeepEqual(
 
 // mocha //
 {
-  const testMocha = (npx) => {
+  const testMocha = (command) => {
     assertDeepEqual(
       stripEnvironmentConfiguration(
         compileConfigurationCommand(
@@ -345,7 +377,7 @@ assertDeepEqual(
                   homepage: null,
                 },
               },
-              command: [...(npx ? ["npx"] : []), "mocha", "argv1"],
+              command,
               recorder: "mocha",
             },
             "file:///base",
@@ -354,12 +386,12 @@ assertDeepEqual(
         ),
       ),
       {
-        exec: npx ? "npx" : "mocha",
+        exec: command[0],
         argv: [
-          ...(npx ? ["--always-spawn", "mocha"] : []),
+          ...(command[0] === "npx" ? ["--always-spawn"] : []),
+          ...command.slice(1),
           "--require",
           "../agent/lib/node/recorder-mocha.mjs",
-          "argv1",
         ],
         cwd: new URL("file:///base"),
         env: {
@@ -372,28 +404,8 @@ assertDeepEqual(
       },
     );
   };
-  testMocha(true);
-  testMocha(false);
+  testMocha(["mocha"]);
+  testMocha(["npx", "mocha"]);
+  testMocha(["npm", "exec", "mocha"]);
+  assertThrow(() => testMocha(["foo"]), /^AppmapError/);
 }
-
-assertThrow(() => {
-  compileConfigurationCommand(
-    extendConfiguration(
-      createConfiguration("file:///home"),
-      {
-        agent: {
-          directory: "file:///agent",
-          package: {
-            name: "@appmap-agent-js",
-            version: "1.2.3",
-            homepage: null,
-          },
-        },
-        command: ["exec"],
-        recorder: "mocha",
-      },
-      "file:///base",
-    ),
-    {},
-  );
-}, /^AppmapError/);
