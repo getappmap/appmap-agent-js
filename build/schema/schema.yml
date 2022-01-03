@@ -390,9 +390,11 @@
     scenario: {$ref: regexp}
     recursive-process-recording: {type: boolean}
     command:
-      type: array
-      minItems: 1
-      items: {type: string}
+      anyOf:
+        - type: string
+        - type: array
+          minItems: 1
+          items: {type: string}
     command-options: {$ref: command-options}
     validate:
       type: object

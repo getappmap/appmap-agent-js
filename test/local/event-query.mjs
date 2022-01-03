@@ -14,7 +14,7 @@ await runAsync(
   null,
   {
     recorder: "process",
-    command: ["node", "main.mjs"],
+    command: "node main.mjs",
     hooks: {
       esm: false,
       cjs: false,

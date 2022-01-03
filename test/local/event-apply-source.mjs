@@ -16,7 +16,7 @@ await runAsync(
   null,
   {
     recorder: "process",
-    command: ["node", "script.js"],
+    command: "node script.js",
     packages: { glob: "*" },
     output: {
       basename: "basename",

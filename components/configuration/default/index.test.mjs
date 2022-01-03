@@ -156,6 +156,15 @@ assertDeepEqual(extend("command", ["node", "main.js"], "file:///base"), {
   base: "file:///base",
 });
 
+assertDeepEqual(
+  extend("command", "  foo  \"b\\\"a\\nr\"  '\\q\\'u\\'\\x'  ", "file:///base"),
+  {
+    exec: "foo",
+    argv: ['b"a\nr', "q'u'x"],
+    base: "file:///base",
+  },
+);
+
 // exclude //
 
 assertDeepEqual(extend("exclude", ["foo\\.bar"]), [
