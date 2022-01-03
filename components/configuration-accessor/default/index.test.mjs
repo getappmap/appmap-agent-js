@@ -407,5 +407,6 @@ assertDeepEqual(
   testMocha(["mocha"]);
   testMocha(["npx", "mocha"]);
   testMocha(["npm", "exec", "mocha"]);
+  testMocha(["node", "node_modules/bin/mocha"]);
   assertThrow(() => testMocha(["foo"]), /^AppmapError/);
 }

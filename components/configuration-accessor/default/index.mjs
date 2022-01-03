@@ -32,6 +32,10 @@ export default (dependencies) => {
   const isMocha = ({ exec }) => exec.split(".")[0] === "mocha";
   const isNpxMocha = ({ exec, argv }) =>
     exec.split(".")[0] === "npx" && argv.length > 0 && argv[0] === "mocha";
+  const isNodeMocha = ({ exec, argv }) =>
+    exec === "node" &&
+    argv.length > 0 &&
+    /[\\/]mocha(.[a-z]+)?$/u.test(argv[0]);
   const isNpmMocha = ({ exec, argv }) =>
     exec.split(".")[0] === "npm" &&
     argv.length > 1 &&
@@ -70,7 +74,8 @@ export default (dependencies) => {
             recorder:
               isMocha(configuration.command) ||
               isNpxMocha(configuration.command) ||
-              isNpmMocha(configuration.command)
+              isNpmMocha(configuration.command) ||
+              isNodeMocha(configuration.command)
                 ? "mocha"
                 : "remote",
           },
@@ -220,6 +225,8 @@ export default (dependencies) => {
             argv = ["--always-spawn", argv[0], ...hook, ...argv.slice(1)];
           } else if (isNpmMocha(command)) {
             argv = [argv[0], argv[1], ...hook, ...argv.slice(2)];
+          } else if (isNodeMocha(command)) {
+            argv = [argv[0], ...hook, ...argv.slice(1)];
           } else {
             expect(
               false,
