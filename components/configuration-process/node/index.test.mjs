@@ -74,3 +74,24 @@ assertThrow(
     },
   );
 }
+
+assertDeepEqual(
+  Reflect.get(
+    loadProcessConfiguration({
+      env: {
+        APPMAP_CONFIGURATION_PATH: fileURLToPath(getFreshTemporaryURL(".json")),
+      },
+      argv: [
+        ["node", "agent.mjs"],
+        ["--command", "exec arg1 arg2"],
+      ].flat(),
+      cwd: () => "cwd",
+    }),
+    "command",
+  ),
+  {
+    exec: "exec",
+    argv: ["arg1", "arg2"],
+    base: "file:///cwd",
+  },
+);

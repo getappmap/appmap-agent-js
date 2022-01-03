@@ -89,12 +89,19 @@ export default (dependencies) => {
 
   const extractConfig = (argv) => {
     let { _: positional, ...config } = minimist(argv.slice(2));
-    expect(
-      !hasOwnProperty(config, "command"),
-      "command should be provided as positional argument",
-    );
+
     if (positional.length > 0) {
+      expect(
+        !hasOwnProperty(config, "command"),
+        "The command should not be specified both as positional arguments and in --command",
+      );
       addOption(config, "command", positional);
+    } else {
+      expect(
+        !hasOwnProperty(config, "command") ||
+          typeof config.command === "string",
+        "There should only be one --command argument",
+      );
     }
     for (const key of ownKeys(config)) {
       if (aliases.has(key)) {
