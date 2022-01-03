@@ -1,23 +1,27 @@
 import {
   writeFile as writeFileAsync,
   readdir as readdirAsync,
+  copyFile as copyFileAsync,
 } from "fs/promises";
-import { platform as getPlatform} from "os";
+import { platform as getPlatform } from "os";
 import { strict as Assert } from "assert";
 import { join as joinPath } from "path";
-import {spawnAsync } from "../spawn.mjs";
+import { spawnAsync } from "../spawn.mjs";
 import { runAsync } from "../__fixture__.mjs";
 
 const { deepEqual: assertDeepEqual } = Assert;
 
-// TODO figure how to do adapt the abomination.
-// The abomination is back to haunt us...
-// On windows files in .bin are not symbolic links but batch file.
-// It does not seem resonable to parse it to uncover the js script it references.
-getPlatform() === "win32" || await runAsync(
+await runAsync(
   null,
   {
-    command: [getPlatform() === "win32" ? "npx.cmd" : "npx", "mocha", "main.test.mjs"],
+    // TODO figure how to do adapt the abomination.
+    // The abomination is back to haunt us...
+    // On windows files in .bin are not symbolic links but batch file.
+    // It does not seem resonable to parse it to uncover the js script it references.
+    command:
+      getPlatform() === "win32"
+        ? "node node_modules/mocha/bin/mocha.cjs main.test.mjs"
+        : "npx mocha main.test.mjs",
     recorder: "mocha",
     packages: { path: "index.js" },
     hooks: {
@@ -32,10 +36,16 @@ getPlatform() === "win32" || await runAsync(
       await spawnAsync(
         getPlatform() === "win32" ? "npm.cmd" : "npm",
         ["install", "mocha"],
-        {cwd: repository, stdio:"inherit"},
+        { cwd: repository, stdio: "inherit" },
       ),
-      {signal:null, status:0},
+      { signal: null, status: 0 },
     );
+    if (getPlatform() === "win32") {
+      await copyFileAsync(
+        joinPath(repository, "node_modules", "mocha", "bin", "mocha"),
+        joinPath(repository, "node_modules", "mocha", "bin", "mocha.cjs"),
+      );
+    }
     await writeFileAsync(
       joinPath(repository, "main.mjs"),
       `
