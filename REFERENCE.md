@@ -185,7 +185,7 @@ The agent filter code objects (functions or objects/classes) based on a format c
 
 ### Automated Recording Configuration Fields
 
-* `command <string>` The command to record.
+* `command <string> | <string[]>` The command to record. It is either a string containing the command tokens or a list of already parsed tokens. Note that this is not a shell or cmd.exe script. Rather it is simply the name or path of an executable followed by arguments. Tokens can be words, double quoted strings, or single quoted strings. Double-quoted strings are parsed as JSON string and single-quoted string use backslashes to escape any character. For instance, the string command (represented as a JS string literal) `'  exec  "foo\"bar"  \\'\\\q\\\u\\\x\\'  '` is parsed as `['word', 'foo"bar', 'qux']`.
 * `command-options <object>` Options to run the command, inspired by node's `child_process` library.
     * `env <object>` Environment variables. Note that Unlike for the [child_process#spawn](https://nodejs.org/api/child_process.html#child_process_child_process_spawn_command_args_options), the environment variables from the parent process will always be included.
     *Default*: `{}` -- ie: the environment variables from the parent process.
