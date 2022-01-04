@@ -114,15 +114,18 @@ export default (dependencies) => {
         }
         serial.index = getIndex(references, counter, value);
         if (method === "toString") {
-          if (typeof value === "function") {
-            serial.print = apply(toString, value, noargs);
-          } else {
+          if (
+            typeof value !== "function" &&
+            typeof value.toString === "function"
+          ) {
             try {
               serial.print = value.toString();
             } catch (error) {
               logWarning("%o.toString() failed with %e", value, error);
               serial.print = apply(toString, value, noargs);
             }
+          } else {
+            serial.print = apply(toString, value, noargs);
           }
         } else {
           assert(
