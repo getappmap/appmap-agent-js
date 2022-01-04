@@ -1,6 +1,6 @@
 {
   "name": "@appland/appmap-agent-js",
-  "version": "8.8.3",
+  "version": "8.8.4",
   "bin": {
     "appmap-agent-js": "bin/bin.mjs"
   },

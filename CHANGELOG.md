@@ -1,3 +1,10 @@
+## [8.8.4](https://github.com/applandinc/appmap-agent-js/compare/v8.8.3...v8.8.4) (2022-01-04)
+
+
+### Bug Fixes
+
+* Get rid of top-level awaits ([48d03b0](https://github.com/applandinc/appmap-agent-js/commit/48d03b007ef45a688f58c7979162215be058e897))
+
 ## [8.8.3](https://github.com/applandinc/appmap-agent-js/compare/v8.8.2...v8.8.3) (2021-12-24)
 
 
