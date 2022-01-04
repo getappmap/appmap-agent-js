@@ -1,4 +1,4 @@
-import { strict as Assert } from "assert";
+import { assertDeepEqual } from "../../../../__fixture__.mjs";
 import * as Acorn from "acorn";
 import {
   buildTestDependenciesAsync,
@@ -7,13 +7,6 @@ import {
 import Visit from "./visit.mjs";
 
 const { parse: parseAcorn } = Acorn;
-
-Error.stackTraceLimit = Infinity;
-
-const {
-  deepEqual: assertDeepEqual,
-  // equal: assertEqual,
-} = Assert;
 
 const { createCounter } = await buildTestComponentAsync("util");
 

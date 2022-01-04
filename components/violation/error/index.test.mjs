@@ -1,4 +1,4 @@
-import { strict as Assert } from "assert";
+import { assertEqual, assertFail } from "../../__fixture__.mjs";
 import Violation from "./index.mjs";
 
 const {
@@ -8,11 +8,11 @@ const {
   catchViolationAsync,
 } = Violation({});
 
-Assert.equal(
+assertEqual(
   catchViolation(
     () => {
       throwViolation("foo");
-      Assert.fail();
+      assertFail();
     },
     (message) => `${message}bar`,
   ),
@@ -25,15 +25,15 @@ try {
       throw new Error("foo");
     },
     () => {
-      Assert.fail();
+      assertFail();
     },
   );
-  Assert.fail();
+  assertFail();
 } catch ({ message }) {
-  Assert.equal(message, "foo");
+  assertEqual(message, "foo");
 }
 
-Assert.equal(
+assertEqual(
   await catchViolationAsync(
     throwViolationAsync("foo"),
     (message) => `${message}bar`,
@@ -42,9 +42,9 @@ Assert.equal(
 );
 try {
   await catchViolationAsync(Promise.reject(new Error("foo")), () => {
-    Assert.fail();
+    assertFail();
   });
-  Assert.fail();
+  assertFail();
 } catch ({ message }) {
-  Assert.equal(message, "foo");
+  assertEqual(message, "foo");
 }

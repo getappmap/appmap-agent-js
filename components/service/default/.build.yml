@@ -1,4 +1,6 @@
 branches: [test, node]
 dependencies:
   - log
+  - path
+  - url
   - uuid

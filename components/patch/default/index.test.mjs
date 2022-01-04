@@ -1,12 +1,6 @@
-import { strict as Assert } from "assert";
-
+import { assertEqual } from "../../__fixture__.mjs";
 import { buildTestDependenciesAsync } from "../../build.mjs";
 import Patch from "./index.mjs";
-
-const {
-  equal: assertEqual,
-  // deepEqual: assertDeepEqual,
-} = Assert;
 
 const { patch } = Patch(await buildTestDependenciesAsync(import.meta.url));
 

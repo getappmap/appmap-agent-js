@@ -1,4 +1,6 @@
 - util
+- path
+- url
 - violation
 - expect-inner
 - expect
@@ -33,6 +35,7 @@
   * interpretation
   * serialization
 - frontend
+- socket
 - emitter
 - hook
 - * hook-apply

@@ -1,4 +1,4 @@
-import { strict as Assert } from "assert";
+import { assertEqual, assertThrow, assertFail } from "../../__fixture__.mjs";
 import {
   noop,
   identity,
@@ -10,8 +10,6 @@ import {
   compose,
   bind,
 } from "./function.mjs";
-
-const { equal: assertEqual } = Assert;
 
 // noop //
 
@@ -88,13 +86,13 @@ assertEqual(
   }
 }
 
-Assert.throws(() =>
+assertThrow(() =>
   compose(
     (x1, x2, x3, x4) => {
-      Assert.fail();
+      assertFail();
     },
     (z, y1, y2, y3, y4) => {
-      Assert.fail();
+      assertFail();
     },
   ),
 );
@@ -117,8 +115,8 @@ assertEqual(
   "abcde",
 );
 
-Assert.throws(() =>
+assertThrow(() =>
   bind((x1, x2, x3, x4, x5, x6) => {
-    Assert.fail();
+    assertFail();
   }, "a"),
 );

@@ -1,16 +1,14 @@
-import { strict as Assert } from "assert";
 import { createServer, request as createRequest } from "http";
-import { tmpdir } from "os";
+import {
+  assert,
+  assertReject,
+  assertDeepEqual,
+  assertEqual,
+  getFreshTemporaryURL,
+  convertPort,
+} from "../../__fixture__.mjs";
 import { buildTestDependenciesAsync } from "../../build.mjs";
 import Request from "./index.mjs";
-
-const {
-  ok: assert,
-  rejects: assertRejects,
-  deepEqual: assertDeepEqual,
-  equal: assertEqual,
-  // fail: assertFail,
-} = Assert;
 
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
 
@@ -19,7 +17,7 @@ const { generateRespond, requestAsync } = Request(dependencies);
 const listenServerAsync = (server, port) =>
   new Promise((resolve) => {
     server.on("listening", resolve);
-    server.listen(port);
+    server.listen(convertPort(port));
   });
 
 const closeServerAsync = (server) =>
@@ -68,7 +66,7 @@ const closeServerAsync = (server) =>
       body: null,
     })),
   );
-  const port = `${tmpdir()}/${Math.random().toString(36).substring(2)}`;
+  const port = getFreshTemporaryURL();
   await listenServerAsync(server, port);
   assertDeepEqual(await requestAsync("localhost", port, "GET", "/path", null), {
     code: 200,
@@ -90,7 +88,7 @@ const closeServerAsync = (server) =>
     response.end("foo", "utf8");
   });
   await listenServerAsync(server, 0);
-  await assertRejects(async () => {
+  await assertReject(async () => {
     await requestAsync(
       "localhost",
       server.address().port,

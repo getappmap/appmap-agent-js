@@ -1,16 +1,11 @@
 /* globals $uuid */
 
-import { strict as Assert } from "assert";
+import { assertDeepEqual } from "../../__fixture__.mjs";
 import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
 } from "../../build.mjs";
 import HookApply from "./index.mjs";
-
-const {
-  // equal: assertEqual,
-  deepEqual: assertDeepEqual,
-} = Assert;
 
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
 const { testHookAsync, makeEvent } = await buildTestComponentAsync("hook");

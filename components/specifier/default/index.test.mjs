@@ -1,15 +1,13 @@
-import { strict as Assert } from "assert";
+import { assertEqual, assertThrow } from "../../__fixture__.mjs";
 import { buildTestDependenciesAsync } from "../../build.mjs";
 import Specifier from "./index.mjs";
-
-const { equal: assertEqual, throws: assertThrows } = Assert;
 
 const { createSpecifier, matchSpecifier } = Specifier(
   await buildTestDependenciesAsync(import.meta.url),
 );
 
-assertThrows(
-  () => createSpecifier("/foo", {}),
+assertThrow(
+  () => createSpecifier({}, "file:///base"),
   /^AssertionError: invalid specifier options/,
 );
 
@@ -18,12 +16,42 @@ assertThrows(
 ////////////
 
 assertEqual(
-  matchSpecifier(createSpecifier("/foo", { regexp: "^bar" }), "/foo/bar.js"),
+  matchSpecifier(
+    createSpecifier({ regexp: "^file\\." }, "file:///base"),
+    "file:///base/file.ext",
+  ),
   true,
 );
 
 assertEqual(
-  matchSpecifier(createSpecifier("/foo", { regexp: "^bar" }), "/qux/bar"),
+  matchSpecifier(
+    createSpecifier({ regexp: "^file\\." }, "file:///base"),
+    "file:///base/FILE.ext",
+  ),
+  false,
+);
+
+assertEqual(
+  matchSpecifier(
+    createSpecifier({ regexp: "^file\\." }, "file:///base"),
+    "file:///BASE/file.ext",
+  ),
+  false,
+);
+
+assertEqual(
+  matchSpecifier(
+    createSpecifier({ regexp: "^\\.\\./BASE/file\\." }, "file:///base"),
+    "file:///BASE/file.ext",
+  ),
+  true,
+);
+
+assertEqual(
+  matchSpecifier(
+    createSpecifier({ regexp: "^" }, "file://host1/base"),
+    "file://host2/base/file.ext",
+  ),
   false,
 );
 
@@ -34,27 +62,33 @@ assertEqual(
 // normal //
 
 assertEqual(
-  matchSpecifier(createSpecifier("/foo", { glob: "*.js" }), "/foo/bar.js"),
-  true,
-);
-
-assertEqual(
-  matchSpecifier(createSpecifier("/foo", { glob: "*.js" }), "/foo/bar/qux.js"),
-  false,
-);
-
-assertEqual(
   matchSpecifier(
-    createSpecifier("/foo", { glob: "**/*.js" }),
-    "/foo/bar/qux.js",
+    createSpecifier({ glob: "*.ext" }, "file:///base"),
+    "file:///base/file.ext",
   ),
   true,
 );
 
 assertEqual(
   matchSpecifier(
-    createSpecifier("/foo", { glob: "**/*.js" }),
-    "/foo/../bar.js",
+    createSpecifier({ glob: "*.ext" }, "file:///base"),
+    "file:///base/dir/file.ext",
+  ),
+  false,
+);
+
+assertEqual(
+  matchSpecifier(
+    createSpecifier({ glob: "**/*.ext" }, "file:///base"),
+    "file:///base/dir/file.ext",
+  ),
+  true,
+);
+
+assertEqual(
+  matchSpecifier(
+    createSpecifier({ glob: "**/*.js" }, "file:///base"),
+    "file:///base/../file.ext",
   ),
   false,
 );
@@ -66,14 +100,28 @@ assertEqual(
 // file //
 
 assertEqual(
-  matchSpecifier(createSpecifier("/foo", { path: "bar.js" }), "/foo/bar.js"),
+  matchSpecifier(
+    createSpecifier({ path: "path" }, "file:///base"),
+    "file:///base/path",
+  ),
+  true,
+);
+
+assertEqual(
+  matchSpecifier(
+    createSpecifier({ path: "][" }, "file:///base"),
+    "file:///base/%5D%5B",
+  ),
   true,
 );
 
 // directory //
 
 assertEqual(
-  matchSpecifier(createSpecifier("/foo", { path: "bar" }), "/foo/bar/qux.js"),
+  matchSpecifier(
+    createSpecifier({ path: "path" }, "file:///base"),
+    "file:///base/path/file.ext",
+  ),
   true,
 );
 
@@ -81,16 +129,16 @@ assertEqual(
 
 assertEqual(
   matchSpecifier(
-    createSpecifier("/foo", { path: "bar", recursive: false }),
-    "/foo/bar/qux/buz.js",
+    createSpecifier({ path: "path", recursive: false }, "file:///base"),
+    "file:///base/path/dir/file.ext",
   ),
   false,
 );
 
 assertEqual(
   matchSpecifier(
-    createSpecifier("/foo", { path: "bar", recursive: true }),
-    "/foo/bar/qux/buz.js",
+    createSpecifier({ path: "path", recursive: true }, "file:///base"),
+    "file:///base/path/dir/file.ext",
   ),
   true,
 );
@@ -103,8 +151,8 @@ assertEqual(
 
 assertEqual(
   matchSpecifier(
-    createSpecifier("/foo", { dist: "bar" }),
-    "/foo/node_modules/bar/qux.js",
+    createSpecifier({ dist: "dist" }, "file:///base"),
+    "file:///base/node_modules/dist/file.ext",
   ),
   true,
 );
@@ -113,16 +161,16 @@ assertEqual(
 
 assertEqual(
   matchSpecifier(
-    createSpecifier("/foo", { dist: "bar", recursive: false }),
-    "/foo/node_modules/bar/qux/buz.js",
+    createSpecifier({ dist: "dist", recursive: false }, "file:///base"),
+    "file:///base/node_modules/dist/dir/file.ext",
   ),
   false,
 );
 
 assertEqual(
   matchSpecifier(
-    createSpecifier("/foo", { dist: "bar", recursive: true }),
-    "/foo/node_modules/bar/qux/buz.js",
+    createSpecifier({ dist: "dist", recursive: true }, "file:///base"),
+    "file:///base/node_modules/dist/dir/file.ext",
   ),
   true,
 );
@@ -131,16 +179,22 @@ assertEqual(
 
 assertEqual(
   matchSpecifier(
-    createSpecifier("/foo", { dist: "bar" }),
-    "/node_modules/bar/qux.js",
+    createSpecifier({ dist: "dist" }, "file:///base"),
+    "file:///node_modules/dist/file.ext",
   ),
   false,
 );
 
 assertEqual(
   matchSpecifier(
-    createSpecifier("/foo", { dist: "bar", external: true }),
-    "/node_modules/bar/qux.js",
+    createSpecifier({ dist: "dist", external: true }, "file:///base"),
+    "file:///node_modules/dist/file.ext",
   ),
   true,
 );
+
+// constant //
+
+assertEqual(matchSpecifier(true, "file:///file.ext"), true);
+
+assertEqual(matchSpecifier(false, "file:///file.ext"), false);

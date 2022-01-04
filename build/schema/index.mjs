@@ -1,14 +1,12 @@
 import {
   readFile as readFileAsync,
   writeFile as writeFileAsync,
-  mkdir as mkdirAsync,
 } from "fs/promises";
 import { fileURLToPath } from "url";
-import { dirname as getDirname } from "path";
+import { dirname as getDirectory } from "path";
 import YAML from "yaml";
 import Ajv from "ajv";
 import GenerateStandaloneCode from "ajv/dist/standalone/index.js";
-import { spawn } from "child_process";
 
 const { default: generateStandaloneCode } = GenerateStandaloneCode;
 
@@ -16,25 +14,7 @@ const { stringify: stringifyJSON } = JSON;
 const { parse: parseYAML } = YAML;
 
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = getDirname(__filename);
-
-await new Promise((resolve, reject) => {
-  const child = spawn("rm", ["-rf", "./dist"], { stdio: "inherit" });
-  child.on("error", reject);
-  child.on("exit", (code, signal) => {
-    if (signal !== null) {
-      reject(new Error("Removing dist directory killed"));
-    } else if (code !== 0) {
-      reject(new Error("Failed to remove dist directory"));
-    } else {
-      resolve(undefined);
-    }
-  });
-});
-
-await mkdirAsync("./dist");
-
-await mkdirAsync("./dist/node");
+const __dirname = getDirectory(__filename);
 
 const schema = parseYAML(
   await readFileAsync(`${__dirname}/schema.yml`, "utf8"),

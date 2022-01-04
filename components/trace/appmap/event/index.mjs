@@ -3,7 +3,7 @@ import Data from "./data.mjs";
 
 export default (dependencies) => {
   const {
-    util: { assert },
+    util: { assert, mapMaybe },
   } = dependencies;
   const { getClassmapClosure } = Classmap(dependencies);
   const { compileCallData, compileReturnData } = Data(dependencies);
@@ -19,6 +19,7 @@ export default (dependencies) => {
   };
 
   const compileEventTrace = (events, classmap) => {
+    const getClosureInfo = (location) => getClassmapClosure(classmap, location);
     let counter = 0;
     const digest = [];
     const digestCallEvent = (data, options) => {
@@ -51,12 +52,8 @@ export default (dependencies) => {
         if (type === "before" || type === "begin") {
           if (data_type === "apply") {
             assert(type === "begin", "invalid envent type for apply data type");
-            const { function: location } = data;
-            // location is null in the case of a manufactured begin apply event.
-            /* c8 ignore start */
-            const info =
-              location === null ? null : getClassmapClosure(classmap, location);
-            if (info === null) {
+            const info = mapMaybe(data.function, getClosureInfo);
+            /* c8 ignore start */ if (info === null) {
               stack.push({ time, shallow: null, id: null });
             } /* c8 ignore stop */ else {
               const { shallow, ...options } = info;

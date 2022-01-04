@@ -5,6 +5,11 @@
 
 # enumeration #
 
+- $id: socket
+  enum:
+    - unix
+    - net
+
 - $id: encoding
   enum:
     - buffer
@@ -78,9 +83,8 @@
 - $id: path
   type: string
 
-- $id: absolute-path
+- $id: regexp
   type: string
-  pattern: "^/"
 
 - $id: basename
   type: string
@@ -90,10 +94,24 @@
   type: string
   pattern: "^\\.[^/]+$"
 
-- $id: index
+- $id: natural
   type: integer
   minimum: 0
   maximum: 9007199254740991
+
+- $id: nullable-natural
+  anyOf:
+    - const: null
+    - $ref: natural
+
+- $id: index
+  $ref: natural
+
+- $id: heartbeat
+  $ref: nullable-natural
+
+- $id: threshold
+  $ref: nullable-natural
 
 - $id: port-number
   type: integer
@@ -102,13 +120,17 @@
 
 - $id: port
   anyOf:
+    - const: 0
+    - const: ""
+    - $ref: port-number
     - $ref: path
-    - $ref: port-number
 
-- $id: absolute-port
+- $id: cooked-port
   anyOf:
-    - $ref: absolute-path
+    - const: 0
+    - const: ""
     - $ref: port-number
+    - $ref: url
 
 # name-version #
 
@@ -233,10 +255,8 @@
       additionalProperties: false
       required: [regexp]
       properties:
-        regexp:
-          type: string
-        flags:
-          type: string
+        regexp: {$ref: regexp}
+        flags: {type: string}
         enabled: {type: boolean}
         shallow: {type: boolean}
         exclude: {$ref: exclude}
@@ -301,13 +321,15 @@
               required: [exclude]
 
 - $id: cooked-specifier
-  type: object
-  additionalProperties: false
-  required: [cwd, source, flags]
-  properties:
-    cwd: {$ref: absolute-path}
-    source: {type: string}
-    flags: {type: string}
+  anyOf:
+    - type: boolean
+    - type: object
+      additionalProperties: false
+      required: [base, source, flags]
+      properties:
+        base: {$ref: url}
+        source: {type: string}
+        flags: {type: string}
 
 - $id: command-options
   type: object
@@ -336,7 +358,7 @@
   additionalProperties: false
   required: [directory, package]
   properties:
-    directory: {$ref: absolute-path}
+    directory: {$ref: url}
     package: {$ref: package}
 
 - $id: repository
@@ -344,7 +366,7 @@
   additionalProperties: false
   required: [directory, history, package]
   properties:
-    directory: {$ref: absolute-path}
+    directory: {$ref: url}
     history:
       type: object
       nullable: true
@@ -365,9 +387,14 @@
       additionalProperties: false
       patternProperties:
         "^": {$ref: config}
-    scenario: {type: string}
+    scenario: {$ref: regexp}
     recursive-process-recording: {type: boolean}
-    command: {type: string}
+    command:
+      anyOf:
+        - type: string
+        - type: array
+          minItems: 1
+          items: {type: string}
     command-options: {$ref: command-options}
     validate:
       type: object
@@ -378,19 +405,16 @@
     log: {$ref: log-level}
     host: {const: localhost}
     session: {$ref: basename}
-    trace-port:
-      anyOf:
-        - const: 0
-        - $ref: port
+    trace-port: {$ref: port}
     trace-protocol: {const: TCP}
-    track-port:
-      anyOf:
-        - const: 0
-        - $ref: port
+    track-port: {$ref: port}
     track-protocol: {const: "HTTP/1.1"}
-    intercept-track-port: {type: string}
+    intercept-track-port: {$ref: regexp}
     intercept-track-protocol: {const: "HTTP/1.1"}
     # client
+    socket: {$ref: socket}
+    heartbeat: {$ref: heartbeat}
+    threshold: {$ref: threshold}
     recorder: {$ref: recorder}
     inline-source: {type: boolean}
     hooks:
@@ -461,25 +485,31 @@
 - $id: configuration
   type: object
   additionalProperties: false
-  minProperties: 39
+  minProperties: 41
   properties:
-    scenario: {type: string}
+    socket: {$ref: socket}
+    heartbeat: {$ref: heartbeat}
+    threshold: {$ref: threshold}
+    scenario: {$ref: regexp}
     scenarios:
       type: array
       items:
         type: object
-        required: [key, value, cwd]
+        required: [key, value, base]
         properties:
           key: {type: string}
           value: {$ref: config}
-          cwd: {$ref: absolute-path}
+          base: {$ref: url}
     recursive-process-recording: {type: boolean}
     command:
       type: object
       nullable: true
       properties:
-        value: {type: string}
-        cwd: {$ref: absolute-path}
+        exec: {type: string}
+        argv:
+          type: array
+          items: {type: string}
+        base: {$ref: url}
     command-options: {$ref: cooked-command-options}
     validate:
       type: object
@@ -499,17 +529,11 @@
       anyOf:
         - const: null
         - $ref: basename
-    trace-port:
-      anyOf:
-        - const: 0
-        - $ref: absolute-port
+    trace-port: {$ref: cooked-port}
     trace-protocol: {const: TCP}
-    track-port:
-      anyOf:
-        - const: 0
-        - $ref: absolute-port
+    track-port: {$ref: cooked-port}
     track-protocol: {const: "HTTP/1.1"}
-    intercept-track-port: {type: string}
+    intercept-track-port: {$ref: regexp}
     intercept-track-protocol: {const: "HTTP/1.1"}
     recorder:
       anyOf:
@@ -542,7 +566,7 @@
     main:
       anyOf:
         - const: null
-        - $ref: absolute-path
+        - $ref: url
     engine:
       anyOf:
         - const: null
@@ -594,7 +618,7 @@
         directory:
           anyOf:
             - const: null
-            - $ref: absolute-path
+            - $ref: url
         basename:
           anyOf:
             - const: null
@@ -631,7 +655,7 @@
     path:
       anyOf:
         - const: null
-        - $ref: absolute-path
+        - $ref: url
     data: {$ref: config}
 
 - $id: termination

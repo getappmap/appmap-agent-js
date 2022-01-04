@@ -1,11 +1,9 @@
-import { strict as Assert } from "assert";
+import { assertDeepEqual, assertEqual } from "../../__fixture__.mjs";
 import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
 } from "../../build.mjs";
 import Instrumentation from "./index.mjs";
-
-const { deepEqual: assertDeepEqual, equal: assertEqual } = Assert;
 
 const { createMirrorSourceMap } = await buildTestComponentAsync("source");
 const { createConfiguration, extendConfiguration } =
@@ -32,7 +30,7 @@ const makeExclusion = (name) => ({
 
 const instrumentation = createInstrumentation(
   extendConfiguration(
-    createConfiguration("/"),
+    createConfiguration("file:///home"),
     {
       "hidden-identifier": "$",
       language: { name: "ecmascript", version: "2020" },
@@ -55,7 +53,7 @@ const instrumentation = createInstrumentation(
       ],
       exclude: ["qux"],
     },
-    "/cwd",
+    "file:///base",
   ),
 );
 
@@ -63,25 +61,25 @@ assertEqual(getInstrumentationIdentifier(instrumentation), "$uuid");
 
 {
   const file = {
-    url: "file:///cwd/foo.js",
+    url: "file:///base/foo.js",
     content: "123;",
     type: "script",
   };
   assertDeepEqual(
     instrument(instrumentation, file, createMirrorSourceMap(file)),
     {
-      url: "file:///cwd/foo.js",
+      url: "file:///base/foo.js",
       content: "123;",
       sources: [
         {
-          url: "file:///cwd/foo.js",
+          url: "file:///base/foo.js",
           content: "123;",
           shallow: true,
           inline: true,
           exclude: [
             makeExclusion("foo"),
             makeExclusion("qux"),
-            ...createConfiguration("/base").exclude,
+            ...createConfiguration("file:///home").exclude,
           ],
         },
       ],
@@ -91,14 +89,14 @@ assertEqual(getInstrumentationIdentifier(instrumentation), "$uuid");
 
 {
   const file = {
-    url: "file:///cwd/bar.js",
+    url: "file:///base/bar.js",
     content: "456;",
     type: "script",
   };
   assertDeepEqual(
     instrument(instrumentation, file, createMirrorSourceMap(file)),
     {
-      url: "file:///cwd/bar.js",
+      url: "file:///base/bar.js",
       content: "456;",
       sources: [],
     },

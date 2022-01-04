@@ -1,17 +1,34 @@
 import Minimatch from "minimatch";
 
 const _Map = Map;
-const _undefined = undefined;
 const _RegExp = RegExp;
 const { Minimatch: MinimatchClass } = Minimatch;
 
 export default (dependencies) => {
   const {
-    util: { assert, toRelativePath },
+    log: { logDebug },
+    util: { assert },
+    url: { pathifyURL },
     expect: { expectSuccess },
   } = dependencies;
 
   const regexps = new _Map();
+
+  const makeRegExp = (source, flags) => {
+    const key = `/${source}/${flags}`;
+    if (regexps.has(key)) {
+      return regexps.get(key);
+    } else {
+      const regexp = expectSuccess(
+        () => new _RegExp(source, flags),
+        "failed to compile regexp source = %j flags = %j >> %e",
+        source,
+        flags,
+      );
+      regexps.set(key, regexp);
+      return regexp;
+    }
+  };
 
   const escape = (char) => `\\${char}`;
 
@@ -21,7 +38,7 @@ export default (dependencies) => {
   // const sanitizeForGlob = (string) => string.replace(/[*?[\]]/g, escape);
 
   return {
-    createSpecifier: (cwd, options) => {
+    createSpecifier: (options, base) => {
       const { glob, path, dist, regexp, flags, recursive, external } = {
         glob: null,
         path: null,
@@ -34,7 +51,7 @@ export default (dependencies) => {
       };
       if (regexp !== null) {
         return {
-          cwd,
+          base,
           source: regexp,
           flags,
         };
@@ -42,7 +59,7 @@ export default (dependencies) => {
       if (glob !== null) {
         const { source, flags } = new MinimatchClass(glob).makeRe();
         return {
-          cwd,
+          base,
           source,
           flags,
         };
@@ -50,10 +67,10 @@ export default (dependencies) => {
       if (path !== null) {
         assert(
           path[path.length - 1] !== "/",
-          "directory path should not end with '/'",
+          "directory path should not end with a path separator",
         );
         return {
-          cwd,
+          base,
           source: `^${sanitizeForRegExp(path)}($|/${
             recursive ? "" : "[^/]*$"
           })`,
@@ -63,7 +80,7 @@ export default (dependencies) => {
       if (dist !== null) {
         assert(
           dist[dist.length - 1] !== "/",
-          "package path should not end with '/'",
+          "package path should not end with a path separator",
         );
         let source = `node_modules/${sanitizeForRegExp(dist)}/`;
         if (!external) {
@@ -73,26 +90,39 @@ export default (dependencies) => {
           source = `${source}[^/]*$`;
         }
         return {
-          cwd,
+          base,
           source,
           flags: "",
         };
       }
       assert(false, "invalid specifier options");
     },
-    matchSpecifier: (specifier, path) => {
-      const { cwd, source, flags } = specifier;
-      const key = `/${source}/${flags}`;
-      let regexp = regexps.get(key);
-      if (regexp === _undefined) {
-        regexp = expectSuccess(
-          () => new _RegExp(source, flags),
-          "failed to compile specifier %j >> %e",
-          specifier,
+    matchSpecifier: (specifier, url) => {
+      if (typeof specifier === "boolean") {
+        logDebug(
+          "url %j %s constant specifier",
+          url,
+          specifier ? "matched" : "did not match",
         );
-        regexps.set(key, regexp);
+        return specifier;
+      } else {
+        const { base, source, flags } = specifier;
+        const maybe_path = pathifyURL(url, base);
+        const matched =
+          maybe_path === null
+            ? false
+            : makeRegExp(source, flags).test(maybe_path);
+        logDebug(
+          "url %j which resolves to %j relatively to %j %s regexp specifier %j with flags %j",
+          url,
+          maybe_path,
+          base,
+          matched ? "matched" : "did not match",
+          source,
+          flags,
+        );
+        return matched;
       }
-      return regexp.test(toRelativePath(cwd, path));
     },
   };
 };

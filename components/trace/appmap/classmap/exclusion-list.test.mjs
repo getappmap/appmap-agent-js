@@ -1,14 +1,12 @@
-import { strict as Assert } from "assert";
+import { assertDeepEqual, assertThrow } from "../../../__fixture__.mjs";
 import { buildTestDependenciesAsync } from "../../../build.mjs";
 import ExclusionList from "./exclusion-list.mjs";
-
-const { deepEqual: assertDeepEqual, throws: assertThrows } = Assert;
 
 const { compileExclusionList, matchExclusionList } = ExclusionList(
   await buildTestDependenciesAsync(import.meta.url),
 );
 
-assertThrows(() => {
+assertThrow(() => {
   matchExclusionList(compileExclusionList([]), { type: "function" }, null);
 });
 

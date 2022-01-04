@@ -1,6 +1,7 @@
 import { spawnSync } from "child_process";
 import { readdirSync } from "fs";
 
+const _URL = URL;
 const _parseInt = parseInt;
 
 export default (dependencies) => {
@@ -12,12 +13,12 @@ export default (dependencies) => {
 
   const trim = (string) => string.trim();
 
-  const run = (command, path) => {
+  const run = (command, url) => {
     const result = spawnSync(
       command.split(" ")[0],
       command.split(" ").slice(1),
       {
-        cwd: path,
+        cwd: new _URL(url),
         encoding: "utf8",
         timeout: 1000,
         stdio: ["ignore", "pipe", "pipe"],
@@ -28,7 +29,7 @@ export default (dependencies) => {
       error === null,
       `command %j on cwd %j threw an error >> %e`,
       command,
-      path,
+      url,
       error || { message: "dummy" },
     );
     const { signal, status, stdout, stderr } = result;
@@ -36,7 +37,7 @@ export default (dependencies) => {
       signal === null,
       `command %j on cwd %j was killed with %j`,
       command,
-      path,
+      url,
       signal,
     );
     if (status === 0) {
@@ -46,7 +47,7 @@ export default (dependencies) => {
     logWarning(
       `command %j on cwd %j failed with %j >> %s`,
       command,
-      path,
+      url,
       status,
       stderr,
     );
@@ -68,30 +69,30 @@ export default (dependencies) => {
   };
 
   return {
-    extractGitInformation: (directory) => {
+    extractGitInformation: (url) => {
       if (
         !expectSuccess(
-          () => readdirSync(directory),
+          () => readdirSync(new _URL(url)),
           "could not read repository directory %j >> %e",
-          directory,
+          url,
         ).includes(".git")
       ) {
-        logWarning("Repository directory %j is not a git directory", directory);
+        logWarning("Repository directory %j is not a git directory", url);
         return null;
       }
       return {
-        repository: run(`git config --get remote.origin.url`, directory),
-        branch: run(`git rev-parse --abbrev-ref HEAD`, directory),
-        commit: run(`git rev-parse HEAD`, directory),
-        status: mapMaybe(run(`git status --porcelain`, directory), parseStatus),
-        tag: run(`git describe --abbrev=0 --tags`, directory),
-        annotated_tag: run(`git describe --abbrev=0`, directory),
+        repository: run(`git config --get remote.origin.url`, url),
+        branch: run(`git rev-parse --abbrev-ref HEAD`, url),
+        commit: run(`git rev-parse HEAD`, url),
+        status: mapMaybe(run(`git status --porcelain`, url), parseStatus),
+        tag: run(`git describe --abbrev=0 --tags`, url),
+        annotated_tag: run(`git describe --abbrev=0`, url),
         commits_since_tag: mapMaybe(
-          run(`git describe --long --tags`, directory),
+          run(`git describe --long --tags`, url),
           parseDescription,
         ),
         commits_since_annotated_tag: mapMaybe(
-          run(`git describe --long`, directory),
+          run(`git describe --long`, url),
           parseDescription,
         ),
       };

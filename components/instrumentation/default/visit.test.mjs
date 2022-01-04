@@ -1,4 +1,4 @@
-import { strict as Assert } from "assert";
+import { assertEqual } from "../../__fixture__.mjs";
 import * as Acorn from "acorn";
 import Escodegen from "escodegen";
 import {
@@ -12,8 +12,6 @@ const { generate } = Escodegen;
 const { stringify: stringifyJSON } = JSON;
 
 Error.stackTraceLimit = Infinity;
-
-const { equal: assertEqual } = Assert;
 
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
 const { visit } = Visit(dependencies);

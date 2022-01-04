@@ -1,8 +1,8 @@
 import fs from "fs";
+import { basename as getBasename, join as joinPath } from "path";
 import { tmpdir } from "os";
-import { basename } from "path";
 import { strict as assert } from "assert";
-import { mkdir /*, writeFile, symlink*/ } from "fs/promises";
+import { mkdir } from "fs/promises";
 import { buildTestDependenciesAsync } from "../../build.mjs";
 import YAML from "yaml";
 import { afterEach, beforeEach, describe, it } from "mocha";
@@ -17,7 +17,7 @@ describe("the init command", () => {
   let directory;
   let cwd;
   beforeEach(async () => {
-    directory = `${tmpdir()}/${Math.random().toString(36).substring(2)}`;
+    directory = joinPath(tmpdir(), Math.random().toString(36).substring(2));
     await mkdir(directory);
     externals.showResults = sinon.stub();
     cwd = process.cwd();
@@ -46,12 +46,12 @@ describe("the init command", () => {
       assert.equal(result.filename, "appmap.yml");
       assert(result.configuration.contents.length > 0, "Missing configuration");
       const config = YAML.parse(result.configuration.contents);
-      assert.equal(config.name, basename(directory));
+      assert.equal(config.name, getBasename(directory));
       assert.notEqual(config.packages, undefined);
       assert(typeof config.packages, "array");
       config.packages.sort((a, b) => a.path.localeCompare(b.path));
       assert.deepEqual(config.packages, [
-        { path: "lib/sub1" },
+        { path: joinPath("lib", "sub1") },
         { path: "src" },
       ]);
     });
@@ -65,7 +65,7 @@ describe("the init command", () => {
       const result = JSON.parse(run(directory));
       const config = YAML.parse(result.configuration.contents);
       config.packages.sort((a, b) => a.path.localeCompare(b.path));
-      assert.deepEqual(config.packages, [{ path: "lib/sub1" }]);
+      assert.deepEqual(config.packages, [{ path: joinPath("lib", "sub1") }]);
     });
 
     it("isn't confused by inaccessible directories", () => {

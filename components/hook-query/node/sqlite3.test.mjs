@@ -1,4 +1,10 @@
-import { strict as Assert } from "assert";
+import {
+  assertEqual,
+  assertDeepEqual,
+  assertFail,
+  assertMatch,
+  assertThrow,
+} from "../../__fixture__.mjs";
 import Sqlite3 from "sqlite3";
 import {
   buildTestDependenciesAsync,
@@ -24,15 +30,6 @@ const promisify = (o, m, ...xs) =>
       }
     });
   });
-
-const {
-  // ok: assert,
-  equal: assertEqual,
-  deepEqual: assertDeepEqual,
-  fail: assertFail,
-  match: assertMatch,
-  throws: assertThrows,
-} = Assert;
 
 const database = new Database(":memory:");
 
@@ -72,8 +69,8 @@ assertDeepEqual(await testCaseAsync(false, async () => {}), {
 // TypeError //
 assertDeepEqual(
   await testCaseAsync(true, async () => {
-    assertThrows(() => database.run(), /^TypeError: missing sql query string/u);
-    assertThrows(
+    assertThrow(() => database.run(), /^TypeError: missing sql query string/u);
+    assertThrow(
       () => database.run(123),
       /^TypeError: first argument is expected to be a sql query string/u,
     );

@@ -1,30 +1,22 @@
-import { strict as Assert } from "assert";
+import { getFreshTemporaryURL, assertEqual } from "../../__fixture__.mjs";
 import { mkdir as mkdirAsync, writeFile as writeFileAsync } from "fs/promises";
-import { tmpdir } from "os";
 import { buildTestDependenciesAsync } from "../../build.mjs";
 import Require from "./require.mjs";
-
-const {
-  // ok: assert,
-  equal: assertEqual,
-  // notEqual: assertNotEqual,
-  // deepEqual: assertDeepEqual,
-} = Assert;
 
 const { requireMaybe } = Require(
   await buildTestDependenciesAsync(import.meta.url),
 );
 
-const directory = `${tmpdir()}/${Math.random().toString(36).substring(2)}`;
+const directory = getFreshTemporaryURL();
 
-await mkdirAsync(directory);
+await mkdirAsync(new URL(directory));
 
-await mkdirAsync(`${directory}/node_modules`);
+await mkdirAsync(new URL(`${directory}/node_modules`));
 
-await mkdirAsync(`${directory}/node_modules/foo`);
+await mkdirAsync(new URL(`${directory}/node_modules/foo`));
 
 await writeFileAsync(
-  `${directory}/node_modules/foo/package.json`,
+  new URL(`${directory}/node_modules/foo/package.json`),
   JSON.stringify({
     name: "foo",
     version: "1.2.3",
@@ -33,7 +25,7 @@ await writeFileAsync(
 );
 
 await writeFileAsync(
-  `${directory}/node_modules/foo/index.js`,
+  new URL(`${directory}/node_modules/foo/index.js`),
   "module.exports = 123;",
   "utf8",
 );

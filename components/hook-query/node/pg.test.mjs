@@ -1,26 +1,27 @@
+import { spawn } from "child_process";
+import { rm as rmAsync } from "fs/promises";
+import Pg from "pg";
+import { fileURLToPath } from "url";
+import {
+  getFreshTemporaryURL,
+  assertEqual,
+  assertDeepEqual,
+  assertFail,
+  assertMatch,
+} from "../../__fixture__.mjs";
+import {
+  buildTestDependenciesAsync,
+  buildTestComponentAsync,
+} from "../../build.mjs";
+
 // TODO investigate why this fails on travis.
 if (Reflect.getOwnPropertyDescriptor(process.env, "TRAVIS") !== undefined) {
   process.exit(0);
 }
 
-import { spawn } from "child_process";
-import { tmpdir } from "os";
-import Pg from "pg";
-import { strict as Assert } from "assert";
-import {
-  buildTestDependenciesAsync,
-  buildTestComponentAsync,
-} from "../../build.mjs";
 const { default: HookPg } = await import("./pg.mjs");
 
 const { Client, Query } = Pg;
-
-const {
-  equal: assertEqual,
-  deepEqual: assertDeepEqual,
-  fail: assertFail,
-  match: assertMatch,
-} = Assert;
 
 const promiseTermination = (child) =>
   new Promise((resolve, reject) => {
@@ -30,7 +31,7 @@ const promiseTermination = (child) =>
 
 const port = 5432;
 const user = "postgres";
-const path = `${tmpdir()}/${Math.random().toString(36).substring(2)}`;
+const url = getFreshTemporaryURL();
 
 const proceedAsync = async () => {
   const dependencies = await buildTestDependenciesAsync(import.meta.url);
@@ -190,7 +191,7 @@ if (Reflect.getOwnPropertyDescriptor(process.env, "TRAVIS")) {
           "--encoding",
           "UTF-8",
           "--pgdata",
-          path,
+          fileURLToPath(url),
           "--username",
           user,
         ],
@@ -199,9 +200,13 @@ if (Reflect.getOwnPropertyDescriptor(process.env, "TRAVIS")) {
     ),
     { signal: null, status: 0 },
   );
-  const child = spawn("postgres", ["-D", path, "-p", String(port)], {
-    stdio: "inherit",
-  });
+  const child = spawn(
+    "postgres",
+    ["-D", fileURLToPath(url), "-p", String(port)],
+    {
+      stdio: "inherit",
+    },
+  );
   const termination = promiseTermination(child);
   while (
     /* eslint-disable no-constant-condition */ true /* eslint-enable no-constant-condition */
@@ -226,6 +231,6 @@ if (Reflect.getOwnPropertyDescriptor(process.env, "TRAVIS")) {
   } finally {
     child.kill("SIGTERM");
     await termination;
-    await promiseTermination(spawn("/bin/sh", ["-c", `rm -rf ${path}$`]));
+    await rmAsync(new URL(url), { recursive: true });
   }
 }

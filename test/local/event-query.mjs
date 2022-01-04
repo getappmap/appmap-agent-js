@@ -1,5 +1,10 @@
-import { writeFile, symlink, readFile } from "fs/promises";
+import {
+  writeFile as writeFileAsync,
+  symlink as symlinkAsync,
+  readFile as readFileAsync,
+} from "fs/promises";
 import { strict as Assert } from "assert";
+import { join as joinPath } from "path";
 import { runAsync } from "../__fixture__.mjs";
 
 const { cwd } = process;
@@ -9,7 +14,7 @@ await runAsync(
   null,
   {
     recorder: "process",
-    command: "node ./main.mjs",
+    command: "node main.mjs",
     hooks: {
       esm: false,
       cjs: false,
@@ -22,12 +27,13 @@ await runAsync(
     },
   },
   async (repository) => {
-    await symlink(
-      `${cwd()}/node_modules/sqlite3`,
-      `${repository}/node_modules/sqlite3`,
+    await symlinkAsync(
+      joinPath(cwd(), "node_modules", "sqlite3"),
+      joinPath(repository, "node_modules", "sqlite3"),
+      "dir",
     );
-    await writeFile(
-      `${repository}/main.mjs`,
+    await writeFileAsync(
+      joinPath(repository, "main.mjs"),
       `
         import Sqlite3 from "sqlite3";
         const {Database} = Sqlite3;
@@ -39,7 +45,10 @@ await runAsync(
   },
   async (directory) => {
     const appmap = JSON.parse(
-      await readFile(`${directory}/tmp/appmap/basename.appmap.json`, "utf8"),
+      await readFileAsync(
+        joinPath(directory, "tmp", "appmap", "basename.appmap.json"),
+        "utf8",
+      ),
     );
     const { events } = appmap;
     /* eslint-disable no-unused-vars */

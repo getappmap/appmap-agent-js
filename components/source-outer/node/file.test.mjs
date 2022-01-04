@@ -1,5 +1,8 @@
-import { strict as Assert } from "assert";
-import { tmpdir } from "os";
+import {
+  getFreshTemporaryURL,
+  assert,
+  assertDeepEqual,
+} from "../../__fixture__.mjs";
 import { writeFile as writeFileAsync } from "fs/promises";
 import {
   buildTestDependenciesAsync,
@@ -7,9 +10,9 @@ import {
 } from "../../build.mjs";
 import File from "./file.mjs";
 
-const { deepEqual: assertDeepEqual, ok: assert } = Assert;
-
-const { readFile } = File(await buildTestDependenciesAsync(import.meta.url));
+const { readFileSync } = File(
+  await buildTestDependenciesAsync(import.meta.url),
+);
 const { isLeft, makeRight } = await buildTestComponentAsync("util");
 
 //////////
@@ -17,7 +20,7 @@ const { isLeft, makeRight } = await buildTestComponentAsync("util");
 //////////
 
 assertDeepEqual(
-  readFile(
+  readFileSync(
     `data:text/plain;charset=utf-8;base64,${Buffer.from("\n", "utf8").toString(
       "base64",
     )}`,
@@ -27,7 +30,7 @@ assertDeepEqual(
 );
 
 assertDeepEqual(
-  readFile(`data:,${encodeURIComponent("\n")}`, "file:///path"),
+  readFileSync(`data:,${encodeURIComponent("\n")}`, "file:///path"),
   makeRight({ url: "file:///path", content: "\n" }),
 );
 
@@ -35,22 +38,27 @@ assertDeepEqual(
 // file //
 //////////
 
-const path = `${tmpdir()}/${Math.random().toString(36).substring(2)}`;
-const url = `file://${path}`;
-assert(isLeft(readFile(url)));
+const url = getFreshTemporaryURL();
+assert(isLeft(readFileSync(url)));
 
-await writeFileAsync(path, "foo", "utf8");
+await writeFileAsync(new URL(url), "foo", "utf8");
 assertDeepEqual(
-  readFile(url),
+  readFileSync(url),
   makeRight({
     url,
     content: "foo",
   }),
 );
 assertDeepEqual(
-  readFile(url),
+  readFileSync(url),
   makeRight({
     url,
     content: "foo",
   }),
 );
+
+/////////////
+// Invalid //
+/////////////
+
+assert(isLeft(readFileSync("http://localhost/foo")));

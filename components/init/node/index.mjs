@@ -1,7 +1,7 @@
 import fs from "fs";
 import glob from "glob";
 import klaw from "klaw-sync";
-import { basename, join } from "path";
+import { basename as getBasename, join as joinPath } from "path";
 import YAML from "yaml";
 
 // Glob to match/exclude all the directories we should scan for source files:
@@ -26,7 +26,7 @@ export default (dependencies) => {
       }
 
       // Don't descend into node_modules
-      if (basename(item.path) === "node_modules") {
+      if (getBasename(item.path) === "node_modules") {
         return true;
       }
 
@@ -52,7 +52,7 @@ export default (dependencies) => {
     const gs = glob.GlobSync(GLOB, { cwd: root, strict: false, silent: true });
     const dirs = gs.found.map((d) => d.slice(0, -1));
     dirs.forEach((dir) => {
-      const path = join(root, dir);
+      const path = joinPath(root, dir);
       const match_present = hasMatch({ path, stats: fs.statSync(path) });
       if (!match_present) {
         // klaw-sync doesn't provide a way to suppress errors in the same way
@@ -85,7 +85,7 @@ export default (dependencies) => {
 
     const root_len = root.length;
     const config = {
-      name: basename(root),
+      name: getBasename(root),
       packages: dirs.map((d) => ({ path: d.substr(root_len + 1) })),
     };
     const result = {

@@ -1,11 +1,7 @@
-import { strict as Assert } from "assert";
+import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
 import { buildTestDependenciesAsync } from "../../build.mjs";
 import Source from "./index.mjs";
 import { SourceMapGenerator } from "source-map";
-
-Error.stackTraceLimit = Infinity;
-
-const { equal: assertEqual, deepEqual: assertDeepEqual } = Assert;
 
 const {
   extractSourceMapURL,
@@ -22,6 +18,14 @@ assertEqual(
     content: "//# sourceMappingURL=filename2",
   }),
   "file:///directory/filename2",
+);
+
+assertEqual(
+  extractSourceMapURL({
+    url: "file:///directory/filename1",
+    content: "//# sourceMappingURL=/filename2",
+  }),
+  "file:///filename2",
 );
 
 assertEqual(

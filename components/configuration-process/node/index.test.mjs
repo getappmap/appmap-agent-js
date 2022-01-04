@@ -1,28 +1,37 @@
-import { writeFile } from "fs/promises";
-import { tmpdir } from "os";
-import { strict as Assert } from "assert";
+import { writeFile as writeFileAsync } from "fs/promises";
+import { fileURLToPath } from "url";
+import {
+  assertThrow,
+  assertDeepEqual,
+  assertEqual,
+  getFreshTemporaryURL,
+} from "../../__fixture__.mjs";
 import { buildTestDependenciesAsync } from "../../build.mjs";
 import ConfigurationProcess from "./index.mjs";
-
-const {
-  deepEqual: assertDeepEqual,
-  // fail: assertFail,
-  equal: assertEqual,
-} = Assert;
 
 const { loadProcessConfiguration } = ConfigurationProcess(
   await buildTestDependenciesAsync(import.meta.url),
 );
 
+assertThrow(
+  () =>
+    loadProcessConfiguration({
+      env: { APPMAP_CONFIGURATION_PATH: "foo" },
+      argv: ["node", "main.mjs"],
+      cwd: () => "cwd",
+    }),
+  /^AppmapError: Unsupported configuration file extension/,
+);
+
 {
-  const path = `${tmpdir()}/${Math.random().toString(36).substring(2)}.json`;
+  const url = getFreshTemporaryURL(".json");
   loadProcessConfiguration({
-    env: { APPMAP_CONFIGURATION_PATH: path },
+    env: { APPMAP_CONFIGURATION_PATH: fileURLToPath(url) },
     argv: ["node", "main.mjs"],
-    cwd: () => "/cwd",
+    cwd: () => "cwd",
   });
-  await writeFile(
-    path,
+  await writeFileAsync(
+    new URL(url),
     JSON.stringify({ name: "app", "map-name": "name1" }),
     "utf8",
   );
@@ -35,7 +44,7 @@ const { loadProcessConfiguration } = ConfigurationProcess(
     log,
     "track-port": track_port,
   } = loadProcessConfiguration({
-    env: { APPMAP_CONFIGURATION_PATH: path },
+    env: { APPMAP_CONFIGURATION_PATH: fileURLToPath(url) },
     argv: [
       ["node", "agent.mjs"],
       ["--track-port", "8080"],
@@ -46,7 +55,7 @@ const { loadProcessConfiguration } = ConfigurationProcess(
       ["--process", "'*'"],
       ["--", "exec", "arg1", "arg2"],
     ].flat(),
-    cwd: () => "/cwd",
+    cwd: () => "cwd",
   });
   assertEqual(packages.length, 3);
   assertEqual(processes.length, 2);
@@ -58,9 +67,31 @@ const { loadProcessConfiguration } = ConfigurationProcess(
       log: "error",
       map_name: "name2",
       command: {
-        value: "'exec' 'arg1' 'arg2'",
-        cwd: "/cwd",
+        exec: "exec",
+        argv: ["arg1", "arg2"],
+        base: "file:///cwd",
       },
     },
   );
 }
+
+assertDeepEqual(
+  Reflect.get(
+    loadProcessConfiguration({
+      env: {
+        APPMAP_CONFIGURATION_PATH: fileURLToPath(getFreshTemporaryURL(".json")),
+      },
+      argv: [
+        ["node", "agent.mjs"],
+        ["--command", "exec arg1 arg2"],
+      ].flat(),
+      cwd: () => "cwd",
+    }),
+    "command",
+  ),
+  {
+    exec: "exec",
+    argv: ["arg1", "arg2"],
+    base: "file:///cwd",
+  },
+);

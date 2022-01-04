@@ -3,6 +3,7 @@ import Https from "https";
 import { EventEmitter } from "events";
 
 const _RegExp = RegExp;
+const _String = String;
 const { nextTick } = process;
 const { apply, construct } = Reflect;
 const _Proxy = Proxy;
@@ -30,9 +31,9 @@ export default (dependencies) => {
   } = dependencies;
   // TODO: improve test coverage
   /* c8 ignore start */
-  const getPort = (server) => {
+  const getStringPort = (server) => {
     const address = server.address();
-    return typeof address === "string" ? address : address.port;
+    return typeof address === "string" ? address : _String(address.port);
   };
   const interceptTraffic = (
     { emitter, recorder, regexp },
@@ -43,7 +44,7 @@ export default (dependencies) => {
     if (
       recorder === "remote" &&
       request.url.startsWith("/_appmap/") &&
-      regexp.test(getPort(server))
+      regexp.test(getStringPort(server))
     ) {
       request.url = request.url.substring("/_appmap".length);
       generateRespond((method, path, body) =>

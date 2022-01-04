@@ -1,4 +1,4 @@
-import { strict as Assert } from "assert";
+import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
 import {
   makeLeft,
   makeRight,
@@ -8,8 +8,6 @@ import {
   mapEither,
   bindEither,
 } from "./either.mjs";
-
-const { equal: assertEqual, deepEqual: assertDeepEqual } = Assert;
 
 assertEqual(isLeft(makeLeft(123)), true);
 assertEqual(fromLeft(makeLeft(123)), 123);

@@ -1,10 +1,6 @@
-import { fileURLToPath } from "url";
-
 export default (dependencies) => {
   const {
-    util: { getDirectory },
-  } = dependencies;
-  const {
+    url: { appendURLSegment },
     configuration: { createConfiguration, extendConfiguration },
     frontend: { createFrontend },
     emitter: { openEmitter, closeEmitter, sendEmitter, takeLocalEmitterTrace },
@@ -20,11 +16,11 @@ export default (dependencies) => {
       },
     }),
     testHookAsync: async (hook, unhook, config, callbackAsync) => {
-      const directory = getDirectory(fileURLToPath(import.meta.url));
+      const url = appendURLSegment(import.meta.url, "..");
       const configuration = extendConfiguration(
-        createConfiguration(directory),
+        createConfiguration(url),
         { ...config },
-        directory,
+        url,
       );
       const frontend = createFrontend(configuration);
       const emitter = openEmitter(configuration);

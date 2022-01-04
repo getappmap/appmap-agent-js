@@ -1,6 +1,4 @@
 branches: [node]
 dependencies:
-  - util
-  - uuid
-  - http
+  - path
   - log

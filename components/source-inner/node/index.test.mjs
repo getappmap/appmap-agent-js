@@ -1,14 +1,7 @@
-import { strict as Assert } from "assert";
+import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
 import { SourceMapGenerator } from "source-map";
 import { buildTestDependenciesAsync } from "../../build.mjs";
 import SourceInner from "./index.mjs";
-
-const {
-  // ok: assert,
-  equal: assertEqual,
-  // notEqual: assertNotEqual,
-  deepEqual: assertDeepEqual,
-} = Assert;
 
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
 const { compileSourceMap, mapSource } = SourceInner(dependencies);

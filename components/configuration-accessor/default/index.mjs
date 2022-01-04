@@ -1,53 +1,26 @@
-/* globals URL */
-
-import ShellQuote from "shell-quote";
-
-const { parse: parseShell } = ShellQuote;
-
 const _URL = URL;
 const _RegExp = RegExp;
+const { entries: toEntries } = Object;
 const { stringify: stringifyJSON } = JSON;
 
 export default (dependencies) => {
   const {
-    log: { logDebug, logInfo, logGuardWarning, logWarning },
+    util: { assert, coalesce },
+    url: { pathifyURL, urlifyPath, appendURLSegmentArray },
     expect: { expect, expectSuccess },
+    log: { logDebug, logInfo, logGuardWarning },
+    repository: {
+      extractRepositoryDependency,
+      extractRepositoryHistory,
+      extractRepositoryPackage,
+    },
     specifier: { matchSpecifier },
     configuration: { extendConfiguration },
-    util: { assert, coalesce, toAbsolutePath },
   } = dependencies;
 
-  const default_package_specifier = {
-    enabled: true,
-    "inline-source": null,
-    shallow: false,
-    exclude: [],
-  };
-
-  // const filterEnvironmentPair = ([key, value]) =>
-  //   key.toLowerCase().startsWith("appmap_");
-  //
-  // const mapEnvironmentPair = ([key, value]) => [
-  //   key.toLowerCase().substring(7).replace(/_/g, "-"),
-  //   value,
-  // ];
-
   const getSpecifierValue = (pairs, key) => {
-    for (let index = 0; index < pairs.length; index += 1) {
-      const [specifier, value] = pairs[index];
-      const matched = matchSpecifier(specifier, key);
-      // TODO: this breaks encapsulation
-      const { cwd, pattern, flags } = specifier;
-      logDebug(
-        "Specifier #%j (pattern = %j, flags = %j) %s path $j relative to %j.",
-        index,
-        pattern,
-        flags,
-        matched ? "matched" : "did not match",
-        key,
-        cwd,
-      );
-      if (matched) {
+    for (const [specifier, value] of pairs) {
+      if (matchSpecifier(specifier, key)) {
         return value;
       }
     }
@@ -56,129 +29,40 @@ export default (dependencies) => {
     /* c8 ignore stop */
   };
 
-  const quote = (token) => {
-    if (typeof token === "object") {
-      const { op } = token;
-      if (op === "glob") {
-        const { pattern } = token;
-        return pattern;
-      }
-      return op;
-    }
-    return `'${token.replace(/'/gu, "\\'")}'`;
-  };
+  const isMocha = ({ exec }) => exec.split(".")[0] === "mocha";
+  const isNpxMocha = ({ exec, argv }) =>
+    exec.split(".")[0] === "npx" && argv.length > 0 && argv[0] === "mocha";
+  const isNodeMocha = ({ exec, argv }) =>
+    exec === "node" &&
+    argv.length > 0 &&
+    /[\\/]mocha(.[a-z]+)?$/u.test(argv[0]);
+  const isNpmMocha = ({ exec, argv }) =>
+    exec.split(".")[0] === "npm" &&
+    argv.length > 1 &&
+    argv[0] === "exec" &&
+    argv[1] === "mocha";
 
   return {
-    // extractEnvironmentConfiguration: (env) =>
-    //   fromEntries(
-    //     toArray(toEntries(env))
-    //       .filter(filterEnvironmentPair)
-    //       .map(mapEnvironmentPair),
-    //   ),
-    getConfigurationPackage: ({ packages }, url) => {
-      const { protocol, pathname } = new _URL(url);
-      if (protocol === "data:") {
-        logWarning(
-          "Could not apply 'packages' configuration field on package url because it is a data url, got: %j.",
-          url,
-        );
-        return default_package_specifier;
-      }
-      const options = getSpecifierValue(packages, pathname);
-      logDebug(
-        "%s source file %j",
-        options.enabled ? "Instrumenting" : "Not instrumenting",
-        url,
-      );
-      return options;
-    },
-    getConfigurationScenarios: (configuration) => {
-      const { scenarios, scenario } = configuration;
-      const regexp = expectSuccess(
-        () => new _RegExp(scenario, "u"),
-        "Scenario configuration field is not a valid regexp: %j >> %e",
-        scenario,
-      );
-      return scenarios
-        .filter(({ key }) => regexp.test(key))
-        .map(({ cwd, value }) =>
-          extendConfiguration(configuration, { scenarios: {}, ...value }, cwd),
-        );
-    },
-    initializeConfiguration: (configuration, agent, repository) => {
-      assert(
-        configuration.agent === null,
-        "duplicate configuration initialization",
-      );
-      assert(
-        configuration.repository.directory === repository.directory,
-        "repository directory mismatch",
-      );
-      return extendConfiguration(configuration, { agent, repository }, null);
-    },
-    sanitizeConfigurationManual: (configuration) => {
-      const {
-        recorder,
-        hooks: { esm },
-      } = configuration;
-      logGuardWarning(
-        recorder !== "manual",
-        "Manual recorder expected configuration field 'recorder' to be %s and got %j.",
-        "manual",
-        recorder,
-      );
-      logGuardWarning(
-        esm,
-        "Manual recorder does not support native module recording and configuration field 'hooks.esm' is enabled.",
-      );
-      return extendConfiguration(configuration, {
-        recorder: "manual",
-        hooks: {
-          esm: false,
-        },
-      });
-    },
-    resolveConfigurationPort: (configuration, trace_port, track_port) => {
-      for (const [key, value1] of [
-        ["trace-port", trace_port],
-        ["track-port", track_port],
-      ]) {
-        const { [key]: value2 } = configuration;
-        if (value2 === 0) {
-          assert(typeof value1 === "number", "expected a port number");
-          configuration = extendConfiguration(
-            configuration,
-            { [key]: value1 },
-            null,
-          );
-        } else {
-          assert(value1 === value2, "port mismatch");
-        }
-      }
-      return configuration;
-    },
-    isConfigurationEnabled: ({ processes, main }) => {
-      const enabled = main === null || getSpecifierValue(processes, main);
-      logInfo(`%s %s.`, enabled ? "Recording" : "Bypassing", main);
-      return enabled;
-    },
-    extendConfigurationNode: (configuration, { version, argv, cwd }) => {
-      assert(argv.length >= 2, "expected at least two argv");
-      const [, main] = argv;
-      assert(version.startsWith("v"), "expected version to start with v");
+    resolveConfigurationRepository: (configuration) => {
+      assert(configuration.agent === null, "duplicate respository resolution");
+      const { directory } = configuration.repository;
       return extendConfiguration(
         configuration,
         {
-          engine: {
-            name: "node",
-            version: version.substring(1),
+          agent: extractRepositoryDependency(directory, [
+            "@appland",
+            "appmap-agent-js",
+          ]),
+          repository: {
+            directory,
+            history: extractRepositoryHistory(directory),
+            package: extractRepositoryPackage(directory),
           },
-          main: toAbsolutePath(cwd(), main),
         },
-        null,
+        directory,
       );
     },
-    resolveConfigurationRecorder: (configuration) => {
+    resolveConfigurationAutomatedRecorder: (configuration) => {
       if (configuration.recorder === null) {
         assert(
           configuration.command !== null,
@@ -187,11 +71,15 @@ export default (dependencies) => {
         configuration = extendConfiguration(
           configuration,
           {
-            recorder: configuration.command.value.includes("mocha")
-              ? "mocha"
-              : "remote",
+            recorder:
+              isMocha(configuration.command) ||
+              isNpxMocha(configuration.command) ||
+              isNpmMocha(configuration.command) ||
+              isNodeMocha(configuration.command)
+                ? "mocha"
+                : "remote",
           },
-          null,
+          configuration.repository.directory,
         );
       }
       if (configuration.output.directory === null) {
@@ -210,22 +98,105 @@ export default (dependencies) => {
       }
       return configuration;
     },
+    resolveConfigurationManualRecorder: (configuration) => {
+      const {
+        recorder,
+        hooks: { esm },
+      } = configuration;
+      logGuardWarning(
+        recorder !== "manual",
+        "Manual recorder expected configuration field 'recorder' to be %s and got %j.",
+        "manual",
+        recorder,
+      );
+      logGuardWarning(
+        esm,
+        "Manual recorder does not support native module recording and configuration field 'hooks.esm' is enabled.",
+      );
+      return extendConfiguration(
+        configuration,
+        {
+          recorder: "manual",
+          hooks: {
+            esm: false,
+          },
+        },
+        configuration.repository.directory,
+      );
+    },
+    extendConfigurationNode: (configuration, { version, argv, cwd }) => {
+      assert(argv.length >= 2, "expected at least two argv");
+      const [, main] = argv;
+      assert(version.startsWith("v"), "expected version to start with v");
+      return extendConfiguration(
+        configuration,
+        {
+          engine: {
+            name: "node",
+            version: version.substring(1),
+          },
+          main,
+        },
+        urlifyPath(cwd(), configuration.repository.directory),
+      );
+    },
+    extendConfigurationPort: (configuration, ports) => {
+      for (const [key, new_port] of toEntries(ports)) {
+        const { [key]: old_port } = configuration;
+        if (old_port === 0 || old_port === "") {
+          assert(typeof new_port === typeof old_port, "port type mismatch");
+          configuration = extendConfiguration(
+            configuration,
+            { [key]: new_port },
+            configuration.repository.directory,
+          );
+        } else {
+          assert(old_port === new_port);
+        }
+      }
+      return configuration;
+    },
+    isConfigurationEnabled: ({ processes, main }) => {
+      const enabled = main === null || getSpecifierValue(processes, main);
+      logInfo(`%s %s.`, enabled ? "Recording" : "Bypassing", main);
+      return enabled;
+    },
+    getConfigurationPackage: ({ packages }, url) => {
+      const options = getSpecifierValue(packages, url);
+      logDebug(
+        "%s source file %j",
+        options.enabled ? "Instrumenting" : "Not instrumenting",
+        url,
+      );
+      return options;
+    },
+    getConfigurationScenarios: (configuration) => {
+      const { scenarios, scenario } = configuration;
+      const regexp = expectSuccess(
+        () => new _RegExp(scenario, "u"),
+        "Scenario configuration field is not a valid regexp: %j >> %e",
+        scenario,
+      );
+      return scenarios
+        .filter(({ key }) => regexp.test(key))
+        .map(({ base, value }) =>
+          extendConfiguration(configuration, { scenarios: {}, ...value }, base),
+        );
+    },
     compileConfigurationCommand: (configuration, env) => {
       assert(configuration.agent !== null, "missing agent in configuration");
       assert(
         configuration.command !== null,
         "missing command in configuration",
       );
-      let {
-        command: { value: command },
-      } = configuration;
       const {
-        command: { cwd },
+        command,
         recorder,
         "command-options": options,
         "recursive-process-recording": recursive,
         agent: { directory },
       } = configuration;
+      let { base, exec, argv } = command;
       env = {
         ...env,
         ...options.env,
@@ -237,71 +208,84 @@ export default (dependencies) => {
       );
       if (recursive || recorder === "mocha") {
         if (recorder === "mocha") {
-          let tokens = parseShell(command, env);
           const hook = [
             "--require",
-            `${directory}/lib/node/recorder-mocha.mjs`,
+            pathifyURL(
+              appendURLSegmentArray(directory, [
+                "lib",
+                "node",
+                "recorder-mocha.mjs",
+              ]),
+              base,
+            ),
           ];
-          if (tokens.length > 0 && tokens[0] === "mocha") {
-            tokens = ["mocha", ...hook, ...tokens.slice(1)];
-          } else if (
-            tokens.length > 1 &&
-            tokens[0] === "npx" &&
-            tokens[1] === "mocha"
-          ) {
-            tokens = [
-              "npx",
-              "--always-spawn",
-              "mocha",
-              ...hook,
-              ...tokens.slice(2),
-            ];
+          if (isMocha(command)) {
+            argv = [...hook, ...argv];
+          } else if (isNpxMocha(command)) {
+            argv = ["--always-spawn", argv[0], ...hook, ...argv.slice(1)];
+          } else if (isNpmMocha(command)) {
+            argv = [argv[0], argv[1], ...hook, ...argv.slice(2)];
+          } else if (isNodeMocha(command)) {
+            argv = [argv[0], ...hook, ...argv.slice(1)];
           } else {
             expect(
               false,
-              "The mocha recorder expected the command to start by either 'mocha' or 'npx mocha', got %j.",
-              tokens,
+              "The mocha recorder expected the command to start by either 'mocha' or 'npx mocha' or 'npm exec mocha', got %j %j.",
+              exec,
+              argv,
             );
           }
-          command = tokens.map(quote).join(" ");
         }
         env = {
           ...env,
           NODE_OPTIONS: [
             coalesce(env, "NODE_OPTIONS", ""),
             // abomination: https://github.com/mochajs/mocha/issues/4720
-            `--require=${directory}/lib/node/abomination.js`,
-            `--experimental-loader=${directory}/lib/node/${
-              recorder === "mocha" ? "mocha-loader" : `recorder-${recorder}`
-            }.mjs`,
+            `--require=${pathifyURL(
+              appendURLSegmentArray(directory, [
+                "lib",
+                "node",
+                "abomination.js",
+              ]),
+              base,
+            )}`,
+            `--experimental-loader=${pathifyURL(
+              appendURLSegmentArray(directory, [
+                "lib",
+                "node",
+                recorder === "mocha"
+                  ? "mocha-loader.mjs"
+                  : `recorder-${recorder}.mjs`,
+              ]),
+              base,
+            )}`,
           ].join(" "),
         };
       } else {
-        const tokens = parseShell(command, env);
-        expect(
-          tokens.length > 0,
-          "Could not find executable from command: %j.",
-          command,
-        );
         logGuardWarning(
-          tokens[0] !== "node",
+          exec !== "node",
           "Assuming %j is a node executable, recording will *not* happens if this is not the case.",
-          tokens[0],
+          exec,
         );
-        command = [
-          tokens[0],
+        argv = [
           "--experimental-loader",
-          `${directory}/lib/node/recorder-${recorder}.mjs`,
-          ...tokens.slice(1),
-        ]
-          .map(quote)
-          .join(" ");
+          pathifyURL(
+            appendURLSegmentArray(directory, [
+              "lib",
+              "node",
+              `recorder-${recorder}.mjs`,
+            ]),
+            base,
+          ),
+          ...argv,
+        ];
       }
       return {
-        command,
+        exec,
+        argv,
         options: {
           ...options,
-          cwd,
+          cwd: new _URL(base),
           env,
         },
       };

@@ -1,4 +1,6 @@
-import { tmpdir } from "os";
+import { tmpdir as getTemporaryDirectory } from "os";
+import { pathToFileURL, fileURLToPath } from "url";
+
 const _Promise = Promise;
 const _Set = Set;
 const _setTimeout = setTimeout;
@@ -6,6 +8,8 @@ const _setTimeout = setTimeout;
 export default (dependencies) => {
   const {
     log: { logWarning },
+    url: { appendURLSegment },
+    path: { toIPCPath, fromIPCPath },
     uuid: { getUUID },
   } = dependencies;
   return {
@@ -28,16 +32,22 @@ export default (dependencies) => {
           server.removeListener("error", reject);
           resolve({ server, sockets });
         });
-        server.listen(port === "" ? `${tmpdir()}/${getUUID()}` : port);
+        if (port === "") {
+          port = appendURLSegment(
+            pathToFileURL(getTemporaryDirectory()),
+            getUUID(),
+          );
+        }
+        server.listen(
+          typeof port === "string" ? toIPCPath(fileURLToPath(port)) : port,
+        );
       });
     },
     getServicePort: ({ server }) => {
       const address = server.address();
-      if (typeof address === "string") {
-        return address;
-      }
-      const { port } = address;
-      return port;
+      return typeof address === "string"
+        ? pathToFileURL(fromIPCPath(address)).toString()
+        : address.port;
     },
     closeServiceAsync: ({ server, sockets }) =>
       new Promise((resolve, reject) => {

@@ -11,5 +11,5 @@ const { loadEnvironmentConfiguration } = LoadEnvironmentConfiguration(
 );
 
 loadEnvironmentConfiguration({
-  APPMAP_CONFIGURATION: JSON.stringify(createConfiguration("/cwd")),
+  APPMAP_CONFIGURATION: JSON.stringify(createConfiguration("file:///home")),
 });

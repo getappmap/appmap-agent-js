@@ -1,12 +1,10 @@
 /* eslint-env node */
-import { strict as Assert } from "assert";
+import { assertDeepEqual, assertEqual } from "../../__fixture__.mjs";
 import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
 } from "../../build.mjs";
 import Agent from "./index.mjs";
-
-const { deepEqual: assertDeepEqual, equal: assertEqual } = Assert;
 
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
 const { createConfiguration, extendConfiguration } =
@@ -21,7 +19,7 @@ const {
 } = Agent(dependencies);
 const agent = openAgent(
   extendConfiguration(
-    createConfiguration("/"),
+    createConfiguration("file:///home"),
     {
       packages: ["*"],
       hooks: {
@@ -32,12 +30,12 @@ const agent = openAgent(
         http: false,
       },
     },
-    "/",
+    "file:///base",
   ),
 );
 startTrack(agent, "record", { path: null, data: {} });
 assertEqual(
-  recordAgentScript(agent, { url: "file:///main.js", content: "123;" }),
+  recordAgentScript(agent, { url: "file:///base/main.js", content: "123;" }),
   123,
 );
 stopTrack(agent, "record", { errors: [], status: 0 });
@@ -48,9 +46,9 @@ assertDeepEqual(
   {
     sources: [
       {
-        url: "file:///main.js",
+        url: "file:///base/main.js",
         content: "123;",
-        exclude: createConfiguration("/dummy").exclude,
+        exclude: createConfiguration("file:///home").exclude,
         shallow: false,
         inline: false,
       },

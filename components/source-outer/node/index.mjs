@@ -12,14 +12,14 @@ export default (dependencies) => {
       getSources,
     },
   } = dependencies;
-  const { readFile } = File(dependencies);
+  const { readFileSync } = File(dependencies);
   return {
     extractSourceMap: (file) => {
       const source_map_url = extractSourceMapURL(file);
       if (source_map_url === null) {
         return createMirrorSourceMap(file);
       }
-      const either = readFile(source_map_url, file.url);
+      const either = readFileSync(source_map_url, file.url);
       if (isLeft(either)) {
         logWarning(
           "Cannot read source map file %j\n  Referenced in script file at %j\n  >> %s",
@@ -33,7 +33,7 @@ export default (dependencies) => {
       const mapping = createSourceMap(source_map_file);
       for (const { url, content } of getSources(mapping)) {
         if (content === null) {
-          const either = readFile(url, source_map_file.url);
+          const either = readFileSync(url, source_map_file.url);
           if (isLeft(either)) {
             logWarning(
               "Cannot read source file %j\n  Referenced in source map file %j\n  Referenced in script file %j\n  >> %s",

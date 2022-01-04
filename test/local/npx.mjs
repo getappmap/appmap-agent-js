@@ -1,36 +1,47 @@
-import { writeFile, symlink, readFile } from "fs/promises";
+import { readFile as readFileAsync } from "fs/promises";
+import { platform as getPlatform } from "os";
 import { strict as Assert } from "assert";
+import { join as joinPath } from "path";
+import { spawnAsync } from "../spawn.mjs";
 import { runAsync } from "../__fixture__.mjs";
 
-const { deepEqual: assertDeepEqual } = Assert;
+const { deepEqual: assertDeepEqual, equal: assertEqual } = Assert;
 
 await runAsync(
   null,
   {
-    command: "npx --always-spawn bin",
+    command: [
+      getPlatform() === "win32" ? "npx.cmd" : "npx",
+      "--always-spawn",
+      // TODO adapt abomination to work on windows
+      getPlatform() === "win32" ? "bin-sample-js" : "bin-sample",
+    ],
     pruning: false,
     output: {
       basename: "basename",
     },
-    processes: { path: "node_modules/.bin/bin" },
-    packages: "bin.cjs",
+    processes: { regexp: "^../", enabled: false },
+    packages: { dist: "bin-sample", recursive: true },
     recorder: "process",
     hooks: { esm: false, cjs: true, apply: false, http: false },
   },
   async (repository) => {
-    await writeFile(`${repository}/bin`, "#!/usr/bin/env node\n123;", {
-      encoding: "utf8",
-      mode: 0o777,
-    });
-    await symlink("../../bin", `${repository}/node_modules/.bin/bin`);
+    assertDeepEqual(
+      await spawnAsync(
+        getPlatform() === "win32" ? "npm.cmd" : "npm",
+        ["install", "bin-sample@0.0.0"],
+        { cwd: repository, stdio: "inherit" },
+      ),
+      { signal: null, status: 0 },
+    );
   },
   async (directory) => {
     const appmap = JSON.parse(
-      await readFile(`${directory}/tmp/appmap/basename.appmap.json`, "utf8"),
+      await readFileAsync(
+        joinPath(directory, "tmp", "appmap", "basename.appmap.json"),
+        "utf8",
+      ),
     );
-    const { classMap: classmap } = appmap;
-    assertDeepEqual(classmap, [
-      { type: "package", name: "bin.cjs", children: [] },
-    ]);
+    assertEqual(appmap.classMap.length, 1);
   },
 );

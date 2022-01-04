@@ -1,12 +1,10 @@
-import { strict as Assert } from "assert";
+import { assertEqual } from "../../__fixture__.mjs";
 import {
   createCounter,
   incrementCounter,
   decrementCounter,
   getCounterValue,
 } from "./counter.mjs";
-
-const { equal: assertEqual } = Assert;
 
 const counter = createCounter(0);
 assertEqual(getCounterValue(counter), 0);

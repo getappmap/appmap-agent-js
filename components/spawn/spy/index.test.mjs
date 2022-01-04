@@ -1,14 +1,8 @@
 /* eslint-env node */
 
-import { strict as Assert } from "assert";
+import { assertDeepEqual } from "../../__fixture__.mjs";
 import { buildTestDependenciesAsync } from "../../build.mjs";
 import Spawn from "./index.mjs";
-
-const {
-  // fail: assertFail,
-  deepEqual: assertDeepEqual,
-  // equal: assertEqual,
-} = Assert;
 
 global.GLOBAL_SPY_SPAWN = (exec, argv, options) => ({ exec, argv, options });
 global.GLOBAL_SPY_FORK = (path, argv, options) => ({ path, argv, options });
