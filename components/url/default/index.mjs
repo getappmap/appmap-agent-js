@@ -78,7 +78,7 @@ export default (dependencies) => {
     return pathname.split("/").filter(isNotEmptyString).map(decodeSegment);
   };
 
-  const pathifyURL = (url, base_url) => {
+  const pathifyURL = (url, base_url, dot_prefix = false) => {
     const { pathname, protocol, host } = new _URL(url);
     const {
       pathname: base_pathname,
@@ -108,8 +108,10 @@ export default (dependencies) => {
         base_segments.pop();
         segments.unshift("..");
       }
-      if (segments.length === 0) {
-        segments.push(".");
+      // This generated paths are sometimes given to node's `--require`.
+      // And it relies on having explicit `.` or `..` in relative paths.
+      if (segments.length === 0 || (dot_prefix && segments[0] !== "..")) {
+        segments.unshift(".");
       }
       return segments.join("/");
     }

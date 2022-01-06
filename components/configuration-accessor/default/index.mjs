@@ -217,6 +217,7 @@ export default (dependencies) => {
                 "recorder-mocha.mjs",
               ]),
               base,
+              true,
             ),
           ];
           if (isMocha(command)) {
@@ -248,6 +249,7 @@ export default (dependencies) => {
                 "abomination.js",
               ]),
               base,
+              true,
             )}`,
             `--experimental-loader=${pathifyURL(
               appendURLSegmentArray(directory, [
@@ -258,6 +260,7 @@ export default (dependencies) => {
                   : `recorder-${recorder}.mjs`,
               ]),
               base,
+              true,
             )}`,
           ].join(" "),
         };
@@ -276,6 +279,7 @@ export default (dependencies) => {
               `recorder-${recorder}.mjs`,
             ]),
             base,
+            true,
           ),
           ...argv,
         ];
