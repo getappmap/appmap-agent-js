@@ -1,23 +1,26 @@
-import { strict as Assert } from "assert";
-import { fileURLToPath } from "url";
-import { dirname } from "path";
+import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
 import { buildTestDependenciesAsync } from "../../build.mjs";
 import Repository from "./index.mjs";
-
-const { deepEqual: assertDeepEqual, equal: assertEqual } = Assert;
-
-const { url } = import.meta;
 
 const { extractRepositoryPackage, extractRepositoryDependency } = Repository(
   await buildTestDependenciesAsync(import.meta.url),
 );
-let path = fileURLToPath(url);
-while (!path.endsWith("appmap-agent-js")) {
-  path = dirname(path);
-}
-assertDeepEqual(extractRepositoryPackage(`${path}/lib`), null);
+
+const getHomeURL = () => {
+  const { url } = import.meta;
+  const url_object = new URL(url);
+  url_object.pathname += "/..";
+  while (!url_object.pathname.endsWith("/appmap-agent-js/")) {
+    url_object.pathname += "..";
+  }
+  return url_object.toString();
+};
+
+const url = getHomeURL();
+
+assertDeepEqual(extractRepositoryPackage(`${url}/lib`), null);
 {
-  const { name, version, homepage } = extractRepositoryPackage(path);
+  const { name, version, homepage } = extractRepositoryPackage(url);
   assertEqual(name, "@appland/appmap-agent-js");
   assertEqual(
     homepage,
@@ -29,7 +32,7 @@ assertDeepEqual(extractRepositoryPackage(`${path}/lib`), null);
   const {
     directory,
     package: { name, version },
-  } = extractRepositoryDependency(path, "acorn");
+  } = extractRepositoryDependency(url, ["acorn"]);
   assertEqual(name, "acorn");
   assertEqual(typeof directory, "string");
   assertEqual(typeof version, "string");

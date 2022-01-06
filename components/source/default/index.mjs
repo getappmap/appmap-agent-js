@@ -1,12 +1,10 @@
-/* globals URL */
-
 const { parse: parseJSON } = JSON;
 const _URL = URL;
 
 export default (dependencies) => {
   const {
     expect: { expect, expectSuccess },
-    util: { assert, toAbsolutePath, getDirectory, coalesce },
+    util: { assert, coalesce },
     validate: { validateSourceMap },
     "source-inner": { compileSourceMap, mapSource },
     location: { makeLocation },
@@ -19,15 +17,22 @@ export default (dependencies) => {
     if (url.startsWith("data:")) {
       expect(
         relative_url[0] === "/",
-        "Expected an absolute path because the reference url is a data url, got %j relative to %j",
+        "Expected an unix absolute path because the reference url is a data url, got %j relative to %j",
         relative_url,
         url,
       );
       return `file://${relative_url}`;
     }
     const url_object = new _URL(url);
-    const { pathname: path } = url_object;
-    url_object.pathname = toAbsolutePath(getDirectory(path), relative_url);
+    if (relative_url[0] === "/") {
+      url_object.pathname = relative_url;
+    } else {
+      const { pathname } = url_object;
+      const segments = pathname.split("/");
+      segments.pop();
+      segments.push(...relative_url.split("/"));
+      url_object.pathname = segments.join("/");
+    }
     return url_object.toString();
   };
 

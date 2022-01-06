@@ -11,10 +11,15 @@ import {
   symlink as symlinkAsync,
 } from "fs/promises";
 
+import {
+  extname as getExtension,
+  dirname as getDirectory,
+  resolve as resolvePath,
+} from "path";
+
 export default (dependencies) => {
   const {
     log: { logInfo },
-    util: { getExtension, toAbsolutePath, getDirectory },
     expect: { expectSuccessAsync, expect },
   } = dependencies;
   const readMaybeLinkAsync = async (link) => {
@@ -42,14 +47,14 @@ export default (dependencies) => {
             link,
             path,
           );
-          const absolute_path = toAbsolutePath(getDirectory(link), path);
+          const absolute_path = resolvePath(getDirectory(link), path);
           await expectSuccessAsync(
             (async () => {
               await copyFileAsync(absolute_path, `${absolute_path}.cjs`);
               await unlinkAsync(link);
-              await symlinkAsync(`${path}.cjs`, link);
+              await symlinkAsync(`${path}.cjs`, link, "file");
             })(),
-            "Something went wrong wen resolving the missing file extension issue >> %e",
+            "Something went wrong when resolving the missing file extension issue >> %e",
           );
         }
       }

@@ -1,4 +1,4 @@
-import { strict as Assert } from "assert";
+import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
 import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
@@ -6,8 +6,6 @@ import {
 import Questionnaire from "./index.mjs";
 
 const BREAK = {};
-
-const { deepEqual: assertDeepEqual, equal: assertEqual } = Assert;
 
 const { validateConfig } = await buildTestComponentAsync("validate");
 
@@ -37,7 +35,7 @@ assertDeepEqual(
   await runAsync([
     ({ format }) => format("app-name"),
     ({ choices }) => choices[0].value,
-    ({ format }) => format("command"),
+    ({ format }) => format('["exec", "arg0"]'),
     ({ format }) => format("output-directory"),
     ({ format }) => format(["esm", "cjs"]),
     ({ choices }) => choices[0].value,
@@ -49,7 +47,7 @@ assertDeepEqual(
   {
     name: "app-name",
     recorder: "process",
-    command: "command",
+    command: ["exec", "arg0"],
     output: {
       directory: "output-directory",
     },

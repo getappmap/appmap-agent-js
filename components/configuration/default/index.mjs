@@ -1,12 +1,15 @@
 const { isArray } = Array;
 const { ownKeys } = Reflect;
 const { entries: toEntries } = Object;
+const { parse: parseJSON } = JSON;
 
 const ANONYMOUS_NAME_SEPARATOR = "-";
 
 export default (dependencies) => {
   const {
-    util: { coalesce, assert, identity, toAbsolutePath, hasOwnProperty },
+    util: { coalesce, identity, hasOwnProperty },
+    expect: { expect },
+    url: { urlifyPath },
     validate: { validateConfig },
     specifier: { createSpecifier },
   } = dependencies;
@@ -23,9 +26,6 @@ export default (dependencies) => {
 
   const prepend = (value1, value2) => [...value2, ...value1];
 
-  const toAbsolutePathFlip = (relative, absolute) =>
-    toAbsolutePath(absolute, relative);
-
   const extendCommandOptions = (options1, options2) => ({
     ...options1,
     ...options2,
@@ -39,7 +39,7 @@ export default (dependencies) => {
   // Normalize //
   ///////////////
 
-  const normalizeExclusion = (exclusion, nullable_directory) => {
+  const normalizeExclusion = (exclusion, base) => {
     if (typeof exclusion === "string") {
       exclusion = {
         "qualified-name": exclusion,
@@ -59,35 +59,56 @@ export default (dependencies) => {
     };
   };
 
-  const normalizeExclude = (exclusions, nullable_directory) =>
+  const normalizeExclude = (exclusions, base) =>
     exclusions.map(normalizeExclusion);
 
-  const normalizeCommand = (command, nullable_directory) => {
-    assert(
-      nullable_directory !== null,
-      "cannot normalize command without directory",
-    );
+  const parseToken = (token) => {
+    if (token[0] === '"') {
+      return parseJSON(token);
+    }
+    if (token[0] === "'") {
+      return token.substring(1, token.length - 1).replace(/\\([\s\S])/gu, "$1");
+    }
+    return token;
+  };
+  const normalizeCommand = (command, base) => {
+    if (typeof command === "string") {
+      const tokenizer =
+        /\s*([^\s'"]+|"(\\[\s\S]|[^\\"])*"|'(\\[\s\S]|[^\\'])*')/gu;
+      const tokens = [];
+      let index = 0;
+      let parts = tokenizer.exec(command);
+      while (parts !== null) {
+        tokens.push(parseToken(parts[1]));
+        index = tokenizer.lastIndex;
+        parts = tokenizer.exec(command);
+      }
+      expect(
+        /^\s*$/u.test(command.substring(index)),
+        "Could not parse command: %j",
+        command,
+      );
+      expect(tokens.length > 0, "Empty command: %j", command);
+      command = tokens;
+    }
     return {
-      value: command,
-      cwd: nullable_directory,
+      exec: command[0],
+      argv: command.slice(1),
+      base,
     };
   };
 
-  const normalizeScenarios = (scenarios, nullable_directory) => {
-    assert(
-      nullable_directory !== null,
-      "cannot normalize scenarios without reference directory",
-    );
+  const normalizeScenarios = (scenarios, base) => {
     return toEntries(scenarios).map(([key, value]) => ({
-      cwd: nullable_directory,
+      base,
       key,
       value,
     }));
   };
 
-  const normalizePort = (port, nullable_directory) => {
-    if (typeof port === "string") {
-      port = toAbsolutePath(nullable_directory, port);
+  const normalizePort = (port, base) => {
+    if (typeof port === "string" && port !== "") {
+      port = urlifyPath(port, base);
     }
     return port;
   };
@@ -125,7 +146,7 @@ export default (dependencies) => {
     return serialization;
   };
 
-  const normalizeOutput = (output, nullable_directory) => {
+  const normalizeOutput = (output, base) => {
     if (typeof output === "string") {
       output = { directory: output };
     }
@@ -133,17 +154,13 @@ export default (dependencies) => {
       const { directory } = output;
       output = {
         ...output,
-        directory: toAbsolutePath(nullable_directory, directory),
+        directory: urlifyPath(directory, base),
       };
     }
     return output;
   };
 
-  const normalizePackageSpecifier = (specifier, nullable_directory) => {
-    assert(
-      nullable_directory !== null,
-      "extending packages configuration requires directory",
-    );
+  const normalizePackageSpecifier = (specifier, base) => {
     if (typeof specifier === "string") {
       specifier = { glob: specifier };
     }
@@ -161,7 +178,7 @@ export default (dependencies) => {
       ...specifier,
     };
     return [
-      createSpecifier(nullable_directory, rest),
+      createSpecifier(rest, base),
       {
         enabled,
         "inline-source": inline,
@@ -171,20 +188,16 @@ export default (dependencies) => {
     ];
   };
 
-  const normalizePackages = (specifiers, nullable_directory) => {
+  const normalizePackages = (specifiers, base) => {
     if (!isArray(specifiers)) {
       specifiers = [specifiers];
     }
     return specifiers.map((specifier) =>
-      normalizePackageSpecifier(specifier, nullable_directory),
+      normalizePackageSpecifier(specifier, base),
     );
   };
 
-  const normalizeProcessSpecifier = (specifier, nullable_directory) => {
-    assert(
-      nullable_directory !== null,
-      "normalizing process elements requires a directory",
-    );
+  const normalizeProcessSpecifier = (specifier, base) => {
     if (typeof specifier === "string") {
       specifier = { glob: specifier };
     } else if (typeof specifier === "boolean") {
@@ -194,15 +207,15 @@ export default (dependencies) => {
       enabled: true,
       ...specifier,
     };
-    return [createSpecifier(nullable_directory, rest), enabled];
+    return [createSpecifier(rest, base), enabled];
   };
 
-  const normalizeProcesses = (specifiers, nullable_directory) => {
+  const normalizeProcesses = (specifiers, base) => {
     if (!isArray(specifiers)) {
       specifiers = [specifiers];
     }
     return specifiers.map((specifier) =>
-      normalizeProcessSpecifier(specifier, nullable_directory),
+      normalizeProcessSpecifier(specifier, base),
     );
   };
 
@@ -211,6 +224,18 @@ export default (dependencies) => {
   ////////////
 
   const fields = {
+    socket: {
+      extend: overwrite,
+      normalize: identity,
+    },
+    heartbeat: {
+      extend: overwrite,
+      normalize: identity,
+    },
+    threshold: {
+      extend: overwrite,
+      normalize: identity,
+    },
     agent: {
       extend: overwrite,
       normalize: identity,
@@ -321,7 +346,7 @@ export default (dependencies) => {
     },
     main: {
       extend: overwrite,
-      normalize: toAbsolutePathFlip,
+      normalize: urlifyPath,
     },
     language: {
       extend: assign,
@@ -410,6 +435,9 @@ export default (dependencies) => {
       main: null,
       recording: null,
       // provided by the user
+      socket: "unix",
+      heartbeat: 1000,
+      threshold: 100,
       host: "localhost",
       session: null,
       "trace-port": 0, // possibly overwritten by the agent
@@ -428,16 +456,7 @@ export default (dependencies) => {
         basename: null,
         extension: ".appmap.json",
       },
-      processes: [
-        [
-          {
-            cwd: home,
-            source: "^",
-            flags: "u",
-          },
-          true,
-        ],
-      ],
+      processes: [[true, true]],
       recorder: null,
       "inline-source": false,
       hooks: {
@@ -464,11 +483,7 @@ export default (dependencies) => {
       },
       packages: [
         [
-          {
-            cwd: home,
-            source: "^",
-            flags: "u",
-          },
+          true,
           {
             enabled: false,
             shallow: false,
@@ -502,14 +517,14 @@ export default (dependencies) => {
       name: null,
       "map-name": null,
     }),
-    extendConfiguration: (configuration, config, nullable_directory) => {
+    extendConfiguration: (configuration, config, base) => {
       configuration = { ...configuration };
       validateConfig(config);
       for (let key of ownKeys(config)) {
         const { normalize, extend } = fields[key];
         configuration[key] = extend(
           configuration[key],
-          normalize(config[key], nullable_directory),
+          normalize(config[key], base),
         );
       }
       return configuration;

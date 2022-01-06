@@ -1,7 +1,13 @@
 import { tmpdir } from "os";
+import { pathToFileURL } from "url";
 import { strict as Assert } from "assert";
 import { createRequire } from "module";
-import { mkdir, symlink, writeFile, realpath } from "fs/promises";
+import {
+  mkdir as mkdirAsync,
+  symlink as symlinkAsync,
+  writeFile as writeFileAsync,
+  realpath as realpathAsync,
+} from "fs/promises";
 import { createAppmap } from "../../lib/node/recorder-manual.mjs";
 
 Error.stackTraceLimit = Infinity;
@@ -10,17 +16,20 @@ const { cwd } = process;
 const { equal: assertEqual, deepEqual: assertDeepEqual } = Assert;
 const { stringify: stringifyJSON } = JSON;
 
-const directory = `${await realpath(tmpdir())}/${Math.random()
-  .toString(36)
-  .substring(2)}`;
+const directory = `${pathToFileURL(
+  await realpathAsync(tmpdir()),
+)}/${Math.random().toString(36).substring(2)}`;
 
-await mkdir(directory);
-await mkdir(`${directory}/node_modules`);
-await mkdir(`${directory}/node_modules/.bin`);
-await mkdir(`${directory}/node_modules/@appland`);
-await symlink(cwd(), `${directory}/node_modules/@appland/appmap-agent-js`);
-await writeFile(
-  `${directory}/package.json`,
+await mkdirAsync(new URL(directory));
+await mkdirAsync(new URL(`${directory}/node_modules`));
+await mkdirAsync(new URL(`${directory}/node_modules/.bin`));
+await mkdirAsync(new URL(`${directory}/node_modules/@appland`));
+await symlinkAsync(
+  cwd(),
+  new URL(`${directory}/node_modules/@appland/appmap-agent-js`),
+);
+await writeFileAsync(
+  new URL(`${directory}/package.json`),
   stringifyJSON({
     name: "package",
     version: "1.2.3",
@@ -28,7 +37,7 @@ await writeFile(
   "utf8",
 );
 
-const require = createRequire(`${directory}/dummy.mjs`);
+const require = createRequire(new URL(`${directory}/dummy.mjs`));
 const appmap = createAppmap(
   directory,
   {
@@ -51,8 +60,8 @@ const appmap = createAppmap(
 
 appmap.startTrack("track", { path: null, data: {} });
 
-await writeFile(
-  `${directory}/common.js`,
+await writeFileAsync(
+  new URL(`${directory}/common.js`),
   `exports.common = function common () { return "COMMON"; }`,
   "utf8",
 );
@@ -62,8 +71,8 @@ await writeFile(
 }
 {
   const script = appmap.recordScript(
-    `${directory}/script.js`,
     `(function script () { return "SCRIPT"; });`,
+    `${directory}/script.js`,
   );
   assertEqual(script(), "SCRIPT");
 }

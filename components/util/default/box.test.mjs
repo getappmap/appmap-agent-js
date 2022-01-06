@@ -1,7 +1,5 @@
-import { strict as Assert } from "assert";
+import { assertEqual } from "../../__fixture__.mjs";
 import { createBox, getBox, setBox } from "./box.mjs";
-
-const { equal: assertEqual } = Assert;
 
 const box = createBox("foo");
 assertEqual(getBox(box), "foo");

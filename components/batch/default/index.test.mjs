@@ -1,4 +1,4 @@
-import { strict as Assert } from "assert";
+import { assertEqual } from "../../__fixture__.mjs";
 import { EventEmitter } from "events";
 import {
   buildTestDependenciesAsync,
@@ -6,31 +6,21 @@ import {
 } from "../../build.mjs";
 import Batch from "./index.mjs";
 
-const {
-  equal: assertEqual,
-  // fail: assertFail,
-  // deepEqual: assertDeepEqual
-} = Assert;
-
 global.GLOBAL_SPY_SPAWN = (exec, argv, options) => {
   const emitter = new EventEmitter();
   emitter.kill = (signal) => {
     emitter.emit("close", null, signal);
   };
-  assertEqual(exec, "/bin/sh");
-  assertEqual(argv.length, 2);
-  assertEqual(argv[0], "-c");
-  const command = argv[1];
-  if (command.startsWith("success")) {
+  if (exec === "success") {
     setTimeout(() => {
       emitter.emit("close", 0, null);
     }, 0);
-  } else if (command.startsWith("failure")) {
+  } else if (exec === "failure") {
     setTimeout(() => {
       emitter.emit("close", 1, null);
     }, 0);
   } else {
-    assertEqual(command.startsWith("sleep"), true);
+    assertEqual(exec, "sleep");
   }
   return emitter;
 };
@@ -44,22 +34,7 @@ const { mainAsync } = Batch(
 const { createConfiguration, extendConfiguration } =
   await buildTestComponentAsync("configuration");
 
-const configuration = createConfiguration("/repository");
-
-// const configuration = extendConfiguration(
-//   createConfiguration("/repository"),
-//   {
-//     agent: {
-//       directory: "/agent",
-//       package: {
-//         name: "appmap-agent-js",
-//         version: "1.2.3",
-//         homepage: null,
-//       },
-//     },
-//   },
-//   null,
-// );
+const configuration = createConfiguration("file:///home");
 
 // no child
 {
@@ -67,23 +42,6 @@ const configuration = createConfiguration("/repository");
   emitter.env = {};
   await mainAsync(emitter, configuration);
 }
-
-// // single success child
-// {
-//   const emitter = new EventEmitter();
-//   emitter.env = {};
-//   await mainAsync(
-//     emitter,
-//     extendConfiguration(
-//       configuration,
-//       {
-//         scenario: "foo",
-//         scenarios: { foo: ["success"], bar: ["failure"] },
-//       },
-//       "/directory",
-//     ),
-//   );
-// }
 
 // single killed child
 {
@@ -99,11 +57,11 @@ const configuration = createConfiguration("/repository");
       {
         scenario: "^",
         scenarios: {
-          key1: { command: "sleep remote" },
-          key2: { command: "sleep mocha" },
+          key1: { command: ["sleep"] },
+          key2: { command: ["sleep"] },
         },
       },
-      "/directory",
+      "file:///base",
     ),
   );
 }
@@ -119,9 +77,9 @@ const configuration = createConfiguration("/repository");
       {
         recorder: "process",
         scenario: "^",
-        scenarios: { key: { command: "success" } },
+        scenarios: { key: { command: ["success"] } },
       },
-      "/directory",
+      "file:///base",
     ),
   );
 }
@@ -138,11 +96,11 @@ const configuration = createConfiguration("/repository");
         recorder: "process",
         scenario: "^",
         scenarios: {
-          key1: { command: "success" },
-          key2: { command: "failure" },
+          key1: { command: ["success"] },
+          key2: { command: ["failure"] },
         },
       },
-      "/directory",
+      "file:///base",
     ),
   );
 }

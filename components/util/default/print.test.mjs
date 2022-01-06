@@ -1,6 +1,6 @@
-import { strict as Assert } from "assert";
+import { assertEqual } from "../../__fixture__.mjs";
 import { print } from "./print.mjs";
 
-Assert.equal(print(true), "true");
-Assert.equal(print("foo"), '"foo"');
-Assert.equal(print([]), "[object Array]");
+assertEqual(print(true), "true");
+assertEqual(print("foo"), '"foo"');
+assertEqual(print([]), "[object Array]");

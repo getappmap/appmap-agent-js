@@ -4,6 +4,8 @@ extends:
   - plugin:import/recommended
 globals:
   console: readonly
+  URL: readonly
+  URLSearchParams: readonly
 env:
   es6: true
   es2017: true
@@ -12,6 +14,7 @@ rules:
   #   - error
   #   - devDependencies: true
   no-empty-pattern: off
+  no-control-regex: off
   no-debugger:
     - warn
   no-console:

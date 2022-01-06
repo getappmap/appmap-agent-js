@@ -1,14 +1,12 @@
 /* global APPMAP_TRANSFORM_MODULE_ASYNC:writable */
 
-import { strict as Assert } from "assert";
+import {
+  assertEqual,
+  assertDeepEqual,
+  assertThrow,
+} from "../../__fixture__.mjs";
 import { buildTestDependenciesAsync } from "../../build.mjs";
 import Loader from "./index.mjs";
-
-const {
-  equal: assertEqual,
-  deepEqual: assertDeepEqual,
-  throws: assertThrows,
-} = Assert;
 
 const { createLoaderHooks } = Loader(
   await buildTestDependenciesAsync(import.meta.url),
@@ -72,4 +70,4 @@ assertEqual(stringifyModule("123;"), "123;");
   }
   assertEqual(stringifyModule(view), content);
 }
-assertThrows(() => stringifyModule(123));
+assertThrow(() => stringifyModule(123));

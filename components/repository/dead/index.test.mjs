@@ -1,13 +1,11 @@
-import { strict as Assert } from "assert";
+import { assertThrow } from "../../__fixture__.mjs";
 import { buildTestDependenciesAsync } from "../../build.mjs";
 import Repository from "./index.mjs";
-
-const { throws: assertThrows } = Assert;
 
 const { extractRepositoryHistory } = Repository(
   await buildTestDependenciesAsync(import.meta.url),
 );
-assertThrows(
-  () => extractRepositoryHistory("/foo"),
+assertThrow(
+  () => extractRepositoryHistory("file:///home"),
   /^AssertionError: cannot extract/,
 );

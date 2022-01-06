@@ -1,4 +1,4 @@
-import { tmpdir } from "os";
+import { getFreshTemporaryURL } from "../../__fixture__.mjs";
 import { mkdir as mkdirAsync } from "fs/promises";
 
 import {
@@ -18,12 +18,12 @@ const {
   adaptReceptorConfiguration,
 } = Receptor(await buildTestDependenciesAsync(import.meta.url));
 
-const directory = `${tmpdir()}/${Math.random().toString(36).substring(2)}`;
-await mkdirAsync(directory);
+const directory = getFreshTemporaryURL();
+await mkdirAsync(new URL(directory));
 const configuration = extendConfiguration(
   createConfiguration(directory),
-  { recorder: "process", output: { directory: tmpdir() } },
-  null,
+  { recorder: "process", output: { directory: "directory" } },
+  directory,
 );
 
 const receptor = await openReceptorAsync(

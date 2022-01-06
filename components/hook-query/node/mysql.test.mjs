@@ -1,20 +1,23 @@
-// TODO investigate why this fails on travis.
-if (Reflect.getOwnPropertyDescriptor(process.env, "TRAVIS") !== undefined) {
-  process.exit(0);
-}
-
-import { strict as Assert } from "assert";
 import { spawn } from "child_process";
-import { tmpdir } from "os";
+import { rm as rmAsync } from "fs/promises";
+import { fileURLToPath } from "url";
 import Mysql from "mysql";
+import {
+  getFreshTemporaryURL,
+  assertEqual,
+  assertDeepEqual,
+} from "../../__fixture__.mjs";
 import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
 } from "../../build.mjs";
 
-const { default: HookMysql } = await import("./mysql.mjs");
+// TODO investigate why this fails on travis.
+if (Reflect.getOwnPropertyDescriptor(process.env, "TRAVIS") !== undefined) {
+  process.exit(0);
+}
 
-const { equal: assertEqual, deepEqual: assertDeepEqual } = Assert;
+const { default: HookMysql } = await import("./mysql.mjs");
 
 const promiseTermination = (child) =>
   new Promise((resolve, reject) => {
@@ -23,7 +26,7 @@ const promiseTermination = (child) =>
   });
 
 const port = 3306;
-const path = `${tmpdir()}/${Math.random().toString(36).substring(2)}`;
+const url = getFreshTemporaryURL();
 
 const proceedAsync = async () => {
   const dependencies = await buildTestDependenciesAsync(import.meta.url);
@@ -109,7 +112,7 @@ if (Reflect.getOwnPropertyDescriptor(process.env, "TRAVIS") !== undefined) {
           "--initialize-insecure",
           "--default-authentication-plugin=mysql_native_password",
           "--datadir",
-          path,
+          fileURLToPath(url),
         ],
         { stdio: "inherit" },
       ),
@@ -118,7 +121,7 @@ if (Reflect.getOwnPropertyDescriptor(process.env, "TRAVIS") !== undefined) {
   );
   const child = spawn(
     "/usr/local/mysql/bin/mysqld",
-    ["--port", String(port), "--datadir", path],
+    ["--port", String(port), "--datadir", fileURLToPath(url)],
     { stdio: "inherit" },
   );
   const termination = promiseTermination(child);
@@ -154,6 +157,6 @@ if (Reflect.getOwnPropertyDescriptor(process.env, "TRAVIS") !== undefined) {
     // SIGKILL will leave stuff in /tmp which prevent next mysqld to run
     child.kill("SIGTERM");
     await termination;
-    await promiseTermination(spawn("/bin/sh", ["-c", `rm -rf ${path}$`]));
+    await rmAsync(new URL(url), { recursive: true });
   }
 }

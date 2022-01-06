@@ -1,27 +1,43 @@
 import { createRequire } from "module";
 import { readFileSync, readdirSync } from "fs";
+import { pathToFileURL } from "url";
 import Git from "./git.mjs";
 
+const _URL = URL;
 const { parse } = JSON;
 
 export default (dependencies) => {
   const {
-    util: { getDirectory },
     expect: { expectSuccess, expect },
+    url: { appendURLSegment },
     log: { logWarning },
   } = dependencies;
   const { extractGitInformation } = Git(dependencies);
-  const createPackage = (directory) => {
+  const hasPackageJSON = (url) => {
+    try {
+      readFileSync(new _URL(appendURLSegment(url, "package.json")), "utf8");
+      return true;
+    } catch (error) {
+      const { code } = { code: null, ...error };
+      expect(
+        code === "ENOENT",
+        "failed to attempt reading package.json >> %e",
+        error,
+      );
+      return false;
+    }
+  };
+  const createPackage = (url) => {
     if (
       !expectSuccess(
-        () => readdirSync(directory),
+        () => readdirSync(new _URL(url)),
         "could not read repository directory %j >> %e",
-        directory,
+        url,
       ).includes("package.json")
     ) {
       logWarning(
         "No 'package.json' file found at repository directory %s",
-        directory,
+        url,
       );
       return null;
     }
@@ -33,62 +49,60 @@ export default (dependencies) => {
         () =>
           parse(
             expectSuccess(
-              () => readFileSync(`${directory}/package.json`, "utf8"),
+              () =>
+                readFileSync(
+                  new _URL(appendURLSegment(url, "package.json")),
+                  "utf8",
+                ),
               "could not read 'package.json' file from %j >> %e",
-              directory,
+              url,
             ),
           ),
         "could not parse 'package.json' file from %j >> %e",
-        directory,
+        url,
       ),
     };
     expect(
       name !== null,
       "missing name property in 'package.json' file from %j",
-      directory,
+      url,
     );
     expect(
       version !== null,
       "missing version property in 'package.json' file from %j",
-      directory,
+      url,
     );
     return { name, version, homepage };
   };
   return {
     extractRepositoryHistory: extractGitInformation,
     extractRepositoryPackage: createPackage,
-    extractRepositoryDependency: (repository, name) => {
-      const { resolve } = createRequire(`${repository}/dummy.js`);
-      let path = expectSuccess(
-        () => resolve(name),
-        "could not resolve %j from %j >> %e",
-        name,
-        repository,
+    extractRepositoryDependency: (home, segments) => {
+      const { resolve } = createRequire(
+        new _URL(appendURLSegment(home, "dummy.js")),
       );
-      path = getDirectory(path);
-      while (path !== "/") {
-        try {
-          readFileSync(`${path}/package.json`, "utf8");
-          break;
-        } catch (error) {
-          const { code } = { code: null, ...error };
-          expect(
-            code === "ENOENT",
-            "failed to attempt reading package.json >> %e",
-            error,
-          );
-        }
-        path = getDirectory(path);
+      let url = pathToFileURL(
+        expectSuccess(
+          () => resolve(segments.join("/")),
+          "could not resolve %j from %j >> %e",
+          segments,
+          home,
+        ),
+      );
+      url = appendURLSegment(url, "..");
+      while (!hasPackageJSON(url)) {
+        const parent_url = appendURLSegment(url, "..");
+        expect(
+          parent_url !== url,
+          "failed to find package.json file from module %j in repository %j",
+          segments,
+          home,
+        );
+        url = parent_url;
       }
-      expect(
-        path !== "/",
-        "failed to find package.json file from module %j in repository %j",
-        name,
-        repository,
-      );
       return {
-        directory: path,
-        package: createPackage(path),
+        directory: url,
+        package: createPackage(url),
       };
     },
   };

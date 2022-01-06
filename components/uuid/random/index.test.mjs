@@ -1,7 +1,5 @@
-import { strict as Assert } from "assert";
+import { assertEqual, assertNotEqual } from "../../__fixture__.mjs";
 import UUID from "./index.mjs";
-
-const { equal: assertEqual, notEqual: assertNotEqual } = Assert;
 
 const { getUUID } = UUID({});
 assertEqual(typeof getUUID(), "string");

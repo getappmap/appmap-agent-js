@@ -6,7 +6,6 @@ import * as Either from "./either.mjs";
 import * as Format from "./format.mjs";
 import * as Function from "./function.mjs";
 import * as Object from "./object.mjs";
-import * as Path from "./path.mjs";
 import * as Print from "./print.mjs";
 import * as Version from "./version.mjs";
 
@@ -20,7 +19,6 @@ export default (dependencies) => {
     ...Format,
     ...Function,
     ...Object,
-    ...Path,
     ...Print,
     ...Version,
   };

@@ -2,6 +2,7 @@ import minimist from "minimist";
 import { readFileSync } from "fs";
 import YAML from "yaml";
 
+const _URL = URL;
 const _Map = Map;
 const { parse: parseYAML } = YAML;
 const { parse: parseJSON } = JSON;
@@ -10,7 +11,8 @@ const { isArray } = Array;
 
 export default (dependencies) => {
   const {
-    util: { hasOwnProperty, getDirectory, coalesce, getExtension },
+    util: { hasOwnProperty, coalesce },
+    url: { urlifyPath, getLastURLSegment, appendURLSegment },
     expect: { expect, expectSuccess },
     configuration: { createConfiguration, extendConfiguration },
   } = dependencies;
@@ -21,8 +23,13 @@ export default (dependencies) => {
     ["yaml", parseYAML],
   ]);
 
-  const loadConfigFile = (path) => {
-    const extension = getExtension(path);
+  const getExtension = (url) => {
+    const parts = getLastURLSegment(url).split(".");
+    return parts.length === 1 ? "" : parts[parts.length - 1];
+  };
+
+  const loadConfigFile = (url) => {
+    const extension = getExtension(url);
     expect(
       parsers.has(extension),
       "Unsupported configuration file extension: %j.",
@@ -31,13 +38,13 @@ export default (dependencies) => {
     const parse = parsers.get(extension);
     let content = null;
     try {
-      content = readFileSync(path, "utf8");
+      content = readFileSync(new _URL(url), "utf8");
     } catch (error) {
       const { code } = error;
       expect(
         code === "ENOENT",
         "Cannot read configuration file at %j >> %e",
-        path,
+        url,
         error,
       );
       return {};
@@ -45,11 +52,9 @@ export default (dependencies) => {
     return expectSuccess(
       () => parse(content),
       "Failed to parse configuration file at %j >> %e",
-      path,
+      url,
     );
   };
-
-  const quote = (arg) => `'${arg.replace(/'/gu, "\\'")}'`;
 
   const aliases = new _Map([
     ["log-level", "log"],
@@ -84,8 +89,19 @@ export default (dependencies) => {
 
   const extractConfig = (argv) => {
     let { _: positional, ...config } = minimist(argv.slice(2));
+
     if (positional.length > 0) {
-      addOption(config, "command", positional.map(quote).join(" "));
+      expect(
+        !hasOwnProperty(config, "command"),
+        "The command should not be specified both as positional arguments and in --command",
+      );
+      addOption(config, "command", positional);
+    } else {
+      expect(
+        !hasOwnProperty(config, "command") ||
+          typeof config.command === "string",
+        "There should only be one --command argument",
+      );
     }
     for (const key of ownKeys(config)) {
       if (aliases.has(key)) {
@@ -104,21 +120,23 @@ export default (dependencies) => {
 
   return {
     loadProcessConfiguration: ({ env, argv, cwd }) => {
-      const path = coalesce(
-        env,
-        "APPMAP_CONFIGURATION_PATH",
-        `${cwd()}/appmap.yml`,
+      const url = urlifyPath(
+        coalesce(env, "APPMAP_CONFIGURATION_PATH", "appmap.yml"),
+        urlifyPath(cwd(), "file:///"),
       );
       return extendConfiguration(
         extendConfiguration(
           createConfiguration(
-            coalesce(env, "APPMAP_REPOSITORY_DIRECTORY", cwd()),
+            urlifyPath(
+              coalesce(env, "APPMAP_REPOSITORY_DIRECTORY", "."),
+              urlifyPath(cwd(), "file:///"),
+            ),
           ),
-          loadConfigFile(path),
-          getDirectory(path),
+          loadConfigFile(url),
+          appendURLSegment(url, ".."),
         ),
         extractConfig(argv),
-        cwd(),
+        urlifyPath(cwd(), "file:///"),
       );
     },
   };

@@ -1,4 +1,9 @@
-import { dirname, relative } from "path";
+import {
+  dirname,
+  relative,
+  join as joinPath,
+  sep as path_separator,
+} from "path";
 import { readdir, writeFile, lstat } from "fs/promises";
 import { fileURLToPath } from "url";
 import { expect } from "./expect.mjs";
@@ -9,6 +14,9 @@ const __filname = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filname);
 
 const indent = (line) => `  ${line}`;
+
+const toPosixPath = (relative_path) =>
+  relative_path.split(path_separator).join("/");
 
 const getIdentifier = (component, instance) =>
   `${component.replace(/-/gu, "_")}$${instance.replace(/-/gu, "_")}`;
@@ -28,7 +36,7 @@ const visitComponentAsync = async (component, context) => {
   if (blueprint.has(component)) {
     for (const instance of blueprint.get(component)) {
       const { branches, dependencies } = await loadConfAsync(
-        `${root}/${component}/${instance}/${conf}`,
+        joinPath(root, component, instance, conf),
       );
       expect(
         branches.includes(branch),
@@ -41,10 +49,10 @@ const visitComponentAsync = async (component, context) => {
       components.push(...dependencies);
     }
   } else {
-    for (const instance of await readdir(`${root}/${component}`)) {
-      if ((await lstat(`${root}/${component}/${instance}`)).isDirectory()) {
+    for (const instance of await readdir(joinPath(root, component))) {
+      if ((await lstat(joinPath(root, component, instance))).isDirectory()) {
         const { branches, dependencies } = await loadConfAsync(
-          `${root}/${component}/${instance}/${conf}`,
+          joinPath(root, component, instance, conf),
         );
         if (branches.includes(branch)) {
           instances.push(instance);
@@ -73,9 +81,8 @@ const visitComponentAsync = async (component, context) => {
       ...head,
       ...instances.map(
         (instance) =>
-          `import ${getIdentifier(component, instance)} from "./${relative(
-            directory,
-            `${root}/${component}/${instance}/${main}`,
+          `import ${getIdentifier(component, instance)} from "./${toPosixPath(
+            relative(directory, joinPath(root, component, instance, main)),
           )}";`,
       ),
     ],
@@ -105,8 +112,8 @@ const visitComponentAsync = async (component, context) => {
 
 export const writeEntryPointAsync = async (branch, component, options) => {
   const context = {
-    root: `${__dirname}/../../components`,
-    directory: `${__dirname}/../../dist/${branch}`,
+    root: joinPath(__dirname, "..", "..", "components"),
+    directory: joinPath(__dirname, "..", "..", "dist", branch),
     filename: `${component}.mjs`,
     conf: ".build.yml",
     main: "index.mjs",
@@ -119,7 +126,7 @@ export const writeEntryPointAsync = async (branch, component, options) => {
   const { directory, filename } = context;
   const { head, body } = await visitComponentAsync(component, context);
   await writeFile(
-    `${directory}/${filename}`,
+    joinPath(directory, filename),
     [
       ...head,
       "",

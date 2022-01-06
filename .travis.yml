@@ -3,9 +3,10 @@ os: linux
 dist: focal
 language: node_js
 cache: npm
+node_js: 16
 
 install:
-  - npm install
+  - npm ci
   - npm run build
 
 stages:
@@ -13,29 +14,37 @@ stages:
   - test
   - deploy
 
-script:
-  - npm run test-unit
-  - npm run test-integration
-
 jobs:
   include:
     - stage: lint
-      node_js: 16
       script:
         - npm run lint
     - stage: test
+      os: linux
+      node_js: 16
+      script:
+        - npm run test-unit-coverage
+        - npm run test-integration
+    - stage: test
+      os: linux
       node_js: 14
       script:
         - npm run test-unit
         - npm run test-integration
     - stage: test
+      os: windows
       node_js: 16
       script:
         - npm run test-unit
         - npm run test-integration
+    - stage: test
+      os: windows
+      node_js: 14
+      script:
+        - npm run test-unit
+        - npm run test-integration
     - stage: deploy
-      node_js: 16
+      if: branch = main
       script:
         - npm run format
         - npm run deploy
-      branches: main

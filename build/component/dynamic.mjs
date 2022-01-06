@@ -1,11 +1,17 @@
-import { readdir, lstat } from "fs/promises";
-import { relative, dirname } from "path";
+import { readdir as readdirAsync, lstat as lstatAsync } from "fs/promises";
+import {
+  sep as path_separator,
+  relative as toRelativePath,
+  dirname as getDirectory,
+  basename as getFilename,
+  join as joinPath,
+} from "path";
 import { fileURLToPath } from "url";
 import { expect } from "./expect.mjs";
 import { loadConfAsync } from "./conf.mjs";
 
 const __filname = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filname);
+const __dirname = getDirectory(__filname);
 const { entries: toEntries } = Object;
 
 const getInstanceAsync = async (
@@ -15,7 +21,7 @@ const getInstanceAsync = async (
   if (blueprint.has(component)) {
     const instance = blueprint.get(component);
     const { branches, dependencies } = await loadConfAsync(
-      `${root}/${component}/${instance}/${conf}`,
+      joinPath(root, component, instance, conf),
     );
     expect(
       branches.includes(branch),
@@ -30,10 +36,10 @@ const getInstanceAsync = async (
     };
   }
   const results = [];
-  for (const instance of await readdir(`${root}/${component}`)) {
-    if ((await lstat(`${root}/${component}/${instance}`)).isDirectory()) {
+  for (const instance of await readdirAsync(joinPath(root, component))) {
+    if ((await lstatAsync(joinPath(root, component, instance))).isDirectory()) {
       const { branches, dependencies } = await loadConfAsync(
-        `${root}/${component}/${instance}/${conf}`,
+        joinPath(root, component, instance, conf),
       );
       if (branches.includes(branch)) {
         results.push({ instance, dependencies });
@@ -65,7 +71,9 @@ const visitComponentAsync = async (component, context) => {
       context,
     );
     const { default: Component } = await import(
-      `${root}/${component}/${instance}/${main}`
+      joinPath(toRelativePath(__dirname, root), component, instance, main)
+        .split(path_separator)
+        .join("/")
     );
     cache.set(
       component,
@@ -86,7 +94,7 @@ const visitComponentsAsync = async (components, context) => {
 const createContext = (branch, blueprint, options) => ({
   conf: ".build.yml",
   main: "index.mjs",
-  root: `${__dirname}/../../components`,
+  root: joinPath(__dirname, "..", "..", "components"),
   ...options,
   branch,
   blueprint: new Map(toEntries(blueprint)),
@@ -117,9 +125,16 @@ export const buildDependenciesAsync = async (
   const path = fileURLToPath(url);
   const context = createContext(branch, blueprint, options);
   const { root, conf } = context;
-  const [component, instance] = relative(root, path).split("/");
+  let relative_path = toRelativePath(root, path);
+  let component = null;
+  let instance = null;
+  while (relative_path !== ".") {
+    instance = component;
+    component = getFilename(relative_path);
+    relative_path = getDirectory(relative_path);
+  }
   const { dependencies } = await loadConfAsync(
-    `${root}/${component}/${instance}/${conf}`,
+    joinPath(root, component, instance, conf),
   );
   return visitComponentsAsync(dependencies, context);
 };

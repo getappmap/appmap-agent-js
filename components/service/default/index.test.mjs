@@ -1,12 +1,7 @@
-import { strict as Assert } from "assert";
 import { createServer, Socket } from "net";
-
+import { convertPort } from "../../__fixture__.mjs";
 import { buildTestDependenciesAsync } from "../../build.mjs";
 import Service from "./index.mjs";
-
-const {
-  // equal:assertEqual,
-} = Assert;
 
 const { openServiceAsync, closeServiceAsync, getServicePort } = Service(
   await buildTestDependenciesAsync(import.meta.url),
@@ -18,7 +13,7 @@ const { openServiceAsync, closeServiceAsync, getServicePort } = Service(
   await new Promise((resolve, reject) => {
     socket.on("connect", resolve);
     socket.on("error", reject);
-    socket.connect(getServicePort(service));
+    socket.connect(convertPort(getServicePort(service)));
   });
   // Wait for server to process connection
   await new Promise((resolve) => {
@@ -33,7 +28,7 @@ const { openServiceAsync, closeServiceAsync, getServicePort } = Service(
   await new Promise((resolve, reject) => {
     socket.on("connect", resolve);
     socket.on("error", reject);
-    socket.connect(getServicePort(service));
+    socket.connect(convertPort(getServicePort(service)));
   });
   await new Promise((resolve, reject) => {
     socket.on("close", resolve);

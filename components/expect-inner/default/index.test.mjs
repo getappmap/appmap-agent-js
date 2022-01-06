@@ -1,8 +1,6 @@
-import { strict as Assert } from "assert";
+import { assertEqual, assertThrow, assertFail } from "../../__fixture__.mjs";
 import { buildTestDependenciesAsync } from "../../build.mjs";
 import Expect from "./index.mjs";
-
-const { equal: assertEqual, throws: assertThrows, fail: assertFail } = Assert;
 
 const {
   expect,
@@ -14,9 +12,9 @@ const {
 
 assertEqual(expect(true, "%s", "foo"), undefined);
 
-assertThrows(() => expect(false, "%s", "foo"), /^AppmapError: foo/);
+assertThrow(() => expect(false, "%s", "foo"), /^AppmapError: foo/);
 
-assertThrows(
+assertThrow(
   () => expectDeadcode("%s %s", "foo")("bar"),
   /^AppmapError: foo bar/,
 );

@@ -1,16 +1,9 @@
-import { strict as Assert } from "assert";
+import { assertDeepEqual } from "../../__fixture__.mjs";
 import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
 } from "../../build.mjs";
 import Trace from "./index.mjs";
-
-Error.stackTraceLimit = Infinity;
-
-const {
-  deepEqual: assertDeepEqual,
-  // equal: assertEqual,
-} = Assert;
 
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
 const { createConfiguration, extendConfiguration } =
@@ -20,11 +13,11 @@ const { makeLocation, stringifyLocation } = await buildTestComponentAsync(
 );
 const { compileTrace } = Trace(dependencies);
 const configuration = extendConfiguration(
-  createConfiguration("/cwd"),
+  createConfiguration("file:///home"),
   {
     recorder: "process",
     agent: {
-      directory: "/agent",
+      directory: "file:///agent",
       package: {
         name: "agent",
         version: "1.2.3",
@@ -34,7 +27,7 @@ const configuration = extendConfiguration(
     pruning: true,
     "function-name-placeholder": "$",
   },
-  "/cwd",
+  "file:///base",
 );
 const indexes = {
   file: 1,
@@ -47,7 +40,7 @@ assertDeepEqual(
     configuration,
     [
       {
-        url: "file:///cwd/filename.js",
+        url: "file:///home/filename.js",
         content: "function f (x) {}",
         shallow: false,
         exclude: [
@@ -72,7 +65,7 @@ assertDeepEqual(
         data: {
           type: "apply",
           function: stringifyLocation(
-            makeLocation("file:///cwd/filename.js", 1, 0),
+            makeLocation("file:///home/filename.js", 1, 0),
           ),
           this: { type: "string", print: "this-print" },
           arguments: [{ type: "string", print: "arg-print" }],

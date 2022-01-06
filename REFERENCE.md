@@ -185,7 +185,7 @@ The agent filter code objects (functions or objects/classes) based on a format c
 
 ### Automated Recording Configuration Fields
 
-* `command <string>` The command to record.
+* `command <string> | <string[]>` The command to record. It is either a string containing the command tokens or a list of already parsed tokens. Note that this is not a shell or cmd.exe script. Rather it is simply the name or path of an executable followed by arguments. Tokens can be words, double quoted strings, or single quoted strings. Double-quoted strings are parsed as JSON string and single-quoted string use backslashes to escape any character. For instance, the string command (represented as a JS string literal) `'  exec  "foo\"bar"  \\'\\\q\\\u\\\x\\'  '` is parsed as `['word', 'foo"bar', 'qux']`.
 * `command-options <object>` Options to run the command, inspired by node's `child_process` library.
     * `env <object>` Environment variables. Note that Unlike for the [child_process#spawn](https://nodejs.org/api/child_process.html#child_process_child_process_spawn_command_args_options), the environment variables from the parent process will always be included.
     *Default*: `{}` -- ie: the environment variables from the parent process.
@@ -198,6 +198,9 @@ The agent filter code objects (functions or objects/classes) based on a format c
     * `"process"` Generate a single appmap which spans over the entire lifetime of the process.
     * `"mocha"` Generate an appmap for each test case (ie `it` calls) of the entire test suite (ie every `describe` calls on every test file).
     * `"remote"` Generate appmap on demand via HTTP requests.
+* `socket "unix" | "net"` Defines the socket implementation to use: [`posix-socket`](https://www.npmjs.com/package/posix-socket) or [`net.Socket`](https://nodejs.org/api/net.html#class-netsocket). The `posix-socket` module provide synchronous methods which avoid creating asynchronous resources that are observed when `ordering` is `"causal"`. To avoid infinite loop, the `"net"` implementation buffers messages. The `"unix"` is probably the better option but it requires node-gyp compilation and is not available on windows. If `"unix"` is chosen but the `posix-socket` could not be installed, the agent will fallback on `"net"`. Default: `"unix"`.
+* `heartbeat <number> | null` Defines the interval in millisecond where the socket should be flushed. This only has effect if `socket` is `"net"`. Default: `1000`.
+* `threshold <number> | null` Defines the maximum number of message before the socket should be flushed. This only has effect if `socket` is `"net"`. Default: `100`.
 * `trace-port <number> | <string>` Defines the communication port between frontend and backend. A string indicates a path to a unix domain socket which is faster. *Default*: `0` which will use a random available port.
 * `track-port <number> | <string>`: Port in the backend process for serving remote recording HTTP requests. *Default*: `0` A random port will be used.
 * `intercept-track-port <string>`: Regular expression to whitelist the ports in the frontend process for intercepting remote recording HTTP requests. *Default*: `"^"` Every detected HTTP ports will be spied upon.
@@ -254,7 +257,7 @@ The agent filter code objects (functions or objects/classes) based on a format c
     * `<boolean>` Shorthand, `true` is the same as `{message: true, appmap:true}` and `false` is the same as `{message:true, appmap:true}`.
     * `<object>`
         * `message <boolean>` Indicates whether to validate trace elements as they are buffered. This is useful to help diagnose the root cause of some bugs. *Default* `false`.
-        * `appmap <boolean>` Indicates whether to validate the appmap before writting it to a file. *Default* `false`.
+        * `appmap <boolean>` Indicates whether to validate the appmap before writing it to a file. *Default* `false`.
 
 ## Application Representation
 

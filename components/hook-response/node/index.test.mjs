@@ -1,7 +1,10 @@
-import { strict as Assert } from "assert";
-import { tmpdir } from "os";
 import Http from "http";
 import createApp from "express";
+import {
+  assertDeepEqual,
+  getFreshTemporaryURL,
+  convertPort,
+} from "../../__fixture__.mjs";
 import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
@@ -9,11 +12,6 @@ import {
 import HookResponse from "./index.mjs";
 
 const { get } = Http;
-
-const {
-  // equal: assertEqual,
-  deepEqual: assertDeepEqual,
-} = Assert;
 
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
 const { testHookAsync, makeEvent } = await buildTestComponentAsync("hook");
@@ -23,10 +21,9 @@ const listenAsync = (server, port) =>
   new Promise((resolve, reject) => {
     server.on("error", reject);
     server.on("listening", () => {
-      const address = server.address();
-      resolve(typeof address === "string" ? address : address.port);
+      resolve(port === 0 ? server.address().port : port);
     });
-    server.listen(port);
+    server.listen(convertPort(port));
   });
 
 const promiseCycleClosing = async (request, response) =>
@@ -189,7 +186,7 @@ assertDeepEqual(
 
 // Track Port && http.Server //
 {
-  const port = `${tmpdir()}/${Math.random().toString(36).substring(2)}`;
+  const port = getFreshTemporaryURL();
   assertDeepEqual(
     await testHookAsync(
       hookResponse,
@@ -223,7 +220,7 @@ assertDeepEqual(
         assertDeepEqual(
           await requestAsync(
             Http.get({
-              socketPath: port,
+              socketPath: convertPort(port),
               path: "/foo/bar",
             }),
           ),

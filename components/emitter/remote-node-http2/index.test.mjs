@@ -1,14 +1,12 @@
 import { createServer } from "http2";
-import { tmpdir } from "os";
-import { strict as Assert } from "assert";
+import {
+  getFreshTemporaryPath,
+  assertEqual,
+  assertDeepEqual,
+  assertFail,
+} from "../../__fixture__.mjs";
 import { buildTestDependenciesAsync } from "../../build.mjs";
 import Client from "./index.mjs";
-
-const {
-  equal: assertEqual,
-  deepEqual: assertDeepEqual,
-  fail: assertFail,
-} = Assert;
 
 const testCaseAsync = async (port, respond, runAsync) => {
   const server = createServer();
@@ -38,7 +36,7 @@ const { createClient, executeClientAsync, interruptClient, traceClient } =
 {
   let buffer = [];
   await testCaseAsync(
-    `${tmpdir()}/${Math.random().toString("36").substring(2)}`,
+    getFreshTemporaryPath(),
     (body, stream) => {
       buffer.push(body);
       stream.respond({ ":status": 200 });

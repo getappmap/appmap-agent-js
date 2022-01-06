@@ -1,4 +1,5 @@
 import Http from "http";
+import { fileURLToPath } from "url";
 
 const { request: createRequest } = Http;
 const { from: toBuffer, concat: concatBuffer } = Buffer;
@@ -11,6 +12,7 @@ const INVALID_HEADERS_MESSAGE =
 export default (dependencies) => {
   const {
     util: { noop, hasOwnProperty },
+    path: { toIPCPath },
   } = dependencies;
   const parse = (body) => {
     if (body === "") {
@@ -48,7 +50,8 @@ export default (dependencies) => {
         const request = createRequest({
           host,
           port: typeof port === "number" ? port : null,
-          socketPath: typeof port === "string" ? port : null,
+          socketPath:
+            typeof port === "string" ? toIPCPath(fileURLToPath(port)) : null,
           method,
           path,
           headers: createHeaders(buffer),

@@ -1,13 +1,9 @@
-import { strict as Assert } from "assert";
+import { assertDeepEqual, assertEqual } from "../../../__fixture__.mjs";
 import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
 } from "../../../build.mjs";
 import Classmap from "./index.mjs";
-
-Error.stackTraceLimit = Infinity;
-
-const { deepEqual: assertDeepEqual, equal: assertEqual } = Assert;
 
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
 const { stringifyLocation, makeLocation } = await buildTestComponentAsync(
@@ -21,8 +17,6 @@ const {
   compileClassmap,
   getClassmapClosure,
 } = Classmap(dependencies);
-
-const cwd = "/cwd";
 
 const placeholder = "$";
 
@@ -49,18 +43,18 @@ const and_exclude = {
 {
   const classmap = createClassmap(
     extendConfiguration(
-      createConfiguration(cwd),
+      createConfiguration("file:///home"),
       {
         pruning: true,
         "function-name-placeholder": placeholder,
         "collapse-package-hierachy": true,
       },
-      cwd,
+      "file:///base",
     ),
   );
 
   addClassmapSource(classmap, {
-    url: `file://${cwd}/directory/function.js`,
+    url: `file:///home/directory/function.js`,
     content:
       "const o = { f: \n function (x) {} , g: \n function (y) {} , h: \n function (z) {} , i : \n function (t) { function j () {} } }; const p = {};",
     inline: false,
@@ -86,7 +80,7 @@ const and_exclude = {
     getClassmapClosure(
       classmap,
       stringifyLocation(
-        makeLocation(`file://${cwd}/directory/function.js`, 1, 1),
+        makeLocation(`file:///home/directory/function.js`, 1, 1),
       ),
     ),
     null,
@@ -96,7 +90,7 @@ const and_exclude = {
     getClassmapClosure(
       classmap,
       stringifyLocation(
-        makeLocation(`file://${cwd}/directory/function.js`, 2, 1),
+        makeLocation(`file:///home/directory/function.js`, 2, 1),
       ),
     ),
     {
@@ -116,7 +110,7 @@ const and_exclude = {
     getClassmapClosure(
       classmap,
       stringifyLocation(
-        makeLocation(`file://${cwd}/directory/function.js`, 3, 1),
+        makeLocation(`file:///home/directory/function.js`, 3, 1),
       ),
     ),
     null,
@@ -126,13 +120,13 @@ const and_exclude = {
     getClassmapClosure(
       classmap,
       stringifyLocation(
-        makeLocation(`file://${cwd}/directory/function.js`, 2, 0),
+        makeLocation(`file:///home/directory/function.js`, 2, 0),
       ),
     ),
     getClassmapClosure(
       classmap,
       stringifyLocation(
-        makeLocation(`file://${cwd}/directory/function.js`, 2, 1),
+        makeLocation(`file:///home/directory/function.js`, 2, 1),
       ),
     ),
   );
@@ -142,10 +136,10 @@ const and_exclude = {
       classmap,
       new Set([
         stringifyLocation(
-          makeLocation(`file://${cwd}/directory/function.js`, 2, 0),
+          makeLocation(`file:///home/directory/function.js`, 2, 0),
         ),
         stringifyLocation(
-          makeLocation(`file://${cwd}/directory/function.js`, 2, 1),
+          makeLocation(`file:///home/directory/function.js`, 2, 1),
         ),
       ]),
     ),
@@ -184,18 +178,18 @@ const and_exclude = {
 {
   const classmap = createClassmap(
     extendConfiguration(
-      createConfiguration(cwd),
+      createConfiguration("file:///home"),
       {
         pruning: false,
         "function-name-placeholder": placeholder,
         "collapse-package-hierachy": false,
       },
-      cwd,
+      "file:///base",
     ),
   );
 
   addClassmapSource(classmap, {
-    url: `file://${cwd}/directory/function.js`,
+    url: `file:///home/directory/function.js`,
     content:
       "function f () {} /* comment1 */ \n function g () {} /* comment2 */ /* comment3 */ \n function h () {}",
     inline: true,

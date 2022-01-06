@@ -1,38 +1,36 @@
-import { strict as Assert } from "assert";
+import {
+  assertDeepEqual,
+  assertEqual,
+  assertThrow,
+} from "../../__fixture__.mjs";
 import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
 } from "../../build.mjs";
-import ConfigurationHelper from "./index.mjs";
-
-const {
-  deepEqual: assertDeepEqual,
-  equal: assertEqual,
-  throws: assertThrows,
-} = Assert;
+import ConfigurationAccessor from "./index.mjs";
 
 const { createConfiguration, extendConfiguration } =
   await buildTestComponentAsync("configuration");
 
 const {
-  getConfigurationScenarios,
-  initializeConfiguration,
-  sanitizeConfigurationManual,
+  resolveConfigurationRepository,
+  resolveConfigurationAutomatedRecorder,
+  resolveConfigurationManualRecorder,
+  extendConfigurationNode,
+  extendConfigurationPort,
   isConfigurationEnabled,
   getConfigurationPackage,
-  extendConfigurationNode,
+  getConfigurationScenarios,
   compileConfigurationCommand,
-  resolveConfigurationPort,
-  resolveConfigurationRecorder,
-} = ConfigurationHelper(await buildTestDependenciesAsync(import.meta.url));
+} = ConfigurationAccessor(await buildTestDependenciesAsync(import.meta.url));
 
-/////////////////////////////////
-// sanitizeConfigurationManual //
-/////////////////////////////////
+////////////////////////////////////////
+// resolveConfigurationManualRecorder //
+////////////////////////////////////////
 
 assertEqual(
   Reflect.get(
-    sanitizeConfigurationManual(createConfiguration("/home")),
+    resolveConfigurationManualRecorder(createConfiguration("file:///home")),
     "recorder",
   ),
   "manual",
@@ -45,81 +43,67 @@ assertEqual(
 assertDeepEqual(
   getConfigurationScenarios(
     extendConfiguration(
-      createConfiguration("/home"),
+      createConfiguration("file:///home"),
       {
         scenario: "^f",
         scenarios: { foo: { name: "foo" }, bar: { name: "bar" } },
       },
-      "/cwd",
+      "file:///base",
     ),
   ),
   [
     extendConfiguration(
-      createConfiguration("/home"),
+      createConfiguration("file:///home"),
       { scenario: "^f", name: "foo" },
       null,
     ),
   ],
 );
 
-/////////////////////////////
-// initializeConfiguration //
-/////////////////////////////
+////////////////////////////////////
+// resolveConfigurationRepository //
+////////////////////////////////////
 
-{
-  const agent = {
-    directory: "/agent",
-    package: { name: "agent", version: "1.2.3", homepage: null },
-  };
-  assertDeepEqual(
-    Reflect.get(
-      initializeConfiguration(createConfiguration("/home"), agent, {
-        directory: "/home",
-        history: null,
-        package: null,
-      }),
-      "agent",
-    ),
-    agent,
-  );
-}
+resolveConfigurationRepository(createConfiguration("file:///home"));
 
-//////////////////////////////
-// resolveConfigurationPort //
-//////////////////////////////
+/////////////////////////////
+// extendConfigurationPort //
+/////////////////////////////
 
 assertEqual(
   Reflect.get(
-    resolveConfigurationPort(
+    extendConfigurationPort(
       extendConfiguration(
-        createConfiguration("/home"),
+        createConfiguration("file:///home"),
         {
-          "trace-port": 0,
+          "trace-port": "",
           "track-port": 8000,
         },
-        null,
+        "file:///base",
       ),
-      8080,
-      8000,
+      {
+        "trace-port": "ipc",
+        "track-port": 8000,
+      },
     ),
     "trace-port",
   ),
-  8080,
+  "file:///home/ipc",
 );
 
-//////////////////////////////////
-// resolveConfigurationRecorder //
-//////////////////////////////////
+///////////////////////////////////////////
+// resolveConfigurationAutomatedRecorder //
+///////////////////////////////////////////
 
 assertEqual(
   Reflect.get(
-    resolveConfigurationRecorder(
+    resolveConfigurationAutomatedRecorder(
       extendConfiguration(
-        createConfiguration("/home"),
+        createConfiguration("file:///home"),
         {
-          command: "npx mocha",
+          command: ["mocha.ext"],
         },
-        "/cwd",
+        "file:///base",
       ),
     ),
     "recorder",
@@ -129,13 +113,45 @@ assertEqual(
 
 assertEqual(
   Reflect.get(
-    resolveConfigurationRecorder(
+    resolveConfigurationAutomatedRecorder(
       extendConfiguration(
-        createConfiguration("/home"),
+        createConfiguration("file:///home"),
         {
-          command: "node main.js",
+          command: ["npx.ext", "mocha"],
         },
-        "/cwd",
+        "file:///base",
+      ),
+    ),
+    "recorder",
+  ),
+  "mocha",
+);
+
+assertEqual(
+  Reflect.get(
+    resolveConfigurationAutomatedRecorder(
+      extendConfiguration(
+        createConfiguration("file:///home"),
+        {
+          command: ["npm.ext", "exec", "mocha"],
+        },
+        "file:///base",
+      ),
+    ),
+    "recorder",
+  ),
+  "mocha",
+);
+
+assertEqual(
+  Reflect.get(
+    resolveConfigurationAutomatedRecorder(
+      extendConfiguration(
+        createConfiguration("file:///home"),
+        {
+          command: ["node", "main.js"],
+        },
+        "file:///base",
       ),
     ),
     "recorder",
@@ -148,10 +164,10 @@ assertEqual(
 ////////////////////////////
 
 {
-  const configuration = createConfiguration("/repository");
+  const configuration = createConfiguration("file:///home");
   assertEqual(
     isConfigurationEnabled(
-      extendConfiguration(configuration, { main: "main.js" }, "/repository"),
+      extendConfiguration(configuration, { main: "main.js" }, "file:///base"),
     ),
     true,
   );
@@ -166,7 +182,7 @@ assertEqual(
           },
           main: "main.js",
         },
-        "/directory",
+        "file:///base",
       ),
     ),
     false,
@@ -178,9 +194,12 @@ assertEqual(
 /////////////////////////////
 
 assertDeepEqual(
-  getConfigurationPackage(createConfiguration("/repository"), "data:,FOO"),
+  getConfigurationPackage(
+    createConfiguration("file:///home"),
+    "http://host/file.txt",
+  ),
   {
-    enabled: true,
+    enabled: false,
     shallow: false,
     exclude: [],
     "inline-source": null,
@@ -188,7 +207,7 @@ assertDeepEqual(
 );
 assertDeepEqual(
   getConfigurationPackage(
-    createConfiguration("/repository"),
+    createConfiguration("file:///home"),
     "file:///directory/foo",
   ),
   {
@@ -201,16 +220,16 @@ assertDeepEqual(
 assertDeepEqual(
   getConfigurationPackage(
     extendConfiguration(
-      createConfiguration("/repository"),
+      createConfiguration("file:///home"),
       {
         packages: [
           { glob: "*", exclude: ["exclude1"] },
           { glob: "**/*", exclude: ["exclude2"] },
         ],
       },
-      "/directory",
+      "file:///base",
     ),
-    "file:///directory/foo/bar",
+    "file:///base/foo/bar",
   ),
   {
     enabled: true,
@@ -230,62 +249,44 @@ assertDeepEqual(
   },
 );
 
-/////////////
-// extract //
-/////////////
+/////////////////////////////
+// extendConfigurationNode //
+/////////////////////////////
 
-// assertDeepEqual(
-//   extractEnvironmentConfiguration({
-//     APPMAP_FOO_BAR: "value1",
-//     QUX: "value2",
-//   }),
-//   { "foo-bar": "value1" },
-// );
+assertEqual(
+  Reflect.get(
+    extendConfigurationNode(createConfiguration("file:///home"), {
+      version: "v1.2.3",
+      argv: ["node", "main.js"],
+      cwd: () => "cwd",
+    }),
+    "main",
+  ),
+  "file:///home/cwd/main.js",
+);
 
 /////////////////////////////////
 // compilConfigurationeCommand //
 /////////////////////////////////
 
-// scenarios //
-
-// assertDeepEqual(extend("scenarios", { name: ["exec", "argv0"] }, "/base"), {
-//   name: [
-//     {
-//       fork: null,
-//       exec: "exec",
-//       argv: ["argv0"],
-//       configuration: {
-//         data: {},
-//         directory: "/base",
-//       },
-//       options: {
-//         encoding: "utf8",
-//         cwd: "/base",
-//         env: {},
-//         stdio: "inherit",
-//         timeout: 0,
-//         killSignal: "SIGTERM",
-//       },
-//     },
-//   ],
-// });
-
 const stripEnvironmentConfiguration = ({
-  command,
+  exec,
+  argv,
   options: {
+    cwd,
     env: { APPMAP_CONFIGURATION, ...env },
   },
-}) => ({ command, env });
+}) => ({ exec, argv, cwd, env });
 
 // recursive-process-recording: true //
 assertDeepEqual(
   stripEnvironmentConfiguration(
     compileConfigurationCommand(
       extendConfiguration(
-        createConfiguration("/cwd1"),
+        createConfiguration("file:///home"),
         {
           agent: {
-            directory: "/agent",
+            directory: "file:///agent",
             package: {
               name: "@appmap-agent-js",
               version: "1.2.3",
@@ -293,29 +294,30 @@ assertDeepEqual(
             },
           },
           "recursive-process-recording": true,
-          command: "exec argv1 $VAR1",
+          command: ["exec", "argv1"],
           recorder: "process",
           "command-options": {
-            env: { VAR1: "VAL1-1", NODE_OPTIONS: "--node-key=node-value" },
+            env: { VAR1: "VAL1", NODE_OPTIONS: "--node-key=node-value" },
           },
         },
-        "/cwd2",
+        "file:///base",
       ),
       {
-        VAR1: "VAL1-2",
         VAR2: "VAL2",
       },
     ),
   ),
   {
-    command: "exec argv1 $VAR1",
+    exec: "exec",
+    argv: ["argv1"],
+    cwd: new URL("file:///base"),
     env: {
       NODE_OPTIONS: [
         "--node-key=node-value",
-        "--require=/agent/lib/node/abomination.js",
-        "--experimental-loader=/agent/lib/node/recorder-process.mjs",
+        "--require=../agent/lib/node/abomination.js",
+        "--experimental-loader=../agent/lib/node/recorder-process.mjs",
       ].join(" "),
-      VAR1: "VAL1-1",
+      VAR1: "VAL1",
       VAR2: "VAL2",
     },
   },
@@ -326,10 +328,10 @@ assertDeepEqual(
   stripEnvironmentConfiguration(
     compileConfigurationCommand(
       extendConfiguration(
-        createConfiguration("/cwd1"),
+        createConfiguration("file:///home"),
         {
           agent: {
-            directory: "/agent",
+            directory: "file:///agent",
             package: {
               name: "@appmap-agent-js",
               version: "1.2.3",
@@ -337,111 +339,74 @@ assertDeepEqual(
             },
           },
           "recursive-process-recording": false,
-          command: "node * $VAR1 > $VAR2",
+          command: ["node", "main.js", "argv1"],
           recorder: "process",
-          "command-options": {
-            env: { VAR1: "VAL1-1" },
-          },
         },
-        "/cwd2",
+        "file:///base",
       ),
-      {
-        VAR1: "VAL1-2",
-        VAR2: "VAL2",
-      },
+      {},
     ),
   ),
   {
-    command: [
-      "'node'",
-      "'--experimental-loader'",
-      "'/agent/lib/node/recorder-process.mjs'",
-      "*",
-      "'VAL1-1'",
-      ">",
-      "'VAL2'",
-    ].join(" "),
-    env: {
-      VAR1: "VAL1-1",
-      VAR2: "VAL2",
-    },
+    exec: "node",
+    argv: [
+      "--experimental-loader",
+      "../agent/lib/node/recorder-process.mjs",
+      "main.js",
+      "argv1",
+    ],
+    cwd: new URL("file:///base"),
+    env: {},
   },
 );
 
 // mocha //
 {
-  const testMocha = (npx) => {
+  const testMocha = (command) => {
     assertDeepEqual(
       stripEnvironmentConfiguration(
         compileConfigurationCommand(
           extendConfiguration(
-            createConfiguration("/cwd1"),
+            createConfiguration("file:///home"),
             {
               agent: {
-                directory: "/agent",
+                directory: "file:///agent",
                 package: {
                   name: "@appmap-agent-js",
                   version: "1.2.3",
                   homepage: null,
                 },
               },
-              command: [...(npx ? ["npx"] : []), "mocha", "argv1"].join(" "),
+              command,
               recorder: "mocha",
             },
-            "/cwd2",
+            "file:///base",
           ),
           {},
         ),
       ),
       {
-        command: [
-          ...(npx ? ["'npx'", "'--always-spawn'"] : []),
-          "'mocha'",
-          "'--require'",
-          "'/agent/lib/node/recorder-mocha.mjs'",
-          "'argv1'",
-        ].join(" "),
+        exec: command[0],
+        argv: [
+          ...(command[0] === "npx" ? ["--always-spawn"] : []),
+          ...command.slice(1),
+          "--require",
+          "../agent/lib/node/recorder-mocha.mjs",
+        ],
+        cwd: new URL("file:///base"),
         env: {
           NODE_OPTIONS: [
             "",
-            "--require=/agent/lib/node/abomination.js",
-            "--experimental-loader=/agent/lib/node/mocha-loader.mjs",
+            "--require=../agent/lib/node/abomination.js",
+            "--experimental-loader=../agent/lib/node/mocha-loader.mjs",
           ].join(" "),
         },
       },
     );
   };
-  testMocha(true);
-  testMocha(false);
-  assertThrows(() => {
-    compileConfigurationCommand(
-      extendConfiguration(
-        createConfiguration("/cwd1"),
-        {
-          agent: {
-            directory: "/agent",
-            package: {
-              name: "@appmap-agent-js",
-              version: "1.2.3",
-              homepage: null,
-            },
-          },
-          command: "foo",
-          recorder: "mocha",
-        },
-        "/cwd2",
-      ),
-      {},
-    );
-  }, /^AppmapError/);
+  testMocha(["mocha"]);
+  testMocha(["npx", "mocha"]);
+  testMocha(["npm", "exec", "mocha"]);
+  testMocha(["node", "node_modules/bin/mocha"]);
+  assertThrow(() => testMocha(["foo"]), /^AppmapError/);
 }
-
-/////////////////////////////
-// extendConfigurationNode //
-/////////////////////////////
-
-extendConfigurationNode(createConfiguration("cwd"), {
-  version: "v1.2.3",
-  argv: ["node", "main.js"],
-  cwd: () => "/cwd",
-});

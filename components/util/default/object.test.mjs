@@ -1,4 +1,8 @@
-import { strict as Assert } from "assert";
+import {
+  assertEqual,
+  assertFail,
+  assertDeepEqual,
+} from "../../__fixture__.mjs";
 import {
   hasOwnProperty,
   getOwnPropertyValue,
@@ -9,12 +13,6 @@ import {
   assignProperty,
   generateGet,
 } from "./object.mjs";
-
-const {
-  equal: assertEqual,
-  fail: assertFail,
-  deepEqual: assertDeepEqual,
-} = Assert;
 
 // mapMaybe //
 

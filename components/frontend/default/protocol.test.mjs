@@ -1,8 +1,6 @@
-import { strict as Assert } from "assert";
+import { assertDeepEqual } from "../../__fixture__.mjs";
 import { buildTestDependenciesAsync } from "../../build.mjs";
 import Protocol from "./protocol.mjs";
-
-const { deepEqual: assertDeepEqual } = Assert;
 
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
 

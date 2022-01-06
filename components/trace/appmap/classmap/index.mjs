@@ -1,17 +1,15 @@
-/* globals URL */
-
 import Estree from "./estree/index.mjs";
 import ExclusionList from "./exclusion-list.mjs";
 
 const _Set = Set;
 const _Map = Map;
-const _URL = URL;
 const _undefined = undefined;
 const { from: toArray } = Array;
 
 export default (dependencies) => {
   const {
-    util: { assert, createCounter, toRelativePath },
+    util: { assert, createCounter },
+    url: { pathifyURL },
     log: { logWarning, logDebug },
     location: {
       makeLocation,
@@ -185,8 +183,7 @@ export default (dependencies) => {
     ) => {
       assert(!urls.has(url), "duplicate source url");
       urls.add(url);
-      const { pathname } = new _URL(url);
-      const path = toRelativePath(directory, pathname);
+      const path = pathifyURL(url, directory);
       const context = { url, path, shallow, inline, content, placeholder };
       const exclusions = compileExclusionList(exclude);
       const excluded_entities = [];
@@ -209,23 +206,23 @@ export default (dependencies) => {
       }
       sources.push({ context, entities });
     },
-    getClassmapClosure: ({ closures }, url) => {
-      if (closures.has(url)) {
-        return closures.get(url);
+    getClassmapClosure: ({ closures }, location) => {
+      if (closures.has(location)) {
+        return closures.get(location);
       }
-      const next_url = stringifyLocation(
-        incrementLocationColumn(parseLocation(url)),
+      const next_location = stringifyLocation(
+        incrementLocationColumn(parseLocation(location)),
       );
-      if (closures.has(next_url)) {
+      if (closures.has(next_location)) {
         logDebug(
           "Had to increase column by one to fetch closure information at %j",
-          url,
+          location,
         );
-        return closures.get(next_url);
+        return closures.get(next_location);
       }
       logWarning(
         "Missing file information for closure at %s, threating it as excluded.",
-        url,
+        location,
       );
       return null;
     },
@@ -235,21 +232,25 @@ export default (dependencies) => {
         configuration: { pruning, "collapse-package-hierachy": collapse },
         closures,
       },
-      urls,
+      locations,
     ) => {
       if (pruning) {
-        urls = new Set(
-          toArray(urls).map((url) =>
-            closures.has(url)
-              ? url
-              : stringifyLocation(incrementLocationColumn(parseLocation(url))),
+        locations = new Set(
+          toArray(locations).map((location) =>
+            closures.has(location)
+              ? location
+              : stringifyLocation(
+                  incrementLocationColumn(parseLocation(location)),
+                ),
           ),
         );
         sources = sources.map(({ context, entities }) => ({
           context,
-          entities: filterCalledEntityArray(entities, context, urls).flatMap(
-            cleanupEntity,
-          ),
+          entities: filterCalledEntityArray(
+            entities,
+            context,
+            locations,
+          ).flatMap(cleanupEntity),
         }));
       }
       const directories = new Set();
