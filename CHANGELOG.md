@@ -1,3 +1,15 @@
+# [9.0.0](https://github.com/applandinc/appmap-agent-js/compare/v8.8.4...v9.0.0) (2022-01-06)
+
+
+### Features
+
+* windows-support ([70d2c66](https://github.com/applandinc/appmap-agent-js/commit/70d2c669772948ce91b0149bde77d75ba786d30f))
+
+
+### BREAKING CHANGES
+
+* Commands are no longer interpreted using `/bin/sh`. Rather, they are understood as simply the path / name of an executable followed by its arguments. This the easiest and most portable approach and it should be sufficient for most cases. However, in the future we might want to use the npm approach where commands are interpreted by `/bin/sh` on unix platforms and `cmd.exe` on Windows platforms. We could also be using PowerShell on Windows and interpret the command as shell programs across all platforms.
+
 ## [8.8.4](https://github.com/applandinc/appmap-agent-js/compare/v8.8.3...v8.8.4) (2022-01-04)
 
 
