@@ -19,11 +19,15 @@ platform = "darwin";
   // pathifyURL //
   assertEqual(pathifyURL("http://host1/foo/bar", "http://host2/qux"), null);
   assertEqual(
-    pathifyURL("http://localhost/foo/bar/q%75x", "http://localhost/foo"),
-    "bar/qux",
+    pathifyURL("http://localhost/foo/bar/q%75x", "http://localhost/foo", true),
+    "./bar/qux",
   );
   assertEqual(
-    pathifyURL("http://localhost/foo//bar/qux/", "http://localhost//foo"),
+    pathifyURL(
+      "http://localhost/foo//bar/qux/",
+      "http://localhost//foo",
+      false,
+    ),
     "bar/qux",
   );
   assertEqual(
