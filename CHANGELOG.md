@@ -1,3 +1,10 @@
+## [9.0.1](https://github.com/applandinc/appmap-agent-js/compare/v9.0.0...v9.0.1) (2022-01-06)
+
+
+### Bug Fixes
+
+* node --require needs explicit dot in relative paths ([579ccdf](https://github.com/applandinc/appmap-agent-js/commit/579ccdf659784c2725a737590a413af5230a098c))
+
 # [9.0.0](https://github.com/applandinc/appmap-agent-js/compare/v8.8.4...v9.0.0) (2022-01-06)
 
 
