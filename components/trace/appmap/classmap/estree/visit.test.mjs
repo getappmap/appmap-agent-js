@@ -12,17 +12,6 @@ const { createCounter } = await buildTestComponentAsync("util");
 
 const { visit } = Visit(await buildTestDependenciesAsync(import.meta.url));
 
-// console.log(JSON.stringify(visit(
-//   (await import("@babel/parser")).default.parse(await (await import("fs/promises")).readFile("./yo.ts", "utf8"), {sourceType:"module", plugins:["typescript", "estree"]}),
-//   {
-//     naming: {
-//       separator: "-",
-//       counter: createCounter(0),
-//     },
-//     getLeadingCommentArray: () => [],
-//   },
-// ), null, 2));
-
 const test = (content, separator, comments) =>
   visit(
     parseAcorn(content, {
@@ -53,13 +42,29 @@ assertDeepEqual(test("({k:{}});", "@", ["comment"]), [
   },
 ]);
 
-assertDeepEqual(
-  test("class c { static m (x) { } }", "@", [
-    " @label-1 foo @label-2 ",
-    "@label-3",
-    "bar",
-  ]),
-  [
+assertDeepEqual(test("function f () {}", "@", []), [
+  {
+    type: "function",
+    name: "f",
+    line: 1,
+    column: 0,
+    static: false,
+    comments: [],
+    range: [0, 16],
+    parameters: [],
+    labels: [],
+    children: [],
+  },
+]);
+
+{
+  const comments = [
+    "  @label  label-1  label-2  \n  foo  ",
+    "  bar  ",
+    "  @label  label-3  ",
+    "  @label  \n  qux  ",
+  ];
+  assertDeepEqual(test("class c { static m (x) { } }", "@", comments), [
     {
       type: "class",
       name: "c",
@@ -70,13 +75,13 @@ assertDeepEqual(
           line: 1,
           column: 19,
           static: true,
-          comments: [" @label-1 foo @label-2 ", "@label-3", "bar"],
+          comments: comments,
           range: [19, 26],
           parameters: [[20, 21]],
-          labels: ["@label-1", "@label-2", "@label-3"],
+          labels: ["label-1", "label-2", "label-3"],
           children: [],
         },
       ],
     },
-  ],
-);
+  ]);
+}

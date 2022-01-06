@@ -5,12 +5,20 @@ const { isArray } = Array;
 
 export default (dependencies) => {
   const {
-    util: { hasOwnProperty },
+    util: { assert, hasOwnProperty },
   } = dependencies;
 
+  const trimStartString = (string) => string.trimStart();
+
+  const extractLineLabel = (line) => {
+    assert(line.startsWith("@label "), "invalid label line");
+    const maybe_tokens = line.substring("@label".length).match(/\s+\S+/gu);
+    return maybe_tokens === null ? [] : maybe_tokens.map(trimStartString);
+  };
+
   const extractCommentLabelArray = (comment) => {
-    const labels = comment.match(/@\S+(?=(\s|$))/gu);
-    return labels === null ? [] : labels;
+    const maybe_lines = comment.match(/@label .*/gu);
+    return maybe_lines === null ? [] : maybe_lines.flatMap(extractLineLabel);
   };
 
   const { getName } = Naming(dependencies);
