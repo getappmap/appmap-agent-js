@@ -1,3 +1,10 @@
+# [9.1.0](https://github.com/applandinc/appmap-agent-js/compare/v9.0.1...v9.1.0) (2022-01-07)
+
+
+### Features
+
+* change user-provided label format in comments ([0ef6534](https://github.com/applandinc/appmap-agent-js/commit/0ef65349fd2661fbf39be799d69c5dae4629816b))
+
 ## [9.0.1](https://github.com/applandinc/appmap-agent-js/compare/v9.0.0...v9.0.1) (2022-01-06)
 
 
