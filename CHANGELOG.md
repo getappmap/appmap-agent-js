@@ -1,3 +1,15 @@
+## [9.1.1](https://github.com/applandinc/appmap-agent-js/compare/v9.1.0...v9.1.1) (2022-01-09)
+
+
+### Bug Fixes
+
+* failing assertion on identity of emit method ([cd7817d](https://github.com/applandinc/appmap-agent-js/commit/cd7817dee574b4447322c778fa57c5fd823b70c1))
+
+
+### Performance Improvements
+
+* avoid installing the agent twise in npm system test ([b412f40](https://github.com/applandinc/appmap-agent-js/commit/b412f40bb97c3cb987423fc79c4e1db51d976d69))
+
 # [9.1.0](https://github.com/applandinc/appmap-agent-js/compare/v9.0.1...v9.1.0) (2022-01-07)
 
 
