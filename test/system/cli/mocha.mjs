@@ -6,8 +6,8 @@ import {
 import { platform as getPlatform } from "os";
 import { strict as Assert } from "assert";
 import { join as joinPath } from "path";
-import { spawnAsync } from "../spawn.mjs";
-import { runAsync } from "../__fixture__.mjs";
+import { spawnAsync } from "../../spawn.mjs";
+import { runAsync } from "./__fixture__.mjs";
 
 const { deepEqual: assertDeepEqual } = Assert;
 

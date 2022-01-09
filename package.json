@@ -32,7 +32,7 @@
     "test-unit-cov": "npx test-turtle --layout alongside -- /bin/sh test/unit/test-cov.sh",
     "test-unit": "npx test-turtle --layout alongside -- node test/unit/test.mjs",
     "test-unit-pass": "npx test-turtle --layout alongside -- node test/unit/test-pass.mjs",
-    "test-integration": "node --unhandled-rejections=strict test/integration/index.mjs",
+    "test-system": "node --unhandled-rejections=strict test/system/index.mjs",
     "format": "npx prettier -w '**/*.@(mjs|js|cjs)'",
     "deploy": "npx semantic-release"
   },
