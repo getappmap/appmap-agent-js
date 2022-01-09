@@ -8,7 +8,7 @@ import {
   realpath as realpathAsync,
 } from "fs/promises";
 import YAML from "yaml";
-import { spawnAsync } from "../../spawn.mjs";
+import { spawnStrictAsync } from "../../spawn.mjs";
 
 const { cwd } = process;
 const { stringify: stringifyYAML } = YAML;
@@ -46,7 +46,7 @@ const runAsyncInner = async (_package, config, beforeAsync, afterAsync) => {
       ...config,
     }),
   );
-  await spawnAsync("node", [joinPath(cwd(), "bin", "bin.mjs")], {
+  await spawnStrictAsync("node", [joinPath(cwd(), "bin", "bin.mjs")], {
     cwd: directory,
     stdio: "inherit",
   });

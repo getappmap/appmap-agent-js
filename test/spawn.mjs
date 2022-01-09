@@ -8,3 +8,13 @@ export const spawnAsync = (exec, argv, options) =>
     });
     child.on("error", reject);
   });
+
+export const spawnStrictAsync = async (exec, argv, options) => {
+  const { signal, status } = await spawnAsync(exec, argv, options);
+  if (signal !== null) {
+    throw new Error(`Kill signal: ${signal}`);
+  }
+  if (status !== 0) {
+    throw new Error(`Exit code: ${status}`);
+  }
+};

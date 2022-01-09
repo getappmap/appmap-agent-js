@@ -2,10 +2,10 @@ import { readFile as readFileAsync } from "fs/promises";
 import { platform as getPlatform } from "os";
 import { strict as Assert } from "assert";
 import { join as joinPath } from "path";
-import { spawnAsync } from "../../spawn.mjs";
+import { spawnStrictAsync } from "../../spawn.mjs";
 import { runAsync } from "./__fixture__.mjs";
 
-const { deepEqual: assertDeepEqual, equal: assertEqual } = Assert;
+const { equal: assertEqual } = Assert;
 
 await runAsync(
   null,
@@ -26,13 +26,10 @@ await runAsync(
     hooks: { esm: false, cjs: true, apply: false, http: false },
   },
   async (repository) => {
-    assertDeepEqual(
-      await spawnAsync(
-        getPlatform() === "win32" ? "npm.cmd" : "npm",
-        ["install", "bin-sample@0.0.0"],
-        { cwd: repository, stdio: "inherit" },
-      ),
-      { signal: null, status: 0 },
+    await spawnStrictAsync(
+      getPlatform() === "win32" ? "npm.cmd" : "npm",
+      ["install", "bin-sample@0.0.0"],
+      { cwd: repository, stdio: "inherit" },
     );
   },
   async (directory) => {
