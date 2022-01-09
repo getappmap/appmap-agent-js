@@ -1,6 +1,6 @@
 import { lstat as lstatAsync, readdir as readdirAsync } from "fs/promises";
 import { join as joinPath } from "path";
-import { spawnAsync } from "./spawn.mjs";
+import { spawnAsync } from "../spawn.mjs";
 
 const { stdout } = process;
 
