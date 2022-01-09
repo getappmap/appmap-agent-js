@@ -1,17 +1,13 @@
 import Http from "http";
 import Https from "https";
-import { EventEmitter } from "events";
 
 const _RegExp = RegExp;
 const _String = String;
 const { nextTick } = process;
-const { apply, construct } = Reflect;
+const { apply, construct, getPrototypeOf } = Reflect;
 const _Proxy = Proxy;
 const _Set = Set;
 const _undefined = undefined;
-const {
-  prototype: { emit: _emit },
-} = EventEmitter;
 
 export default (dependencies) => {
   const {
@@ -149,28 +145,24 @@ export default (dependencies) => {
   };
   const afterRequest = ({ resume, pause }, request, response) => {
     let depth = 0;
-    function emit(...args) {
-      if (depth === 0) {
-        resume();
-      }
-      depth += 1;
-      try {
-        return apply(_emit, this, args);
-      } finally {
-        depth -= 1;
+    const patchEmitter = (emitter) => {
+      patch(emitter, "emit", function emit(...args) {
         if (depth === 0) {
-          pause();
+          resume();
         }
-      }
-    }
-    expect(
-      patch(request, "emit", emit) === _emit,
-      "Unexpected 'emit' method on http.Request",
-    );
-    expect(
-      patch(response, "emit", emit) === _emit,
-      "Unexpected 'emit' method on http.Response",
-    );
+        depth += 1;
+        try {
+          return apply(getPrototypeOf(this).emit, this, args);
+        } finally {
+          depth -= 1;
+          if (depth === 0) {
+            pause();
+          }
+        }
+      });
+    };
+    patchEmitter(request);
+    patchEmitter(response);
     pause();
   };
   const spyTraffic = (state, server, request, response) => {
@@ -182,11 +174,11 @@ export default (dependencies) => {
     }
   };
   const forwardTraffic = (state, server, request, response) =>
-    apply(_emit, server, ["request", request, response]);
+    apply(getPrototypeOf(server).emit, server, ["request", request, response]);
   const spyServer = (state, server, handleTraffic) => {
-    const emit = patch(server, "emit", function emit(name, ...args) {
+    patch(server, "emit", function emit(name, ...args) {
       if (name !== "request") {
-        return apply(_emit, this, [name, ...args]);
+        return apply(getPrototypeOf(server).emit, this, [name, ...args]);
       }
       expect(
         args.length === 2,
@@ -198,7 +190,6 @@ export default (dependencies) => {
       }
       return true;
     });
-    expect(emit === _emit, "Unexpected 'emit' method on http.Server");
   };
   return {
     unhookResponse: (backup) => {

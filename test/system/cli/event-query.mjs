@@ -5,7 +5,7 @@ import {
 } from "fs/promises";
 import { strict as Assert } from "assert";
 import { join as joinPath } from "path";
-import { runAsync } from "../__fixture__.mjs";
+import { runAsync } from "./__fixture__.mjs";
 
 const { cwd } = process;
 const { deepEqual: assertDeepEqual } = Assert;

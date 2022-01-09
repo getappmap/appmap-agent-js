@@ -3,7 +3,7 @@ import { writeFile } from "fs/promises";
 import { tmpdir } from "os";
 import { request as createRequest } from "http";
 import { strict as Assert } from "assert";
-import { runAsync } from "../__fixture__.mjs";
+import { runAsync } from "./__fixture__.mjs";
 
 // Travis is taking too long for these timer to works.
 // I'm disabling this test for now.

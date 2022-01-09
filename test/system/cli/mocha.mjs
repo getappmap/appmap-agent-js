@@ -6,8 +6,8 @@ import {
 import { platform as getPlatform } from "os";
 import { strict as Assert } from "assert";
 import { join as joinPath } from "path";
-import { spawnAsync } from "../spawn.mjs";
-import { runAsync } from "../__fixture__.mjs";
+import { spawnStrictAsync } from "../../spawn.mjs";
+import { runAsync } from "./__fixture__.mjs";
 
 const { deepEqual: assertDeepEqual } = Assert;
 
@@ -32,13 +32,10 @@ await runAsync(
     },
   },
   async (repository) => {
-    assertDeepEqual(
-      await spawnAsync(
-        getPlatform() === "win32" ? "npm.cmd" : "npm",
-        ["install", "mocha"],
-        { cwd: repository, stdio: "inherit" },
-      ),
-      { signal: null, status: 0 },
+    await spawnStrictAsync(
+      getPlatform() === "win32" ? "npm.cmd" : "npm",
+      ["install", "mocha"],
+      { cwd: repository, stdio: "inherit" },
     );
     if (getPlatform() === "win32") {
       await copyFileAsync(
