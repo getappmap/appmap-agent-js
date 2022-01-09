@@ -23,26 +23,26 @@ jobs:
       os: linux
       node_js: 16
       script:
-        - npm run test-unit-coverage
-        - npm run test-integration
+        - npm run test-unit-cov
+        - npm run test-system
     - stage: test
       os: linux
       node_js: 14
       script:
         - npm run test-unit
-        - npm run test-integration
+        - npm run test-system
     - stage: test
       os: windows
       node_js: 16
       script:
         - npm run test-unit
-        - npm run test-integration
+        - npm run test-system
     - stage: test
       os: windows
       node_js: 14
       script:
         - npm run test-unit
-        - npm run test-integration
+        - npm run test-system
     - stage: deploy
       if: branch = main
       script:
