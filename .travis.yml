@@ -23,7 +23,7 @@ jobs:
       os: linux
       node_js: 16
       script:
-        - npm run test-unit-coverage
+        - npm run test-unit-cov
         - npm run test-integration
     - stage: test
       os: linux
