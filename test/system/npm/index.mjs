@@ -2,7 +2,9 @@ import { spawnStrictAsync } from "../../spawn.mjs";
 import { join as joinPath } from "path";
 import { tmpdir as getTmpdir } from "os";
 import {
+  rm as rmAsync,
   readFile as readFileAsync,
+  writeFile as writeFileAsync,
   readdir as readdirAsync,
 } from "fs/promises";
 import { strict as Assert } from "assert";
@@ -30,11 +32,12 @@ await spawnStrictAsync(
 await spawnStrictAsync("npm", ["pack", "--pack-destination", directory], {
   stdio: "inherit",
 });
+{
+  const json = JSON.parse(await readFileAsync(joinPath(directory, "package.json"), "utf8"));
+  json.devDependencies["@appland/appmap-agent-js"] = `file:${await getPackNameAsync()}`;
+  await writeFileAsync(joinPath(directory, "package.json"), JSON.stringify(json, null, 2), "utf8");
+}
 await spawnStrictAsync("npm", ["install"], {
-  stdio: "inherit",
-  cwd: directory,
-});
-await spawnStrictAsync("npm", ["install", await getPackNameAsync()], {
   stdio: "inherit",
   cwd: directory,
 });
@@ -66,3 +69,4 @@ await spawnStrictAsync("npm", ["run", "build"], {
   stdout.write(`Generated mocha appmaps: ${JSON.stringify(filenames)}${"\n"}`);
   assertEqual(filenames.length, 14);
 }
+await rmAsync(directory, {recursive:true});
