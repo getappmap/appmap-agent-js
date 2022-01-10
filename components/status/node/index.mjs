@@ -38,13 +38,7 @@ export const externals = {
 export default (dependencies) => {
   const run = (root) => {
     const errors = [];
-    if (externals.getPlatform() === "win32") {
-      errors.push({
-        level: "error",
-        message: "Windows is not currently supported",
-      });
-    }
-
+    
     const node_version = externals.getNodeVersion();
     if (!semver.satisfies(node_version, "14.x || 16.x || 17.x")) {
       errors.push({
