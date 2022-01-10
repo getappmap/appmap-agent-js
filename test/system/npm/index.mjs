@@ -1,6 +1,6 @@
 import { spawnStrictAsync } from "../../spawn.mjs";
 import { join as joinPath } from "path";
-import { tmpdir as getTmpdir } from "os";
+import { tmpdir as getTmpdir, platform as getPlatform } from "os";
 import {
   rm as rmAsync,
   readFile as readFileAsync,
@@ -29,7 +29,8 @@ await spawnStrictAsync(
   ["clone", "https://github.com/land-of-apps/appmap-agent-js-demo", directory],
   { stdio: "inherit" },
 );
-await spawnStrictAsync("npm", ["pack", "--pack-destination", directory], {
+const npm = getPlatform() === "win32" ? "npm.cmd" : "npm";
+await spawnStrictAsync(npm, ["pack", "--pack-destination", directory], {
   stdio: "inherit",
 });
 {
@@ -45,11 +46,11 @@ await spawnStrictAsync("npm", ["pack", "--pack-destination", directory], {
     "utf8",
   );
 }
-await spawnStrictAsync("npm", ["install"], {
+await spawnStrictAsync(npm, ["install"], {
   stdio: "inherit",
   cwd: directory,
 });
-await spawnStrictAsync("npm", ["run", "build"], {
+await spawnStrictAsync(npm, ["run", "build"], {
   stdio: "inherit",
   cwd: directory,
 });
@@ -58,7 +59,7 @@ await spawnStrictAsync("node", [joinPath("appmap/install.js")], {
   cwd: directory,
 });
 {
-  await spawnStrictAsync("npm", ["run", "appmap-start"], {
+  await spawnStrictAsync(npm, ["run", "appmap-start"], {
     stdio: "inherit",
     cwd: directory,
     timeout: 5000,
@@ -71,7 +72,7 @@ await spawnStrictAsync("node", [joinPath("appmap/install.js")], {
   assertEqual(filenames.length, 1);
 }
 {
-  await spawnStrictAsync("npm", ["run", "appmap-test"], {
+  await spawnStrictAsync(npm, ["run", "appmap-test"], {
     stdio: "inherit",
     cwd: directory,
   });
