@@ -1,3 +1,10 @@
+## [9.1.2](https://github.com/applandinc/appmap-agent-js/compare/v9.1.1...v9.1.2) (2022-01-10)
+
+
+### Bug Fixes
+
+* Allow CLI installation on Windows ([8001465](https://github.com/applandinc/appmap-agent-js/commit/80014653265de676a850f4ef7f9e5ba5a0c25edc))
+
 ## [9.1.1](https://github.com/applandinc/appmap-agent-js/compare/v9.1.0...v9.1.1) (2022-01-09)
 
 
