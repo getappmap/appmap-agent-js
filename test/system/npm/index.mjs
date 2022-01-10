@@ -45,6 +45,10 @@ await spawnStrictAsync("npm", ["run", "build"], {
   stdio: "inherit",
   cwd: directory,
 });
+await spawnStrictAsync("node", [joinPath("appmap/install.js")], {
+  stdio: "inherit",
+  cwd: directory,
+});
 {
   await spawnStrictAsync("npm", ["run", "appmap-start"], {
     stdio: "inherit",
@@ -59,7 +63,7 @@ await spawnStrictAsync("npm", ["run", "build"], {
   assertEqual(filenames.length, 1);
 }
 {
-  await spawnStrictAsync("npm", ["run", "appmap-mocha"], {
+  await spawnStrictAsync("npm", ["run", "appmap-test"], {
     stdio: "inherit",
     cwd: directory,
   });
