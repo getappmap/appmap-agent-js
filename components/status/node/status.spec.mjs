@@ -40,21 +40,11 @@ describe("the status command", () => {
   });
 
   describe("run", () => {
-    it("fails on windows", () => {
-      externals.getPlatform = sinon.stub().returns("win32");
-      const result = JSON.parse(run(process));
-      assert(externals.getPlatform.calledOnce);
-      assert.deepEqual(result.errors[0], {
-        level: "error",
-        message: "Windows is not currently supported",
-      });
-    });
-
     it("fails for unsupported node", () => {
       const node_version = "13.0";
       externals.getNodeVersion = sinon.stub().returns(node_version);
       const result = JSON.parse(run(process));
-      assert(externals.getPlatform.calledOnce);
+      assert(externals.getNodeVersion.calledOnce);
       assert.deepEqual(result.errors[0], {
         level: "error",
         message: `Unsupported node version ${node_version}`,
