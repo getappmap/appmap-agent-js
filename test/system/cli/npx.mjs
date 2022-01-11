@@ -13,8 +13,7 @@ await runAsync(
     command: [
       getPlatform() === "win32" ? "npx.cmd" : "npx",
       "--always-spawn",
-      // TODO adapt abomination to work on windows
-      getPlatform() === "win32" ? "bin-sample-js" : "bin-sample",
+      "bin-sample",
     ],
     pruning: false,
     output: {
