@@ -1,4 +1,14 @@
-import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
+import {
+  mkdir as mkdirAsync,
+  writeFile as writeFileAsync,
+  realpath as realpathAsync,
+} from "fs/promises";
+import { pathToFileURL } from "url";
+import {
+  assertEqual,
+  assertDeepEqual,
+  getFreshTemporaryURL,
+} from "../../__fixture__.mjs";
 import { buildTestDependenciesAsync } from "../../build.mjs";
 import Repository from "./index.mjs";
 
@@ -6,34 +16,68 @@ const { extractRepositoryPackage, extractRepositoryDependency } = Repository(
   await buildTestDependenciesAsync(import.meta.url),
 );
 
-const getHomeURL = () => {
-  const { url } = import.meta;
-  const url_object = new URL(url);
-  url_object.pathname += "/..";
-  while (!url_object.pathname.endsWith("/appmap-agent-js/")) {
-    url_object.pathname += "..";
-  }
-  return url_object.toString();
-};
+const url = getFreshTemporaryURL();
+await mkdirAsync(new URL(url));
 
-const url = getHomeURL();
+assertEqual(extractRepositoryPackage(url), null);
 
-assertDeepEqual(extractRepositoryPackage(`${url}/lib`), null);
-{
-  const { name, version, homepage } = extractRepositoryPackage(url);
-  assertEqual(name, "@appland/appmap-agent-js");
-  assertEqual(
-    homepage,
-    "https://github.com/applandinc/appmap-agent-js.git/#readme",
-  );
-  assertEqual(typeof version, "string");
-}
-{
-  const {
-    directory,
-    package: { name, version },
-  } = extractRepositoryDependency(url, ["acorn"]);
-  assertEqual(name, "acorn");
-  assertEqual(typeof directory, "string");
-  assertEqual(typeof version, "string");
-}
+await writeFileAsync(new URL(`${url}/package.json`), "invalid-json", "utf8");
+assertEqual(extractRepositoryPackage(url), null);
+
+await writeFileAsync(new URL(`${url}/package.json`), "{}", "utf8");
+assertEqual(extractRepositoryPackage(url), null);
+
+await writeFileAsync(new URL(`${url}/package.json`), '{"name":"foo"}', "utf8");
+assertEqual(extractRepositoryPackage(url), null);
+
+await writeFileAsync(
+  new URL(`${url}/package.json`),
+  '{"name":"foo", "version":"bar"}',
+  "utf8",
+);
+assertDeepEqual(extractRepositoryPackage(url), {
+  name: "foo",
+  version: "bar",
+  homepage: null,
+});
+
+await writeFileAsync(
+  new URL(`${url}/package.json`),
+  '{"name":"foo", "version":"bar", "homepage":"qux"}',
+  "utf8",
+);
+assertDeepEqual(extractRepositoryPackage(url), {
+  name: "foo",
+  version: "bar",
+  homepage: "qux",
+});
+
+await writeFileAsync(
+  new URL(`${url}/package.json`),
+  '{"name":"foo", "version":"1.2.3", "dependencies":{"bar":"4.5.6"}}',
+  "utf8",
+);
+await mkdirAsync(new URL(`${url}/node_modules`));
+await mkdirAsync(new URL(`${url}/node_modules/bar`));
+await writeFileAsync(
+  new URL(`${url}/node_modules/bar/package.json`),
+  '{"name":"bar", "version":"4.5.6", "main":"lib/index.js"}',
+  "utf8",
+);
+await mkdirAsync(new URL(`${url}/node_modules/bar/lib`));
+await writeFileAsync(
+  new URL(`${url}/node_modules/bar/lib/index.js`),
+  "789;",
+  "utf8",
+);
+
+assertDeepEqual(extractRepositoryDependency(url, ["bar"]), {
+  directory: `${pathToFileURL(
+    await realpathAsync(new URL(url)),
+  )}/node_modules/bar/`,
+  package: {
+    name: "bar",
+    version: "4.5.6",
+    homepage: null,
+  },
+});
