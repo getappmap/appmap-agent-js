@@ -5,13 +5,6 @@ import { request as createRequest } from "http";
 import { strict as Assert } from "assert";
 import { runAsync } from "./__fixture__.mjs";
 
-// Travis is taking too long for these timer to works.
-// I'm disabling this test for now.
-// It might be worthwhile to synchronize between node processes to avoid timers.
-if (Reflect.getOwnPropertyDescriptor(process.env, "TRAVIS") !== undefined) {
-  process.exit(0);
-}
-
 const {
   deepEqual: assertDeepEqual,
   // equal: assertEqual
@@ -127,35 +120,37 @@ const testAsync = async (port_key, port, main) => {
   );
 };
 
-stdout.write("\ntrack-port\n");
-
-await testAsync(
-  "track-port",
-  joinPath(tmpdir(), Math.random().toString(36).substring(2)),
-  `
-    const interval = setInterval(function heartbeat () {}, 100);
-    setTimeout(() => {
-      clearInterval(interval);
-    }, 9000);
-  `,
-);
-
-stdout.write("\nintercept-track-port\n");
-
-{
-  const port = joinPath(tmpdir(), Math.random().toString(36).substring(2));
+// Travis is taking too long for these timer to works.
+// I'm disabling this test for now.
+// It might be worthwhile to synchronize between node processes to avoid timers.
+if (Reflect.getOwnPropertyDescriptor(process.env, "TRAVIS") === undefined) {
+  stdout.write("\ntrack-port\n");
   await testAsync(
-    "intercept-track-port",
-    port,
+    "track-port",
+    joinPath(tmpdir(), Math.random().toString(36).substring(2)),
     `
-      import {createServer} from "http";
-      const server = createServer();
-      server.unref();
-      server.listen(${JSON.stringify(port)});
       const interval = setInterval(function heartbeat () {}, 100);
       setTimeout(() => {
         clearInterval(interval);
-      }, 6000);
+      }, 9000);
     `,
   );
+  stdout.write("\nintercept-track-port\n");
+  {
+    const port = joinPath(tmpdir(), Math.random().toString(36).substring(2));
+    await testAsync(
+      "intercept-track-port",
+      port,
+      `
+        import {createServer} from "http";
+        const server = createServer();
+        server.unref();
+        server.listen(${JSON.stringify(port)});
+        const interval = setInterval(function heartbeat () {}, 100);
+        setTimeout(() => {
+          clearInterval(interval);
+        }, 6000);
+      `,
+    );
+  }
 }
