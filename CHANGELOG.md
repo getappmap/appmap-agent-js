@@ -1,3 +1,10 @@
+# [9.2.0](https://github.com/applandinc/appmap-agent-js/compare/v9.1.2...v9.2.0) (2022-01-11)
+
+
+### Features
+
+* proper support for extension-less node binary files in windows ([3a5eaca](https://github.com/applandinc/appmap-agent-js/commit/3a5eaca7fdfc21dbe1cd6616482b21efbce3612e))
+
 ## [9.1.2](https://github.com/applandinc/appmap-agent-js/compare/v9.1.1...v9.1.2) (2022-01-10)
 
 
