@@ -38,7 +38,7 @@ export const externals = {
 export default (dependencies) => {
   const run = (root) => {
     const errors = [];
-    
+
     const node_version = externals.getNodeVersion();
     if (!semver.satisfies(node_version, "14.x || 16.x || 17.x")) {
       errors.push({
