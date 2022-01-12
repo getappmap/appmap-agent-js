@@ -1,3 +1,11 @@
+## [9.3.1](https://github.com/applandinc/appmap-agent-js/compare/v9.3.0...v9.3.1) (2022-01-12)
+
+
+### Bug Fixes
+
+* Add semver to package.json ([c81163d](https://github.com/applandinc/appmap-agent-js/commit/c81163dc3ddeafcd6c961369e752bc57acd10611))
+* Tighten node version restrictions ([f45700f](https://github.com/applandinc/appmap-agent-js/commit/f45700f98af1ae3116c748725f6bbb18b396f89e))
+
 # [9.3.0](https://github.com/applandinc/appmap-agent-js/compare/v9.2.0...v9.3.0) (2022-01-12)
 
 
