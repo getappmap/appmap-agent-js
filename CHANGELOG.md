@@ -1,3 +1,10 @@
+# [9.3.0](https://github.com/applandinc/appmap-agent-js/compare/v9.2.0...v9.3.0) (2022-01-12)
+
+
+### Features
+
+* do not crash on invalid package.json ([7926926](https://github.com/applandinc/appmap-agent-js/commit/7926926889095bf1c20dfce681fb05fc2706d697))
+
 # [9.2.0](https://github.com/applandinc/appmap-agent-js/compare/v9.1.2...v9.2.0) (2022-01-11)
 
 
