@@ -52,6 +52,7 @@
     "minimist": "^1.2.5",
     "net-socket-messaging": "^0.1.6",
     "prompts": "^2.4.2",
+    "semver": "^7.3.5",
     "treeify": "^1.1.0",
     "yaml": "^1.10.2"
   },
