@@ -15,7 +15,7 @@ describe("the status command", () => {
     externals.getPlatform = sinon.stub().returns("darwin");
     externals.lsPackage = sinon.stub().returns("{}");
     externals.showResults = sinon.stub();
-    externals.getNodeVersion = sinon.stub().returns("14.0.0");
+    externals.getNodeVersion = sinon.stub().returns("14.18.0");
 
     // Make sure we got them all, notCalled will be undefined if the function
     // hasn't been replaced.
