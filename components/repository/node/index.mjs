@@ -1,10 +1,10 @@
 import { createRequire } from "module";
-import { readFileSync, readdirSync } from "fs";
+import { readFileSync } from "fs";
 import { pathToFileURL } from "url";
 import Git from "./git.mjs";
 
 const _URL = URL;
-const { parse } = JSON;
+const { parse: parseJSON } = JSON;
 
 export default (dependencies) => {
   const {
@@ -28,51 +28,42 @@ export default (dependencies) => {
     }
   };
   const createPackage = (url) => {
-    if (
-      !expectSuccess(
-        () => readdirSync(new _URL(url)),
-        "could not read repository directory %j >> %e",
-        url,
-      ).includes("package.json")
-    ) {
-      logWarning(
-        "No 'package.json' file found at repository directory %s",
-        url,
+    let content;
+    try {
+      content = readFileSync(
+        new _URL(appendURLSegment(url, "package.json")),
+        "utf8",
       );
+    } catch (error) {
+      logWarning("Cannot read package.json file at %j >> %e", url, error);
+      return null;
+    }
+    let json;
+    try {
+      json = parseJSON(content);
+    } catch (error) {
+      logWarning("Failed to parse package.json file at %j >> %e", url, error);
       return null;
     }
     const { name, version, homepage } = {
       name: null,
       version: null,
       homepage: null,
-      ...expectSuccess(
-        () =>
-          parse(
-            expectSuccess(
-              () =>
-                readFileSync(
-                  new _URL(appendURLSegment(url, "package.json")),
-                  "utf8",
-                ),
-              "could not read 'package.json' file from %j >> %e",
-              url,
-            ),
-          ),
-        "could not parse 'package.json' file from %j >> %e",
-        url,
-      ),
+      ...json,
     };
-    expect(
-      name !== null,
-      "missing name property in 'package.json' file from %j",
-      url,
-    );
-    expect(
-      version !== null,
-      "missing version property in 'package.json' file from %j",
-      url,
-    );
-    return { name, version, homepage };
+    if (typeof name !== "string") {
+      logWarning("Invalid name property in package.json file at %j", url);
+      return null;
+    }
+    if (typeof version !== "string") {
+      logWarning("Invalid version property in package.json file at %j", url);
+      return null;
+    }
+    return {
+      name,
+      version,
+      homepage: typeof homepage === "string" ? homepage : null,
+    };
   };
   return {
     extractRepositoryHistory: extractGitInformation,
