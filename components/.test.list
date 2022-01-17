@@ -1,11 +1,11 @@
 - util
-- path
-- url
-- violation
-- expect-inner
-- expect
-- log-inner
-- log
+- * - path
+    - url
+  * - violation
+    - expect-inner
+    - expect
+  * - log-inner
+    - log
 - validate
 - * validate-message
   * validate-appmap
