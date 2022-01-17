@@ -66,6 +66,7 @@ assertDeepEqual(
 assertDeepEqual(
   extend("command-options", { env: { FOO: "BAR" }, timeout: 123 }),
   {
+    shell: null,
     encoding: "utf8",
     env: { FOO: "BAR" },
     stdio: "inherit",
@@ -150,20 +151,17 @@ assertDeepEqual(extend("serialization", "toString", null), {
 
 // command //
 
-assertDeepEqual(extend("command", ["node", "main.js"], "file:///base"), {
-  exec: "node",
-  argv: ["main.js"],
+assertDeepEqual(extend("command", ["token1", "token2"], "file:///base"), {
+  tokens: ["token1", "token2"],
+  script: null,
   base: "file:///base",
 });
 
-assertDeepEqual(
-  extend("command", "  foo  \"b\\\"a\\nr\"  '\\q\\'u\\'\\x'  ", "file:///base"),
-  {
-    exec: "foo",
-    argv: ['b"a\nr', "q'u'x"],
-    base: "file:///base",
-  },
-);
+assertDeepEqual(extend("command", "script", "file:///base"), {
+  tokens: null,
+  script: "script",
+  base: "file:///base",
+});
 
 // exclude //
 

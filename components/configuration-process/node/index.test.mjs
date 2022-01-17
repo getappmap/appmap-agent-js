@@ -67,8 +67,8 @@ assertThrow(
       log: "error",
       map_name: "name2",
       command: {
-        exec: "exec",
-        argv: ["arg1", "arg2"],
+        script: null,
+        tokens: ["exec", "arg1", "arg2"],
         base: "file:///cwd",
       },
     },
@@ -90,8 +90,8 @@ assertDeepEqual(
     "command",
   ),
   {
-    exec: "exec",
-    argv: ["arg1", "arg2"],
+    script: "exec arg1 arg2",
+    tokens: null,
     base: "file:///cwd",
   },
 );

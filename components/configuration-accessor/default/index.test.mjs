@@ -7,6 +7,7 @@ import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
 } from "../../build.mjs";
+import { platform as getPlatform } from "os";
 import ConfigurationAccessor from "./index.mjs";
 
 const { createConfiguration, extendConfiguration } =
@@ -101,7 +102,7 @@ assertEqual(
       extendConfiguration(
         createConfiguration("file:///home"),
         {
-          command: ["mocha.ext"],
+          command: ["mocha"],
         },
         "file:///base",
       ),
@@ -117,7 +118,7 @@ assertEqual(
       extendConfiguration(
         createConfiguration("file:///home"),
         {
-          command: ["npx.ext", "mocha"],
+          command: ["npx", "mocha"],
         },
         "file:///base",
       ),
@@ -133,7 +134,7 @@ assertEqual(
       extendConfiguration(
         createConfiguration("file:///home"),
         {
-          command: ["npm.ext", "exec", "mocha"],
+          command: ["npm", "exec", "mocha"],
         },
         "file:///base",
       ),
@@ -149,7 +150,7 @@ assertEqual(
       extendConfiguration(
         createConfiguration("file:///home"),
         {
-          command: ["node", "main.js"],
+          command: "node main.js",
         },
         "file:///base",
       ),
@@ -294,7 +295,7 @@ assertDeepEqual(
             },
           },
           "recursive-process-recording": true,
-          command: ["exec", "argv1"],
+          command: "command",
           recorder: "process",
           "command-options": {
             env: { VAR1: "VAL1", NODE_OPTIONS: "--node-key=node-value" },
@@ -308,8 +309,8 @@ assertDeepEqual(
     ),
   ),
   {
-    exec: "exec",
-    argv: ["argv1"],
+    exec: getPlatform() === "win32" ? "cmd.exe" : "/bin/sh",
+    argv: getPlatform() === "win32" ? ["/c", "command"] : ["-c", "command"],
     cwd: new URL("file:///base"),
     env: {
       NODE_OPTIONS: [
@@ -340,6 +341,9 @@ assertDeepEqual(
           },
           "recursive-process-recording": false,
           command: ["node", "main.js", "argv1"],
+          "command-options": {
+            shell: ["/bin/sh", "-c"],
+          },
           recorder: "process",
         },
         "file:///base",
@@ -348,12 +352,10 @@ assertDeepEqual(
     ),
   ),
   {
-    exec: "node",
+    exec: "/bin/sh",
     argv: [
-      "--experimental-loader",
-      "../agent/lib/node/recorder-process.mjs",
-      "main.js",
-      "argv1",
+      "-c",
+      "node --experimental-loader ../agent/lib/node/recorder-process.mjs main.js argv1",
     ],
     cwd: new URL("file:///base"),
     env: {},
@@ -378,6 +380,9 @@ assertDeepEqual(
                 },
               },
               command,
+              "command-options": {
+                shell: ["/bin/sh", "-c"],
+              },
               recorder: "mocha",
             },
             "file:///base",
@@ -386,12 +391,10 @@ assertDeepEqual(
         ),
       ),
       {
-        exec: command[0],
+        exec: "/bin/sh",
         argv: [
-          ...(command[0] === "npx" ? ["--always-spawn"] : []),
-          ...command.slice(1),
-          "--require",
-          "../agent/lib/node/recorder-mocha.mjs",
+          "-c",
+          `${command} --require ../agent/lib/node/recorder-mocha.mjs`,
         ],
         cwd: new URL("file:///base"),
         env: {
@@ -404,9 +407,8 @@ assertDeepEqual(
       },
     );
   };
-  testMocha(["mocha"]);
-  testMocha(["npx", "mocha"]);
-  testMocha(["npm", "exec", "mocha"]);
-  testMocha(["node", "node_modules/bin/mocha"]);
-  assertThrow(() => testMocha(["foo"]), /^AppmapError/);
+  testMocha("mocha");
+  testMocha("npx mocha");
+  testMocha("npm exec mocha");
+  assertThrow(() => testMocha("foo"), /^AppmapError/);
 }
