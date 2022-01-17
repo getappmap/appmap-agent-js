@@ -9,14 +9,23 @@ const _decodeURIComponent = decodeURIComponent;
 
 export default (dependencies) => {
   const {
-    util: { assert },
+    util: { assert, constant, coalesce },
   } = dependencies;
-  const makeComponent = ({ ipc, separator, splitter, root, forbidden }) => {
+  const makeComponent = ({
+    getShell,
+    ipc,
+    separator,
+    splitter,
+    root,
+    forbidden,
+  }) => {
     const assertSegmentValidity = (segment) => {
       forbidden.lastIndex = 0;
       assert(!forbidden.test(segment), "invalid file name");
     };
     return {
+      // TODO maybe we should rename path to platform to more accurate
+      getShell,
       toIPCPath: (path) => `${ipc}${path}`,
       fromIPCPath: (path) => {
         assert(path.startsWith(ipc), "invalid ipc path");
@@ -45,6 +54,13 @@ export default (dependencies) => {
   };
   if (getPlatform() === "win32") {
     return makeComponent({
+      getShell: (env) => {
+        const exec = coalesce(env, "comspec", "cmd.exe");
+        return [
+          exec,
+          exec.endsWith("cmd") || exec.endsWith("cmd.exe") ? "/c" : "-c",
+        ];
+      },
       ipc: "\\\\.\\pipe\\",
       separator: "\\",
       splitter: /[\\/]/gu,
@@ -53,6 +69,7 @@ export default (dependencies) => {
     });
   } else {
     return makeComponent({
+      getShell: constant(["/bin/sh", "-c"]),
       ipc: "",
       separator: "/",
       splitter: "/",

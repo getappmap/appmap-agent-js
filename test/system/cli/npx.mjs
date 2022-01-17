@@ -10,11 +10,7 @@ const { equal: assertEqual } = Assert;
 await runAsync(
   null,
   {
-    command: [
-      getPlatform() === "win32" ? "npx.cmd" : "npx",
-      "--always-spawn",
-      "bin-sample",
-    ],
+    command: "npx bin-sample",
     pruning: false,
     output: {
       basename: "basename",

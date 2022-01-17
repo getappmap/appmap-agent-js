@@ -13,11 +13,7 @@ const { deepEqual: assertDeepEqual } = Assert;
 await runAsync(
   null,
   {
-    command: [
-      getPlatform() === "win32" ? "npx.cmd" : "npx",
-      "mocha",
-      "main.test.mjs",
-    ],
+    command: "npx mocha main.test.mjs",
     recorder: "mocha",
     packages: { path: "index.js" },
     hooks: {

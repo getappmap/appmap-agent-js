@@ -5,6 +5,7 @@ const { stringify: stringifyJSON } = JSON;
 
 export default (dependencies) => {
   const {
+    path: { getShell },
     util: { assert, coalesce },
     url: { pathifyURL, urlifyPath, appendURLSegmentArray },
     expect: { expect, expectSuccess },
@@ -29,18 +30,33 @@ export default (dependencies) => {
     /* c8 ignore stop */
   };
 
-  const isMocha = ({ exec }) => exec.split(".")[0] === "mocha";
-  const isNpxMocha = ({ exec, argv }) =>
-    exec.split(".")[0] === "npx" && argv.length > 0 && argv[0] === "mocha";
-  const isNodeMocha = ({ exec, argv }) =>
-    exec === "node" &&
-    argv.length > 0 &&
-    /[\\/]mocha(.[a-z]+)?$/u.test(argv[0]);
-  const isNpmMocha = ({ exec, argv }) =>
-    exec.split(".")[0] === "npm" &&
-    argv.length > 1 &&
-    argv[0] === "exec" &&
-    argv[1] === "mocha";
+  /* c8 ignore start */
+  const generateEscape = (shell) =>
+    shell.endsWith("cmd") || shell.endsWith("cmd.exe")
+      ? escapeCmdExe
+      : escapeShell;
+  const escapeCmdExe = (token) =>
+    token.replace(/[^a-zA-Z0-9\-_./:@\\]/gu, "^$&");
+  /* c8 ignore stop */
+
+  const escapeShell = (token) => token.replace(/[^a-zA-Z0-9\-_./:@]/gu, "\\$&");
+  const generateCommand = (shell, tokens) =>
+    tokens.map(generateEscape(shell)).join(" ");
+
+  const mocha_regexps = [
+    /^(?<before>mocha)(?<after>($|\s[\s\S]*$))/u,
+    /^(?<before>npx\s+mocha)(?<after>($|\s[\s\S]*$))/u,
+    /^(?<before>npm\s+exec\s+mocha)(?<after>($|\s[\s\S]*$))/u,
+  ];
+  const splitMocha = (command) => {
+    for (const regexp of mocha_regexps) {
+      const result = regexp.exec(command);
+      if (result !== null) {
+        return result.groups;
+      }
+    }
+    return null;
+  };
 
   return {
     resolveConfigurationRepository: (configuration) => {
@@ -72,12 +88,13 @@ export default (dependencies) => {
           configuration,
           {
             recorder:
-              isMocha(configuration.command) ||
-              isNpxMocha(configuration.command) ||
-              isNpmMocha(configuration.command) ||
-              isNodeMocha(configuration.command)
-                ? "mocha"
-                : "remote",
+              splitMocha(
+                configuration.command.script === null
+                  ? configuration.command.tokens.join(" ")
+                  : configuration.command.script,
+              ) === null
+                ? "remote"
+                : "mocha",
           },
           configuration.repository.directory,
         );
@@ -190,52 +207,40 @@ export default (dependencies) => {
         "missing command in configuration",
       );
       const {
-        command,
+        command: { base, script, tokens },
         recorder,
-        "command-options": options,
+        "command-options": { shell, ...options },
         "recursive-process-recording": recursive,
         agent: { directory },
       } = configuration;
-      let { base, exec, argv } = command;
       env = {
         ...env,
         ...options.env,
         APPMAP_CONFIGURATION: stringifyJSON(configuration),
       };
+      const [exec, ...flags] = shell === null ? getShell(env) : shell;
+      let command = script === null ? generateCommand(exec, tokens) : script;
       logGuardWarning(
         recursive && recorder === "mocha",
         "The mocha recorder cannot recursively record processes.",
       );
       if (recursive || recorder === "mocha") {
         if (recorder === "mocha") {
-          const hook = [
-            "--require",
-            pathifyURL(
-              appendURLSegmentArray(directory, [
-                "lib",
-                "node",
-                "recorder-mocha.mjs",
-              ]),
-              base,
-              true,
-            ),
-          ];
-          if (isMocha(command)) {
-            argv = [...hook, ...argv];
-          } else if (isNpxMocha(command)) {
-            argv = ["--always-spawn", argv[0], ...hook, ...argv.slice(1)];
-          } else if (isNpmMocha(command)) {
-            argv = [argv[0], argv[1], ...hook, ...argv.slice(2)];
-          } else if (isNodeMocha(command)) {
-            argv = [argv[0], ...hook, ...argv.slice(1)];
-          } else {
-            expect(
-              false,
-              "The mocha recorder expected the command to start by either 'mocha' or 'npx mocha' or 'npm exec mocha', got %j %j.",
-              exec,
-              argv,
-            );
-          }
+          const groups = splitMocha(command);
+          expect(
+            groups !== null,
+            "Could not parse the command %j as a mocha command",
+            tokens,
+          );
+          command = `${groups.before} --require ${pathifyURL(
+            appendURLSegmentArray(directory, [
+              "lib",
+              "node",
+              "recorder-mocha.mjs",
+            ]),
+            base,
+            true,
+          )}${groups.after}`;
         }
         env = {
           ...env,
@@ -251,27 +256,34 @@ export default (dependencies) => {
               base,
               true,
             )}`,
-            `--experimental-loader=${pathifyURL(
-              appendURLSegmentArray(directory, [
-                "lib",
-                "node",
-                recorder === "mocha"
-                  ? "mocha-loader.mjs"
-                  : `recorder-${recorder}.mjs`,
-              ]),
-              base,
-              true,
+            `--experimental-loader=${generateEscape(exec)(
+              pathifyURL(
+                appendURLSegmentArray(directory, [
+                  "lib",
+                  "node",
+                  recorder === "mocha"
+                    ? "mocha-loader.mjs"
+                    : `recorder-${recorder}.mjs`,
+                ]),
+                base,
+                true,
+              ),
             )}`,
           ].join(" "),
         };
       } else {
-        logGuardWarning(
-          exec !== "node",
-          "Assuming %j is a node executable, recording will *not* happens if this is not the case.",
-          exec,
+        const parts =
+          /^(?<before>\s*\S*node(.[a-zA-Z]+)?)(?<after>($|\s[\s\S]*$))$/u.exec(
+            command,
+          );
+        expect(
+          parts !== null,
+          "Could not find node exectuable in command %j",
+          command,
         );
-        argv = [
-          "--experimental-loader",
+        command = `${
+          parts.groups.before
+        } --experimental-loader ${generateEscape(exec)(
           pathifyURL(
             appendURLSegmentArray(directory, [
               "lib",
@@ -281,12 +293,11 @@ export default (dependencies) => {
             base,
             true,
           ),
-          ...argv,
-        ];
+        )}${parts.groups.after}`;
       }
       return {
         exec,
-        argv,
+        argv: [...flags, command],
         options: {
           ...options,
           cwd: new _URL(base),

@@ -2,6 +2,5 @@ branches: [test, node, browser]
 dependencies:
   - util
   - url
-  - expect
   - validate
   - specifier

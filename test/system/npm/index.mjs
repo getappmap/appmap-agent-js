@@ -29,8 +29,12 @@ await spawnStrictAsync(
   ["clone", "https://github.com/land-of-apps/appmap-agent-js-demo", directory],
   { stdio: "inherit" },
 );
+await spawnStrictAsync(
+  "git",
+  ["checkout", "211b6fd21e45c3771e6f894d7e92d74d8b906006"],
+  { stdio: "inherit", cwd: directory },
+);
 const npm = getPlatform() === "win32" ? "npm.cmd" : "npm";
-const npx = getPlatform() === "win32" ? "npx.cmd" : "npx";
 await spawnStrictAsync(npm, ["pack", "--pack-destination", directory], {
   stdio: "inherit",
 });
@@ -55,19 +59,22 @@ await spawnStrictAsync(npm, ["run", "build"], {
   stdio: "inherit",
   cwd: directory,
 });
+await spawnStrictAsync("node", ["appmap/install-config.js"], {
+  stdio: "inherit",
+  cwd: directory,
+});
+await spawnStrictAsync("node", ["appmap/install-script.js"], {
+  stdio: "inherit",
+  cwd: directory,
+});
 // TODO investigate why this fails on travis.
-// I tried to increase the timeout to 10000 without success.
 if (Reflect.getOwnPropertyDescriptor(process.env, "TRAVIS") === undefined) {
-  await spawnStrictAsync(
-    npx,
-    ["appmap-agent-js", "--recorder=process", "--", "node", "bin/bin.js", "0", ":memory:"],
-    {
-      stdio: "inherit",
-      cwd: directory,
-      timeout: 10000,
-      killSignal: "SIGINT",
-    },
-  );
+  await spawnStrictAsync(npm, ["run", "appmap-start"], {
+    stdio: "inherit",
+    cwd: directory,
+    timeout: 10000,
+    killSignal: "SIGINT",
+  });
   const filenames = await readdirAsync(joinPath(directory, "tmp", "appmap"));
   stdout.write(
     `Generated complete appmap: ${JSON.stringify(filenames)}${"\n"}`,
@@ -75,24 +82,10 @@ if (Reflect.getOwnPropertyDescriptor(process.env, "TRAVIS") === undefined) {
   assertEqual(filenames.length, 1);
 }
 {
-  // TODO revert to npm, ["run", "appmap-test"] once the agent launch commands via shell
-  await spawnStrictAsync(
-    npx,
-    [
-      "appmap-agent-js",
-      "--recorder=mocha",
-      "--",
-      npx,
-      "mocha",
-      "-r",
-      "ts-node/register",
-      "'test/*.ts'",
-    ],
-    {
-      stdio: "inherit",
-      cwd: directory,
-    },
-  );
+  await spawnStrictAsync(npm, ["run", "appmap-test"], {
+    stdio: "inherit",
+    cwd: directory,
+  });
   const filenames = await readdirAsync(
     joinPath(directory, "tmp", "appmap", "mocha"),
   );

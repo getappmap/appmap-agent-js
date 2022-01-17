@@ -335,6 +335,11 @@
   type: object
   additionalProperties: false
   properties:
+    shell:
+      type: array
+      nullable: true
+      items: {type: string}
+      minItems: 1
     encoding: {$ref: encoding}
     env: {$ref: env}
     stdio: {$ref: stdio}
@@ -347,7 +352,7 @@
   allOf:
     - $ref: command-options
     - type: object
-      required: [encoding, env, stdio, timeout, killSignal]
+      required: [shell, encoding, env, stdio, timeout, killSignal]
 
 #################
 # Configuration #
@@ -393,7 +398,6 @@
       anyOf:
         - type: string
         - type: array
-          minItems: 1
           items: {type: string}
     command-options: {$ref: command-options}
     validate:
@@ -505,10 +509,13 @@
       type: object
       nullable: true
       properties:
-        exec: {type: string}
-        argv:
+        tokens:
           type: array
+          nullable: true
           items: {type: string}
+        script:
+          type: string
+          nullable: true
         base: {$ref: url}
     command-options: {$ref: cooked-command-options}
     validate:

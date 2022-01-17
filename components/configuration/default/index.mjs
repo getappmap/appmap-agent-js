@@ -1,14 +1,12 @@
 const { isArray } = Array;
 const { ownKeys } = Reflect;
 const { entries: toEntries } = Object;
-const { parse: parseJSON } = JSON;
 
 const ANONYMOUS_NAME_SEPARATOR = "-";
 
 export default (dependencies) => {
   const {
     util: { coalesce, identity, hasOwnProperty },
-    expect: { expect },
     url: { urlifyPath },
     validate: { validateConfig },
     specifier: { createSpecifier },
@@ -62,41 +60,11 @@ export default (dependencies) => {
   const normalizeExclude = (exclusions, base) =>
     exclusions.map(normalizeExclusion);
 
-  const parseToken = (token) => {
-    if (token[0] === '"') {
-      return parseJSON(token);
-    }
-    if (token[0] === "'") {
-      return token.substring(1, token.length - 1).replace(/\\([\s\S])/gu, "$1");
-    }
-    return token;
-  };
-  const normalizeCommand = (command, base) => {
-    if (typeof command === "string") {
-      const tokenizer =
-        /\s*([^\s'"]+|"(\\[\s\S]|[^\\"])*"|'(\\[\s\S]|[^\\'])*')/gu;
-      const tokens = [];
-      let index = 0;
-      let parts = tokenizer.exec(command);
-      while (parts !== null) {
-        tokens.push(parseToken(parts[1]));
-        index = tokenizer.lastIndex;
-        parts = tokenizer.exec(command);
-      }
-      expect(
-        /^\s*$/u.test(command.substring(index)),
-        "Could not parse command: %j",
-        command,
-      );
-      expect(tokens.length > 0, "Empty command: %j", command);
-      command = tokens;
-    }
-    return {
-      exec: command[0],
-      argv: command.slice(1),
-      base,
-    };
-  };
+  const normalizeCommand = (command, base) => ({
+    base,
+    script: typeof command === "string" ? command : null,
+    tokens: typeof command === "string" ? null : command,
+  });
 
   const normalizeScenarios = (scenarios, base) => {
     return toEntries(scenarios).map(([key, value]) => ({
@@ -414,6 +382,7 @@ export default (dependencies) => {
       "recursive-process-recording": true,
       command: null,
       "command-options": {
+        shell: null,
         encoding: "utf8",
         env: {},
         stdio: "inherit",
