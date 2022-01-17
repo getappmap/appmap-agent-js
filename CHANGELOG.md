@@ -1,3 +1,15 @@
+# [9.4.0](https://github.com/applandinc/appmap-agent-js/compare/v9.3.1...v9.4.0) (2022-01-17)
+
+
+### Bug Fixes
+
+* handles absolute windows path in `sources` of source maps ([a4c89a3](https://github.com/applandinc/appmap-agent-js/commit/a4c89a36f4cd6bb69bf88ac2161edf4d781e0d00))
+
+
+### Features
+
+* commands are now executed via a shell rather than directly spawned ([9e8cfa1](https://github.com/applandinc/appmap-agent-js/commit/9e8cfa1dabf504927b44a5a0c071c924fd0338d5))
+
 ## [9.3.1](https://github.com/applandinc/appmap-agent-js/compare/v9.3.0...v9.3.1) (2022-01-12)
 
 
