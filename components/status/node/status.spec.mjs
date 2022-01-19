@@ -15,7 +15,7 @@ describe("the status command", () => {
     externals.getPlatform = sinon.stub().returns("darwin");
     externals.lsPackage = sinon.stub().returns("{}");
     externals.showResults = sinon.stub();
-    externals.getNodeVersion = sinon.stub().returns("14.18.0");
+    externals.getNodeVersion = sinon.stub().returns("14.19.0");
 
     // Make sure we got them all, notCalled will be undefined if the function
     // hasn't been replaced.
@@ -45,10 +45,8 @@ describe("the status command", () => {
       externals.getNodeVersion = sinon.stub().returns(node_version);
       const result = JSON.parse(run(process));
       assert(externals.getNodeVersion.calledOnce);
-      assert.deepEqual(result.errors[0], {
-        level: "error",
-        message: `Unsupported node version ${node_version}`,
-      });
+      assert.equal(result.errors[0].level, 'error');
+      assert.match(result.errors[0].message, new RegExp(`Unsupported node version ${node_version}`))
     });
 
     describe("mocha support", () => {
