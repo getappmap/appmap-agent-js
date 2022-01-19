@@ -40,10 +40,12 @@ export default (dependencies) => {
     const errors = [];
 
     const node_version = externals.getNodeVersion();
-    if (!semver.satisfies(node_version, "14.18.x || 16.13.x || 17.3.x")) {
+
+    const versions = "^14.18.x || ^16.13.x || ^17.3.x";
+    if (!semver.satisfies(node_version, versions)) {
       errors.push({
         level: "error",
-        message: `Unsupported node version ${node_version}`,
+        message: `Unsupported node version ${node_version}, wanted ${versions}`,
       });
     }
 
