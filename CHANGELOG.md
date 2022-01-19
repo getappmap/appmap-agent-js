@@ -1,3 +1,10 @@
+## [9.4.1](https://github.com/applandinc/appmap-agent-js/compare/v9.4.0...v9.4.1) (2022-01-19)
+
+
+### Bug Fixes
+
+* Fix the version constraints used by status ([dfd2514](https://github.com/applandinc/appmap-agent-js/commit/dfd2514f93db7fe06901f7f1cc85868dc0518877))
+
 # [9.4.0](https://github.com/applandinc/appmap-agent-js/compare/v9.3.1...v9.4.0) (2022-01-17)
 
 
