@@ -1,7 +1,7 @@
 import { tmpdir as getTmpDir, platform as getPlatform } from "os";
 import { join as joinPath } from "path";
 import {
-  rm as rmAsync,
+  rmdir as rmdirAsync,
   mkdir as mkdirAsync,
   symlink as symlinkAsync,
   writeFile as writeFileAsync,
@@ -51,7 +51,7 @@ const runAsyncInner = async (_package, config, beforeAsync, afterAsync) => {
     stdio: "inherit",
   });
   await afterAsync(directory);
-  await rmAsync(directory, { recursive: true });
+  await rmdirAsync(directory, { recursive: true });
 };
 
 export const runAsync =
