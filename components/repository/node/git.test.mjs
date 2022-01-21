@@ -1,4 +1,5 @@
 import { mkdir as mkdirAsync } from "fs/promises";
+import { fileURLToPath } from "url";
 import { execSync } from "child_process";
 import {
   assertEqual,
@@ -21,7 +22,7 @@ assertThrow(() => extractGitInformation(url), /^AppmapError:.*ENOENT/);
 await mkdirAsync(new URL(url));
 assertEqual(extractGitInformation(url), null);
 execSync(`git clone ${origin_url} .`, {
-  cwd: new URL(url),
+  cwd: fileURLToPath(url),
   stdio: "ignore",
 });
 

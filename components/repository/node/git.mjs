@@ -1,5 +1,6 @@
 import { spawnSync } from "child_process";
 import { readdirSync } from "fs";
+import { fileURLToPath } from "url";
 
 const _URL = URL;
 const _parseInt = parseInt;
@@ -18,7 +19,7 @@ export default (dependencies) => {
       command.split(" ")[0],
       command.split(" ").slice(1),
       {
-        cwd: new _URL(url),
+        cwd: fileURLToPath(url),
         encoding: "utf8",
         timeout: 1000,
         stdio: ["ignore", "pipe", "pipe"],
