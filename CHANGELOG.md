@@ -1,3 +1,10 @@
+## [9.4.2](https://github.com/applandinc/appmap-agent-js/compare/v9.4.1...v9.4.2) (2022-01-21)
+
+
+### Bug Fixes
+
+* Improved node version compatibility ([646692e](https://github.com/applandinc/appmap-agent-js/commit/646692e4bdee2ea4938689ddd4b021960b795e50))
+
 ## [9.4.1](https://github.com/applandinc/appmap-agent-js/compare/v9.4.0...v9.4.1) (2022-01-19)
 
 
