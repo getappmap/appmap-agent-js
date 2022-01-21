@@ -5,9 +5,11 @@ import {
 } from "fs/promises";
 import { createRequire } from "module";
 import YAML from "yaml";
+import Semver from "semver";
 import Chalk from "chalk";
 
 const _URL = URL;
+const { satisfies: satisfiesSemver } = Semver;
 const { green: chalkGreen, yellow: chalkYellow, red: chalkRed } = Chalk;
 const { parse: parseYAML, stringify: stringifyYAML } = YAML;
 
@@ -15,8 +17,8 @@ export default (dependencies) => {
   const {
     validate: { validateConfig },
     questionnaire: { questionConfigAsync },
-    util: { assert, hasOwnProperty },
-    url: { urlifyPath, appendURLSegment },
+    util: { hasOwnProperty },
+    url: { urlifyPath, appendURLSegment, appendURLSegmentArray },
     prompts: { prompts },
   } = dependencies;
   const generateLog = (prefix, writable) => (message) => {
@@ -24,25 +26,36 @@ export default (dependencies) => {
   };
   return {
     mainAsync: async ({ version, platform, cwd, env, stdout, stderr }) => {
-      const url = urlifyPath(cwd(), "file:///");
       const logSuccess = generateLog(chalkGreen("\u2714"), stdout);
       const logWarning = generateLog(chalkYellow("\u26A0"), stderr);
       const logFailure = generateLog(chalkRed("\u2716"), stderr);
-      let conf_url = appendURLSegment(url, "appmap.yml");
+      const cwd_url = urlifyPath(cwd(), "file:///");
+      const agent_url = appendURLSegmentArray(import.meta.url, [
+        "..",
+        "..",
+        "..",
+        "..",
+      ]);
+      let conf_url = appendURLSegment(cwd_url, "appmap.yml");
       if (hasOwnProperty(env, "APPMAP_CONFIGURATION_PATH")) {
-        conf_url = urlifyPath(env.APPMAP_CONFIGURATION_PATH, url);
+        conf_url = urlifyPath(env.APPMAP_CONFIGURATION_PATH, cwd_url);
       }
-      let repo_url = url;
+      let repo_url = cwd_url;
       if (hasOwnProperty(env, "APPMAP_REPOSITORY_DIRECTORY")) {
-        repo_url = urlifyPath(env.APPMAP_REPOSITORY_DIRECTORY, url);
+        repo_url = urlifyPath(env.APPMAP_REPOSITORY_DIRECTORY, cwd_url);
       }
       // node //
       {
-        const parts = /^v([0-9][0-9])\./u.exec(version);
-        assert(parts !== null, "invalid process.version format");
-        const major = parseInt(parts[1]);
-        if (major < 14) {
-          logFailure(`incompatible node version (min 14.x), got: ${version}`);
+        const _package = JSON.parse(
+          await readFileAsync(
+            new URL(appendURLSegment(agent_url, "package.json")),
+            "utf8",
+          ),
+        );
+        if (!satisfiesSemver(version, _package.engine.node)) {
+          logFailure(
+            `Node version ${version} is not compatible with ${_package.engine.node}`,
+          );
           return false;
         }
         logSuccess(`compatible node version: ${version}`);
@@ -107,13 +120,26 @@ export default (dependencies) => {
         const { resolve } = createRequire(
           new _URL(appendURLSegment(repo_url, "dummy.js")),
         );
+        let agent_main = null;
         try {
-          resolve("@appland/appmap-agent-js");
+          agent_main = resolve("@appland/appmap-agent-js");
         } catch ({ message }) {
           logFailure(`cannot resolve appmap-agent-js module: ${message}`);
           return false;
         }
         logSuccess("appmap-agent-js module is available");
+        const resolved_agent_url = appendURLSegmentArray(
+          urlifyPath(agent_main, "file:///"),
+          ["..", "..", ".."],
+        );
+        /* c8 ignore start */
+        if (agent_url !== resolved_agent_url) {
+          logFailure(
+            `agent location mismatch, expected agent to resolve to ${agent_url} but got ${resolved_agent_url}`,
+          );
+          return false;
+        }
+        /* c8 ignore stop */
       }
       // git repository //
       {

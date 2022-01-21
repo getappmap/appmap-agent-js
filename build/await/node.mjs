@@ -3,6 +3,7 @@ import {
   join as joinPath,
   relative as getRelativePath,
   dirname as getDirname,
+  sep,
 } from "path";
 import { tmpdir as getTmpdir } from "os";
 import { fileURLToPath } from "url";
@@ -15,7 +16,7 @@ export const supportTopAwaitAsync = async () => {
     `${Math.random().toString(36).substring(2)}.mjs`,
   );
   await writeFileAsync(path, "await 123;", "utf8");
-  const relative_path = getRelativePath(__dirname, path);
+  const relative_path = getRelativePath(__dirname, path).split(sep).join("/");
   try {
     await import(relative_path);
   } catch (error) {

@@ -7,7 +7,7 @@
   "main": "lib/node/recorder-manual.mjs",
   "license": "MIT",
   "engine": {
-    "node": ">= 14.0.0"
+    "node": "14.x.x || 16.x.x || 17.x.x"
   },
   "licence": "MIT",
   "keywords": [
@@ -30,8 +30,8 @@
     "build": "node build/index.mjs",
     "lint": "npx eslint '**/*.@(mjs|js|cjs)'",
     "test-unit-cov": "npx test-turtle --layout alongside -- /bin/sh test/unit/test-cov.sh",
-    "test-unit": "npx test-turtle --layout alongside -- node test/unit/test.mjs",
-    "test-unit-pass": "npx test-turtle --layout alongside -- node test/unit/test-pass.mjs",
+    "test-unit": "npx test-turtle --layout alongside -- node --unhandled-rejections=strict test/unit/test.mjs",
+    "test-unit-pass": "npx test-turtle --layout alongside -- node --unhandled-rejections=strict test/unit/test-pass.mjs",
     "test-system": "node --unhandled-rejections=strict test/system/index.mjs",
     "format": "npx prettier -w '**/*.@(mjs|js|cjs)'",
     "deploy": "npx semantic-release",
@@ -78,7 +78,7 @@
     "sqlite3": "^5.0.2",
     "tap": "^15.0.10",
     "tape": "^5.2.2",
-    "test-turtle": "^5.1.0"
+    "test-turtle": "^5.1.1"
   },
   "publishConfig": {
     "cache": "~/.npm",

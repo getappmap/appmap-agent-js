@@ -1,5 +1,6 @@
 import { execSync } from "child_process";
 import os from "os";
+import { createRequire } from "module";
 import semver from "semver";
 import { schema } from "../../../dist/schema.mjs";
 
@@ -40,8 +41,8 @@ export default (dependencies) => {
     const errors = [];
 
     const node_version = externals.getNodeVersion();
-
-    const versions = "^14.18.x || ^16.13.x || ^17.3.x";
+    const require = createRequire(import.meta.url);
+    const versions = require("../../../package.json").engine.node;
     if (!semver.satisfies(node_version, versions)) {
       errors.push({
         level: "error",
