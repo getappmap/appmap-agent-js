@@ -1,0 +1,9 @@
+[
+  "build/**/index.mjs",
+  "build/**/*.test.mjs",
+  "components/**/*.test.mjs",
+  "components/**/*.spec.mjs",
+  "test/**/*.mjs",
+  "!test/spawn.mjs",
+  "!test/system/cli/__fixture__.mjs"
+]

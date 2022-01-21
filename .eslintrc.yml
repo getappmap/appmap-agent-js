@@ -10,9 +10,6 @@ env:
   es6: true
   es2017: true
 rules:
-  # import/no-extraneous-dependencies:
-  #   - error
-  #   - devDependencies: true
   no-empty-pattern: off
   no-control-regex: off
   no-debugger:

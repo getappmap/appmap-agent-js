@@ -12,7 +12,7 @@ const {
 
 const { stdout } = process;
 
-export const requestAsync = (host, port, method, path, body) =>
+const requestAsync = (host, port, method, path, body) =>
   new Promise((resolve, reject) => {
     const content =
       body === null ? "" : Buffer.from(JSON.stringify(body), "utf8");
@@ -47,7 +47,7 @@ export const requestAsync = (host, port, method, path, body) =>
     });
   });
 
-export const forkAsync = async (host, port) => {
+const forkAsync = async (host, port) => {
   await new Promise((resolve) => {
     setTimeout(resolve, 3000);
   });
