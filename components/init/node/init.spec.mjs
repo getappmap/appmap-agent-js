@@ -5,10 +5,12 @@ import { strict as assert } from "assert";
 import { mkdir } from "fs/promises";
 import { buildTestDependenciesAsync } from "../../build.mjs";
 import YAML from "yaml";
-import { afterEach, beforeEach, describe, it } from "mocha";
+import Mocha from "mocha";
 import * as sinon from "sinon";
 
 import Init, { externals } from "./index.mjs";
+
+const { afterEach, beforeEach, describe, it } = Mocha;
 
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
 const { main, run } = Init(dependencies);
