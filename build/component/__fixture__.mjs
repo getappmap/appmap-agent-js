@@ -7,7 +7,11 @@ import {
   join as joinPath,
   relative as toRelativePath,
 } from "path";
-import { writeFile, mkdir, rm } from "fs/promises";
+import {
+  writeFile as writeFileAsync,
+  mkdir as mkdirAsync,
+  rmdir as rmdirAsync,
+} from "fs/promises";
 import YAML from "yaml";
 import { tmpdir } from "os";
 
@@ -25,9 +29,13 @@ const writeInstanceAsync = async (
   config,
 ) => {
   const directory = joinPath(root, component, instance);
-  await mkdir(directory);
-  await writeFile(joinPath(directory, conf), stringifyYAML(config), "utf8");
-  await writeFile(
+  await mkdirAsync(directory);
+  await writeFileAsync(
+    joinPath(directory, conf),
+    stringifyYAML(config),
+    "utf8",
+  );
+  await writeFileAsync(
     joinPath(directory, main),
     `export default (dependencies) => ["${component}", "${instance}", {__proto__:null, ...dependencies}];`,
     "utf8",
@@ -41,13 +49,13 @@ export const testAsync = async (type, module) => {
   const options = { root, main, conf };
   try {
     // Setup //
-    await mkdir(root);
-    await mkdir(joinPath(root, "component1"));
+    await mkdirAsync(root);
+    await mkdirAsync(joinPath(root, "component1"));
     await writeInstanceAsync("component1", "instance", options, {
       branches: ["branch1", "branch2"],
       dependencies: ["component2"],
     });
-    await mkdir(joinPath(root, "component2"));
+    await mkdirAsync(joinPath(root, "component2"));
     await writeInstanceAsync("component2", "instance1", options, {
       branches: ["branch1", "branch2"],
       dependencies: [],
@@ -130,7 +138,7 @@ export const testAsync = async (type, module) => {
       throw new Error("Invalid type");
     }
   } finally {
-    await rm(root, { recursive: true, force: true });
+    await rmdirAsync(root, { recursive: true });
   }
 };
 

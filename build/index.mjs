@@ -1,9 +1,28 @@
-import { mkdir as mkdirAsync, rm as rmAsync } from "fs/promises";
+import {
+  mkdir as mkdirAsync,
+  rmdir as rmdirAsync,
+  readdir as readdirAsync,
+} from "fs/promises";
+import { loadAsync } from "./await/load.mjs";
 
-await rmAsync("./dist", { force: true, recursive: true });
+const isDirectoryPresentAsync = async (path) => {
+  try {
+    await readdirAsync(path);
+    return true;
+  } catch (error) {
+    if (error.code === "ENOENT") {
+      return false;
+    } else {
+      throw error;
+    }
+  }
+};
+
+if (await isDirectoryPresentAsync("./dist")) {
+  await rmdirAsync("./dist", { recursive: true });
+}
+
 await mkdirAsync("./dist");
 
-await Promise.all([
-  import("./schema/index.mjs"),
-  import("./component/index.mjs"),
-]);
+await loadAsync(import("./schema/index.mjs"));
+await loadAsync(import("./component/index.mjs"));

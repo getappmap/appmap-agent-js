@@ -1,7 +1,9 @@
 import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
-import { SourceMapGenerator } from "source-map";
+import SourceMap from "source-map";
 import { buildTestDependenciesAsync } from "../../build.mjs";
 import SourceInner from "./index.mjs";
+
+const { SourceMapGenerator } = SourceMap;
 
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
 const { compileSourceMap, mapSource } = SourceInner(dependencies);

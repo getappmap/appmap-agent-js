@@ -1,5 +1,5 @@
 import { spawn } from "child_process";
-import { rm as rmAsync } from "fs/promises";
+import { rmdir as rmdirAsync } from "fs/promises";
 import { fileURLToPath } from "url";
 import Mysql from "mysql";
 import {
@@ -13,6 +13,7 @@ import {
 } from "../../build.mjs";
 
 // TODO investigate why this fails on travis.
+
 if (Reflect.getOwnPropertyDescriptor(process.env, "TRAVIS") !== undefined) {
   process.exit(0);
 }
@@ -157,6 +158,6 @@ if (Reflect.getOwnPropertyDescriptor(process.env, "TRAVIS") !== undefined) {
     // SIGKILL will leave stuff in /tmp which prevent next mysqld to run
     child.kill("SIGTERM");
     await termination;
-    await rmAsync(new URL(url), { recursive: true });
+    await rmdirAsync(new URL(url), { recursive: true });
   }
 }

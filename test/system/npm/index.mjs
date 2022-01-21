@@ -2,7 +2,7 @@ import { spawnStrictAsync } from "../../spawn.mjs";
 import { join as joinPath } from "path";
 import { tmpdir as getTmpdir, platform as getPlatform } from "os";
 import {
-  rm as rmAsync,
+  rmdir as rmdirAsync,
   readFile as readFileAsync,
   writeFile as writeFileAsync,
   readdir as readdirAsync,
@@ -92,4 +92,4 @@ if (Reflect.getOwnPropertyDescriptor(process.env, "TRAVIS") === undefined) {
   stdout.write(`Generated mocha appmaps: ${JSON.stringify(filenames)}${"\n"}`);
   assertEqual(filenames.length, 14);
 }
-await rmAsync(directory, { recursive: true });
+await rmdirAsync(directory, { recursive: true });

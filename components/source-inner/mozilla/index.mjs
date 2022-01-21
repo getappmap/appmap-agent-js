@@ -1,4 +1,6 @@
-import { SourceMapConsumer } from "source-map";
+import SourceMap from "source-map";
+
+const { SourceMapConsumer } = SourceMap;
 
 export default (dependencies) => {
   const {

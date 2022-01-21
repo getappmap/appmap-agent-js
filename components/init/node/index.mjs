@@ -103,7 +103,7 @@ export default (dependencies) => {
     main: async (root) => {
       const json = run(root);
       await externals.showResults(json);
-      return true;
+      return 0;
     },
   };
 };

@@ -1,5 +1,5 @@
 import { spawn } from "child_process";
-import { rm as rmAsync } from "fs/promises";
+import { rmdir as rmdirAsync } from "fs/promises";
 import Pg from "pg";
 import { fileURLToPath } from "url";
 import {
@@ -15,6 +15,7 @@ import {
 } from "../../build.mjs";
 
 // TODO investigate why this fails on travis.
+
 if (Reflect.getOwnPropertyDescriptor(process.env, "TRAVIS") !== undefined) {
   process.exit(0);
 }
@@ -231,6 +232,6 @@ if (Reflect.getOwnPropertyDescriptor(process.env, "TRAVIS")) {
   } finally {
     child.kill("SIGTERM");
     await termination;
-    await rmAsync(new URL(url), { recursive: true });
+    await rmdirAsync(new URL(url), { recursive: true });
   }
 }

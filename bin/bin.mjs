@@ -18,4 +18,16 @@ if (routes.has(process.argv[2])) {
   process.argv = [process.argv[0], process.argv[1], ...process.argv.slice(3)];
 }
 
-import(routes.get(verb));
+import(routes.get(verb))
+  .then(({ default: promise }) => {
+    promise
+      .then((status) => {
+        process.exitCode = status;
+      })
+      .catch((error) => {
+        throw error;
+      });
+  })
+  .catch((error) => {
+    throw error;
+  });
