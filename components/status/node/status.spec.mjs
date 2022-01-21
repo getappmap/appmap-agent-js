@@ -45,8 +45,11 @@ describe("the status command", () => {
       externals.getNodeVersion = sinon.stub().returns(node_version);
       const result = JSON.parse(run(process));
       assert(externals.getNodeVersion.calledOnce);
-      assert.equal(result.errors[0].level, 'error');
-      assert.match(result.errors[0].message, new RegExp(`Unsupported node version ${node_version}`))
+      assert.equal(result.errors[0].level, "error");
+      assert.match(
+        result.errors[0].message,
+        new RegExp(`Unsupported node version ${node_version}`),
+      );
     });
 
     describe("mocha support", () => {

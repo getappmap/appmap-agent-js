@@ -116,6 +116,7 @@ export default (dependencies) => {
           await closeReceptorAsync(receptor);
         }
       }
+      return 0;
     },
   };
 };
