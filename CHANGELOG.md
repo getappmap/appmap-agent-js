@@ -1,3 +1,10 @@
+## [9.4.3](https://github.com/applandinc/appmap-agent-js/compare/v9.4.2...v9.4.3) (2022-01-26)
+
+
+### Bug Fixes
+
+* add glob to dependencies instead of devDependencies ([2317abc](https://github.com/applandinc/appmap-agent-js/commit/2317abc2f812c62e9a5254dd9412c0ae78b31d44))
+
 ## [9.4.2](https://github.com/applandinc/appmap-agent-js/compare/v9.4.1...v9.4.2) (2022-01-21)
 
 
