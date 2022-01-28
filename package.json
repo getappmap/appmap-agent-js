@@ -6,7 +6,7 @@
   },
   "main": "lib/node/recorder-manual.mjs",
   "license": "MIT",
-  "engine": {
+  "engines": {
     "node": "14.x.x || 16.x.x || 17.x.x"
   },
   "licence": "MIT",
