@@ -42,7 +42,7 @@ export default (dependencies) => {
 
     const node_version = externals.getNodeVersion();
     const require = createRequire(import.meta.url);
-    const versions = require("../../../package.json").engine.node;
+    const versions = require("../../../package.json").engines.node;
     if (!semver.satisfies(node_version, versions)) {
       errors.push({
         level: "error",

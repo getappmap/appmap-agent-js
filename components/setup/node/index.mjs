@@ -52,9 +52,9 @@ export default (dependencies) => {
             "utf8",
           ),
         );
-        if (!satisfiesSemver(version, _package.engine.node)) {
+        if (!satisfiesSemver(version, _package.engines.node)) {
           logFailure(
-            `Node version ${version} is not compatible with ${_package.engine.node}`,
+            `Node version ${version} is not compatible with ${_package.engines.node}`,
           );
           return false;
         }
