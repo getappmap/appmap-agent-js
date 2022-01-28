@@ -46,7 +46,7 @@ const runAsyncInner = async (_package, config, beforeAsync, afterAsync) => {
       ...config,
     }),
   );
-  await spawnStrictAsync("node", [joinPath(cwd(), "bin", "bin.mjs")], {
+  await spawnStrictAsync("node", [joinPath(cwd(), "bin", "appmap-agent-js")], {
     cwd: directory,
     stdio: "inherit",
   });
