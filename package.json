@@ -2,11 +2,11 @@
   "name": "@appland/appmap-agent-js",
   "version": "9.4.3",
   "bin": {
-    "appmap-agent-js": "bin/bin.mjs"
+    "appmap-agent-js": "bin/appmap-agent-js"
   },
   "main": "lib/node/recorder-manual.mjs",
   "license": "MIT",
-  "engine": {
+  "engines": {
     "node": "14.x.x || 16.x.x || 17.x.x"
   },
   "licence": "MIT",
