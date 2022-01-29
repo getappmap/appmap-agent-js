@@ -1,3 +1,11 @@
+## [9.4.4](https://github.com/applandinc/appmap-agent-js/compare/v9.4.3...v9.4.4) (2022-01-29)
+
+
+### Bug Fixes
+
+* bin file is now commonjs instead of native module ([f729934](https://github.com/applandinc/appmap-agent-js/commit/f729934a17301d10c495998077e50086895b7e1f))
+* rename noop engine into engines in package.json ([9d05d81](https://github.com/applandinc/appmap-agent-js/commit/9d05d81b79cec869283d09e778a56405ac1e6c3e))
+
 ## [9.4.3](https://github.com/applandinc/appmap-agent-js/compare/v9.4.2...v9.4.3) (2022-01-26)
 
 
