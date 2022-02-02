@@ -34,7 +34,9 @@ const promisify = (o, m, ...xs) =>
 const database = new Database(":memory:");
 
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
-const { testHookAsync, makeEvent } = await buildTestComponentAsync("hook");
+const { testHookAsync, makeEvent } = await buildTestComponentAsync(
+  "hook-fixture",
+);
 const { hookSqlite3, unhookSqlite3 } = HookSqlite3(dependencies);
 
 const testCaseAsync = (enabled, runAsync) =>

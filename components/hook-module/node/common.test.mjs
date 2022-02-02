@@ -14,7 +14,7 @@ import Common from "./common.mjs";
 
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
 const { createConfiguration } = await buildTestComponentAsync("configuration");
-const { testHookAsync } = await buildTestComponentAsync("hook");
+const { testHookAsync } = await buildTestComponentAsync("hook-fixture");
 const { hookCommonModule, unhookCommonModule } = Common(dependencies);
 const require = createRequire(new URL(import.meta.url));
 const url = getFreshTemporaryURL();

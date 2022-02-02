@@ -6,7 +6,7 @@ import {
 import HookGroup from "./index.mjs";
 
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
-const { testHookAsync } = await buildTestComponentAsync("hook");
+const { testHookAsync } = await buildTestComponentAsync("hook-fixture");
 const { hookGroup, unhookGroup } = HookGroup(dependencies);
 assertDeepEqual(
   await testHookAsync(
