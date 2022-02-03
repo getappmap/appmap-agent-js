@@ -2,6 +2,6 @@
     - event
   * metadata.mjs
   * completion.mjs
-  * erratum.mjs
+  * amend.mjs
   * stack.mjs
 - index.mjs

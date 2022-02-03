@@ -1,13 +1,13 @@
 import { assertDeepEqual } from "../../__fixture__.mjs";
 import { buildTestDependenciesAsync } from "../../build.mjs";
-import Erratum from "./erratum.mjs";
+import Amend from "./amend.mjs";
 
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
 
-const { substituteErratum } = Erratum(dependencies);
+const { amend } = Amend(dependencies);
 
 assertDeepEqual(
-  substituteErratum([
+  amend([
     {
       type: "begin",
       index: 123,
