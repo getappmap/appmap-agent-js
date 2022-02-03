@@ -1,0 +1,8 @@
+branches: [test, node, browser]
+dependencies:
+  - hook-apply
+  - hook-group
+  - hook-module
+  - hook-query
+  - hook-request
+  - hook-response
