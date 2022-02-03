@@ -4,11 +4,9 @@ export default (dependencies) => {
   const {
     util: { assignProperty },
     interpretation: { runScript },
-    emitter: { sendEmitter },
-    frontend: {
+    agent: {
       getSerializationEmptyValue,
       getInstrumentationIdentifier,
-      incrementEventCounter,
       recordBeginApply,
       recordEndApply,
       recordBeforeJump,
@@ -17,14 +15,14 @@ export default (dependencies) => {
     util: { noop },
   } = dependencies;
   return {
-    unhookApply: (backup) => {
+    unhook: (backup) => {
       backup.forEach(assignProperty);
     },
-    hookApply: (emitter, frontend, { hooks: { apply } }) => {
+    hook: (agent, { hooks: { apply } }) => {
       if (!apply) {
         return [];
       }
-      const identifier = getInstrumentationIdentifier(frontend);
+      const identifier = getInstrumentationIdentifier(agent);
       runScript(
         `
           const ${identifier}_APPLY_ID = 0;
@@ -39,33 +37,17 @@ export default (dependencies) => {
         "file:///appmap-setup.js",
       );
       const runtime = _eval(identifier);
-      runtime.empty = getSerializationEmptyValue(frontend);
-      runtime.recordBeginApply = (_function, _this, _arguments) => {
-        const index = incrementEventCounter(frontend);
-        sendEmitter(
-          emitter,
-          recordBeginApply(frontend, index, {
-            function: _function,
-            this: _this,
-            arguments: _arguments,
-          }),
-        );
-        return index;
-      };
-      runtime.recordEndApply = (index, error, result) => {
-        sendEmitter(
-          emitter,
-          recordEndApply(frontend, index, { error, result }),
-        );
-      };
-      runtime.recordBeforeJump = () => {
-        const index = incrementEventCounter(frontend);
-        sendEmitter(emitter, recordBeforeJump(frontend, index, null));
-        return index;
-      };
-      runtime.recordAfterJump = (index) => {
-        sendEmitter(emitter, recordAfterJump(frontend, index, null));
-      };
+      runtime.empty = getSerializationEmptyValue(agent);
+      runtime.recordBeginApply = (_function, _this, _arguments) =>
+        recordBeginApply(agent, {
+          function: _function,
+          this: _this,
+          arguments: _arguments,
+        });
+      runtime.recordEndApply = (index, error, result) =>
+        recordEndApply(agent, index, { error, result });
+      runtime.recordBeforeJump = () => recordBeforeJump(agent, null);
+      runtime.recordAfterJump = (index) => recordAfterJump(agent, index, null);
       return [
         "recordBeginApply",
         "recordEndApply",

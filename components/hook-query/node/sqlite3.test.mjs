@@ -37,15 +37,10 @@ const dependencies = await buildTestDependenciesAsync(import.meta.url);
 const { testHookAsync, makeEvent } = await buildTestComponentAsync(
   "hook-fixture",
 );
-const { hookSqlite3, unhookSqlite3 } = HookSqlite3(dependencies);
+const component = HookSqlite3(dependencies);
 
 const testCaseAsync = (enabled, runAsync) =>
-  testHookAsync(
-    hookSqlite3,
-    unhookSqlite3,
-    { hooks: { sqlite3: enabled } },
-    runAsync,
-  );
+  testHookAsync(component, { hooks: { sqlite3: enabled } }, runAsync);
 
 const createTrace = (sql, parameters, error) => ({
   sources: [],

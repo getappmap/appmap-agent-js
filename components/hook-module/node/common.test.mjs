@@ -15,14 +15,13 @@ import Common from "./common.mjs";
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
 const { createConfiguration } = await buildTestComponentAsync("configuration");
 const { testHookAsync } = await buildTestComponentAsync("hook-fixture");
-const { hookCommonModule, unhookCommonModule } = Common(dependencies);
+const component = Common(dependencies);
 const require = createRequire(new URL(import.meta.url));
 const url = getFreshTemporaryURL();
 await writeFileAsync(new URL(url), "module.exports = 123;", "utf8");
 assertDeepEqual(
   await testHookAsync(
-    hookCommonModule,
-    unhookCommonModule,
+    component,
     {
       hooks: { cjs: false },
       packages: [
@@ -40,8 +39,7 @@ assertDeepEqual(
 delete require.cache[require.resolve(fileURLToPath(url))];
 assertDeepEqual(
   await testHookAsync(
-    hookCommonModule,
-    unhookCommonModule,
+    component,
     {
       hooks: { cjs: true },
       packages: [

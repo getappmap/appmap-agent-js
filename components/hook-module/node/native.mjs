@@ -10,12 +10,10 @@
 export default (dependencies) => {
   const {
     util: { assert },
-    frontend: { instrument },
-    emitter: { sendEmitter },
-    "source-outer": { extractSourceMap },
+    agent: { instrument },
   } = dependencies;
   return {
-    unhookNativeModule: (enabled) => {
+    unhook: (enabled) => {
       if (enabled) {
         assert(
           typeof APPMAP_TRANSFORM_MODULE_ASYNC === "function",
@@ -24,7 +22,7 @@ export default (dependencies) => {
         APPMAP_TRANSFORM_MODULE_ASYNC = null;
       }
     },
-    hookNativeModule: (emitter, frontend, { hooks: { esm } }) => {
+    hook: (agent, { hooks: { esm } }) => {
       if (esm) {
         assert(
           typeof APPMAP_TRANSFORM_MODULE_ASYNC !== "undefined",
@@ -34,22 +32,12 @@ export default (dependencies) => {
           APPMAP_TRANSFORM_MODULE_ASYNC === null,
           "native modules are already hooked",
         );
-        APPMAP_TRANSFORM_MODULE_ASYNC = async (url, content1) => {
-          const file = {
+        APPMAP_TRANSFORM_MODULE_ASYNC = async (url, content1) =>
+          instrument(agent, {
             url,
             content: content1,
             type: "module",
-          };
-          const { content: content2, messages } = instrument(
-            frontend,
-            file,
-            extractSourceMap(file),
-          );
-          for (const message of messages) {
-            sendEmitter(emitter, message);
-          }
-          return content2;
-        };
+          });
       }
       return esm;
     },

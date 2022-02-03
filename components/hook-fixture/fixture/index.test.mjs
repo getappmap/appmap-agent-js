@@ -1,27 +1,24 @@
-import { assertDeepEqual } from "../../__fixture__.mjs";
-import {
-  buildTestDependenciesAsync,
-  buildTestComponentAsync,
-} from "../../build.mjs";
-import Hook from "./index.mjs";
+import { assertDeepEqual, assertEqual } from "../../__fixture__.mjs";
+import { buildTestDependenciesAsync } from "../../build.mjs";
+import HookFixture from "./index.mjs";
 
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
-const { sendEmitter } = await buildTestComponentAsync("emitter");
-const { testHookAsync, makeEvent } = Hook(dependencies);
-let emitter = null;
-const event = ["begin", 123, 0, "bundle", null];
+const { testHookAsync, makeEvent } = HookFixture(dependencies);
+
+assertEqual(
+  typeof makeEvent("type", "index", "time", "data_type", "data_rest"),
+  "object",
+);
 assertDeepEqual(
   await testHookAsync(
-    (_emitter) => {
-      emitter = _emitter;
-    },
-    () => {
-      emitter = null;
+    {
+      hook: (agent, configuration) => "hooking",
+      unhook: (hooking) => {
+        assertEqual(hooking, "hooking");
+      },
     },
     {},
-    async () => {
-      sendEmitter(emitter, ["event", ...event]);
-    },
+    async () => {},
   ),
-  { sources: [], events: [makeEvent(...event)] },
+  { sources: [], events: [] },
 );

@@ -7,11 +7,10 @@ import HookNativeModule from "./index.mjs";
 
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
 const { testHookAsync } = await buildTestComponentAsync("hook-fixture");
-const { hookModule, unhookModule } = HookNativeModule(dependencies);
+const component = HookNativeModule(dependencies);
 assertDeepEqual(
   await testHookAsync(
-    hookModule,
-    unhookModule,
+    component,
     { hooks: { esm: false, cjs: false } },
     async () => {},
   ),

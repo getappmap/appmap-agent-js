@@ -2,7 +2,5 @@ branches: [test, node]
 dependencies:
   - path
   - util
-  - frontend
-  - emitter
   - expect
-  - source-outer
+  - agent

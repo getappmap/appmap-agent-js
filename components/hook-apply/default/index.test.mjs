@@ -11,20 +11,15 @@ const dependencies = await buildTestDependenciesAsync(import.meta.url);
 const { testHookAsync, makeEvent } = await buildTestComponentAsync(
   "hook-fixture",
 );
-const { hookApply, unhookApply } = HookApply(dependencies);
+const component = HookApply(dependencies);
+
 assertDeepEqual(
-  await testHookAsync(
-    hookApply,
-    unhookApply,
-    { hooks: { apply: false } },
-    async () => {},
-  ),
+  await testHookAsync(component, { hooks: { apply: false } }, async () => {}),
   { sources: [], events: [] },
 );
 assertDeepEqual(
   await testHookAsync(
-    hookApply,
-    unhookApply,
+    component,
     { hooks: { apply: true }, "hidden-identifier": "$" },
     async () => {
       const index1 = $uuid.recordBeginApply("function", 123, [456]);

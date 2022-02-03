@@ -2,5 +2,4 @@ branches: [test]
 dependencies:
   - url
   - configuration
-  - frontend
-  - emitter
+  - agent

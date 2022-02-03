@@ -17,7 +17,7 @@ const dependencies = await buildTestDependenciesAsync(import.meta.url);
 const { testHookAsync, makeEvent } = await buildTestComponentAsync(
   "hook-fixture",
 );
-const { hookResponse, unhookResponse } = HookResponse(dependencies);
+const component = HookResponse(dependencies);
 
 const listenAsync = (server, port) =>
   new Promise((resolve, reject) => {
@@ -75,8 +75,7 @@ const requestAsync = (request) =>
 // Empty //
 assertDeepEqual(
   await testHookAsync(
-    hookResponse,
-    unhookResponse,
+    component,
     {
       recorder: "process",
       hooks: { http: false },
@@ -119,8 +118,7 @@ assertDeepEqual(
   ];
   const events = (
     await testHookAsync(
-      hookResponse,
-      unhookResponse,
+      component,
       { recorder: "process", hooks: { http: true } },
       async () => {
         const server = Http.createServer();
@@ -191,8 +189,7 @@ assertDeepEqual(
   const port = getFreshTemporaryURL();
   assertDeepEqual(
     await testHookAsync(
-      hookResponse,
-      unhookResponse,
+      component,
       {
         recorder: "remote",
         hooks: { http: false },

@@ -8,31 +8,25 @@ const _TypeError = TypeError;
 export default (dependencies) => {
   const {
     util: { assignProperty },
-    frontend: {
+    agent: {
       getSerializationEmptyValue,
-      incrementEventCounter,
       recordBeginBundle,
       recordEndBundle,
       recordBeforeQuery,
       recordAfterQuery,
     },
-    emitter: { sendEmitter },
   } = dependencies;
   const { requireMaybe } = Require(dependencies);
   return {
-    unhookPg: (backup) => {
+    unhook: (backup) => {
       backup.forEach(assignProperty);
     },
-    hookPg: (
-      emitter,
-      frontend,
-      { repository: { directory }, hooks: { pg } },
-    ) => {
+    hook: (agent, { repository: { directory }, hooks: { pg } }) => {
       const Postgres = requireMaybe(pg, directory, "pg");
       if (Postgres === null) {
         return [];
       }
-      const empty = getSerializationEmptyValue(frontend);
+      const empty = getSerializationEmptyValue(agent);
       const { Client, Query } = Postgres;
       const { prototype } = Client;
       const { query: original } = prototype;
@@ -65,26 +59,18 @@ export default (dependencies) => {
               });
             }
           }
-          const index1 = incrementEventCounter(frontend);
-          const index2 = incrementEventCounter(frontend);
-          sendEmitter(emitter, recordBeginBundle(frontend, index1, null));
-          sendEmitter(
-            emitter,
-            recordBeforeQuery(frontend, index2, {
-              database: "postgres",
-              version: null,
-              sql: query.text,
-              parameters: query.values || {},
-            }),
-          );
+          const index1 = recordBeginBundle(agent, null);
+          const index2 = recordBeforeQuery(agent, {
+            database: "postgres",
+            version: null,
+            sql: query.text,
+            parameters: query.values || {},
+          });
           callback = query.callback;
           query.callback = (error, result) => {
-            sendEmitter(
-              emitter,
-              recordAfterQuery(frontend, index2, { error: error || empty }),
-            );
+            recordAfterQuery(agent, index2, { error: error || empty });
             callback(error, result);
-            sendEmitter(emitter, recordEndBundle(frontend, index1, null));
+            recordEndBundle(agent, index1, null);
           };
           apply(original, this, [query]);
           return result;
