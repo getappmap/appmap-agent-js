@@ -1,0 +1,7 @@
+branches: [test, node, browser]
+dependencies:
+  - log
+  - configuration
+  - util
+  - validate-message
+  - trace

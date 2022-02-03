@@ -37,6 +37,7 @@
 - frontend
 - socket
 - emitter
+- agent
 - hook-fixture
 - * hook-apply
   * hook-group
@@ -44,9 +45,10 @@
   * hook-request
   * hook-response
   * hook-query
-- agent
-- * recorder-manual
-  * recorder-process
+- hook
+- * recorder-api
+  * recorder-cli
+- * recorder-process
   * recorder-mocha
   * recorder-remote
 - receptor-file
