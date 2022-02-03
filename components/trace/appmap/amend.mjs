@@ -2,7 +2,7 @@ const _Map = Map;
 
 export default (dependencies) => {
   return {
-    substituteErratum: (events) => {
+    amend: (events) => {
       const map = new _Map();
       const output = [];
       for (const event of events) {

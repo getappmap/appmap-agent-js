@@ -2,7 +2,7 @@ import Metadata from "./metadata.mjs";
 import Classmap from "./classmap/index.mjs";
 import Event from "./event/index.mjs";
 import Completion from "./completion.mjs";
-import Erratum from "./erratum.mjs";
+import Amend from "./amend.mjs";
 import Stack from "./stack.mjs";
 
 const VERSION = "1.6.0";
@@ -18,7 +18,7 @@ export default (dependencies) => {
   const { manufactureCompletion } = Completion(dependencies);
   const { orderByStack } = Stack(dependencies);
   const { compileEventTrace } = Event(dependencies);
-  const { substituteErratum } = Erratum(dependencies);
+  const { amend } = Amend(dependencies);
   return {
     compileTrace: (configuration, sources, events, termination) => {
       logDebug(
@@ -32,7 +32,7 @@ export default (dependencies) => {
       for (const source of sources) {
         addClassmapSource(classmap, source);
       }
-      events = substituteErratum(events);
+      events = amend(events);
       const routes = new Set();
       for (const event of events) {
         if (event.type === "begin" && event.data.type === "apply") {
