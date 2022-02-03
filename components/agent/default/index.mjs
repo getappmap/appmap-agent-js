@@ -1,14 +1,29 @@
+const { entries: toEntries, fromEntries } = Object;
+
 export default (dependencies) => {
   const {
-    "hook-group": { hookGroup, unhookGroup },
-    "hook-module": { hookModule, unhookModule },
-    "hook-apply": { hookApply, unhookApply },
-    "hook-request": { hookRequest, unhookRequest },
-    "hook-response": { hookResponse, unhookResponse },
-    "hook-query": { hookQuery, unhookQuery },
-    interpretation: { runScript },
-    source: { createMirrorSourceMap },
-    frontend: { createFrontend, instrument, startTrack, stopTrack },
+    "source-outer": { extractSourceMap },
+    frontend: {
+      createFrontend,
+      instrument,
+      startTrack,
+      stopTrack,
+      getInstrumentationIdentifier,
+      getSerializationEmptyValue,
+      incrementEventCounter,
+      recordBeginBundle,
+      recordEndBundle,
+      recordBeginApply,
+      recordEndApply,
+      recordBeginResponse,
+      recordEndResponse,
+      recordBeforeJump,
+      recordAfterJump,
+      recordBeforeRequest,
+      recordAfterRequest,
+      recordBeforeQuery,
+      recordAfterQuery,
+    },
     emitter: {
       openEmitter,
       closeEmitter,
@@ -17,56 +32,44 @@ export default (dependencies) => {
       takeLocalEmitterTrace,
     },
   } = dependencies;
+  const generateRecordIncrement =
+    (record) =>
+    ({ frontend, emitter }, data) => {
+      const index = incrementEventCounter(frontend);
+      sendEmitter(emitter, record(frontend, index, data));
+      return index;
+    };
+  const generateRecord =
+    (record) =>
+    ({ frontend, emitter }, index, data) => {
+      sendEmitter(emitter, record(frontend, index, data));
+    };
+  const generateMapEntry =
+    (transform) =>
+    ([key, value]) =>
+      [key, transform(value)];
   return {
-    openAgent: (configuration) => {
-      const emitter = openEmitter(configuration);
-      const frontend = createFrontend(configuration);
-      return {
-        frontend,
-        emitter,
-        group_hook: hookGroup(emitter, frontend, configuration),
-        module_hook: hookModule(emitter, frontend, configuration),
-        apply_hook: hookApply(emitter, frontend, configuration),
-        request_hook: hookRequest(emitter, frontend, configuration),
-        response_hook: hookResponse(emitter, frontend, configuration),
-        query_hook: hookQuery(emitter, frontend, configuration),
-      };
-    },
-    closeAgent: (
-      {
-        frontend,
-        emitter,
-        group_hook,
-        module_hook,
-        apply_hook,
-        request_hook,
-        response_hook,
-        query_hook,
-      },
-      termination,
-    ) => {
+    openAgent: (configuration) => ({
+      emitter: openEmitter(configuration),
+      frontend: createFrontend(configuration),
+    }),
+    closeAgent: ({ emitter }) => {
       closeEmitter(emitter);
-      unhookGroup(group_hook);
-      unhookModule(module_hook);
-      unhookApply(apply_hook);
-      unhookRequest(request_hook);
-      unhookResponse(response_hook);
-      unhookQuery(query_hook);
     },
-    recordAgentScript: ({ frontend, emitter }, file) => {
+    getInstrumentationIdentifier: ({ frontend }) =>
+      getInstrumentationIdentifier(frontend),
+    getSerializationEmptyValue: ({ frontend }) =>
+      getSerializationEmptyValue(frontend),
+    instrument: ({ frontend, emitter }, file) => {
       const { messages, content: instrumented_content } = instrument(
         frontend,
-        {
-          ...file,
-          type: "script",
-        },
-        createMirrorSourceMap(file),
+        file,
+        extractSourceMap(file),
       );
       for (const message of messages) {
         sendEmitter(emitter, message);
       }
-      const { url } = file;
-      return runScript(instrumented_content, url);
+      return instrumented_content;
     },
     takeLocalAgentTrace: ({ emitter }, key) =>
       takeLocalEmitterTrace(emitter, key),
@@ -80,5 +83,26 @@ export default (dependencies) => {
     stopTrack: ({ emitter, frontend }, key, termination) => {
       sendEmitter(emitter, stopTrack(frontend, key, termination));
     },
+    ...fromEntries(
+      toEntries({
+        recordBeginBundle,
+        recordBeginApply,
+        recordBeginResponse,
+        recordBeforeJump,
+        recordBeforeRequest,
+        recordBeforeQuery,
+      }).map(generateMapEntry(generateRecordIncrement)),
+    ),
+    ...fromEntries(
+      toEntries({
+        recordEndBundle,
+        recordEndApply,
+        recordEndResponse,
+        recordAfterJump,
+        recordAfterRequest,
+        recordAfterQuery,
+      }).map(generateMapEntry(generateRecord)),
+    ),
+    amendBeginResponse: generateRecord(recordBeginResponse),
   };
 };

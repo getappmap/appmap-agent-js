@@ -12,31 +12,39 @@ const { createConfiguration, extendConfiguration } =
 const {
   openAgent,
   closeAgent,
-  recordAgentScript,
+  instrument,
   takeLocalAgentTrace,
   startTrack,
   stopTrack,
+  getInstrumentationIdentifier,
+  getSerializationEmptyValue,
+  recordBeforeQuery,
+  recordAfterQuery,
 } = Agent(dependencies);
 const agent = openAgent(
   extendConfiguration(
     createConfiguration("file:///home"),
     {
       packages: ["*"],
-      hooks: {
-        apply: false,
-        cjs: false,
-        esm: false,
-        mysql: false,
-        http: false,
-      },
     },
     "file:///base",
   ),
 );
+assertEqual(typeof getInstrumentationIdentifier(agent), "string");
 startTrack(agent, "record", { path: null, data: {} });
 assertEqual(
-  recordAgentScript(agent, { url: "file:///base/main.js", content: "123;" }),
+  eval(instrument(agent, { url: "file:///base/main.js", content: "123;" })),
   123,
+);
+recordAfterQuery(
+  agent,
+  recordBeforeQuery(agent, {
+    database: "mysql",
+    version: null,
+    sql: "SELECT 123;",
+    parameters: [],
+  }),
+  { error: getSerializationEmptyValue(agent) },
 );
 stopTrack(agent, "record", { errors: [], status: 0 });
 closeAgent(agent, { errors: [], status: 123 });
@@ -53,6 +61,25 @@ assertDeepEqual(
         inline: false,
       },
     ],
-    events: [],
+    events: [
+      {
+        type: "before",
+        index: 1,
+        time: 0,
+        data: {
+          type: "query",
+          database: "mysql",
+          version: null,
+          sql: "SELECT 123;",
+          parameters: [],
+        },
+      },
+      {
+        type: "after",
+        index: 1,
+        time: 0,
+        data: { type: "query", error: null },
+      },
+    ],
   },
 );
