@@ -1,12 +1,5 @@
 branches: [test, node, browser]
 dependencies:
   - frontend
-  - interpretation
   - emitter
-  - hook-apply
-  - hook-group
-  - hook-module
-  - hook-request
-  - hook-response
-  - hook-query
-  - source
+  - source-outer
