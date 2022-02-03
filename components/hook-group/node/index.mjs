@@ -3,17 +3,15 @@ import { createHook } from "async_hooks";
 export default (dependencies) => {
   const {
     util: { assert },
-    frontend: {
-      incrementEventCounter,
+    agent: {
       recordBeginBundle,
       recordEndBundle,
       recordBeforeJump,
       recordAfterJump,
     },
-    emitter: { sendEmitter },
   } = dependencies;
   return {
-    hookGroup: (emitter, frontend, { ordering }) => {
+    hook: (agent, { ordering }) => {
       if (ordering !== "causal") {
         return null;
       }
@@ -24,11 +22,10 @@ export default (dependencies) => {
       const hook = createHook({
         init: (id, description, origin) => {
           assert(!groups.has(id), "duplicate async id");
-          const bundle_index = incrementEventCounter(frontend);
-          const jump_index = incrementEventCounter(frontend);
-          groups.set(id, { bundle_index, jump_index });
-          sendEmitter(emitter, recordBeginBundle(frontend, bundle_index, null));
-          sendEmitter(emitter, recordBeforeJump(frontend, jump_index, null));
+          groups.set(id, {
+            bundle_index: recordBeginBundle(agent, null),
+            jump_index: recordBeforeJump(agent, null),
+          });
         },
         destroy: (id) => {
           if (groups.has(id)) {
@@ -38,8 +35,8 @@ export default (dependencies) => {
             );
             const { bundle_index, jump_index } = groups.get(id);
             groups.delete(id);
-            sendEmitter(emitter, recordAfterJump(frontend, jump_index, null));
-            sendEmitter(emitter, recordEndBundle(frontend, bundle_index, null));
+            recordAfterJump(agent, jump_index, null);
+            recordEndBundle(agent, bundle_index, null);
           }
         },
         before: (id) => {
@@ -48,14 +45,12 @@ export default (dependencies) => {
             const group = groups.get(id);
             const { jump_index } = group;
             group.jump_index = null;
-            sendEmitter(emitter, recordAfterJump(frontend, jump_index, null));
+            recordAfterJump(agent, jump_index, null);
           } else {
-            const bundle_index = incrementEventCounter(frontend);
-            groups.set(id, { bundle_index, jump_index: null });
-            sendEmitter(
-              emitter,
-              recordBeginBundle(frontend, bundle_index, null),
-            );
+            groups.set(id, {
+              bundle_index: recordBeginBundle(agent, null),
+              jump_index: null,
+            });
           }
         },
         after: (id) => {
@@ -66,15 +61,13 @@ export default (dependencies) => {
             group.jump_index === null,
             "expected null jump index in after asynchronous hook",
           );
-          const jump_index = incrementEventCounter(frontend);
-          group.jump_index = jump_index;
-          sendEmitter(emitter, recordBeforeJump(frontend, jump_index, null));
+          group.jump_index = recordBeforeJump(agent, null);
         },
       });
       hook.enable();
       return hook;
     },
-    unhookGroup: (hook) => {
+    unhook: (hook) => {
       if (hook !== null) {
         hook.disable();
       }

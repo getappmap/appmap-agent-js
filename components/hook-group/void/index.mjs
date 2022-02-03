@@ -4,12 +4,12 @@ export default (dependencies) => {
     expect: { expect },
   } = dependencies;
   return {
-    hookGroup: (emitter, frontend, { ordering }) => {
+    hook: (agent, { ordering }) => {
       expect(
         ordering !== "causal",
         "expected configuration to disable group re-ordering",
       );
     },
-    unhookGroup: noop,
+    unhook: noop,
   };
 };

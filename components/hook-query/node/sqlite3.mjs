@@ -82,31 +82,25 @@ const combine = (parameters1, parameters2) => {
 export default (dependencies) => {
   const {
     util: { assignProperty, coalesce },
-    frontend: {
+    agent: {
       getSerializationEmptyValue,
-      incrementEventCounter,
       recordBeforeQuery,
       recordAfterQuery,
       recordBeginBundle,
       recordEndBundle,
     },
-    emitter: { sendEmitter },
   } = dependencies;
   const { requireMaybe } = Require(dependencies);
   return {
-    unhookSqlite3: (backup) => {
+    unhook: (backup) => {
       backup.forEach(assignProperty);
     },
-    hookSqlite3: (
-      emitter,
-      frontend,
-      { repository: { directory }, hooks: { sqlite3 } },
-    ) => {
+    hook: (agent, { repository: { directory }, hooks: { sqlite3 } }) => {
       const Sqlite3 = requireMaybe(sqlite3, directory, "sqlite3");
       if (Sqlite3 === null) {
         return [];
       }
-      const empty = getSerializationEmptyValue(frontend);
+      const empty = getSerializationEmptyValue(agent);
       const { Database } = Sqlite3;
       const { prototype: database_prototype } = Database;
       const backup = ["run", "get", "all", "each", "prepare"].map((key) => ({
@@ -116,29 +110,21 @@ export default (dependencies) => {
       }));
       const copy = { ...database_prototype };
       const recordQuery = (sql, parameters, callback) => {
-        const index1 = incrementEventCounter(frontend);
-        const index2 = incrementEventCounter(frontend);
-        sendEmitter(emitter, recordBeginBundle(frontend, index1));
-        sendEmitter(
-          emitter,
-          recordBeforeQuery(frontend, index2, {
-            database: "sqlite3",
-            version: null,
-            sql,
-            parameters,
-          }),
-        );
+        const index1 = recordBeginBundle(agent, null);
+        const index2 = recordBeforeQuery(agent, {
+          database: "sqlite3",
+          version: null,
+          sql,
+          parameters,
+        });
         return function (...args) {
-          sendEmitter(
-            emitter,
-            recordAfterQuery(frontend, index2, {
-              error: coalesce(args, 0, null) || empty,
-            }),
-          );
+          recordAfterQuery(agent, index2, {
+            error: coalesce(args, 0, null) || empty,
+          });
           try {
             return apply(callback, this, args);
           } finally {
-            sendEmitter(emitter, recordEndBundle(frontend, index1));
+            recordEndBundle(agent, index1, null);
           }
         };
       };

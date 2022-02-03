@@ -34,20 +34,14 @@ const proceedAsync = async () => {
   const { testHookAsync, makeEvent } = await buildTestComponentAsync(
     "hook-fixture",
   );
-  const { hookMysql, unhookMysql } = HookMysql(dependencies);
+  const component = HookMysql(dependencies);
   assertDeepEqual(
-    await testHookAsync(
-      hookMysql,
-      unhookMysql,
-      { hooks: { mysql: false } },
-      async () => {},
-    ),
+    await testHookAsync(component, { hooks: { mysql: false } }, async () => {}),
     { events: [], sources: [] },
   );
   assertDeepEqual(
     await testHookAsync(
-      hookMysql,
-      unhookMysql,
+      component,
       { hooks: { mysql: true } },
       async (frontend) => {
         const connection = Mysql.createConnection({
