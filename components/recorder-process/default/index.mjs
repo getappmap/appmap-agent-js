@@ -1,4 +1,3 @@
-
 export default (dependencies) => {
   const {
     recorder: { createRecorder, startTrack },

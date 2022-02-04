@@ -22,7 +22,14 @@ export default (dependencies) => {
       takeLocalAgentTrace,
     },
   } = dependencies;
-  const { record } = Record(dependencies);
+  const {
+    recordBundle,
+    recordApply,
+    recordResponse,
+    recordJump,
+    recordQuery,
+    recordRequest,
+  } = Record(dependencies);
   let global_running = false;
   const makeFile = (type, content, url = "file:///") => {
     content = _String(content);
@@ -51,15 +58,15 @@ export default (dependencies) => {
     }
     instrumentScript(content, url) {
       expectRunning(this.hooking);
-      return instrument(this, makeFile("script", content, url));
+      return instrument(this.agent, makeFile("script", content, url));
     }
     instrumentModule(content, url) {
       expectRunning(this.hooking);
-      return instrument(this, makeFile("module", content, url));
+      return instrument(this.agent, makeFile("module", content, url));
     }
     recordScript(content, url) {
       expectRunning(this.hooking);
-      return runScript(this.instrument(content, url));
+      return runScript(this.instrumentScript(content, url));
     }
     startTrack(track, initialization) {
       expectRunning(this.hooking);
@@ -71,18 +78,12 @@ export default (dependencies) => {
         "Cannot start track %j because it already exists.",
         track,
       );
-      initialization = {
+      this.tracks.add(track);
+      startTrack(this.agent, track, {
         path: null,
         data: {},
         ...initialization,
-      };
-      expect(
-        initialization.path === null || typeof initialization.path === "string",
-        "initialization.path must either be null or a string, got: %",
-        initialization,
-      );
-      this.tracks.add(track);
-      startTrack(this.agent, track);
+      });
       return track;
     }
     stopTrack(track, termination) {
@@ -104,34 +105,36 @@ export default (dependencies) => {
       this.hooking = null;
       closeAgent(this.agent);
     }
+    /* c8 ignore start */
     getEmptyValue() {
       expectRunning(this.hooking);
       return getSerializationEmptyValue(this.agent);
     }
     recordBundle(data) {
       expectRunning(this.hooking);
-      return record(this.agent, "bundle", data);
+      return recordBundle(this.agent, data);
     }
     recordApply(data) {
       expectRunning(this.hooking);
-      return record(this.agent, "apply", data);
+      return recordApply(this.agent, data);
     }
     recordResponse(data) {
       expectRunning(this.hooking);
-      return record(this.agent, "response", data);
+      return recordResponse(this.agent, data);
     }
     recordJump(data) {
       expectRunning(this.hooking);
-      return record(this.agent, "jump", data);
+      return recordJump(this.agent, data);
     }
     recordQuery(data) {
       expectRunning(this.hooking);
-      return record(this.agent, "query", data);
+      return recordQuery(this.agent, data);
     }
     recordRequest(data) {
       expectRunning(this.hooking);
-      return record(this.agent, "request", data);
+      return recordRequest(this.agent, data);
     }
+    /* c8 ignore stop */
   }
   return { Appmap };
 };

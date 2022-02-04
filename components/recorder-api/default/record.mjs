@@ -21,12 +21,6 @@ export default (dependencies) => {
       recordAfterQuery,
     },
   } = dependencies;
-  const makeRecording = (enter, sanitizeEnter, leave, sanitizeLeave) => ({
-    enter,
-    sanitizeEnter,
-    leave,
-    sanitizeLeave,
-  });
   const expectType = (location, object, key, type) => {
     expect(
       typeof object[key] === type,
@@ -95,19 +89,29 @@ export default (dependencies) => {
     expectHeaders(location, data, "headers");
     return data;
   };
-  const recordings = {
-    bundle: makeRecording(
+  const generateRecord =
+    (enter, sanitizeEnter, leave, sanitizeLeave) => (agent, data) => {
+      const empty = getSerializationEmptyValue(agent);
+      let index = enter(agent, sanitizeEnter(empty, data));
+      return (data) => {
+        expect(index !== null, "event has already been closed");
+        leave(agent, index, sanitizeLeave(empty, data));
+        index = null;
+      };
+    };
+  return {
+    recordBundle: generateRecord(
       recordBeginBundle,
       sanitizeNull,
       recordEndBundle,
       sanitizeNull,
     ),
-    apply: makeRecording(
+    recordApply: generateRecord(
       recordBeginApply,
       (empty, data) => {
         data = {
           this: _undefined,
-          aguments: [],
+          arguments: [],
           ...data,
           function: null,
         };
@@ -129,19 +133,19 @@ export default (dependencies) => {
         return data;
       },
     ),
-    response: makeRecording(
+    recordResponse: generateRecord(
       recordBeginResponse,
       generateSanitizeRequest("BeginResponseEvent"),
       recordEndResponse,
       generateSanitizeResponse("EndResponseEvent"),
     ),
-    jump: makeRecording(
+    recordJump: generateRecord(
       recordBeforeJump,
       sanitizeNull,
       recordAfterJump,
       sanitizeNull,
     ),
-    query: makeRecording(
+    recordQuery: generateRecord(
       recordBeforeQuery,
       (empty, data) => {
         data = {
@@ -164,23 +168,11 @@ export default (dependencies) => {
         return data;
       },
     ),
-    request: makeRecording(
+    recordRequest: generateRecord(
       recordBeforeRequest,
       generateSanitizeRequest("BeforeRequestEvent"),
       recordAfterRequest,
       generateSanitizeResponse("AfterRequestEvent"),
     ),
-  };
-  return {
-    record: (agent, name, data) => {
-      const { enter, sanitizeEnter, leave, sanitizeLeave } = recordings[name];
-      const empty = getSerializationEmptyValue(agent);
-      let index = enter(agent, sanitizeEnter(empty, data));
-      return (data) => {
-        expect(index !== null, "event has already been closed");
-        leave(agent, index, sanitizeLeave(empty, data));
-        index = null;
-      };
-    },
   };
 };

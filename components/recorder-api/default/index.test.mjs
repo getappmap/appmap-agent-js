@@ -24,6 +24,7 @@ const configuration = extendConfiguration(
 );
 
 const appmap = new Appmap(configuration);
+assertEqual(typeof appmap.instrumentModule("123;", "file:///base/main.js"), "string");
 
 const track = appmap.startTrack(null, { path: null, data: { name: "name2" } });
 assertEqual(appmap.recordScript("123;", "file:///base/main.js"), 123);
