@@ -14,9 +14,17 @@ const { createRecorder, generateRequestAsync, startTrack, stopTrack } =
 const { createConfiguration, extendConfiguration } =
   await buildTestComponentAsync("configuration");
 
+const mock_process = new EventEmitter();
+Object.assign(mock_process, {
+  pid: process.pid,
+  cwd: process.cwd,
+  argv: ["node", "main.js"],
+  version: process.version,
+});
+
 assertEqual(
   createRecorder(
-    process,
+    mock_process,
     extendConfiguration(
       createConfiguration("file:///home"),
       {
@@ -42,14 +50,6 @@ const configuration = extendConfiguration(
   },
   "file:///base",
 );
-
-const mock_process = new EventEmitter();
-Object.assign(mock_process, {
-  pid: process.pid,
-  cwd: process.cwd,
-  argv: process.argv,
-  version: process.version,
-});
 
 const recorder = createRecorder(mock_process, configuration);
 
