@@ -112,12 +112,6 @@ export default (dependencies) => {
           maybe_path === null
             ? false
             : makeRegExp(source, flags).test(maybe_path);
-        console.log("matchSpecifier", url,
-        maybe_path,
-        base,
-        matched,
-        source,
-        flags,);
         logDebug(
           "url %j which resolves to %j relatively to %j %s regexp specifier %j with flags %j",
           url,

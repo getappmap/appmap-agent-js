@@ -21,7 +21,6 @@ export default (dependencies) => {
 
   const getSpecifierValue = (pairs, key) => {
     for (const [specifier, value] of pairs) {
-      console.log("getSpecifierValue", matchSpecifier(specifier, key), specifier, key);
       if (matchSpecifier(specifier, key)) {
         return value;
       }
@@ -175,7 +174,6 @@ export default (dependencies) => {
       return configuration;
     },
     isConfigurationEnabled: ({ processes, main }) => {
-      console.log("isConfigurationEnabled", processes, main);
       const enabled = main === null || getSpecifierValue(processes, main);
       logInfo(`%s %s.`, enabled ? "Recording" : "Bypassing", main);
       return enabled;
