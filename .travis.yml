@@ -17,8 +17,35 @@ stages:
 
 jobs:
   include:
+    - stage: lint
+      script:
+        - npm run lint
+    - stage: test
+      os: linux
+      node_js: 16.0.0
+      script:
+        - npm run test-unit-cov
+        - npm run test-system
+    - stage: test
+      os: linux
+      node_js: 14.0.0
+      script:
+        - npm run test-unit
+        - npm run test-system
+    - stage: test
+      os: windows
+      node_js: 16.0.0
+      script:
+        - npm run test-unit
+        - npm run test-system
     - stage: test
       os: windows
       node_js: 14.0.0
       script:
-        - node components/recorder-cli/default/index.test.mjs
+        - npm run test-unit
+        - npm run test-system
+    - stage: deploy
+      if: branch = main
+      script:
+        - npm run format
+        - npm run deploy

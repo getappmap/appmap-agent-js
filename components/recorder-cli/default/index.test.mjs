@@ -1,7 +1,7 @@
 /* eslint-env node */
 
 import { EventEmitter } from "events";
-import { pathToFileURL} from "url";
+import { pathToFileURL } from "url";
 import { assertThrow, assertEqual } from "../../__fixture__.mjs";
 import {
   buildTestDependenciesAsync,
