@@ -1,9 +1,15 @@
-const { ownKeys } = Reflect;
 const { fromEntries } = Object;
 
 export default (dependencies) => {
   const { "hook-module": transformSourceDefault } = dependencies;
-  const names = ownKeys(dependencies);
+  const names = [
+    "hook-apply",
+    "hook-group",
+    "hook-module",
+    "hook-query",
+    "hook-request",
+    "hook-response",
+  ];
   return {
     transformSourceDefault,
     hook: (agent, configuration) =>
