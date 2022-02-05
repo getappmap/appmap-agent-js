@@ -2,37 +2,20 @@ import { createServer } from "http";
 
 export default (dependencies) => {
   const {
-    util: { assert },
-    log: { logInfo },
-    "configuration-accessor": {
-      isConfigurationEnabled,
-      extendConfigurationNode,
-    },
-    agent: { openAgent, closeAgent, requestRemoteAgentAsync },
+    "recorder-cli": { createRecorder, generateRequestAsync },
     http: { generateRespond },
   } = dependencies;
   return {
     main: (process, configuration) => {
-      logInfo("Recorder 'remote' caught process %j", process.pid);
-      configuration = extendConfigurationNode(configuration, process);
-      const { recorder, "frontend-track-port": port } = configuration;
-      assert(recorder === "remote", "expected remote recorder");
-      if (isConfigurationEnabled(configuration)) {
+      const recorder = createRecorder(process, configuration);
+      if (recorder !== null) {
+        const { "frontend-track-port": port } = configuration;
         if (port !== null) {
           const server = createServer();
           server.unref();
-          server.on(
-            "request",
-            generateRespond((method, path, body) =>
-              requestRemoteAgentAsync(agent, method, path, body),
-            ),
-          );
+          server.on("request", generateRespond(generateRequestAsync(recorder)));
           server.listen(port);
         }
-        const agent = openAgent(configuration);
-        process.on("exit", (status, signal) => {
-          closeAgent(agent);
-        });
       }
     },
   };

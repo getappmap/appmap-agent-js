@@ -1,55 +1,27 @@
 export default (dependencies) => {
   const {
-    uuid: { getUUID },
-    log: { logInfo },
-    "configuration-accessor": {
-      isConfigurationEnabled,
-      extendConfigurationNode,
-    },
-    util: { assert },
-    agent: { openAgent, closeAgent, startTrack, stopTrack },
+    "recorder-cli": { createRecorder, startTrack, stopTrack },
   } = dependencies;
   return {
     createMochaHooks: (process, configuration) => {
-      logInfo("Recorder 'mocha' caught process %j", process.pid);
-      configuration = extendConfigurationNode(configuration, process);
-      const { recorder } = configuration;
-      assert(recorder === "mocha", "expected mocha recorder");
-      if (!isConfigurationEnabled(configuration)) {
+      const recorder = createRecorder(process, configuration);
+      if (recorder === null) {
         return {};
+      } else {
+        return {
+          beforeEach() {
+            startTrack(recorder, "mocha", {
+              path: null,
+              data: {
+                "map-name": this.currentTest.parent.fullTitle(),
+              },
+            });
+          },
+          afterEach() {
+            stopTrack(recorder, "mocha", { errors: [], status: 0 });
+          },
+        };
       }
-      const agent = openAgent(configuration);
-      const errors = [];
-      process.on("uncaughtExceptionMonitor", (error) => {
-        errors.push(error);
-      });
-      process.on("exit", (status, signal) => {
-        const termination = { errors, status };
-        /* c8 ignore start */
-        if (track !== null) {
-          stopTrack(agent, track, termination);
-        }
-        /* c8 ignore stop */
-        closeAgent(agent);
-      });
-      let track = null;
-      return {
-        beforeEach() {
-          assert(track === null, "unexpected mocha concurrent test cases");
-          track = getUUID();
-          startTrack(agent, track, {
-            path: null,
-            data: {
-              "map-name": this.currentTest.parent.fullTitle(),
-            },
-          });
-        },
-        afterEach() {
-          assert(track !== null, "mocha invoked afterEach ");
-          stopTrack(agent, track, { errors: [], status: 0 });
-          track = null;
-        },
-      };
     },
   };
 };
