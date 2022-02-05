@@ -1,6 +1,7 @@
 /* eslint-env node */
 
 import { EventEmitter } from "events";
+import { pathToFileURL} from "url";
 import { assertThrow, assertEqual } from "../../__fixture__.mjs";
 import {
   buildTestDependenciesAsync,
@@ -18,7 +19,7 @@ const mock_process = new EventEmitter();
 Object.assign(mock_process, {
   pid: process.pid,
   cwd: process.cwd,
-  argv: ["node", "/main.js"],
+  argv: process.argv,
   version: process.version,
 });
 
@@ -30,7 +31,7 @@ assertEqual(
       {
         processes: false,
       },
-      "file:///base",
+      pathToFileURL(process.cwd()),
     ),
   ),
   null,
