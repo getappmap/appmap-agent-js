@@ -18,7 +18,7 @@ const mock_process = new EventEmitter();
 Object.assign(mock_process, {
   pid: process.pid,
   cwd: process.cwd,
-  argv: ["node", "main.js"],
+  argv: ["node", "/main.js"],
   version: process.version,
 });
 
