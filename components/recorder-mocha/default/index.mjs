@@ -1,7 +1,6 @@
-
 export default (dependencies) => {
   const {
-    recorder: { createRecorder, startTrack, closeTrack},
+    "recorder-cli": { createRecorder, startTrack, stopTrack },
   } = dependencies;
   return {
     createMochaHooks: (process, configuration) => {

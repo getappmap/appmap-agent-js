@@ -8,7 +8,7 @@ import {
   writeFile as writeFileAsync,
   realpath as realpathAsync,
 } from "fs/promises";
-import { createAppmap } from "../../../lib/node/recorder-manual.mjs";
+import { createAppmap } from "../../../lib/node/recorder-api.mjs";
 
 Error.stackTraceLimit = Infinity;
 

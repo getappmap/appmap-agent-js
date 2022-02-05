@@ -1,6 +1,6 @@
 export default (dependencies) => {
   const {
-    recorder: { createRecorder, startTrack },
+    "recorder-cli": { createRecorder, startTrack },
   } = dependencies;
   return {
     main: (process, configuration) => {

@@ -3,9 +3,9 @@ import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
 } from "../../build.mjs";
-import RecorderManual from "./index.mjs";
+import RecorderAPI from "./index.mjs";
 
-const { Appmap } = RecorderManual(
+const { Appmap } = RecorderAPI(
   await buildTestDependenciesAsync(import.meta.url),
 );
 
@@ -24,7 +24,10 @@ const configuration = extendConfiguration(
 );
 
 const appmap = new Appmap(configuration);
-assertEqual(typeof appmap.instrumentModule("123;", "file:///base/main.js"), "string");
+assertEqual(
+  typeof appmap.instrumentModule("123;", "file:///base/main.js"),
+  "string",
+);
 
 const track = appmap.startTrack(null, { path: null, data: { name: "name2" } });
 assertEqual(appmap.recordScript("123;", "file:///base/main.js"), 123);

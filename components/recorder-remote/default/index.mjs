@@ -2,13 +2,7 @@ import { createServer } from "http";
 
 export default (dependencies) => {
   const {
-    util: { assert },
-    log: { logInfo },
-    "configuration-accessor": {
-      isConfigurationEnabled,
-      extendConfigurationNode,
-    },
-    agent: { openAgent, closeAgent, requestRemoteAgentAsync },
+    "recorder-cli": { createRecorder, generateRequestAsync },
     http: { generateRespond },
   } = dependencies;
   return {
@@ -19,10 +13,7 @@ export default (dependencies) => {
         if (port !== null) {
           const server = createServer();
           server.unref();
-          server.on(
-            "request",
-            generateRespond(generateRequestAsync(recorder)),
-          );
+          server.on("request", generateRespond(generateRequestAsync(recorder)));
           server.listen(port);
         }
       }
