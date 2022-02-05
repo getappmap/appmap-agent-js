@@ -8,7 +8,9 @@ import {
 import HookApply from "./index.mjs";
 
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
-const { testHookAsync, makeEvent } = await buildTestComponentAsync("hook");
+const { testHookAsync, makeEvent } = await buildTestComponentAsync(
+  "hook-fixture",
+);
 const { hookApply, unhookApply } = HookApply(dependencies);
 assertDeepEqual(
   await testHookAsync(

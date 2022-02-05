@@ -2,14 +2,12 @@ import { assertDeepEqual } from "../../__fixture__.mjs";
 // import { executionAsyncId } from "async_hooks";
 import {
   buildTestDependenciesAsync,
-  buildTestComponentsAsync,
+  buildTestComponentAsync,
 } from "../../build.mjs";
 import HookGroup from "./index.mjs";
 
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
-const {
-  hook: { testHookAsync },
-} = await buildTestComponentsAsync(["hook", "frontend"]);
+const { testHookAsync } = await buildTestComponentAsync("hook-fixture");
 const { hookGroup, unhookGroup } = HookGroup(dependencies);
 
 assertDeepEqual(

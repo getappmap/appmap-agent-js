@@ -9,7 +9,9 @@ import HookRequest from "./index.mjs";
 const { createServer } = Http;
 
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
-const { testHookAsync, makeEvent } = await buildTestComponentAsync("hook");
+const { testHookAsync, makeEvent } = await buildTestComponentAsync(
+  "hook-fixture",
+);
 const { hookRequest, unhookRequest } = HookRequest(dependencies);
 
 const server = createServer();

@@ -8,7 +8,7 @@ import Native from "./native.mjs";
 const _eval = eval;
 
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
-const { testHookAsync } = await buildTestComponentAsync("hook");
+const { testHookAsync } = await buildTestComponentAsync("hook-fixture");
 const { createConfiguration } = await buildTestComponentAsync("configuration");
 const { hookNativeModule, unhookNativeModule } = Native(dependencies);
 global.APPMAP_TRANSFORM_MODULE_ASYNC = null;

@@ -37,7 +37,7 @@
 - frontend
 - socket
 - emitter
-- hook
+- hook-fixture
 - * hook-apply
   * hook-group
   * hook-module
