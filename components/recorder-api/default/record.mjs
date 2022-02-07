@@ -100,7 +100,7 @@ export default (dependencies) => {
       };
     };
   return {
-    recordBundle: generateRecord(
+    recordBeginBundle: generateRecord(
       recordBeginBundle,
       sanitizeNull,
       recordEndBundle,
@@ -133,13 +133,13 @@ export default (dependencies) => {
         return data;
       },
     ),
-    recordResponse: generateRecord(
+    recordServerRequest: generateRecord(
       recordBeginResponse,
       generateSanitizeRequest("BeginResponseEvent"),
       recordEndResponse,
       generateSanitizeResponse("EndResponseEvent"),
     ),
-    recordJump: generateRecord(
+    recordBeforeJump: generateRecord(
       recordBeforeJump,
       sanitizeNull,
       recordAfterJump,
@@ -168,7 +168,7 @@ export default (dependencies) => {
         return data;
       },
     ),
-    recordRequest: generateRecord(
+    recordClientRequest: generateRecord(
       recordBeforeRequest,
       generateSanitizeRequest("BeforeRequestEvent"),
       recordAfterRequest,

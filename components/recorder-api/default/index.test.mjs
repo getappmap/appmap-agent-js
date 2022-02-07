@@ -29,9 +29,9 @@ assertEqual(
   "string",
 );
 
-const track = appmap.startTrack(null, { path: null, data: { name: "name2" } });
+const track = appmap.startTrack(null, { name: "name2" }, null);
 assertEqual(appmap.recordScript("123;", "file:///base/main.js"), 123);
-assertDeepEqual(appmap.stopTrack(track, { status: 123, errors: [] }), {
+assertDeepEqual(appmap.stopTrack(track, 123, []), {
   configuration: {
     ...configuration,
     name: "name2",

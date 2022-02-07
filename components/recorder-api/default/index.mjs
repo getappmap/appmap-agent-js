@@ -23,12 +23,12 @@ export default (dependencies) => {
     },
   } = dependencies;
   const {
-    recordBundle,
+    recordBeginBundle,
     recordApply,
-    recordResponse,
-    recordJump,
+    recordServerRequest,
+    recordBeforeJump,
     recordQuery,
-    recordRequest,
+    recordClientRequest,
   } = Record(dependencies);
   let global_running = false;
   const makeFile = (type, content, url = "file:///") => {
@@ -68,7 +68,7 @@ export default (dependencies) => {
       expectRunning(this.hooking);
       return runScript(this.instrumentScript(content, url));
     }
-    startTrack(track, initialization) {
+    startTrack(track, conf = {}, base = null) {
       expectRunning(this.hooking);
       if (track === null) {
         track = getUUID();
@@ -80,13 +80,12 @@ export default (dependencies) => {
       );
       this.tracks.add(track);
       startTrack(this.agent, track, {
-        path: null,
-        data: {},
-        ...initialization,
+        path: base,
+        data: conf,
       });
       return track;
     }
-    stopTrack(track, termination) {
+    stopTrack(track, status = 0, errors = []) {
       expectRunning(this.hooking);
       expect(
         this.tracks.has(track),
@@ -94,7 +93,7 @@ export default (dependencies) => {
         track,
       );
       this.tracks.delete(track);
-      stopTrack(this.agent, track, { errors: [], status: 0, ...termination });
+      stopTrack(this.agent, track, { errors, status });
       return takeLocalAgentTrace(this.agent, track);
     }
     terminate() {
@@ -110,29 +109,29 @@ export default (dependencies) => {
       expectRunning(this.hooking);
       return getSerializationEmptyValue(this.agent);
     }
-    recordBundle(data) {
+    recordBeginBundle(data) {
       expectRunning(this.hooking);
-      return recordBundle(this.agent, data);
+      return recordBeginBundle(this.agent, data);
     }
     recordApply(data) {
       expectRunning(this.hooking);
       return recordApply(this.agent, data);
     }
-    recordResponse(data) {
+    recordServerRequest(data) {
       expectRunning(this.hooking);
-      return recordResponse(this.agent, data);
+      return recordServerRequest(this.agent, data);
     }
-    recordJump(data) {
+    recordBeforeJump(data) {
       expectRunning(this.hooking);
-      return recordJump(this.agent, data);
+      return recordBeforeJump(this.agent, data);
     }
     recordQuery(data) {
       expectRunning(this.hooking);
       return recordQuery(this.agent, data);
     }
-    recordRequest(data) {
+    recordClientRequest(data) {
       expectRunning(this.hooking);
-      return recordRequest(this.agent, data);
+      return recordClientRequest(this.agent, data);
     }
     /* c8 ignore stop */
   }

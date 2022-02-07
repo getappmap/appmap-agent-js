@@ -7,12 +7,12 @@ import Record from "./record.mjs";
 
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
 const {
-  recordBundle,
+  recordBeginBundle,
   recordApply,
-  recordResponse,
-  recordJump,
+  recordServerRequest,
+  recordBeforeJump,
   recordQuery,
-  recordRequest,
+  recordClientRequest,
 } = Record(dependencies);
 const { openAgent, closeAgent, startTrack, stopTrack, takeLocalAgentTrace } =
   await buildTestComponentAsync("agent");
@@ -48,7 +48,7 @@ const test = (
 };
 
 test(
-  recordBundle,
+  recordBeginBundle,
   null,
   null,
   "begin",
@@ -77,7 +77,7 @@ test(
 );
 
 test(
-  recordResponse,
+  recordServerRequest,
   null,
   null,
   "begin",
@@ -94,7 +94,7 @@ test(
 );
 
 test(
-  recordJump,
+  recordBeforeJump,
   null,
   null,
   "before",
@@ -122,7 +122,7 @@ test(
 );
 
 test(
-  recordRequest,
+  recordClientRequest,
   null,
   null,
   "before",
@@ -139,7 +139,7 @@ test(
 );
 
 test(
-  recordRequest,
+  recordClientRequest,
   { headers: { key: "value" }, route: "route" },
   null,
   "before",

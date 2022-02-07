@@ -58,7 +58,7 @@ const appmap = createAppmap(
   directory,
 );
 
-appmap.startTrack("track", { path: null, data: {} });
+appmap.startTrack("track");
 
 await writeFileAsync(
   new URL(`${directory}/common.js`),

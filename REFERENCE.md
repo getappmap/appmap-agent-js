@@ -126,7 +126,7 @@ const appmap = createAppmap(
 );
 // NB: An appmap can create multiple (concurrent) tracks
 const track = "my-identifier";
-appmap.start(track, {
+appmap.startTrack(track, {
   app: "my-app-name",
   name: "my-appmap-name",
   pruning: true,
@@ -139,12 +139,111 @@ appmap.recordScript(
   "(function main () { return 123; } ());",
   "path/to/main.js",
 );
-const trace = appmap.stop(track, {
+const trace = appmap.stopTrack(track, {
   status: 0,
-  errors: [] 
+  errors: []
 });
 console.log(JSON.stringify(trace, null, 2));
 ```
+
+### `createAppmap(home, configuration, base)`
+
+* `home <string>` The file url of the project. Default: file url of the current working directory.
+* `configuration <object>` Root configuration. Default: `{}`.
+* `base <string>` The file url of the directory to resolve the relative paths of the configuration argument.
+* Returns `<appmap>` an appmap instance and start recording.
+
+### `appmap.terminate()`
+
+Stop recording. Subsequent method invocations will throw exception.
+
+### `appmap.startTrack(track, configuration, base)`
+
+* `track <string> | null` An identifier for the track. Default: `null`, a random string will be used
+* `configuration <object>` Configuration for extending the configuration of the appmap instance. Default: `{}`.
+* `base <string> | null`: The file url of the directory to resolve the relative paths of the configuration argument. Default: `null`, the presence of relative paths will throw an error.
+* Returns `<string>` the identifier for the track. This is useful when providing `null` for the `track` argument.
+
+### `appmap.stopTrack(track, status, errors)`
+
+* `track <string>`
+* `status <number>` Exit status code. Default: `[]`.
+* `errors <Errors[]>` List of errors that happened during the track lifetime. Default: `[]`.
+* Returns `<object>` the recorded trace in the appmap format -- ie: a JSON object.
+
+### `appmap.recordScript(content, url)`
+
+* `content <string>` Script content.
+* `url <string>` Script location.
+* Returns `<any>` the completion value of the script.
+
+### `appmap.instrumentScript(content, url)`
+
+* `content <string>` Script content.
+* `url <string>` Script location.
+* Returns `<string>` the instrumented code to run as a module.
+
+### `appmap.instrumentModule(content, url)`
+
+* `content <string>` Script content.
+* `url <string>` Script location.
+* Returns `<string>` the instrumented code to run as a script.
+
+### `appmap.recordBeginBundle()`
+
+* Returns `recordEndBundle()`
+  * Returns `undefined`.
+
+This methods record an anonymous bundle. This event does not appear in the generated appmap but is useful to bundle events together. `appmap.recordApply` and `appmap.recordServerRequest` are also bundle operations.
+
+### `appmap.recordApply(input)`
+
+* `input <object>` The input of the application. We are still figuring out a way to manually define the called function.
+  * `this <any>` The `this` argument. Default: `undefined`.
+  * `arguments <any[]>` The list of arguments. Default: `[]`.
+* Returns `recordReturn(output)`
+  * `output <object>` The output of the application. One and only one the two properties must be defined.
+    * `error: <any>` The thrown value of application (if present).
+    * `result: <any>` The returned value of the application (if present).
+    * Returns `undefined`.
+
+### `appmap.recordServerRequest(request)`
+
+* `request <object>` The head of the incoming HTTP request
+  * `protocol <string>` The HTTP protocol. Default: `"HTTP/1.1"`.
+  * `method <string>` The HTTP method. Default: `"GET"`.
+  * `url <string>` The requested URL. Default: `"/"`.
+  * `headers <object>` The HTTP headers. Default: `{}`.
+  * `route <string> | null` The normalized requested URL (ie stripped of dynamic data). Default: `"null"`.
+* Returns `recordServerResponse(response)`
+  * `response <object>` The head of the outgoing HTTP response.
+    * `status <number>` The HTTP status code. Default: `200`.
+    * `message <string>` The HTTP status message. Default: `"OK"`.
+    * `headers <object>` The HTTP headers. Default: `{}`.
+  * Returns `undefined`.
+
+### `appmap.recordBeforeJump()`
+
+* Returns `recordAfterJump()`
+  * Returns `undefined`.
+
+This methods record an anonymous jump. This event does not appear in the generated appmap but is useful link events togethers. `appmap.recordQuery` and `appmap.recordClientRequest` are also jump operations.
+
+### `appmap.recordQuery(query)`
+
+* `query <object>`
+  * `database <string>` Name of the database service. Default: `"unknown"`.
+  * `version <string>` Version of the database service. Default: `"unknown"`.
+  * `sql <string>` SQL query string. Default: `"unknown"`.
+  * `parameters <any[]> | <object>` Parameters to replace in placeholders. If placeholders are anonymous, then `parameters` should be an array. If placeholders are named, then `parameters` should be a mapping object. Default: `[]`.
+* Returns `recordResult(result)`
+  * `result <object>`
+    * `error <Error>` Potential error while processing the query.
+  * Returns `undefined`.
+
+### `appmap.recordClientRequest(request)`
+
+Same type signature as `appmap.recordServerResponse` but without `route` property. Note that this method records a jump whereas `appmap.recordServerResponse` records a bundle.
 
 ## Configuration
 
@@ -210,7 +309,7 @@ The agent filter code objects (functions or objects/classes) based on a format c
     * `<string>` Shorthand, `"test/**/*.mjs"` is the same as `{glob:"test/**/*.mjs", enabled:true}`.
     * `<object>`
         * `enabled <boolean>` Indicates whether whitelisted files are enabled or not. *Default*: `true`.
-        * `... <Specifier>` Extends from any specifier format. 
+        * `... <Specifier>` Extends from any specifier format.
   *Default*: `[]` -- ie: the agent will be enabled for every process whose entry script resides in the repository directory.
 * `scenarios <Configuration[]>` An array of child configuration.
 * `scenario <string>` A regular expression to whitelist scenarios for execution. If the root configuration contains a command, it will always be executed. *Default*: `"^"` (every scenario will be executed).
@@ -228,11 +327,11 @@ The agent filter code objects (functions or objects/classes) based on a format c
     * `<string>`: Glob shorthand, `"lib/**/*.js"` is the same as `{glob: "lib/**/*.js"}`.
     * `<object>`
         * `enabled <boolean>` Indicates whether the filtered file should be instrumented or not. *Default*: `true`.
-        * `shallow <boolean>` Indicates whether the filtered file should 
+        * `shallow <boolean>` Indicates whether the filtered file should
         * `exclude <Exclusion[]>` Additional code object filtering for the matched file.
         * `... <Specifier>` Extends from any specifier format.
 * `exclude <Exclusion[]>` Code object filtering to apply to every file.
-* `source <boolean>` Indicates whether to include source code in the appmap file. *Default* `false`. 
+* `source <boolean>` Indicates whether to include source code in the appmap file. *Default* `false`.
 * `hooks <object>` Flags controlling what the agent intercepts.
     * `cjs <boolean>` Indicates whether commonjs modules should be instrumented to record function applications. *Default*: `true`.
     * `esm <boolean>` Indicates whether native modules should be instrumented to record function applications. *Default*: `true` for the CLI and `false` for the API.
@@ -291,7 +390,7 @@ function main () {
     name: main
     children:
     - type: function
-      name: "()" 
+      name: "()"
     - type: class
       name: Class
       children: []
