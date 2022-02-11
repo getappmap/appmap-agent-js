@@ -68,7 +68,7 @@ export default (dependencies) => {
       expectRunning(this.hooking);
       return runScript(this.instrumentScript(content, url));
     }
-    startTrack(track, conf = {}, base = null) {
+    startRecording(track, conf = {}, base = null) {
       expectRunning(this.hooking);
       if (track === null) {
         track = getUUID();
@@ -85,7 +85,7 @@ export default (dependencies) => {
       });
       return track;
     }
-    stopTrack(track, status = 0, errors = []) {
+    stopRecording(track, status = 0, errors = []) {
       expectRunning(this.hooking);
       expect(
         this.tracks.has(track),

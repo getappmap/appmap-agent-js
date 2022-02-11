@@ -117,16 +117,16 @@ Remote recording requests can be delivered to two possible end points:
 The agent also provides an API to manually record events in the node process in which it is imported.
 
 ```js
-import {createAppmap} from "@appland/appmap-agent-js";
+import {createAppMap} from "@appland/appmap-agent-js";
 // NB: Only a single concurrent appmap is allowed per process
-const appmap = createAppmap(
+const appmap = createAppMap(
   repository_directory,    // default: process.cwd()
   configuration,           // default: {}
   configuration_directory, // default: null
 );
 // NB: An appmap can create multiple (concurrent) tracks
 const track = "my-identifier";
-appmap.startTrack(track, {
+appmap.startRecording(track, {
   app: "my-app-name",
   name: "my-appmap-name",
   pruning: true,
@@ -139,14 +139,14 @@ appmap.recordScript(
   "(function main () { return 123; } ());",
   "path/to/main.js",
 );
-const trace = appmap.stopTrack(track, {
+const trace = appmap.stopRecording(track, {
   status: 0,
   errors: []
 });
 console.log(JSON.stringify(trace, null, 2));
 ```
 
-### `createAppmap(home, configuration, base)`
+### `createAppMap(home, configuration, base)`
 
 * `home <string>` The file url of the project. Default: file url of the current working directory.
 * `configuration <object>` Root configuration. Default: `{}`.
@@ -157,14 +157,14 @@ console.log(JSON.stringify(trace, null, 2));
 
 Stop recording. Subsequent method invocations will throw exception.
 
-### `appmap.startTrack(track, configuration, base)`
+### `appmap.startRecording(track, configuration, base)`
 
 * `track <string> | null` An identifier for the track. Default: `null`, a random string will be used
 * `configuration <object>` Configuration for extending the configuration of the appmap instance. Default: `{}`.
 * `base <string> | null`: The file url of the directory to resolve the relative paths of the configuration argument. Default: `null`, the presence of relative paths will throw an error.
 * Returns `<string>` the identifier for the track. This is useful when providing `null` for the `track` argument.
 
-### `appmap.stopTrack(track, status, errors)`
+### `appmap.stopRecording(track, status, errors)`
 
 * `track <string>`
 * `status <number>` Exit status code. Default: `[]`.
