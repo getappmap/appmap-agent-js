@@ -3,7 +3,9 @@ dependencies:
   - util
   - path
   - expect
-  - agent
   - uuid
   - configuration-accessor
   - source-outer
+  - interpretation
+  - agent
+  - hook

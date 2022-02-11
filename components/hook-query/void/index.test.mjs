@@ -6,12 +6,11 @@ import {
 import HookModule from "./index.mjs";
 
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
-const { testHookAsync } = await buildTestComponentAsync("hook");
-const { hookQuery, unhookQuery } = HookModule(dependencies);
+const { testHookAsync } = await buildTestComponentAsync("hook-fixture");
+const component = HookModule(dependencies);
 assertDeepEqual(
   await testHookAsync(
-    hookQuery,
-    unhookQuery,
+    component,
     { hooks: { mysql: false, sqlite3: false, pg: false } },
     async (frontend) => null,
   ),

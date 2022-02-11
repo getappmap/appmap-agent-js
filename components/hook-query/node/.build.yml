@@ -3,5 +3,4 @@ dependencies:
   - util
   - log
   - url
-  - frontend
-  - emitter
+  - agent

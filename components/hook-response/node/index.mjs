@@ -15,14 +15,14 @@ export default (dependencies) => {
     log: { logWarning },
     expect: { expect, expectSuccess },
     patch: { patch },
-    frontend: {
-      incrementEventCounter,
+    agent: {
+      requestRemoteAgentAsync,
       recordBeginResponse,
       recordEndResponse,
       recordBeforeJump,
       recordAfterJump,
+      amendBeginResponse,
     },
-    emitter: { requestRemoteEmitterAsync, sendEmitter },
     http: { generateRespond },
   } = dependencies;
   // TODO: improve test coverage
@@ -32,7 +32,7 @@ export default (dependencies) => {
     return typeof address === "string" ? address : _String(address.port);
   };
   const interceptTraffic = (
-    { emitter, recorder, regexp },
+    { agent, recorder, regexp },
     server,
     request,
     response,
@@ -44,16 +44,16 @@ export default (dependencies) => {
     ) {
       request.url = request.url.substring("/_appmap".length);
       generateRespond((method, path, body) =>
-        requestRemoteEmitterAsync(emitter, method, path, body),
+        requestRemoteAgentAsync(agent, method, path, body),
       )(request, response);
       return true;
     }
     return false;
   };
   /* c8 ignore stop */
-  const beforeRequest = ({ frontend, emitter }, request, response) => {
+  const beforeRequest = ({ agent }, request, response) => {
     // bundle //
-    const bundle_index = incrementEventCounter(frontend);
+    let bundle_index;
     const begin = () => {
       const { httpVersion: version, method, url, headers } = request;
       const data = {
@@ -63,7 +63,7 @@ export default (dependencies) => {
         url,
         route: null,
       };
-      sendEmitter(emitter, recordBeginResponse(frontend, bundle_index, data));
+      bundle_index = recordBeginResponse(agent, data);
       // Give time for express to populate the request
       nextTick(() => {
         if (
@@ -71,27 +71,21 @@ export default (dependencies) => {
           typeof coalesce(request, "route", _undefined) === "object" &&
           typeof coalesce(request.route, "path", _undefined) === "string"
         ) {
-          sendEmitter(
-            emitter,
-            recordBeginResponse(frontend, bundle_index, {
-              ...data,
-              route: `${request.baseUrl}${request.route.path}`,
-            }),
-          );
+          amendBeginResponse(agent, bundle_index, {
+            ...data,
+            route: `${request.baseUrl}${request.route.path}`,
+          });
         }
       });
     };
     const end = () => {
       const { statusCode: status, statusMessage: message } = response;
       const headers = response.getHeaders();
-      sendEmitter(
-        emitter,
-        recordEndResponse(frontend, bundle_index, {
-          status,
-          message,
-          headers,
-        }),
-      );
+      recordEndResponse(agent, bundle_index, {
+        status,
+        message,
+        headers,
+      });
     };
     // jump //
     let jump_index = null;
@@ -115,8 +109,7 @@ export default (dependencies) => {
             end();
           }
         } else {
-          jump_index = incrementEventCounter(frontend);
-          sendEmitter(emitter, recordBeforeJump(frontend, jump_index, null));
+          jump_index = recordBeforeJump(agent, null);
         }
       },
       resume: () => {
@@ -137,7 +130,7 @@ export default (dependencies) => {
             jump_index !== null,
             "cannot resume http response because we are not in a jump state",
           );
-          sendEmitter(emitter, recordAfterJump(frontend, jump_index, null));
+          recordAfterJump(agent, jump_index, null);
           jump_index = null;
         }
       },
@@ -192,12 +185,11 @@ export default (dependencies) => {
     });
   };
   return {
-    unhookResponse: (backup) => {
+    unhook: (backup) => {
       backup.forEach(assignProperty);
     },
-    hookResponse: (
-      emitter,
-      frontend,
+    hook: (
+      agent,
       {
         recorder,
         "intercept-track-port": intercept_track_port,
@@ -216,8 +208,7 @@ export default (dependencies) => {
         })),
       );
       const state = {
-        emitter,
-        frontend,
+        agent,
         recorder,
         regexp: expectSuccess(
           () => new _RegExp(intercept_track_port, "u"),

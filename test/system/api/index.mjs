@@ -8,7 +8,7 @@ import {
   writeFile as writeFileAsync,
   realpath as realpathAsync,
 } from "fs/promises";
-import { createAppmap } from "../../../lib/node/recorder-manual.mjs";
+import { createAppMap } from "../../../lib/node/recorder-api.mjs";
 
 Error.stackTraceLimit = Infinity;
 
@@ -38,7 +38,7 @@ await writeFileAsync(
 );
 
 const require = createRequire(new URL(`${directory}/dummy.mjs`));
-const appmap = createAppmap(
+const appmap = createAppMap(
   directory,
   {
     name: "name",
@@ -58,7 +58,7 @@ const appmap = createAppmap(
   directory,
 );
 
-appmap.startTrack("track", { path: null, data: {} });
+appmap.startRecording("track");
 
 await writeFileAsync(
   new URL(`${directory}/common.js`),
@@ -77,7 +77,7 @@ await writeFileAsync(
   assertEqual(script(), "SCRIPT");
 }
 
-const trace = appmap.stopTrack("track");
+const trace = appmap.stopRecording("track");
 
 appmap.terminate();
 

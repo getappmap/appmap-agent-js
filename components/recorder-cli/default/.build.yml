@@ -1,5 +1,8 @@
 branches: [test, node, browser]
 dependencies:
+  - log
+  - configuration-accessor
   - util
-  - interpretation
+  - expect
   - agent
+  - hook

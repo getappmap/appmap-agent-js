@@ -3,7 +3,6 @@ dependencies:
   - util
   - expect
   - patch
-  - frontend
-  - emitter
   - http
   - log
+  - agent

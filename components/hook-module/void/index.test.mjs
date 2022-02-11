@@ -6,17 +6,15 @@ import {
 import HookModule from "./index.mjs";
 
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
-const { testHookAsync } = await buildTestComponentAsync("hook");
-const { hookModule, unhookModule, transformSourceDefault } =
-  HookModule(dependencies);
+const { testHookAsync } = await buildTestComponentAsync("hook-fixture");
+const { transformSourceDefault, ...component } = HookModule(dependencies);
 assertEqual(
   transformSourceDefault("content", "context", (x) => x),
   "content",
 );
 assertDeepEqual(
   await testHookAsync(
-    hookModule,
-    unhookModule,
+    component,
     { hooks: { cjs: false, esm: false } },
     async (state) => null,
   ),

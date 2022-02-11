@@ -6,14 +6,13 @@ import {
 import HookGroup from "./index.mjs";
 
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
-const { testHookAsync } = await buildTestComponentAsync("hook");
-const { hookGroup, unhookGroup } = HookGroup(dependencies);
+const { testHookAsync } = await buildTestComponentAsync("hook-fixture");
+const component = HookGroup(dependencies);
 assertDeepEqual(
   await testHookAsync(
-    hookGroup,
-    unhookGroup,
+    component,
     { ordering: "chronological" },
-    async (frontend) => null,
+    async () => null,
   ),
   { sources: [], events: [] },
 );

@@ -36,12 +36,14 @@ const url = getFreshTemporaryURL();
 
 const proceedAsync = async () => {
   const dependencies = await buildTestDependenciesAsync(import.meta.url);
-  const { testHookAsync, makeEvent } = await buildTestComponentAsync("hook");
+  const { testHookAsync, makeEvent } = await buildTestComponentAsync(
+    "hook-fixture",
+  );
 
-  const { hookPg, unhookPg } = HookPg(dependencies);
+  const component = HookPg(dependencies);
 
   const testCaseAsync = (enabled, runAsync) =>
-    testHookAsync(hookPg, unhookPg, { hooks: { pg: enabled } }, async () => {
+    testHookAsync(component, { hooks: { pg: enabled } }, async () => {
       const client = new Client({
         host: "localhost",
         port: port,

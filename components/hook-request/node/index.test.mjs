@@ -9,8 +9,10 @@ import HookRequest from "./index.mjs";
 const { createServer } = Http;
 
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
-const { testHookAsync, makeEvent } = await buildTestComponentAsync("hook");
-const { hookRequest, unhookRequest } = HookRequest(dependencies);
+const { testHookAsync, makeEvent } = await buildTestComponentAsync(
+  "hook-fixture",
+);
+const component = HookRequest(dependencies);
 
 const server = createServer();
 server.on("request", (request, response) => {
@@ -40,14 +42,9 @@ const promiseResponse = (request) =>
   });
 
 assertDeepEqual(
-  await testHookAsync(
-    hookRequest,
-    unhookRequest,
-    { hooks: { http: false } },
-    async () => {
-      await promiseResponse(Http.get(url));
-    },
-  ),
+  await testHookAsync(component, { hooks: { http: false } }, async () => {
+    await promiseResponse(Http.get(url));
+  }),
   { sources: [], events: [] },
 );
 
@@ -71,28 +68,18 @@ const events = [
 ];
 
 assertDeepEqual(
-  await testHookAsync(
-    hookRequest,
-    unhookRequest,
-    { hooks: { http: true } },
-    async () => {
-      await promiseResponse(Http.get(url));
-    },
-  ),
+  await testHookAsync(component, { hooks: { http: true } }, async () => {
+    await promiseResponse(Http.get(url));
+  }),
   { sources: [], events },
 );
 
 assertDeepEqual(
-  await testHookAsync(
-    hookRequest,
-    unhookRequest,
-    { hooks: { http: true } },
-    async () => {
-      const request = new Http.ClientRequest(url);
-      request.end();
-      await promiseResponse(request);
-    },
-  ),
+  await testHookAsync(component, { hooks: { http: true } }, async () => {
+    const request = new Http.ClientRequest(url);
+    request.end();
+    await promiseResponse(request);
+  }),
   { sources: [], events },
 );
 

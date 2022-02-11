@@ -31,21 +31,17 @@ const url = getFreshTemporaryURL();
 
 const proceedAsync = async () => {
   const dependencies = await buildTestDependenciesAsync(import.meta.url);
-  const { testHookAsync, makeEvent } = await buildTestComponentAsync("hook");
-  const { hookMysql, unhookMysql } = HookMysql(dependencies);
+  const { testHookAsync, makeEvent } = await buildTestComponentAsync(
+    "hook-fixture",
+  );
+  const component = HookMysql(dependencies);
   assertDeepEqual(
-    await testHookAsync(
-      hookMysql,
-      unhookMysql,
-      { hooks: { mysql: false } },
-      async () => {},
-    ),
+    await testHookAsync(component, { hooks: { mysql: false } }, async () => {}),
     { events: [], sources: [] },
   );
   assertDeepEqual(
     await testHookAsync(
-      hookMysql,
-      unhookMysql,
+      component,
       { hooks: { mysql: true } },
       async (frontend) => {
         const connection = Mysql.createConnection({

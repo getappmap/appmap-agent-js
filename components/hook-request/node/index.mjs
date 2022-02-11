@@ -8,18 +8,16 @@ const _Proxy = Proxy;
 export default (dependencies) => {
   const {
     util: { assignProperty },
-    frontend: {
-      incrementEventCounter,
+    agent: {
       recordBeginBundle,
       recordEndBundle,
       recordBeforeRequest,
       recordAfterRequest,
     },
-    emitter: { sendEmitter },
   } = dependencies;
   return {
-    unhookRequest: (backup) => backup.forEach(assignProperty),
-    hookRequest: (emitter, frontend, { hooks: { http } }) => {
+    unhook: (backup) => backup.forEach(assignProperty),
+    hook: (agent, { hooks: { http } }) => {
       if (!http) {
         return [];
       }
@@ -31,21 +29,18 @@ export default (dependencies) => {
         ...["request", "get"].map((key) => ({ object: Https, key })),
       ].map(({ object, key }) => ({ object, key, value: object[key] }));
       const spyRequest = (request) => {
-        const index1 = incrementEventCounter(frontend);
-        const index2 = incrementEventCounter(frontend);
+        let index1;
+        let index2;
         request.on("finish", () => {
           const { method, path: url } = request;
           const headers = request.getHeaders();
-          sendEmitter(emitter, recordBeginBundle(frontend, index1, null));
-          sendEmitter(
-            emitter,
-            recordBeforeRequest(frontend, index2, {
-              protocol: "HTTP/1.1",
-              method,
-              url,
-              headers,
-            }),
-          );
+          index1 = recordBeginBundle(agent, null);
+          index2 = recordBeforeRequest(agent, {
+            protocol: "HTTP/1.1",
+            method,
+            url,
+            headers,
+          });
         });
         request.on("response", (response) => {
           const {
@@ -56,20 +51,17 @@ export default (dependencies) => {
           // Hoopfully, this is triggered before user 'end' handlers.
           // Use of removeAllListeners or prependListener will break this assumption.
           response.on("end", () => {
-            sendEmitter(
-              emitter,
-              recordAfterRequest(frontend, index2, {
-                status,
-                message,
-                headers,
-              }),
-            );
+            recordAfterRequest(agent, index2, {
+              status,
+              message,
+              headers,
+            });
           });
           nextTick(() => {
             // Hoopfully, this is triggered after user 'end' handlers.
             // Since emit is synchronous the groups will still match!
             response.on("end", () => {
-              sendEmitter(emitter, recordEndBundle(frontend, index1, null));
+              recordEndBundle(agent, index1, null);
             });
           });
         });
