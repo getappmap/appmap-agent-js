@@ -1,3 +1,22 @@
+# [10.0.0](https://github.com/applandinc/appmap-agent-js/compare/v9.4.4...v10.0.0) (2022-02-11)
+
+
+### Bug Fixes
+
+* use static hook name ([9931785](https://github.com/applandinc/appmap-agent-js/commit/9931785593584f7027848b20a5b0a1a2d017aedf))
+
+
+### Features
+
+* add recording methods to recorder api ([2fcebda](https://github.com/applandinc/appmap-agent-js/commit/2fcebda1aeadbf74f4ce8a262672561f8ec2e7ee))
+* rename some API methods ([61560d4](https://github.com/applandinc/appmap-agent-js/commit/61560d42c4280be2bc4e39da99cee05c320f8c4b))
+* tweak the API and update the reference doc ([c518b17](https://github.com/applandinc/appmap-agent-js/commit/c518b1712838bc4518657c063358d5b5329a2b91))
+
+
+### BREAKING CHANGES
+
+* createAppmap becomes createAppMap, appmap.startTrack becomes appmap.startRecording, and appmap.startTrack becomes appmap.stopRecording
+
 ## [9.4.4](https://github.com/applandinc/appmap-agent-js/compare/v9.4.3...v9.4.4) (2022-01-29)
 
 
