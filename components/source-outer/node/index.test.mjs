@@ -20,6 +20,16 @@ const { extractSourceMap } = SourceOuter(
 }
 
 {
+  const file = {
+    url: `${getFreshTemporaryURL()}/node_modules/${Math.random()
+      .toString(36)
+      .substring()}`,
+    content: "123; //# sourceMappingURL=source.map",
+  };
+  assertDeepEqual(getSources(extractSourceMap(file)), [file]);
+}
+
+{
   const url = getFreshTemporaryURL();
   await mkdirAsync(new URL(url));
   const file = {
@@ -36,7 +46,6 @@ const { extractSourceMap } = SourceOuter(
       content: "456;",
     },
   ];
-  assertDeepEqual(getSources(extractSourceMap(file)), [file]);
   await writeFileAsync(
     new URL(`${url}/source.map`),
     JSON.stringify({
