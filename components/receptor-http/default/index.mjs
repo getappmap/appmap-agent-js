@@ -11,7 +11,7 @@ export default (dependencies) => {
   const {
     util: { assert },
     http: { generateRespond },
-    log: { logInfo, logError },
+    log: { logDebug, logError },
     service: { openServiceAsync, closeServiceAsync, getServicePort },
     backend: {
       createBackend,
@@ -55,7 +55,7 @@ export default (dependencies) => {
       track_server.on(
         "request",
         generateRespond(async (method, path, body) => {
-          logInfo("Received remote recording request: %s %s", method, path);
+          logDebug("Received remote recording request: %s %s", method, path);
           const parts = path.split("/");
           if (parts.length !== 3 || parts[0] !== "") {
             return {
@@ -169,8 +169,8 @@ export default (dependencies) => {
       });
       const trace_service = await openServiceAsync(trace_server, trace_port);
       const track_service = await openServiceAsync(track_server, track_port);
-      logInfo("Trace port: %j", getServicePort(trace_service));
-      logInfo("Track port: %j", getServicePort(track_service));
+      logDebug("Trace port: %j", getServicePort(trace_service));
+      logDebug("Track port: %j", getServicePort(track_service));
       return { trace_service, track_service };
     },
     adaptReceptorConfiguration: (
