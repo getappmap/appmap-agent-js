@@ -42,6 +42,11 @@ export default (dependencies) => {
             exclude,
             "inline-source": inline,
           } = getConfigurationPackage(configuration, url);
+          logDebug(
+            "%s source file %j",
+            enabled ? "Instrumenting" : "Not instrumenting",
+            url,
+          );
           return {
             head: enabled,
             body: {

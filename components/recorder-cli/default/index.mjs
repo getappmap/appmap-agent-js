@@ -18,9 +18,15 @@ export default (dependencies) => {
   } = dependencies;
   return {
     createRecorder: (process, configuration) => {
-      logInfo("Caught process %j", process.pid);
       configuration = extendConfigurationNode(configuration, process);
-      if (isConfigurationEnabled(configuration)) {
+      const enabled = isConfigurationEnabled(configuration);
+      logInfo(
+        "%s process #%j -- %j",
+        enabled ? "Recording" : "*Not* recording",
+        process.pid,
+        process.argv,
+      );
+      if (enabled) {
         const agent = openAgent(configuration);
         const hooking = hook(agent, configuration);
         const tracks = new Set();
