@@ -150,6 +150,22 @@ assertDeepEqual(
     print: "[object Object]",
   },
 );
+assertDeepEqual(
+  testSerialize(
+    {
+      method: "toString",
+      "include-constructor-name": false,
+    },
+    {
+      toString: () => 123,
+    },
+  ),
+  {
+    type: "object",
+    index: 1,
+    print: "[object Object]",
+  },
+);
 // function (toString)
 assertDeepEqual(
   testSerialize(

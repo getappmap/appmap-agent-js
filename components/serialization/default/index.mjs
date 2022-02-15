@@ -124,6 +124,10 @@ export default (dependencies) => {
               logDebug("%o.toString() failure >> %O", value, error);
               serial.print = apply(toString, value, noargs);
             }
+            if (typeof serial.print !== "string") {
+              logDebug("%o.toString() returned a non-string result");
+              serial.print = apply(toString, value, noargs);
+            }
           } else {
             serial.print = apply(toString, value, noargs);
           }
