@@ -21,7 +21,7 @@ export default (dependencies) => {
     } else {
       const regexp = expectSuccess(
         () => new _RegExp(source, flags),
-        "failed to compile regexp source = %j flags = %j >> %e",
+        "failed to compile regexp source = %j flags = %j >> %O",
         source,
         flags,
       );

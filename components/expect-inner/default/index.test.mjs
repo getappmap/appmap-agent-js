@@ -33,7 +33,7 @@ try {
 }
 
 assertEqual(
-  expectSuccess(() => 123, "%e"),
+  expectSuccess(() => 123, "%O"),
   123,
 );
 
@@ -42,19 +42,19 @@ try {
     () => {
       throw new Error("foo");
     },
-    "%s %e",
+    "%s %O",
     "bar",
   );
   assertFail();
 } catch ({ message }) {
-  assertEqual(message, "bar foo");
+  assertEqual(message, "bar Error: foo");
 }
 
-await expectSuccessAsync(Promise.resolve(123), "%e");
+await expectSuccessAsync(Promise.resolve(123), "%O");
 
 try {
-  await expectSuccessAsync(Promise.reject(new Error("foo")), "%s %e", "bar");
+  await expectSuccessAsync(Promise.reject(new Error("foo")), "%s %O", "bar");
   assertFail();
 } catch ({ message }) {
-  assertEqual(message, "bar foo");
+  assertEqual(message, "bar Error: foo");
 }

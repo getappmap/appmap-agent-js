@@ -19,7 +19,7 @@ export default (dependencies) => {
         sockets.add(socket);
         /* c8 ignore start */
         socket.on("error", (error) => {
-          logWarning("Socket error >> %e", error);
+          logWarning("Socket error >> %O", error);
         });
         /* c8 ignore stop */
         socket.on("close", () => {

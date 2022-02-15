@@ -34,7 +34,7 @@ export default (dependencies) => {
       const { code } = error;
       expect(
         code === "ENOENT",
-        "cannot read directory status %j >> %e",
+        "cannot read directory status %j >> %O",
         directory,
         error,
       );

@@ -121,7 +121,7 @@ export default (dependencies) => {
             try {
               serial.print = value.toString();
             } catch (error) {
-              logWarning("%o.toString() failed with %e", value, error);
+              logWarning("%o.toString() failure >> %O", value, error);
               serial.print = apply(toString, value, noargs);
             }
           } else {

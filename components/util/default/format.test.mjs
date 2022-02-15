@@ -28,18 +28,17 @@ assertEqual(format("%j", [[123]]), "[123]");
 
 assertEqual(format("%o", [() => {}]), "[object Function]");
 
-// %e //
+// %O //
 
-assertEqual(format("%e", [new Error("foo")]), "foo");
+assertEqual(format("%O", [{ toString: () => "foo" }]), "foo");
 
-assertThrow(() => format("%e", [null]), /^AssertionError: expected an object/u);
-
-assertThrow(
-  () => format("%e", [{}]),
-  /^AssertionError: missing 'message' property/u,
-);
-
-assertThrow(
-  () => format("%e", [{ message: 123 }]),
-  /^AssertionError: expected 'message' property value to be a string/u,
+assertEqual(
+  format("%O", [
+    {
+      toString: () => {
+        throw new Error("BOUM");
+      },
+    },
+  ]),
+  "[object Object]",
 );

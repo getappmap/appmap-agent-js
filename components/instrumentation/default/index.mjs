@@ -86,7 +86,7 @@ export default (dependencies) => {
                   ecmaVersion: configuration.language.version,
                   locations: true,
                 }),
-              "failed to parse file %j >> %e",
+              "failed to parse file %j >> %O",
               url,
             ),
             {

@@ -43,7 +43,7 @@ export default (dependencies) => {
       const { code } = error;
       expect(
         code === "ENOENT",
-        "Cannot read configuration file at %j >> %e",
+        "Cannot read configuration file at %j >> %O",
         url,
         error,
       );
@@ -51,7 +51,7 @@ export default (dependencies) => {
     }
     return expectSuccess(
       () => parse(content),
-      "Failed to parse configuration file at %j >> %e",
+      "Failed to parse configuration file at %j >> %O",
       url,
     );
   };

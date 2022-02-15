@@ -181,7 +181,7 @@ export default (dependencies) => {
       const { scenarios, scenario } = configuration;
       const regexp = expectSuccess(
         () => new _RegExp(scenario, "u"),
-        "Scenario configuration field is not a valid regexp: %j >> %e",
+        "Scenario configuration field is not a valid regexp: %j >> %O",
         scenario,
       );
       return scenarios

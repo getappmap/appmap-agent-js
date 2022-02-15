@@ -16,7 +16,7 @@ export default (dependencies) => {
       const { APPMAP_CONFIGURATION: content } = env;
       const configuration = expectSuccess(
         () => parseJSON(content),
-        "failed to parse 'APPMAP_CONFIGURATION' environment variable >> %e",
+        "failed to parse 'APPMAP_CONFIGURATION' environment variable >> %O",
       );
       validateConfiguration(configuration);
       return configuration;
