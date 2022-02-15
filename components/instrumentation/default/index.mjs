@@ -83,6 +83,7 @@ export default (dependencies) => {
                 parseEstree(content, {
                   allowHashBang: true,
                   sourceType: type,
+                  allowAwaitOutsideFunction: type === "module",
                   ecmaVersion: configuration.language.version,
                   locations: true,
                 }),

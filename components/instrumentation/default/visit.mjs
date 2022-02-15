@@ -307,6 +307,12 @@ export default (dependencies) => {
     body: [
       makeVariableDeclaration("let", [
         makeVariableDeclarator(
+          makeIdentifier(`${runtime}_JUMP`),
+          makeLiteral(null),
+        ),
+      ]),
+      makeVariableDeclaration("let", [
+        makeVariableDeclarator(
           makeIdentifier(`${runtime}_JUMP_ID`),
           makeLiteral(null),
         ),
