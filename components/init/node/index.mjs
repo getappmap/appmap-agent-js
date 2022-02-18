@@ -10,8 +10,14 @@ const GLOB = "!(node_modules)/";
 /* c8 ignore start */
 export const externals = {
   async showResults(s) {
-    return new Promise((resolve) => {
-      process.stdout.end(s, () => resolve());
+    return new Promise((resolve, reject) => {
+      process.stdout.write(s, (error) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve();
+        }
+      });
     });
   },
 };
