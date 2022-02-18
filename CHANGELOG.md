@@ -1,3 +1,10 @@
+## [10.0.1](https://github.com/applandinc/appmap-agent-js/compare/v10.0.0...v10.0.1) (2022-02-18)
+
+
+### Bug Fixes
+
+* use write instead of end to show results ([af3235f](https://github.com/applandinc/appmap-agent-js/commit/af3235fc09ef495969be845a887f233bb6273cef))
+
 # [10.0.0](https://github.com/applandinc/appmap-agent-js/compare/v9.4.4...v10.0.0) (2022-02-11)
 
 
