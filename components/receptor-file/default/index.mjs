@@ -83,7 +83,7 @@ export default (dependencies) => {
       counter += 1;
       url = appendURLSegment(
         directory,
-        makeSegment(`${basename}-${_String(counter)}${extension}`),
+        makeSegment(`${basename}-${_String(counter)}${extension}`, "-"),
       );
     }
     urls.add(url);
