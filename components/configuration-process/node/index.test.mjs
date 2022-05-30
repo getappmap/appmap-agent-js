@@ -48,7 +48,8 @@ assertThrow(
     argv: [
       ["node", "agent.mjs"],
       ["--track-port", "8080"],
-      ["--log-level", "error"],
+      ["--log-level", "warning"],
+      ["--log-file", "1"],
       ["--map-name", "name2"],
       ["--packages", "'lib/*.js'"],
       ["--package", "'test/*.js'"],
@@ -64,7 +65,10 @@ assertThrow(
     {
       track_port: 8080,
       app_name: "app",
-      log: "error",
+      log: {
+        level: "warning",
+        file: 1,
+      },
       map_name: "name2",
       command: {
         script: null,

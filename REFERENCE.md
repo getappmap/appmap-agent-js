@@ -35,15 +35,18 @@ The configuration format is detailed [here](#configuration).
   npx appmap-agent-js --name my-appmap-name --app my-app-name
   ```
   Aliases:
-  | Alias          | Corresponding Name |
-  |----------------|--------------------|
-  | `--log-level`  | `--log`            |
-  | `--output-dir` | `--output`         |
+  | Alias               | Corresponding Name     |
+  |---------------------|------------------------|
+  | `--log-level`       | `log.level`            |
+  | `--log-file`        | `log.file`             |
+  | `--app-port`        | `intercept-track-port` |
+  | `--alt-remote-port` | `track-port`           |
+  | `--output-dir`      | `output`               |
   In addition, the command can be encoded as positional argument.
   For instance, these commands have the same effect:
   ```sh
   npx appmap-agent-js -- node main.js
-  npx appmap-agent-js --command: 'node main.js'
+  npx appmap-agent-js --command 'node main.js'
   ```
 * *Environment variables*
     * `APPMAP_CONFIGURATION_PATH`: path to the configuration file, default: `./appmap.yml`.

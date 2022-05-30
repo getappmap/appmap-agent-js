@@ -239,6 +239,30 @@
         - {$ref: stdio-stream}
         - {$ref: stdio-stream}
 
+- $id: log
+  anyOf:
+    - {$ref: log-level}
+    - type: object
+      additionalProperties: false
+      properties:
+        level: {$ref: log-level}
+        file:
+          anyOf:
+            - $ref: path
+            - const: 1
+            - const: 2
+
+- $id: cooked-log
+  type: object
+  additionalProperties: false
+  properties:
+    level: {$ref: log-level}
+    file:
+      anyOf:
+        - $ref: url
+        - const: 1
+        - const: 2
+
 - $id: env
   type: object
   additionalProperties: false
@@ -406,7 +430,7 @@
       properties:
         message: {type: boolean}
         appmap: {type: boolean}
-    log: {$ref: log-level}
+    log: {$ref: log}
     host: {const: localhost}
     session: {$ref: basename}
     trace-port: {$ref: port}
@@ -530,7 +554,7 @@
         - const: null
         - $ref: agent
     repository: {$ref: repository}
-    log: {$ref: log-level}
+    log: {$ref: cooked-log}
     host: {const: localhost}
     session:
       anyOf:
