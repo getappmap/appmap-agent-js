@@ -1,3 +1,17 @@
+# [10.1.0](https://github.com/applandinc/appmap-agent-js/compare/v10.0.1...v10.1.0) (2022-06-07)
+
+
+### Bug Fixes
+
+* add missing separator in appmap path ([8dedccf](https://github.com/applandinc/appmap-agent-js/commit/8dedccffea718da6aae7e1a1443f199de27d277d))
+* verify that toString method returned a string ([ea17330](https://github.com/applandinc/appmap-agent-js/commit/ea1733095536ecee793c8029d46844632d7a5084))
+
+
+### Features
+
+* add log file as configuration option ([b8551cc](https://github.com/applandinc/appmap-agent-js/commit/b8551ccf85e1312fbcafabdec535e0848dd50277))
+* support top-level await in modules ([60ee6e6](https://github.com/applandinc/appmap-agent-js/commit/60ee6e64355556962fddbdddd31d34e0310872b5))
+
 ## [10.0.1](https://github.com/applandinc/appmap-agent-js/compare/v10.0.0...v10.0.1) (2022-02-18)
 
 
