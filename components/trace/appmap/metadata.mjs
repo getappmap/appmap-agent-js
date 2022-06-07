@@ -1,5 +1,3 @@
-const _String = String;
-
 export default (dependencies) => {
   const {
     util: { assert, mapMaybe },
@@ -45,7 +43,8 @@ export default (dependencies) => {
 
   const makeRecording = (recording) => mapMaybe(recording, makeJustRecording);
 
-  const makeJustEngine = ({ name, version }) => `${name}@${version}`;
+  const makeJustEngine = ({ name, version }) =>
+    version === null ? name : `${name}@${version}`;
 
   const makeEngine = (engine) => mapMaybe(engine, makeJustEngine);
 
@@ -71,11 +70,6 @@ export default (dependencies) => {
     const { length } = errors;
     return length === 0 && status === 0 ? "succeeded" : "failed";
   };
-
-  const makeLanguage = ({ name, version }) => ({
-    name,
-    version: _String(version),
-  });
 
   const makeRecorder = (recorder) => {
     assert(recorder !== null, "recorder should have been resolved earlier");
@@ -116,7 +110,7 @@ export default (dependencies) => {
       app: makeAppName(app_name, repository),
       labels,
       language: {
-        ...makeLanguage(language),
+        ...language,
         engine: makeEngine(engine),
       },
       frameworks,

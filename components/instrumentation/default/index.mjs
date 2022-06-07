@@ -84,7 +84,10 @@ export default (dependencies) => {
                   allowHashBang: true,
                   sourceType: type,
                   allowAwaitOutsideFunction: type === "module",
-                  ecmaVersion: configuration.language.version,
+                  ecmaVersion:
+                    configuration.language.version === null
+                      ? "latest"
+                      : parseInt(configuration.language.version),
                   locations: true,
                 }),
               "failed to parse file %j >> %O",

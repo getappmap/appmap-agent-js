@@ -6,15 +6,12 @@ const { validateConfig } = Validation(
   await buildTestDependenciesAsync(import.meta.url),
 );
 
-assertEqual(
-  validateConfig({ extra: "extra-root-property" }),
-  undefined,
-);
+assertEqual(validateConfig({ extra: "extra-root-property" }), undefined);
 
 assertThrow(() => {
   validateConfig("invalid-configuration-type");
 }, /^AppmapError: invalid configuration\n/u);
 
 assertThrow(() => {
-  validateConfig({ engine: "invalid-engine-format" });
+  validateConfig({ engine: "invalid@engine@format" });
 }, /^AppmapError: invalid configuration\n/u);

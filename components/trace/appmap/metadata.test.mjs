@@ -136,6 +136,17 @@ assertDeepEqual(
 );
 
 assertDeepEqual(
+  test({ engine: { name: "engine-name", version: null } }, "file:///cwd"),
+  {
+    ...default_meta_data,
+    language: {
+      ...default_meta_data.language,
+      engine: "engine-name",
+    },
+  },
+);
+
+assertDeepEqual(
   test({ engine: { name: "engine-name", version: "1.2.3" } }, "file:///cwd"),
   {
     ...default_meta_data,

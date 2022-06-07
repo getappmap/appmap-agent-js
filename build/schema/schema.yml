@@ -136,7 +136,7 @@
 
 - $id: name-version-string
   type: string
-  pattern: "^[^@]+@[^@]+$"
+  pattern: "^[^@]+(@[^@]+)?$"
 
 - $id: name-version-object
   type: object
@@ -144,7 +144,9 @@
   required: [name, version]
   properties:
     name: {type: string}
-    version: {type: string}
+    version:
+      type: string
+      nullable: true
 
 - $id: name-version
   anyOf:

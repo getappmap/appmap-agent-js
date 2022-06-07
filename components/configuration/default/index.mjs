@@ -94,10 +94,10 @@ export default (dependencies) => {
 
   const generateNormalizeSplit = (separator, key1, key2) => (value) => {
     if (typeof value === "string") {
-      const [value1, value2] = value.split(separator);
+      const segments = value.split(separator);
       return {
-        [key1]: value1,
-        [key2]: value2,
+        [key1]: segments[0],
+        [key2]: segments.length === 1 ? null : segments[1],
       };
     }
     return value;

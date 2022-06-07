@@ -95,6 +95,11 @@ assertDeepEqual(extend("trace-port", 8080, "file:///base"), 8080);
 
 // language //
 
+assertDeepEqual(extend("language", "foo"), {
+  name: "foo",
+  version: null,
+});
+
 assertDeepEqual(extend("language", "foo@bar"), {
   name: "foo",
   version: "bar",
