@@ -3,13 +3,15 @@ import Treeify from "treeify";
 import AjvErrorTree from "ajv-error-tree";
 import { schema } from "../../../dist/schema.mjs";
 
+const {ownKeys} = Reflect;
 const _Map = Map;
 const { asTree } = Treeify;
 
 export default (dependencies) => {
   const {
-    util: { assert, coalesce },
+    util: { hasOwnProperty, assert, coalesce },
     expect: { expect },
+    log: {logGuardInfo},
   } = dependencies;
   const naming = new _Map([
     ["config", "configuration"],
@@ -39,9 +41,20 @@ export default (dependencies) => {
       }
     };
   };
+  const validateConfig = generateValidate("config");
+  const config_schema = schema.find(({$id}) => $id === "config");
   return {
     validateMessage: generateValidate("message"),
-    validateConfig: generateValidate("config"),
+    validateConfig: (config) => {
+      validateConfig(config);
+      for (const key of ownKeys(config)) {
+        logGuardInfo(
+          !hasOwnProperty(config_schema.properties, key),
+          "Configuration property not recognized by the agent: %j",
+          key,
+        );
+      }
+    },
     validateConfiguration: generateValidate("configuration"),
     validateSourceMap: generateValidate("source-map"),
   };

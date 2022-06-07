@@ -406,7 +406,6 @@
 
 - $id: config
   type: object
-  additionalProperties: false
   properties:
     # server
     agent: {$ref: agent}

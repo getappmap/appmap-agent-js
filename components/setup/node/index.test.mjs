@@ -50,7 +50,7 @@ global.GLOBAL_PROMPTS = () => ({ value: false });
 {
   await writeFileAsync(
     new URL(`${directory}/appmap.yml`),
-    "{valid: yaml}",
+    "invalid configuration type",
     "utf8",
   );
   assertEqual(await mainAsync({ ...process, cwd }), false);
