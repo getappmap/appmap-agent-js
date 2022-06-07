@@ -1,10 +1,12 @@
 import { assertEqual } from "../../../../__fixture__.mjs";
-import { parse as parseAcorn } from "acorn";
+import * as Acorn from "acorn";
 import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
 } from "../../../../build.mjs";
 import Naming from "./naming.mjs";
+
+const { parse: parseAcorn } = Acorn;
 
 const { createCounter } = await buildTestComponentAsync("util");
 
