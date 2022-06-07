@@ -135,5 +135,5 @@ npx appmap-agent-js --recorder=mocha --command="mocha test/**/*.ts" --log-level=
 
 ## Next steps
 
-- View [`apppmap-agent-js` reference guide](./REFERENCE.md)
-- Open [AppMap documentation](https://appland.com/docs/)
+- [appmap-agent-js reference documentation](https://appland.com/docs/reference/appmap-agent-js.html)
+
