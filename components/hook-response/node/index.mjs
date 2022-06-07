@@ -212,7 +212,7 @@ export default (dependencies) => {
         recorder,
         regexp: expectSuccess(
           () => new _RegExp(intercept_track_port, "u"),
-          "Failed to compile the 'intercept-track-port' configuration field %j as regexp >> %e",
+          "Failed to compile the 'intercept-track-port' configuration field %j as regexp >> %O",
           intercept_track_port,
         ),
       };

@@ -36,7 +36,7 @@ export default (dependencies) => {
     url = _String(url);
     expectSuccess(
       () => new _URL(url),
-      "the second argument of appmap.recordScript should be a valid url, got: %j >> %e",
+      "the second argument of appmap.recordScript should be a valid url, got: %j >> %O",
       url,
     );
     return { type, url, content };

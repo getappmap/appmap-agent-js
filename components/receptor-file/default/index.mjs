@@ -16,7 +16,7 @@ export default (dependencies) => {
     path: { makeSegment },
     url: { appendURLSegment },
     util: { assert },
-    log: { logInfo, logError },
+    log: { logDebug, logInfo, logError },
     expect: { expect },
     service: { openServiceAsync, closeServiceAsync, getServicePort },
     backend: {
@@ -34,7 +34,7 @@ export default (dependencies) => {
       const { code } = error;
       expect(
         code === "ENOENT",
-        "cannot read directory status %j >> %e",
+        "cannot read directory status %j >> %O",
         directory,
         error,
       );
@@ -83,7 +83,7 @@ export default (dependencies) => {
       counter += 1;
       url = appendURLSegment(
         directory,
-        makeSegment(`${basename}-${_String(counter)}${extension}`),
+        makeSegment(`${basename}-${_String(counter)}${extension}`, "-"),
       );
     }
     urls.add(url);
@@ -159,7 +159,7 @@ export default (dependencies) => {
         });
       });
       const trace_service = await openServiceAsync(server, trace_port);
-      logInfo("Trace port: %j", getServicePort(trace_service));
+      logDebug("Trace port: %j", getServicePort(trace_service));
       return trace_service;
     },
     adaptReceptorConfiguration: (service, configuration) =>

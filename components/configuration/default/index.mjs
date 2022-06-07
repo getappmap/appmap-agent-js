@@ -74,6 +74,17 @@ export default (dependencies) => {
     }));
   };
 
+  const normalizeLog = (log, base) => {
+    if (typeof log === "string") {
+      log = { level: log };
+    }
+    log = { level: "error", file: 2, ...log };
+    if (typeof log.file !== "number") {
+      log.file = urlifyPath(log.file, base);
+    }
+    return log;
+  };
+
   const normalizePort = (port, base) => {
     if (typeof port === "string" && port !== "") {
       port = urlifyPath(port, base);
@@ -237,8 +248,8 @@ export default (dependencies) => {
       normalize: identity,
     },
     log: {
-      extend: overwrite,
-      normalize: identity,
+      extend: assign,
+      normalize: normalizeLog,
     },
     host: {
       extend: overwrite,
@@ -419,7 +430,10 @@ export default (dependencies) => {
         appmap: false,
         message: false,
       },
-      log: "info",
+      log: {
+        level: "error",
+        file: 2,
+      },
       output: {
         directory: null,
         basename: null,

@@ -43,7 +43,7 @@ export default (dependencies) => {
       const { code } = error;
       expect(
         code === "ENOENT",
-        "Cannot read configuration file at %j >> %e",
+        "Cannot read configuration file at %j >> %O",
         url,
         error,
       );
@@ -51,13 +51,12 @@ export default (dependencies) => {
     }
     return expectSuccess(
       () => parse(content),
-      "Failed to parse configuration file at %j >> %e",
+      "Failed to parse configuration file at %j >> %O",
       url,
     );
   };
 
   const aliases = new _Map([
-    ["log-level", "log"],
     ["output-dir", "output"],
     ["app-port", "intercept-track-port"],
     ["alt-remote-port", "track-port"],
@@ -114,6 +113,15 @@ export default (dependencies) => {
       if (transformers.has(key)) {
         config[key] = transformers.get(key)(config[key]);
       }
+    }
+    config.log = {};
+    if (hasOwnProperty(config, "log-level")) {
+      config.log.level = config["log-level"];
+      delete config["log-level"];
+    }
+    if (hasOwnProperty(config, "log-file")) {
+      config.log.file = config["log-file"];
+      delete config["log-file"];
     }
     return config;
   };

@@ -2,7 +2,7 @@ import File from "./file.mjs";
 
 export default (dependencies) => {
   const {
-    log: { logWarning },
+    log: { logDebug, logWarning },
     util: { isLeft, fromLeft, fromRight },
     source: {
       extractSourceMapURL,
@@ -19,9 +19,10 @@ export default (dependencies) => {
       if (source_map_url === null) {
         return createMirrorSourceMap(file);
       }
+      const log = file.url.includes("/node_modules/") ? logDebug : logWarning;
       const either = readFileSync(source_map_url, file.url);
       if (isLeft(either)) {
-        logWarning(
+        log(
           "Cannot read source map file %j\n  Referenced in script file at %j\n  >> %s",
           source_map_url,
           file.url,
@@ -35,7 +36,7 @@ export default (dependencies) => {
         if (content === null) {
           const either = readFileSync(url, source_map_file.url);
           if (isLeft(either)) {
-            logWarning(
+            log(
               "Cannot read source file %j\n  Referenced in source map file %j\n  Referenced in script file %j\n  >> %s",
               url,
               source_map_url,

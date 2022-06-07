@@ -28,7 +28,7 @@ export default (dependencies) => {
     const error = coalesce(result, "error", null);
     expect(
       error === null,
-      `command %j on cwd %j threw an error >> %e`,
+      `command %j on cwd %j threw an error >> %O`,
       command,
       url,
       error || { message: "dummy" },
@@ -74,7 +74,7 @@ export default (dependencies) => {
       if (
         !expectSuccess(
           () => readdirSync(new _URL(url)),
-          "could not read repository directory %j >> %e",
+          "could not read repository directory %j >> %O",
           url,
         ).includes(".git")
       ) {

@@ -1,8 +1,7 @@
 import { assert } from "./assert.mjs";
 import { print } from "./print.mjs";
 
-const { getOwnPropertyDescriptor } = Reflect;
-const _undefined = undefined;
+const _String = String;
 const { stringify } = JSON;
 
 export const format = (template, values) => {
@@ -21,26 +20,15 @@ export const format = (template, values) => {
         assert(typeof value === "string", "expected a string for format");
         return value;
       }
-      if (marker === "e") {
-        assert(
-          typeof value === "object" && value !== null,
-          "expected an object",
-        );
-        const descriptor = getOwnPropertyDescriptor(value, "message");
-        assert(descriptor !== _undefined, "missing 'message' property");
-        assert(
-          getOwnPropertyDescriptor(descriptor, "value") !== _undefined,
-          "'message' property is an accessor",
-        );
-        const { value: message } = descriptor;
-        assert(
-          typeof message === "string",
-          "expected 'message' property value to be a string",
-        );
-        return message;
-      }
       if (marker === "j") {
         return stringify(value);
+      }
+      if (marker === "O") {
+        try {
+          return _String(value);
+        } catch {
+          return print(value);
+        }
       }
       if (marker === "o") {
         return print(value);

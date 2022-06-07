@@ -42,6 +42,11 @@ export default (dependencies) => {
             exclude,
             "inline-source": inline,
           } = getConfigurationPackage(configuration, url);
+          logDebug(
+            "%s source file %j",
+            enabled ? "Instrumenting" : "Not instrumenting",
+            url,
+          );
           return {
             head: enabled,
             body: {
@@ -78,10 +83,11 @@ export default (dependencies) => {
                 parseEstree(content, {
                   allowHashBang: true,
                   sourceType: type,
+                  allowAwaitOutsideFunction: type === "module",
                   ecmaVersion: configuration.language.version,
                   locations: true,
                 }),
-              "failed to parse file %j >> %e",
+              "failed to parse file %j >> %O",
               url,
             ),
             {

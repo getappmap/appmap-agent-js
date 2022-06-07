@@ -9,7 +9,7 @@ export default (dependencies) => {
     util: { assert, coalesce },
     url: { pathifyURL, urlifyPath, appendURLSegmentArray },
     expect: { expect, expectSuccess },
-    log: { logDebug, logInfo, logGuardWarning },
+    log: { logGuardWarning },
     repository: {
       extractRepositoryDependency,
       extractRepositoryHistory,
@@ -173,25 +173,15 @@ export default (dependencies) => {
       }
       return configuration;
     },
-    isConfigurationEnabled: ({ processes, main }) => {
-      const enabled = main === null || getSpecifierValue(processes, main);
-      logInfo(`%s %s.`, enabled ? "Recording" : "Bypassing", main);
-      return enabled;
-    },
-    getConfigurationPackage: ({ packages }, url) => {
-      const options = getSpecifierValue(packages, url);
-      logDebug(
-        "%s source file %j",
-        options.enabled ? "Instrumenting" : "Not instrumenting",
-        url,
-      );
-      return options;
-    },
+    isConfigurationEnabled: ({ processes, main }) =>
+      main === null || getSpecifierValue(processes, main),
+    getConfigurationPackage: ({ packages }, url) =>
+      getSpecifierValue(packages, url),
     getConfigurationScenarios: (configuration) => {
       const { scenarios, scenario } = configuration;
       const regexp = expectSuccess(
         () => new _RegExp(scenario, "u"),
-        "Scenario configuration field is not a valid regexp: %j >> %e",
+        "Scenario configuration field is not a valid regexp: %j >> %O",
         scenario,
       );
       return scenarios

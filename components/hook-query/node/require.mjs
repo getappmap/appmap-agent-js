@@ -14,7 +14,7 @@ export default (dependencies) => {
       try {
         return createRequire(url)(name);
       } catch (error) {
-        logWarning("Could not load %j from %j >> %e", name, directory, error);
+        logWarning("Could not load %j from %j >> %O", name, directory, error);
         return null;
       }
     },

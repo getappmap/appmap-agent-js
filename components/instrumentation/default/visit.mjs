@@ -199,7 +199,7 @@ export default (dependencies) => {
     expect: { expect },
     util: { assert, hasOwnProperty, coalesce },
     source: { mapSource },
-    log: { logGuardWarning },
+    log: { logGuardDebug },
     location: { stringifyLocation, getLocationFileURL },
   } = dependencies;
 
@@ -305,6 +305,12 @@ export default (dependencies) => {
     type: "Program",
     sourceType: type,
     body: [
+      makeVariableDeclaration("let", [
+        makeVariableDeclarator(
+          makeIdentifier(`${runtime}_JUMP`),
+          makeLiteral(null),
+        ),
+      ]),
       makeVariableDeclaration("let", [
         makeVariableDeclarator(
           makeIdentifier(`${runtime}_JUMP_ID`),
@@ -492,7 +498,7 @@ export default (dependencies) => {
           },
         } = node;
         const location = mapSource(mapping, line, column);
-        logGuardWarning(
+        logGuardDebug(
           location === null,
           "Missing source map at file %j at line %j at column %j",
           url,

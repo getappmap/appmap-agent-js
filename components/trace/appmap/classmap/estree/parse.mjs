@@ -60,12 +60,12 @@ export default (dependencies) => {
           attachComment: true,
         });
       } catch (error) {
-        logError("Unrecoverable parsing error at file %j >> %e", path, error);
+        logError("Unrecoverable parsing error at file %j >> %O", path, error);
         return { type: "Program", body: [], sourceType: "script" };
       }
       const { errors, program: node } = result;
       for (const error of errors) {
-        logWarning("Recoverable parsing error at file %j >> %e", path, error);
+        logWarning("Recoverable parsing error at file %j >> %O", path, error);
       }
       return node;
     },

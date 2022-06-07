@@ -7,7 +7,7 @@ const { expect, expectSuccess, expectSuccessAsync } = Expect(
 );
 assertEqual(expect(true, "%s", "foo"), undefined);
 assertEqual(
-  expectSuccess(() => 123, "%e"),
+  expectSuccess(() => 123, "%O"),
   123,
 );
-await expectSuccessAsync(Promise.resolve(123), "%e");
+await expectSuccessAsync(Promise.resolve(123), "%O");

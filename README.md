@@ -124,8 +124,8 @@ The most frequently used `appmap-agent-js` parameters are:
     - **Warning:** AppMaps recorded with the `process` recorder can be excessively large and noisy.
 - `--command="_start command_"` : alternate method of specifying the app- or tests-starting command, wrapped in quotes
 - `--log-level=[debug|info|warning|error]` :  defaults to `info`
+- `--log-file=_file_` : location of log file, defaults to `stderr` 
 - `--output-dir=_directory_` : location of recorded AppMap files, default is `tmp/appmap` or `tmp/appmap/mocha`
-
 
 ### Example
 

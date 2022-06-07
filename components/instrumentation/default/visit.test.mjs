@@ -218,7 +218,8 @@ assertEqual(
   ),
   normalize(
     `
-    let $_JUMP_ID = null
+    let $_JUMP = null;
+    let $_JUMP_ID = null;
     try { } catch ($_ERROR) {
       if ($_JUMP_ID !== null) {
         $.recordAfterJump($_JUMP_ID);

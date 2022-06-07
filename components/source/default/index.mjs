@@ -76,7 +76,7 @@ export default (dependencies) => {
         url,
         expectSuccess(
           () => parseJSON(content),
-          "Invalid JSON format for source map at %j >> %e",
+          "Invalid JSON format for source map at %j >> %O",
           url,
         ),
       );

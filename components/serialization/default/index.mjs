@@ -17,7 +17,7 @@ const noargs = [];
 export default (dependencies) => {
   const {
     util: { assert, hasOwnProperty, coalesce, incrementCounter, createCounter },
-    log: { logWarning },
+    log: { logDebug },
   } = dependencies;
   const empty = symbolFor("APPMAP_EMPTY_MARKER");
   const wellknown = new _Set(
@@ -52,7 +52,7 @@ export default (dependencies) => {
         if (typeof name === "string") {
           return name;
         }
-        logWarning("failed to extract constructor name from %o", object);
+        logDebug("failed to extract constructor name from %o", object);
         return null;
       }
       object = getPrototypeOf(object);
@@ -121,7 +121,11 @@ export default (dependencies) => {
             try {
               serial.print = value.toString();
             } catch (error) {
-              logWarning("%o.toString() failed with %e", value, error);
+              logDebug("%o.toString() failure >> %O", value, error);
+              serial.print = apply(toString, value, noargs);
+            }
+            if (typeof serial.print !== "string") {
+              logDebug("%o.toString() returned a non-string result");
               serial.print = apply(toString, value, noargs);
             }
           } else {

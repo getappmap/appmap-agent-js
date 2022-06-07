@@ -54,7 +54,7 @@ export default (dependencies) => {
               await unlinkAsync(link);
               await symlinkAsync(`${path}.cjs`, link, "file");
             })(),
-            "Something went wrong when resolving the missing file extension issue >> %e",
+            "Something went wrong when resolving the missing file extension issue >> %O",
           );
         }
       }

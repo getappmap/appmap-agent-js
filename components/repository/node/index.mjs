@@ -21,7 +21,7 @@ export default (dependencies) => {
       const { code } = { code: null, ...error };
       expect(
         code === "ENOENT",
-        "failed to attempt reading package.json >> %e",
+        "failed to attempt reading package.json >> %O",
         error,
       );
       return false;
@@ -35,14 +35,14 @@ export default (dependencies) => {
         "utf8",
       );
     } catch (error) {
-      logWarning("Cannot read package.json file at %j >> %e", url, error);
+      logWarning("Cannot read package.json file at %j >> %O", url, error);
       return null;
     }
     let json;
     try {
       json = parseJSON(content);
     } catch (error) {
-      logWarning("Failed to parse package.json file at %j >> %e", url, error);
+      logWarning("Failed to parse package.json file at %j >> %O", url, error);
       return null;
     }
     const { name, version, homepage } = {
@@ -75,7 +75,7 @@ export default (dependencies) => {
       let url = pathToFileURL(
         expectSuccess(
           () => resolve(segments.join("/")),
-          "could not resolve %j from %j >> %e",
+          "could not resolve %j from %j >> %O",
           segments,
           home,
         ),

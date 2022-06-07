@@ -105,6 +105,18 @@ assertDeepEqual(extend("language", { name: "foo", version: "bar" }), {
   version: "bar",
 });
 
+// log //
+
+assertDeepEqual(extend("log", "warning"), {
+  level: "warning",
+  file: 2,
+});
+
+assertDeepEqual(extend("log", { file: "log" }, "file:///base"), {
+  level: "error",
+  file: "file:///base/log",
+});
+
 // recording //
 
 assertDeepEqual(extend("recording", "foo.bar"), {
