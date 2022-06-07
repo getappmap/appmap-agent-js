@@ -1,5 +1,6 @@
 import Escodegen from "escodegen";
 import * as Acorn from "acorn";
+import Version from "./version.mjs";
 
 const { generate: generateEstree } = Escodegen;
 const { parse: parseEstree } = Acorn;
@@ -18,6 +19,7 @@ export default (dependencies) => {
     source: { getSources },
   } = dependencies;
   const { visit } = Visit(dependencies);
+  const { getEcmaVersion } = Version(dependencies);
   const getHead = generateGet("head");
   const getBody = generateGet("body");
   const getURL = generateGet("url");
@@ -84,10 +86,7 @@ export default (dependencies) => {
                   allowHashBang: true,
                   sourceType: type,
                   allowAwaitOutsideFunction: type === "module",
-                  ecmaVersion:
-                    configuration.language.version === null
-                      ? "latest"
-                      : parseInt(configuration.language.version),
+                  ecmaVersion: getEcmaVersion(configuration.language),
                   locations: true,
                 }),
               "failed to parse file %j >> %O",
