@@ -4,9 +4,12 @@ const { entries: toEntries } = Object;
 
 const ANONYMOUS_NAME_SEPARATOR = "-";
 
+const EXPECTED_EXTRA_PROPERTIES = ["appmap_dir", "test_recording"];
+
 export default (dependencies) => {
   const {
-    util: { coalesce, identity, hasOwnProperty },
+    log: {logGuardInfo},
+    util: { hasOwnProperty, coalesce, identity },
     url: { urlifyPath },
     validate: { validateConfig },
     specifier: { createSpecifier },
@@ -484,11 +487,19 @@ export default (dependencies) => {
       configuration = { ...configuration };
       validateConfig(config);
       for (let key of ownKeys(config)) {
-        const { normalize, extend } = fields[key];
-        configuration[key] = extend(
-          configuration[key],
-          normalize(config[key], base),
-        );
+        if (hasOwnProperty(fields, key)) {
+          const { normalize, extend } = fields[key];
+          configuration[key] = extend(
+            configuration[key],
+            normalize(config[key], base),
+          );
+        } else {
+          logGuardInfo(
+            EXPECTED_EXTRA_PROPERTIES.includes(key),
+            "Configuration property not recognized by the agent: %j",
+            key,
+          );
+        }
       }
       return configuration;
     },

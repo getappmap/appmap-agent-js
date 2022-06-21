@@ -13,5 +13,5 @@ assertThrow(() => {
 }, /^AppmapError: invalid configuration\n/u);
 
 assertThrow(() => {
-  validateConfig({ engine: "invalid@engine@format" });
+  validateConfig({ frameworks: ["invalid@framework@format"] });
 }, /^AppmapError: invalid configuration\n/u);

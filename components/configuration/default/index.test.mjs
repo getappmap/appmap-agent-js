@@ -185,3 +185,7 @@ assertDeepEqual(extend("exclude", ["foo\\.bar"]), [
   },
   ...createConfiguration("file:///home").exclude,
 ]);
+
+// additional //
+
+assertDeepEqual(extend("additional", "foo", "bar"), undefined);
