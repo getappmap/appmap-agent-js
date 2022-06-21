@@ -41,7 +41,7 @@ The configuration format is detailed [here](#configuration).
   | `--log-file`        | `log.file`             |
   | `--app-port`        | `intercept-track-port` |
   | `--alt-remote-port` | `track-port`           |
-  | `--output-dir`      | `output`               |
+  | `--appmap-dir`      | `appmap_dir`           |
   In addition, the command can be encoded as positional argument.
   For instance, these commands have the same effect:
   ```sh
@@ -64,8 +64,7 @@ It involves recording node processes from start to finish and write the resultin
 ```yaml
 recorder: process
 command: "node bin/bin.js argv1 argv2" # the usual command for running the project
-output:
-  directory: tmp/appmap
+appmap_dir: tmp/appmap
 ```
 
 ### Mocha Test Case Recording
@@ -316,12 +315,8 @@ The agent filter code objects (functions or objects/classes) based on a format c
   *Default*: `[]` -- ie: the agent will be enabled for every process whose entry script resides in the repository directory.
 * `scenarios <Configuration[]>` An array of child configuration.
 * `scenario <string>` A regular expression to whitelist scenarios for execution. If the root configuration contains a command, it will always be executed. *Default*: `"^"` (every scenario will be executed).
-* `output <string> | <object>` Options to store appmap files.
-    * `<string>` Shorthand, `"tmp/appmap"` is the same as `{directory: "tmp/appmap"}`.
-    * `<object>`
-        * `directory <string>` Directory to write appmap files. *Default*: `null` the agent will choose between `"tmp/appmap/mocha"` and `"tmp/appmap"` based on the `recorder` field.
-        * `basename null | <string>` Basename of the future appmap file. Indexing will be appended to prevent accidental overwriting of appmap files within a single run. *Default*: `null` the agent will look at the `name` configuration field, if it is `null` as well, `"anonymous"` will be used.
-        * `extension <string>` Extension to append after the basename. *Default*: `".appmap.json"`.
+* `appmap_dir <string>` Path to directory for storing appmap files. *Default*: `"tmp/appmap"`.
+* `appmap_file <string> | null` Base name (ie file name but without the extension) of the file where the appmap data should be written. *Default*: `null` the agent will look at the `name` configuration field, if it is `null` as well, `"anonymous"` will be used.
 
 ### Common Options
 
