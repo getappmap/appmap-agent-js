@@ -94,8 +94,8 @@ assertDeepEqual(
       app: null,
       labels: [],
       language: {
-        name: "ecmascript",
-        version: "2020",
+        name: "javascript",
+        version: "ES.Next",
         engine: null,
       },
       frameworks: [],

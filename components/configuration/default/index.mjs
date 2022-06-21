@@ -109,8 +109,6 @@ export default (dependencies) => {
     "method-id",
   );
 
-  const normalizeLanguage = generateNormalizeSplit("@", "name", "version");
-
   const normalizeEngine = generateNormalizeSplit("@", "name", "version");
 
   const normalizeFramework = generateNormalizeSplit("@", "name", "version");
@@ -328,8 +326,8 @@ export default (dependencies) => {
       normalize: urlifyPath,
     },
     language: {
-      extend: assign,
-      normalize: normalizeLanguage,
+      extend: overwrite,
+      normalize: identity,
     },
     engine: {
       extend: overwrite,
@@ -460,10 +458,7 @@ export default (dependencies) => {
         method: "toString",
       },
       "hidden-identifier": "APPMAP",
-      language: {
-        name: "ecmascript",
-        version: "2020",
-      },
+      language: "javascript",
       packages: [
         [
           true,

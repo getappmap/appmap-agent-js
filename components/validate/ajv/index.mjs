@@ -7,7 +7,7 @@ const { ownKeys } = Reflect;
 const _Map = Map;
 const { asTree } = Treeify;
 
-const expected_extra_properties = ["appmap_dir"];
+const expected_extra_properties = ["appmap_dir", "test_recording"];
 
 export default (dependencies) => {
   const {

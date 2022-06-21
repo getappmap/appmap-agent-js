@@ -33,7 +33,6 @@ const instrumentation = createInstrumentation(
     createConfiguration("file:///home"),
     {
       "hidden-identifier": "$",
-      language: { name: "ecmascript", version: "2020" },
       "inline-source": false,
       packages: [
         {

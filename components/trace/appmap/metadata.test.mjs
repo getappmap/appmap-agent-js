@@ -36,7 +36,7 @@ const default_meta_data = {
   app: null,
   name: null,
   labels: [],
-  language: { name: "ecmascript", version: "2020", engine: null },
+  language: { name: "javascript", version: "ES.Next", engine: null },
   frameworks: [],
   client: {
     name: "appmap-agent-js",

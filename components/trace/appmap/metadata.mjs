@@ -110,7 +110,8 @@ export default (dependencies) => {
       app: makeAppName(app_name, repository),
       labels,
       language: {
-        ...language,
+        name: language,
+        version: "ES.Next",
         engine: makeEngine(engine),
       },
       frameworks,

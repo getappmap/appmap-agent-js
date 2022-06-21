@@ -95,20 +95,13 @@ assertDeepEqual(extend("trace-port", 8080, "file:///base"), 8080);
 
 // language //
 
-assertDeepEqual(extend("language", "foo"), {
-  name: "foo",
-  version: null,
-});
+assertDeepEqual(extend("language", "javascript"), "javascript");
 
-assertDeepEqual(extend("language", "foo@bar"), {
-  name: "foo",
-  version: "bar",
-});
+// engine //
 
-assertDeepEqual(extend("language", { name: "foo", version: "bar" }), {
-  name: "foo",
-  version: "bar",
-});
+assertDeepEqual(extend("engine", "foo"), {name:"foo", version:null});
+
+assertDeepEqual(extend("engine", {name:"foo", version:"bar"}), {name:"foo", version:"bar"});
 
 // log //
 

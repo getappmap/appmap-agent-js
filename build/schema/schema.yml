@@ -5,6 +5,9 @@
 
 # enumeration #
 
+- $id: language
+  const: javascript
+
 - $id: socket
   enum:
     - unix
@@ -466,7 +469,7 @@
     hidden-identifier: {$ref: regular-identifier}
     main: {$ref: path}
     engine: {$ref: name-version}
-    language: {$ref: name-version}
+    language: {$ref: language}
     packages:
       anyOf:
         - $ref: package-specifier
@@ -603,8 +606,7 @@
       anyOf:
         - const: null
         - $ref: name-version-object
-    language:
-      $ref: name-version-object
+    language: {$ref: language}
     packages:
       type: array
       items:
