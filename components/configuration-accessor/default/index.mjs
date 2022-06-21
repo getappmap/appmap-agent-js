@@ -148,10 +148,7 @@ export default (dependencies) => {
       return extendConfiguration(
         configuration,
         {
-          engine: {
-            name: "node",
-            version: version.substring(1),
-          },
+          engine: `node@${version.substring(1)}`,
           main,
         },
         urlifyPath(cwd(), configuration.repository.directory),

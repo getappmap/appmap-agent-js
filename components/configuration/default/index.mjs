@@ -109,8 +109,6 @@ export default (dependencies) => {
     "method-id",
   );
 
-  const normalizeEngine = generateNormalizeSplit("@", "name", "version");
-
   const normalizeFramework = generateNormalizeSplit("@", "name", "version");
 
   const normalizeFrameworkArray = (frameworks) =>
@@ -331,7 +329,7 @@ export default (dependencies) => {
     },
     engine: {
       extend: overwrite,
-      normalize: normalizeEngine,
+      normalize: identity,
     },
     packages: {
       extend: prepend,

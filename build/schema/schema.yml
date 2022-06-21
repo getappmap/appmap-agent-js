@@ -468,7 +468,7 @@
           items: {$ref: enabled-specifier}
     hidden-identifier: {$ref: regular-identifier}
     main: {$ref: path}
-    engine: {$ref: name-version}
+    engine: {type: string}
     language: {$ref: language}
     packages:
       anyOf:
@@ -603,9 +603,8 @@
         - const: null
         - $ref: url
     engine:
-      anyOf:
-        - const: null
-        - $ref: name-version-object
+      type: string
+      nullable: true
     language: {$ref: language}
     packages:
       type: array

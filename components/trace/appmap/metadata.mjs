@@ -43,11 +43,6 @@ export default (dependencies) => {
 
   const makeRecording = (recording) => mapMaybe(recording, makeJustRecording);
 
-  const makeJustEngine = ({ name, version }) =>
-    version === null ? name : `${name}@${version}`;
-
-  const makeEngine = (engine) => mapMaybe(engine, makeJustEngine);
-
   const makeHistory = ({ history }) => history;
 
   const makeAppName = (app_name, { package: _package }) =>
@@ -112,7 +107,7 @@ export default (dependencies) => {
       language: {
         name: language,
         version: "ES.Next",
-        engine: makeEngine(engine),
+        engine,
       },
       frameworks,
       client: makeClient(agent),
