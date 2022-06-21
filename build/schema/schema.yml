@@ -494,15 +494,8 @@
               minimum: 0
               nullable: true
     pruning: {type: boolean}
-    output:
-      anyOf:
-        - type: string
-        - type: object
-          additionalProperties: false
-          properties:
-            directory: {$ref: path}
-            basename: {$ref: basename}
-            extension: {$ref: extension}
+    appmap_dir: {$ref: path}
+    appmap_file: {$ref: basename}
     name: {type: string}
     map-name: {type: string}
     feature: {type: string}
@@ -643,20 +636,11 @@
         include-constructor-name: {type: boolean}
         method: {$ref: serialization-method}
     pruning: {type: boolean}
-    output:
-      type: object
-      additionalProperties: false
-      required: [directory, basename, extension]
-      properties:
-        directory:
-          anyOf:
-            - const: null
-            - $ref: url
-        basename:
-          anyOf:
-            - const: null
-            - $ref: basename
-        extension: {$ref: extension}
+    appmap_dir: {$ref: url}
+    appmap_file:
+      anyOf:
+        - $ref: basename
+        - const: null
     name:
       type: string
       nullable: true

@@ -36,7 +36,7 @@ assertDeepEqual(
     ({ format }) => format("app-name"),
     ({ choices }) => choices[0].value,
     ({ format }) => format('["exec", "arg0"]'),
-    ({ format }) => format("output-directory"),
+    ({ format }) => format("appmap-directory"),
     ({ format }) => format(["esm", "cjs"]),
     ({ choices }) => choices[0].value,
     // ({ format }) => format(["process1", "process2"]),
@@ -48,9 +48,7 @@ assertDeepEqual(
     name: "app-name",
     recorder: "process",
     command: ["exec", "arg0"],
-    output: {
-      directory: "output-directory",
-    },
+    appmap_dir: "appmap-directory",
     hooks: {
       esm: true,
       cjs: true,

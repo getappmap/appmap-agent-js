@@ -48,12 +48,12 @@ export default (dependencies) => {
   const makeAppName = (app_name, { package: _package }) =>
     app_name === null ? mapMaybe(_package, getName) : app_name;
 
-  const makeMapName = (map_name, { basename }, main) => {
+  const makeMapName = (map_name, file_name, main) => {
     if (map_name !== null) {
       return map_name;
     }
-    if (basename !== null) {
-      return basename;
+    if (file_name !== null) {
+      return file_name;
     }
     if (main !== null) {
       return getLastURLSegment(main).split(".")[0];
@@ -95,13 +95,13 @@ export default (dependencies) => {
         engine,
         agent,
         main,
-        output,
+        appmap_file: file_name,
         recorder,
         recording,
       },
       termination,
     ) => ({
-      name: makeMapName(map_name, output, main),
+      name: makeMapName(map_name, file_name, main),
       app: makeAppName(app_name, repository),
       labels,
       language: {

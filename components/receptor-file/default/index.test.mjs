@@ -25,9 +25,7 @@ const configuration = extendConfiguration(
   createConfiguration("file:///home"),
   {
     recorder: "process",
-    output: {
-      directory: "directory",
-    },
+    appmap_dir: "directory",
   },
   url,
 );

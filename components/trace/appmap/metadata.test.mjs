@@ -91,7 +91,7 @@ assertDeepEqual(test({ "map-name": "map-name" }, "file:///cwd"), {
   name: "map-name",
 });
 
-assertDeepEqual(test({ output: { basename: "basename" } }, "file:///cwd"), {
+assertDeepEqual(test({ appmap_file: "basename" }, "file:///cwd"), {
   ...default_meta_data,
   name: "basename",
 });

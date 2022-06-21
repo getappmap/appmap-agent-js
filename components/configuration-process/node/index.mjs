@@ -57,7 +57,7 @@ export default (dependencies) => {
   };
 
   const aliases = new _Map([
-    ["output-dir", "output"],
+    ["appmap-dir", "appmap_dir"],
     ["app-port", "intercept-track-port"],
     ["alt-remote-port", "track-port"],
     ["package", "packages"],

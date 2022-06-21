@@ -121,20 +121,6 @@ export default (dependencies) => {
     return serialization;
   };
 
-  const normalizeOutput = (output, base) => {
-    if (typeof output === "string") {
-      output = { directory: output };
-    }
-    if (hasOwnProperty(output, "directory")) {
-      const { directory } = output;
-      output = {
-        ...output,
-        directory: urlifyPath(directory, base),
-      };
-    }
-    return output;
-  };
-
   const normalizePackageSpecifier = (specifier, base) => {
     if (typeof specifier === "string") {
       specifier = { glob: specifier };
@@ -343,9 +329,13 @@ export default (dependencies) => {
       extend: overwrite,
       normalize: normalizeRecording,
     },
-    output: {
-      extend: assign,
-      normalize: normalizeOutput,
+    appmap_dir: {
+      extend: overwrite,
+      normalize: urlifyPath,
+    },
+    appmap_file: {
+      extend: overwrite,
+      normalize: identity,
     },
     name: {
       extend: overwrite,
@@ -430,11 +420,8 @@ export default (dependencies) => {
         level: "error",
         file: 2,
       },
-      output: {
-        directory: null,
-        basename: null,
-        extension: ".appmap.json",
-      },
+      appmap_dir: urlifyPath("tmp/appmap", home),
+      appmap_file: null,
       processes: [[true, true]],
       recorder: null,
       "inline-source": false,

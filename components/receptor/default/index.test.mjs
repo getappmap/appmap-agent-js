@@ -22,7 +22,7 @@ const directory = getFreshTemporaryURL();
 await mkdirAsync(new URL(directory));
 const configuration = extendConfiguration(
   createConfiguration(directory),
-  { recorder: "process", output: { directory: "directory" } },
+  { recorder: "process", appmap_dir: "directory" },
   directory,
 );
 

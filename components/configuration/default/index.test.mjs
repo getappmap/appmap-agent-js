@@ -137,14 +137,6 @@ assertDeepEqual(extend("frameworks", ["foo@bar", {name:"foo", version: "bar"}, "
   },
 ]);
 
-// output //
-
-assertDeepEqual(extend("output", "directory", "file:///base"), {
-  directory: "file:///base/directory",
-  basename: null,
-  extension: ".appmap.json",
-});
-
 // processes //
 
 assertDeepEqual(extend("processes", true, "file:///base", "file:///home"), [
