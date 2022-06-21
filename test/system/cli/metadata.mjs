@@ -21,7 +21,7 @@ await runAsync(
       apply: false,
       http: false,
     },
-    output: { basename: "basename" },
+    appmap_file: "basename",
   },
   async (repository) => {
     await writeFileAsync(joinPath(repository, "main.mjs"), `123;`, "utf8");

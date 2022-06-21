@@ -12,9 +12,7 @@ await runAsync(
   {
     command: "npx bin-sample",
     pruning: false,
-    output: {
-      basename: "basename",
-    },
+    appmap_file: "basename",
     processes: { regexp: "^../", enabled: false },
     packages: { dist: "bin-sample", recursive: true },
     recorder: "process",
