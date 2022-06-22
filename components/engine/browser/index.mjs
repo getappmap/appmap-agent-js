@@ -14,10 +14,7 @@ export default (dependencies) => {
         "could not parse navigator.userAgent: %j",
         description,
       );
-      return {
-        name: parts[1],
-        version: parts[2],
-      };
+      return `${parts[1]}@${parts[2]}`;
     },
   };
 };

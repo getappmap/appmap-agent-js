@@ -14,9 +14,7 @@ await runAsync(
     recorder: "process",
     packages: { glob: "*" },
     command: "node main.mjs",
-    output: {
-      basename: "basename",
-    },
+    appmap_file: "basename",
     hooks: {
       esm: true,
       cjs: true,

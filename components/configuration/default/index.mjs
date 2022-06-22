@@ -4,9 +4,12 @@ const { entries: toEntries } = Object;
 
 const ANONYMOUS_NAME_SEPARATOR = "-";
 
+const EXPECTED_EXTRA_PROPERTIES = ["appmap_dir", "test_recording"];
+
 export default (dependencies) => {
   const {
-    util: { coalesce, identity, hasOwnProperty },
+    log: {logGuardInfo},
+    util: { hasOwnProperty, coalesce, identity },
     url: { urlifyPath },
     validate: { validateConfig },
     specifier: { createSpecifier },
@@ -94,10 +97,10 @@ export default (dependencies) => {
 
   const generateNormalizeSplit = (separator, key1, key2) => (value) => {
     if (typeof value === "string") {
-      const [value1, value2] = value.split(separator);
+      const segments = value.split(separator);
       return {
-        [key1]: value1,
-        [key2]: value2,
+        [key1]: segments[0],
+        [key2]: segments.length === 1 ? null : segments[1],
       };
     }
     return value;
@@ -109,10 +112,6 @@ export default (dependencies) => {
     "method-id",
   );
 
-  const normalizeLanguage = generateNormalizeSplit("@", "name", "version");
-
-  const normalizeEngine = generateNormalizeSplit("@", "name", "version");
-
   const normalizeFramework = generateNormalizeSplit("@", "name", "version");
 
   const normalizeFrameworkArray = (frameworks) =>
@@ -123,20 +122,6 @@ export default (dependencies) => {
       serialization = { method: serialization };
     }
     return serialization;
-  };
-
-  const normalizeOutput = (output, base) => {
-    if (typeof output === "string") {
-      output = { directory: output };
-    }
-    if (hasOwnProperty(output, "directory")) {
-      const { directory } = output;
-      output = {
-        ...output,
-        directory: urlifyPath(directory, base),
-      };
-    }
-    return output;
   };
 
   const normalizePackageSpecifier = (specifier, base) => {
@@ -328,12 +313,12 @@ export default (dependencies) => {
       normalize: urlifyPath,
     },
     language: {
-      extend: assign,
-      normalize: normalizeLanguage,
+      extend: overwrite,
+      normalize: identity,
     },
     engine: {
       extend: overwrite,
-      normalize: normalizeEngine,
+      normalize: identity,
     },
     packages: {
       extend: prepend,
@@ -347,9 +332,13 @@ export default (dependencies) => {
       extend: overwrite,
       normalize: normalizeRecording,
     },
-    output: {
-      extend: assign,
-      normalize: normalizeOutput,
+    appmap_dir: {
+      extend: overwrite,
+      normalize: urlifyPath,
+    },
+    appmap_file: {
+      extend: overwrite,
+      normalize: identity,
     },
     name: {
       extend: overwrite,
@@ -434,11 +423,8 @@ export default (dependencies) => {
         level: "error",
         file: 2,
       },
-      output: {
-        directory: null,
-        basename: null,
-        extension: ".appmap.json",
-      },
+      appmap_dir: urlifyPath("tmp/appmap", home),
+      appmap_file: null,
       processes: [[true, true]],
       recorder: null,
       "inline-source": false,
@@ -460,10 +446,7 @@ export default (dependencies) => {
         method: "toString",
       },
       "hidden-identifier": "APPMAP",
-      language: {
-        name: "ecmascript",
-        version: "2020",
-      },
+      language: "javascript",
       packages: [
         [
           true,
@@ -504,11 +487,19 @@ export default (dependencies) => {
       configuration = { ...configuration };
       validateConfig(config);
       for (let key of ownKeys(config)) {
-        const { normalize, extend } = fields[key];
-        configuration[key] = extend(
-          configuration[key],
-          normalize(config[key], base),
-        );
+        if (hasOwnProperty(fields, key)) {
+          const { normalize, extend } = fields[key];
+          configuration[key] = extend(
+            configuration[key],
+            normalize(config[key], base),
+          );
+        } else {
+          logGuardInfo(
+            EXPECTED_EXTRA_PROPERTIES.includes(key),
+            "Configuration property not recognized by the agent: %j",
+            key,
+          );
+        }
       }
       return configuration;
     },

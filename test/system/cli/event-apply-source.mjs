@@ -20,9 +20,7 @@ await runAsync(
     recorder: "process",
     command: "node script.js",
     packages: { glob: "*" },
-    output: {
-      basename: "basename",
-    },
+    appmap_file: "basename",
     hooks: {
       esm: true,
       cjs: true,

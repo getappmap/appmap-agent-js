@@ -64,7 +64,7 @@ export default (dependencies) => {
     directory,
     {
       head: {
-        output: { basename, extension },
+        appmap_file: basename,
         "map-name": map_name,
       },
       body: trace,
@@ -76,14 +76,14 @@ export default (dependencies) => {
     basename = basename.replace(/[\t\n ]/gu, "");
     let url = appendURLSegment(
       directory,
-      makeSegment(`${basename}${extension}`, "-"),
+      makeSegment(`${basename}.appmap.json`, "-"),
     );
     let counter = 0;
     while (urls.has(url)) {
       counter += 1;
       url = appendURLSegment(
         directory,
-        makeSegment(`${basename}-${_String(counter)}${extension}`, "-"),
+        makeSegment(`${basename}-${_String(counter)}.appmap.json`, "-"),
       );
     }
     urls.add(url);
@@ -104,22 +104,21 @@ export default (dependencies) => {
     minifyReceptorConfiguration: ({
       recorder,
       "trace-port": trace_port,
-      output: { directory },
+      appmap_dir,
     }) => ({
       recorder,
       "trace-port": trace_port,
-      output: { directory },
+      appmap_dir,
     }),
     openReceptorAsync: async ({
       recorder,
       "trace-port": trace_port,
-      output: { directory },
+      appmap_dir: directory,
     }) => {
       assert(
         recorder === "mocha" || recorder === "process",
         "invalid recorder for receptor-file",
       );
-      assert(directory !== null, "output directory should have been resolved");
       await createDirectoryAsync(directory);
       const server = createServer();
       const urls = new _Set();

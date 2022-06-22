@@ -162,7 +162,7 @@ export default (dependencies) => {
               "Provide a relative path to a directory.",
             ],
             initial: "tmp/appmap",
-            format: (directory) => ({ output: { directory } }),
+            format: (directory) => ({ appmap_dir: directory }),
           },
     // Hooks //
     ({ recorder }) => ({

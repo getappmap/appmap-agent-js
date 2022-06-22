@@ -11,7 +11,4 @@ const { default: Engine } = await import("./index.mjs");
 
 const { getEngine } = Engine(await buildTestDependenciesAsync(import.meta.url));
 
-assertDeepEqual(getEngine(), {
-  name: "name",
-  version: "version",
-});
+assertDeepEqual(getEngine(), "name@version");

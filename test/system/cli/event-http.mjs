@@ -15,9 +15,7 @@ await runAsync(
     packages: { glob: "*" },
     command: "node main.mjs",
     ordering: "chronological",
-    output: {
-      basename: "basename",
-    },
+    appmap_file: "basename",
     hooks: {
       esm: false,
       cjs: false,

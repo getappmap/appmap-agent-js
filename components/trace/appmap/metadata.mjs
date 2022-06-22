@@ -1,5 +1,3 @@
-const _String = String;
-
 export default (dependencies) => {
   const {
     util: { assert, mapMaybe },
@@ -45,21 +43,17 @@ export default (dependencies) => {
 
   const makeRecording = (recording) => mapMaybe(recording, makeJustRecording);
 
-  const makeJustEngine = ({ name, version }) => `${name}@${version}`;
-
-  const makeEngine = (engine) => mapMaybe(engine, makeJustEngine);
-
   const makeHistory = ({ history }) => history;
 
   const makeAppName = (app_name, { package: _package }) =>
     app_name === null ? mapMaybe(_package, getName) : app_name;
 
-  const makeMapName = (map_name, { basename }, main) => {
+  const makeMapName = (map_name, file_name, main) => {
     if (map_name !== null) {
       return map_name;
     }
-    if (basename !== null) {
-      return basename;
+    if (file_name !== null) {
+      return file_name;
     }
     if (main !== null) {
       return getLastURLSegment(main).split(".")[0];
@@ -71,11 +65,6 @@ export default (dependencies) => {
     const { length } = errors;
     return length === 0 && status === 0 ? "succeeded" : "failed";
   };
-
-  const makeLanguage = ({ name, version }) => ({
-    name,
-    version: _String(version),
-  });
 
   const makeRecorder = (recorder) => {
     assert(recorder !== null, "recorder should have been resolved earlier");
@@ -106,18 +95,19 @@ export default (dependencies) => {
         engine,
         agent,
         main,
-        output,
+        appmap_file: file_name,
         recorder,
         recording,
       },
       termination,
     ) => ({
-      name: makeMapName(map_name, output, main),
+      name: makeMapName(map_name, file_name, main),
       app: makeAppName(app_name, repository),
       labels,
       language: {
-        ...makeLanguage(language),
-        engine: makeEngine(engine),
+        name: language,
+        version: "ES.Next",
+        engine,
       },
       frameworks,
       client: makeClient(agent),

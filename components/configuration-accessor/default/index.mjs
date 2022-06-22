@@ -99,16 +99,14 @@ export default (dependencies) => {
           configuration.repository.directory,
         );
       }
-      if (configuration.output.directory === null) {
+      if (
+        configuration.recorder === "mocha" &&
+        configuration.appmap_dir === urlifyPath("tmp/appmap", configuration.repository.directory)
+      ) {
         configuration = extendConfiguration(
           configuration,
           {
-            output: {
-              directory:
-                configuration.recorder === "mocha"
-                  ? "tmp/appmap/mocha"
-                  : "tmp/appmap",
-            },
+            appmap_dir: "tmp/appmap/mocha",
           },
           configuration.repository.directory,
         );
@@ -148,10 +146,7 @@ export default (dependencies) => {
       return extendConfiguration(
         configuration,
         {
-          engine: {
-            name: "node",
-            version: version.substring(1),
-          },
+          engine: `node@${version.substring(1)}`,
           main,
         },
         urlifyPath(cwd(), configuration.repository.directory),

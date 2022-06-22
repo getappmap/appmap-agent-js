@@ -95,15 +95,7 @@ assertDeepEqual(extend("trace-port", 8080, "file:///base"), 8080);
 
 // language //
 
-assertDeepEqual(extend("language", "foo@bar"), {
-  name: "foo",
-  version: "bar",
-});
-
-assertDeepEqual(extend("language", { name: "foo", version: "bar" }), {
-  name: "foo",
-  version: "bar",
-});
+assertDeepEqual(extend("language", "javascript"), "javascript");
 
 // log //
 
@@ -126,20 +118,24 @@ assertDeepEqual(extend("recording", "foo.bar"), {
 
 // frameworks //
 
-assertDeepEqual(extend("frameworks", ["foo@bar"]), [
+assertDeepEqual(extend("frameworks", ["foo@bar", {name:"foo", version: "bar"}, "foo", {name:"foo", version:null}]), [
   {
     name: "foo",
     version: "bar",
   },
+  {
+    name: "foo",
+    version: "bar",
+  },
+  {
+    name: "foo",
+    version: null,
+  },
+  {
+    name: "foo",
+    version: null,
+  },
 ]);
-
-// output //
-
-assertDeepEqual(extend("output", "directory", "file:///base"), {
-  directory: "file:///base/directory",
-  basename: null,
-  extension: ".appmap.json",
-});
 
 // processes //
 
@@ -189,3 +185,7 @@ assertDeepEqual(extend("exclude", ["foo\\.bar"]), [
   },
   ...createConfiguration("file:///home").exclude,
 ]);
+
+// additional //
+
+assertDeepEqual(extend("additional", "foo", "bar"), undefined);

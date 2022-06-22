@@ -36,7 +36,7 @@ const default_meta_data = {
   app: null,
   name: null,
   labels: [],
-  language: { name: "ecmascript", version: "2020", engine: null },
+  language: { name: "javascript", version: "ES.Next", engine: null },
   frameworks: [],
   client: {
     name: "appmap-agent-js",
@@ -91,7 +91,7 @@ assertDeepEqual(test({ "map-name": "map-name" }, "file:///cwd"), {
   name: "map-name",
 });
 
-assertDeepEqual(test({ output: { basename: "basename" } }, "file:///cwd"), {
+assertDeepEqual(test({ appmap_file: "basename" }, "file:///cwd"), {
   ...default_meta_data,
   name: "basename",
 });
@@ -116,32 +116,5 @@ assertDeepEqual(
   {
     ...default_meta_data,
     recording: { defined_class: "defined-class", method_id: "method-id" },
-  },
-);
-
-// engine //
-
-assertDeepEqual(
-  test(
-    { engine: { name: "engine-name", version: "engine-version" } },
-    "file:///cwd",
-  ),
-  {
-    ...default_meta_data,
-    language: {
-      ...default_meta_data.language,
-      engine: "engine-name@engine-version",
-    },
-  },
-);
-
-assertDeepEqual(
-  test({ engine: { name: "engine-name", version: "1.2.3" } }, "file:///cwd"),
-  {
-    ...default_meta_data,
-    language: {
-      ...default_meta_data.language,
-      engine: "engine-name@1.2.3",
-    },
   },
 );

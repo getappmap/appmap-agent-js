@@ -1,4 +1,5 @@
 branches: [test, node, browser]
 dependencies:
   - util
+  - log
   - expect

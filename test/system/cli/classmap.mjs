@@ -21,9 +21,7 @@ await runAsync(
       apply: false,
       http: false,
     },
-    output: {
-      basename: "basename",
-    },
+    appmap_file: "basename",
     "function-name-placeholder": "placeholder",
   },
   async (repository) => {

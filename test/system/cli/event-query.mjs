@@ -22,9 +22,7 @@ await runAsync(
       http: false,
       sqlite3: true,
     },
-    output: {
-      basename: "basename",
-    },
+    appmap_file: "basename",
   },
   async (repository) => {
     await symlinkAsync(

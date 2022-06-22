@@ -5,6 +5,9 @@
 
 # enumeration #
 
+- $id: language
+  const: javascript
+
 - $id: socket
   enum:
     - unix
@@ -136,7 +139,7 @@
 
 - $id: name-version-string
   type: string
-  pattern: "^[^@]+@[^@]+$"
+  pattern: "^[^@]+(@[^@]+)?$"
 
 - $id: name-version-object
   type: object
@@ -144,7 +147,9 @@
   required: [name, version]
   properties:
     name: {type: string}
-    version: {type: string}
+    version:
+      type: string
+      nullable: true
 
 - $id: name-version
   anyOf:
@@ -406,7 +411,6 @@
 
 - $id: config
   type: object
-  additionalProperties: false
   properties:
     # server
     agent: {$ref: agent}
@@ -464,8 +468,8 @@
           items: {$ref: enabled-specifier}
     hidden-identifier: {$ref: regular-identifier}
     main: {$ref: path}
-    engine: {$ref: name-version}
-    language: {$ref: name-version}
+    engine: {type: string}
+    language: {$ref: language}
     packages:
       anyOf:
         - $ref: package-specifier
@@ -490,15 +494,8 @@
               minimum: 0
               nullable: true
     pruning: {type: boolean}
-    output:
-      anyOf:
-        - type: string
-        - type: object
-          additionalProperties: false
-          properties:
-            directory: {$ref: path}
-            basename: {$ref: basename}
-            extension: {$ref: extension}
+    appmap_dir: {$ref: path}
+    appmap_file: {$ref: basename}
     name: {type: string}
     map-name: {type: string}
     feature: {type: string}
@@ -599,11 +596,9 @@
         - const: null
         - $ref: url
     engine:
-      anyOf:
-        - const: null
-        - $ref: name-version-object
-    language:
-      $ref: name-version-object
+      type: string
+      nullable: true
+    language: {$ref: language}
     packages:
       type: array
       items:
@@ -641,20 +636,11 @@
         include-constructor-name: {type: boolean}
         method: {$ref: serialization-method}
     pruning: {type: boolean}
-    output:
-      type: object
-      additionalProperties: false
-      required: [directory, basename, extension]
-      properties:
-        directory:
-          anyOf:
-            - const: null
-            - $ref: url
-        basename:
-          anyOf:
-            - const: null
-            - $ref: basename
-        extension: {$ref: extension}
+    appmap_dir: {$ref: url}
+    appmap_file:
+      anyOf:
+        - $ref: basename
+        - const: null
     name:
       type: string
       nullable: true
