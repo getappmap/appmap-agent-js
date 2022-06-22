@@ -1,3 +1,37 @@
+# [11.0.0](https://github.com/applandinc/appmap-agent-js/compare/v10.1.0...v11.0.0) (2022-06-22)
+
+
+### Bug Fixes
+
+* sanitize language version before passing it to acorn ([2595030](https://github.com/applandinc/appmap-agent-js/commit/2595030e3d0074c4666a79bbe1d464161a82ac3f))
+* support extension of unrecognized configuration field ([8ee69b6](https://github.com/applandinc/appmap-agent-js/commit/8ee69b6f6d8f4fb46763ebd718d91a39d1eda4e8))
+* use more robust import of acorn ([e6b6e2d](https://github.com/applandinc/appmap-agent-js/commit/e6b6e2d9f2ca8ab1a8c9d10c4a001c0426320baf))
+
+
+### Features
+
+* allow extra root properties in configuration file ([3cbcec0](https://github.com/applandinc/appmap-agent-js/commit/3cbcec0369a6bd06499779116906bd60542df0a1))
+* more lenient language and engine configuration field ([f9eef3d](https://github.com/applandinc/appmap-agent-js/commit/f9eef3da03ea3397d0370f84b237910668baede6))
+* support only string format for engine config field ([838464e](https://github.com/applandinc/appmap-agent-js/commit/838464e01f0f7d259701410137ab840ca3559c33))
+* use appmap_dir and appmap_file instead of output config field ([bcad7b7](https://github.com/applandinc/appmap-agent-js/commit/bcad7b7b2b07bd558375a4421db510d517d7b6d0))
+* use the constant javascript string for language's config field ([c28c273](https://github.com/applandinc/appmap-agent-js/commit/c28c27372e91600e120e9603cd35f8924e82bc61))
+* whitelist some external but expected root config properties ([ddbb914](https://github.com/applandinc/appmap-agent-js/commit/ddbb9140a0b4a08109e06460484e4efa7f499da1))
+
+
+### BREAKING CHANGES
+
+* The output configuration field is no longer recognized.
+* It is no longer possible to provide a custom extension 
+for appmap files.
+* name-version object format for engine configuration 
+field is no longer supported
+* the agent will throw an error if the language 
+configuration field is anything else than 'javascript'
+* It is no longer possible to tell acorn to parse the 
+code to be instrumented as a particular ecmascript version. Instead, we 
+now always use the latest version. This should not cause problems 
+because ecmascript is backward-compatible.
+
 # [10.1.0](https://github.com/applandinc/appmap-agent-js/compare/v10.0.1...v10.1.0) (2022-06-07)
 
 
