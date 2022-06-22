@@ -119,7 +119,8 @@ export default (dependencies) => {
         recorder === "mocha" || recorder === "process",
         "invalid recorder for receptor-file",
       );
-      await createDirectoryAsync(directory);
+      const recorder_directory = appendURLSegment(directory, recorder);
+      await createDirectoryAsync(recorder_directory);
       const server = createServer();
       const urls = new _Set();
       server.on("connection", (socket) => {
@@ -143,13 +144,13 @@ export default (dependencies) => {
                   sendBackend(backend, ["stop", key, disconnection]);
                 }
                 for (const key of getBackendTraceIterator(backend)) {
-                  store(urls, directory, takeBackendTrace(backend, key));
+                  store(urls, recorder_directory, takeBackendTrace(backend, key));
                 }
               });
               socket.on("message", (content) => {
                 if (sendBackend(backend, parseJSON(content))) {
                   for (const key of getBackendTraceIterator(backend)) {
-                    store(urls, directory, takeBackendTrace(backend, key));
+                    store(urls, recorder_directory, takeBackendTrace(backend, key));
                   }
                 }
               });
