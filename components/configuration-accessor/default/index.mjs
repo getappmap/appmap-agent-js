@@ -99,18 +99,6 @@ export default (dependencies) => {
           configuration.repository.directory,
         );
       }
-      if (
-        configuration.recorder === "mocha" &&
-        configuration.appmap_dir === urlifyPath("tmp/appmap", configuration.repository.directory)
-      ) {
-        configuration = extendConfiguration(
-          configuration,
-          {
-            appmap_dir: "tmp/appmap/mocha",
-          },
-          configuration.repository.directory,
-        );
-      }
       return configuration;
     },
     resolveConfigurationManualRecorder: (configuration) => {

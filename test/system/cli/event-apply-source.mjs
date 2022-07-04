@@ -59,7 +59,7 @@ await runAsync(
       events: [{ lineno }],
     } = JSON.parse(
       await readFileAsync(
-        joinPath(directory, "tmp", "appmap", "basename.appmap.json"),
+        joinPath(directory, "tmp", "appmap", "process", "basename.appmap.json"),
         "utf8",
       ),
     );
