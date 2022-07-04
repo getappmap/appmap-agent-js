@@ -1,3 +1,10 @@
+# [11.1.0](https://github.com/applandinc/appmap-agent-js/compare/v11.0.0...v11.1.0) (2022-07-04)
+
+
+### Features
+
+* always append the recorder name to the output directory ([aff3ab1](https://github.com/applandinc/appmap-agent-js/commit/aff3ab1b836ae30899c93d242821dd036c1c5864))
+
 # [11.0.0](https://github.com/applandinc/appmap-agent-js/compare/v10.1.0...v11.0.0) (2022-06-22)
 
 
