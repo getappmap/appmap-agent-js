@@ -62,13 +62,7 @@ export default (dependencies) => {
   const store = (
     urls,
     directory,
-    {
-      head: {
-        appmap_file: basename,
-        "map-name": map_name,
-      },
-      body: trace,
-    },
+    { head: { appmap_file: basename, "map-name": map_name }, body: trace },
   ) => {
     if (basename === null) {
       basename = map_name === null ? "anonymous" : map_name;
@@ -144,13 +138,21 @@ export default (dependencies) => {
                   sendBackend(backend, ["stop", key, disconnection]);
                 }
                 for (const key of getBackendTraceIterator(backend)) {
-                  store(urls, recorder_directory, takeBackendTrace(backend, key));
+                  store(
+                    urls,
+                    recorder_directory,
+                    takeBackendTrace(backend, key),
+                  );
                 }
               });
               socket.on("message", (content) => {
                 if (sendBackend(backend, parseJSON(content))) {
                   for (const key of getBackendTraceIterator(backend)) {
-                    store(urls, recorder_directory, takeBackendTrace(backend, key));
+                    store(
+                      urls,
+                      recorder_directory,
+                      takeBackendTrace(backend, key),
+                    );
                   }
                 }
               });
