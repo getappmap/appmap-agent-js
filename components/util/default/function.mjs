@@ -104,3 +104,12 @@ export const bind = (f, x1) => {
   }
   assert(false, "arity of out bounds");
 };
+
+// export const applySafe = (closure, context, inputs, log, recovery) => {
+//   try {
+//     return apply(closure, context, inputs);
+//   } catch (error) {
+//     log(error);
+//     return recovery;
+//   }
+// };
