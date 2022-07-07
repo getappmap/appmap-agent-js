@@ -94,3 +94,43 @@ assertDeepEqual(
     error: { type: "number", print: "123" },
   }),
 );
+assertDeepEqual(
+  recordBeforeClient({ recording }, "index", {
+    protocol: "HTTP/1.1",
+    method: "GET",
+    url: "/path",
+    route: null,
+    headers: { foo: "bar" },
+    body: 123,
+  }),
+  createMessage("before", "index", {
+    type: "client",
+    protocol: "HTTP/1.1",
+    method: "GET",
+    url: "/path",
+    route: null,
+    headers: { foo: "bar" },
+    body: {
+      type: "number",
+      print: "123",
+    },
+  }),
+);
+assertDeepEqual(
+  recordAfterClient({ recording }, "index", {
+    status: 200,
+    message: "OK",
+    headers: { foo: "bar" },
+    body: 123,
+  }),
+  createMessage("after", "index", {
+    type: "client",
+    status: 200,
+    message: "OK",
+    headers: { foo: "bar" },
+    body: {
+      type: "number",
+      print: "123",
+    },
+  }),
+);

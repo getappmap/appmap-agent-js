@@ -1,4 +1,5 @@
 branches: [test, node]
 dependencies:
   - util
+  - hook-http
   - agent

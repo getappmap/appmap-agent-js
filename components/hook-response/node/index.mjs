@@ -11,11 +11,13 @@ const _undefined = undefined;
 
 export default (dependencies) => {
   const {
-    util: { assert, coalesce, assignProperty },
+    util: { assert, coalesce, assignProperty, getOwnProperty },
+    "hook-http": { parseContentType, decodeSafe, parseJSONSafe, spyWritable },
     log: { logWarning },
     expect: { expect, expectSuccess },
     patch: { patch },
     agent: {
+      getSerializationEmptyValue,
       requestRemoteAgentAsync,
       recordBeginServer,
       recordEndServer,
@@ -47,11 +49,16 @@ export default (dependencies) => {
         requestRemoteAgentAsync(agent, method, path, body),
       )(request, response);
       return true;
+    } else {
+      return false;
     }
-    return false;
   };
   /* c8 ignore stop */
   const beforeRequest = ({ agent }, request, response) => {
+    let response_body_buffer = null;
+    spyWritable(response, (buffer) => {
+      response_body_buffer = buffer;
+    });
     // bundle //
     let bundle_index;
     const begin = () => {
@@ -59,9 +66,10 @@ export default (dependencies) => {
       const data = {
         protocol: `HTTP/${version}`,
         method,
-        headers,
         url,
         route: null,
+        headers,
+        body: getSerializationEmptyValue(agent),
       };
       bundle_index = recordBeginServer(agent, data);
       // Give time for express to populate the request
@@ -81,10 +89,26 @@ export default (dependencies) => {
     const end = () => {
       const { statusCode: status, statusMessage: message } = response;
       const headers = response.getHeaders();
-      recordEndResponse(agent, bundle_index, {
+      const { type, subtype, parameters } = parseContentType(
+        getOwnProperty(headers, "content-type", "text/plain"),
+      );
+      let body = getSerializationEmptyValue(agent);
+      assert(response_body_buffer !== null, "failed to spy response");
+      if (type === "application" && subtype === "json") {
+        const maybe = decodeSafe(
+          response_body_buffer,
+          getOwnProperty(parameters, "charset", "utf-8"),
+          null,
+        );
+        if (maybe !== null) {
+          body = parseJSONSafe(maybe, getSerializationEmptyValue(agent));
+        }
+      }
+      recordEndServer(agent, bundle_index, {
         status,
         message,
         headers,
+        body,
       });
     };
     // jump //
@@ -171,7 +195,7 @@ export default (dependencies) => {
   const spyServer = (state, server, handleTraffic) => {
     patch(server, "emit", function emit(name, ...args) {
       if (name !== "request") {
-        return apply(getPrototypeOf(server).emit, this, [name, ...args]);
+        return apply(getPrototypeOf(this).emit, this, [name, ...args]);
       }
       expect(
         args.length === 2,

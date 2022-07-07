@@ -89,6 +89,7 @@ test(
     url: "/",
     headers: {},
     route: null,
+    body: null,
   },
   { type: "server", status: 200, message: "OK", headers: {}, body: null },
 );
@@ -132,8 +133,9 @@ test(
     protocol: "HTTP/1.1",
     method: "GET",
     url: "/",
-    headers: {},
     route: null,
+    headers: {},
+    body: null,
   },
   { type: "client", status: 200, message: "OK", headers: {}, body: null },
 );
@@ -149,8 +151,9 @@ test(
     protocol: "HTTP/1.1",
     method: "GET",
     url: "/",
-    headers: { key: "value" },
     route: "route",
+    headers: { key: "value" },
+    body: null,
   },
   { type: "client", status: 200, message: "OK", headers: {}, body: null },
 );

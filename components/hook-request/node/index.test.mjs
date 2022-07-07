@@ -19,8 +19,9 @@ server.on("request", (request, response) => {
   request.on("data", () => {});
   request.on("end", () => {});
   response.removeHeader("date");
-  response.writeHead(200, "ok");
-  response.end();
+  response.setHeader("content-type", "application/json; charset=utf-8");
+  response.writeHead(200, "OK");
+  response.end("123", "utf8");
 });
 server.on("error", (error) => {
   throw error;
@@ -60,8 +61,13 @@ const events = [
     status: 200,
     message: "ok",
     headers: {
+      "content-type": "application/json; charset=utf-8",
       "transfer-encoding": "chunked",
       connection: "close",
+    },
+    body: {
+      type: "number",
+      print: "123",
     },
   }),
   makeEvent("end", 1, 0, "bundle", null),

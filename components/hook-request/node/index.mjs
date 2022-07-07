@@ -7,8 +7,10 @@ const _Proxy = Proxy;
 
 export default (dependencies) => {
   const {
-    util: { assignProperty },
+    util: { assignProperty, getOwnProperty },
+    "hook-http": { parseContentType, decodeSafe, parseJSONSafe, spyReadable },
     agent: {
+      getSerializationEmptyValue,
       recordBeginBundle,
       recordEndBundle,
       recordBeforeClient,
@@ -39,7 +41,9 @@ export default (dependencies) => {
             protocol: "HTTP/1.1",
             method,
             url,
+            route: null,
             headers,
+            body: getSerializationEmptyValue(agent),
           });
         });
         request.on("response", (response) => {
@@ -48,13 +52,30 @@ export default (dependencies) => {
             statusCode: status,
             statusMessage: message,
           } = response;
-          // Hoopfully, this is triggered before user 'end' handlers.
+          let body = getSerializationEmptyValue(agent);
+          const { type, subtype, parameters } = parseContentType(
+            getOwnProperty(headers, "content-type", "text/plain"),
+          );
+          if (type === "application" && subtype === "json") {
+            spyReadable(response, (buffer) => {
+              const maybe = decodeSafe(
+                buffer,
+                getOwnProperty(parameters, "charset", "utf-8"),
+                null,
+              );
+              if (maybe !== null) {
+                body = parseJSONSafe(maybe, getSerializationEmptyValue(agent));
+              }
+            });
+          }
+          // Hopefully, this is triggered before user 'end' handlers.
           // Use of removeAllListeners or prependListener will break this assumption.
           response.on("end", () => {
             recordAfterClient(agent, index2, {
               status,
               message,
               headers,
+              body,
             });
           });
           nextTick(() => {

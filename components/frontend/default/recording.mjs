@@ -6,7 +6,7 @@ const { fromEntries, entries: toEntries } = Object;
 export default (dependencies) => {
   const {
     time: { now },
-    util: { returnSecond, constant, createCounter, incrementCounter },
+    util: { constant, createCounter, incrementCounter },
     serialization: {
       createSerialization,
       serialize,
@@ -52,6 +52,26 @@ export default (dependencies) => {
             serialize(serialization, parameter),
           ]),
         ),
+  });
+  const serializeRequest = (
+    serialization,
+    { protocol, method, url, route, headers, body },
+  ) => ({
+    protocol,
+    method,
+    url,
+    route,
+    headers,
+    body: serialize(serialization, body),
+  });
+  const serializeResponse = (
+    serialization,
+    { status, message, headers, body },
+  ) => ({
+    status,
+    message,
+    headers,
+    body: serialize(serialization, body),
   });
   const serializeAfterQuery = (serialization, { error }) => ({
     error: serialize(serialization, error),

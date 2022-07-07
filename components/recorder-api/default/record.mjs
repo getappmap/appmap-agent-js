@@ -66,6 +66,7 @@ export default (dependencies) => {
       url: "/",
       headers: {},
       route: null,
+      body: empty,
       ...data,
     };
     expectType(location, data, "protocol", "string");
@@ -82,6 +83,7 @@ export default (dependencies) => {
       status: 200,
       message: "OK",
       headers: {},
+      body: empty,
       ...data,
     };
     expectType(location, data, "status", "number");
