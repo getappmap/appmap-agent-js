@@ -342,12 +342,14 @@ The agent filter code objects (functions or objects/classes) based on a format c
 * `app <string>` Name of the recorded application. *Default*: `null` the value found in `package.json` if any.
 * `name <string>` Name of the appmap. *Default*: `null` the agent will do its best to come up with a meaningful name.
 * `pruning <boolean>` Remove elements of the classmap which did not trigger any function application event. *Default*: `true`.
-* `serialization <string> | <object>` Serialization options.
-    * `<string>` Shorthand, `"toString"` is the same as `{method: "toString"}`.
-    * `<object>`
-        * `method "toString" | "Object.prototype.toString"`: the name of the algorithm that should be used to print object runtime values (not `null` nor functions). `"toString"` will use the printing method provided by the object. Note that there is no guarantee that this method is side-effect free. By opposition `"Object.prototype.toString"` is always guaranteed to be side-effect free but provide a very vague description of the object. For instance: `/foo/g.toString()` is `"/foo/g"` whereas `Object.prototype.toString.call(/foo/g)` is `"[object RegExp]"`. *Default* `"toString"`.
-        * `include-constructor-name <boolean>`: indicates whether or not to fetch the constructor name of runtime values. Fetching constructor name for every intercepted runtime value can add up to some performance overhead. Also, fetching constructor name can trigger code from the application being recorded if it uses [proxies](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy). *Default* `true`.
-        * `maximum-length <number>` the maximum length of the string representation of runtime values. *Default* `96`.
+* `serialization <object>` Serialization options. Many options focus on defining how agressive the serialization should be. Pure serialization is faster and avoid disturbing the flow of the observed application but is less detailled than impure serialization.
+    * `maximum-print-length <number> | null` the maximum length of the string representation of runtime values before being truncated. `null` indicates no limitation. *Default* `100`.
+    * `maximum-properties-length <number> | null` the maximum of amount of properties serialized for hash objects. Objects are considered as hashes if their prototype is either `null` or `Object.prototype`. `null` indicates no limitation. *Default* `10`.
+    * `impure-printing <boolean>` indicates whether to use a pure printing algorithm or not. For instance, an object can be printed either using `Object.prototype.toString.call(object)` which is pure or `object.toString()` which is impure. *Default* `true`.
+    * `impure-constructor-naming <boolean>` indicates whether the constructor name should be retrieved using `Object.prototype.toString.call(object)` which is pure or using `object.constructor.name` which is impure. *Default* `true`.
+    * `impure-array-inspection <boolean>` indicates whether the length of an array should be retreived which is an impure operation. *Default* `true`.
+    * `impure-error-inspection <boolean>` indicates whether the message and stack of an error should be retrieved which is an impure operation. *Default* `true`.
+    * `impure-hash-inspection <boolean>` indicates whether the message and stack of an error should be retrieved which is an impure operation. *Default* `true`.
 * `hidden-identifier <string>` The prefix of hidden variables used by the agent. The instrumentation will fail if variables from the program under recording starts with this prefix. *Default*: `"APPMAP"`.
 * `function-name-placeholder <string>` The placeholder name for classmap function elements. *Default* `"()"`.
 * `collapse-package-hiearchy <boolean>` Indicates whether packages should organized as a tree which mirrors the structure of the file system or if they should be flatten into a list. *Default*: `true`.
