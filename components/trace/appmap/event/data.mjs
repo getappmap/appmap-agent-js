@@ -56,31 +56,6 @@ export default (dependencies) => {
         ),
       };
     }
-    if (type === "server") {
-      const { protocol, method, url, headers, route } = data;
-      const { pathname, search } = parseURL(url, headers);
-      return {
-        http_server_request: {
-          headers,
-          authorization: coalesceCaseInsensitive(
-            headers,
-            "authorization",
-            null,
-          ),
-          mime_type: coalesceCaseInsensitive(headers, "content-type", null),
-          request_method: method,
-          path_info: pathname,
-          normalized_path_info: route,
-          protocol,
-        },
-        message: [
-          ...(route === null
-            ? []
-            : zip(route.split("/"), pathname.split("/")).filter(isFirstColon)),
-          ...compileSearchMessage(search),
-        ].map(compileParameterPrimitiveTuple),
-      };
-    }
     if (type === "query") {
       const { database, version, sql, parameters } = data;
       return {
@@ -91,6 +66,25 @@ export default (dependencies) => {
           explain_sql: null,
         },
         message: toEntries(parameters).map(compileParameterSerialTuple),
+      };
+    }
+    if (type === "server") {
+      const { protocol, method, url, headers, route } = data;
+      const { pathname, search } = parseURL(url, headers);
+      return {
+        http_server_request: {
+          protocol,
+          request_method: method,
+          path_info: pathname,
+          normalized_path_info: route,
+          headers,
+        },
+        message: [
+          ...(route === null
+            ? []
+            : zip(route.split("/"), pathname.split("/")).filter(isFirstColon)),
+          ...compileSearchMessage(search),
+        ].map(compileParameterPrimitiveTuple),
       };
     }
     if (type === "client") {
@@ -120,32 +114,22 @@ export default (dependencies) => {
         return_value: mapMaybe(result, compileParameterSerialReturn),
         exceptions: error === null ? null : [compileExceptionSerial(error)],
       };
-    }
-    if (type === "response") {
-      const { status, headers } = data;
-      return {
-        http_server_response: {
-          status_code: status,
-          mime_type: coalesceCaseInsensitive(headers, "content-type", null),
-        },
-      };
-    }
-    if (type === "query") {
+    } else if (type === "query") {
       return {};
-    }
-    if (type === "request") {
-      const { status, headers } = data;
+    } else {
+      assert(
+        type === "server" || type === "client",
+        "invalid return event type",
+      );
+      const { status, headers, body } = data;
       return {
-        http_client_response: {
+        [`http_${type}_response`]: {
           status_code: status,
-          mime_type: coalesceCaseInsensitive(headers, "content-type", null),
           headers,
+          return_value: mapMaybe(body, compileParameterSerialReturn),
         },
       };
     }
-    /* c8 ignore start */
-    assert(false, "invalid return event type");
-    /* c8 ignore stop */
   };
 
   const compileParameterPrimitive = (name, primitive) => ({
@@ -158,27 +142,35 @@ export default (dependencies) => {
   const compileParameterPrimitiveTuple = ([name, primitive]) =>
     compileParameterPrimitive(name, primitive);
 
+  const compileSpecific = (specific) => {
+    if (specific === null) {
+      return null;
+    } else if (specific.type === "array") {
+      return { size: specific.length };
+    } else if (specific.type === "hash") {
+      return { size: specific.length, properties: specific.properties };
+    } else {
+      return null;
+    }
+  };
+
   const compileParameterSerial = (name, serial) => {
-    const {
-      type,
-      constructor: _constructor,
-      index,
-      truncated,
-      print,
-    } = {
-      type: null,
-      constructor: null,
-      index: null,
-      truncated: false,
-      print: null,
-      ...serial,
-    };
-    return {
-      name,
-      class: _constructor === null ? type : _constructor,
-      object_id: index,
-      value: truncated ? `${print} ...` : print,
-    };
+    if (serial.type === "object" || serial.type === "function") {
+      return {
+        name,
+        class: serial.constructor,
+        object_id: serial.index,
+        value: serial.print,
+        ...compileSpecific(serial.specific),
+      };
+    } else {
+      return {
+        name,
+        class: serial.type,
+        object_id: serial.type === "symbol" ? serial.index : null,
+        value: serial.print,
+      };
+    }
   };
 
   const compileParameterSerialReturn = (serial) =>
@@ -190,36 +182,32 @@ export default (dependencies) => {
   const compileParameterSerialTuple = ([name, serial]) =>
     compileParameterSerial(name, serial);
 
+  const extractErrorSpecific = (specific) =>
+    specific !== null && specific.type === "error"
+      ? specific
+      : { message: null, stack: null };
+
   const compileExceptionSerial = (serial) => {
-    const {
-      type,
-      constructor: _constructor,
-      index,
-      specific,
-    } = {
-      type: null,
-      constructor: null,
-      index: null,
-      specific: null,
-      ...serial,
-    };
-    let stack = null;
-    let message = null;
-    if (specific !== null) {
-      const { type } = specific;
-      if (type === "error") {
-        ({ stack, message } = specific);
-      }
+    if (serial.type === "object" || serial.type === "function") {
+      const { message, stack } = extractErrorSpecific(serial.specific);
+      return {
+        class: serial.constructor,
+        message,
+        object_id: serial.index,
+        // TODO: extract path from stack
+        path: stack,
+        // TODO: extract line number from stack
+        lineno: null,
+      };
+    } else {
+      return {
+        class: serial.type,
+        message: null,
+        object_id: serial.type === "symbol" ? serial.index : null,
+        path: null,
+        lineno: null,
+      };
     }
-    return {
-      class: _constructor === null ? type : _constructor,
-      message,
-      object_id: index,
-      // TODO: extract path from stack
-      path: stack,
-      // TODO: extract line number from stack
-      lineno: null,
-    };
   };
 
   return {

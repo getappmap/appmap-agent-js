@@ -5,7 +5,7 @@ import Completion from "./completion.mjs";
 import Amend from "./amend.mjs";
 import Stack from "./stack.mjs";
 
-const VERSION = "1.6.0";
+const VERSION = "1.8.0";
 
 export default (dependencies) => {
   const {
