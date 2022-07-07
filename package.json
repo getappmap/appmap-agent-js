@@ -42,7 +42,7 @@
     "posix-socket-messaging": "0.0.1"
   },
   "dependencies": {
-    "@appland/appmap-validate": "^2.0.0",
+    "@appland/appmap-validate": "^2.3.0",
     "@babel/parser": "^7.15.8",
     "acorn": "^8.5.0",
     "ajv": "^8.6.3",
