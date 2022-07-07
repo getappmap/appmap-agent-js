@@ -45,11 +45,6 @@
     - manual
     - remote
 
-- $id: serialization-method
-  enum:
-    - toString
-    - Object.prototype.toString
-
 - $id: stdio-stream
   enum:
     - ignore
@@ -221,6 +216,24 @@
     recursive: {type: boolean}
 
 # other #
+
+- $id: serialization
+  type: object
+  additionalProperties: false
+  properties:
+    maximum-print-length:
+      type: number
+      nullable: true
+      minimum: 0
+    maximum-properties-length:
+      type: number
+      nullable: true
+      minimum: 0
+    impure-printing: {type: boolean}
+    impure-constructor-naming: {type: boolean}
+    impure-array-inspection: {type: boolean}
+    impure-error-inspection: {type: boolean}
+    impure-hash-inspection: {type: boolean}
 
 - $id: package
   type: object
@@ -482,17 +495,7 @@
     collapse-package-hierachy: {type: boolean}
     recording: {$ref: recording}
     serialization:
-      anyOf:
-        - type: string
-        - type: object
-          additionalProperties: false
-          properties:
-            method: {$ref: serialization-method}
-            include-constructor-name: {type: boolean}
-            maximum-length:
-              type: integer
-              minimum: 0
-              nullable: true
+      $ref: serialization
     pruning: {type: boolean}
     appmap_dir: {$ref: path}
     appmap_file: {$ref: basename}
@@ -625,16 +628,17 @@
         - const: null
         - $ref: recording-object
     serialization:
-      type: object
-      additionalProperties: false
-      required: [maximum-length, include-constructor-name, method]
-      properties:
-        maximum-length:
-          type: integer
-          minimum: 0
-          nullable: true
-        include-constructor-name: {type: boolean}
-        method: {$ref: serialization-method}
+      allOf:
+        - $ref: serialization
+        - type: object
+          required:
+            - maximum-print-length
+            - maximum-properties-length
+            - impure-printing
+            - impure-constructor-naming
+            - impure-array-inspection
+            - impure-error-inspection
+            - impure-hash-inspection
     pruning: {type: boolean}
     appmap_dir: {$ref: url}
     appmap_file:

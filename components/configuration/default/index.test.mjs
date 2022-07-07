@@ -118,24 +118,32 @@ assertDeepEqual(extend("recording", "foo.bar"), {
 
 // frameworks //
 
-assertDeepEqual(extend("frameworks", ["foo@bar", {name:"foo", version: "bar"}, "foo", {name:"foo", version:null}]), [
-  {
-    name: "foo",
-    version: "bar",
-  },
-  {
-    name: "foo",
-    version: "bar",
-  },
-  {
-    name: "foo",
-    version: null,
-  },
-  {
-    name: "foo",
-    version: null,
-  },
-]);
+assertDeepEqual(
+  extend("frameworks", [
+    "foo@bar",
+    { name: "foo", version: "bar" },
+    "foo",
+    { name: "foo", version: null },
+  ]),
+  [
+    {
+      name: "foo",
+      version: "bar",
+    },
+    {
+      name: "foo",
+      version: "bar",
+    },
+    {
+      name: "foo",
+      version: null,
+    },
+    {
+      name: "foo",
+      version: null,
+    },
+  ],
+);
 
 // processes //
 
@@ -148,14 +156,6 @@ assertDeepEqual(extend("processes", "/foo", "file:///base", "file:///home"), [
   [{ base: "file:///base", source: "^(?:\\/foo)$", flags: "" }, true],
   [true, true],
 ]);
-
-// serialization //
-
-assertDeepEqual(extend("serialization", "toString", null), {
-  method: "toString",
-  "maximum-length": 96,
-  "include-constructor-name": true,
-});
 
 // command //
 
