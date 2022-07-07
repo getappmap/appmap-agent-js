@@ -1,15 +1,32 @@
-const { getOwnPropertyDescriptor, ownKeys } = Reflect;
-const _undefined = undefined;
+const {
+  undefined,
+  Object,
+  Reflect: { getOwnPropertyDescriptor, ownKeys, defineProperty },
+} = globalThis;
 
-export const hasOwnProperty = (object, key) =>
-  getOwnPropertyDescriptor(object, key) !== _undefined;
+const NULL_DATA_DESCRIPTOR = {
+  __proto__: null,
+  value: null,
+  writable: true,
+  enumerable: true,
+  configurable: true,
+};
 
-export const getOwnPropertyValue = (object, key, _default) => {
-  const descriptor = getOwnPropertyDescriptor(object, key);
-  if (descriptor === _undefined || !hasOwnProperty(descriptor, "value")) {
-    return _default;
+/* c8 ignore start */
+export const hasOwnProperty =
+  getOwnPropertyDescriptor(Object, "hasOwn") === undefined
+    ? (object, key) => getOwnPropertyDescriptor(object, key) !== undefined
+    : Object.hasOwn;
+/* c8 ignore stop */
+
+export const getOwnProperty = (object, key, _default) =>
+  hasOwnProperty(object, key) ? object[key] : _default;
+
+export const setOwnProperty = (object, key, value) => {
+  if (!hasOwnProperty(object, key)) {
+    defineProperty(object, key, NULL_DATA_DESCRIPTOR);
   }
-  return descriptor.value;
+  object[key] = value;
 };
 
 export const assignProperty = ({ object, key, value }) => {
@@ -21,7 +38,7 @@ export const coalesce = (value, key, _default) => {
     typeof value === "function" ||
     (typeof value === "object" && value !== null)
   ) {
-    return getOwnPropertyValue(value, key, _default);
+    return getOwnProperty(value, key, _default);
   }
   return _default;
 };
@@ -34,7 +51,7 @@ export const coalesceCaseInsensitive = (value, key1, _default) => {
     key1 = key1.toLowerCase();
     for (const key2 of ownKeys(value)) {
       if (key2.toLowerCase() === key1) {
-        return getOwnPropertyValue(value, key2, _default);
+        return getOwnProperty(value, key2, _default);
       }
     }
   }

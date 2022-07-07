@@ -5,7 +5,8 @@ import {
 } from "../../__fixture__.mjs";
 import {
   hasOwnProperty,
-  getOwnPropertyValue,
+  getOwnProperty,
+  setOwnProperty,
   coalesce,
   coalesceCaseInsensitive,
   mapMaybe,
@@ -48,27 +49,26 @@ assertEqual(hasOwnProperty({ key: "bar" }, "key"), true);
 
 assertEqual(hasOwnProperty({ __proto__: { key: "bar" } }, "key"), false);
 
-// getOwnPropertyValue //
+// getOwnProperty //
 
-assertEqual(getOwnPropertyValue({ key: "value" }, "key", "default"), "value");
+assertEqual(getOwnProperty({ key: "value" }, "key", "default"), "value");
 
-assertEqual(
-  getOwnPropertyValue({ key: "value" }, "missing", "default"),
-  "default",
-);
+assertEqual(getOwnProperty({ key: "value" }, "missing", "default"), "default");
 
-assertEqual(
-  getOwnPropertyValue(
-    {
+// setOwnProperty //
+
+{
+  const obj = {
+    __proto__: {
+      set key(value) {},
       get key() {
-        return "value";
+        return "VALUE";
       },
     },
-    "key",
-    "default",
-  ),
-  "default",
-);
+  };
+  assertEqual(setOwnProperty(obj, "key", "value"), undefined);
+  assertEqual(getOwnProperty(obj, "key", "default"), "value");
+}
 
 // coalesce //
 
