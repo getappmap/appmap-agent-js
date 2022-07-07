@@ -82,7 +82,7 @@ assertDeepEqual(
     database: "database",
     version: "version",
     sql: "sql",
-    parameters: { name: { type: "string", print: "parameter" } },
+    parameters: { name: { type: "string", print: '"parameter"' } },
   }),
 );
 assertDeepEqual(

@@ -111,7 +111,7 @@ assertDeepEqual(
   }),
   createTrace(
     "SELECT ? AS solution;",
-    [{ type: "string", print: "foo" }],
+    [{ type: "string", print: '"foo"' }],
     null,
   ),
 );
