@@ -16,6 +16,8 @@ const {
   recordEndApply,
   recordBeforeQuery,
   recordAfterQuery,
+  recordBeforeClient,
+  recordAfterClient,
 } = Recording(dependencies);
 const configuration = createConfiguration("file:///home");
 const recording = createRecording(configuration);

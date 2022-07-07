@@ -50,13 +50,13 @@ assertDeepEqual(
 
 const events = [
   makeEvent("begin", 1, 0, "bundle", null),
-  makeEvent("before", 2, 0, "request", {
+  makeEvent("before", 2, 0, "client", {
     protocol: "HTTP/1.1",
     method: "GET",
     url: "/path/?key=value",
     headers: { __proto__: null, host: `localhost:${String(port)}` },
   }),
-  makeEvent("after", 2, 0, "request", {
+  makeEvent("after", 2, 0, "client", {
     status: 200,
     message: "ok",
     headers: {

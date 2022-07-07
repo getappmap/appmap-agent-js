@@ -56,7 +56,7 @@ export default (dependencies) => {
         ),
       };
     }
-    if (type === "response") {
+    if (type === "server") {
       const { protocol, method, url, headers, route } = data;
       const { pathname, search } = parseURL(url, headers);
       return {
@@ -93,7 +93,7 @@ export default (dependencies) => {
         message: toEntries(parameters).map(compileParameterSerialTuple),
       };
     }
-    if (type === "request") {
+    if (type === "client") {
       const { method, url, headers } = data;
       const { origin, pathname, search } = parseURL(url, headers);
       return {

@@ -17,11 +17,11 @@ export default (dependencies) => {
     patch: { patch },
     agent: {
       requestRemoteAgentAsync,
-      recordBeginResponse,
-      recordEndResponse,
+      recordBeginServer,
+      recordEndServer,
       recordBeforeJump,
       recordAfterJump,
-      amendBeginResponse,
+      amendBeginServer,
     },
     http: { generateRespond },
   } = dependencies;
@@ -63,7 +63,7 @@ export default (dependencies) => {
         url,
         route: null,
       };
-      bundle_index = recordBeginResponse(agent, data);
+      bundle_index = recordBeginServer(agent, data);
       // Give time for express to populate the request
       nextTick(() => {
         if (
@@ -71,7 +71,7 @@ export default (dependencies) => {
           typeof coalesce(request, "route", _undefined) === "object" &&
           typeof coalesce(request.route, "path", _undefined) === "string"
         ) {
-          amendBeginResponse(agent, bundle_index, {
+          amendBeginServer(agent, bundle_index, {
             ...data,
             route: `${request.baseUrl}${request.route.path}`,
           });

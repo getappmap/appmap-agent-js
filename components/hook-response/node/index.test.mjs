@@ -107,7 +107,7 @@ assertDeepEqual(
     time,
     data: { type: data_type, ...data_rest },
   }) => {
-    if (data_type === "response") {
+    if (data_type === "server") {
       data_rest.headers = null;
     }
     return makeEvent(type, index, time, data_type, data_rest);
@@ -159,7 +159,7 @@ assertDeepEqual(
   assertDeepEqual(
     [...events.slice(0, 4), events[events.length - 1]],
     [
-      makeEvent("begin", 1, 0, "response", {
+      makeEvent("begin", 1, 0, "server", {
         protocol: "HTTP/1.1",
         method: "GET",
         headers: null,
@@ -167,7 +167,7 @@ assertDeepEqual(
         route: null,
       }),
       makeJump(2)[0],
-      makeEvent("begin", 1, 0, "response", {
+      makeEvent("begin", 1, 0, "server", {
         protocol: "HTTP/1.1",
         method: "GET",
         headers: null,
@@ -175,7 +175,7 @@ assertDeepEqual(
         route: "/route/*/:param1/:param2",
       }),
       makeJump(2)[1],
-      makeEvent("end", 1, 0, "response", {
+      makeEvent("end", 1, 0, "server", {
         status: 200,
         message: "OK",
         headers: null,

@@ -11,8 +11,8 @@ export default (dependencies) => {
     agent: {
       recordBeginBundle,
       recordEndBundle,
-      recordBeforeRequest,
-      recordAfterRequest,
+      recordBeforeClient,
+      recordAfterClient,
     },
   } = dependencies;
   return {
@@ -35,7 +35,7 @@ export default (dependencies) => {
           const { method, path: url } = request;
           const headers = request.getHeaders();
           index1 = recordBeginBundle(agent, null);
-          index2 = recordBeforeRequest(agent, {
+          index2 = recordBeforeClient(agent, {
             protocol: "HTTP/1.1",
             method,
             url,
@@ -51,7 +51,7 @@ export default (dependencies) => {
           // Hoopfully, this is triggered before user 'end' handlers.
           // Use of removeAllListeners or prependListener will break this assumption.
           response.on("end", () => {
-            recordAfterRequest(agent, index2, {
+            recordAfterClient(agent, index2, {
               status,
               message,
               headers,

@@ -9,15 +9,15 @@ export default (dependencies) => {
       getSerializationEmptyValue,
       recordBeginBundle,
       recordBeginApply,
-      recordBeginResponse,
+      recordBeginServer,
       recordBeforeJump,
-      recordBeforeRequest,
+      recordBeforeClient,
       recordBeforeQuery,
       recordEndBundle,
       recordEndApply,
-      recordEndResponse,
+      recordEndServer,
       recordAfterJump,
-      recordAfterRequest,
+      recordAfterClient,
       recordAfterQuery,
     },
   } = dependencies;
@@ -134,9 +134,9 @@ export default (dependencies) => {
       },
     ),
     recordServerRequest: generateRecord(
-      recordBeginResponse,
+      recordBeginServer,
       generateSanitizeRequest("BeginResponseEvent"),
-      recordEndResponse,
+      recordEndServer,
       generateSanitizeResponse("EndResponseEvent"),
     ),
     recordBeforeJump: generateRecord(
@@ -169,9 +169,9 @@ export default (dependencies) => {
       },
     ),
     recordClientRequest: generateRecord(
-      recordBeforeRequest,
+      recordBeforeClient,
       generateSanitizeRequest("BeforeRequestEvent"),
-      recordAfterRequest,
+      recordAfterClient,
       generateSanitizeResponse("AfterRequestEvent"),
     ),
   };
