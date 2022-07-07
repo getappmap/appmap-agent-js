@@ -4,7 +4,7 @@ import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
 } from "../../build.mjs";
-import HookRequest from "./index.mjs";
+import HookHttpClient from "./index.mjs";
 
 const { createServer } = Http;
 
@@ -12,7 +12,7 @@ const dependencies = await buildTestDependenciesAsync(import.meta.url);
 const { testHookAsync, makeEvent } = await buildTestComponentAsync(
   "hook-fixture",
 );
-const component = HookRequest(dependencies);
+const component = HookHttpClient(dependencies);
 
 const server = createServer();
 server.on("request", (request, response) => {
@@ -55,11 +55,13 @@ const events = [
     protocol: "HTTP/1.1",
     method: "GET",
     url: "/path/?key=value",
+    route: null,
     headers: { __proto__: null, host: `localhost:${String(port)}` },
+    body: null,
   }),
   makeEvent("after", 2, 0, "client", {
     status: 200,
-    message: "ok",
+    message: "OK",
     headers: {
       "content-type": "application/json; charset=utf-8",
       "transfer-encoding": "chunked",

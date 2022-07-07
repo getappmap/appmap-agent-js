@@ -4,5 +4,5 @@ dependencies:
   - hook-group
   - hook-module
   - hook-query
-  - hook-request
-  - hook-response
+  - hook-http-server
+  - hook-http-client

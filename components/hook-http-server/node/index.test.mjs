@@ -9,7 +9,7 @@ import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
 } from "../../build.mjs";
-import HookResponse from "./index.mjs";
+import HookHttpServer from "./index.mjs";
 
 const { get } = Http;
 
@@ -17,7 +17,7 @@ const dependencies = await buildTestDependenciesAsync(import.meta.url);
 const { testHookAsync, makeEvent } = await buildTestComponentAsync(
   "hook-fixture",
 );
-const component = HookResponse(dependencies);
+const component = HookHttpServer(dependencies);
 
 const listenAsync = (server, port) =>
   new Promise((resolve, reject) => {
