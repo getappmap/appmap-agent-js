@@ -32,10 +32,10 @@ export default (dependencies) => {
       );
       defineProperty(object, key, {
         __proto__: null,
-        writable: false,
-        enumerable: false,
+        writable: descriptor.writable,
+        enumerable: descriptor.enumerable,
         value,
-        configurable: true,
+        configurable: descriptor.configurable,
       });
       return descriptor.value;
     },

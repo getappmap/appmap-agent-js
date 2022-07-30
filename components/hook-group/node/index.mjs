@@ -21,6 +21,7 @@ export default (dependencies) => {
       const stack = [];
       const hook = createHook({
         init: (id, description, origin) => {
+          if (groups.has(id)) return;
           assert(!groups.has(id), "duplicate async id");
           groups.set(id, {
             bundle_index: recordBeginBundle(agent, null),
@@ -28,6 +29,7 @@ export default (dependencies) => {
           });
         },
         destroy: (id) => {
+          if (stack[stack.length - 1] === id) return;
           if (groups.has(id)) {
             assert(
               stack[stack.length - 1] !== id,
@@ -54,6 +56,7 @@ export default (dependencies) => {
           }
         },
         after: (id) => {
+          if (!groups.has(id)) return;
           assert(groups.has(id), "missing async id (after)");
           assert(stack.pop() === id, "async id mismatch");
           const group = groups.get(id);

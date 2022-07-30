@@ -1,8 +1,8 @@
-import Escodegen from "escodegen";
-import * as Acorn from "acorn";
+import { parse } from "@babel/parser";
+import * as babel from "@babel/generator";
 
-const { generate: generateEstree } = Escodegen;
-const { parse: parseEstree } = Acorn;
+
+const generateEstree = babel.default.default;
 
 import Visit from "./visit.mjs";
 
@@ -80,13 +80,7 @@ export default (dependencies) => {
           visit(
             expectSuccess(
               () =>
-                parseEstree(content, {
-                  allowHashBang: true,
-                  sourceType: type,
-                  allowAwaitOutsideFunction: type === "module",
-                  ecmaVersion: "latest",
-                  locations: true,
-                }),
+                parse(content),
               "failed to parse file %j >> %O",
               url,
             ),

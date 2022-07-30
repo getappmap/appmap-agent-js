@@ -1,8 +1,13 @@
+import { parse } from "@babel/parser";
+import * as babel from "@babel/generator";
+
+const generate = babel.default.default;
 const _String = String;
 const { isArray } = Array;
 const { fromEntries } = Object;
 const { ownKeys } = Reflect;
 
+let count = 0;
 //////////////////////////////
 // Difficulties with groups //
 //////////////////////////////
@@ -147,10 +152,28 @@ const makeIdentifier = (name) => ({
   name,
 });
 
-const makeLiteral = (name) => ({
-  type: "Literal",
-  value: name,
-});
+const makeLiteral = (value) => {
+  let type;
+  switch (typeof value) {
+    case 'string': type = 'StringLiteral'; break;
+    case 'number': type = 'NumericLiteral'; break;
+    case 'boolean': type = 'BooleanLiteral'; break;
+    case 'bigint': type = 'BigIntLiteral'; break;
+    default: {
+      if (value === null) {
+        type = 'NullLiteral';
+      } else if (value instanceof RegExp) {
+        type = 'RegExpLiteral';
+      }
+    }
+  }
+
+  if (typeof type === 'undefined') {
+    throw new Error(`could not resolve node type for literal value ${value}`);
+  }
+
+  return { type, value };
+};
 
 const makeVariableDeclaration = (kind, nodes) => ({
   type: "VariableDeclaration",
@@ -199,7 +222,7 @@ export default (dependencies) => {
     expect: { expect },
     util: { assert, hasOwnProperty, coalesce },
     source: { mapSource },
-    log: { logGuardDebug },
+    log: { logGuardDebug, logWarning },
     location: { stringifyLocation, getLocationFileURL },
   } = dependencies;
 
@@ -554,6 +577,17 @@ export default (dependencies) => {
             context.runtime,
           );
         }
+        const maxCount = 0;
+        if (type === "StringLiteral" && parent.type === "CallExpression" && parent.callee.name === "eval" && count++ < maxCount ) {
+          try {
+          const ast = parse(node.value);
+          const { code } = generate(visit(ast, { type: "File" }, { type: "Root" }, instrumented, context));
+          return makeLiteral(code);
+          } catch (e) {
+            logWarning(`failed transforming eval source at ${context.url}:${parent.loc.start.line}`);
+            logWarning(e.stack);
+          }
+        }
       }
       return visitGeneric(node, parent, instrumented, context);
     }
@@ -564,13 +598,13 @@ export default (dependencies) => {
   return {
     visit: (node, context) => {
       assert(
-        node.type === "Program",
-        "expected program as top level estree node",
+        node.program,
+        "expected program at top level node",
       );
       // Top level async jump only present in module.
       // Avoid poluting global scope in script.
       return visit(
-        node,
+        node.program,
         initial_parent,
         initial_grand_parent,
         node.sourceType === "module",
