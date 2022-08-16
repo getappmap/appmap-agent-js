@@ -6,7 +6,7 @@ const { fromEntries, entries: toEntries } = Object;
 export default (dependencies) => {
   const {
     time: { now },
-    util: { returnSecond, constant, createCounter, incrementCounter },
+    util: { constant, createCounter, incrementCounter },
     serialization: {
       createSerialization,
       serialize,
@@ -53,6 +53,26 @@ export default (dependencies) => {
           ]),
         ),
   });
+  const serializeRequest = (
+    serialization,
+    { protocol, method, url, route, headers, body },
+  ) => ({
+    protocol,
+    method,
+    url,
+    route,
+    headers,
+    body: serialize(serialization, body),
+  });
+  const serializeResponse = (
+    serialization,
+    { status, message, headers, body },
+  ) => ({
+    status,
+    message,
+    headers,
+    body: serialize(serialization, body),
+  });
   const serializeAfterQuery = (serialization, { error }) => ({
     error: serialize(serialization, error),
   });
@@ -70,13 +90,13 @@ export default (dependencies) => {
     recordEndBundle: generateRecord("end", "bundle", returnNull),
     recordBeginApply: generateRecord("begin", "apply", serializeBeforeApply),
     recordEndApply: generateRecord("end", "apply", serializeAfterApply),
-    recordBeginResponse: generateRecord("begin", "response", returnSecond),
-    recordEndResponse: generateRecord("end", "response", returnSecond),
+    recordBeginServer: generateRecord("begin", "server", serializeRequest),
+    recordEndServer: generateRecord("end", "server", serializeResponse),
     // jump //
     recordBeforeJump: generateRecord("before", "jump", returnNull),
     recordAfterJump: generateRecord("after", "jump", returnNull),
-    recordBeforeRequest: generateRecord("before", "request", returnSecond),
-    recordAfterRequest: generateRecord("after", "request", returnSecond),
+    recordBeforeClient: generateRecord("before", "client", serializeRequest),
+    recordAfterClient: generateRecord("after", "client", serializeResponse),
     recordBeforeQuery: generateRecord("before", "query", serializeBeforeQuery),
     recordAfterQuery: generateRecord("after", "query", serializeAfterQuery),
   };

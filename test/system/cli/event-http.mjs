@@ -84,11 +84,11 @@ await runAsync(
         parent_id: 1,
         http_client_response: {
           status_code: 200,
-          mime_type: null,
           headers: {
             connection: "close",
             "transfer-encoding": "chunked",
           },
+          return_value: null,
         },
       },
       {
@@ -96,16 +96,14 @@ await runAsync(
         event: "call",
         thread_id: 0,
         http_server_request: {
+          protocol: "HTTP/1.1",
+          request_method: "GET",
+          path_info: "/",
+          normalized_path_info: null,
           headers: {
             host: "localhost:8888",
             connection: "close",
           },
-          authorization: null,
-          mime_type: null,
-          request_method: "GET",
-          path_info: "/",
-          normalized_path_info: null,
-          protocol: "HTTP/1.1",
         },
         message: [],
       },
@@ -116,7 +114,8 @@ await runAsync(
         parent_id: 3,
         http_server_response: {
           status_code: 200,
-          mime_type: null,
+          headers: {},
+          return_value: null,
         },
       },
     ]);

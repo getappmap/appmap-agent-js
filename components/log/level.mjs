@@ -19,6 +19,8 @@ const get = (map, key) => {
 
 const noop = () => {};
 
+// const returnNoop = () => () => {};
+
 export const levelLog = (logs, min_level_name) => {
   const min_level = get(levels, min_level_name);
   return fromEntries(
@@ -36,6 +38,14 @@ export const levelLog = (logs, min_level_name) => {
               }
             : noop,
         ],
+        // [
+        //   `bindLog${level_name}`,
+        //   get(levels, level_name) >= min_level
+        //     ? (...xs) => (...ys) => {
+        //       log(xs.concat(ys));
+        //     }
+        //     : returnNoop,
+        // ],
       ];
     }),
   );

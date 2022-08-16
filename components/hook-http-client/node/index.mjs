@@ -7,12 +7,14 @@ const _Proxy = Proxy;
 
 export default (dependencies) => {
   const {
-    util: { assignProperty },
+    util: { assignProperty, getOwnProperty },
+    "hook-http": { parseContentType, decodeSafe, parseJSONSafe, spyReadable },
     agent: {
+      getSerializationEmptyValue,
       recordBeginBundle,
       recordEndBundle,
-      recordBeforeRequest,
-      recordAfterRequest,
+      recordBeforeClient,
+      recordAfterClient,
     },
   } = dependencies;
   return {
@@ -35,11 +37,13 @@ export default (dependencies) => {
           const { method, path: url } = request;
           const headers = request.getHeaders();
           index1 = recordBeginBundle(agent, null);
-          index2 = recordBeforeRequest(agent, {
+          index2 = recordBeforeClient(agent, {
             protocol: "HTTP/1.1",
             method,
             url,
+            route: null,
             headers,
+            body: getSerializationEmptyValue(agent),
           });
         });
         request.on("response", (response) => {
@@ -48,13 +52,30 @@ export default (dependencies) => {
             statusCode: status,
             statusMessage: message,
           } = response;
-          // Hoopfully, this is triggered before user 'end' handlers.
+          let body = getSerializationEmptyValue(agent);
+          const { type, subtype, parameters } = parseContentType(
+            getOwnProperty(headers, "content-type", "text/plain"),
+          );
+          if (type === "application" && subtype === "json") {
+            spyReadable(response, (buffer) => {
+              const maybe = decodeSafe(
+                buffer,
+                getOwnProperty(parameters, "charset", "utf-8"),
+                null,
+              );
+              if (maybe !== null) {
+                body = parseJSONSafe(maybe, getSerializationEmptyValue(agent));
+              }
+            });
+          }
+          // Hopefully, this is triggered before user 'end' handlers.
           // Use of removeAllListeners or prependListener will break this assumption.
           response.on("end", () => {
-            recordAfterRequest(agent, index2, {
+            recordAfterClient(agent, index2, {
               status,
               message,
               headers,
+              body,
             });
           });
           nextTick(() => {

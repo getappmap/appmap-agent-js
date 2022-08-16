@@ -9,15 +9,15 @@ export default (dependencies) => {
       getSerializationEmptyValue,
       recordBeginBundle,
       recordBeginApply,
-      recordBeginResponse,
+      recordBeginServer,
       recordBeforeJump,
-      recordBeforeRequest,
+      recordBeforeClient,
       recordBeforeQuery,
       recordEndBundle,
       recordEndApply,
-      recordEndResponse,
+      recordEndServer,
       recordAfterJump,
-      recordAfterRequest,
+      recordAfterClient,
       recordAfterQuery,
     },
   } = dependencies;
@@ -66,6 +66,7 @@ export default (dependencies) => {
       url: "/",
       headers: {},
       route: null,
+      body: empty,
       ...data,
     };
     expectType(location, data, "protocol", "string");
@@ -82,6 +83,7 @@ export default (dependencies) => {
       status: 200,
       message: "OK",
       headers: {},
+      body: empty,
       ...data,
     };
     expectType(location, data, "status", "number");
@@ -134,9 +136,9 @@ export default (dependencies) => {
       },
     ),
     recordServerRequest: generateRecord(
-      recordBeginResponse,
+      recordBeginServer,
       generateSanitizeRequest("BeginResponseEvent"),
-      recordEndResponse,
+      recordEndServer,
       generateSanitizeResponse("EndResponseEvent"),
     ),
     recordBeforeJump: generateRecord(
@@ -169,9 +171,9 @@ export default (dependencies) => {
       },
     ),
     recordClientRequest: generateRecord(
-      recordBeforeRequest,
+      recordBeforeClient,
       generateSanitizeRequest("BeforeRequestEvent"),
-      recordAfterRequest,
+      recordAfterClient,
       generateSanitizeResponse("AfterRequestEvent"),
     ),
   };

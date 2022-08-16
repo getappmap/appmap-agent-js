@@ -7,8 +7,8 @@ export default (dependencies) => {
     "hook-group",
     "hook-module",
     "hook-query",
-    "hook-request",
-    "hook-response",
+    "hook-http-client",
+    "hook-http-server",
   ];
   return {
     transformSourceDefault,

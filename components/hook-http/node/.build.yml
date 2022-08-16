@@ -1,4 +1,4 @@
 branches: [test, node]
 dependencies:
-  - util
-  - agent
+  - log
+  - patch

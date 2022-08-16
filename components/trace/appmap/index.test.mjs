@@ -88,7 +88,7 @@ assertDeepEqual(
     { errors: [], status: 0 },
   ),
   {
-    version: "1.6.0",
+    version: "1.8.0",
     metadata: {
       name: null,
       app: null,

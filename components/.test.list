@@ -42,9 +42,10 @@
 - * hook-apply
   * hook-group
   * hook-module
-  * hook-request
-  * hook-response
   * hook-query
+  * - hook-http
+    - * hook-http-client
+      * hook-http-server
 - hook
 - * recorder-api
   * recorder-cli

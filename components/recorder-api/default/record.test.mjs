@@ -83,14 +83,15 @@ test(
   "begin",
   "end",
   {
-    type: "response",
+    type: "server",
     protocol: "HTTP/1.1",
     method: "GET",
     url: "/",
     headers: {},
     route: null,
+    body: null,
   },
-  { type: "response", status: 200, message: "OK", headers: {} },
+  { type: "server", status: 200, message: "OK", headers: {}, body: null },
 );
 
 test(
@@ -128,14 +129,15 @@ test(
   "before",
   "after",
   {
-    type: "request",
+    type: "client",
     protocol: "HTTP/1.1",
     method: "GET",
     url: "/",
-    headers: {},
     route: null,
+    headers: {},
+    body: null,
   },
-  { type: "request", status: 200, message: "OK", headers: {} },
+  { type: "client", status: 200, message: "OK", headers: {}, body: null },
 );
 
 test(
@@ -145,12 +147,13 @@ test(
   "before",
   "after",
   {
-    type: "request",
+    type: "client",
     protocol: "HTTP/1.1",
     method: "GET",
     url: "/",
-    headers: { key: "value" },
     route: "route",
+    headers: { key: "value" },
+    body: null,
   },
-  { type: "request", status: 200, message: "OK", headers: {} },
+  { type: "client", status: 200, message: "OK", headers: {}, body: null },
 );

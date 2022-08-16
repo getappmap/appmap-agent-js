@@ -111,7 +111,11 @@ const receptor = await openReceptorAsync(
     socket.end();
   });
   await closeReceptorAsync(receptor);
-  await readFileAsync(new URL(`${url}/directory/process/anonymous.appmap.json`));
-  await readFileAsync(new URL(`${url}/directory/process/anonymous-1.appmap.json`));
+  await readFileAsync(
+    new URL(`${url}/directory/process/anonymous.appmap.json`),
+  );
+  await readFileAsync(
+    new URL(`${url}/directory/process/anonymous-1.appmap.json`),
+  );
   await readFileAsync(new URL(`${url}/directory/process/map-name.appmap.json`));
 }

@@ -9,7 +9,7 @@ import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
 } from "../../build.mjs";
-import HookResponse from "./index.mjs";
+import HookHttpServer from "./index.mjs";
 
 const { get } = Http;
 
@@ -17,7 +17,7 @@ const dependencies = await buildTestDependenciesAsync(import.meta.url);
 const { testHookAsync, makeEvent } = await buildTestComponentAsync(
   "hook-fixture",
 );
-const component = HookResponse(dependencies);
+const component = HookHttpServer(dependencies);
 
 const listenAsync = (server, port) =>
   new Promise((resolve, reject) => {
@@ -50,7 +50,7 @@ const readAsync = (readable) =>
     const buffers = [];
     readable.on("error", reject);
     readable.on("data", (buffer) => {
-      buffers.add(buffer);
+      buffers.push(buffer);
     });
     readable.on("end", () => {
       resolve(Buffer.concat(buffers));
@@ -84,13 +84,13 @@ assertDeepEqual(
       const server = Http.createServer();
       server.on("request", async (request, response) => {
         await readAsync(request);
-        response.writeHead(200, "ok");
+        response.writeHead(200, "OK");
         response.end();
       });
       const port = await listenAsync(server, 0);
       assertDeepEqual(await requestAsync(Http.get({ port, path: "/path" })), {
         code: 200,
-        message: "ok",
+        message: "OK",
         body: "",
       });
       await closeAsync(server);
@@ -107,7 +107,7 @@ assertDeepEqual(
     time,
     data: { type: data_type, ...data_rest },
   }) => {
-    if (data_type === "response") {
+    if (data_type === "server") {
       data_rest.headers = null;
     }
     return makeEvent(type, index, time, data_type, data_rest);
@@ -124,6 +124,7 @@ assertDeepEqual(
         const server = Http.createServer();
         const app = createApp();
         app.get("/route/*/:param1/:param2", function (req, res) {
+          res.setHeader("content-type", "application/json; charset=utf-8");
           req.on("data", () => {});
           req.on("end", () => {
             res.send(JSON.stringify(req.params));
@@ -159,26 +160,43 @@ assertDeepEqual(
   assertDeepEqual(
     [...events.slice(0, 4), events[events.length - 1]],
     [
-      makeEvent("begin", 1, 0, "response", {
+      makeEvent("begin", 1, 0, "server", {
         protocol: "HTTP/1.1",
         method: "GET",
-        headers: null,
         url: "/route/foo/bar/qux",
         route: null,
+        headers: null,
+        body: null,
       }),
       makeJump(2)[0],
-      makeEvent("begin", 1, 0, "response", {
+      makeEvent("begin", 1, 0, "server", {
         protocol: "HTTP/1.1",
         method: "GET",
-        headers: null,
         url: "/route/foo/bar/qux",
         route: "/route/*/:param1/:param2",
+        headers: null,
+        body: null,
       }),
       makeJump(2)[1],
-      makeEvent("end", 1, 0, "response", {
+      makeEvent("end", 1, 0, "server", {
         status: 200,
         message: "OK",
         headers: null,
+        body: {
+          type: "object",
+          print: "[object Object]",
+          index: 1,
+          constructor: "Object",
+          specific: {
+            type: "hash",
+            length: 3,
+            properties: [
+              { name: "0", class: "String" },
+              { name: "param1", class: "String" },
+              { name: "param2", class: "String" },
+            ],
+          },
+        },
       }),
     ],
   );
@@ -212,7 +230,7 @@ assertDeepEqual(
         //   ),
         //   {
         //     code: 200,
-        //     message: "ok",
+        //     message: "OK",
         //     body: "",
         //   },
         // );

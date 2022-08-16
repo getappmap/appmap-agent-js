@@ -8,7 +8,7 @@ const EXPECTED_EXTRA_PROPERTIES = ["appmap_dir", "test_recording"];
 
 export default (dependencies) => {
   const {
-    log: {logGuardInfo},
+    log: { logGuardInfo },
     util: { hasOwnProperty, coalesce, identity },
     url: { urlifyPath },
     validate: { validateConfig },
@@ -116,13 +116,6 @@ export default (dependencies) => {
 
   const normalizeFrameworkArray = (frameworks) =>
     frameworks.map(normalizeFramework);
-
-  const normalizeSerialization = (serialization) => {
-    if (typeof serialization === "string") {
-      serialization = { method: serialization };
-    }
-    return serialization;
-  };
 
   const normalizePackageSpecifier = (specifier, base) => {
     if (typeof specifier === "string") {
@@ -302,7 +295,7 @@ export default (dependencies) => {
     },
     serialization: {
       extend: assign,
-      normalize: normalizeSerialization,
+      normalize: identity,
     },
     "hidden-identifier": {
       extend: overwrite,
@@ -441,9 +434,13 @@ export default (dependencies) => {
       "function-name-placeholder": "()",
       "collapse-package-hierachy": false,
       serialization: {
-        "maximum-length": 96,
-        "include-constructor-name": true,
-        method: "toString",
+        "maximum-print-length": 100,
+        "maximum-properties-length": 10,
+        "impure-printing": true,
+        "impure-constructor-naming": true,
+        "impure-array-inspection": true,
+        "impure-error-inspection": true,
+        "impure-hash-inspection": true,
       },
       "hidden-identifier": "APPMAP",
       language: "javascript",
