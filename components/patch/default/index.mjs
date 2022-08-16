@@ -1,5 +1,7 @@
-const _undefined = undefined;
 const { getPrototypeOf, defineProperty, getOwnPropertyDescriptor } = Reflect;
+
+const _undefined = undefined;
+
 export default (dependencies) => {
   const {
     expect: { expect },
@@ -7,37 +9,49 @@ export default (dependencies) => {
   } = dependencies;
   return {
     patch: (object, key, value) => {
-      expect(
-        !hasOwnProperty(object, key),
-        "cannot patch object because it has %j as own property",
-        key,
-      );
-      let descriptor = _undefined;
-      for (
-        let prototype = object;
-        prototype !== null && descriptor === _undefined;
-        prototype = getPrototypeOf(prototype)
-      ) {
-        descriptor = getOwnPropertyDescriptor(prototype, key);
+      if (hasOwnProperty(object, key)) {
+        const descriptor = getOwnPropertyDescriptor(object, key);
+        expect(
+          hasOwnProperty(descriptor, "value"),
+          "cannot monkey-patch accessor property %j of object %o",
+          key,
+          object,
+        );
+        expect(
+          descriptor.configurable || descriptor.writable,
+          "cannot monkey-patch constant data property %j of object %o",
+          key,
+          object,
+        );
+        defineProperty(object, key, {
+          __proto__: descriptor,
+          value,
+        });
+        return descriptor.value;
+      } else {
+        defineProperty(object, key, {
+          __proto__: null,
+          writable: true,
+          enumerable: false,
+          value,
+          configurable: true,
+        });
+        object = getPrototypeOf(object);
+        while (object !== null) {
+          if (hasOwnProperty(object, key)) {
+            const descriptor = getOwnPropertyDescriptor(object, key);
+            expect(
+              hasOwnProperty(descriptor, "value"),
+              "cannot monkey-patch accessor property %j of prototype %o",
+              key,
+              object,
+            );
+            return descriptor.value;
+          }
+          object = getPrototypeOf(object);
+        }
+        return _undefined;
       }
-      expect(
-        descriptor !== _undefined,
-        "cannot patch object because %j is not present in it prototype chain",
-        key,
-      );
-      expect(
-        hasOwnProperty(descriptor, "value"),
-        "cannot path object because %j is an accessor property",
-        key,
-      );
-      defineProperty(object, key, {
-        __proto__: null,
-        writable: false,
-        enumerable: false,
-        value,
-        configurable: true,
-      });
-      return descriptor.value;
     },
   };
 };

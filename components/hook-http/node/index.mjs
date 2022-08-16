@@ -4,7 +4,7 @@ const { from: toBuffer, concat: concatBuffer } = Buffer;
 const {
   Object: { fromEntries },
   TextDecoder,
-  Reflect: { getPrototypeOf, apply },
+  Reflect: { apply },
   JSON: { parse: parseJSON },
 } = globalThis;
 
@@ -17,36 +17,36 @@ export default (dependencies) => {
     typeof chunk === "string" ? toBuffer(chunk, encoding) : chunk;
   const spyReadable = (readable, callback) => {
     const buffers = [];
-    patch(readable, "push", function (chunk, encoding) {
+    const original_push = patch(readable, "push", function (chunk, encoding) {
       if (chunk === null) {
         callback(concatBuffer(buffers));
       } else {
         buffers.push(normalizeChunk(chunk, encoding));
       }
-      return apply(getPrototypeOf(this).push, this, [chunk, encoding]);
+      return apply(original_push, this, [chunk, encoding]);
     });
   };
   const spyWritable = (writable, callback1) => {
     const buffers = [];
-    patch(writable, "write", function (chunk, encoding, callback2) {
-      buffers.push(normalizeChunk(chunk, encoding));
-      return apply(getPrototypeOf(this).write, this, [
-        chunk,
-        encoding,
-        callback2,
-      ]);
-    });
-    patch(writable, "end", function (chunk, encoding, callback2) {
-      if (chunk !== null && chunk !== undefined) {
+    const original_write = patch(
+      writable,
+      "write",
+      function (chunk, encoding, callback2) {
         buffers.push(normalizeChunk(chunk, encoding));
-      }
-      callback1(concatBuffer(buffers));
-      return apply(getPrototypeOf(this).end, this, [
-        chunk,
-        encoding,
-        callback2,
-      ]);
-    });
+        return apply(original_write, this, [chunk, encoding, callback2]);
+      },
+    );
+    const original_end = patch(
+      writable,
+      "end",
+      function (chunk, encoding, callback2) {
+        if (chunk !== null && chunk !== undefined) {
+          buffers.push(normalizeChunk(chunk, encoding));
+        }
+        callback1(concatBuffer(buffers));
+        return apply(original_end, this, [chunk, encoding, callback2]);
+      },
+    );
   };
   const parseJSONSafe = (string, recovery) => {
     try {

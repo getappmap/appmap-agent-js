@@ -163,13 +163,13 @@ export default (dependencies) => {
   const afterRequest = ({ resume, pause }, request, response) => {
     let depth = 0;
     const patchEmitter = (emitter) => {
-      patch(emitter, "emit", function emit(...args) {
+      const original_emit = patch(emitter, "emit", function emit(...args) {
         if (depth === 0) {
           resume();
         }
         depth += 1;
         try {
-          return apply(getPrototypeOf(this).emit, this, args);
+          return apply(original_emit, this, args);
         } finally {
           depth -= 1;
           if (depth === 0) {
@@ -193,9 +193,9 @@ export default (dependencies) => {
   const forwardTraffic = (state, server, request, response) =>
     apply(getPrototypeOf(server).emit, server, ["request", request, response]);
   const spyServer = (state, server, handleTraffic) => {
-    patch(server, "emit", function emit(name, ...args) {
+    const original_emit = patch(server, "emit", function emit(name, ...args) {
       if (name !== "request") {
-        return apply(getPrototypeOf(this).emit, this, [name, ...args]);
+        return apply(original_emit, this, [name, ...args]);
       }
       expect(
         args.length === 2,
