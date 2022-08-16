@@ -1,3 +1,12 @@
+# [11.2.0](https://github.com/applandinc/appmap-agent-js/compare/v11.1.0...v11.2.0) (2022-08-16)
+
+
+### Features
+
+* add specific serialization data for array and hash ([49da5d4](https://github.com/applandinc/appmap-agent-js/commit/49da5d40c9b3e802ba39921ec6a51de6c139a698))
+* capture http response body ([a6f3ffe](https://github.com/applandinc/appmap-agent-js/commit/a6f3ffe622d36eeb9c97e61a0e9bc0824389ae2c))
+* generate 1.8.0 appmaps ([a931920](https://github.com/applandinc/appmap-agent-js/commit/a931920986a17cf0af546a998b68a89b992bf773))
+
 # [11.1.0](https://github.com/applandinc/appmap-agent-js/compare/v11.0.0...v11.1.0) (2022-07-04)
 
 
