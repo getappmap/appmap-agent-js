@@ -462,51 +462,41 @@ export default (dependencies) => {
       return node.map((node) =>
         visit(node, parent, grand_parent, instrumented, context),
       );
-    }
-    if (
+    } else if (
       typeof node === "object" &&
       node !== null &&
       hasOwnProperty(node, "type")
     ) {
-      const { type } = node;
-      if (type === "Identifier") {
-        const { url, runtime } = context;
-        const {
-          name,
-          loc: {
-            start: { line, column },
-          },
-        } = node;
+      if (node.type === "Identifier") {
         expect(
-          !name.startsWith(runtime),
+          !node.name.startsWith(context.runtime),
           "Identifier collision detected at %j line %j column %j >> identifier should not start with %j, got: %j",
-          url,
-          line,
-          column,
-          runtime,
-          name,
+          context.url,
+          node.loc.start.line,
+          node.loc.start.column,
+          context.runtime,
+          node.name,
         );
-      }
-      if (
-        type === "ArrowFunctionExpression" ||
-        type === "FunctionExpression" ||
-        type === "FunctionDeclaration"
+        return makeIdentifier(node.name);
+      } else if (
+        node.type === "ArrowFunctionExpression" ||
+        node.type === "FunctionExpression" ||
+        node.type === "FunctionDeclaration"
       ) {
-        const { url, whitelist, mapping } = context;
-        const {
-          loc: {
-            start: { line, column },
-          },
-        } = node;
-        const location = mapSource(mapping, line, column);
+        const location = mapSource(
+          context.mapping,
+          node.loc.start.line,
+          node.loc.start.column,
+        );
         logGuardDebug(
           location === null,
           "Missing source map at file %j at line %j at column %j",
-          url,
-          line,
-          column,
+          context.url,
+          node.loc.start.line,
+          node.loc.start.column,
         );
-        return location !== null && whitelist.has(getLocationFileURL(location))
+        return location !== null &&
+          context.whitelist.has(getLocationFileURL(location))
           ? compileFunction(
               node,
               parent.type === "MethodDefinition" &&
@@ -518,47 +508,42 @@ export default (dependencies) => {
               context.runtime,
             )
           : visitGeneric(node, parent, false, context);
+      } else if (instrumented && node.type === "Program") {
+        return compileProgram(
+          node.sourceType,
+          visit(node.body, node, parent, instrumented, context),
+          context.runtime,
+        );
+      } else if (instrumented && node.type === "TryStatement") {
+        return compileTryStatement(
+          visit(node.block, node, parent, instrumented, context),
+          visit(node.handler, node, parent, instrumented, context),
+          visit(node.finalizer, node, parent, instrumented, context),
+          context.runtime,
+        );
+      } else if (instrumented && node.type === "AwaitExpression") {
+        return makeJumpExpression(
+          visit(node.argument, node, parent, instrumented, context),
+          makeAwaitExpression,
+          context.runtime,
+        );
+      } else if (instrumented && node.type === "YieldExpression") {
+        return makeJumpExpression(
+          visit(node.argument, node, parent, instrumented, context),
+          (expression) => makeYieldExpression(node.delegate, expression),
+          context.runtime,
+        );
+      } else if (instrumented && node.type === "ReturnStatement") {
+        return compileReturn(
+          visit(node.argument, node, parent, instrumented, context),
+          context.runtime,
+        );
+      } else {
+        return visitGeneric(node, parent, instrumented, context);
       }
-      if (instrumented) {
-        if (type === "Program") {
-          return compileProgram(
-            node.sourceType,
-            visit(node.body, node, parent, instrumented, context),
-            context.runtime,
-          );
-        }
-        if (type === "TryStatement") {
-          return compileTryStatement(
-            visit(node.block, node, parent, instrumented, context),
-            visit(node.handler, node, parent, instrumented, context),
-            visit(node.finalizer, node, parent, instrumented, context),
-            context.runtime,
-          );
-        }
-        if (type === "AwaitExpression") {
-          return makeJumpExpression(
-            visit(node.argument, node, parent, instrumented, context),
-            makeAwaitExpression,
-            context.runtime,
-          );
-        }
-        if (type === "YieldExpression") {
-          return makeJumpExpression(
-            visit(node.argument, node, parent, instrumented, context),
-            (expression) => makeYieldExpression(node.delegate, expression),
-            context.runtime,
-          );
-        }
-        if (type === "ReturnStatement") {
-          return compileReturn(
-            visit(node.argument, node, parent, instrumented, context),
-            context.runtime,
-          );
-        }
-      }
-      return visitGeneric(node, parent, instrumented, context);
+    } else {
+      return node;
     }
-    return node;
   };
   const initial_parent = { type: "File" };
   const initial_grand_parent = { type: "Root" };
