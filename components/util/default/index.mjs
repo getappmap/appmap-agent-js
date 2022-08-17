@@ -5,6 +5,7 @@ import * as Counter from "./counter.mjs";
 import * as Either from "./either.mjs";
 import * as Format from "./format.mjs";
 import * as Function from "./function.mjs";
+import * as Maybe from "./maybe.mjs";
 import * as Object from "./object.mjs";
 import * as Print from "./print.mjs";
 import * as Version from "./version.mjs";
@@ -19,6 +20,7 @@ export default (dependencies) => {
     ...Format,
     ...Function,
     ...Object,
+    ...Maybe,
     ...Print,
     ...Version,
   };
