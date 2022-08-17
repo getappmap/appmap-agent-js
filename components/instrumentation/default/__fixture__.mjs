@@ -1,4 +1,3 @@
-
 import * as Acorn from "acorn";
 import * as Astring from "astring";
 
