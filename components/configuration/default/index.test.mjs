@@ -5,7 +5,9 @@ import {
 } from "../../build.mjs";
 import Configuration from "./index.mjs";
 
-const { validateConfiguration } = await buildTestComponentAsync("validate");
+const { validateInternalConfiguration } = await buildTestComponentAsync(
+  "validate",
+);
 
 const { matchSpecifier } = await buildTestComponentAsync("specifier");
 
@@ -13,7 +15,7 @@ const { createConfiguration, extendConfiguration } = Configuration(
   await buildTestDependenciesAsync(import.meta.url),
 );
 
-validateConfiguration(createConfiguration("file:///home"));
+validateInternalConfiguration(createConfiguration("file:///home"));
 
 const extend = (
   name,
@@ -26,7 +28,7 @@ const extend = (
     { [name]: value1 },
     base,
   );
-  validateConfiguration(configuration);
+  validateInternalConfiguration(configuration);
   const { [name]: value2 } = configuration;
   return value2;
 };

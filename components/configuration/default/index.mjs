@@ -11,7 +11,7 @@ export default (dependencies) => {
     log: { logGuardInfo },
     util: { hasOwnProperty, coalesce, identity },
     url: { urlifyPath },
-    validate: { validateConfig },
+    validate: { validateExternalConfiguration },
     specifier: { createSpecifier },
   } = dependencies;
 
@@ -480,15 +480,19 @@ export default (dependencies) => {
       name: null,
       "map-name": null,
     }),
-    extendConfiguration: (configuration, config, base) => {
-      configuration = { ...configuration };
-      validateConfig(config);
-      for (let key of ownKeys(config)) {
+    extendConfiguration: (
+      internal_configuration,
+      external_configuration,
+      base,
+    ) => {
+      internal_configuration = { ...internal_configuration };
+      validateExternalConfiguration(external_configuration);
+      for (let key of ownKeys(external_configuration)) {
         if (hasOwnProperty(fields, key)) {
           const { normalize, extend } = fields[key];
-          configuration[key] = extend(
-            configuration[key],
-            normalize(config[key], base),
+          internal_configuration[key] = extend(
+            internal_configuration[key],
+            normalize(external_configuration[key], base),
           );
         } else {
           logGuardInfo(
@@ -498,7 +502,7 @@ export default (dependencies) => {
           );
         }
       }
-      return configuration;
+      return internal_configuration;
     },
   };
 };

@@ -422,7 +422,7 @@
         - const: null
         - $ref: package
 
-- $id: config
+- $id: external-configuration
   type: object
   properties:
     # server
@@ -432,7 +432,7 @@
       type: object
       additionalProperties: false
       patternProperties:
-        "^": {$ref: config}
+        "^": {$ref: external-configuration}
     scenario: {$ref: regexp}
     recursive-process-recording: {type: boolean}
     command:
@@ -510,7 +510,7 @@
       type: array
       items: {$ref: name-version}
 
-- $id: configuration
+- $id: internal-configuration
   type: object
   additionalProperties: false
   minProperties: 41
@@ -526,7 +526,7 @@
         required: [key, value, base]
         properties:
           key: {type: string}
-          value: {$ref: config}
+          value: {$ref: external-configuration}
           base: {$ref: url}
     recursive-process-recording: {type: boolean}
     command:
@@ -677,7 +677,7 @@
       anyOf:
         - const: null
         - $ref: url
-    data: {$ref: config}
+    data: {$ref: external-configuration}
 
 - $id: termination
   type: object
@@ -719,7 +719,7 @@
       maxItems: 2
       items:
         - const: initialize
-        - $ref: configuration
+        - $ref: internal-configuration
     - type: array
       minItems: 2
       maxItems: 2

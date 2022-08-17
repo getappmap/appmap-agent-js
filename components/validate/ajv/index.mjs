@@ -12,8 +12,8 @@ export default (dependencies) => {
     expect: { expect },
   } = dependencies;
   const naming = new _Map([
-    ["config", "configuration"],
-    ["configuration", "cooked-configuration"],
+    ["external-configuration", "user-defined configuration"],
+    ["internal-configuration", "internal configuration"],
     ["message", "message"],
     ["source-map", "source-map"],
   ]);
@@ -41,8 +41,8 @@ export default (dependencies) => {
   };
   return {
     validateMessage: generateValidate("message"),
-    validateConfig: generateValidate("config"),
-    validateConfiguration: generateValidate("configuration"),
+    validateExternalConfiguration: generateValidate("external-configuration"),
+    validateInternalConfiguration: generateValidate("internal-configuration"),
     validateSourceMap: generateValidate("source-map"),
   };
 };
