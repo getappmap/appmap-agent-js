@@ -3,7 +3,7 @@ import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
 } from "../../build.mjs";
-import Native from "./native.mjs";
+import Native from "./index.mjs";
 
 const _eval = eval;
 

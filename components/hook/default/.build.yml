@@ -2,7 +2,8 @@ branches: [test, node, browser]
 dependencies:
   - hook-apply
   - hook-group
-  - hook-module
+  - hook-esm
+  - hook-cjs
   - hook-query
   - hook-http-server
   - hook-http-client

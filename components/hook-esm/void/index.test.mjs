@@ -1,4 +1,4 @@
-import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
+import { assertDeepEqual } from "../../__fixture__.mjs";
 import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
@@ -7,15 +7,11 @@ import HookModule from "./index.mjs";
 
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
 const { testHookAsync } = await buildTestComponentAsync("hook-fixture");
-const { transformSourceDefault, ...component } = HookModule(dependencies);
-assertEqual(
-  transformSourceDefault("content", "context", (x) => x),
-  "content",
-);
+const component = HookModule(dependencies);
 assertDeepEqual(
   await testHookAsync(
     component,
-    { hooks: { cjs: false, esm: false } },
+    { hooks: { esm: false } },
     async (state) => null,
   ),
   { sources: [], events: [] },

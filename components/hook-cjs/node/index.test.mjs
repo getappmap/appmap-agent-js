@@ -10,7 +10,7 @@ import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
 } from "../../build.mjs";
-import Common from "./common.mjs";
+import Common from "./index.mjs";
 
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
 const { createConfiguration } = await buildTestComponentAsync("configuration");

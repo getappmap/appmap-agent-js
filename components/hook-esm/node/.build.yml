@@ -3,4 +3,5 @@ dependencies:
   - path
   - util
   - expect
+  - interpretation
   - agent

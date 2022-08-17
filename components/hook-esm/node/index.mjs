@@ -11,7 +11,11 @@ export default (dependencies) => {
   const {
     util: { assert },
     agent: { instrument },
+    interpretation: { runScript },
   } = dependencies;
+  if (typeof APPMAP_ESM_HOOK === "undefined") {
+    runScript("let APPMAP_NATIVE_MODULE_HOOK = null");
+  }
   return {
     unhook: (enabled) => {
       if (enabled) {
