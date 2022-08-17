@@ -468,6 +468,11 @@
       properties:
         cjs: {type: boolean}
         esm: {type: boolean}
+        eval:
+          anyOf:
+            - type: boolean
+            - type: array
+              items: {type: string}
         apply: {type: boolean}
         http: {type: boolean}
         mysql: {type: boolean}
@@ -578,6 +583,9 @@
       properties:
         cjs: {type: boolean}
         esm: {type: boolean}
+        eval:
+          type: array
+          items: {type: string}
         apply: {type: boolean}
         http: {type: boolean}
         mysql: {type: boolean}

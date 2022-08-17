@@ -15,6 +15,7 @@ const { visit } = Visit(dependencies);
 const { makeLocation, stringifyLocation } = await buildTestComponentAsync(
   "location",
 );
+const { createCounter } = await buildTestComponentAsync("util");
 const { createMirrorSourceMap } = await buildTestComponentAsync("source");
 
 const instrument = (file, whitelist) =>
@@ -28,8 +29,10 @@ const instrument = (file, whitelist) =>
       {
         url: file.url,
         runtime: "$",
+        evals: ["eval"],
         mapping: createMirrorSourceMap(file),
         whitelist: new Set(whitelist),
+        counter: createCounter(0),
       },
     ),
   );
@@ -247,4 +250,27 @@ assertEqual(
     [],
   ),
   normalize("function g () { return 123; };", "script"),
+);
+
+// eval //
+
+assertEqual(
+  instrument(
+    {
+      url: "file:///script.js#hash",
+      content: "eval(123, 456);",
+      type: "script",
+    },
+    [],
+  ),
+  normalize(
+    `eval(
+      APPMAP_HOOK_EVAL(
+        "file:///script.js/eval-1#hash",
+        123,
+      ),
+      456,
+    );`,
+    "script",
+  ),
 );

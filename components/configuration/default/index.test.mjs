@@ -48,6 +48,18 @@ const extend = (
   assertEqual(matchSpecifier(specifier, "file:///base/src/foo.js"), false);
 }
 
+// hooks //
+
+assertDeepEqual(extend("hooks", { eval: true }, "file:///base").eval, ["eval"]);
+
+assertDeepEqual(extend("hooks", { eval: false }, "file:///base").eval, []);
+
+assertDeepEqual(extend("hooks", {}, "file:///base").eval, []);
+
+assertDeepEqual(extend("hooks", { eval: ["foo"] }, "file:///base").eval, [
+  "foo",
+]);
+
 // scenarios //
 assertDeepEqual(
   extend(

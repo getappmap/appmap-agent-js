@@ -60,6 +60,23 @@ export default (dependencies) => {
     };
   };
 
+  const normalizeHooks = (hooks, base) => {
+    if (hasOwnProperty(hooks, "eval")) {
+      const { eval: whitelist } = hooks;
+      return {
+        ...hooks,
+        eval:
+          typeof whitelist === "boolean"
+            ? whitelist
+              ? ["eval"]
+              : []
+            : whitelist,
+      };
+    } else {
+      return hooks;
+    }
+  };
+
   const normalizeExclude = (exclusions, base) =>
     exclusions.map(normalizeExclusion);
 
@@ -279,7 +296,7 @@ export default (dependencies) => {
     },
     hooks: {
       extend: assign,
-      normalize: identity,
+      normalize: normalizeHooks,
     },
     ordering: {
       extend: overwrite,
@@ -423,6 +440,7 @@ export default (dependencies) => {
       "inline-source": false,
       hooks: {
         apply: true,
+        eval: [],
         esm: true,
         cjs: true,
         http: true,

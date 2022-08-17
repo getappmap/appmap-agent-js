@@ -5,6 +5,7 @@ const { stdout } = process;
 for (const name of [
   "metadata",
   "classmap",
+  "eval",
   "event-apply",
   "event-apply-source",
   "event-http",

@@ -198,7 +198,8 @@ const makeReturnStatement = (argument) => ({
 export default (dependencies) => {
   const {
     expect: { expect },
-    util: { assert, hasOwnProperty, coalesce },
+    url: { appendURLSegment },
+    util: { fromMaybe, assert, hasOwnProperty, coalesce, incrementCounter },
     source: { mapSource },
     log: { logGuardDebug },
     location: { stringifyLocation, getLocationFileURL },
@@ -322,12 +323,23 @@ export default (dependencies) => {
     ],
   });
 
+  const compileEvalCall = (url, name, node, nodes) =>
+    makeCallExpression(
+      makeIdentifier(name),
+      [
+        makeCallExpression(makeIdentifier("APPMAP_HOOK_EVAL"), [
+          makeLiteral(url),
+          node,
+        ]),
+      ].concat(nodes),
+    );
+
   const compileFunction = (
     node,
     is_child_constructor,
     params,
     body,
-    url,
+    location,
     runtime,
   ) => ({
     type: node.type,
@@ -343,7 +355,7 @@ export default (dependencies) => {
           makeCallExpression(
             makeRegularMemberExpression(runtime, "recordBeginApply"),
             [
-              makeLiteral(url),
+              makeLiteral(stringifyLocation(location)),
               node.type === "ArrowFunctionExpression" || is_child_constructor
                 ? makeRegularMemberExpression(runtime, "empty")
                 : makeThisExpression(),
@@ -504,7 +516,7 @@ export default (dependencies) => {
                 grand_parent.superClass !== null,
               visit(node.params, node, parent, true, context),
               visit(node.body, node, parent, true, context),
-              stringifyLocation(location),
+              location,
               context.runtime,
             )
           : visitGeneric(node, parent, false, context);
@@ -537,6 +549,37 @@ export default (dependencies) => {
         return compileReturn(
           visit(node.argument, node, parent, instrumented, context),
           context.runtime,
+        );
+      } else if (
+        node.type === "CallExpression" &&
+        node.callee.type === "Identifier" &&
+        context.evals.includes(node.callee.name) &&
+        node.arguments.length > 0
+      ) {
+        const location = mapSource(
+          context.mapping,
+          node.loc.start.line,
+          node.loc.start.column,
+        );
+        logGuardDebug(
+          location === null,
+          "Missing source map at file %j at line %j at column %j",
+          context.url,
+          node.loc.start.line,
+          node.loc.start.column,
+        );
+        return compileEvalCall(
+          appendURLSegment(
+            fromMaybe(location, context.url, getLocationFileURL),
+            `eval-${_String(incrementCounter(context.counter))}`,
+          ),
+          node.callee.name,
+          visit(node.arguments[0], node, parent, instrumented, context),
+          node.arguments
+            .slice(1)
+            .map((argument) =>
+              visit(argument, node, parent, instrumented, context),
+            ),
         );
       } else {
         return visitGeneric(node, parent, instrumented, context);

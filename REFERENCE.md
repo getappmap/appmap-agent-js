@@ -1,4 +1,4 @@
-# appmap-agent-js reference
+aggressive# appmap-agent-js reference
 
 JavaScript agent for the AppMap framework.
 
@@ -333,6 +333,7 @@ The agent filter code objects (functions or objects/classes) based on a format c
 * `hooks <object>` Flags controlling what the agent intercepts.
     * `cjs <boolean>` Indicates whether commonjs modules should be instrumented to record function applications. *Default*: `true`.
     * `esm <boolean>` Indicates whether native modules should be instrumented to record function applications. *Default*: `true` for the CLI and `false` for the API.
+    * `eval <boolean> | <String[]>` Defines the call expressions that should be considered as eval calls. More precisely, if a call expression has an identitifier as callee whose name appears in `hooks.eval` then its first argument will be instrumented as an `eval` code. `true` is a shorthand for `["eval"]` and `false` is a shorthand for `[]`. *Default*: `false`.
     * `group <boolean>` Indicates whether asynchronous resources should be monitored to infer causality link between events. This provides more accurate appmaps but comes at the price of performance overhead. *Default*: `true`.
     * `http <boolean>` Indicates whether [`http`](https://nodejs.org/api/http.html) should be monkey patched to monitor http traffic. *Default*: `true`.
     * `mysql <boolean>` Indicates whether [`mysql`](https://www.npmjs.com/package/mysql) should be monkey patched to monitor sql queries. The agent will crash if the `mysql` package is not available. *Default*: `true`.
@@ -342,14 +343,14 @@ The agent filter code objects (functions or objects/classes) based on a format c
 * `app <string>` Name of the recorded application. *Default*: `null` the value found in `package.json` if any.
 * `name <string>` Name of the appmap. *Default*: `null` the agent will do its best to come up with a meaningful name.
 * `pruning <boolean>` Remove elements of the classmap which did not trigger any function application event. *Default*: `true`.
-* `serialization <object>` Serialization options. Many options focus on defining how agressive the serialization should be. Pure serialization is faster and avoid disturbing the flow of the observed application but is less detailled than impure serialization.
-    * `maximum-print-length <number> | null` the maximum length of the string representation of runtime values before being truncated. `null` indicates no limitation. *Default* `100`.
+* `serialization <object>` Serialization options. Many options focus on defining how aggressive the serialization should be. Pure serialization is faster and avoid disturbing the flow of the observed application but is less detailed than impure serialization.
+    * `maximum-print-length <number> | null` the maximum length of the string representation of values before being truncated. `null` indicates no limitation. *Default* `100`.
     * `maximum-properties-length <number> | null` the maximum of amount of properties serialized for hash objects. Objects are considered as hashes if their prototype is either `null` or `Object.prototype`. `null` indicates no limitation. *Default* `10`.
     * `impure-printing <boolean>` indicates whether to use a pure printing algorithm or not. For instance, an object can be printed either using `Object.prototype.toString.call(object)` which is pure or `object.toString()` which is impure. *Default* `true`.
     * `impure-constructor-naming <boolean>` indicates whether the constructor name should be retrieved using `Object.prototype.toString.call(object)` which is pure or using `object.constructor.name` which is impure. *Default* `true`.
-    * `impure-array-inspection <boolean>` indicates whether the length of an array should be retreived which is an impure operation. *Default* `true`.
+    * `impure-array-inspection <boolean>` indicates whether the length of an array should be retrieved which is an impure operation. *Default* `true`.
     * `impure-error-inspection <boolean>` indicates whether the message and stack of an error should be retrieved which is an impure operation. *Default* `true`.
-    * `impure-hash-inspection <boolean>` indicates whether the message and stack of an error should be retrieved which is an impure operation. *Default* `true`.
+    * `impure-hash-inspection <boolean>` indicates whether the properties of an hash object should be inspected which is an impure operation. *Default* `true`.
 * `hidden-identifier <string>` The prefix of hidden variables used by the agent. The instrumentation will fail if variables from the program under recording starts with this prefix. *Default*: `"APPMAP"`.
 * `function-name-placeholder <string>` The placeholder name for classmap function elements. *Default* `"()"`.
 * `collapse-package-hiearchy <boolean>` Indicates whether packages should organized as a tree which mirrors the structure of the file system or if they should be flatten into a list. *Default*: `true`.

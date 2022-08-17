@@ -43,6 +43,7 @@
   * hook-group
   * hook-cjs
   * hook-esm
+  * hook-eval
   * hook-query
   * - hook-http
     - * hook-http-client

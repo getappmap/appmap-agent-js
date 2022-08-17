@@ -6,6 +6,7 @@ export default (dependencies) => {
     "hook-group",
     "hook-esm",
     "hook-cjs",
+    "hook-eval",
     "hook-query",
     "hook-http-client",
     "hook-http-server",

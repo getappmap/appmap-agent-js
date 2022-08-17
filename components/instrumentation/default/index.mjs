@@ -11,7 +11,7 @@ const _Set = Set;
 export default (dependencies) => {
   const {
     log: { logDebug },
-    util: { generateGet },
+    util: { generateGet, createCounter },
     "configuration-accessor": { getConfigurationPackage },
     uuid: { getUUID },
     expect: { expectSuccess },
@@ -26,10 +26,11 @@ export default (dependencies) => {
       configuration,
       runtime: `${configuration["hidden-identifier"]}${getUUID()}`,
       done: new _Set(),
+      counter: createCounter(0),
     }),
     getInstrumentationIdentifier: ({ runtime }) => runtime,
     instrument: (
-      { configuration, runtime, done },
+      { configuration, runtime, done, counter },
       { type, url, content },
       mapping,
     ) => {
@@ -94,7 +95,9 @@ export default (dependencies) => {
               url,
               runtime,
               whitelist: new _Set(sources.map(getURL)),
+              evals: configuration.hooks.eval,
               mapping,
+              counter,
             },
           ),
         ),
