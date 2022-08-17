@@ -1,14 +1,11 @@
 import { assertEqual } from "../../__fixture__.mjs";
-import * as Acorn from "acorn";
-import Escodegen from "escodegen";
 import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
 } from "../../build.mjs";
+import { normalize, parse, generate } from "./__fixture__.mjs";
 import Visit from "./visit.mjs";
 
-const { parse } = Acorn;
-const { generate } = Escodegen;
 const { stringify: stringifyJSON } = JSON;
 
 Error.stackTraceLimit = Infinity;
@@ -19,9 +16,6 @@ const { makeLocation, stringifyLocation } = await buildTestComponentAsync(
   "location",
 );
 const { createMirrorSourceMap } = await buildTestComponentAsync("source");
-
-const normalize = (code, source) =>
-  generate(parse(code, { ecmaVersion: 2021, sourceType: source }));
 
 const instrument = (file, whitelist) =>
   generate(

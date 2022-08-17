@@ -47,7 +47,7 @@
     "acorn": "^8.5.0",
     "ajv": "^8.6.3",
     "ajv-error-tree": "0.0.5",
-    "escodegen": "^2.0.0",
+    "astring": "^1.8.3",
     "glob": "^7.2.0",
     "klaw-sync": "^6.0.0",
     "minimatch": "^3.0.4",

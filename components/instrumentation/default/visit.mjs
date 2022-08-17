@@ -115,6 +115,7 @@ const makeRestElement = (node) => ({
 
 const makeUnaryExpression = (operator, node) => ({
   type: "UnaryExpression",
+  prefix: true,
   operator,
   argument: node,
 });

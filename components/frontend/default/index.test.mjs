@@ -52,7 +52,7 @@ assertEqual(
   const file = { url: "file:///filename.js", content: "123;", type: "script" };
   assertDeepEqual(instrument(frontend, file, createMirrorSourceMap(file)), {
     url: "file:///filename.js",
-    content: "123;",
+    content: "123;\n",
     messages: [
       [
         "source",

@@ -1,7 +1,7 @@
-import Escodegen from "escodegen";
+import * as Astring from "astring";
 import * as Acorn from "acorn";
 
-const { generate: generateEstree } = Escodegen;
+const { generate: generateEstree } = Astring;
 const { parse: parseEstree } = Acorn;
 
 import Visit from "./visit.mjs";
