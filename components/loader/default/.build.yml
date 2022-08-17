@@ -1,5 +1,0 @@
-branches: [node, test]
-dependencies:
-  - expect
-  - log
-  - interpretation
