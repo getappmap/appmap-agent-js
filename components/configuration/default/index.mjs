@@ -98,8 +98,7 @@ export default (dependencies) => {
     if (typeof log === "string") {
       log = { level: log };
     }
-    log = { level: "error", file: 2, ...log };
-    if (typeof log.file !== "number") {
+    if (hasOwnProperty(log, "file") && typeof log.file !== "number") {
       log.file = urlifyPath(log.file, base);
     }
     return log;
