@@ -11,7 +11,7 @@ const _Set = Set;
 export default (dependencies) => {
   const {
     log: { logDebug },
-    util: { generateGet, createCounter },
+    util: { generateGet, createCounter, recoverMaybe },
     "configuration-accessor": { getConfigurationPackage },
     uuid: { getUUID },
     expect: { expectSuccess },
@@ -54,9 +54,7 @@ export default (dependencies) => {
               url,
               content,
               shallow,
-              /* c8 ignore start */
-              inline: inline === null ? configuration["inline-source"] : inline,
-              /* c8 ignore stop */
+              inline: recoverMaybe(inline, configuration["inline-source"]),
               exclude: [...exclude, ...configuration.exclude],
             },
           };
