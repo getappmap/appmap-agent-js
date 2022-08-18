@@ -54,6 +54,7 @@ const data_map = new _Map([
       headers: {},
       url: "http://localhost/APPMAP-MANUFACTURED-BEGIN-RESPONSE",
       route: null,
+      body: null,
     },
   ],
   [
@@ -63,6 +64,7 @@ const data_map = new _Map([
       status: 200,
       message: "APPMAP-MANUFACTURED-END-RESPONSE",
       headers: {},
+      body: null,
     },
   ],
   // jump //
@@ -103,6 +105,7 @@ const data_map = new _Map([
       method: "GET",
       url: "http://localhost/APPMAP-MANUFACTURED-BEFORE-REQUEST",
       headers: {},
+      body: null,
     },
   ],
   [
@@ -112,6 +115,7 @@ const data_map = new _Map([
       status: 200,
       message: "APPMAP-MANUFACTURED-END-REQUEST",
       headers: {},
+      body: null,
     },
   ],
 ]);
