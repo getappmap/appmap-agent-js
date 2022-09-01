@@ -13,6 +13,7 @@ const {
     prototype: object_prototype,
     prototype: { toString },
     entries: toEntries,
+    fromEntries,
   },
   Array: { isArray },
   JSON: { stringify: stringifyJSON },
@@ -142,10 +143,10 @@ export default (dependencies) => {
     return tag.substring(tag.indexOf(" ") + 1, tag.length - 1);
   };
   const isEntryString = ({ 0: key }) => typeof key === "string";
-  const serializeEntry = ({ 0: key, 1: value }) => ({
-    name: key,
-    class: getConstructorNamePure(value),
-  });
+  const serializeEntry = ({ 0: key, 1: value }) => [
+    key,
+    getConstructorNamePure(value),
+  ];
   const getSpecific = (serialization, object) => {
     if (serialization.impure_error_inspection && object instanceof Error) {
       const stack = getSafe(object, "stack");
@@ -178,10 +179,12 @@ export default (dependencies) => {
       return {
         type: "hash",
         length: entries.length,
-        properties: entries
-          .filter(isEntryString)
-          .slice(0, serialization.maximum_properties_length)
-          .map(serializeEntry),
+        properties: fromEntries(
+          entries
+            .filter(isEntryString)
+            .slice(0, serialization.maximum_properties_length)
+            .map(serializeEntry),
+        ),
       };
     } else {
       return null;
