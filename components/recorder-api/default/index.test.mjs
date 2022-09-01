@@ -31,24 +31,32 @@ assertEqual(
 
 const track = appmap.startRecording(null, { name: "name2" }, null);
 assertEqual(appmap.recordScript("123;", "file:///base/main.js"), 123);
-assertDeepEqual(appmap.stopRecording(track, 123, []), {
-  configuration: {
-    ...configuration,
-    name: "name2",
+assertEqual(appmap.recordError("name", "message", "stack"), undefined);
+assertDeepEqual(appmap.stopRecording(track, 123), [
+  {
+    type: "source",
+    url: "file:///base/main.js",
+    content: "123;",
+    exclude: createConfiguration("file:///home").exclude,
+    shallow: false,
+    inline: false,
   },
-  sources: [
-    {
-      url: "file:///base/main.js",
-      content: "123;",
-      exclude: createConfiguration("file:///home").exclude,
-      shallow: false,
-      inline: false,
-    },
-  ],
-  events: [],
-  termination: {
+  {
+    type: "start",
+    track: "uuid",
+    configuration: { name: "name2" },
+    url: null,
+  },
+  {
+    type: "error",
+    name: "name",
+    message: "message",
+    stack: "stack",
+  },
+  {
+    type: "stop",
+    track: "uuid",
     status: 123,
-    errors: [],
   },
-});
+]);
 appmap.terminate();

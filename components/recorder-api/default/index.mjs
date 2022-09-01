@@ -17,8 +17,9 @@ export default (dependencies) => {
       openAgent,
       closeAgent,
       instrument,
-      startTrack,
-      stopTrack,
+      recordError,
+      recordStartTrack,
+      recordStopTrack,
       takeLocalAgentTrace,
     },
   } = dependencies;
@@ -68,6 +69,9 @@ export default (dependencies) => {
       expectRunning(this.hooking);
       return runScript(this.instrumentScript(content, url));
     }
+    recordError(name = "", message = "", stack = "") {
+      recordError(this.agent, name, message, stack);
+    }
     startRecording(track, conf = {}, base = null) {
       expectRunning(this.hooking);
       if (track === null) {
@@ -79,13 +83,10 @@ export default (dependencies) => {
         track,
       );
       this.tracks.add(track);
-      startTrack(this.agent, track, {
-        path: base,
-        data: conf,
-      });
+      recordStartTrack(this.agent, track, conf, base);
       return track;
     }
-    stopRecording(track, status = 0, errors = []) {
+    stopRecording(track, status = 0) {
       expectRunning(this.hooking);
       expect(
         this.tracks.has(track),
@@ -93,7 +94,7 @@ export default (dependencies) => {
         track,
       );
       this.tracks.delete(track);
-      stopTrack(this.agent, track, { errors, status });
+      recordStopTrack(this.agent, track, status);
       return takeLocalAgentTrace(this.agent, track);
     }
     terminate() {

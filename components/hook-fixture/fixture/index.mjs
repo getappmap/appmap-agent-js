@@ -1,36 +1,32 @@
 export default (dependencies) => {
   const {
+    util: { assert },
     url: { appendURLSegment },
     configuration: { createConfiguration, extendConfiguration },
     agent: {
-      stopTrack,
-      startTrack,
+      recordStopTrack,
+      recordStartTrack,
       openAgent,
       takeLocalAgentTrace,
       closeAgent,
     },
   } = dependencies;
   return {
-    makeEvent: (type, index, time, data_type, data_rest) => ({
-      type,
-      index,
-      time,
-      data: {
-        type: data_type,
-        ...data_rest,
-      },
-    }),
-    testHookAsync: async ({ hook, unhook }, config, callbackAsync) => {
-      const url = appendURLSegment(import.meta.url, "..");
+    testHookAsync: async ({ hook, unhook }, options, callbackAsync) => {
+      options = {
+        configuration: {},
+        url: null,
+        ...options,
+      };
       const configuration = extendConfiguration(
-        createConfiguration(url),
-        { ...config },
-        url,
+        createConfiguration(appendURLSegment(import.meta.url, "..")),
+        options.configuration,
+        options.url,
       );
       const agent = openAgent(configuration);
       const hooking = hook(agent, configuration);
       try {
-        startTrack(agent, "record", { data: {}, path: null });
+        recordStartTrack(agent, "record", {}, null);
         await callbackAsync();
         recordStopTrack(agent, "record", 0);
         const trace = takeLocalAgentTrace(agent, "record");

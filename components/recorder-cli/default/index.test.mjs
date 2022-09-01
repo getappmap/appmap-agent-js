@@ -9,8 +9,12 @@ import {
 } from "../../build.mjs";
 import RecorderCLI from "./index.mjs";
 
-const { createRecorder, generateRequestAsync, startTrack, stopTrack } =
-  RecorderCLI(await buildTestDependenciesAsync(import.meta.url));
+const {
+  createRecorder,
+  generateRequestAsync,
+  recordStartTrack,
+  recordStopTrack,
+} = RecorderCLI(await buildTestDependenciesAsync(import.meta.url));
 
 const { createConfiguration, extendConfiguration } =
   await buildTestComponentAsync("configuration");
@@ -54,12 +58,12 @@ const configuration = extendConfiguration(
 
 const recorder = createRecorder(mock_process, configuration);
 
-startTrack(recorder, "track1", { path: null, data: {} });
+recordStartTrack(recorder, "track1", {}, null);
 const requestAsync = generateRequestAsync(recorder);
 assertThrow(() => {
   requestAsync("GET", "/", {});
 });
-stopTrack(recorder, "track1", { status: 123, errors: [] });
+recordStopTrack(recorder, "track1", 123);
 mock_process.emit("uncaughtExceptionMonitor", new Error("BOUM"));
-startTrack(recorder, "track2", { path: null, data: {} });
+recordStartTrack(recorder, "track2", {}, null);
 mock_process.emit("exit", 1, null);

@@ -11,8 +11,9 @@ export default (dependencies) => {
     agent: {
       openAgent,
       closeAgent,
-      startTrack,
-      stopTrack,
+      recordError,
+      recordStartTrack,
+      recordStopTrack,
       requestRemoteAgentAsync,
     },
   } = dependencies;
@@ -30,7 +31,6 @@ export default (dependencies) => {
         const agent = openAgent(configuration);
         const hooking = hook(agent, configuration);
         const tracks = new Set();
-        const errors = [];
         process.on("uncaughtExceptionMonitor", (error) => {
           expect(
             error instanceof Error,
@@ -53,11 +53,11 @@ export default (dependencies) => {
             "expected uncaught error's stack to be a string, got: %o",
             stack,
           );
-          errors.push({ name, message, stack });
+          recordError(agent, name, message, stack);
         });
         process.on("exit", (status, signal) => {
           for (const track of tracks) {
-            stopTrack(agent, track, { errors, status });
+            recordStopTrack(agent, track, status);
           }
           unhook(hooking);
           closeAgent(agent);
@@ -74,15 +74,15 @@ export default (dependencies) => {
       ({ agent }) =>
       (method, path, body) =>
         requestRemoteAgentAsync(agent, method, path, body),
-    startTrack: ({ agent, tracks }, track, initialization) => {
+    recordStartTrack: ({ agent, tracks }, track, configuration, url) => {
       assert(!tracks.has(track), "duplicate track");
       tracks.add(track);
-      startTrack(agent, track, initialization);
+      recordStartTrack(agent, track, configuration, url);
     },
-    stopTrack: ({ agent, tracks }, track, termination) => {
+    recordStopTrack: ({ agent, tracks }, track, status) => {
       assert(tracks.has(track), "missing track");
       tracks.delete(track);
-      stopTrack(agent, track, termination);
+      recordStopTrack(agent, track, status);
     },
   };
 };
