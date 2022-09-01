@@ -1,5 +1,8 @@
 branches: [test, node, browser]
 dependencies:
+  - util
+  - time
+  - group
   - frontend
   - emitter
   - source-outer
