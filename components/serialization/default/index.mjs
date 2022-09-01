@@ -149,13 +149,14 @@ export default (dependencies) => {
   ];
   const getSpecific = (serialization, object) => {
     if (serialization.impure_error_inspection && object instanceof Error) {
-      const stack = getSafe(object, "stack");
+      const name = getSafe(object, "name");
       const message = getSafe(object, "message");
+      const stack = getSafe(object, "stack");
       logGuardDebug(
-        typeof stack !== "string",
-        "Stack of error %o is not a string: %o",
+        typeof name !== "string",
+        "Name of error %o is not a string: %o",
         object,
-        stack,
+        name,
       );
       logGuardDebug(
         typeof message !== "string",
@@ -163,10 +164,17 @@ export default (dependencies) => {
         object,
         message,
       );
+      logGuardDebug(
+        typeof stack !== "string",
+        "Stack of error %o is not a string: %o",
+        object,
+        stack,
+      );
       return {
         type: "error",
-        stack: typeof stack === "string" ? stack : "",
+        name: typeof name === "string" ? name : "",
         message: typeof message === "string" ? message : "",
+        stack: typeof stack === "string" ? stack : "",
       };
     } else if (serialization.impure_array_inspection && isArray(object)) {
       return { type: "array", length: getSafe(object, "length") };
