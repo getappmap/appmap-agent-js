@@ -9,6 +9,7 @@ import {
   memoize,
   compose,
   bind,
+  spyOnce,
 } from "./function.mjs";
 
 // noop //
@@ -120,3 +121,17 @@ assertThrow(() =>
     assertFail();
   }, "a"),
 );
+
+// spyOnce //
+{
+  let counter = 0;
+  const closure = spyOnce(
+    () => {
+      counter += 1;
+    },
+    () => "result",
+  );
+  assertEqual(closure(), "result");
+  assertEqual(closure(), "result");
+  assertEqual(counter, 1);
+}
