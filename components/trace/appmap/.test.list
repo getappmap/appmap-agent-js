@@ -1,6 +1,5 @@
 - * - classmap
     - event
+  * ordering
   * metadata.mjs
-  * completion.mjs
-  * stack.mjs
 - index.mjs
