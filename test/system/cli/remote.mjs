@@ -72,13 +72,6 @@ const forkAsync = async (host, port) => {
     },
   } = await requestAsync(host, port, "DELETE", "/_appmap/record", {
     status: 1,
-    errors: [
-      {
-        name: "Foo",
-        message: "Bar",
-        stack: "Qux",
-      },
-    ],
   });
   assertDeepEqual(
     { code, map_name, test_status, exception },
@@ -86,7 +79,7 @@ const forkAsync = async (host, port) => {
       code: 200,
       map_name: "map-name-2",
       test_status: "failed",
-      exception: { class: "Foo", message: "Bar" },
+      exception: null,
     },
   );
 };

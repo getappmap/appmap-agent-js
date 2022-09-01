@@ -9,7 +9,7 @@ const { parse: parseJSON } = JSON;
 
 export default (dependencies) => {
   const {
-    util: { assert },
+    util: { assert, coalesce },
     http: { generateRespond },
     log: { logDebug, logError },
     service: { openServiceAsync, closeServiceAsync, getServicePort },
@@ -23,16 +23,6 @@ export default (dependencies) => {
     },
     "configuration-accessor": { extendConfigurationPort },
   } = dependencies;
-  const disconnection = {
-    status: 1,
-    errors: [
-      {
-        name: "AppmapError",
-        message: "disconnection",
-        stack: "",
-      },
-    ],
-  };
   return {
     minifyReceptorConfiguration: ({
       recorder,
@@ -95,11 +85,12 @@ export default (dependencies) => {
                 body: null,
               };
             }
-            sendBackend(backend, [
-              "start",
-              record,
-              { path: null, data: {}, ...body },
-            ]);
+            sendBackend(backend, {
+              type: "start",
+              track: record,
+              configuration: coalesce(body, "data", {}),
+              url: coalesce(body, "path", null),
+            });
             return {
               code: 200,
               message: "OK",
@@ -117,11 +108,11 @@ export default (dependencies) => {
           }
           if (method === "DELETE") {
             if (hasBackendTrack(backend, record)) {
-              sendBackend(backend, [
-                "stop",
-                record,
-                { status: 0, errors: [], ...body },
-              ]);
+              sendBackend(backend, {
+                type: "stop",
+                track: record,
+                status: coalesce(body, "status", 0),
+              });
             } else if (!hasBackendTrace(backend, record)) {
               return {
                 code: 404,
@@ -157,7 +148,17 @@ export default (dependencies) => {
               backends.set(session, backend);
               socket.on("close", () => {
                 for (const key of getBackendTrackIterator(backend)) {
-                  sendBackend(backend, ["stop", key, disconnection]);
+                  sendBackend(backend, {
+                    type: "error",
+                    name: "AppmapError",
+                    message: "disconnection",
+                    stack: "",
+                  });
+                  sendBackend(backend, {
+                    type: "stop",
+                    track: key,
+                    status: 1,
+                  });
                 }
               });
               socket.on("message", (content) => {

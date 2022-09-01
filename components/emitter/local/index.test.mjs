@@ -15,14 +15,45 @@ const { openEmitter, closeEmitter, sendEmitter, takeLocalEmitterTrace } =
 const configuration = createConfiguration("file:///home");
 
 const emitter = openEmitter(configuration);
-sendEmitter(emitter, ["start", "record1", { data: {}, path: null }]);
-sendEmitter(emitter, ["stop", "record1", { status: 0, errors: [] }]);
-assertDeepEqual(takeLocalEmitterTrace(emitter, "record1"), {
-  configuration,
-  sources: [],
-  events: [],
-  termination: { status: 0, errors: [] },
+
+sendEmitter(emitter, {
+  type: "start",
+  track: "record1",
+  configuration: {},
+  url: null,
 });
-sendEmitter(emitter, ["start", "record2", { data: {}, path: null }]);
+
+sendEmitter(emitter, {
+  type: "stop",
+  track: "record1",
+  status: 0,
+});
+
+assertDeepEqual(takeLocalEmitterTrace(emitter, "record1"), [
+  {
+    type: "start",
+    track: "record1",
+    configuration: {},
+    url: null,
+  },
+  {
+    type: "stop",
+    track: "record1",
+    status: 0,
+  },
+]);
+
+sendEmitter(emitter, {
+  type: "start",
+  track: "record2",
+  configuration: {},
+  url: null,
+});
+
 closeEmitter(emitter);
-sendEmitter(emitter, ["stop", "record2", { status: 0, errors: [] }]);
+
+sendEmitter(emitter, {
+  type: "stop",
+  track: "record2",
+  status: 0,
+});

@@ -121,14 +121,23 @@ await assertRequestAsync("GET", "/_appmap/track", null, {
   await assertRequestAsync(
     "DELETE",
     "/session/track1",
-    { status: 123, errors: [] },
+    { status: 123 },
     {
-      body: {
-        configuration: { ...configuration, recorder: "remote", name: "name" },
-        sources: [],
-        events: [],
-        termination: { status: 123, errors: [] },
-      },
+      body: [
+        {
+          type: "start",
+          track: "track1",
+          configuration: {
+            name: "name",
+          },
+          url: null,
+        },
+        {
+          type: "stop",
+          track: "track1",
+          status: 123,
+        },
+      ],
     },
   );
   await assertRequestAsync("GET", "/_appmap/track1", null, {
@@ -137,12 +146,17 @@ await assertRequestAsync("GET", "/_appmap/track", null, {
   await assertRequestAsync(
     "DELETE",
     "/session/track1",
-    { status: 123, errors: [] },
+    { status: 123 },
     { code: 404, message: "Missing Track" },
   );
   socket.write(
     createMessage(
-      JSON.stringify(["start", "track2", { path: null, data: {} }]),
+      JSON.stringify({
+        type: "start",
+        track: "track2",
+        configuration: {},
+        url: null,
+      }),
     ),
   );
   await new Promise((resolve) => {
@@ -152,22 +166,27 @@ await assertRequestAsync("GET", "/_appmap/track", null, {
   await assertRequestAsync(
     "DELETE",
     "/session/track2",
-    { status: 123, errors: [] },
+    { status: 123 },
     {
-      body: {
-        configuration: {
-          ...configuration,
-          recorder: "remote",
+      body: [
+        {
+          type: "start",
+          track: "track2",
+          configuration: {},
+          url: null,
         },
-        sources: [],
-        events: [],
-        termination: {
+        {
+          type: "error",
+          name: "AppmapError",
+          message: "disconnection",
+          stack: "",
+        },
+        {
+          type: "stop",
+          track: "track2",
           status: 1,
-          errors: [
-            { name: "AppmapError", message: "disconnection", stack: "" },
-          ],
         },
-      },
+      ],
     },
   );
   await closeReceptorAsync(receptor);
