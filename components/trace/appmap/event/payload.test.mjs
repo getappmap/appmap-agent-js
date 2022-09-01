@@ -1,24 +1,21 @@
 import { assertDeepEqual } from "../../../__fixture__.mjs";
 import { buildTestDependenciesAsync } from "../../../build.mjs";
-import Data from "./data.mjs";
+import Payload from "./payload.mjs";
 
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
 const {
-  compileCallData,
-  compileReturnData,
-  compileParameterPrimitive,
-  compileExceptionSerial,
-  compileParameterSerial,
-} = Data(dependencies);
+  digestParameterPrimitive,
+  digestExceptionSerial,
+  digestParameterSerial,
+  digestPayload,
+} = Payload(dependencies);
 
-////////////
-// serial //
-////////////
-
-// compileParameterSerial //
+///////////////////////////
+// digestParameterSerial //
+///////////////////////////
 
 assertDeepEqual(
-  compileParameterSerial("name", {
+  digestParameterSerial("name", {
     type: "symbol",
     print: "print",
     index: 123,
@@ -32,7 +29,7 @@ assertDeepEqual(
 );
 
 assertDeepEqual(
-  compileParameterSerial("name", {
+  digestParameterSerial("name", {
     type: "object",
     print: "print",
     index: 123,
@@ -48,7 +45,7 @@ assertDeepEqual(
 );
 
 assertDeepEqual(
-  compileParameterSerial("name", {
+  digestParameterSerial("name", {
     type: "object",
     print: "print",
     index: 123,
@@ -68,7 +65,7 @@ assertDeepEqual(
 );
 
 assertDeepEqual(
-  compileParameterSerial("name", {
+  digestParameterSerial("name", {
     type: "object",
     print: "print",
     index: 123,
@@ -76,12 +73,9 @@ assertDeepEqual(
     specific: {
       type: "hash",
       length: 456,
-      properties: [
-        {
-          name: "name",
-          class: "class",
-        },
-      ],
+      properties: {
+        name: "class",
+      },
     },
   }),
   {
@@ -95,7 +89,7 @@ assertDeepEqual(
 );
 
 assertDeepEqual(
-  compileParameterSerial("name", {
+  digestParameterSerial("name", {
     type: "object",
     print: "print",
     index: 123,
@@ -114,19 +108,23 @@ assertDeepEqual(
   },
 );
 
-// compileParameterPrimitive //
+//////////////////////////////
+// digestParameterPrimitive //
+//////////////////////////////
 
-assertDeepEqual(compileParameterPrimitive("name", "primitive"), {
+assertDeepEqual(digestParameterPrimitive("name", "primitive"), {
   name: "name",
   object_id: null,
   class: "string",
   value: "primitive",
 });
 
-// compileExceptionSerial //
+///////////////////////////
+// digestExceptionSerial //
+///////////////////////////
 
 assertDeepEqual(
-  compileExceptionSerial({
+  digestExceptionSerial({
     type: "object",
     print: "print",
     index: 123,
@@ -143,7 +141,7 @@ assertDeepEqual(
 );
 
 assertDeepEqual(
-  compileExceptionSerial({
+  digestExceptionSerial({
     type: "object",
     print: "print",
     index: 123,
@@ -160,7 +158,7 @@ assertDeepEqual(
 );
 
 assertDeepEqual(
-  compileExceptionSerial({
+  digestExceptionSerial({
     type: "symbol",
     print: "print",
     index: 123,
@@ -175,7 +173,7 @@ assertDeepEqual(
 );
 
 assertDeepEqual(
-  compileExceptionSerial({
+  digestExceptionSerial({
     type: "string",
     print: "print",
   }),
@@ -188,13 +186,13 @@ assertDeepEqual(
   },
 );
 
-/////////////////////
-// compileCallData //
-/////////////////////
+///////////////////
+// digestPayload //
+///////////////////
 
 // apply >> routing //
 assertDeepEqual(
-  compileCallData(
+  digestPayload(
     {
       type: "apply",
       function: "foobar",
@@ -226,7 +224,7 @@ assertDeepEqual(
 
 // apply >> missing receiver //
 assertDeepEqual(
-  compileCallData(
+  digestPayload(
     {
       type: "apply",
       function: "foobar",
@@ -249,10 +247,109 @@ assertDeepEqual(
   },
 );
 
-// response >> message //
+// return //
 assertDeepEqual(
-  compileCallData({
-    type: "server",
+  digestPayload(
+    {
+      type: "return",
+      result: { type: "string", print: "print" },
+    },
+    null,
+  ),
+  {
+    exceptions: null,
+    return_value: {
+      class: "string",
+      name: "return",
+      object_id: null,
+      value: "print",
+    },
+  },
+);
+
+// throw //
+assertDeepEqual(
+  digestPayload(
+    {
+      type: "throw",
+      error: {
+        type: "object",
+        print: "print",
+        index: 123,
+        constructor: "constructor",
+        specific: { type: "error", message: "message", stack: "stack" },
+      },
+    },
+    null,
+  ),
+  {
+    exceptions: [
+      {
+        object_id: 123,
+        class: "constructor",
+        message: "message",
+        path: "stack",
+        lineno: null,
+      },
+    ],
+    return_value: null,
+  },
+);
+
+// request >> client >> message //
+assertDeepEqual(
+  digestPayload({
+    type: "request",
+    side: "client",
+    method: "GET",
+    protocol: "HTTP/1.1",
+    url: "http://host:8080/path?search=param#hash",
+    route: null,
+    headers: {},
+  }),
+  {
+    http_client_request: {
+      request_method: "GET",
+      url: "http://host:8080/path",
+      headers: {},
+    },
+    message: [
+      {
+        name: "search",
+        object_id: null,
+        class: "string",
+        value: "param",
+      },
+    ],
+  },
+);
+
+// request >> client >> headers //
+assertDeepEqual(
+  digestPayload({
+    type: "request",
+    side: "client",
+    method: "GET",
+    protocol: "HTTP/1.1",
+    url: "/path",
+    route: null,
+    headers: { HOST: "host:8080" },
+  }),
+  {
+    http_client_request: {
+      request_method: "GET",
+      url: "http://host:8080/path",
+      headers: { HOST: "host:8080" },
+    },
+    message: [],
+  },
+);
+
+// request >> server >> message //
+assertDeepEqual(
+  digestPayload({
+    type: "request",
+    side: "server",
     method: "GET",
     protocol: "HTTP/1.1",
     url: "http://host:8080/path/info?search=param#hash",
@@ -284,10 +381,11 @@ assertDeepEqual(
   },
 );
 
-// response >> no message //
+// request >> server >> no message //
 assertDeepEqual(
-  compileCallData({
-    type: "server",
+  digestPayload({
+    type: "request",
+    side: "server",
     method: "GET",
     protocol: "HTTP/1.1",
     url: "/path",
@@ -306,13 +404,38 @@ assertDeepEqual(
   },
 );
 
-/////////////////////
-// compileCallData //
-/////////////////////
+// response //
+assertDeepEqual(
+  digestPayload(
+    {
+      type: "response",
+      side: "client",
+      status: 200,
+      headers: { "CONTENT-TYPE": "content-type" },
+      body: {
+        type: "string",
+        print: "print",
+      },
+    },
+    null,
+  ),
+  {
+    http_client_response: {
+      status_code: 200,
+      headers: { "CONTENT-TYPE": "content-type" },
+      return_value: {
+        class: "string",
+        name: "return",
+        object_id: null,
+        value: "print",
+      },
+    },
+  },
+);
 
 // query //
 assertDeepEqual(
-  compileCallData({
+  digestPayload({
     type: "query",
     database: "database",
     version: "version",
@@ -337,145 +460,13 @@ assertDeepEqual(
   },
 );
 
-// request >> message //
+// answer //
 assertDeepEqual(
-  compileCallData({
-    type: "client",
-    method: "GET",
-    protocol: "HTTP/1.1",
-    url: "http://host:8080/path?search=param#hash",
-    headers: {},
-  }),
-  {
-    http_client_request: {
-      request_method: "GET",
-      url: "http://host:8080/path",
-      headers: {},
-    },
-    message: [
-      {
-        name: "search",
-        object_id: null,
-        class: "string",
-        value: "param",
-      },
-    ],
-  },
-);
-
-// request >> headers //
-assertDeepEqual(
-  compileCallData({
-    type: "client",
-    method: "GET",
-    protocol: "HTTP/1.1",
-    url: "/path",
-    headers: { HOST: "host:8080" },
-  }),
-  {
-    http_client_request: {
-      request_method: "GET",
-      url: "http://host:8080/path",
-      headers: { HOST: "host:8080" },
-    },
-    message: [],
-  },
-);
-
-/////////////////////
-// compileCallData //
-/////////////////////
-
-// apply >> success //
-assertDeepEqual(
-  compileReturnData(
+  digestPayload(
     {
-      type: "apply",
-      error: null,
-      result: { type: "string", print: "print" },
-    },
-    null,
-  ),
-  {
-    exceptions: null,
-    return_value: {
-      class: "string",
-      name: "return",
-      object_id: null,
-      value: "print",
-    },
-  },
-);
-
-// apply >> failure //
-assertDeepEqual(
-  compileReturnData(
-    {
-      type: "apply",
-      error: {
-        type: "object",
-        print: "print",
-        index: 123,
-        constructor: "constructor",
-        specific: { type: "error", message: "message", stack: "stack" },
-      },
-      result: null,
-    },
-    null,
-  ),
-  {
-    exceptions: [
-      {
-        object_id: 123,
-        class: "constructor",
-        message: "message",
-        path: "stack",
-        lineno: null,
-      },
-    ],
-    return_value: null,
-  },
-);
-
-///////////////////////
-// compileReturnData //
-///////////////////////
-
-// query //
-assertDeepEqual(
-  compileReturnData(
-    {
-      type: "query",
+      type: "answer",
     },
     null,
   ),
   {},
-);
-
-// request //
-assertDeepEqual(
-  compileReturnData(
-    {
-      type: "client",
-      status: 200,
-      headers: { "CONTENT-TYPE": "content-type" },
-      body: {
-        type: "string",
-        print: "print",
-      },
-    },
-    null,
-  ),
-  {
-    http_client_response: {
-      status_code: 200,
-      headers: { "CONTENT-TYPE": "content-type" },
-      return_value: {
-        class: "string",
-        name: "return",
-        object_id: null,
-        value: "print",
-      },
-    },
-  },
 );

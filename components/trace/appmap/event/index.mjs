@@ -1,88 +1,94 @@
 import Classmap from "../classmap/index.mjs";
-import Data from "./data.mjs";
+import Payload from "./payload.mjs";
 
 export default (dependencies) => {
   const {
-    util: { assert, mapMaybe },
+    util: { mapMaybe, createCounter, incrementCounter },
   } = dependencies;
   const { getClassmapClosure } = Classmap(dependencies);
-  const { compileCallData, compileReturnData } = Data(dependencies);
+  const { digestPayload } = Payload(dependencies);
 
-  const isLastShallow = (stack) => {
-    for (let index = stack.length - 1; index >= 0; index -= 1) {
-      const { shallow } = stack[index];
-      if (shallow !== null) {
-        return shallow;
-      }
-    }
-    return false;
-  };
+  const digestEventPair = (event1, event2, id1, id2, info) => [
+    {
+      event: "call",
+      thread_id: 0,
+      id: id1,
+      ...digestPayload(event1.payload, info),
+    },
+    {
+      event: "return",
+      thread_id: 0,
+      id: id2,
+      parent_id: id1,
+      elapsed: (event2.time - event1.time) / 1000,
+      ...digestPayload(event2.payload, info),
+    },
+  ];
 
-  const compileEventTrace = (events, classmap) => {
+  const digestEventTrace = (root, classmap) => {
+    const counter = createCounter(0);
     const getClosureInfo = (location) => getClassmapClosure(classmap, location);
-    let counter = 0;
-    const digest = [];
-    const digestCallEvent = (data, options) => {
-      const id = (counter += 1);
-      digest.push({
-        event: "call",
-        thread_id: 0,
-        id,
-        ...compileCallData(data, options),
-      });
-      return id;
-    };
-    const digestReturnEvent = (time, data, { time: initial_time, id }) => {
-      if (id !== null) {
-        digest.push({
-          event: "return",
-          thread_id: 0,
-          id: (counter += 1),
-          parent_id: id,
-          elapsed: (time - initial_time) / 1000,
-          ...compileReturnData(data, null),
-        });
-      }
-    };
-    const stack = [];
-    for (const event of events) {
-      const { type, time, data } = event;
-      const { type: data_type } = data;
-      if (data_type !== "jump" && data_type !== "bundle") {
-        if (type === "before" || type === "begin") {
-          if (data_type === "apply") {
-            assert(type === "begin", "invalid envent type for apply data type");
-            const info = mapMaybe(data.function, getClosureInfo);
-            /* c8 ignore start */ if (info === null) {
-              stack.push({ time, shallow: null, id: null });
-            } /* c8 ignore stop */ else {
-              const { shallow, ...options } = info;
-              if (shallow && isLastShallow(stack)) {
-                stack.push({ time, shallow: true, id: null });
-              } else {
-                stack.push({
-                  time,
-                  shallow: true,
-                  id: digestCallEvent(data, options),
-                });
-              }
-            }
-          } else {
-            stack.push({
-              time,
-              shallow: null,
-              id: digestCallEvent(data, null),
-            });
+    const loop = (node) => {
+      if (node.type === "bundle") {
+        const { begin, children, end } = node;
+        const {
+          payload: { type },
+        } = begin;
+        if (type === "bundle" || type === "group") {
+          return children.flatMap(loop);
+        } else {
+          let info = null;
+          if (begin.payload.type === "apply") {
+            info = mapMaybe(begin.payload.function, getClosureInfo);
           }
-        } else if (type === "after" || type === "end") {
-          digestReturnEvent(time, data, stack.pop());
-        } /* c8 ignore start */ else {
-          assert(false, "invalid event type");
-        } /* c8 ignore stop */
-      }
-    }
-    return digest;
+          if (info === null && begin.payload.type === "apply") {
+            return [];
+          } else if (info !== null && info.shallow) {
+            return digestEventPair(
+              begin,
+              end,
+              incrementCounter(counter),
+              incrementCounter(counter),
+              info,
+            );
+          } else {
+            const id1 = incrementCounter(counter);
+            const digest = children.flatMap(loop);
+            const id2 = incrementCounter(counter);
+            const [event1, event2] = digestEventPair(
+              begin,
+              end,
+              id1,
+              id2,
+              info,
+            );
+            digest.unshift(event1);
+            digest.push(event2);
+            return digest;
+          }
+        }
+      } else if (node.type === "jump") {
+        const { before, after } = node;
+        const {
+          payload: { type },
+        } = before;
+        if (type === "jump" || type === "await" || type === "yield") {
+          return [];
+        } else {
+          return digestEventPair(
+            before,
+            after,
+            incrementCounter(counter),
+            incrementCounter(counter),
+            null,
+          );
+        }
+      } /* c8 ignore start */ else {
+        throw new Error("invalid node type");
+      } /* c8 ignore stop */
+    };
+    return root.flatMap(loop);
   };
 
-  return { compileEventTrace };
+  return { digestEventTrace };
 };
