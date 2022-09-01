@@ -10,7 +10,7 @@ const { createConfiguration, extendConfiguration } =
   await buildTestComponentAsync("configuration", "test");
 const { compileMetadata } = Metadata(dependencies);
 
-const test = (conf, url, termination = { errors: [], status: 0 }) => {
+const test = (conf, url, errors = [], status = 0) => {
   let configuration = createConfiguration(url);
   configuration = extendConfiguration(configuration, conf, url);
   configuration = extendConfiguration(
@@ -28,8 +28,7 @@ const test = (conf, url, termination = { errors: [], status: 0 }) => {
     },
     null,
   );
-  // console.log(configuration);
-  return compileMetadata(configuration, termination);
+  return compileMetadata(configuration, errors, status);
 };
 
 const default_meta_data = {
@@ -61,15 +60,17 @@ assertDeepEqual(test({ recorder: "process" }, "file:///cwd"), {
 // termination //
 
 assertDeepEqual(
-  test({}, "file:///cwd", {
-    errors: [
+  test(
+    {},
+    "file:///cwd",
+    [
       {
         name: "error-name",
         message: "error-message",
       },
     ],
-    status: 0,
-  }),
+    0,
+  ),
   {
     ...default_meta_data,
     test_status: "failed",

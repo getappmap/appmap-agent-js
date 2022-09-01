@@ -61,7 +61,7 @@ export default (dependencies) => {
     return null;
   };
 
-  const makeTestStatus = ({ errors, status }) => {
+  const makeTestStatus = (errors, status) => {
     const { length } = errors;
     return length === 0 && status === 0 ? "succeeded" : "failed";
   };
@@ -71,7 +71,7 @@ export default (dependencies) => {
     return { name: recorder };
   };
 
-  const makeException = ({ errors }) => {
+  const makeException = (errors) => {
     const { length } = errors;
     if (length === 0) {
       return null;
@@ -99,7 +99,8 @@ export default (dependencies) => {
         recorder,
         recording,
       },
-      termination,
+      errors,
+      status,
     ) => ({
       name: makeMapName(map_name, file_name, main),
       app: makeAppName(app_name, repository),
@@ -114,8 +115,8 @@ export default (dependencies) => {
       recorder: makeRecorder(recorder),
       recording: makeRecording(recording),
       git: makeHistory(repository),
-      test_status: makeTestStatus(termination),
-      exception: makeException(termination),
+      test_status: makeTestStatus(errors, status),
+      exception: makeException(errors),
     }),
   };
 };

@@ -32,9 +32,14 @@ export default (dependencies) => {
       try {
         startTrack(agent, "record", { data: {}, path: null });
         await callbackAsync();
-        stopTrack(agent, "record", { status: 0, errors: [] });
-        const { sources, events } = takeLocalAgentTrace(agent, "record");
-        return { sources, events };
+        recordStopTrack(agent, "record", 0);
+        const trace = takeLocalAgentTrace(agent, "record");
+        assert(trace[0].type === "start", "expected stop as first message");
+        assert(
+          trace[trace.length - 1].type === "stop",
+          "expected stop as last message",
+        );
+        return trace.slice(1, -1);
       } finally {
         closeAgent(agent);
         unhook(hooking);

@@ -6,7 +6,6 @@ export default (dependencies) => {
     log: { logDebug },
     "validate-message": { validateMessage },
     trace: { compileTrace },
-    configuration: { extendConfiguration },
   } = dependencies;
   return {
     createBackend: (configuration) => ({
@@ -28,46 +27,27 @@ export default (dependencies) => {
     sendBackend: ({ configuration, sources, tracks, traces }, message) => {
       validateMessage(message);
       logDebug("message >> %j", message);
-      const type = message[0];
-      if (type === "event") {
-        const event = {
-          type: message[1],
-          index: message[2],
-          time: message[3],
-          data: {
-            type: message[4],
-            ...message[5],
-          },
-        };
-        for (const { events } of tracks.values()) {
-          events.push(event);
-        }
-      } else if (type === "source") {
-        sources.push(message[1]);
-      } else if (type === "start") {
-        const [, key, initialization] = message;
+      const { type } = message;
+      if (type === "start") {
+        const { track: key } = message;
         assert(!tracks.has(key), "duplicate track");
-        tracks.set(key, {
-          configuration: extendConfiguration(
-            configuration,
-            initialization.data,
-            initialization.path,
-          ),
-          events: [],
-        });
+        tracks.set(key, [].concat(sources, [message]));
       } else if (type === "stop") {
-        const [, key, termination] = message;
+        const { track: key } = message;
         assert(tracks.has(key), "missing track");
         assert(!traces.has(key), "duplicate trace");
-        const { events, configuration } = tracks.get(key);
+        const messages = tracks.get(key);
+        messages.push(message);
         tracks.delete(key);
-        traces.set(key, {
-          head: configuration,
-          body: compileTrace(configuration, sources, events, termination),
-        });
-      } /* c8 ignore start */ else {
-        assert(false, "invalid message type");
-      } /* c8 ignore stop */
+        traces.set(key, compileTrace(configuration, messages));
+      } else {
+        if (type === "source") {
+          sources.push(message);
+        }
+        for (const messages of tracks.values()) {
+          messages.push(message);
+        }
+      }
       return type === "stop";
     },
   };

@@ -20,5 +20,5 @@ assertDeepEqual(
     {},
     async () => {},
   ),
-  { sources: [], events: [] },
+  [],
 );
