@@ -14,9 +14,7 @@ import HookHttpServer from "./index.mjs";
 const { get } = Http;
 
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
-const { testHookAsync, makeEvent } = await buildTestComponentAsync(
-  "hook-fixture",
-);
+const { testHookAsync } = await buildTestComponentAsync("hook-fixture");
 const component = HookHttpServer(dependencies);
 
 const listenAsync = (server, port) =>
@@ -77,8 +75,10 @@ assertDeepEqual(
   await testHookAsync(
     component,
     {
-      recorder: "process",
-      hooks: { http: false },
+      configuration: {
+        recorder: "process",
+        hooks: { http: false },
+      },
     },
     async () => {
       const server = Http.createServer();
@@ -96,30 +96,28 @@ assertDeepEqual(
       await closeAsync(server);
     },
   ),
-  { sources: [], events: [] },
+  [],
 );
 
 // Express && http.createServer //
 {
-  const cleanupHeaders = ({
-    type,
-    index,
-    time,
-    data: { type: data_type, ...data_rest },
-  }) => {
-    if (data_type === "server") {
-      data_rest.headers = null;
+  const cleanupHeaders = (event) => {
+    if (event.payload.type === "request" || event.payload.type === "response") {
+      return {
+        ...event,
+        payload: {
+          ...event.payload,
+          headers: {},
+        },
+      };
+    } else {
+      return event;
     }
-    return makeEvent(type, index, time, data_type, data_rest);
   };
-  const makeJump = (index) => [
-    makeEvent("before", index, 0, "jump", null),
-    makeEvent("after", index, 0, "jump", null),
-  ];
   const events = (
     await testHookAsync(
       component,
-      { recorder: "process", hooks: { http: true } },
+      { configuration: { recorder: "process", hooks: { http: true } } },
       async () => {
         const server = Http.createServer();
         const app = createApp();
@@ -156,48 +154,91 @@ assertDeepEqual(
         await closeAsync(server);
       },
     )
-  ).events.map(cleanupHeaders);
+  ).map(cleanupHeaders);
   assertDeepEqual(
     [...events.slice(0, 4), events[events.length - 1]],
     [
-      makeEvent("begin", 1, 0, "server", {
-        protocol: "HTTP/1.1",
-        method: "GET",
-        url: "/route/foo/bar/qux",
-        route: null,
-        headers: null,
-        body: null,
-      }),
-      makeJump(2)[0],
-      makeEvent("begin", 1, 0, "server", {
-        protocol: "HTTP/1.1",
-        method: "GET",
-        url: "/route/foo/bar/qux",
-        route: "/route/*/:param1/:param2",
-        headers: null,
-        body: null,
-      }),
-      makeJump(2)[1],
-      makeEvent("end", 1, 0, "server", {
-        status: 200,
-        message: "OK",
-        headers: null,
-        body: {
-          type: "object",
-          print: "[object Object]",
-          index: 1,
-          constructor: "Object",
-          specific: {
-            type: "hash",
-            length: 3,
-            properties: [
-              { name: "0", class: "String" },
-              { name: "param1", class: "String" },
-              { name: "param2", class: "String" },
-            ],
+      {
+        type: "event",
+        site: "begin",
+        tab: 1,
+        group: 0,
+        time: 0,
+        payload: {
+          type: "request",
+          side: "server",
+          protocol: "HTTP/1.1",
+          method: "GET",
+          url: "/route/foo/bar/qux",
+          route: null,
+          headers: {},
+          body: null,
+        },
+      },
+      {
+        type: "event",
+        site: "before",
+        tab: 2,
+        group: 0,
+        time: 0,
+        payload: {
+          type: "jump",
+        },
+      },
+      {
+        type: "amend",
+        site: "begin",
+        tab: 1,
+        payload: {
+          type: "request",
+          side: "server",
+          protocol: "HTTP/1.1",
+          method: "GET",
+          url: "/route/foo/bar/qux",
+          route: "/route/*/:param1/:param2",
+          headers: {},
+          body: null,
+        },
+      },
+      {
+        type: "event",
+        site: "after",
+        tab: 2,
+        group: 0,
+        time: 0,
+        payload: {
+          type: "jump",
+        },
+      },
+      {
+        type: "event",
+        site: "end",
+        tab: 1,
+        group: 0,
+        time: 0,
+        payload: {
+          type: "response",
+          side: "server",
+          status: 200,
+          message: "OK",
+          headers: {},
+          body: {
+            type: "object",
+            print: "[object Object]",
+            index: 1,
+            constructor: "Object",
+            specific: {
+              type: "hash",
+              length: 3,
+              properties: {
+                0: "String",
+                param1: "String",
+                param2: "String",
+              },
+            },
           },
         },
-      }),
+      },
     ],
   );
 }
@@ -209,9 +250,11 @@ assertDeepEqual(
     await testHookAsync(
       component,
       {
-        recorder: "remote",
-        hooks: { http: false },
-        "intercept-track-port": "^",
+        configuration: {
+          recorder: "remote",
+          hooks: { http: false },
+          "intercept-track-port": "^",
+        },
       },
       async () => {
         const server = new Http.Server();
@@ -221,19 +264,6 @@ assertDeepEqual(
           response.end();
         });
         await listenAsync(server, port);
-        // assertDeepEqual(
-        //   await requestAsync(
-        //     Http.get({
-        //       socketPath: port,
-        //       path: "/_appmap/bar",
-        //     }),
-        //   ),
-        //   {
-        //     code: 200,
-        //     message: "OK",
-        //     body: "",
-        //   },
-        // );
         assertDeepEqual(
           await requestAsync(
             Http.get({
@@ -250,9 +280,6 @@ assertDeepEqual(
         await closeAsync(server);
       },
     ),
-    {
-      sources: [],
-      events: [],
-    },
+    [],
   );
 }
