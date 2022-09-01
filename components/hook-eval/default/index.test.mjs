@@ -18,45 +18,45 @@ assertDeepEqual(
   await testHookAsync(
     component,
     {
-      hooks: { eval: ["eval"] },
-      packages: [
-        {
-          regexp: "^",
-          shallow: true,
-        },
-      ],
+      configuration: {
+        hooks: { eval: ["eval"] },
+        packages: [
+          {
+            regexp: "^",
+            shallow: true,
+          },
+        ],
+      },
+      url: "file:///base",
     },
     async () => {
       assertEqual(_eval(APPMAP_HOOK_EVAL("file:///foo", "123;")), 123);
     },
   ),
-  {
-    sources: [
-      {
-        url: "file:///foo",
-        content: "123;",
-        shallow: true,
-        exclude: createConfiguration("file:///home").exclude,
-        inline: false,
-      },
-    ],
-    events: [],
-  },
+  [
+    {
+      type: "source",
+      url: "file:///foo",
+      content: "123;",
+      shallow: true,
+      exclude: createConfiguration("file:///home").exclude,
+      inline: false,
+    },
+  ],
 );
 
 assertDeepEqual(
   await testHookAsync(
     component,
     {
-      hooks: { eval: [] },
-      packages: [],
+      configuration: {
+        hooks: { eval: [] },
+        packages: [],
+      },
     },
     async () => {
       assertEqual(_eval(APPMAP_HOOK_EVAL("file:///foo", "123;")), 123);
     },
   ),
-  {
-    sources: [],
-    events: [],
-  },
+  [],
 );

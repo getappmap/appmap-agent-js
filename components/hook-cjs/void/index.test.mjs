@@ -11,8 +11,8 @@ const component = HookModule(dependencies);
 assertDeepEqual(
   await testHookAsync(
     component,
-    { hooks: { cjs: false } },
+    { configuration: { hooks: { cjs: false } } },
     async (state) => null,
   ),
-  { sources: [], events: [] },
+  [],
 );

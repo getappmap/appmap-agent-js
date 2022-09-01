@@ -1,6 +1,7 @@
 import {
   assertEqual,
   assertDeepEqual,
+  getTemporaryDirectoryURL,
   getFreshTemporaryURL,
 } from "../../__fixture__.mjs";
 import { createRequire } from "module";
@@ -23,46 +24,50 @@ assertDeepEqual(
   await testHookAsync(
     component,
     {
-      hooks: { cjs: false },
-      packages: [
-        {
-          regexp: "^",
-        },
-      ],
+      configuration: {
+        hooks: { cjs: false },
+        packages: [
+          {
+            regexp: "^",
+          },
+        ],
+      },
+      url: getTemporaryDirectoryURL(),
     },
     async () => {
       assertEqual(require(fileURLToPath(url)), 123);
     },
   ),
-  { sources: [], events: [] },
+  [],
 );
 delete require.cache[require.resolve(fileURLToPath(url))];
 assertDeepEqual(
   await testHookAsync(
     component,
     {
-      hooks: { cjs: true },
-      packages: [
-        {
-          regexp: "^",
-          shallow: true,
-        },
-      ],
+      configuration: {
+        hooks: { cjs: true },
+        packages: [
+          {
+            regexp: "^",
+            shallow: true,
+          },
+        ],
+      },
+      url: getTemporaryDirectoryURL(),
     },
     async () => {
       assertEqual(require(fileURLToPath(url)), 123);
     },
   ),
-  {
-    sources: [
-      {
-        url: pathToFileURL(require.resolve(fileURLToPath(url))).toString(),
-        content: "module.exports = 123;",
-        exclude: createConfiguration("file:///home").exclude,
-        shallow: true,
-        inline: false,
-      },
-    ],
-    events: [],
-  },
+  [
+    {
+      type: "source",
+      url: pathToFileURL(require.resolve(fileURLToPath(url))).toString(),
+      content: "module.exports = 123;",
+      exclude: createConfiguration("file:///home").exclude,
+      shallow: true,
+      inline: false,
+    },
+  ],
 );

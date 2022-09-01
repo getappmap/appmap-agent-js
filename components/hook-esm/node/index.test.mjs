@@ -18,15 +18,21 @@ assertDeepEqual(
   await testHookAsync(
     component,
     {
-      hooks: { esm: true },
-      packages: [
-        {
-          regexp: "^",
-          shallow: true,
-        },
-      ],
+      configuration: {
+        hooks: { esm: true },
+        packages: [
+          {
+            regexp: "^",
+            shallow: true,
+          },
+        ],
+      },
+      url: "file:///base",
     },
     async () => {
+      global.APPMAPuuid = {
+        getFreshTab: () => 123,
+      };
       // transformSource //
       {
         const { source } = await APPMAP_ESM_HOOK.transformSource(
@@ -58,33 +64,34 @@ assertDeepEqual(
       }
     },
   ),
-  {
-    sources: [
-      {
-        url: "file:///foo",
-        content: "123;",
-        shallow: true,
-        exclude: createConfiguration("file:///home").exclude,
-        inline: false,
-      },
-      {
-        url: "file:///bar",
-        content: "456;",
-        shallow: true,
-        exclude: createConfiguration("file:///home").exclude,
-        inline: false,
-      },
-    ],
-    events: [],
-  },
+  [
+    {
+      type: "source",
+      url: "file:///foo",
+      content: "123;",
+      shallow: true,
+      exclude: createConfiguration("file:///home").exclude,
+      inline: false,
+    },
+    {
+      type: "source",
+      url: "file:///bar",
+      content: "456;",
+      shallow: true,
+      exclude: createConfiguration("file:///home").exclude,
+      inline: false,
+    },
+  ],
 );
 
 assertDeepEqual(
   await testHookAsync(
     component,
     {
-      hooks: { esm: false },
-      packages: [],
+      configuration: {
+        hooks: { esm: false },
+        packages: [],
+      },
     },
     async () => {
       const { source } = await APPMAP_ESM_HOOK.transformSource(
@@ -95,8 +102,5 @@ assertDeepEqual(
       assertEqual(_eval(source), 123);
     },
   ),
-  {
-    sources: [],
-    events: [],
-  },
+  [],
 );

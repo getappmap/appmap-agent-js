@@ -1,5 +1,6 @@
 branches: [test]
 dependencies:
+  - util
   - url
   - configuration
   - agent
