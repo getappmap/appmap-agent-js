@@ -9,9 +9,7 @@ import HookHttpClient from "./index.mjs";
 const { createServer } = Http;
 
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
-const { testHookAsync, makeEvent } = await buildTestComponentAsync(
-  "hook-fixture",
-);
+const { testHookAsync } = await buildTestComponentAsync("hook-fixture");
 const component = HookHttpClient(dependencies);
 
 const server = createServer();
@@ -43,52 +41,100 @@ const promiseResponse = (request) =>
   });
 
 assertDeepEqual(
-  await testHookAsync(component, { hooks: { http: false } }, async () => {
-    await promiseResponse(Http.get(url));
-  }),
-  { sources: [], events: [] },
+  await testHookAsync(
+    component,
+    { configuration: { hooks: { http: false } } },
+    async () => {
+      await promiseResponse(Http.get(url));
+    },
+  ),
+  [],
 );
 
 const events = [
-  makeEvent("begin", 1, 0, "bundle", null),
-  makeEvent("before", 2, 0, "client", {
-    protocol: "HTTP/1.1",
-    method: "GET",
-    url: "/path/?key=value",
-    route: null,
-    headers: { __proto__: null, host: `localhost:${String(port)}` },
-    body: null,
-  }),
-  makeEvent("after", 2, 0, "client", {
-    status: 200,
-    message: "OK",
-    headers: {
-      "content-type": "application/json; charset=utf-8",
-      "transfer-encoding": "chunked",
-      connection: "close",
+  {
+    type: "event",
+    site: "begin",
+    tab: 1,
+    group: 0,
+    time: 0,
+    payload: {
+      type: "bundle",
     },
-    body: {
-      type: "number",
-      print: "123",
+  },
+  {
+    type: "event",
+    site: "before",
+    tab: 2,
+    group: 0,
+    time: 0,
+    payload: {
+      type: "request",
+      side: "client",
+      protocol: "HTTP/1.1",
+      method: "GET",
+      url: "/path/?key=value",
+      route: null,
+      headers: { __proto__: null, host: `localhost:${String(port)}` },
+      body: null,
     },
-  }),
-  makeEvent("end", 1, 0, "bundle", null),
+  },
+  {
+    type: "event",
+    site: "after",
+    tab: 2,
+    group: 0,
+    time: 0,
+    payload: {
+      type: "response",
+      side: "client",
+      status: 200,
+      message: "OK",
+      headers: {
+        "content-type": "application/json; charset=utf-8",
+        "transfer-encoding": "chunked",
+        connection: "close",
+      },
+      body: {
+        type: "number",
+        print: "123",
+      },
+    },
+  },
+  {
+    type: "event",
+    site: "end",
+    tab: 1,
+    group: 0,
+    time: 0,
+    payload: {
+      type: "bundle",
+    },
+  },
 ];
 
 assertDeepEqual(
-  await testHookAsync(component, { hooks: { http: true } }, async () => {
-    await promiseResponse(Http.get(url));
-  }),
-  { sources: [], events },
+  await testHookAsync(
+    component,
+    { configuration: { hooks: { http: true } } },
+    async () => {
+      await promiseResponse(Http.get(url));
+    },
+  ),
+  events,
 );
 
 assertDeepEqual(
-  await testHookAsync(component, { hooks: { http: true } }, async () => {
-    const request = new Http.ClientRequest(url);
-    request.end();
-    await promiseResponse(request);
-  }),
-  { sources: [], events },
+  await testHookAsync(
+    component,
+    { configuration: { hooks: { http: true } } },
+    async () => {
+      const request = new Http.ClientRequest(url);
+      request.end();
+      await promiseResponse(request);
+    },
+  ),
+  events,
 );
 
 await new Promise((resolve) => {
