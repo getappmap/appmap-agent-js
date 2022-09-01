@@ -13,8 +13,10 @@ export default (dependencies) => {
     log: { logWarning },
     patch: { patch },
   } = dependencies;
+
   const normalizeChunk = (chunk, encoding) =>
     typeof chunk === "string" ? toBuffer(chunk, encoding) : chunk;
+
   const spyReadable = (readable, callback) => {
     const buffers = [];
     const original_push = patch(readable, "push", function (chunk, encoding) {
@@ -26,6 +28,7 @@ export default (dependencies) => {
       return apply(original_push, this, [chunk, encoding]);
     });
   };
+
   const spyWritable = (writable, callback1) => {
     const buffers = [];
     const original_write = patch(
@@ -48,6 +51,7 @@ export default (dependencies) => {
       },
     );
   };
+
   const parseJSONSafe = (string, recovery) => {
     try {
       return parseJSON(string);
@@ -56,6 +60,7 @@ export default (dependencies) => {
       return recovery;
     }
   };
+
   const decodeSafe = (buffer, encoding, recovery) => {
     try {
       return new TextDecoder(encoding).decode(buffer);
@@ -64,6 +69,7 @@ export default (dependencies) => {
       return recovery;
     }
   };
+
   const parseContentTypeHead = (head) => {
     const parts = /^ *([a-zA-Z-]+) *\/ *([a-zA-Z-]+) *$/u.exec(head);
     if (parts === null) {
@@ -73,6 +79,7 @@ export default (dependencies) => {
       return { type: parts[1], subtype: parts[2] };
     }
   };
+
   const parseContentTypeParameter = (parameter) => {
     const parts = /^ *([a-zA-Z0-9-]+) *= *([a-zA-Z0-9-]+) *$/u.exec(parameter);
     if (parts === null) {
@@ -82,6 +89,7 @@ export default (dependencies) => {
       return [[parts[1], parts[2]]];
     }
   };
+
   const parseContentType = (content_type) => {
     const segments = content_type.toLowerCase().split(";");
     const { type, subtype } = parseContentTypeHead(segments.shift());
@@ -91,6 +99,7 @@ export default (dependencies) => {
       parameters: fromEntries(segments.flatMap(parseContentTypeParameter)),
     };
   };
+
   return {
     parseContentType,
     parseJSONSafe,
