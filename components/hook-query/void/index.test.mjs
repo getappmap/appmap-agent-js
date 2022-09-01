@@ -11,8 +11,8 @@ const component = HookModule(dependencies);
 assertDeepEqual(
   await testHookAsync(
     component,
-    { hooks: { mysql: false, sqlite3: false, pg: false } },
+    { configuration: { hooks: { mysql: false, sqlite3: false, pg: false } } },
     async (frontend) => null,
   ),
-  { sources: [], events: [] },
+  [],
 );

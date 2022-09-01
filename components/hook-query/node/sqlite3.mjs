@@ -13,6 +13,9 @@ const throwIfNotNull = (error) => {
   /* c8 ignore stop */
 };
 
+const DATABASE = "sqlite3";
+const VERSION = null;
+
 const extractEach = (args) => {
   let each = throwIfNotNull;
   if (args.length > 0 && typeof args[args.length - 1] === "function") {
@@ -81,13 +84,16 @@ const combine = (parameters1, parameters2) => {
 
 export default (dependencies) => {
   const {
-    util: { assignProperty, coalesce },
+    util: { spyOnce, assignProperty },
     agent: {
-      getSerializationEmptyValue,
-      recordBeforeQuery,
-      recordAfterQuery,
-      recordBeginBundle,
-      recordEndBundle,
+      getFreshTab,
+      recordBeginEvent,
+      recordEndEvent,
+      recordBeforeEvent,
+      recordAfterEvent,
+      formatQueryPayload,
+      getAnswerPayload,
+      getBundlePayload,
     },
   } = dependencies;
   const { requireMaybe } = Require(dependencies);
@@ -100,7 +106,8 @@ export default (dependencies) => {
       if (Sqlite3 === null) {
         return [];
       }
-      const empty = getSerializationEmptyValue(agent);
+      const bundle_payload = getBundlePayload(agent);
+      const answer_payload = getAnswerPayload(agent);
       const { Database } = Sqlite3;
       const { prototype: database_prototype } = Database;
       const backup = ["run", "get", "all", "each", "prepare"].map((key) => ({
@@ -109,24 +116,20 @@ export default (dependencies) => {
         value: database_prototype[key],
       }));
       const copy = { ...database_prototype };
+
       const recordQuery = (sql, parameters, callback) => {
-        const index1 = recordBeginBundle(agent, null);
-        const index2 = recordBeforeQuery(agent, {
-          database: "sqlite3",
-          version: null,
-          sql,
-          parameters,
-        });
-        return function (...args) {
-          recordAfterQuery(agent, index2, {
-            error: coalesce(args, 0, null) || empty,
-          });
-          try {
-            return apply(callback, this, args);
-          } finally {
-            recordEndBundle(agent, index1, null);
-          }
-        };
+        const bundle_tab = getFreshTab(agent);
+        const jump_tab = getFreshTab(agent);
+        recordBeginEvent(agent, bundle_tab, bundle_payload);
+        recordBeforeEvent(
+          agent,
+          jump_tab,
+          formatQueryPayload(agent, DATABASE, VERSION, sql, parameters),
+        );
+        return spyOnce(() => {
+          recordAfterEvent(agent, jump_tab, answer_payload);
+          recordEndEvent(agent, bundle_tab, bundle_payload);
+        }, callback);
       };
 
       /////////////////////////////////
