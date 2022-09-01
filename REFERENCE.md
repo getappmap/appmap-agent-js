@@ -191,7 +191,7 @@ Stop recording. Subsequent method invocations will throw exception.
 * `url <string>` Script location.
 * Returns `<string>` the instrumented code to run as a script.
 
-### `appmap.recordBeginBundle()`
+<!-- ### `appmap.recordBeginBundle()`
 
 * Returns `recordEndBundle()`
   * Returns `undefined`.
@@ -245,7 +245,7 @@ This methods record an anonymous jump. This event does not appear in the generat
 
 ### `appmap.recordClientRequest(request)`
 
-Same type signature as `appmap.recordServerResponse` but without `route` property. Note that this method records a jump whereas `appmap.recordServerResponse` records a bundle.
+Same type signature as `appmap.recordServerResponse` but without `route` property. Note that this method records a jump whereas `appmap.recordServerResponse` records a bundle. -->
 
 ## Configuration
 

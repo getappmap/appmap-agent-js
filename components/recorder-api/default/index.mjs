@@ -2,7 +2,7 @@ const _Set = Set;
 const _String = String;
 const _URL = URL;
 
-import Record from "./record.mjs";
+// import Record from "./record.mjs";
 
 export default (dependencies) => {
   const {
@@ -13,7 +13,7 @@ export default (dependencies) => {
     "configuration-accessor": { resolveConfigurationManualRecorder },
     hook: { hook, unhook },
     agent: {
-      getSerializationEmptyValue,
+      // getSerializationEmptyValue,
       openAgent,
       closeAgent,
       instrument,
@@ -23,14 +23,14 @@ export default (dependencies) => {
       takeLocalAgentTrace,
     },
   } = dependencies;
-  const {
-    recordBeginBundle,
-    recordApply,
-    recordServerRequest,
-    recordBeforeJump,
-    recordQuery,
-    recordClientRequest,
-  } = Record(dependencies);
+  // const {
+  //   recordBeginBundle,
+  //   recordApply,
+  //   recordServerRequest,
+  //   recordBeforeJump,
+  //   recordQuery,
+  //   recordClientRequest,
+  // } = Record(dependencies);
   let global_running = false;
   const makeFile = (type, content, url = "file:///") => {
     content = _String(content);
@@ -106,34 +106,34 @@ export default (dependencies) => {
       closeAgent(this.agent);
     }
     /* c8 ignore start */
-    getEmptyValue() {
-      expectRunning(this.hooking);
-      return getSerializationEmptyValue(this.agent);
-    }
-    recordBeginBundle(data) {
-      expectRunning(this.hooking);
-      return recordBeginBundle(this.agent, data);
-    }
-    recordApply(data) {
-      expectRunning(this.hooking);
-      return recordApply(this.agent, data);
-    }
-    recordServerRequest(data) {
-      expectRunning(this.hooking);
-      return recordServerRequest(this.agent, data);
-    }
-    recordBeforeJump(data) {
-      expectRunning(this.hooking);
-      return recordBeforeJump(this.agent, data);
-    }
-    recordQuery(data) {
-      expectRunning(this.hooking);
-      return recordQuery(this.agent, data);
-    }
-    recordClientRequest(data) {
-      expectRunning(this.hooking);
-      return recordClientRequest(this.agent, data);
-    }
+    // getEmptyValue() {
+    //   expectRunning(this.hooking);
+    //   return getSerializationEmptyValue(this.agent);
+    // }
+    // recordBeginBundle(data) {
+    //   expectRunning(this.hooking);
+    //   return recordBeginBundle(this.agent, data);
+    // }
+    // recordApply(data) {
+    //   expectRunning(this.hooking);
+    //   return recordApply(this.agent, data);
+    // }
+    // recordServerRequest(data) {
+    //   expectRunning(this.hooking);
+    //   return recordServerRequest(this.agent, data);
+    // }
+    // recordBeforeJump(data) {
+    //   expectRunning(this.hooking);
+    //   return recordBeforeJump(this.agent, data);
+    // }
+    // recordQuery(data) {
+    //   expectRunning(this.hooking);
+    //   return recordQuery(this.agent, data);
+    // }
+    // recordClientRequest(data) {
+    //   expectRunning(this.hooking);
+    //   return recordClientRequest(this.agent, data);
+    // }
     /* c8 ignore stop */
   }
   return { Appmap };
