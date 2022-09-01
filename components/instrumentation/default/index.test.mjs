@@ -40,6 +40,7 @@ const instrumentation = createInstrumentation(
     {
       "hidden-identifier": "$",
       "inline-source": false,
+      hooks: { eval: false },
       packages: [
         {
           path: "foo.js",

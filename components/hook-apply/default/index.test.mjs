@@ -8,40 +8,65 @@ import {
 import HookApply from "./index.mjs";
 
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
-const { testHookAsync, makeEvent } = await buildTestComponentAsync(
-  "hook-fixture",
-);
+const { testHookAsync } = await buildTestComponentAsync("hook-fixture");
 const component = HookApply(dependencies);
 
 assertDeepEqual(
-  await testHookAsync(component, { hooks: { apply: false } }, async () => {}),
-  { sources: [], events: [] },
-);
-assertDeepEqual(
   await testHookAsync(
     component,
-    { hooks: { apply: true }, "hidden-identifier": "$" },
-    async () => {
-      const index1 = $uuid.recordBeginApply("function", 123, [456]);
-      const index2 = $uuid.recordBeforeJump();
-      $uuid.recordAfterJump(index2);
-      $uuid.recordEndApply(index1, null, 789);
-    },
+    { configuration: { hooks: { apply: false } } },
+    async () => {},
   ),
-  {
-    sources: [],
-    events: [
-      makeEvent("begin", 1, 0, "apply", {
-        function: "function",
-        this: { type: "number", print: "123" },
-        arguments: [{ type: "number", print: "456" }],
-      }),
-      makeEvent("before", 2, 0, "jump", null),
-      makeEvent("after", 2, 0, "jump", null),
-      makeEvent("end", 1, 0, "apply", {
-        error: { type: "null", print: "null" },
-        result: { type: "number", print: "789" },
-      }),
-    ],
-  },
+  [],
+);
+
+const summarize = ({ site, payload: { type } }) => `${site}/${type}`;
+
+assertDeepEqual(
+  (
+    await testHookAsync(
+      component,
+      { configuration: { hooks: { apply: true }, "hidden-identifier": "$" } },
+      async () => {
+        {
+          const tab = $uuid.getFreshTab();
+          $uuid.recordApply(tab, "function", "this", ["argument"]);
+          $uuid.recordAwait(tab, "promise");
+          $uuid.recordResolve(tab, "result");
+          $uuid.recordReturn(tab, "function", "result");
+        }
+        {
+          const tab = $uuid.getFreshTab();
+          $uuid.recordApply(tab, "function", "this", ["argument"]);
+          $uuid.recordAwait(tab, "promise");
+          $uuid.recordReject(tab, "error");
+          $uuid.recordThrow(tab, "function", "error");
+        }
+        {
+          const tab = $uuid.getFreshTab();
+          $uuid.recordApply(tab, "function", "this", ["argument"]);
+          $uuid.recordYield(tab, "iterator");
+          $uuid.recordResume(tab);
+          $uuid.recordReturn(tab, "function", "result");
+        }
+      },
+    )
+  ).map(summarize),
+  [
+    // tab1 //
+    "begin/apply",
+    "before/await",
+    "after/resolve",
+    "end/return",
+    // tab2 //
+    "begin/apply",
+    "before/await",
+    "after/reject",
+    "end/throw",
+    // tab3 //
+    "begin/apply",
+    "before/yield",
+    "after/resume",
+    "end/return",
+  ],
 );

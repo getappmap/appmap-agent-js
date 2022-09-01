@@ -61,46 +61,52 @@ export default (dependencies) => {
         })
         .filter(getHead)
         .map(getBody);
-      if (sources.length === 0) {
-        logDebug(
-          "Not instrumenting file %j because it has no allowed sources.",
-          url,
-        );
-        return { url, content, sources: [] };
-      }
-      logDebug("Instrumenting generated file %j", url);
+      const excluded = sources.length === 0;
       sources = sources.filter(({ url }) => !done.has(url));
       for (const { url } of sources) {
         done.add(url);
       }
-      return {
-        url,
-        content: generateEstree(
-          visit(
-            expectSuccess(
-              () =>
-                parseEstree(content, {
-                  allowHashBang: true,
-                  sourceType: type,
-                  allowAwaitOutsideFunction: type === "module",
-                  ecmaVersion: "latest",
-                  locations: true,
-                }),
-              "failed to parse file %j >> %O",
-              url,
+      if (
+        excluded ||
+        (configuration.hooks.eval.length === 0 && !configuration.hooks.apply)
+      ) {
+        logDebug(
+          "Not instrumenting file %j because it has no allowed sources or because instrumentation hooks (apply and eval) are disabled.",
+          url,
+        );
+        return { url, content, sources };
+      } else {
+        logDebug("Instrumenting file %j", url);
+        return {
+          url,
+          content: generateEstree(
+            visit(
+              expectSuccess(
+                () =>
+                  parseEstree(content, {
+                    allowHashBang: true,
+                    sourceType: type,
+                    allowAwaitOutsideFunction: type === "module",
+                    ecmaVersion: "latest",
+                    locations: true,
+                  }),
+                "failed to parse file %j >> %O",
+                url,
+              ),
+              {
+                url,
+                runtime,
+                whitelist: new _Set(sources.map(getURL)),
+                evals: configuration.hooks.eval,
+                apply: configuration.hooks.apply,
+                mapping,
+                counter,
+              },
             ),
-            {
-              url,
-              runtime,
-              whitelist: new _Set(sources.map(getURL)),
-              evals: configuration.hooks.eval,
-              mapping,
-              counter,
-            },
           ),
-        ),
-        sources,
-      };
+          sources,
+        };
+      }
     },
   };
 };

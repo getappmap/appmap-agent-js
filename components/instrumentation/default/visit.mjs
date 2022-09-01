@@ -55,6 +55,30 @@ const { ownKeys } = Reflect;
 // Builder //
 /////////////
 
+const makeProgram = (source, body) => ({
+  type: "Program",
+  sourceType: source,
+  body,
+});
+
+const makeClosure = (
+  type,
+  asynchronous,
+  generator,
+  expression,
+  id,
+  params,
+  body,
+) => ({
+  type,
+  async: asynchronous,
+  generator,
+  expression,
+  id,
+  params,
+  body,
+});
+
 const makeSequenceExpression = (nodes) => ({
   type: "SequenceExpression",
   expressions: nodes,
@@ -195,363 +219,365 @@ const makeReturnStatement = (argument) => ({
   argument,
 });
 
+///////////////
+// Component //
+///////////////
+
 export default (dependencies) => {
   const {
     expect: { expect },
     url: { appendURLSegment },
-    util: { fromMaybe, assert, hasOwnProperty, coalesce, incrementCounter },
+    util: {
+      mapMaybe,
+      fromMaybe,
+      assert,
+      hasOwnProperty,
+      coalesce,
+      incrementCounter,
+    },
     source: { mapSource },
     log: { logGuardDebug },
     location: { stringifyLocation, getLocationFileURL },
   } = dependencies;
 
+  const isSubclassConstructor = (node, parent, grand_parent) =>
+    parent.type === "MethodDefinition" &&
+    parent.kind === "constructor" &&
+    grand_parent.superClass !== null;
+
   const isEstreeKey = (key) =>
     key !== "loc" && key !== "start" && key !== "end";
 
-  const makeCatchJumpStatement = (runtime) =>
-    makeIfStatement(
-      makeBinaryExpression(
-        "!==",
-        makeIdentifier(`${runtime}_JUMP_ID`),
-        makeLiteral(null),
-      ),
-      makeBlockStatement([
-        makeStatement(
-          makeCallExpression(
-            makeRegularMemberExpression(runtime, "recordAfterJump"),
-            [makeIdentifier(`${runtime}_JUMP_ID`)],
-          ),
-        ),
-        makeStatement(
-          makeAssignmentExpression(
-            makeIdentifier(`${runtime}_JUMP_ID`),
-            makeLiteral(null),
-          ),
-        ),
-      ]),
-      null,
+  const instrumentClosure = (node, parent, grand_parent, closure, context) => {
+    const location = mapSource(
+      context.mapping,
+      node.loc.start.line,
+      node.loc.start.column,
     );
-
-  const makeJumpExpression = (expression, makeExpression, runtime) =>
-    makeSequenceExpression([
-      makeAssignmentExpression(makeIdentifier(`${runtime}_JUMP`), expression),
-      makeAssignmentExpression(
-        makeIdentifier(`${runtime}_JUMP_ID`),
-        makeCallExpression(
-          makeRegularMemberExpression(runtime, "recordBeforeJump"),
-          [],
-        ),
-      ),
-      makeAssignmentExpression(
-        makeIdentifier(`${runtime}_JUMP`),
-        makeExpression(makeIdentifier(`${runtime}_JUMP`)),
-      ),
-      makeCallExpression(
-        makeRegularMemberExpression(runtime, "recordAfterJump"),
-        [makeIdentifier(`${runtime}_JUMP_ID`)],
-      ),
-      makeAssignmentExpression(
-        makeIdentifier(`${runtime}_JUMP_ID`),
-        makeLiteral(null),
-      ),
-      makeIdentifier(`${runtime}_JUMP`),
-    ]);
-
-  // *NB*: This supposes that the surrounding function has been compiled!
-  const compileReturn = (node, runtime) =>
-    makeReturnStatement(
-      makeAssignmentExpression(
-        makeIdentifier(`${runtime}_SUCCESS`),
-        node === null ? makeUnaryExpression("void", makeLiteral(0)) : node,
-      ),
+    logGuardDebug(
+      location === null,
+      "Missing source map at file %j at line %j at column %j",
+      context.url,
+      node.loc.start.line,
+      node.loc.start.column,
     );
-
-  const compileParam = ({ type }, index, runtime) => {
-    const pattern = makeIdentifier(`${runtime}_ARGUMENT_${_String(index)}`);
-    return type === "RestElement" ? makeRestElement(pattern) : pattern;
-  };
-
-  const compileBody = (node, runtime) => {
-    const { type } = node;
-    if (type === "BlockStatement") {
-      const { body } = node;
-      return body;
-    }
-    return [compileReturn(node, runtime)];
-  };
-
-  const compileTryStatement = (node1, node2, node3, runtime) =>
-    makeTryStatement(
-      node1,
-      makeCatchClause(
-        makeIdentifier(`${runtime}_ERROR`),
+    closure = {
+      node,
+      instrumented:
+        context.apply &&
+        location !== null &&
+        context.whitelist.has(getLocationFileURL(location)),
+    };
+    if (closure.instrumented) {
+      return makeClosure(
+        node.type,
+        node.async,
+        node.generator,
+        false,
+        mapMaybe(coalesce(node, "id", null), (child) =>
+          visit(child, node, parent, closure, context),
+        ),
+        node.params.map((param, index) => {
+          const pattern = makeIdentifier(
+            `${context.runtime}_ARGUMENT_${_String(index)}`,
+          );
+          return param.type === "RestElement"
+            ? makeRestElement(pattern)
+            : pattern;
+        }),
         makeBlockStatement([
-          makeCatchJumpStatement(runtime),
-          ...(node2 === null || node2.param === null
-            ? []
-            : [
-                makeVariableDeclaration("let", [
-                  makeVariableDeclarator(
-                    node2.param,
-                    makeIdentifier(`${runtime}_ERROR`),
-                  ),
-                ]),
-              ]),
-          ...(node2 === null ? [] : [node2.body]),
-        ]),
-      ),
-      node3,
-    );
-
-  const compileProgram = (type, nodes, runtime) => ({
-    type: "Program",
-    sourceType: type,
-    body: [
-      makeVariableDeclaration("let", [
-        makeVariableDeclarator(
-          makeIdentifier(`${runtime}_JUMP`),
-          makeLiteral(null),
-        ),
-      ]),
-      makeVariableDeclaration("let", [
-        makeVariableDeclarator(
-          makeIdentifier(`${runtime}_JUMP_ID`),
-          makeLiteral(null),
-        ),
-      ]),
-      ...nodes,
-    ],
-  });
-
-  const compileEvalCall = (url, name, node, nodes) =>
-    makeCallExpression(
-      makeIdentifier(name),
-      [
-        makeCallExpression(makeIdentifier("APPMAP_HOOK_EVAL"), [
-          makeLiteral(url),
-          node,
-        ]),
-      ].concat(nodes),
-    );
-
-  const compileFunction = (
-    node,
-    is_child_constructor,
-    params,
-    body,
-    location,
-    runtime,
-  ) => ({
-    type: node.type,
-    id: coalesce(node, "id", null),
-    expression: false,
-    async: node.async,
-    generator: node.generator,
-    params: params.map((node, index) => compileParam(node, index, runtime)),
-    body: makeBlockStatement([
-      makeVariableDeclaration("var", [
-        makeVariableDeclarator(
-          makeIdentifier(`${runtime}_APPLY_ID`),
-          makeCallExpression(
-            makeRegularMemberExpression(runtime, "recordBeginApply"),
-            [
-              makeLiteral(stringifyLocation(location)),
-              node.type === "ArrowFunctionExpression" || is_child_constructor
-                ? makeRegularMemberExpression(runtime, "empty")
-                : makeThisExpression(),
-              makeArrayExpression(
-                params.map((param, index) =>
-                  makeIdentifier(`${runtime}_ARGUMENT_${_String(index)}`),
-                ),
-              ),
-            ],
-          ),
-        ),
-        makeVariableDeclarator(
-          makeIdentifier(`${runtime}_FAILURE`),
-          makeRegularMemberExpression(runtime, "empty"),
-        ),
-        makeVariableDeclarator(
-          makeIdentifier(`${runtime}_SUCCESS`),
-          makeRegularMemberExpression(runtime, "empty"),
-        ),
-        makeVariableDeclarator(
-          makeIdentifier(`${runtime}_JUMP`),
-          makeLiteral(null),
-        ),
-        makeVariableDeclarator(
-          makeIdentifier(`${runtime}_JUMP_ID`),
-          makeLiteral(null),
-        ),
-      ]),
-      makeTryStatement(
-        makeBlockStatement([
-          ...(params.length === 0
-            ? []
-            : [
-                makeVariableDeclaration(
-                  "var",
-                  params.map((param, index) => {
-                    if (param.type === "RestElement") {
-                      param = param.argument;
-                    }
-                    // Special case for AssignmentPattern:
-                    //
-                    // function f (x = {}) {}
-                    //
-                    // function f (APPMAP_ARGUMENT_0) {
-                    //   // does not work :(
-                    //   var x = {} = APPMAP_ARGUMENT_0;
-                    // }
-                    if (param.type === "AssignmentPattern") {
-                      const { left, right } = param;
-                      return makeVariableDeclarator(
-                        left,
-                        makeConditionalExpression(
-                          makeBinaryExpression(
-                            "===",
-                            makeIdentifier(
-                              `${runtime}_ARGUMENT_${_String(index)}`,
-                            ),
-                            makeUnaryExpression("void", makeLiteral(0)),
-                          ),
-                          right,
-                          makeIdentifier(
-                            `${runtime}_ARGUMENT_${_String(index)}`,
-                          ),
-                        ),
-                      );
-                    }
-                    return makeVariableDeclarator(
-                      param,
-                      makeIdentifier(`${runtime}_ARGUMENT_${_String(index)}`),
-                    );
-                  }),
-                ),
-              ]),
-          ...compileBody(body, runtime),
-        ]),
-        makeCatchClause(
-          makeIdentifier(`${runtime}_ERROR`),
-          makeBlockStatement([
-            makeCatchJumpStatement(runtime),
-            makeThrowStatement(
-              makeAssignmentExpression(
-                makeIdentifier(`${runtime}_FAILURE`),
-                makeIdentifier(`${runtime}_ERROR`),
+          makeVariableDeclaration("var", [
+            makeVariableDeclarator(
+              makeIdentifier(`${context.runtime}_BUNDLE_TAB`),
+              makeCallExpression(
+                makeRegularMemberExpression(context.runtime, "getFreshTab"),
+                [],
               ),
             ),
+            makeVariableDeclarator(
+              makeIdentifier(`${context.runtime}_RETURN`),
+              null,
+            ),
+            makeVariableDeclarator(
+              makeIdentifier(`${context.runtime}_RETURNED`),
+              makeLiteral(true),
+            ),
+            ...(node.generator
+              ? [
+                  makeVariableDeclarator(
+                    makeIdentifier(`${context.runtime}_YIELD`),
+                    null,
+                  ),
+                  makeVariableDeclarator(
+                    makeIdentifier(`${context.runtime}_YIELD_TAB`),
+                    null,
+                  ),
+                ]
+              : []),
+            ...(node.async
+              ? [
+                  makeVariableDeclarator(
+                    makeIdentifier(`${context.runtime}_AWAIT`),
+                    null,
+                  ),
+                  makeVariableDeclarator(
+                    makeIdentifier(`${context.runtime}_AWAIT_TAB`),
+                    null,
+                  ),
+                ]
+              : []),
           ]),
-        ),
-        makeBlockStatement([
           makeExpressionStatement(
             makeCallExpression(
-              makeRegularMemberExpression(runtime, "recordEndApply"),
+              makeRegularMemberExpression(context.runtime, "recordApply"),
               [
-                makeIdentifier(`${runtime}_APPLY_ID`),
-                makeIdentifier(`${runtime}_FAILURE`),
-                makeIdentifier(`${runtime}_SUCCESS`),
+                makeIdentifier(`${context.runtime}_BUNDLE_TAB`),
+                makeLiteral(stringifyLocation(location)),
+                node.type === "ArrowFunctionExpression" ||
+                isSubclassConstructor(node, parent, grand_parent)
+                  ? makeRegularMemberExpression(context.runtime, "empty")
+                  : makeThisExpression(),
+                makeArrayExpression(
+                  node.params.map((param, index) =>
+                    makeIdentifier(
+                      `${context.runtime}_ARGUMENT_${_String(index)}`,
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
+          makeTryStatement(
+            makeBlockStatement([
+              ...(node.params.length === 0
+                ? []
+                : [
+                    makeVariableDeclaration(
+                      "var",
+                      node.params.map((param, index) => {
+                        if (param.type === "RestElement") {
+                          param = param.argument;
+                        }
+                        // Special case for AssignmentPattern:
+                        //
+                        // function f (x = {}) {}
+                        //
+                        // function f (APPMAP_ARGUMENT_0) {
+                        //   // does not work :(
+                        //   var x = {} = APPMAP_ARGUMENT_0;
+                        // }
+                        if (param.type === "AssignmentPattern") {
+                          return makeVariableDeclarator(
+                            param.left,
+                            makeConditionalExpression(
+                              makeBinaryExpression(
+                                "===",
+                                makeIdentifier(
+                                  `${context.runtime}_ARGUMENT_${_String(
+                                    index,
+                                  )}`,
+                                ),
+                                makeUnaryExpression("void", makeLiteral(0)),
+                              ),
+                              param.right,
+                              makeIdentifier(
+                                `${context.runtime}_ARGUMENT_${_String(index)}`,
+                              ),
+                            ),
+                          );
+                        } else {
+                          return makeVariableDeclarator(
+                            param,
+                            makeIdentifier(
+                              `${context.runtime}_ARGUMENT_${_String(index)}`,
+                            ),
+                          );
+                        }
+                      }),
+                    ),
+                  ]),
+              node.expression
+                ? makeReturnStatement(
+                    makeAssignmentExpression(
+                      makeIdentifier(`${context.runtime}_RETURN`),
+                      visit(node.body, node, parent, closure, context),
+                    ),
+                  )
+                : visit(node.body, node, parent, closure, context),
+            ]),
+            makeCatchClause(
+              makeIdentifier(`${context.runtime}_ERROR`),
+              makeBlockStatement([
+                ...(node.async
+                  ? [
+                      makeIfStatement(
+                        makeBinaryExpression(
+                          "!==",
+                          makeIdentifier(`${context.runtime}_AWAIT_TAB`),
+                          makeUnaryExpression("void", makeLiteral(0)),
+                        ),
+                        makeBlockStatement([
+                          makeStatement(
+                            makeCallExpression(
+                              makeRegularMemberExpression(
+                                context.runtime,
+                                "recordReject",
+                              ),
+                              [
+                                makeIdentifier(`${context.runtime}_AWAIT_TAB`),
+                                makeIdentifier(`${context.runtime}_ERROR`),
+                              ],
+                            ),
+                          ),
+                        ]),
+                        null,
+                      ),
+                    ]
+                  : []),
+                makeExpressionStatement(
+                  makeAssignmentExpression(
+                    makeIdentifier(`${context.runtime}_RETURNED`),
+                    makeLiteral(false),
+                  ),
+                ),
+                makeExpressionStatement(
+                  makeCallExpression(
+                    makeRegularMemberExpression(context.runtime, "recordThrow"),
+                    [
+                      makeIdentifier(`${context.runtime}_BUNDLE_TAB`),
+                      makeLiteral(stringifyLocation(location)),
+                      makeIdentifier(`${context.runtime}_ERROR`),
+                    ],
+                  ),
+                ),
+                makeThrowStatement(makeIdentifier(`${context.runtime}_ERROR`)),
+              ]),
+            ),
+            makeBlockStatement([
+              makeIfStatement(
+                makeIdentifier(`${context.runtime}_RETURNED`),
+                makeBlockStatement([
+                  makeExpressionStatement(
+                    makeCallExpression(
+                      makeRegularMemberExpression(
+                        context.runtime,
+                        "recordReturn",
+                      ),
+                      [
+                        makeIdentifier(`${context.runtime}_BUNDLE_TAB`),
+                        makeLiteral(stringifyLocation(location)),
+                        makeIdentifier(`${context.runtime}_RETURN`),
+                      ],
+                    ),
+                  ),
+                ]),
+                null,
+              ),
+            ]),
+          ),
         ]),
-      ),
-    ]),
-  });
-
-  const visitGeneric = (node, parent, instrumented, context) =>
-    fromEntries(
-      ownKeys(node)
-        .filter(isEstreeKey)
-        .map((key) => [
-          key,
-          visit(node[key], node, parent, instrumented, context),
-        ]),
-    );
-
-  const visit = (node, parent, grand_parent, instrumented, context) => {
-    if (isArray(node)) {
-      return node.map((node) =>
-        visit(node, parent, grand_parent, instrumented, context),
       );
-    } else if (
-      typeof node === "object" &&
-      node !== null &&
-      hasOwnProperty(node, "type")
-    ) {
-      if (node.type === "Identifier") {
-        expect(
-          !node.name.startsWith(context.runtime),
-          "Identifier collision detected at %j line %j column %j >> identifier should not start with %j, got: %j",
-          context.url,
-          node.loc.start.line,
-          node.loc.start.column,
-          context.runtime,
-          node.name,
-        );
-        return makeIdentifier(node.name);
-      } else if (
-        node.type === "ArrowFunctionExpression" ||
-        node.type === "FunctionExpression" ||
-        node.type === "FunctionDeclaration"
-      ) {
-        const location = mapSource(
-          context.mapping,
-          node.loc.start.line,
-          node.loc.start.column,
-        );
-        logGuardDebug(
-          location === null,
-          "Missing source map at file %j at line %j at column %j",
-          context.url,
-          node.loc.start.line,
-          node.loc.start.column,
-        );
-        return location !== null &&
-          context.whitelist.has(getLocationFileURL(location))
-          ? compileFunction(
-              node,
-              parent.type === "MethodDefinition" &&
-                parent.kind === "constructor" &&
-                grand_parent.superClass !== null,
-              visit(node.params, node, parent, true, context),
-              visit(node.body, node, parent, true, context),
-              location,
-              context.runtime,
-            )
-          : visitGeneric(node, parent, false, context);
-      } else if (instrumented && node.type === "Program") {
-        return compileProgram(
-          node.sourceType,
-          visit(node.body, node, parent, instrumented, context),
-          context.runtime,
-        );
-      } else if (instrumented && node.type === "TryStatement") {
-        return compileTryStatement(
-          visit(node.block, node, parent, instrumented, context),
-          visit(node.handler, node, parent, instrumented, context),
-          visit(node.finalizer, node, parent, instrumented, context),
-          context.runtime,
-        );
-      } else if (instrumented && node.type === "AwaitExpression") {
-        return makeJumpExpression(
-          visit(node.argument, node, parent, instrumented, context),
-          makeAwaitExpression,
-          context.runtime,
-        );
-      } else if (instrumented && node.type === "YieldExpression") {
-        return makeJumpExpression(
-          visit(node.argument, node, parent, instrumented, context),
-          (expression) => makeYieldExpression(node.delegate, expression),
-          context.runtime,
-        );
-      } else if (instrumented && node.type === "ReturnStatement") {
-        return compileReturn(
-          visit(node.argument, node, parent, instrumented, context),
-          context.runtime,
-        );
-      } else if (
-        node.type === "CallExpression" &&
+    } else {
+      return makeClosure(
+        node.type,
+        node.async,
+        node.generator,
+        node.expression,
+        mapMaybe(node.id, (child) =>
+          visit(child, node, parent, closure, context),
+        ),
+        node.params.map((param) =>
+          visit(param, node, parent, closure, context),
+        ),
+        visit(node.body, node, parent, closure, context),
+      );
+    }
+  };
+
+  const instrumenters = {
+    AwaitExpression: (node, parent, grand_parent, closure, context) =>
+      closure.instrumented
+        ? makeSequenceExpression([
+            makeAssignmentExpression(
+              makeIdentifier(`${context.runtime}_AWAIT`),
+              visit(node.argument, node, parent, closure, context),
+            ),
+            makeAssignmentExpression(
+              makeIdentifier(`${context.runtime}_AWAIT_TAB`),
+              makeCallExpression(
+                makeRegularMemberExpression(context.runtime, "getFreshTab"),
+                [],
+              ),
+            ),
+            makeCallExpression(
+              makeRegularMemberExpression(context.runtime, "recordAwait"),
+              [
+                makeIdentifier(`${context.runtime}_AWAIT_TAB`),
+                makeIdentifier(`${context.runtime}_AWAIT`),
+              ],
+            ),
+            makeAssignmentExpression(
+              makeIdentifier(`${context.runtime}_AWAIT`),
+              makeAwaitExpression(makeIdentifier(`${context.runtime}_AWAIT`)),
+            ),
+            makeCallExpression(
+              makeRegularMemberExpression(context.runtime, "recordResolve"),
+              [
+                makeIdentifier(`${context.runtime}_AWAIT_TAB`),
+                makeIdentifier(`${context.runtime}_AWAIT`),
+              ],
+            ),
+            makeAssignmentExpression(
+              makeIdentifier(`${context.runtime}_AWAIT_TAB`),
+              makeUnaryExpression("void", makeLiteral(0)),
+            ),
+            makeIdentifier(`${context.runtime}_AWAIT`),
+          ])
+        : null,
+    YieldExpression: (node, parent, grand_parent, closure, context) =>
+      closure.instrumented
+        ? makeSequenceExpression([
+            makeAssignmentExpression(
+              makeIdentifier(`${context.runtime}_YIELD`),
+              visit(node.argument, node, parent, closure, context),
+            ),
+            makeAssignmentExpression(
+              makeIdentifier(`${context.runtime}_YIELD_TAB`),
+              makeCallExpression(
+                makeRegularMemberExpression(context.runtime, "getFreshTab"),
+                [],
+              ),
+            ),
+            makeCallExpression(
+              makeRegularMemberExpression(context.runtime, "recordYield"),
+              [
+                makeIdentifier(`${context.runtime}_YIELD_TAB`),
+                makeLiteral(node.delegate),
+                makeIdentifier(`${context.runtime}_YIELD`),
+              ],
+            ),
+            makeYieldExpression(
+              node.delegate,
+              makeIdentifier(`${context.runtime}_YIELD`),
+            ),
+            makeCallExpression(
+              makeRegularMemberExpression(context.runtime, "recordResume"),
+              [makeIdentifier(`${context.runtime}_YIELD_TAB`)],
+            ),
+            makeUnaryExpression("void", makeLiteral(0)),
+          ])
+        : null,
+    ReturnStatement: (node, parent, grand_parent, closure, context) =>
+      closure.instrumented && node.argument !== null
+        ? makeReturnStatement(
+            makeAssignmentExpression(
+              makeIdentifier(`${context.runtime}_RETURN`),
+              visit(node.argument, node, parent, closure, context),
+            ),
+          )
+        : null,
+    CallExpression: (node, parent, grand_parent, closure, context) => {
+      if (
         node.callee.type === "Identifier" &&
         context.evals.includes(node.callee.name) &&
         node.arguments.length > 0
@@ -568,28 +594,183 @@ export default (dependencies) => {
           node.loc.start.line,
           node.loc.start.column,
         );
-        return compileEvalCall(
-          appendURLSegment(
-            fromMaybe(location, context.url, getLocationFileURL),
-            `eval-${_String(incrementCounter(context.counter))}`,
-          ),
-          node.callee.name,
-          visit(node.arguments[0], node, parent, instrumented, context),
-          node.arguments
-            .slice(1)
-            .map((argument) =>
-              visit(argument, node, parent, instrumented, context),
+        return makeCallExpression(makeIdentifier(node.callee.name), [
+          makeCallExpression(makeIdentifier("APPMAP_HOOK_EVAL"), [
+            makeLiteral(
+              appendURLSegment(
+                fromMaybe(location, context.url, getLocationFileURL),
+                `eval-${_String(incrementCounter(context.counter))}`,
+              ),
             ),
+            visit(node.arguments[0], node, parent, closure, context),
+          ]),
+          ...node.arguments
+            .slice(1)
+            .map((argument) => visit(argument, node, parent, closure, context)),
+        ]);
+      } else {
+        return null;
+      }
+    },
+    TryStatement: (node, parent, grand_parent, closure, context) => {
+      if (
+        closure.instrumented &&
+        ((closure.node.type === "Program" &&
+          closure.node.sourceType === "module") ||
+          (hasOwnProperty(closure.node, "async") && closure.node.async))
+      ) {
+        return makeTryStatement(
+          visit(node.block, node, parent, closure, context),
+          makeCatchClause(
+            makeIdentifier(`${context.runtime}_ERROR`),
+            makeBlockStatement([
+              makeIfStatement(
+                makeBinaryExpression(
+                  "!==",
+                  makeIdentifier(`${context.runtime}_AWAIT_TAB`),
+                  makeUnaryExpression("void", makeLiteral(0)),
+                ),
+                makeBlockStatement([
+                  makeStatement(
+                    makeCallExpression(
+                      makeRegularMemberExpression(
+                        context.runtime,
+                        "recordReject",
+                      ),
+                      [
+                        makeIdentifier(`${context.runtime}_AWAIT_TAB`),
+                        makeIdentifier(`${context.runtime}_ERROR`),
+                      ],
+                    ),
+                  ),
+                  makeStatement(
+                    makeAssignmentExpression(
+                      makeIdentifier(`${context.runtime}_AWAIT_TAB`),
+                      makeUnaryExpression("void", makeLiteral(0)),
+                    ),
+                  ),
+                ]),
+                null,
+              ),
+              ...(node.handler === null
+                ? []
+                : [
+                    ...(node.handler.param === null
+                      ? []
+                      : [
+                          makeVariableDeclaration("let", [
+                            makeVariableDeclarator(
+                              visit(
+                                node.handler.param,
+                                node.handler,
+                                node,
+                                closure,
+                                context,
+                              ),
+                              makeIdentifier(`${context.runtime}_ERROR`),
+                            ),
+                          ]),
+                        ]),
+                    visit(
+                      node.handler.body,
+                      node.handler,
+                      node,
+                      closure,
+                      context,
+                    ),
+                  ]),
+            ]),
+          ),
+          node.finalizer === null
+            ? null
+            : visit(node.finalizer, node, parent, closure, context),
         );
       } else {
-        return visitGeneric(node, parent, instrumented, context);
+        return null;
+      }
+    },
+    Identifier: (node, parent, grand_parent, closure, context) => {
+      expect(
+        !node.name.startsWith(context.runtime),
+        "Identifier collision detected at %j line %j column %j >> identifier should not start with %j, got: %j",
+        context.url,
+        node.loc.start.line,
+        node.loc.start.column,
+        context.runtime,
+        node.name,
+      );
+      return null;
+    },
+    Program: (node, parent, grand_parent, closure, context) =>
+      closure.instrumented && node.sourceType === "module"
+        ? makeProgram("module", [
+            makeVariableDeclaration("let", [
+              makeVariableDeclarator(
+                makeIdentifier(`${context.runtime}_BUNDLE_TAB`),
+                makeCallExpression(
+                  makeRegularMemberExpression(context.runtime, "getFreshTab"),
+                  [],
+                ),
+              ),
+              makeVariableDeclarator(
+                makeIdentifier(`${context.runtime}_AWAIT`),
+                null,
+              ),
+              makeVariableDeclarator(
+                makeIdentifier(`${context.runtime}_AWAIT_TAB`),
+                null,
+              ),
+            ]),
+            ...node.body.map((child) =>
+              visit(child, node, parent, closure, context),
+            ),
+          ])
+        : null,
+    FunctionExpression: instrumentClosure,
+    FunctionDeclaration: instrumentClosure,
+    ArrowFunctionExpression: instrumentClosure,
+  };
+
+  const visitGeneric = (node, parent, grand_parent, closure, context) =>
+    fromEntries(
+      ownKeys(node)
+        .filter(isEstreeKey)
+        .map((key) => [key, visit(node[key], node, parent, closure, context)]),
+    );
+
+  const visit = (node, parent, grand_parent, closure, context) => {
+    if (isArray(node)) {
+      return node.map((node) =>
+        visit(node, parent, grand_parent, closure, context),
+      );
+    } else if (
+      typeof node === "object" &&
+      node !== null &&
+      hasOwnProperty(node, "type")
+    ) {
+      if (hasOwnProperty(instrumenters, node.type)) {
+        const maybe_node = instrumenters[node.type](
+          node,
+          parent,
+          grand_parent,
+          closure,
+          context,
+        );
+        return maybe_node === null
+          ? visitGeneric(node, parent, grand_parent, closure, context)
+          : maybe_node;
+      } else {
+        return visitGeneric(node, parent, grand_parent, closure, context);
       }
     } else {
       return node;
     }
   };
+
   const initial_parent = { type: "File" };
+
   const initial_grand_parent = { type: "Root" };
+
   return {
     visit: (node, context) => {
       assert(
@@ -602,7 +783,10 @@ export default (dependencies) => {
         node,
         initial_parent,
         initial_grand_parent,
-        node.sourceType === "module",
+        {
+          node,
+          instrumented: context.apply && node.sourceType === "module",
+        },
         context,
       );
     },
