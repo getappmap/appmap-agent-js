@@ -1,4 +1,4 @@
-import { assertDeepEqual, assertEqual } from "../../__fixture__.mjs";
+import { assertDeepEqual } from "../../__fixture__.mjs";
 import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
@@ -10,77 +10,91 @@ const {
 } = globalThis;
 
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
+
 const { createConfiguration, extendConfiguration } =
-  await buildTestComponentAsync("configuration", "test");
+  await buildTestComponentAsync("configuration");
+
+const { validateSerial } = await buildTestComponentAsync("validate");
+
 const { createSerialization, getSerializationEmptyValue, serialize } =
   Serialization(dependencies);
+
 const setupSerialization = (config) =>
   createSerialization(
     extendConfiguration(createConfiguration("file:///home"), {
       serialization: config,
     }),
   );
+
 const testSerialize = (config, value) =>
   serialize(setupSerialization(config), value);
+
+///////////
 // empty //
+///////////
+
 {
   const serialization = setupSerialization({});
   const empty = getSerializationEmptyValue(serialization);
-  assertEqual(serialize(serialization, empty), null);
+  validateSerial(serialize(serialization, empty));
 }
+
+//////////
 // null //
-assertDeepEqual(testSerialize({}, null), {
-  type: "null",
-  print: "null",
-});
+//////////
+
+validateSerial(testSerialize({}, null));
+
+/////////////
+// boolean //
+/////////////
+
+validateSerial(testSerialize({}, true));
+
+////////////
 // number //
-assertDeepEqual(testSerialize({}, 123), {
-  type: "number",
-  print: "123",
-});
+////////////
+
+validateSerial(testSerialize({}, 123));
+
+////////////
 // bigint //
-assertDeepEqual(testSerialize({}, 123n), {
-  type: "bigint",
-  print: "123n",
-});
-// string with overflow //
-assertDeepEqual(
-  testSerialize({ "maximum-print-length": 50 }, ".".repeat(100)),
-  {
-    type: "string",
-    print: `"${".".repeat(45)} ...`,
-  },
-);
-assertDeepEqual(
+////////////
+
+validateSerial(testSerialize({}, 123n));
+
+////////////
+// string //
+////////////
+
+validateSerial(testSerialize({ "maximum-print-length": 50 }, ".".repeat(100)));
+validateSerial(
   testSerialize({ "maximum-print-length": null }, ".".repeat(100)),
-  {
-    type: "string",
-    print: `"${".".repeat(100)}"`,
-  },
 );
+
+////////////
 // symbol //
-assertDeepEqual(testSerialize({}, Symbol("description")), {
-  type: "symbol",
-  print: "Symbol(description)",
-  index: 1,
-});
+////////////
+
+validateSerial(testSerialize({}, Symbol("description")));
+
 {
   const serialization = setupSerialization({});
-  const serial = {
-    type: "symbol",
-    print: "global Symbol(description)",
-    index: 1,
-  };
-  assertDeepEqual(serialize(serialization, Symbol.for("description")), serial);
-  assertDeepEqual(serialize(serialization, Symbol.for("description")), serial);
+  const serial1 = serialize(serialization, Symbol.for("description"));
+  const serial2 = serialize(serialization, Symbol.for("description"));
+  validateSerial(serial1);
+  validateSerial(serial2);
+  assertDeepEqual(serial1, serial2);
 }
-assertDeepEqual(testSerialize({}, Symbol.iterator), {
-  type: "symbol",
-  print: "well-known Symbol(Symbol.iterator)",
-  index: 1,
-});
+
+validateSerial(testSerialize({}, Symbol.iterator));
+
+////////////
+// object //
+////////////
+
 // object pure //
-assertDeepEqual(
+validateSerial(
   testSerialize(
     {
       "impure-printing": false,
@@ -91,16 +105,10 @@ assertDeepEqual(
       return arguments;
     })(),
   ),
-  {
-    type: "object",
-    print: "[object Arguments]",
-    index: 1,
-    constructor: "Arguments",
-    specific: null,
-  },
 );
+
 // object impure //
-assertDeepEqual(
+validateSerial(
   testSerialize(
     {
       "impure-hash-inspection": false,
@@ -111,16 +119,10 @@ assertDeepEqual(
       constructor: function CONSTRUCTOR() {},
     },
   ),
-  {
-    type: "object",
-    print: "PRINT",
-    index: 1,
-    constructor: "CONSTRUCTOR",
-    specific: null,
-  },
 );
+
 // object impure failing toString //
-assertDeepEqual(
+validateSerial(
   testSerialize(
     {
       "impure-hash-inspection": false,
@@ -132,16 +134,10 @@ assertDeepEqual(
       },
     },
   ),
-  {
-    type: "object",
-    print: "[object Object]",
-    index: 1,
-    constructor: null,
-    specific: null,
-  },
 );
+
 // object impure invalid toString result //
-assertDeepEqual(
+validateSerial(
   testSerialize(
     {
       "impure-hash-inspection": false,
@@ -151,19 +147,13 @@ assertDeepEqual(
       toString: () => 123,
     },
   ),
-  {
-    type: "object",
-    print: "[object Object]",
-    index: 1,
-    constructor: null,
-    specific: null,
-  },
 );
+
 // object impure invalid constructor name //
 {
   const closure = function () {};
   defineProperty(closure, "name", { __proto__: null, value: 123 });
-  assertDeepEqual(
+  validateSerial(
     testSerialize(
       {
         "impure-hash-inspection": false,
@@ -173,105 +163,61 @@ assertDeepEqual(
         constructor: closure,
       },
     ),
-    {
-      type: "object",
-      print: "[object Object]",
-      index: 1,
-      constructor: null,
-      specific: null,
-    },
   );
 }
-// function named //
-assertDeepEqual(
-  testSerialize({}, function f() {}),
-  {
-    type: "function",
-    print: "function f (...) { ... }",
-    index: 1,
-    constructor: "Function",
-    specific: null,
-  },
-);
-// function anonymous //
-assertDeepEqual(
-  testSerialize({}, function () {}),
-  {
-    type: "function",
-    print: "function (...) { ... }",
-    index: 1,
-    constructor: "Function",
-    specific: null,
-  },
-);
-// arrow named //
-assertDeepEqual(testSerialize({}, { f: () => {} }.f), {
-  type: "function",
-  print: "f = (...) => { ... }",
-  index: 1,
-  constructor: "Function",
-  specific: null,
-});
-// arrow anonymous //
-assertDeepEqual(
-  testSerialize({}, () => {}),
-  {
-    type: "function",
-    print: "(...) => { ... }",
-    index: 1,
-    constructor: "Function",
-    specific: null,
-  },
-);
 
+/////////////
+// closure //
+/////////////
+
+// function named //
+validateSerial(testSerialize({}, function f() {}));
+
+// function anonymous //
+validateSerial(testSerialize({}, function () {}));
+
+// arrow named //
+validateSerial(testSerialize({}, { f: () => {} }.f));
+
+// arrow anonymous //
+validateSerial(testSerialize({}, () => {}));
+
+///////////
 // error //
-assertDeepEqual(
+///////////
+
+validateSerial(
   testSerialize(
     {},
     {
       __proto__: Error.prototype,
+      name: "name",
       message: "message",
       stack: "stack",
     },
   ),
-  {
-    type: "object",
-    print: "Error: message",
-    index: 1,
-    constructor: "Error",
-    specific: {
-      type: "error",
-      stack: "stack",
-      message: "message",
-    },
-  },
 );
-// error invalid message and getSafe recovery //
-assertDeepEqual(
+
+// invalid message and getSafe recovery //
+validateSerial(
   testSerialize(
     {},
     {
       __proto__: Error.prototype,
-      message: 123,
+      name: 123,
+      message: 456,
       get stack() {
         throw new Error("BOUM");
       },
     },
   ),
-  {
-    type: "object",
-    print: "Error: 123",
-    index: 1,
-    constructor: "Error",
-    specific: {
-      type: "error",
-      stack: "",
-      message: "",
-    },
-  },
 );
+
+//////////
 // hash //
-assertDeepEqual(
+//////////
+
+validateSerial(
   testSerialize(
     {},
     {
@@ -279,23 +225,10 @@ assertDeepEqual(
       bar: 456,
     },
   ),
-  {
-    type: "object",
-    print: "[object Object]",
-    index: 1,
-    constructor: "Object",
-    specific: {
-      type: "hash",
-      length: 2,
-      properties: [
-        { name: "foo", class: "Number" },
-        { name: "bar", class: "Number" },
-      ],
-    },
-  },
 );
+
 // hash toEntriesSafe recovery //
-assertDeepEqual(
+validateSerial(
   testSerialize(
     {},
     {
@@ -304,111 +237,10 @@ assertDeepEqual(
       },
     },
   ),
-  {
-    type: "object",
-    print: "[object Object]",
-    index: 1,
-    constructor: "Object",
-    specific: {
-      type: "hash",
-      length: 0,
-      properties: [],
-    },
-  },
 );
-// array //
-assertDeepEqual(testSerialize({}, [123, 456]), {
-  type: "object",
-  print: "123,456",
-  index: 1,
-  constructor: "Array",
-  specific: {
-    type: "array",
-    length: 2,
-  },
-});
 
-//
-// assertDeepEqual(
-//   testSerialize(
-//     {
-//       method: "Object.prototype.toString",
-//       "include-constructor-name": true,
-//     },
-//     {
-//       __proto__: { __proto__: null, constructor: { name: 123 } },
-//     },
-//   ),
-//   {
-//     type: "object",
-//     index: 1,
-//     constructor: null,
-//     print: "[object Object]",
-//   },
-// );
-// // object (toString) //
-// assertDeepEqual(
-//   testSerialize(
-//     {
-//       method: "toString",
-//       "include-constructor-name": false,
-//     },
-//     {
-//       toString: () => "description",
-//     },
-//   ),
-//   {
-//     type: "object",
-//     index: 1,
-//     print: "description",
-//   },
-// );
-// assertDeepEqual(
-//   testSerialize(
-//     {
-//       method: "toString",
-//       "include-constructor-name": false,
-//     },
-//     {
-//       toString: () => {
-//         throw new Error("BOUM");
-//       },
-//     },
-//   ),
-//   {
-//     type: "object",
-//     index: 1,
-//     print: "[object Object]",
-//   },
-// );
-// assertDeepEqual(
-//   testSerialize(
-//     {
-//       method: "toString",
-//       "include-constructor-name": false,
-//     },
-//     {
-//       toString: () => 123,
-//     },
-//   ),
-//   {
-//     type: "object",
-//     index: 1,
-//     print: "[object Object]",
-//   },
-// );
-// // function (toString)
-// assertDeepEqual(
-//   testSerialize(
-//     {
-//       method: "toString",
-//       "include-constructor-name": false,
-//     },
-//     () => {},
-//   ),
-//   {
-//     type: "function",
-//     index: 1,
-//     print: "[object Function]",
-//   },
-// );
+///////////
+// array //
+///////////
+
+validateSerial(testSerialize({}, [123, 456]));
