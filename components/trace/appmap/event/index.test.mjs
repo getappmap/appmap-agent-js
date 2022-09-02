@@ -47,6 +47,26 @@ const makeReturnPayload = (location) => ({
   },
 });
 
+const makeRequestPayload = (side) => ({
+  type: "request",
+  side,
+  protocol: "HTTP/1.1",
+  method: "GET",
+  url: "/",
+  route: null,
+  headers: {},
+  body: null,
+});
+
+const makeResponsePayload = (side) => ({
+  type: "response",
+  side,
+  status: 200,
+  message: "OK",
+  headers: {},
+  body: null,
+});
+
 const makeJumpPayload = () => ({ type: "jump" });
 
 const makeBundlePayload = () => ({ type: "bundle" });
@@ -132,7 +152,7 @@ for (const shallow of [true, false]) {
   }
 }
 
-// missing apply //
+// missing apply >> transparent //
 {
   const location = makeLocation("file:///home/filename.js", 1, 0);
   assertDeepEqual(
@@ -141,12 +161,40 @@ for (const shallow of [true, false]) {
         {
           type: "bundle",
           begin: makeEvent("begin", 123, makeApplyPayload(location)),
-          children: [],
+          children: [
+            {
+              type: "jump",
+              before: makeEvent("before", 456, makeQueryPayload()),
+              after: makeEvent("after", 456, makeAnswerPayload()),
+            },
+          ],
           end: makeEvent("end", 123, makeReturnPayload(location)),
         },
       ],
       createClassmap(createConfiguration("file:///home")),
     ).map(getEvent),
-    [],
+    ["call", "return"],
   );
 }
+
+// server apply >> deep //
+assertDeepEqual(
+  digestEventTrace(
+    [
+      {
+        type: "bundle",
+        begin: makeEvent("begin", 123, makeRequestPayload("server")),
+        children: [
+          {
+            type: "jump",
+            before: makeEvent("before", 456, makeQueryPayload()),
+            after: makeEvent("after", 456, makeAnswerPayload()),
+          },
+        ],
+        end: makeEvent("end", 123, makeResponsePayload("server")),
+      },
+    ],
+    createClassmap(createConfiguration("file:///home")),
+  ).map(getEvent),
+  ["call", "call", "return", "return"],
+);

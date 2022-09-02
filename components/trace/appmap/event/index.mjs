@@ -28,44 +28,45 @@ export default (dependencies) => {
   const digestEventTrace = (root, classmap) => {
     const counter = createCounter(0);
     const getClosureInfo = (location) => getClassmapClosure(classmap, location);
+    const digestTransparentBundle = ({ children }, info) =>
+      children.flatMap(loop);
+    const digestShallowBundle = ({ begin, end }, info) =>
+      digestEventPair(
+        begin,
+        end,
+        incrementCounter(counter),
+        incrementCounter(counter),
+        info,
+      );
+    const digestDeepBundle = ({ begin, children, end }, info) => {
+      const id1 = incrementCounter(counter);
+      const digest = children.flatMap(loop);
+      const id2 = incrementCounter(counter);
+      const [event1, event2] = digestEventPair(begin, end, id1, id2, info);
+      digest.unshift(event1);
+      digest.push(event2);
+      return digest;
+    };
     const loop = (node) => {
       if (node.type === "bundle") {
-        const { begin, children, end } = node;
         const {
-          payload: { type },
-        } = begin;
+          begin: {
+            payload: { type },
+          },
+        } = node;
         if (type === "bundle" || type === "group") {
-          return children.flatMap(loop);
-        } else {
-          let info = null;
-          if (begin.payload.type === "apply") {
-            info = mapMaybe(begin.payload.function, getClosureInfo);
-          }
-          if (info === null && begin.payload.type === "apply") {
-            return [];
-          } else if (info !== null && info.shallow) {
-            return digestEventPair(
-              begin,
-              end,
-              incrementCounter(counter),
-              incrementCounter(counter),
-              info,
-            );
+          return digestTransparentBundle(node, null);
+        } else if (type === "apply") {
+          const info = mapMaybe(node.begin.payload.function, getClosureInfo);
+          if (info === null) {
+            return digestTransparentBundle(node, info);
+          } else if (info.shallow) {
+            return digestShallowBundle(node, info);
           } else {
-            const id1 = incrementCounter(counter);
-            const digest = children.flatMap(loop);
-            const id2 = incrementCounter(counter);
-            const [event1, event2] = digestEventPair(
-              begin,
-              end,
-              id1,
-              id2,
-              info,
-            );
-            digest.unshift(event1);
-            digest.push(event2);
-            return digest;
+            return digestDeepBundle(node, info);
           }
+        } else {
+          return digestDeepBundle(node, null);
         }
       } else if (node.type === "jump") {
         const { before, after } = node;
