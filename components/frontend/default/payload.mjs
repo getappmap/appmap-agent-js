@@ -105,6 +105,9 @@ export default (dependencies) => {
       group,
       description,
     }),
-    getUngroupPayload: constant({ type: "ungroup" }),
+    formatUngroupPayload: ({}, group) => ({
+      type: "ungroup",
+      group,
+    }),
   };
 };

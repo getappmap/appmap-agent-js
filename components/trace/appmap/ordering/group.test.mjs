@@ -37,23 +37,13 @@ const makeBundleBeginEvent = (group) =>
 const makeBundleEndEvent = (group) =>
   makeEvent("end", group, makeBundlePayload());
 
+// group following //
 assertDeepEqual(
   groupStack([
     {
-      enter: makeBundleBeginEvent(123),
-      children: [
-        {
-          enter: makeGroupBeginEvent(123, 456, "description"),
-          children: [],
-          leave: makeResumeEndEvent(123),
-        },
-      ],
-      leave: makeBundleEndEvent(123),
-    },
-    {
-      enter: makeBundleBeginEvent(456),
+      enter: makeGroupBeginEvent(123, 456, "description"),
       children: [],
-      leave: makeBundleEndEvent(456),
+      leave: makeResumeEndEvent(123),
     },
     {
       enter: makeBundleBeginEvent(456),
@@ -63,25 +53,72 @@ assertDeepEqual(
   ]),
   [
     {
-      enter: makeBundleBeginEvent(123),
+      enter: makeGroupBeginEvent(123, 456, "description"),
       children: [
         {
-          enter: makeGroupBeginEvent(123, 456, "description"),
-          children: [
-            {
-              enter: makeBundleBeginEvent(456),
-              children: [],
-              leave: makeBundleEndEvent(456),
-            },
-            {
-              enter: makeBundleBeginEvent(456),
-              children: [],
-              leave: makeBundleEndEvent(456),
-            },
-          ],
-          leave: makeResumeEndEvent(123),
+          enter: makeBundleBeginEvent(456),
+          children: [],
+          leave: makeBundleEndEvent(456),
         },
       ],
+      leave: makeResumeEndEvent(123),
+    },
+  ],
+);
+
+// group preceding //
+assertDeepEqual(
+  groupStack([
+    {
+      enter: makeBundleBeginEvent(456),
+      children: [],
+      leave: makeBundleEndEvent(456),
+    },
+    {
+      enter: makeGroupBeginEvent(123, 456, "description"),
+      children: [],
+      leave: makeResumeEndEvent(123),
+    },
+  ]),
+  [
+    {
+      enter: makeGroupBeginEvent(123, 456, "description"),
+      children: [
+        {
+          enter: makeBundleBeginEvent(456),
+          children: [],
+          leave: makeBundleEndEvent(456),
+        },
+      ],
+      leave: makeResumeEndEvent(123),
+    },
+  ],
+);
+
+// group with multiple frames //
+// group preceding //
+assertDeepEqual(
+  groupStack([
+    {
+      enter: makeBundleBeginEvent(123),
+      children: [],
+      leave: makeBundleEndEvent(123),
+    },
+    {
+      enter: makeBundleBeginEvent(123),
+      children: [],
+      leave: makeBundleEndEvent(123),
+    },
+  ]),
+  [
+    {
+      enter: makeBundleBeginEvent(123),
+      children: [],
+      leave: makeBundleEndEvent(123),
+    },
+    {
+      enter: makeBundleBeginEvent(123),
+      children: [],
       leave: makeBundleEndEvent(123),
     },
   ],

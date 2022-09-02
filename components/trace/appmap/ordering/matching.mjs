@@ -95,6 +95,15 @@ export default (dependencies) => {
         type: "APPMAP-REJECT",
       },
     },
+    group: {
+      type: "group",
+      group: null,
+      description: "MISSING",
+    },
+    ungroup: {
+      type: "ungroup",
+      group: null,
+    },
   };
 
   const matching = [

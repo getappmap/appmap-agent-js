@@ -13,18 +13,20 @@ assertDeepEqual(
   await testHookAsync(
     component,
     {
-      ordering: "chronological",
-      hooks: {
-        apply: false,
-        mysql: false,
-        pg: false,
-        sqlite3: false,
-        cjs: false,
-        esm: false,
-        http: false,
+      configuration: {
+        ordering: "chronological",
+        hooks: {
+          apply: false,
+          mysql: false,
+          pg: false,
+          sqlite3: false,
+          cjs: false,
+          esm: false,
+          http: false,
+        },
       },
     },
     async () => {},
   ),
-  { sources: [], events: [] },
+  [],
 );

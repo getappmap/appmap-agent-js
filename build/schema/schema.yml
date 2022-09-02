@@ -1105,10 +1105,12 @@
 - $id: ungroup-payload
   type: object
   additionalProperties: false
-  required: [type]
+  required: [type, group]
   properties:
     type:
       const: ungroup
+    group:
+      $ref: group
 
 - $id: message
   anyOf:

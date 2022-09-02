@@ -8,7 +8,7 @@ export default (dependencies) => {
       recordBeginEvent,
       recordEndEvent,
       formatGroupPayload,
-      getUngroupPayload,
+      formatUngroupPayload,
     },
   } = dependencies;
   return {
@@ -16,7 +16,6 @@ export default (dependencies) => {
       if (ordering !== "causal") {
         return null;
       } else {
-        const ungroup_payload = getUngroupPayload(agent);
         const groups = new Set();
         const hook = createHook({
           init: (id, description, origin) => {
@@ -28,7 +27,7 @@ export default (dependencies) => {
               tab,
               formatGroupPayload(agent, id, description),
             );
-            recordEndEvent(agent, tab, ungroup_payload);
+            recordEndEvent(agent, tab, formatUngroupPayload(agent, id));
           },
         });
         hook.enable();

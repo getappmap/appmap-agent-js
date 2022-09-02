@@ -26,7 +26,7 @@ const {
   formatRequestPayload,
   formatResponsePayload,
   formatGroupPayload,
-  getUngroupPayload,
+  formatUngroupPayload,
 } = Payload(dependencies);
 
 const configuration = createConfiguration("file:///home");
@@ -40,8 +40,6 @@ validatePayload(getJumpPayload({ serialization }));
 validatePayload(getResumePayload({ serialization }));
 
 validatePayload(getAnswerPayload({ serialization }));
-
-validatePayload(getUngroupPayload({ serialization }));
 
 // apply //
 
@@ -101,4 +99,8 @@ validatePayload(
   ),
 );
 
+// group //
+
 validatePayload(formatGroupPayload({ serialization }, 123, "description"));
+
+validatePayload(formatUngroupPayload({ serialization }, 123));
