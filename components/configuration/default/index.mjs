@@ -4,7 +4,7 @@ const { entries: toEntries } = Object;
 
 const ANONYMOUS_NAME_SEPARATOR = "-";
 
-const EXPECTED_EXTRA_PROPERTIES = ["appmap_dir", "test_recording"];
+const EXPECTED_EXTRA_PROPERTIES = ["test_recording"];
 
 export default (dependencies) => {
   const {
@@ -504,7 +504,7 @@ export default (dependencies) => {
     ) => {
       internal_configuration = { ...internal_configuration };
       validateExternalConfiguration(external_configuration);
-      for (let key of ownKeys(external_configuration)) {
+      for (const key of ownKeys(external_configuration)) {
         if (hasOwnProperty(fields, key)) {
           const { normalize, extend } = fields[key];
           internal_configuration[key] = extend(
@@ -513,7 +513,7 @@ export default (dependencies) => {
           );
         } else {
           logGuardInfo(
-            EXPECTED_EXTRA_PROPERTIES.includes(key),
+            !EXPECTED_EXTRA_PROPERTIES.includes(key),
             "Configuration property not recognized by the agent: %j",
             key,
           );
