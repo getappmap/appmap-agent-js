@@ -21,7 +21,7 @@ await runAsync(
       apply: true,
       http: false,
     },
-    ordering: "causal",
+    ordering: "chronological",
   },
   async (repository) => {
     await writeFileAsync(
@@ -92,39 +92,39 @@ await runAsync(
           defined_class: "promiseCallback",
         },
         {
-          event: "call",
+          event: "return",
           id: 6,
-          defined_class: "timeoutCallback",
-        },
-        {
-          event: "return",
-          id: 7,
-          parent_id: 6,
-        },
-        {
-          event: "return",
-          id: 8,
           parent_id: 5,
         },
         {
           event: "call",
-          id: 9,
+          id: 7,
           defined_class: "afterAwait",
         },
         {
           event: "return",
-          id: 10,
-          parent_id: 9,
+          id: 8,
+          parent_id: 7,
         },
         {
           event: "return",
-          id: 11,
+          id: 9,
           parent_id: 2,
         },
         {
           event: "return",
-          id: 12,
+          id: 10,
           parent_id: 1,
+        },
+        {
+          event: "call",
+          id: 11,
+          defined_class: "timeoutCallback",
+        },
+        {
+          event: "return",
+          id: 12,
+          parent_id: 11,
         },
       ],
     );
