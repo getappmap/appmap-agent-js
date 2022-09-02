@@ -81,7 +81,7 @@ export default (dependencies) => {
       );
     }
     urls.add(url);
-    writeFileSync(new URL(url), stringifyJSON(trace), "utf8");
+    writeFileSync(new URL(url), stringifyJSON(trace, null, 2), "utf8");
     logInfo("Trace written at: %s", url);
   };
   return {
