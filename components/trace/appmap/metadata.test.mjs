@@ -1,4 +1,4 @@
-import { assertDeepEqual } from "../../__fixture__.mjs";
+import { assertDeepEqual, assertEqual } from "../../__fixture__.mjs";
 import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
@@ -50,6 +50,22 @@ const default_meta_data = {
 };
 
 assertDeepEqual(test({}, "file:///cwd"), default_meta_data);
+
+// history //
+assertEqual(
+  typeof test(
+    {
+      recorder: "process",
+      repository: {
+        directory: import.meta.url,
+        history: { repository: null, branch: null, commit: null },
+        package: null,
+      },
+    },
+    "file:///cwd",
+  ).git.repository,
+  "string",
+);
 
 // recorder //
 assertDeepEqual(test({ recorder: "process" }, "file:///cwd"), {

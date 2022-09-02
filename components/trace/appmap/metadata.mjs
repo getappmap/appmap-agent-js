@@ -43,7 +43,14 @@ export default (dependencies) => {
 
   const makeRecording = (recording) => mapMaybe(recording, makeJustRecording);
 
-  const makeHistory = ({ history }) => history;
+  const sanitizeHistory = ({ repository, branch, commit, ...rest }) => ({
+    repository: recoverMaybe(repository, "APPMAP-MISSING-REPOSITORY-NAME"),
+    branch: recoverMaybe(branch, "APPMAP-MISSING-REPOSITORY-BRANCH"),
+    commit: recoverMaybe(commit, "APPMAP-MISSING-REPOSITORY-COMMIT"),
+    ...rest,
+  });
+
+  const makeGit = ({ history }) => mapMaybe(history, sanitizeHistory);
 
   const makeAppName = (app_name, { package: _package }) =>
     app_name === null ? mapMaybe(_package, getName) : app_name;
@@ -115,7 +122,7 @@ export default (dependencies) => {
       client: makeClient(agent),
       recorder: makeRecorder(recorder),
       recording: makeRecording(recording),
-      git: makeHistory(repository),
+      git: makeGit(repository),
       test_status: makeTestStatus(errors, status),
       exception: makeException(errors),
     }),
