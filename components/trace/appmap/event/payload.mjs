@@ -8,7 +8,14 @@ const { from: arrayFrom } = Array;
 
 export default (dependencies) => {
   const {
-    util: { assert, coalesceCaseInsensitive, zip, hasOwnProperty, mapMaybe },
+    util: {
+      assert,
+      coalesceCaseInsensitive,
+      zip,
+      hasOwnProperty,
+      mapMaybe,
+      recoverMaybe,
+    },
   } = dependencies;
 
   const parseURL = (url, headers) =>
@@ -185,7 +192,7 @@ export default (dependencies) => {
       const { message, stack } = extractErrorSpecific(serial.specific);
       return {
         class: serial.constructor,
-        message,
+        message: recoverMaybe(message, serial.print),
         object_id: serial.index,
         // TODO: extract path from stack
         path: stack,
@@ -195,8 +202,8 @@ export default (dependencies) => {
     } else {
       return {
         class: serial.type,
-        message: null,
-        object_id: serial.type === "symbol" ? serial.index : null,
+        message: serial.print,
+        object_id: serial.type === "symbol" ? serial.index : 0,
         path: null,
         lineno: null,
       };

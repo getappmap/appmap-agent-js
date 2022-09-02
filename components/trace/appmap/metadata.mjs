@@ -1,6 +1,6 @@
 export default (dependencies) => {
   const {
-    util: { assert, mapMaybe },
+    util: { assert, mapMaybe, recoverMaybe },
     url: { getLastURLSegment },
   } = dependencies;
 
@@ -75,12 +75,13 @@ export default (dependencies) => {
     const { length } = errors;
     if (length === 0) {
       return null;
+    } else {
+      const [{ name, message }] = errors;
+      return {
+        class: recoverMaybe(name, "APPMAP-MISSING-ERROR-NAME"),
+        message,
+      };
     }
-    const [{ name, message }] = errors;
-    return {
-      class: name,
-      message,
-    };
   };
 
   return {

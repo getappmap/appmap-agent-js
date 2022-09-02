@@ -151,7 +151,7 @@ assertDeepEqual(
   {
     object_id: 123,
     class: "constructor",
-    message: null,
+    message: "print",
     path: null,
     lineno: null,
   },
@@ -166,7 +166,7 @@ assertDeepEqual(
   {
     object_id: 123,
     class: "symbol",
-    message: null,
+    message: "print",
     path: null,
     lineno: null,
   },
@@ -178,9 +178,9 @@ assertDeepEqual(
     print: "print",
   }),
   {
-    object_id: null,
+    object_id: 0,
     class: "string",
-    message: null,
+    message: "print",
     path: null,
     lineno: null,
   },
