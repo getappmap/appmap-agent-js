@@ -83,7 +83,7 @@ validatePayload(
     "GET",
     "/path",
     null,
-    { header: "value" },
+    { header: 123 },
     "body",
   ),
 );
@@ -94,7 +94,7 @@ validatePayload(
     "client",
     200,
     "OK",
-    { header: "value" },
+    { header: 123 },
     "body",
   ),
 );

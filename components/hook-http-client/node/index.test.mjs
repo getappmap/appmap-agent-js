@@ -75,7 +75,7 @@ const events = [
       method: "GET",
       url: "/path/?key=value",
       route: null,
-      headers: { __proto__: null, host: `localhost:${String(port)}` },
+      headers: { host: `localhost:${String(port)}` },
       body: null,
     },
   },

@@ -1,3 +1,5 @@
+import { print } from "./print.mjs";
+
 const { isArray, from: toArray } = Array;
 const { fromEntries, entries: toEntries } = Object;
 
@@ -6,6 +8,13 @@ export default (dependencies) => {
     util: { constant },
     serialization: { serialize },
   } = dependencies;
+
+  const hasStringKey = ([key]) => typeof key === "string";
+
+  const printValue = ([key, value]) => [key, print(value)];
+
+  const formatHeaders = (headers) =>
+    fromEntries(toEntries(headers).filter(hasStringKey).map(printValue));
 
   return {
     getJumpPayload: constant({ type: "jump" }),
@@ -61,7 +70,7 @@ export default (dependencies) => {
       method,
       url,
       route,
-      headers,
+      headers: formatHeaders(headers),
       body: serialize(serialization, body),
     }),
     formatResponsePayload: (
@@ -76,7 +85,7 @@ export default (dependencies) => {
       side,
       status,
       message,
-      headers,
+      headers: formatHeaders(headers),
       body: serialize(serialization, body),
     }),
     formatQueryPayload: (
