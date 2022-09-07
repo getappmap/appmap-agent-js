@@ -7,12 +7,10 @@ const { stringifyContent } = Stringify(
 );
 
 assertEqual(stringifyContent("123;"), "123;");
-{
-  const content = "123;";
-  const view = new Uint8Array(content.length);
-  for (let index = 0; index < content.length; index += 1) {
-    view[index] = "123;".charCodeAt(index);
-  }
-  assertEqual(stringifyContent(view), content);
-}
+
+assertEqual(
+  stringifyContent((new TextEncoder("utf8")).encode("123;")),
+  "123;",
+);
+
 assertThrow(() => stringifyContent(123));
