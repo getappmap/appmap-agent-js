@@ -31,7 +31,7 @@ export default (dependencies) => {
       if (type === "start") {
         const { track: key } = message;
         assert(!tracks.has(key), "duplicate track");
-        tracks.set(key, [].concat(sources, [message]));
+        tracks.set(key, [...sources, message]);
       } else if (type === "stop") {
         const { track: key } = message;
         assert(tracks.has(key), "missing track");
