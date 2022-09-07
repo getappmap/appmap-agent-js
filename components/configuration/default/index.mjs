@@ -502,13 +502,13 @@ export default (dependencies) => {
       external_configuration,
       base,
     ) => {
-      internal_configuration = { ...internal_configuration };
+      const extended_internal_configuration = { ...internal_configuration };
       validateExternalConfiguration(external_configuration);
       for (const key of ownKeys(external_configuration)) {
         if (hasOwnProperty(fields, key)) {
           const { normalize, extend } = fields[key];
-          internal_configuration[key] = extend(
-            internal_configuration[key],
+          extended_internal_configuration[key] = extend(
+            extended_internal_configuration[key],
             normalize(external_configuration[key], base),
           );
         } else {
@@ -519,7 +519,7 @@ export default (dependencies) => {
           );
         }
       }
-      return internal_configuration;
+      return extended_internal_configuration;
     },
   };
 };
