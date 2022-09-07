@@ -19,36 +19,43 @@ export default (dependencies) => {
 
   const spyReadable = (readable, callback) => {
     const buffers = [];
-    const original_push = patch(readable, "push", function (chunk, encoding) {
-      if (chunk === null) {
-        callback(concatBuffer(buffers));
-      } else {
-        buffers.push(normalizeChunk(chunk, encoding));
-      }
-      return apply(original_push, this, [chunk, encoding]);
-    });
+    patch(
+      readable,
+      "push",
+      (original_push) =>
+        function (chunk, encoding) {
+          if (chunk === null) {
+            callback(concatBuffer(buffers));
+          } else {
+            buffers.push(normalizeChunk(chunk, encoding));
+          }
+          return apply(original_push, this, [chunk, encoding]);
+        },
+    );
   };
 
   const spyWritable = (writable, callback1) => {
     const buffers = [];
-    const original_write = patch(
+    patch(
       writable,
       "write",
-      function (chunk, encoding, callback2) {
-        buffers.push(normalizeChunk(chunk, encoding));
-        return apply(original_write, this, [chunk, encoding, callback2]);
-      },
+      (original_write) =>
+        function (chunk, encoding, callback2) {
+          buffers.push(normalizeChunk(chunk, encoding));
+          return apply(original_write, this, [chunk, encoding, callback2]);
+        },
     );
-    const original_end = patch(
+    patch(
       writable,
       "end",
-      function (chunk, encoding, callback2) {
-        if (chunk !== null && chunk !== undefined) {
-          buffers.push(normalizeChunk(chunk, encoding));
-        }
-        callback1(concatBuffer(buffers));
-        return apply(original_end, this, [chunk, encoding, callback2]);
-      },
+      (original_end) =>
+        function (chunk, encoding, callback2) {
+          if (chunk !== null && chunk !== undefined) {
+            buffers.push(normalizeChunk(chunk, encoding));
+          }
+          callback1(concatBuffer(buffers));
+          return apply(original_end, this, [chunk, encoding, callback2]);
+        },
     );
   };
 

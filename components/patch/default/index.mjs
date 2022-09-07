@@ -8,7 +8,7 @@ export default (dependencies) => {
     util: { hasOwnProperty },
   } = dependencies;
   return {
-    patch: (object, key, value) => {
+    patch: (object, key, makePatch) => {
       if (hasOwnProperty(object, key)) {
         const descriptor = getOwnPropertyDescriptor(object, key);
         expect(
@@ -25,32 +25,33 @@ export default (dependencies) => {
         );
         defineProperty(object, key, {
           __proto__: descriptor,
-          value,
+          value: makePatch(descriptor.value),
         });
-        return descriptor.value;
       } else {
-        defineProperty(object, key, {
-          __proto__: null,
-          writable: true,
-          enumerable: false,
-          value,
-          configurable: true,
-        });
-        object = getPrototypeOf(object);
-        while (object !== null) {
-          if (hasOwnProperty(object, key)) {
-            const descriptor = getOwnPropertyDescriptor(object, key);
+        let prototype = getPrototypeOf(object);
+        let existing_value = _undefined;
+        while (prototype !== null) {
+          if (hasOwnProperty(prototype, key)) {
+            const descriptor = getOwnPropertyDescriptor(prototype, key);
             expect(
               hasOwnProperty(descriptor, "value"),
               "cannot monkey-patch accessor property %j of prototype %o",
               key,
-              object,
+              prototype,
             );
-            return descriptor.value;
+            existing_value = descriptor.value;
+            prototype = null;
+          } else {
+            prototype = getPrototypeOf(prototype);
           }
-          object = getPrototypeOf(object);
         }
-        return _undefined;
+        defineProperty(object, key, {
+          __proto__: null,
+          writable: true,
+          enumerable: false,
+          value: makePatch(existing_value),
+          configurable: true,
+        });
       }
     },
   };

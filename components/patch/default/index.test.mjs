@@ -17,13 +17,31 @@ const object = {
   },
 };
 
-assertEqual(patch(object, "key", 456), 123);
+assertEqual(
+  patch(object, "key", (value) => {
+    assertEqual(value, 123);
+    return 456;
+  }),
+  undefined,
+);
 assertEqual(object.key, 456);
 defineProperty(object, "key", {
   __proto__: null,
   configurable: false,
 });
-assertEqual(patch(object, "key", 789), 456);
+assertEqual(
+  patch(object, "key", (value) => {
+    assertEqual(value, 456);
+    return 789;
+  }),
+  undefined,
+);
 assertEqual(object.key, 789);
 assertEqual(prototype.key, 123);
-assertEqual(patch(object, "KEY", 123), undefined);
+assertEqual(
+  patch(object, "KEY", (value) => {
+    assertEqual(value, undefined);
+    return 123;
+  }),
+  undefined,
+);

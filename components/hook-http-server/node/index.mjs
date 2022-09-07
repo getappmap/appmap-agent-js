@@ -155,19 +155,24 @@ export default (dependencies) => {
 
   const trackJump = ({ agent, jump_payload }, box, emitter) => {
     const tracking = createBox(true);
-    const original_emit = patch(emitter, "emit", function emit(...args) {
-      if (getBox(tracking)) {
-        recordAfterEvent(agent, getBox(box), jump_payload);
-        setBox(box, getFreshTab(agent));
-        try {
-          return apply(original_emit, this, args);
-        } finally {
-          recordBeforeEvent(agent, getBox(box), jump_payload);
-        }
-      } else {
-        return apply(original_emit, this, args);
-      }
-    });
+    patch(
+      emitter,
+      "emit",
+      (original_emit) =>
+        function emit(...args) {
+          if (getBox(tracking)) {
+            recordAfterEvent(agent, getBox(box), jump_payload);
+            setBox(box, getFreshTab(agent));
+            try {
+              return apply(original_emit, this, args);
+            } finally {
+              recordBeforeEvent(agent, getBox(box), jump_payload);
+            }
+          } else {
+            return apply(original_emit, this, args);
+          }
+        },
+    );
     return tracking;
   };
 
@@ -231,24 +236,31 @@ export default (dependencies) => {
   ) => apply(original_server_emit, server, ["request", request, response]);
 
   const spyServer = (state, server, handleTraffic) => {
-    const original_server_emit = patch(
+    patch(
       server,
       "emit",
-      function emit(name, ...args) {
-        if (name !== "request") {
-          return apply(original_server_emit, this, [name, ...args]);
-        } else {
-          expect(
-            args.length === 2,
-            "expected exactly two arguments for request event on server",
-          );
-          const [request, response] = args;
-          if (!interceptTraffic(state, this, request, response)) {
-            handleTraffic(state, original_server_emit, this, request, response);
+      (original_server_emit) =>
+        function emit(name, ...args) {
+          if (name !== "request") {
+            return apply(original_server_emit, this, [name, ...args]);
+          } else {
+            expect(
+              args.length === 2,
+              "expected exactly two arguments for request event on server",
+            );
+            const [request, response] = args;
+            if (!interceptTraffic(state, this, request, response)) {
+              handleTraffic(
+                state,
+                original_server_emit,
+                this,
+                request,
+                response,
+              );
+            }
+            return true;
           }
-          return true;
-        }
-      },
+        },
     );
   };
 
