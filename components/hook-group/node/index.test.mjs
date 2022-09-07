@@ -27,7 +27,7 @@ setTimeout(() => {}, 100); // provide an unknown async id
 await testHookAsync(
   component,
   { configuration: { ordering: "causal" } },
-  async (frontend) => {
+  async () => {
     await new Promise((resolve) => {
       setTimeout(resolve, 100);
     });
