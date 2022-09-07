@@ -343,7 +343,7 @@ The agent filter code objects (functions or objects/classes) based on a format c
 * `app <string>` Name of the recorded application. *Default*: `null` the value found in `package.json` if any.
 * `name <string>` Name of the appmap. *Default*: `null` the agent will do its best to come up with a meaningful name.
 * `pruning <boolean>` Remove elements of the classmap which did not trigger any function application event. *Default*: `true`.
-* `serialization <object>` Serialization options. Many options focus on defining how aggressive the serialization should be. Pure serialization is faster and avoid disturbing the flow of the observed application but is less detailed than impure serialization.
+* `serialization <object>` Serialization options. Many options focus on defining how aggressive the serialization should be. Pure serialization is faster and avoids disturbing the flow of the observed application but is less detailed than impure serialization.
     * `maximum-print-length <number> | null` the maximum length of the string representation of values before being truncated. `null` indicates no limitation. *Default* `100`.
     * `maximum-properties-length <number> | null` the maximum of amount of properties serialized for hash objects. Objects are considered as hashes if their prototype is either `null` or `Object.prototype`. `null` indicates no limitation. *Default* `10`.
     * `impure-printing <boolean>` indicates whether to use a pure printing algorithm or not. For instance, an object can be printed either using `Object.prototype.toString.call(object)` which is pure or `object.toString()` which is impure. *Default* `true`.
