@@ -1,4 +1,4 @@
-aggressive# appmap-agent-js reference
+# appmap-agent-js reference
 
 JavaScript agent for the AppMap framework.
 
