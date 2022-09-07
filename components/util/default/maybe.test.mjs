@@ -1,6 +1,6 @@
 import { assertEqual, assertFail } from "../../__fixture__.mjs";
 
-import { fromMaybe, mapMaybe, mapMaybeAsync, recoverMaybe } from "./maybe.mjs";
+import { fromMaybe, mapMaybe, recoverMaybe } from "./maybe.mjs";
 
 // recoverMaybe //
 
@@ -28,9 +28,3 @@ assertEqual(
   mapMaybe("foo", (x) => x + x),
   "foofoo",
 );
-
-// mapMaybeAsync //
-
-assertEqual(await mapMaybeAsync(null, async () => assertFail()), null);
-
-assertEqual(await mapMaybeAsync("foo", async (x) => x + x), "foofoo");
