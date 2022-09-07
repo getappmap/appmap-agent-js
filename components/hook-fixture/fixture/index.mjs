@@ -30,7 +30,7 @@ export default (dependencies) => {
         await callbackAsync();
         recordStopTrack(agent, "record", 0);
         const trace = takeLocalAgentTrace(agent, "record");
-        assert(trace[0].type === "start", "expected stop as first message");
+        assert(trace[0].type === "start", "expected start as first message");
         assert(
           trace[trace.length - 1].type === "stop",
           "expected stop as last message",
