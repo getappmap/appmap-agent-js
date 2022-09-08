@@ -5,7 +5,7 @@ const { fromEntries, entries: toEntries } = Object;
 
 export default (dependencies) => {
   const {
-    util: { constant },
+    util: { constant, mapMaybe },
     serialization: { serialize },
   } = dependencies;
 
@@ -66,10 +66,10 @@ export default (dependencies) => {
     ) => ({
       type: "request",
       side,
-      protocol,
-      method,
-      url,
-      route,
+      protocol: toString(protocol),
+      method: toString(method),
+      url: toString(url),
+      route: mapMaybe(route, toString),
       headers: formatHeaders(headers),
       body: serialize(serialization, body),
     }),
@@ -83,9 +83,8 @@ export default (dependencies) => {
     ) => ({
       type: "response",
       side,
-      status,
-      message,
       status: toInteger(status),
+      message: toString(message),
       headers: formatHeaders(headers),
       body: serialize(serialization, body),
     }),
@@ -97,9 +96,9 @@ export default (dependencies) => {
       parameters,
     ) => ({
       type: "query",
-      database,
-      version,
-      sql,
+      database: mapMaybe(database, toString),
+      version: mapMaybe(version, toString),
+      sql: toString(sql),
       parameters: isArray(parameters)
         ? parameters.map((parameter) => serialize(serialization, parameter))
         : fromEntries(
