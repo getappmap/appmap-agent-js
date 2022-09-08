@@ -186,8 +186,6 @@ export default (dependencies) => {
     const { agent, empty } = state;
     const bundle_tab = getFreshTab(agent);
     const jump_box = createBox(getFreshTab(agent));
-    recordBegin(state, bundle_tab, request);
-    recordBeforeEvent(state.agent, getBox(jump_box), state.jump_payload);
     const request_tracking = trackJump(state, jump_box, request);
     const response_tracking = trackJump(state, jump_box, response);
     let body = empty;
@@ -218,13 +216,18 @@ export default (dependencies) => {
         identity,
       ),
     );
-    return forwardTraffic(
-      state,
-      original_server_emit,
-      server,
-      request,
-      response,
-    );
+    recordBegin(state, bundle_tab, request);
+    try {
+      return forwardTraffic(
+        state,
+        original_server_emit,
+        server,
+        request,
+        response,
+      );
+    } finally {
+      recordBeforeEvent(state.agent, getBox(jump_box), state.jump_payload);
+    }
   };
 
   const forwardTraffic = (
