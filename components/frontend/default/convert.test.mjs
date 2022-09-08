@@ -1,13 +1,13 @@
 import { assertEqual } from "../../__fixture__.mjs";
 
-import { print, toInteger } from "./convert.mjs";
+import { toString, toInteger } from "./convert.mjs";
 
-assertEqual(print("foo"), "foo");
+assertEqual(toString("foo"), "foo");
 
-assertEqual(print(123), "123");
+assertEqual(toString(123), "123");
 
 assertEqual(
-  print(function f() {}),
+  toString(function f() {}),
   "[object Function]",
 );
 

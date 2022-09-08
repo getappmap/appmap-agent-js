@@ -11,7 +11,7 @@ export default (dependencies) => {
 
   const hasStringKey = ([key]) => typeof key === "string";
 
-  const printValue = ([key, value]) => [key, print(value)];
+  const printValue = ([key, value]) => [key, toString(value)];
 
   const formatHeaders = (headers) =>
     fromEntries(toEntries(headers).filter(hasStringKey).map(printValue));

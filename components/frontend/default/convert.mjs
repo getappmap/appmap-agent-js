@@ -2,7 +2,7 @@ const { apply } = Reflect;
 const _String = String;
 const _undefined = undefined;
 const {
-  prototype: { toString },
+  prototype: { toString: toStringBuiltin },
 } = Object;
 
 const { round } = Math;
@@ -19,7 +19,7 @@ export const toInteger = (any) => {
   }
 };
 
-export const print = (any) => {
+export const toString = (any) => {
   if (typeof any === "string") {
     return any;
   } else if (
@@ -32,6 +32,6 @@ export const print = (any) => {
   ) {
     return _String(any);
   } else {
-    return apply(toString, any, []);
+    return apply(toStringBuiltin, any, []);
   }
 };
