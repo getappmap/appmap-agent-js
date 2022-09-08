@@ -1,3 +1,10 @@
+
+// Rearrenge the event trace into an array of trees.
+// These trees are made by bookkeeping a stack:
+//   - begin/after events trigger a push
+//   - end/before events trigger a pop
+// Missing events at the beginning or at the end of the trace are manufactured to complete the first and last tree.
+
 export default (dependencies) => {
   const {
     util: { createCounter, incrementCounter },

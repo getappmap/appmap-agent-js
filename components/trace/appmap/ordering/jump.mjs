@@ -1,3 +1,10 @@
+
+// Resolve jumps.
+// Insert trees starting by an after event next to their corresponding before event.
+// Event manufacturing is performed to complete sequences of events.
+// After this pass, each begin event will be matched to their end event.
+// Also, begin/end event pair can have children but not before/after event pair.
+
 import Matching from "./matching.mjs";
 
 const { from: toArray } = Array;

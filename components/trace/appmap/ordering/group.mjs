@@ -1,29 +1,12 @@
+
+// Resolve groups.
+// Each top-level tree is associated to a group.
+// These trees are inserted into their corresponding group/ungroup event pair.
+// NB: group/ungroup event pairs appear when asynchronous ressources are registered.
+
 const { from: toArray } = Array;
 
 export default (dependencies) => {
-  // const manufactureEnterGroupEvent = (group) => ({
-  //   type: "event",
-  //   site: "begin",
-  //   tab: 0,
-  //   group: 0,
-  //   time: 0,
-  //   payload: {
-  //     type: "group",
-  //     group,
-  //     description: "MISSING",
-  //   },
-  // });
-  //
-  // const manufactureLeaveGroupEvent = (group) => ({
-  //   type: "event",
-  //   site: "end",
-  //   tab: 0,
-  //   group: 0,
-  //   time: 0,
-  //   payload: {
-  //     type: "ungroup",
-  //   },
-  // });
 
   const makeFrame = (enter, children, leave) => ({ enter, children, leave });
 
