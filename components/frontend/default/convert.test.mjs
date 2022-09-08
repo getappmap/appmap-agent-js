@@ -1,6 +1,6 @@
 import { assertEqual } from "../../__fixture__.mjs";
 
-import { print, toInteger } from "./print.mjs";
+import { print, toInteger } from "./convert.mjs";
 
 assertEqual(print("foo"), "foo");
 

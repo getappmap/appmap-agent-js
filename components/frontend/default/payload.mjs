@@ -1,4 +1,4 @@
-import { print, toInteger } from "./print.mjs";
+import { toString, toInteger } from "./convert.mjs";
 
 const { isArray, from: toArray } = Array;
 const { fromEntries, entries: toEntries } = Object;
