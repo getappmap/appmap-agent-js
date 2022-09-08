@@ -1088,7 +1088,7 @@
     side:
       $ref: side
     status:
-      $ref: natural
+      type: integer
     message:
       type: string
     headers:

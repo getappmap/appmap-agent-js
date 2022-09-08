@@ -5,6 +5,20 @@ const {
   prototype: { toString },
 } = Object;
 
+const { round } = Math;
+const { parseInt, isNaN } = Number;
+
+export const toInteger = (any) => {
+  if (typeof any === "string") {
+    const number = parseInt(any);
+    return isNaN(number) ? -1 : number;
+  } else if (typeof any === "number") {
+    return round(any);
+  } else {
+    return -1;
+  }
+};
+
 export const print = (any) => {
   if (typeof any === "string") {
     return any;

@@ -1,4 +1,4 @@
-import { print } from "./print.mjs";
+import { print, toInteger } from "./print.mjs";
 
 const { isArray, from: toArray } = Array;
 const { fromEntries, entries: toEntries } = Object;
@@ -85,6 +85,7 @@ export default (dependencies) => {
       side,
       status,
       message,
+      status: toInteger(status),
       headers: formatHeaders(headers),
       body: serialize(serialization, body),
     }),
