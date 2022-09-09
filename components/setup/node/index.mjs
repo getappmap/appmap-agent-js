@@ -15,7 +15,7 @@ const { parse: parseYAML, stringify: stringifyYAML } = YAML;
 
 export default (dependencies) => {
   const {
-    validate: { validateConfig },
+    validate: { validateExternalConfiguration },
     questionnaire: { questionConfigAsync },
     util: { hasOwnProperty },
     url: { urlifyPath, appendURLSegment, appendURLSegmentArray },
@@ -108,7 +108,7 @@ export default (dependencies) => {
         }
         logSuccess("configuration file is valid YAML");
         try {
-          validateConfig(config);
+          validateExternalConfiguration(config);
         } catch ({ message }) {
           logFailure(`configuration file is invalid: ${message}`);
           return false;

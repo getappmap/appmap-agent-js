@@ -1,37 +1,13 @@
-import {
-  assertEqual,
-  assertFail,
-  assertDeepEqual,
-} from "../../__fixture__.mjs";
+import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
 import {
   hasOwnProperty,
   getOwnProperty,
   setOwnProperty,
   coalesce,
   coalesceCaseInsensitive,
-  mapMaybe,
-  mapMaybeAsync,
   assignProperty,
   generateGet,
 } from "./object.mjs";
-
-// mapMaybe //
-
-assertEqual(
-  mapMaybe(null, () => assertFail()),
-  null,
-);
-
-assertEqual(
-  mapMaybe("foo", (x) => x + x),
-  "foofoo",
-);
-
-// mapMaybeAsync //
-
-assertEqual(await mapMaybeAsync(null, async () => assertFail()), null);
-
-assertEqual(await mapMaybeAsync("foo", async (x) => x + x), "foofoo");
 
 // assignProperty //
 {

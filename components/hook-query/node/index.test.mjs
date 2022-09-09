@@ -14,5 +14,5 @@ assertDeepEqual(
     { hooks: { mysql: false, pg: false, sqlite3: false } },
     async (frontend) => null,
   ),
-  { events: [], sources: [] },
+  [],
 );

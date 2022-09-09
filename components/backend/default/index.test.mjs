@@ -27,69 +27,74 @@ const configuration = extendConfiguration(
 {
   const backend = createBackend(configuration);
   assertEqual(
-    sendBackend(backend, [
-      "source",
+    sendBackend(backend, {
+      type: "source",
+      url: "file:///cwd/main.js",
+      content: "function main () {}",
+      shallow: false,
+      inline: false,
+      exclude: [],
+    }),
+    false,
+  );
+  assertEqual(
+    sendBackend(backend, {
+      type: "start",
+      track: "record",
+      configuration: { name: "name2" },
+      url: null,
+    }),
+    false,
+  );
+  assertEqual(
+    sendBackend(backend, {
+      type: "error",
+      name: "name",
+      message: "message",
+      stack: "stack",
+    }),
+    false,
+  );
+  assertEqual(hasBackendTrace(backend, "record"), false);
+  assertDeepEqual(Array.from(getBackendTrackIterator(backend)), ["record"]);
+  assertEqual(
+    sendBackend(backend, {
+      type: "stop",
+      track: "record",
+      status: 0,
+    }),
+    true,
+  );
+  assertDeepEqual(Array.from(getBackendTraceIterator(backend)), ["record"]);
+  assertEqual(hasBackendTrack(backend, "record"), false);
+  assertDeepEqual(takeBackendTrace(backend, "record"), {
+    head: configuration,
+    body: [
       {
+        type: "source",
         url: "file:///cwd/main.js",
         content: "function main () {}",
         shallow: false,
         inline: false,
         exclude: [],
       },
-    ]),
-    false,
-  );
-  assertEqual(
-    sendBackend(backend, [
-      "start",
-      "record",
-      { path: null, data: { name: "name2" } },
-    ]),
-    false,
-  );
-  assertEqual(
-    sendBackend(backend, ["event", "begin", 123, 0, "bundle", null]),
-    false,
-  );
-  assertEqual(hasBackendTrace(backend, "record"), false);
-  assertDeepEqual(Array.from(getBackendTrackIterator(backend)), ["record"]);
-  assertEqual(
-    sendBackend(backend, ["stop", "record", { status: 0, errors: [] }]),
-    true,
-  );
-  assertDeepEqual(Array.from(getBackendTraceIterator(backend)), ["record"]);
-  assertEqual(hasBackendTrack(backend, "record"), false);
-  assertDeepEqual(takeBackendTrace(backend, "record"), {
-    head: extendConfiguration(configuration, { name: "name2" }, null),
-    body: {
-      configuration: extendConfiguration(
-        configuration,
-        { name: "name2" },
-        null,
-      ),
-      sources: [
-        {
-          url: "file:///cwd/main.js",
-          content: "function main () {}",
-          shallow: false,
-          inline: false,
-          exclude: [],
-        },
-      ],
-      events: [
-        {
-          type: "begin",
-          index: 123,
-          time: 0,
-          data: {
-            type: "bundle",
-          },
-        },
-      ],
-      termination: {
-        status: 0,
-        errors: [],
+      {
+        type: "start",
+        track: "record",
+        configuration: { name: "name2" },
+        url: null,
       },
-    },
+      {
+        type: "error",
+        name: "name",
+        message: "message",
+        stack: "stack",
+      },
+      {
+        type: "stop",
+        track: "record",
+        status: 0,
+      },
+    ],
   });
 }

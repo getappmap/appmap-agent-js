@@ -78,7 +78,7 @@ export default (dependencies) => {
         const { line, column, parameters, name, static: _static } = entity;
         closures.set(stringifyLocation(makeLocation(url, line, column)), {
           parameters: parameters.map(cutContent),
-          shallow: shallow,
+          shallow,
           link: {
             method_id: placeholder,
             path: path,

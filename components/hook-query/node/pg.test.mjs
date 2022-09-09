@@ -36,48 +36,82 @@ const url = getFreshTemporaryURL();
 
 const proceedAsync = async () => {
   const dependencies = await buildTestDependenciesAsync(import.meta.url);
-  const { testHookAsync, makeEvent } = await buildTestComponentAsync(
-    "hook-fixture",
-  );
+  const { testHookAsync } = await buildTestComponentAsync("hook-fixture");
 
   const component = HookPg(dependencies);
 
   const testCaseAsync = (enabled, runAsync) =>
-    testHookAsync(component, { hooks: { pg: enabled } }, async () => {
-      const client = new Client({
-        host: "localhost",
-        port: port,
-        user: user,
-        database: "postgres",
-      });
-      try {
-        client.connect();
-        await runAsync(client);
-      } finally {
-        client.end();
-      }
-    });
+    testHookAsync(
+      component,
+      { configuration: { hooks: { pg: enabled } } },
+      async () => {
+        const client = new Client({
+          host: "localhost",
+          port: port,
+          user: user,
+          database: "postgres",
+        });
+        try {
+          client.connect();
+          await runAsync(client);
+        } finally {
+          client.end();
+        }
+      },
+    );
 
   const events = [
-    makeEvent("begin", 1, 0, "bundle", null),
-    makeEvent("before", 2, 0, "query", {
-      database: "postgres",
-      version: null,
-      sql: "SELECT $1::integer * $2::integer AS solution;",
-      parameters: [
-        { type: "number", print: "2" },
-        { type: "number", print: "3" },
-      ],
-    }),
-    makeEvent("after", 2, 0, "query", { error: null }),
-    makeEvent("end", 1, 0, "bundle", null),
+    {
+      type: "event",
+      site: "begin",
+      tab: 1,
+      group: 0,
+      time: 0,
+      payload: {
+        type: "bundle",
+      },
+    },
+    {
+      type: "event",
+      site: "before",
+      tab: 2,
+      group: 0,
+      time: 0,
+      payload: {
+        type: "query",
+        database: "postgres",
+        version: null,
+        sql: "SELECT $1::integer * $2::integer AS solution;",
+        parameters: [
+          { type: "number", print: "2" },
+          { type: "number", print: "3" },
+        ],
+      },
+    },
+    {
+      type: "event",
+      site: "after",
+      tab: 2,
+      group: 0,
+      time: 0,
+      payload: {
+        type: "answer",
+      },
+    },
+    {
+      type: "event",
+      site: "end",
+      tab: 1,
+      group: 0,
+      time: 0,
+      payload: {
+        type: "bundle",
+      },
+    },
   ];
 
   // disabled //
-  assertDeepEqual(await testCaseAsync(false, async () => {}), {
-    sources: [],
-    events: [],
-  });
+  assertDeepEqual(await testCaseAsync(false, async () => {}), []);
 
   // promise //
   assertDeepEqual(
@@ -88,7 +122,7 @@ const proceedAsync = async () => {
       );
       assertDeepEqual(rows, [{ solution: 6 }]);
     }),
-    { sources: [], events },
+    events,
   );
 
   // callback //
@@ -109,7 +143,7 @@ const proceedAsync = async () => {
       });
       assertDeepEqual(rows, [{ solution: 6 }]);
     }),
-    { sources: [], events },
+    events,
   );
 
   // type error //
@@ -122,17 +156,13 @@ const proceedAsync = async () => {
         assertEqual(message, "Client was passed a null or undefined query");
       }
     }),
-    { sources: [], events: [] },
+    [],
   );
 
   // invalid sql //
   {
-    const cleanup = ({ sources, events }) => ({
-      sources,
-      events: events.slice(0, 2),
-    });
     assertDeepEqual(
-      cleanup(
+      (
         await testCaseAsync(true, async (client) => {
           const query = new Query("INVALID SQL;");
           const promise = new Promise((resolve) => {
@@ -141,42 +171,46 @@ const proceedAsync = async () => {
           client.query(query);
           const { message } = await promise;
           assertMatch(message, /^syntax error/);
-        }),
-      ),
+        })
+      )[1],
       {
-        sources: [],
-        events: [
-          makeEvent("begin", 1, 0, "bundle", null),
-          makeEvent("before", 2, 0, "query", {
-            database: "postgres",
-            parameters: {},
-            sql: "INVALID SQL;",
-            version: null,
-          }),
-        ],
+        type: "event",
+        site: "before",
+        tab: 2,
+        group: 0,
+        time: 0,
+        payload: {
+          type: "query",
+          database: "postgres",
+          version: null,
+          sql: "INVALID SQL;",
+          parameters: {},
+        },
       },
     );
     assertDeepEqual(
-      cleanup(
+      (
         await testCaseAsync(true, async (client) => {
           try {
             await client.query("INVALID SQL;");
           } catch ({ message }) {
             assertMatch(message, /^syntax error/);
           }
-        }),
-      ),
+        })
+      )[1],
       {
-        sources: [],
-        events: [
-          makeEvent("begin", 1, 0, "bundle", null),
-          makeEvent("before", 2, 0, "query", {
-            database: "postgres",
-            parameters: {},
-            sql: "INVALID SQL;",
-            version: null,
-          }),
-        ],
+        type: "event",
+        site: "before",
+        tab: 2,
+        group: 0,
+        time: 0,
+        payload: {
+          type: "query",
+          database: "postgres",
+          version: null,
+          sql: "INVALID SQL;",
+          parameters: {},
+        },
       },
     );
   }

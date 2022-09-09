@@ -3,7 +3,7 @@ const { parse: parseJSON } = JSON;
 export default (dependencies) => {
   const {
     util: { hasOwnProperty },
-    validate: { validateConfiguration },
+    validate: { validateInternalConfiguration },
     expect: { expect, expectSuccess },
   } = dependencies;
 
@@ -18,7 +18,7 @@ export default (dependencies) => {
         () => parseJSON(content),
         "failed to parse 'APPMAP_CONFIGURATION' environment variable >> %O",
       );
-      validateConfiguration(configuration);
+      validateInternalConfiguration(configuration);
       return configuration;
     },
   };

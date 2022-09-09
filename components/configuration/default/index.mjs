@@ -4,14 +4,14 @@ const { entries: toEntries } = Object;
 
 const ANONYMOUS_NAME_SEPARATOR = "-";
 
-const EXPECTED_EXTRA_PROPERTIES = ["appmap_dir", "test_recording"];
+const EXPECTED_EXTRA_PROPERTIES = ["test_recording"];
 
 export default (dependencies) => {
   const {
     log: { logGuardInfo },
     util: { hasOwnProperty, coalesce, identity },
     url: { urlifyPath },
-    validate: { validateConfig },
+    validate: { validateExternalConfiguration },
     specifier: { createSpecifier },
   } = dependencies;
 
@@ -60,6 +60,23 @@ export default (dependencies) => {
     };
   };
 
+  const normalizeHooks = (hooks, base) => {
+    if (hasOwnProperty(hooks, "eval")) {
+      const { eval: whitelist } = hooks;
+      return {
+        ...hooks,
+        eval:
+          typeof whitelist === "boolean"
+            ? whitelist
+              ? ["eval"]
+              : []
+            : whitelist,
+      };
+    } else {
+      return hooks;
+    }
+  };
+
   const normalizeExclude = (exclusions, base) =>
     exclusions.map(normalizeExclusion);
 
@@ -81,8 +98,7 @@ export default (dependencies) => {
     if (typeof log === "string") {
       log = { level: log };
     }
-    log = { level: "error", file: 2, ...log };
-    if (typeof log.file !== "number") {
+    if (hasOwnProperty(log, "file") && typeof log.file !== "number") {
       log.file = urlifyPath(log.file, base);
     }
     return log;
@@ -279,7 +295,7 @@ export default (dependencies) => {
     },
     hooks: {
       extend: assign,
-      normalize: identity,
+      normalize: normalizeHooks,
     },
     ordering: {
       extend: overwrite,
@@ -423,6 +439,7 @@ export default (dependencies) => {
       "inline-source": false,
       hooks: {
         apply: true,
+        eval: [],
         esm: true,
         cjs: true,
         http: true,
@@ -480,25 +497,29 @@ export default (dependencies) => {
       name: null,
       "map-name": null,
     }),
-    extendConfiguration: (configuration, config, base) => {
-      configuration = { ...configuration };
-      validateConfig(config);
-      for (let key of ownKeys(config)) {
+    extendConfiguration: (
+      internal_configuration,
+      external_configuration,
+      base,
+    ) => {
+      const extended_internal_configuration = { ...internal_configuration };
+      validateExternalConfiguration(external_configuration);
+      for (const key of ownKeys(external_configuration)) {
         if (hasOwnProperty(fields, key)) {
           const { normalize, extend } = fields[key];
-          configuration[key] = extend(
-            configuration[key],
-            normalize(config[key], base),
+          extended_internal_configuration[key] = extend(
+            extended_internal_configuration[key],
+            normalize(external_configuration[key], base),
           );
         } else {
           logGuardInfo(
-            EXPECTED_EXTRA_PROPERTIES.includes(key),
+            !EXPECTED_EXTRA_PROPERTIES.includes(key),
             "Configuration property not recognized by the agent: %j",
             key,
           );
         }
       }
-      return configuration;
+      return extended_internal_configuration;
     },
   };
 };

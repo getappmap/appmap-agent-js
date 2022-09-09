@@ -15,11 +15,8 @@ const dependencies = await buildTestDependenciesAsync(import.meta.url);
 const { compileTrace } = Trace(dependencies);
 
 const configuration = createConfiguration("file:///home");
-const termination = { status: 0, errors: [] };
 
-assertDeepEqual(compileTrace(configuration, [], [], termination), {
-  configuration,
-  sources: [],
-  events: [],
-  termination,
+assertDeepEqual(compileTrace(configuration, []), {
+  head: configuration,
+  body: [],
 });

@@ -1,6 +1,6 @@
 export default (dependencies) => {
   const {
-    "recorder-cli": { createRecorder, startTrack, stopTrack },
+    "recorder-cli": { createRecorder, recordStartTrack, recordStopTrack },
   } = dependencies;
   return {
     createMochaHooks: (process, configuration) => {
@@ -10,15 +10,17 @@ export default (dependencies) => {
       } else {
         return {
           beforeEach() {
-            startTrack(recorder, "mocha", {
-              path: null,
-              data: {
+            recordStartTrack(
+              recorder,
+              "mocha",
+              {
                 "map-name": this.currentTest.parent.fullTitle(),
               },
-            });
+              null,
+            );
           },
           afterEach() {
-            stopTrack(recorder, "mocha", { errors: [], status: 0 });
+            recordStopTrack(recorder, "mocha", 0);
           },
         };
       }

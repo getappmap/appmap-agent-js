@@ -58,12 +58,6 @@ export const coalesceCaseInsensitive = (value, key1, _default) => {
   return _default;
 };
 
-export const mapMaybe = (maybe, transform) =>
-  maybe === null ? null : transform(maybe);
-
-export const mapMaybeAsync = async (maybe, transformAsync) =>
-  maybe === null ? null : await transformAsync(maybe);
-
 export const generateGet =
   (key) =>
   ({ [key]: value }) =>

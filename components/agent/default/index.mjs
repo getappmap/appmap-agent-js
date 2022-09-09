@@ -1,28 +1,28 @@
-const { entries: toEntries, fromEntries } = Object;
+const { fromEntries, entries: toEntries } = Object;
 
 export default (dependencies) => {
   const {
+    time: { now },
+    group: { getCurrentGroup },
     "source-outer": { extractSourceMap },
     frontend: {
       createFrontend,
+      getFreshTab,
       instrument,
-      startTrack,
-      stopTrack,
       getInstrumentationIdentifier,
       getSerializationEmptyValue,
-      incrementEventCounter,
-      recordBeginBundle,
-      recordEndBundle,
-      recordBeginApply,
-      recordEndApply,
-      recordBeginServer,
-      recordEndServer,
-      recordBeforeJump,
-      recordAfterJump,
-      recordBeforeClient,
-      recordAfterClient,
-      recordBeforeQuery,
-      recordAfterQuery,
+      formatError,
+      formatStartTrack,
+      formatStopTrack,
+      formatBeginEvent,
+      formatEndEvent,
+      formatBeforeEvent,
+      formatAfterEvent,
+      formatBeginAmend,
+      formatEndAmend,
+      formatBeforeAmend,
+      formatAfterAmend,
+      ...FormatPayloadLibrary
     },
     emitter: {
       openEmitter,
@@ -32,22 +32,37 @@ export default (dependencies) => {
       takeLocalEmitterTrace,
     },
   } = dependencies;
-  const generateRecordIncrement =
-    (record) =>
-    ({ frontend, emitter }, data) => {
-      const index = incrementEventCounter(frontend);
-      sendEmitter(emitter, record(frontend, index, data));
-      return index;
-    };
+  const generateFormatPayload =
+    (formatPayload) =>
+    // We avoid using reast and spread syntax here for two reasons:
+    //   1) Spread use Array.prototype[@Symbol.iterator] which is unsafe
+    //      because it can be overwritten by the user
+    //   2) This is hot code so avoiding creating an array may have some
+    //      performance gain.
+    ({ frontend }, extra1, extra2, extra3, extra4, extra5, extra6, extra7) =>
+      formatPayload(
+        frontend,
+        extra1,
+        extra2,
+        extra3,
+        extra4,
+        extra5,
+        extra6,
+        extra7,
+      );
   const generateRecord =
-    (record) =>
-    ({ frontend, emitter }, index, data) => {
-      sendEmitter(emitter, record(frontend, index, data));
+    (format) =>
+    ({ emitter, frontend }, extra1, extra2, extra3) => {
+      sendEmitter(emitter, format(frontend, extra1, extra2, extra3));
     };
-  const generateMapEntry =
-    (transform) =>
-    ([key, value]) =>
-      [key, transform(value)];
+  const generateRecordEvent =
+    (formatEvent) =>
+    ({ frontend, emitter }, tag, payload) => {
+      sendEmitter(
+        emitter,
+        formatEvent(frontend, tag, getCurrentGroup(), now(), payload),
+      );
+    };
   return {
     openAgent: (configuration) => ({
       emitter: openEmitter(configuration),
@@ -56,6 +71,7 @@ export default (dependencies) => {
     closeAgent: ({ emitter }) => {
       closeEmitter(emitter);
     },
+    getFreshTab: ({ frontend }) => getFreshTab(frontend),
     getInstrumentationIdentifier: ({ frontend }) =>
       getInstrumentationIdentifier(frontend),
     getSerializationEmptyValue: ({ frontend }) =>
@@ -77,32 +93,22 @@ export default (dependencies) => {
     requestRemoteAgentAsync: ({ emitter }, method, path, body) =>
       requestRemoteEmitterAsync(emitter, method, path, body),
     /* c8 ignore stop */
-    startTrack: ({ emitter, frontend }, key, initialization) => {
-      sendEmitter(emitter, startTrack(frontend, key, initialization));
-    },
-    stopTrack: ({ emitter, frontend }, key, termination) => {
-      sendEmitter(emitter, stopTrack(frontend, key, termination));
-    },
+    recordBeginAmend: generateRecord(formatBeginAmend),
+    recordEndAmend: generateRecord(formatEndAmend),
+    recordBeforeAmend: generateRecord(formatBeforeAmend),
+    recordAfterAmend: generateRecord(formatAfterAmend),
+    recordStartTrack: generateRecord(formatStartTrack),
+    recordStopTrack: generateRecord(formatStopTrack),
+    recordError: generateRecord(formatError),
+    recordBeginEvent: generateRecordEvent(formatBeginEvent),
+    recordEndEvent: generateRecordEvent(formatEndEvent),
+    recordBeforeEvent: generateRecordEvent(formatBeforeEvent),
+    recordAfterEvent: generateRecordEvent(formatAfterEvent),
     ...fromEntries(
-      toEntries({
-        recordBeginBundle,
-        recordBeginApply,
-        recordBeginServer,
-        recordBeforeJump,
-        recordBeforeClient,
-        recordBeforeQuery,
-      }).map(generateMapEntry(generateRecordIncrement)),
+      toEntries(FormatPayloadLibrary).map(([name, formatPayload]) => [
+        name,
+        generateFormatPayload(formatPayload),
+      ]),
     ),
-    ...fromEntries(
-      toEntries({
-        recordEndBundle,
-        recordEndApply,
-        recordEndServer,
-        recordAfterJump,
-        recordAfterClient,
-        recordAfterQuery,
-      }).map(generateMapEntry(generateRecord)),
-    ),
-    amendBeginServer: generateRecord(recordBeginServer),
   };
 };

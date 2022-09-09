@@ -14,7 +14,7 @@ export default (dependencies) => {
       createBox,
       getBox,
       setBox,
-      getCounterValue,
+      gaugeCounter,
       incrementCounter,
       decrementCounter,
     },
@@ -22,7 +22,7 @@ export default (dependencies) => {
   } = dependencies;
 
   const resolveClientTermination = ({ running, pending, interrupt }) => {
-    if (!getBox(running) && getCounterValue(pending) === 0) {
+    if (!getBox(running) && gaugeCounter(pending) === 0) {
       const { resolve } = getBox(interrupt);
       resolve();
     }

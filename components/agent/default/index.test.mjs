@@ -14,12 +14,15 @@ const {
   closeAgent,
   instrument,
   takeLocalAgentTrace,
-  startTrack,
-  stopTrack,
+  recordStartTrack,
+  recordStopTrack,
   getInstrumentationIdentifier,
   getSerializationEmptyValue,
-  recordBeforeQuery,
-  recordAfterQuery,
+  getFreshTab,
+  recordBeforeEvent,
+  recordAfterEvent,
+  formatQueryPayload,
+  getAnswerPayload,
 } = Agent(dependencies);
 const agent = openAgent(
   extendConfiguration(
@@ -30,56 +33,64 @@ const agent = openAgent(
     "file:///base",
   ),
 );
+
+getSerializationEmptyValue(agent);
+
 assertEqual(typeof getInstrumentationIdentifier(agent), "string");
-startTrack(agent, "record", { path: null, data: {} });
+recordStartTrack(agent, "record", {}, null);
 assertEqual(
   eval(instrument(agent, { url: "file:///base/main.js", content: "123;" })),
   123,
 );
-recordAfterQuery(
+const tab = getFreshTab(agent);
+recordBeforeEvent(
   agent,
-  recordBeforeQuery(agent, {
-    database: "mysql",
-    version: null,
-    sql: "SELECT 123;",
-    parameters: [],
-  }),
-  { error: getSerializationEmptyValue(agent) },
+  tab,
+  formatQueryPayload(agent, "mysql", null, "SELECT 123;", []),
 );
-stopTrack(agent, "record", { errors: [], status: 0 });
-closeAgent(agent, { errors: [], status: 123 });
-const { sources, events } = takeLocalAgentTrace(agent, "record");
-assertDeepEqual(
-  { sources, events },
+recordAfterEvent(agent, tab, getAnswerPayload(agent));
+recordStopTrack(agent, "record", 0);
+closeAgent(agent);
+assertDeepEqual(takeLocalAgentTrace(agent, "record"), [
   {
-    sources: [
-      {
-        url: "file:///base/main.js",
-        content: "123;",
-        exclude: createConfiguration("file:///home").exclude,
-        shallow: false,
-        inline: false,
-      },
-    ],
-    events: [
-      {
-        type: "before",
-        index: 1,
-        time: 0,
-        data: {
-          type: "query",
-          database: "mysql",
-          version: null,
-          sql: "SELECT 123;",
-          parameters: [],
-        },
-      },
-      {
-        type: "after",
-        index: 1,
-        time: 0,
-        data: { type: "query", error: null },
-      },
-    ],
+    type: "start",
+    track: "record",
+    configuration: {},
+    url: null,
   },
-);
+  {
+    type: "source",
+    url: "file:///base/main.js",
+    content: "123;",
+    exclude: createConfiguration("file:///home").exclude,
+    shallow: false,
+    inline: false,
+  },
+  {
+    type: "event",
+    site: "before",
+    tab: 1,
+    group: 0,
+    time: 0,
+    payload: {
+      type: "query",
+      database: "mysql",
+      version: null,
+      sql: "SELECT 123;",
+      parameters: [],
+    },
+  },
+  {
+    type: "event",
+    site: "after",
+    tab: 1,
+    group: 0,
+    time: 0,
+    payload: { type: "answer" },
+  },
+  {
+    type: "stop",
+    track: "record",
+    status: 0,
+  },
+]);

@@ -31,19 +31,21 @@ const url = getFreshTemporaryURL();
 
 const proceedAsync = async () => {
   const dependencies = await buildTestDependenciesAsync(import.meta.url);
-  const { testHookAsync, makeEvent } = await buildTestComponentAsync(
-    "hook-fixture",
-  );
+  const { testHookAsync } = await buildTestComponentAsync("hook-fixture");
   const component = HookMysql(dependencies);
   assertDeepEqual(
-    await testHookAsync(component, { hooks: { mysql: false } }, async () => {}),
-    { events: [], sources: [] },
+    await testHookAsync(
+      component,
+      { configuration: { hooks: { mysql: false } } },
+      async () => {},
+    ),
+    [],
   );
   assertDeepEqual(
     await testHookAsync(
       component,
-      { hooks: { mysql: true } },
-      async (frontend) => {
+      { configuration: { hooks: { mysql: true } } },
+      async () => {
         const connection = Mysql.createConnection({
           host: "localhost",
           port,
@@ -78,11 +80,25 @@ const proceedAsync = async () => {
         }
       },
     ),
-    {
-      sources: [],
-      events: [
-        makeEvent("begin", 1, 0, "bundle", null),
-        makeEvent("before", 2, 0, "query", {
+    [
+      {
+        type: "event",
+        site: "begin",
+        tab: 1,
+        group: 0,
+        time: 0,
+        payload: {
+          type: "bundle",
+        },
+      },
+      {
+        type: "event",
+        site: "before",
+        tab: 2,
+        group: 0,
+        time: 0,
+        payload: {
+          type: "query",
           database: "mysql",
           version: null,
           sql: "SELECT ? * ? AS solution;",
@@ -90,11 +106,29 @@ const proceedAsync = async () => {
             { type: "number", print: "2" },
             { type: "number", print: "3" },
           ],
-        }),
-        makeEvent("after", 2, 0, "query", { error: null }),
-        makeEvent("end", 1, 0, "bundle", null),
-      ],
-    },
+        },
+      },
+      {
+        type: "event",
+        site: "after",
+        tab: 2,
+        group: 0,
+        time: 0,
+        payload: {
+          type: "answer",
+        },
+      },
+      {
+        type: "event",
+        site: "end",
+        tab: 1,
+        group: 0,
+        time: 0,
+        payload: {
+          type: "bundle",
+        },
+      },
+    ],
   );
 };
 

@@ -6,3 +6,4 @@ dependencies:
   - validate-appmap
   - log
   - location
+  - configuration

@@ -15,20 +15,20 @@ export default (dependencies) => {
       backend: createBackend(configuration),
     }),
     closeEmitter: ({ closed, backend }) => {
-      const termination = {
-        status: 1,
-        errors: [
-          {
-            name: "AppmapError",
-            message: "disconnection",
-            stack: "",
-          },
-        ],
-      };
       assert(!getBox(closed), "closeClient called on already closed client");
       setBox(closed, true);
       for (const key of getBackendTrackIterator(backend)) {
-        sendBackend(backend, ["stop", key, termination]);
+        sendBackend(backend, {
+          type: "error",
+          name: "AppmapError",
+          message: "disconnection",
+          stack: "",
+        });
+        sendBackend(backend, {
+          type: "stop",
+          track: key,
+          status: 1,
+        });
       }
     },
     sendEmitter: ({ backend, closed }, message) => {

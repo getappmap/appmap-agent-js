@@ -1,17 +1,17 @@
 const { fromEntries } = Object;
 
 export default (dependencies) => {
-  const { "hook-module": transformSourceDefault } = dependencies;
   const names = [
     "hook-apply",
     "hook-group",
-    "hook-module",
+    "hook-esm",
+    "hook-cjs",
+    "hook-eval",
     "hook-query",
     "hook-http-client",
     "hook-http-server",
   ];
   return {
-    transformSourceDefault,
     hook: (agent, configuration) =>
       fromEntries(
         names.map((name) => [

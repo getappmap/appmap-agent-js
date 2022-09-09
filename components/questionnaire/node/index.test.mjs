@@ -7,7 +7,9 @@ import Questionnaire from "./index.mjs";
 
 const BREAK = {};
 
-const { validateConfig } = await buildTestComponentAsync("validate");
+const { validateExternalConfiguration } = await buildTestComponentAsync(
+  "validate",
+);
 
 const { questionConfigAsync } = Questionnaire(
   await buildTestDependenciesAsync(import.meta.url, {
@@ -26,7 +28,7 @@ const runAsync = async (answers) => {
   };
   const configuration = await questionConfigAsync();
   assertEqual(iterator.next().done, true);
-  validateConfig(configuration);
+  validateExternalConfiguration(configuration);
   return configuration;
 };
 

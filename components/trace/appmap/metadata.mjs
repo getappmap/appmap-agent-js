@@ -1,6 +1,6 @@
 export default (dependencies) => {
   const {
-    util: { assert, mapMaybe },
+    util: { assert, mapMaybe, recoverMaybe },
     url: { getLastURLSegment },
   } = dependencies;
 
@@ -43,7 +43,14 @@ export default (dependencies) => {
 
   const makeRecording = (recording) => mapMaybe(recording, makeJustRecording);
 
-  const makeHistory = ({ history }) => history;
+  const sanitizeHistory = ({ repository, branch, commit, ...rest }) => ({
+    repository: recoverMaybe(repository, "APPMAP-MISSING-REPOSITORY-NAME"),
+    branch: recoverMaybe(branch, "APPMAP-MISSING-REPOSITORY-BRANCH"),
+    commit: recoverMaybe(commit, "APPMAP-MISSING-REPOSITORY-COMMIT"),
+    ...rest,
+  });
+
+  const makeGit = ({ history }) => mapMaybe(history, sanitizeHistory);
 
   const makeAppName = (app_name, { package: _package }) =>
     app_name === null ? mapMaybe(_package, getName) : app_name;
@@ -61,7 +68,7 @@ export default (dependencies) => {
     return null;
   };
 
-  const makeTestStatus = ({ errors, status }) => {
+  const makeTestStatus = (errors, status) => {
     const { length } = errors;
     return length === 0 && status === 0 ? "succeeded" : "failed";
   };
@@ -71,16 +78,17 @@ export default (dependencies) => {
     return { name: recorder };
   };
 
-  const makeException = ({ errors }) => {
+  const makeException = (errors) => {
     const { length } = errors;
     if (length === 0) {
       return null;
+    } else {
+      const [{ name, message }] = errors;
+      return {
+        class: recoverMaybe(name, "APPMAP-MISSING-ERROR-NAME"),
+        message,
+      };
     }
-    const [{ name, message }] = errors;
-    return {
-      class: name,
-      message,
-    };
   };
 
   return {
@@ -99,7 +107,8 @@ export default (dependencies) => {
         recorder,
         recording,
       },
-      termination,
+      errors,
+      status,
     ) => ({
       name: makeMapName(map_name, file_name, main),
       app: makeAppName(app_name, repository),
@@ -113,9 +122,9 @@ export default (dependencies) => {
       client: makeClient(agent),
       recorder: makeRecorder(recorder),
       recording: makeRecording(recording),
-      git: makeHistory(repository),
-      test_status: makeTestStatus(termination),
-      exception: makeException(termination),
+      git: makeGit(repository),
+      test_status: makeTestStatus(errors, status),
+      exception: makeException(errors),
     }),
   };
 };

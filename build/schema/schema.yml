@@ -105,6 +105,12 @@
 - $id: index
   $ref: natural
 
+- $id: group
+  type: number
+
+- $id: time
+  type: number
+
 - $id: heartbeat
   $ref: nullable-natural
 
@@ -422,7 +428,7 @@
         - const: null
         - $ref: package
 
-- $id: config
+- $id: external-configuration
   type: object
   properties:
     # server
@@ -432,7 +438,7 @@
       type: object
       additionalProperties: false
       patternProperties:
-        "^": {$ref: config}
+        "^": {$ref: external-configuration}
     scenario: {$ref: regexp}
     recursive-process-recording: {type: boolean}
     command:
@@ -468,6 +474,11 @@
       properties:
         cjs: {type: boolean}
         esm: {type: boolean}
+        eval:
+          anyOf:
+            - type: boolean
+            - type: array
+              items: {type: string}
         apply: {type: boolean}
         http: {type: boolean}
         mysql: {type: boolean}
@@ -510,7 +521,7 @@
       type: array
       items: {$ref: name-version}
 
-- $id: configuration
+- $id: internal-configuration
   type: object
   additionalProperties: false
   minProperties: 41
@@ -526,7 +537,7 @@
         required: [key, value, base]
         properties:
           key: {type: string}
-          value: {$ref: config}
+          value: {$ref: external-configuration}
           base: {$ref: url}
     recursive-process-recording: {type: boolean}
     command:
@@ -578,6 +589,9 @@
       properties:
         cjs: {type: boolean}
         esm: {type: boolean}
+        eval:
+          type: array
+          items: {type: string}
         apply: {type: boolean}
         http: {type: boolean}
         mysql: {type: boolean}
@@ -668,104 +682,465 @@
 # message #
 ###########
 
-- $id: initialization
+- $id: start-message
   type: object
   additionalProperties: false
-  required: [path, data]
+  required: [type, track, configuration, url]
   properties:
-    path:
+    type:
+      const: start
+    track:
+      type: string
+    configuration:
+      $ref: external-configuration
+    url:
       anyOf:
         - const: null
         - $ref: url
-    data: {$ref: config}
 
-- $id: termination
+- $id: stop-message
   type: object
   additionalProperties: false
-  required: [status, errors]
+  required: [type, track, status]
   properties:
+    type:
+      const: stop
+    track:
+      type: string
     status:
       type: integer
       minimum: 0
       maximum: 255
-    errors:
-      type: array
-      items:
-        type: object
-        additionalProperties: false
-        required: [name, message, stack]
-        properties:
-          name: {type: string}
-          message: {type: string}
-          stack: {type: string}
 
-- $id: source
+- $id: error-message
   type: object
   additionalProperties: false
-  required: [url, content, shallow, inline, exclude]
+  required: [type, name, message, stack]
   properties:
-    url: {$ref: url}
+    type:
+      const: error
+    name:
+      type: string
+      nullable: true
+    message:
+      type: string
+      nullable: true
+    stack:
+      type: string
+      nullable: true
+
+- $id: source-message
+  type: object
+  additionalProperties: false
+  required: [type, content, url, shallow, inline, exclude]
+  properties:
+    type: {const: source}
     content: {type: string}
+    url: {$ref: url}
     shallow: {type: boolean}
     inline: {type: boolean}
     exclude:
       type: array
       items: {$ref: cooked-exclusion}
 
+- $id: amend-message
+  type: object
+  additionalProperties: false
+  required: [type, site, tab, payload]
+  properties:
+    type:
+      const: amend
+    site:
+      $ref: site
+    tab:
+      $ref: tab
+    payload:
+      $ref: payload
+
+- $id: tab
+  $ref: natural
+
+- $id: site
+  enum:
+    - begin
+    - end
+    - before
+    - after
+
+- $id: event-message
+  type: object
+  additionalProperties: false
+  required: [type, site, tab, group, time, payload]
+  properties:
+    type:
+      const: event
+    # The type of event.
+    # We do not call this field `type` because it is independent from the other fields.
+    # In fancy terms, we keep type fields for algebraic data types.
+    # The site of an event condition its effect on the stack:
+    #  - begin and after events are pushes
+    #  - end and before events are pops
+    site:
+      $ref: site
+    # An identifier that associate a pair of matching event together.
+    # - begin events are associated to end events
+    # - before events are associated to after events
+    tab:
+      $ref: tab
+    # An identifier that groups top-level stack together.
+    # On node it is the current execution id.
+    group:
+      $ref: group
+    # The time when the occured.
+    # It can be since the launch of the application.
+    # Or since any point in time before that.
+    time:
+      type: number
+    # The data carried by the event which is only used by the agent to create appmap events.
+    payload:
+      $ref: payload
+
+- $id: serial
+  anyOf:
+    - const: null
+    - $ref: primitive-serial
+    - $ref: symbol-serial
+    - $ref: reference-serial
+
+- $id: primitive-serial
+  type: object
+  additionalProperties: false
+  required: [type, print]
+  properties:
+    type:
+      enum:
+        - 'null'
+        - undefined
+        - boolean
+        - number
+        - string
+        - bigint
+    print:
+      type: string
+
+- $id: symbol-serial
+  type: object
+  additionalProperties: false
+  required: [type, print, index]
+  properties:
+    type:
+      const: symbol
+    print:
+      type: string
+    index:
+      $ref: natural
+
+- $id: reference-serial
+  type: object
+  additionalProperties: false
+  required: [type, print, index, constructor, specific]
+  properties:
+    type:
+      enum:
+        - object
+        - function
+    print:
+      type: string
+    index:
+      $ref: natural
+    constructor:
+      type: string
+      nullable: true
+    specific:
+      anyOf:
+        - const: null
+        - $ref: error-specific
+        - $ref: array-specific
+        - $ref: hash-specific
+
+- $id: error-specific
+  type: object
+  additionalProperties: false
+  required: [type, name, message, stack]
+  properties:
+    type:
+      const: error
+    name:
+      type: string
+      nullable: true
+    message:
+      type: string
+      nullable: true
+    stack:
+      type: string
+      nullable: true
+
+- $id: array-specific
+  type: object
+  additionalProperties: false
+  required: [type, length]
+  properties:
+    type:
+      const: array
+    length:
+      $ref: natural
+
+- $id: hash-specific
+  type: object
+  additionalProperties: false
+  required: [type, length, properties]
+  properties:
+    type:
+      const: hash
+    length:
+      $ref: natural
+    properties:
+      type: object
+      additionalProperties: false
+      patternProperties:
+        "^":
+          type: string
+
+- $id: payload
+  anyOf:
+    - $ref: bundle-payload
+    - $ref: jump-payload
+    - $ref: apply-payload
+    - $ref: return-payload
+    - $ref: throw-payload
+    - $ref: await-payload
+    - $ref: resolve-payload
+    - $ref: reject-payload
+    - $ref: yield-payload
+    - $ref: resume-payload
+    - $ref: query-payload
+    - $ref: answer-payload
+    - $ref: request-payload
+    - $ref: response-payload
+    - $ref: group-payload
+    - $ref: ungroup-payload
+
+- $id: bundle-payload
+  type: object
+  additionalProperties: false
+  required: [type]
+  properties:
+    type:
+      const: bundle
+
+- $id: jump-payload
+  type: object
+  additionalProperties: false
+  required: [type]
+  properties:
+    type:
+      const: jump
+
+- $id: apply-payload
+  type: object
+  additionalProperties: false
+  required: [type, function, this, arguments]
+  properties:
+    type:
+      const: apply
+    function:
+      type: string
+    this:
+      $ref: serial
+    arguments:
+      type: array
+      items:
+        $ref: serial
+
+- $id: return-payload
+  type: object
+  additionalProperties: false
+  required: [type, function, result]
+  properties:
+    type:
+      const: return
+    function:
+      type: string
+    result:
+      $ref: serial
+
+- $id: throw-payload
+  type: object
+  additionalProperties: false
+  required: [type, function, error]
+  properties:
+    type:
+      const: throw
+    function:
+      type: string
+    error:
+      $ref: serial
+
+- $id: await-payload
+  type: object
+  additionalProperties: false
+  required: [type, promise]
+  properties:
+    type:
+      const: await
+    promise:
+      $ref: serial
+
+- $id: resolve-payload
+  type: object
+  additionalProperties: false
+  required: [type, result]
+  properties:
+    type:
+      const: resolve
+    result:
+      $ref: serial
+
+- $id: reject-payload
+  type: object
+  additionalProperties: false
+  required: [type, error]
+  properties:
+    type:
+      const: reject
+    error:
+      $ref: serial
+
+- $id: yield-payload
+  type: object
+  additionalProperties: false
+  required: [type, iterator]
+  properties:
+    type:
+      const: yield
+    iterator:
+      $ref: serial
+
+- $id: resume-payload
+  type: object
+  additionalProperties: false
+  required: [type]
+  properties:
+    type:
+      const: resume
+
+- $id: query-payload
+  type: object
+  additionalProperties: false
+  required: [type, database, version, sql, parameters]
+  properties:
+    type:
+      const: query
+    database:
+      type: string
+      nullable: true
+    version:
+      type: string
+      nullable: true
+    sql:
+      type: string
+    parameters:
+      anyOf:
+        - type: array
+          items:
+            $ref: serial
+        - type: object
+          additionalProperties: false
+          patternProperties:
+            "^":
+              $ref: serial
+
+- $id: answer-payload
+  type: object
+  additionalProperties: false
+  required: [type]
+  properties:
+    type:
+      const: answer
+
+- $id: headers
+  type: object
+  additionalProperties: false
+  patternProperties:
+    "^":
+      type: string
+
+- $id: side
+  enum:
+    - client
+    - server
+
+- $id: request-payload
+  type: object
+  additionalProperties: false
+  required: [type, side, protocol, method, url, route, headers, body]
+  properties:
+    type:
+      const: request
+    side:
+      $ref: side
+    protocol:
+      type: string
+    method:
+      type: string
+    url:
+      type: string
+    route:
+      type: string
+      nullable: true
+    headers:
+      $ref: headers
+    body:
+      $ref: serial
+
+- $id: response-payload
+  type: object
+  additionalProperties: false
+  required: [type, side, status, message, headers, body]
+  properties:
+    type:
+      const: response
+    side:
+      $ref: side
+    status:
+      type: integer
+    message:
+      type: string
+    headers:
+      $ref: headers
+    body:
+      $ref: serial
+
+- $id: group-payload
+  type: object
+  additionalProperties: false
+  required: [type, group, description]
+  properties:
+    type:
+      const: group
+    group:
+      $ref: group
+    description:
+      type: string
+
+- $id: ungroup-payload
+  type: object
+  additionalProperties: false
+  required: [type, group]
+  properties:
+    type:
+      const: ungroup
+    group:
+      $ref: group
+
 - $id: message
   anyOf:
-    - type: array
-      minItems: 2
-      maxItems: 2
-      items:
-        - const: initialize
-        - $ref: configuration
-    - type: array
-      minItems: 2
-      maxItems: 2
-      items:
-        - const: terminate
-        - $ref: termination
-    - type: array
-      minItems: 3
-      maxItems: 3
-      items:
-        - const: start
-        - type: string
-        - $ref: initialization
-    - type: array
-      minItems: 3
-      maxItems: 3
-      items:
-        - const: stop
-        - type: string
-        - $ref: termination
-    - type: array
-      minItems: 2
-      maxItems: 2
-      items:
-        - const: source
-        - $ref: source
-    - type: array
-      minItems: 6
-      maxItems: 6
-      items:
-        - const: event
-        - enum:
-          - begin
-          - end
-          - before
-          - after
-        - $ref: index
-        - type: number
-        - enum:
-          - bundle
-          - apply
-          - jump
-          - client
-          - server
-          - query
-        - true
+    - $ref: start-message
+    - $ref: stop-message
+    - $ref: error-message
+    - $ref: source-message
+    - $ref: event-message
+    - $ref: amend-message
 
 ################
 ## Source Map ##

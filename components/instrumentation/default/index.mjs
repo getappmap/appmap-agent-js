@@ -1,7 +1,7 @@
-import Escodegen from "escodegen";
+import * as Astring from "astring";
 import * as Acorn from "acorn";
 
-const { generate: generateEstree } = Escodegen;
+const { generate: generateEstree } = Astring;
 const { parse: parseEstree } = Acorn;
 
 import Visit from "./visit.mjs";
@@ -11,7 +11,7 @@ const _Set = Set;
 export default (dependencies) => {
   const {
     log: { logDebug },
-    util: { generateGet },
+    util: { generateGet, createCounter, recoverMaybe },
     "configuration-accessor": { getConfigurationPackage },
     uuid: { getUUID },
     expect: { expectSuccess },
@@ -26,10 +26,11 @@ export default (dependencies) => {
       configuration,
       runtime: `${configuration["hidden-identifier"]}${getUUID()}`,
       done: new _Set(),
+      counter: createCounter(0),
     }),
     getInstrumentationIdentifier: ({ runtime }) => runtime,
     instrument: (
-      { configuration, runtime, done },
+      { configuration, runtime, done, counter },
       { type, url, content },
       mapping,
     ) => {
@@ -53,53 +54,59 @@ export default (dependencies) => {
               url,
               content,
               shallow,
-              /* c8 ignore start */
-              inline: inline === null ? configuration["inline-source"] : inline,
-              /* c8 ignore stop */
+              inline: recoverMaybe(inline, configuration["inline-source"]),
               exclude: [...exclude, ...configuration.exclude],
             },
           };
         })
         .filter(getHead)
         .map(getBody);
-      if (sources.length === 0) {
-        logDebug(
-          "Not instrumenting file %j because it has no allowed sources.",
-          url,
-        );
-        return { url, content, sources: [] };
-      }
-      logDebug("Instrumenting generated file %j", url);
+      const excluded = sources.length === 0;
       sources = sources.filter(({ url }) => !done.has(url));
       for (const { url } of sources) {
         done.add(url);
       }
-      return {
-        url,
-        content: generateEstree(
-          visit(
-            expectSuccess(
-              () =>
-                parseEstree(content, {
-                  allowHashBang: true,
-                  sourceType: type,
-                  allowAwaitOutsideFunction: type === "module",
-                  ecmaVersion: "latest",
-                  locations: true,
-                }),
-              "failed to parse file %j >> %O",
-              url,
+      if (
+        excluded ||
+        (configuration.hooks.eval.length === 0 && !configuration.hooks.apply)
+      ) {
+        logDebug(
+          "Not instrumenting file %j because it has no allowed sources or because instrumentation hooks (apply and eval) are disabled.",
+          url,
+        );
+        return { url, content, sources };
+      } else {
+        logDebug("Instrumenting file %j", url);
+        return {
+          url,
+          content: generateEstree(
+            visit(
+              expectSuccess(
+                () =>
+                  parseEstree(content, {
+                    allowHashBang: true,
+                    sourceType: type,
+                    allowAwaitOutsideFunction: type === "module",
+                    ecmaVersion: "latest",
+                    locations: true,
+                  }),
+                "failed to parse file %j >> %O",
+                url,
+              ),
+              {
+                url,
+                runtime,
+                whitelist: new _Set(sources.map(getURL)),
+                evals: configuration.hooks.eval,
+                apply: configuration.hooks.apply,
+                mapping,
+                counter,
+              },
             ),
-            {
-              url,
-              runtime,
-              whitelist: new _Set(sources.map(getURL)),
-              mapping,
-            },
           ),
-        ),
-        sources,
-      };
+          sources,
+        };
+      }
     },
   };
 };

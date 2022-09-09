@@ -26,8 +26,8 @@
     "url": "https://github.com/applandinc/appmap-agent-js.git"
   },
   "scripts": {
-    "pre-build": "node build/await/index.mjs",
-    "build": "node build/index.mjs",
+    "prepare": "npm run build",
+    "build": "node build/await/index.mjs && node build/index.mjs",
     "lint": "npx eslint '**/*.@(mjs|js|cjs)'",
     "test-unit-cov": "npx test-turtle --layout alongside -- /bin/sh test/unit/test-cov.sh",
     "test-unit": "npx test-turtle --layout alongside -- node --unhandled-rejections=strict test/unit/test.mjs",
@@ -47,7 +47,7 @@
     "acorn": "^8.5.0",
     "ajv": "^8.6.3",
     "ajv-error-tree": "0.0.5",
-    "escodegen": "^2.0.0",
+    "astring": "^1.8.3",
     "glob": "^7.2.0",
     "klaw-sync": "^6.0.0",
     "minimatch": "^3.0.4",
@@ -55,6 +55,7 @@
     "net-socket-messaging": "^0.1.6",
     "prompts": "^2.4.2",
     "semver": "^7.3.5",
+    "source-map": "^0.6.1",
     "treeify": "^1.1.0",
     "yaml": "^1.10.2"
   },
@@ -74,7 +75,6 @@
     "prettier": "^2.2.1",
     "semantic-release": "^18.0.0",
     "sinon": "^12.0.1",
-    "source-map": "^0.6.1",
     "sqlite3": "^5.0.2",
     "tap": "^15.0.10",
     "tape": "^5.2.2",

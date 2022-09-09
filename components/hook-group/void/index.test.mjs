@@ -11,8 +11,8 @@ const component = HookGroup(dependencies);
 assertDeepEqual(
   await testHookAsync(
     component,
-    { ordering: "chronological" },
+    { configuration: { ordering: "chronological" } },
     async () => null,
   ),
-  { sources: [], events: [] },
+  [],
 );

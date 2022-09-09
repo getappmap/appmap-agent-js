@@ -1,4 +1,6 @@
 import { assert } from "./assert.mjs";
+
+const { apply } = Reflect;
 const _WeakMap = WeakMap;
 
 const cache = new _WeakMap();
@@ -103,6 +105,17 @@ export const bind = (f, x1) => {
     return (x2, x3, x4, x5) => f(x1, x2, x3, x4, x5);
   }
   assert(false, "arity of out bounds");
+};
+
+export const spyOnce = (spy, forward) => {
+  let called = false;
+  return function (...args) {
+    if (!called) {
+      called = true;
+      apply(spy, this, args);
+    }
+    return apply(forward, this, args);
+  };
 };
 
 // export const applySafe = (closure, context, inputs, log, recovery) => {

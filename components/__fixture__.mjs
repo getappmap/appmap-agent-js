@@ -11,8 +11,11 @@ export const convertPort = (port) =>
       )}`
     : port;
 
+export const getTemporaryDirectoryURL = () =>
+  pathToFileURL(getTemporaryDirectory());
+
 export const getFreshTemporaryURL = (extension = "") =>
-  `${pathToFileURL(getTemporaryDirectory())}/${Math.random()
+  `${getTemporaryDirectoryURL()}/${Math.random()
     .toString(36)
     .substring(2)}${extension}`;
 

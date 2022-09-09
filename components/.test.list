@@ -14,6 +14,7 @@
 - * uuid
   * file
   * time
+  * group
   * spawn
   * prompts
   * http
@@ -41,7 +42,9 @@
 - hook-fixture
 - * hook-apply
   * hook-group
-  * hook-module
+  * hook-cjs
+  * hook-esm
+  * hook-eval
   * hook-query
   * - hook-http
     - * hook-http-client
@@ -58,7 +61,6 @@
 - batch
 - questionnaire
 - setup
-- loader
 - abomination
 - init
 - status

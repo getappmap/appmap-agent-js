@@ -3,6 +3,7 @@ import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
 } from "../../build.mjs";
+import { normalize } from "./__fixture__.mjs";
 import Instrumentation from "./index.mjs";
 
 const { createMirrorSourceMap } = await buildTestComponentAsync("source");
@@ -28,12 +29,18 @@ const makeExclusion = (name) => ({
   recursive: true,
 });
 
+const normalizeContent = ({ content, ...rest }, source) => ({
+  content: normalize(content, source),
+  ...rest,
+});
+
 const instrumentation = createInstrumentation(
   extendConfiguration(
     createConfiguration("file:///home"),
     {
       "hidden-identifier": "$",
       "inline-source": false,
+      hooks: { eval: false },
       packages: [
         {
           path: "foo.js",
@@ -65,10 +72,12 @@ assertEqual(getInstrumentationIdentifier(instrumentation), "$uuid");
     type: "script",
   };
   assertDeepEqual(
-    instrument(instrumentation, file, createMirrorSourceMap(file)),
+    normalizeContent(
+      instrument(instrumentation, file, createMirrorSourceMap(file)),
+    ),
     {
       url: "file:///base/foo.js",
-      content: "123;",
+      content: normalize("123;", "script"),
       sources: [
         {
           url: "file:///base/foo.js",
@@ -93,10 +102,12 @@ assertEqual(getInstrumentationIdentifier(instrumentation), "$uuid");
     type: "script",
   };
   assertDeepEqual(
-    instrument(instrumentation, file, createMirrorSourceMap(file)),
+    normalizeContent(
+      instrument(instrumentation, file, createMirrorSourceMap(file)),
+    ),
     {
       url: "file:///base/bar.js",
-      content: "456;",
+      content: normalize("456;", "script"),
       sources: [],
     },
   );

@@ -34,45 +34,73 @@ const promisify = (o, m, ...xs) =>
 const database = new Database(":memory:");
 
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
-const { testHookAsync, makeEvent } = await buildTestComponentAsync(
-  "hook-fixture",
-);
+const { testHookAsync } = await buildTestComponentAsync("hook-fixture");
 const component = HookSqlite3(dependencies);
 
 const testCaseAsync = (enabled, runAsync) =>
-  testHookAsync(component, { hooks: { sqlite3: enabled } }, runAsync);
+  testHookAsync(
+    component,
+    { configuration: { hooks: { sqlite3: enabled } } },
+    runAsync,
+  );
 
-const createTrace = (sql, parameters, error) => ({
-  sources: [],
-  events: [
-    makeEvent("begin", 1, 0, "bundle", null),
-    makeEvent("before", 2, 0, "query", {
+const createTrace = (sql, parameters, error) => [
+  {
+    type: "event",
+    site: "begin",
+    tab: 1,
+    group: 0,
+    time: 0,
+    payload: {
+      type: "bundle",
+    },
+  },
+  {
+    type: "event",
+    site: "before",
+    tab: 2,
+    group: 0,
+    time: 0,
+    payload: {
+      type: "query",
       database: "sqlite3",
       version: null,
       sql,
       parameters,
-    }),
-    makeEvent("after", 2, 0, "query", { error }),
-    makeEvent("end", 1, 0, "bundle", null),
-  ],
-});
+    },
+  },
+  {
+    type: "event",
+    site: "after",
+    tab: 2,
+    group: 0,
+    time: 0,
+    payload: {
+      type: "answer",
+    },
+  },
+  {
+    type: "event",
+    site: "end",
+    tab: 1,
+    group: 0,
+    time: 0,
+    payload: {
+      type: "bundle",
+    },
+  },
+];
 
 // Disable //
-assertDeepEqual(await testCaseAsync(false, async () => {}), {
-  sources: [],
-  events: [],
-});
+assertDeepEqual(await testCaseAsync(false, async () => {}), []);
 
 // TypeError //
 assertDeepEqual(
   await testCaseAsync(true, async () => {
     assertThrow(() => database.run(), /^TypeError: missing sql query string/u);
-    assertThrow(
-      () => database.run(123),
-      /^TypeError: first argument is expected to be a sql query string/u,
-    );
+    assertThrow(() => database.run(123), /^TypeError:/u);
   }),
-  { sources: [], events: [] },
+  [],
 );
 
 //////////////

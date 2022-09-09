@@ -5,15 +5,21 @@ const { apply } = Reflect;
 const _Promise = Promise;
 const _TypeError = TypeError;
 
+const VERSION = null;
+const DATABASE = "postgres";
+
 export default (dependencies) => {
   const {
-    util: { assignProperty },
+    util: { spyOnce, assignProperty },
     agent: {
-      getSerializationEmptyValue,
-      recordBeginBundle,
-      recordEndBundle,
-      recordBeforeQuery,
-      recordAfterQuery,
+      getFreshTab,
+      recordBeginEvent,
+      recordEndEvent,
+      recordBeforeEvent,
+      recordAfterEvent,
+      formatQueryPayload,
+      getAnswerPayload,
+      getBundlePayload,
     },
   } = dependencies;
   const { requireMaybe } = Require(dependencies);
@@ -26,7 +32,8 @@ export default (dependencies) => {
       if (Postgres === null) {
         return [];
       }
-      const empty = getSerializationEmptyValue(agent);
+      const bundle_payload = getBundlePayload(agent);
+      const answer_payload = getAnswerPayload(agent);
       const { Client, Query } = Postgres;
       const { prototype } = Client;
       const { query: original } = prototype;
@@ -59,19 +66,25 @@ export default (dependencies) => {
               });
             }
           }
-          const index1 = recordBeginBundle(agent, null);
-          const index2 = recordBeforeQuery(agent, {
-            database: "postgres",
-            version: null,
-            sql: query.text,
-            parameters: query.values || {},
-          });
+          const bundle_tab = getFreshTab(agent);
+          const jump_tab = getFreshTab(agent);
+          recordBeginEvent(agent, bundle_tab, bundle_payload);
+          recordBeforeEvent(
+            agent,
+            jump_tab,
+            formatQueryPayload(
+              agent,
+              DATABASE,
+              VERSION,
+              query.text,
+              query.values || {},
+            ),
+          );
           callback = query.callback;
-          query.callback = (error, result) => {
-            recordAfterQuery(agent, index2, { error: error || empty });
-            callback(error, result);
-            recordEndBundle(agent, index1, null);
-          };
+          query.callback = spyOnce((error, result) => {
+            recordAfterEvent(agent, jump_tab, answer_payload);
+            recordEndEvent(agent, bundle_tab, bundle_payload);
+          }, callback);
           apply(original, this, [query]);
           return result;
         },

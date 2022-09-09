@@ -81,18 +81,8 @@ export default (dependencies) => {
       );
     }
     urls.add(url);
-    writeFileSync(new URL(url), stringifyJSON(trace), "utf8");
+    writeFileSync(new URL(url), stringifyJSON(trace, null, 2), "utf8");
     logInfo("Trace written at: %s", url);
-  };
-  const disconnection = {
-    status: 1,
-    errors: [
-      {
-        name: "AppmapError",
-        message: "disconnection",
-        stack: "",
-      },
-    ],
   };
   return {
     minifyReceptorConfiguration: ({
@@ -135,7 +125,17 @@ export default (dependencies) => {
               const backend = createBackend(configuration);
               socket.on("close", () => {
                 for (const key of getBackendTrackIterator(backend)) {
-                  sendBackend(backend, ["stop", key, disconnection]);
+                  sendBackend(backend, {
+                    type: "error",
+                    name: "AppmapError",
+                    message: "disconnection",
+                    stack: "",
+                  });
+                  sendBackend(backend, {
+                    type: "stop",
+                    track: key,
+                    status: 1,
+                  });
                 }
                 for (const key of getBackendTraceIterator(backend)) {
                   store(
