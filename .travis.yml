@@ -11,10 +11,8 @@ install:
 
 stages:
   - lint
-  - test-coverage
-  - test-node14
-  - test-node16
-  - test-node18
+  - coverage
+  - test
   - deploy
 
 jobs:
@@ -23,46 +21,46 @@ jobs:
     - stage: lint
       script:
         - npm run lint
-    # test-coverage
-    - stage: test-coverage
+    # coverage
+    - stage: coverage
       os: linux
       node_js: 18
       script:
         - npm run test-unit-cov
     # test-node14
-    - stage: test-node14
+    - stage: test
       os: linux
       node_js: 14
       script:
         - npm run test-unit
         - npm run test-system
-    - stage: test-node14
+    - stage: test
       os: windows
       node_js: 14
       script:
         - npm run test-unit
         - npm run test-system
     # test-node16
-    - stage: test-node16
+    - stage: test
       os: linux
       node_js: 16
       script:
         - npm run test-unit
         - npm run test-system
-    - stage: test-node16
+    - stage: test
       os: windows
       node_js: 16
       script:
         - npm run test-unit
         - npm run test-system
     # test-node18
-    - stage: test-node18
+    - stage: test
       os: linux
       node_js: 18
       script:
         - npm run test-unit
         - npm run test-system
-    - stage: test-node18
+    - stage: test
       os: windows
       node_js: 18
       script:
