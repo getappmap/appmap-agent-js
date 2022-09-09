@@ -4,7 +4,7 @@ import { join as joinPath, relative as getRelativePath } from "path";
 import {
   symlink as symlinkAsync,
   mkdir as mkdirAsync,
-  rmdir as rmdirAsync,
+  rm as rmAsync,
   writeFile as writeFileAsync,
 } from "fs/promises";
 import { assertEqual, getFreshTemporaryURL } from "../../__fixture__.mjs";
@@ -94,7 +94,7 @@ await mkdirAsync(new URL(`${directory}/node_modules/@appland`));
 
 {
   const url = new URL(`${directory}/node_modules/@appland/appmap-agent-js`);
-  await rmdirAsync(url, { recursive: true });
+  await rmAsync(url, { recursive: true });
   await symlinkAsync(
     getRelativePath(
       fileURLToPath(url),

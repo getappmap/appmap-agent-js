@@ -1,6 +1,6 @@
 import {
   mkdir as mkdirAsync,
-  rmdir as rmdirAsync,
+  rm as rmAsync,
   readdir as readdirAsync,
 } from "fs/promises";
 import { loadAsync } from "./await/load.mjs";
@@ -19,7 +19,7 @@ const isDirectoryPresentAsync = async (path) => {
 };
 
 if (await isDirectoryPresentAsync("./dist")) {
-  await rmdirAsync("./dist", { recursive: true });
+  await rmAsync("./dist", { recursive: true });
 }
 
 await mkdirAsync("./dist");
