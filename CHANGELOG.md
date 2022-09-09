@@ -1,3 +1,30 @@
+# [11.3.0](https://github.com/applandinc/appmap-agent-js/compare/v11.2.0...v11.3.0) (2022-09-09)
+
+
+### Bug Fixes
+
+* add body to manufactured http events for completion ([b3b05cf](https://github.com/applandinc/appmap-agent-js/commit/b3b05cfeda3615e3ea163853b9ef24d0f550a642))
+* adhere to the appmap spec for error format ([3ee5da4](https://github.com/applandinc/appmap-agent-js/commit/3ee5da433fde3eecbeabc1a27517b709db42d469))
+* conform to appmap spec for metadata git ([e524791](https://github.com/applandinc/appmap-agent-js/commit/e524791644ff8f2f9b102905416d1064456ecca0))
+* group frame in trace post-processing ([b3fbe60](https://github.com/applandinc/appmap-agent-js/commit/b3fbe60defaa98e4dd1a39d8a1cf250f3780ffd1))
+* handle http headers which are not strings ([499d204](https://github.com/applandinc/appmap-agent-js/commit/499d2040cd0fb9a3b79d1d22690cf1534614a84d))
+* insert symbolic link instead of copying main file ([b905dba](https://github.com/applandinc/appmap-agent-js/commit/b905dbada87ff7c96029f91638e298a97234ccc1)), closes [/github.com/vercel/next.js/blob/7e5cb510c4155572d0b251db34845d34fd078480/packages/next/lib/get-project-dir.ts#L3](https://github.com//github.com/vercel/next.js/blob/7e5cb510c4155572d0b251db34845d34fd078480/packages/next/lib/get-project-dir.ts/issues/L3)
+* make sure all payload field satisfy the schema ([8d28927](https://github.com/applandinc/appmap-agent-js/commit/8d289272ccf2796599416002dbb1db30efca76ee))
+* make sure http response status is in the right format ([96bbcde](https://github.com/applandinc/appmap-agent-js/commit/96bbcdecb275f18e02207a7fc89aa07424cd1709))
+* more lenient monkey-patching ([cb392b3](https://github.com/applandinc/appmap-agent-js/commit/cb392b3d3305580cc2812d633b8a82e7f850f72c))
+* move recording of server side request to capture initial event ([cdf65c1](https://github.com/applandinc/appmap-agent-js/commit/cdf65c1dd11f8a58285fa1aca96d30d3db30d3a1))
+* no longer overwrite configuration.log.level with error ([61d67c7](https://github.com/applandinc/appmap-agent-js/commit/61d67c77e6492e67902709852e059d8d691e8464))
+* properly report unknown configuration field ([1728c56](https://github.com/applandinc/appmap-agent-js/commit/1728c56a7d7d6ad04070ae3c27ff2f1f7360f727))
+* show the children of excluded functions ([c41b3ae](https://github.com/applandinc/appmap-agent-js/commit/c41b3ae8f3f852cf38bcc81a7748d347893c2e8f))
+* source-map is not a dev-only module ([fa278b8](https://github.com/applandinc/appmap-agent-js/commit/fa278b81b1e7f8bb1b7352f889e854b7699a2dcd))
+
+
+### Features
+
+* remove recording methods from the API ([aa85b7d](https://github.com/applandinc/appmap-agent-js/commit/aa85b7ded9bb3e54f203906e46c287481f8552cb))
+* support eval instrumentation ([02821b1](https://github.com/applandinc/appmap-agent-js/commit/02821b1190d78eee6c8d12602d0548636254562f))
+* write appmaps with formatted json ([28b1df0](https://github.com/applandinc/appmap-agent-js/commit/28b1df0b8e19b0eb66e6cfbad6c48348d4d7577d))
+
 # [11.2.0](https://github.com/applandinc/appmap-agent-js/compare/v11.1.0...v11.2.0) (2022-08-16)
 
 
