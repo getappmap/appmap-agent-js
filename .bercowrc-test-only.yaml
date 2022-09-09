@@ -1,0 +1,9 @@
+
+ordering-pattern: (?<!\.test)\.mjs$
+plugins:
+  '@bercow/link-adjacent': {}
+  '@bercow/spawn':
+    command: 'node'
+    argv:
+      - --unhandled-rejections=strict
+      - $TEST

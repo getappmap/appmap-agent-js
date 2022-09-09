@@ -1,4 +1,3 @@
-
 // Rearrenge the event trace into an array of trees.
 // These trees are made by bookkeeping a stack:
 //   - begin/after events trigger a push

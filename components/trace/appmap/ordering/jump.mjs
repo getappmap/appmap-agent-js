@@ -1,4 +1,3 @@
-
 // Resolve jumps.
 // Insert trees starting by an after event next to their corresponding before event.
 // Event manufacturing is performed to complete sequences of events.

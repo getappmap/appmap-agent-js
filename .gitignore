@@ -1,6 +1,6 @@
 .DS_Store
-/.turtle.json
 /node_modules/
+/tmp
 /coverage
 /dist
 /yo*

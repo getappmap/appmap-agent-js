@@ -1,0 +1,15 @@
+
+ordering-pattern: (?<!\.test)\.mjs$
+plugins:
+  '@bercow/link-adjacent': {}
+  '@bercow/spawn':
+    command: 'npx'
+    argv:
+      - c8
+      - --100
+      - --include
+      - $RELATIVE_MAIN_PATH
+      - --
+      - node
+      - --unhandled-rejections=strict
+      - $RELATIVE_TEST_PATH

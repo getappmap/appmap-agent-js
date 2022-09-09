@@ -1,5 +1,0 @@
-- require.mjs
-- * mysql.mjs
-  * pg.mjs
-  * sqlite3.mjs
-- index.mjs
