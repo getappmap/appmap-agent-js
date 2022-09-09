@@ -3,7 +3,8 @@ ordering-pattern: (?<!\.test)\.mjs$
 plugins:
   '@bercow/link-adjacent': {}
   '@bercow/spawn':
-    command: 'npx'
+    command: npx
+    command-windows: npx.cmd
     argv:
       - c8
       - --100

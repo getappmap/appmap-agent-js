@@ -3,7 +3,7 @@ ordering-pattern: (?<!\.test)\.mjs$
 plugins:
   '@bercow/link-adjacent': {}
   '@bercow/spawn':
-    command: 'node'
+    command: node
     argv:
       - --unhandled-rejections=strict
       - $TEST

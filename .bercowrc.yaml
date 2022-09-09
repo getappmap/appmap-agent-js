@@ -6,7 +6,8 @@ plugins:
     prettier-options: ./prettierrc.yml
   '@bercow/eslint': {}
   '@bercow/spawn':
-    command: 'npx'
+    command: npx
+    command-windows: npx.cmd
     argv:
       - c8
       - --100
