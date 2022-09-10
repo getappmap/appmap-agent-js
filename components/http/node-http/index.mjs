@@ -83,7 +83,7 @@ export default (dependencies) => {
       }),
     generateRespond: (respondAsync) => (request, response) => {
       if (areValidHeaders(request.headers)) {
-        let buffers = [];
+        const buffers = [];
         request.on("data", (buffer) => {
           buffers.push(buffer);
         });

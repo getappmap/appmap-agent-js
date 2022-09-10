@@ -90,7 +90,7 @@ export default (dependencies) => {
   };
 
   const extractConfig = (argv) => {
-    let { _: positional, ...config } = minimist(argv.slice(2));
+    const { _: positional, ...config } = minimist(argv.slice(2));
 
     if (positional.length > 0) {
       expect(

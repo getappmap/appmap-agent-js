@@ -28,5 +28,6 @@ rules:
   arrow-body-style: [error, as-needed]
   consistent-return: error
   no-lone-blocks: error
+  prefer-const: [error, {destructuring: all}]
   prefer-template: error
   require-unicode-regexp: error

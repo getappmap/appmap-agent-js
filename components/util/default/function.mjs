@@ -18,7 +18,7 @@ export const memoize = (closure, argument) => {
   if (!cache.has(closure)) {
     cache.set(closure, new WeakMap());
   }
-  let history = cache.get(closure);
+  const history = cache.get(closure);
   if (!history.has(argument)) {
     history.set(argument, closure(argument));
   }

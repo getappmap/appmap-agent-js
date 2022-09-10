@@ -40,7 +40,7 @@ const { createClient, executeClientAsync, interruptClient, traceClient } =
   Client(await buildTestDependenciesAsync(import.meta.url));
 // happy path (unix-domain-socket) //
 {
-  let buffer = [];
+  const buffer = [];
   await testCaseAsync(
     getFreshTemporaryPath(),
     (body, stream) => {
