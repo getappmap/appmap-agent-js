@@ -27,3 +27,4 @@ rules:
       ignoreRestSiblings: false
   arrow-body-style: [error, as-needed]
   consistent-return: error
+  prefer-template: error
