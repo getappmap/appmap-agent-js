@@ -1,10 +1,15 @@
-const _URL = URL;
-const _URLSearchParams = URLSearchParams;
-const _String = String;
-const _undefined = undefined;
+const {
+  Error,
+  URL,
+  URLSearchParams,
+  String,
+  undefined,
+} = globalThis;
 
-const { entries: toEntries } = Object;
-const { from: arrayFrom } = Array;
+const {
+  Object: { entries: toEntries },
+  Array: { from: arrayFrom },
+} = globalThis;
 
 export default (dependencies) => {
   const {
@@ -19,7 +24,7 @@ export default (dependencies) => {
   } = dependencies;
 
   const parseURL = (url, headers) =>
-    new _URL(
+    new URL(
       url[0] === "/"
         ? `http://${coalesceCaseInsensitive(
             headers,
@@ -43,7 +48,7 @@ export default (dependencies) => {
   const isFirstColon = ([string]) => string.startsWith(":");
 
   const digestSearchMessage = (search) =>
-    arrayFrom(new _URLSearchParams(search).entries());
+    arrayFrom(new URLSearchParams(search).entries());
 
   const digesters = {
     // function //
@@ -53,7 +58,7 @@ export default (dependencies) => {
       // receiver: mapMaybe(this, digestParameterSerialThis),
       receiver:
         _this === null
-          ? digestParameterPrimitive("this", _undefined)
+          ? digestParameterPrimitive("this", undefined)
           : digestParameterSerial("this", _this),
       parameters: zip(parameters, _arguments).map(digestParameterSerialTuple),
     }),
@@ -131,7 +136,7 @@ export default (dependencies) => {
     name,
     class: typeof primitive,
     object_id: null,
-    value: _String(primitive),
+    value: String(primitive),
   });
 
   const digestParameterPrimitiveTuple = ([name, primitive]) =>

@@ -1,3 +1,6 @@
+
+const {Set, Error} = globalThis;
+
 export default (dependencies) => {
   const {
     log: { logInfo },

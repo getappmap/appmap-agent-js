@@ -2,9 +2,13 @@ import * as Http2 from "http2";
 // This is necessary to avoid infinite recursion when http2-hook is true
 const { connect } = Http2;
 
-const _String = String;
-const _Error = Error;
-const { stringify } = JSON;
+const {
+  String,
+  Error,
+  JSON: {stringifN:stringifyJSON},
+  Promise,
+  setTimeout,
+} = globalThis;
 
 export default (dependencies) => {
   const {
@@ -28,7 +32,7 @@ export default (dependencies) => {
     const { _appmap_session: session } = this;
     session.emit(
       "error",
-      new _Error(`frame error ${stringify({ type, code, id })}`),
+      new Error(`frame error ${stringifyJSON({ type, code, id })}`),
     );
   }
 
@@ -39,20 +43,20 @@ export default (dependencies) => {
       const { _appmap_session: session } = this;
       session.emit(
         "error",
-        new _Error(`http2 echec status code: ${_String(status)}`),
+        new Error(`http2 echec status code: ${String(status)}`),
       );
     }
   }
 
   function onStreamData(_data) {
     const { _appmap_session: session } = this;
-    session.emit("error", new _Error("non empty http2 response body"));
+    session.emit("error", new Error("non empty http2 response body"));
   }
 
   return {
     createClient: ({ host, port }) =>
       typeof port === "number"
-        ? connect(`http://${host}:${_String(port)}/`)
+        ? connect(`http://${host}:${String(port)}/`)
         : connect(`http://localhost/`, { path: port }),
     executeClientAsync: async (session) => {
       session.unref();
@@ -82,7 +86,7 @@ export default (dependencies) => {
         stream.on("response", onStreamResponse);
         stream.on("data", onStreamData);
         stream.on("end", noop);
-        stream.end(stringify(data), "utf8");
+        stream.end(stringifyJSON(data), "utf8");
       }
     },
   };

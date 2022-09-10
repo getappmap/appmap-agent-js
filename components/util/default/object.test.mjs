@@ -9,6 +9,10 @@ import {
   generateGet,
 } from "./object.mjs";
 
+const {
+  undefined
+} = globalThis;
+
 // assignProperty //
 {
   const object = { __proto__: null };

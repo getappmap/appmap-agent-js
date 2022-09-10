@@ -1,11 +1,11 @@
-import { Buffer } from "buffer";
 
-const { from: toBuffer, concat: concatBuffer } = Buffer;
 const {
+  Buffer: {from:toBuffer, concat:concatBuffer},
   Object: { fromEntries },
   TextDecoder,
   Reflect: { apply },
   JSON: { parse: parseJSON },
+  undefined,
 } = globalThis;
 
 export default (dependencies) => {

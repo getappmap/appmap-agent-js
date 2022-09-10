@@ -1,5 +1,11 @@
 /* eslint-env node */
 
+const {
+  Object: {assign},
+  Error,
+  process,
+} = globalThis;
+
 import { EventEmitter } from "events";
 import { pathToFileURL } from "url";
 import { assertThrow, assertEqual } from "../../__fixture__.mjs";
@@ -20,7 +26,7 @@ const { createConfiguration, extendConfiguration } =
   await buildTestComponentAsync("configuration");
 
 const mock_process = new EventEmitter();
-Object.assign(mock_process, {
+assign(mock_process, {
   pid: process.pid,
   cwd: process.cwd,
   argv: process.argv,

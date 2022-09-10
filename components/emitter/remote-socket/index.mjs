@@ -1,4 +1,6 @@
-const { stringify: stringifyJSON } = JSON;
+const {
+  JSON: { stringify: stringifyJSON }
+} = globalThis;
 
 export default (dependencies) => {
   const {

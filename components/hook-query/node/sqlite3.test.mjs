@@ -12,6 +12,13 @@ import {
 } from "../../build.mjs";
 import HookSqlite3 from "./sqlite3.mjs";
 
+const {
+  Promise,
+  undefined,
+  Error,
+  setTimeout,
+} = globalThis;
+
 const { Database, Statement } = Sqlite3;
 
 const promisify = (o, m, ...xs) =>

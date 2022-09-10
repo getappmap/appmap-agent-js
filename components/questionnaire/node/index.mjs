@@ -1,8 +1,9 @@
-const { parse: parseJSON } = JSON;
-const { parseInt } = Number;
-const { assign } = Object;
 
-const { fromEntries } = Object;
+const {
+  JSON: { parse: parseJSON },
+  Number: { parseInt },
+  Object: {assign, fromEntries},
+} = globalThis;
 
 export default (dependencies) => {
   const {

@@ -2,9 +2,13 @@ import Http from "http";
 import { fileURLToPath } from "url";
 
 const { request: createRequest } = Http;
-const { from: toBuffer, concat: concatBuffer } = Buffer;
-const _Promise = Promise;
-const { parse: parseJSON, stringify: stringifyJSON } = JSON;
+
+const {
+  Buffer: { from: toBuffer, concat: concatBuffer },
+  Promise,
+  Error,
+  JSON: { parse: parseJSON, stringify: stringifyJSON },
+} = globalThis;
 
 const INVALID_HEADERS_MESSAGE =
   "in the presence of a body, 'content-type' should be 'application/json; charset=UTF-8'";
@@ -45,7 +49,7 @@ export default (dependencies) => {
   };
   return {
     requestAsync: (host, port, method, path, data) =>
-      new _Promise((resolve, reject) => {
+      new Promise((resolve, reject) => {
         const buffer = toBuffer(stringify(data), "utf8");
         const request = createRequest({
           host,

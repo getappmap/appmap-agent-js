@@ -10,6 +10,11 @@ import {
 import { platform as getPlatform } from "os";
 import ConfigurationAccessor from "./index.mjs";
 
+const {
+  Reflect:{get},
+  URL,
+} = globalThis;
+
 const { createConfiguration, extendConfiguration } =
   await buildTestComponentAsync("configuration");
 
@@ -30,7 +35,7 @@ const {
 ////////////////////////////////////////
 
 assertEqual(
-  Reflect.get(
+  get(
     resolveConfigurationManualRecorder(createConfiguration("file:///home")),
     "recorder",
   ),
@@ -72,7 +77,7 @@ resolveConfigurationRepository(createConfiguration("file:///home"));
 /////////////////////////////
 
 assertEqual(
-  Reflect.get(
+  get(
     extendConfigurationPort(
       extendConfiguration(
         createConfiguration("file:///home"),
@@ -97,7 +102,7 @@ assertEqual(
 ///////////////////////////////////////////
 
 assertEqual(
-  Reflect.get(
+  get(
     resolveConfigurationAutomatedRecorder(
       extendConfiguration(
         createConfiguration("file:///home"),
@@ -113,7 +118,7 @@ assertEqual(
 );
 
 assertEqual(
-  Reflect.get(
+  get(
     resolveConfigurationAutomatedRecorder(
       extendConfiguration(
         createConfiguration("file:///home"),
@@ -129,7 +134,7 @@ assertEqual(
 );
 
 assertEqual(
-  Reflect.get(
+  get(
     resolveConfigurationAutomatedRecorder(
       extendConfiguration(
         createConfiguration("file:///home"),
@@ -145,7 +150,7 @@ assertEqual(
 );
 
 assertEqual(
-  Reflect.get(
+  get(
     resolveConfigurationAutomatedRecorder(
       extendConfiguration(
         createConfiguration("file:///home"),
@@ -255,7 +260,7 @@ assertDeepEqual(
 /////////////////////////////
 
 assertEqual(
-  Reflect.get(
+  get(
     extendConfigurationNode(createConfiguration("file:///home"), {
       version: "v1.2.3",
       argv: ["node", "main.js"],

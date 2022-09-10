@@ -1,9 +1,11 @@
-const _Map = Map;
-const _RegExp = RegExp;
 
-const { from: toArray } = Array;
+const {
+  Map,
+  RegExp,
+  Array: { from: toArray },
+} = globalThis;
 
-const cache = new _Map();
+const cache = new Map();
 
 export default (dependencies) => {
   const {
@@ -25,7 +27,7 @@ export default (dependencies) => {
     }
     assert(false, "getName called on invalid entity");
   };
-  const criteria = new _Map([
+  const criteria = new Map([
     ["name", (pattern, { name }, _parent) => cache.get(pattern)(name)],
     [
       "qualified-name",
@@ -50,7 +52,7 @@ export default (dependencies) => {
         const pattern = exclusion[name];
         if (typeof pattern === "string") {
           if (!cache.has(pattern)) {
-            const regexp = new _RegExp(pattern, "u");
+            const regexp = new RegExp(pattern, "u");
             cache.set(pattern, (target) => regexp.test(target));
           }
         }

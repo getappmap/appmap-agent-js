@@ -1,8 +1,9 @@
-const _Set = Set;
-const _String = String;
-const _URL = URL;
 
-// import Record from "./record.mjs";
+const {
+  Set,
+  String,
+  URL,
+} = globalThis;
 
 export default (dependencies) => {
   const {
@@ -13,7 +14,6 @@ export default (dependencies) => {
     "configuration-accessor": { resolveConfigurationManualRecorder },
     hook: { hook, unhook },
     agent: {
-      // getSerializationEmptyValue,
       openAgent,
       closeAgent,
       instrument,
@@ -33,10 +33,10 @@ export default (dependencies) => {
   // } = Record(dependencies);
   let global_running = false;
   const makeFile = (type, content, url = "file:///") => {
-    content = _String(content);
-    url = _String(url);
+    content = String(content);
+    url = String(url);
     expectSuccess(
-      () => new _URL(url),
+      () => new URL(url),
       "the second argument of appmap.recordScript should be a valid url, got: %j >> %O",
       url,
     );
@@ -54,7 +54,7 @@ export default (dependencies) => {
       configuration = resolveConfigurationManualRecorder(configuration);
       this.agent = openAgent(configuration);
       this.hooking = hook(this.agent, configuration);
-      this.tracks = new _Set();
+      this.tracks = new Set();
       global_running = true;
     }
     instrumentScript(content, url) {

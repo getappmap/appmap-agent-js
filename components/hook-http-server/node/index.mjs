@@ -1,12 +1,14 @@
 import Http from "http";
 import Https from "https";
 
-const _RegExp = RegExp;
-const _String = String;
-const { nextTick } = process;
-const { apply, construct } = Reflect;
-const _Proxy = Proxy;
-const _undefined = undefined;
+const {
+  RegExp,
+  String,
+  process: {nextTick},
+  Reflect: {apply, construct},
+  Proxy,
+  undefined,
+} = globalThis;
 
 export default (dependencies) => {
   const {
@@ -45,7 +47,7 @@ export default (dependencies) => {
   /* c8 ignore start */
   const getStringPort = (server) => {
     const address = server.address();
-    return typeof address === "string" ? address : _String(address.port);
+    return typeof address === "string" ? address : String(address.port);
   };
 
   const interceptTraffic = (
@@ -91,9 +93,9 @@ export default (dependencies) => {
     // Give time for express to populate the request
     nextTick(() => {
       if (
-        typeof coalesce(request, "baseUrl", _undefined) === "string" &&
-        typeof coalesce(request, "route", _undefined) === "object" &&
-        typeof coalesce(request.route, "path", _undefined) === "string"
+        typeof coalesce(request, "baseUrl", undefined) === "string" &&
+        typeof coalesce(request, "route", undefined) === "object" &&
+        typeof coalesce(request.route, "path", undefined) === "string"
       ) {
         recordBeginAmend(
           agent,
@@ -296,7 +298,7 @@ export default (dependencies) => {
           jump_payload: getJumpPayload(agent),
           empty: getSerializationEmptyValue(agent),
           regexp: expectSuccess(
-            () => new _RegExp(intercept_track_port, "u"),
+            () => new RegExp(intercept_track_port, "u"),
             "Failed to compile the 'intercept-track-port' configuration field %j as regexp >> %O",
             intercept_track_port,
           ),
@@ -315,7 +317,7 @@ export default (dependencies) => {
           },
         };
         for (const { object, key, value } of backup) {
-          object[key] = new _Proxy(value, traps);
+          object[key] = new Proxy(value, traps);
         }
         return backup;
       }

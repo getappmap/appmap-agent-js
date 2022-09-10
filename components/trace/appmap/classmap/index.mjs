@@ -1,10 +1,12 @@
 import Estree from "./estree/index.mjs";
 import ExclusionList from "./exclusion-list.mjs";
 
-const _Set = Set;
-const _Map = Map;
-const _undefined = undefined;
-const { from: toArray } = Array;
+const {
+  Set,
+  Map,
+  undefined,
+  Array: {from:toArray},
+} = globalThis;
 
 export default (dependencies) => {
   const {
@@ -157,9 +159,9 @@ export default (dependencies) => {
 
   return {
     createClassmap: (configuration) => ({
-      closures: new _Map(),
+      closures: new Map(),
       sources: [],
-      urls: new _Set(),
+      urls: new Set(),
       naming: {
         counter: createCounter(0),
         separator: "-",
@@ -280,7 +282,7 @@ export default (dependencies) => {
               let child = children.find(
                 (child) => child.name === dirname && directories.has(child),
               );
-              if (child === _undefined) {
+              if (child === undefined) {
                 child = {
                   type: "package",
                   name: dirname,

@@ -1,4 +1,5 @@
 /* globals APPMAP_HOOK_EVAL:writable */
+/* eslint local/no-globals: ["error", "globalThis", "APPMAP_HOOK_EVAL"] */
 
 // TODO: detect if preloaded with `--experimental-loader`
 // NB: since 15.x we can use module.preloading
@@ -7,7 +8,7 @@
 //   throw new Error("lib/emitter/hook/esm.js must be preloaded with --experimental loader");
 // }};
 
-const _String = String;
+const {String} = globalThis;
 
 export default (dependencies) => {
   const {
@@ -32,7 +33,7 @@ export default (dependencies) => {
           instrument(agent, {
             url,
             type: "script",
-            content: _String(content),
+            content: String(content),
           });
       }
       return enabled;

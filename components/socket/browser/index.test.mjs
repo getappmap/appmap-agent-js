@@ -5,7 +5,7 @@ import { buildTestDependenciesAsync } from "../../build.mjs";
 
 const trace = [];
 
-global.WebSocket = function (url) {
+globalThis.WebSocket = function (url) {
   trace.push(["open", url]);
   return {
     send(message) {

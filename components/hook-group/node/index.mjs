@@ -1,5 +1,7 @@
 import { createHook } from "async_hooks";
 
+const {Set} = globalThis;
+
 export default (dependencies) => {
   const {
     util: { assert },

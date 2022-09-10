@@ -3,6 +3,8 @@ import SourceMap from "source-map";
 import { buildTestDependenciesAsync } from "../../build.mjs";
 import SourceInner from "./index.mjs";
 
+const {JSON : {parse:parseJSON}} = globalThis;
+
 const { SourceMapGenerator } = SourceMap;
 
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
@@ -19,7 +21,7 @@ generator.addMapping({
 });
 generator.setSourceContent("/original.ts", "123;");
 
-const source_map = compileSourceMap(JSON.parse(generator.toString()));
+const source_map = compileSourceMap(parseJSON(generator.toString()));
 
 assertDeepEqual(mapSource(source_map, 30, 40), {
   line: 10,

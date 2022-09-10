@@ -1,8 +1,10 @@
 import Http from "http";
 import Https from "https";
 
-const { apply, construct } = Reflect;
-const _Proxy = Proxy;
+const {
+  Reflect: {apply, construct},
+  Proxy,
+} = globalThis;
 
 export default (dependencies) => {
   const {
@@ -118,7 +120,7 @@ export default (dependencies) => {
           },
         };
         for (const { object, key, value } of backup) {
-          object[key] = new _Proxy(value, traps);
+          object[key] = new Proxy(value, traps);
         }
         return backup;
       }

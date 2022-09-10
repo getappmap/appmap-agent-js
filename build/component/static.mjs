@@ -9,7 +9,8 @@ import { fileURLToPath } from "url";
 import { expect } from "./expect.mjs";
 import { loadConfAsync } from "./conf.mjs";
 
-const { entries: toEntries } = Object;
+const {Map, Set, Object:{ entries: toEntries }} = globalThis;
+
 const __filname = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filname);
 

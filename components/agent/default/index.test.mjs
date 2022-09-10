@@ -6,6 +6,8 @@ import {
 } from "../../build.mjs";
 import Agent from "./index.mjs";
 
+const {eval:evalGlobal} = globalThis;
+
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
 const { createConfiguration, extendConfiguration } =
   await buildTestComponentAsync("configuration", "test");
@@ -39,7 +41,7 @@ getSerializationEmptyValue(agent);
 assertEqual(typeof getInstrumentationIdentifier(agent), "string");
 recordStartTrack(agent, "record", {}, null);
 assertEqual(
-  eval(instrument(agent, { url: "file:///base/main.js", content: "123;" })),
+  evalGlobal(instrument(agent, { url: "file:///base/main.js", content: "123;" })),
   123,
 );
 const tab = getFreshTab(agent);

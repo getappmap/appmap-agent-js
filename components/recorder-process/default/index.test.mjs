@@ -5,6 +5,11 @@ import {
 } from "../../build.mjs";
 import RecorderProcess from "./index.mjs";
 
+const {
+  Object:{assign},
+  Error,
+} = globalThis;
+
 const { main } = RecorderProcess(
   await buildTestDependenciesAsync(import.meta.url),
 );
@@ -15,7 +20,7 @@ const { createConfiguration, extendConfiguration } =
 const configuration = createConfiguration("file:///home");
 
 {
-  const emitter = Object.assign(new EventEmitter(), {
+  const emitter = assign(new EventEmitter(), {
     cwd: () => "cwd",
     argv: ["node", "main.mjs"],
     version: "v1.2.3",

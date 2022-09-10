@@ -1,5 +1,7 @@
 import Eslint from "eslint";
 
+const {Error} = globalThis;
+
 const { ESLint } = Eslint;
 
 const getMessage = ({ message }) => message;

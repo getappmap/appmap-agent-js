@@ -1,5 +1,7 @@
 import { createRequire } from "module";
 
+const {URL} = globalThis;
+
 export default (dependencies) => {
   const {
     log: { logWarning },

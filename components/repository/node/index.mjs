@@ -3,8 +3,10 @@ import { readFileSync } from "fs";
 import { pathToFileURL } from "url";
 import Git from "./git.mjs";
 
-const _URL = URL;
-const { parse: parseJSON } = JSON;
+const {
+  URL,
+  JSON: { parse: parseJSON }
+} = globalThis;
 
 export default (dependencies) => {
   const {
@@ -15,7 +17,7 @@ export default (dependencies) => {
   const { extractGitInformation } = Git(dependencies);
   const hasPackageJSON = (url) => {
     try {
-      readFileSync(new _URL(appendURLSegment(url, "package.json")), "utf8");
+      readFileSync(new URL(appendURLSegment(url, "package.json")), "utf8");
       return true;
     } catch (error) {
       const { code } = { code: null, ...error };
@@ -31,7 +33,7 @@ export default (dependencies) => {
     let content;
     try {
       content = readFileSync(
-        new _URL(appendURLSegment(url, "package.json")),
+        new URL(appendURLSegment(url, "package.json")),
         "utf8",
       );
     } catch (error) {
@@ -70,7 +72,7 @@ export default (dependencies) => {
     extractRepositoryPackage: createPackage,
     extractRepositoryDependency: (home, segments) => {
       const { resolve } = createRequire(
-        new _URL(appendURLSegment(home, "dummy.js")),
+        new URL(appendURLSegment(home, "dummy.js")),
       );
       let url = pathToFileURL(
         expectSuccess(

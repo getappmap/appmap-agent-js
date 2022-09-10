@@ -1,7 +1,10 @@
 import { performance } from "perf_hooks";
 
+const {
+  Math: {round},
+} = globalThis;
+
 const { now } = performance;
-const { round } = Math;
 
 export default (_dependencies) => {
   return {

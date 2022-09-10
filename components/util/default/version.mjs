@@ -1,6 +1,9 @@
 import { assert } from "./assert.mjs";
-const { isNaN, parseInt } = Number;
-const { max } = Math;
+
+const {
+  Number: { isNaN, parseInt },
+  Math: {max},
+} = globalThis;
 
 export const matchVersion = (actual, target) => {
   const segments1 = actual.split(".");

@@ -1,4 +1,4 @@
-const _undefined = undefined;
+const {undefined} = globalThis;
 
 export default (dependencies) => {
   const {
@@ -7,8 +7,8 @@ export default (dependencies) => {
   } = dependencies;
   return {
     validateMocha: (Mocha) => {
-      const prototype = coalesce(Mocha, "prototype", _undefined);
-      const version = coalesce(prototype, "version", _undefined);
+      const prototype = coalesce(Mocha, "prototype", undefined);
+      const version = coalesce(prototype, "version", undefined);
       expect(
         typeof version === "string",
         "Mocha.prototype.version should be a string but got: %o.",

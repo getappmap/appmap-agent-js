@@ -1,10 +1,13 @@
-// This is necessary to avoid infinite recursion when http-hook is true
+// This namespace import is necessary to avoid infinite recursion when http-hook is true
 import * as Http from "http";
 const { Agent, request: connect } = Http;
 
-const _Error = Error;
-const _String = String;
-const { stringify } = JSON;
+const {
+  Error,
+  String,
+  JSON: {stringify:stringifyJSON},
+  Promise,
+} = globalThis;
 
 export default (dependencies) => {
   const {
@@ -56,7 +59,7 @@ export default (dependencies) => {
     if (status !== 200) {
       rejectClientTermination(
         client,
-        new _Error(`http1 echec status code: ${_String(status)}`),
+        new Error(`http1 echec status code: ${String(status)}`),
       );
     }
     response.on("error", onResponseError);
@@ -68,7 +71,7 @@ export default (dependencies) => {
     const { _appmap_client: client } = this;
     rejectClientTermination(
       client,
-      new _Error("non empty http1 response body"),
+      new Error("non empty http1 response body"),
     );
   }
 
@@ -119,7 +122,7 @@ export default (dependencies) => {
         request._appmap_client = client;
         request.on("error", onRequestError);
         request.on("response", onRequestResponse);
-        request.end(stringify({ head, body: data }), "utf8");
+        request.end(stringifyJSON({ head, body: data }), "utf8");
       }
     },
   };

@@ -5,6 +5,8 @@ import {
 } from "../../build.mjs";
 import Backend from "./index.mjs";
 
+const {Array:{from:toArray}} = globalThis;
+
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
 const { createConfiguration, extendConfiguration } =
   await buildTestComponentAsync("configuration", "test");
@@ -56,7 +58,7 @@ const configuration = extendConfiguration(
     false,
   );
   assertEqual(hasBackendTrace(backend, "record"), false);
-  assertDeepEqual(Array.from(getBackendTrackIterator(backend)), ["record"]);
+  assertDeepEqual(toArray(getBackendTrackIterator(backend)), ["record"]);
   assertEqual(
     sendBackend(backend, {
       type: "stop",
@@ -65,7 +67,7 @@ const configuration = extendConfiguration(
     }),
     true,
   );
-  assertDeepEqual(Array.from(getBackendTraceIterator(backend)), ["record"]);
+  assertDeepEqual(toArray(getBackendTraceIterator(backend)), ["record"]);
   assertEqual(hasBackendTrack(backend, "record"), false);
   assertDeepEqual(takeBackendTrace(backend, "record"), {
     head: configuration,

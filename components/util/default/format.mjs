@@ -1,8 +1,10 @@
 import { assert } from "./assert.mjs";
 import { print } from "./print.mjs";
 
-const _String = String;
-const { stringify } = JSON;
+const {
+  String,
+  JSON: {stringify:stringifyJSON},
+} = globalThis;
 
 export const format = (template, values) => {
   let index = 0;
@@ -21,11 +23,11 @@ export const format = (template, values) => {
         return value;
       }
       if (marker === "j") {
-        return stringify(value);
+        return stringifyJSON(value);
       }
       if (marker === "O") {
         try {
-          return _String(value);
+          return String(value);
         } catch {
           return print(value);
         }

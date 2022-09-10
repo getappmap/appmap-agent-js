@@ -8,6 +8,12 @@ import {
 import { buildTestDependenciesAsync } from "../../build.mjs";
 import Client from "./index.mjs";
 
+const {
+  JSON: {parse:parseJSON},
+  Promise,
+  setTimeout,
+} = globalThis;
+
 const testCaseAsync = async (port, respond, runAsync) => {
   const server = createServer();
   server.on("request", (request, response) => {
@@ -16,7 +22,7 @@ const testCaseAsync = async (port, respond, runAsync) => {
       buffer += data.toString("utf8");
     });
     request.on("end", () => {
-      respond(JSON.parse(buffer), response);
+      respond(parseJSON(buffer), response);
     });
   });
   await new Promise((resolve) => {

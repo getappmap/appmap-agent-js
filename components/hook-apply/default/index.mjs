@@ -1,4 +1,4 @@
-const _eval = eval;
+const {eval:evalGlobal} = globalThis;
 
 export default (dependencies) => {
   const {
@@ -51,7 +51,7 @@ export default (dependencies) => {
           "file:///appmap-setup.js",
         );
         const resume_payload = getResumePayload(agent);
-        const runtime = _eval(identifier);
+        const runtime = evalGlobal(identifier);
         runtime.empty = getSerializationEmptyValue(agent);
         runtime.getFreshTab = () => getFreshTab(agent);
         runtime.recordApply = (tab, _function, _this, _arguments) => {

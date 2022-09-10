@@ -1,9 +1,11 @@
 import { tmpdir as getTemporaryDirectory } from "os";
 import { pathToFileURL, fileURLToPath } from "url";
 
-const _Promise = Promise;
-const _Set = Set;
-const _setTimeout = setTimeout;
+const {
+  Promise,
+  Set,
+  setTimeout,
+} = globalThis;
 
 export default (dependencies) => {
   const {
@@ -14,7 +16,7 @@ export default (dependencies) => {
   } = dependencies;
   return {
     openServiceAsync: (server, port) => {
-      const sockets = new _Set();
+      const sockets = new Set();
       server.on("connection", (socket) => {
         sockets.add(socket);
         /* c8 ignore start */
@@ -26,7 +28,7 @@ export default (dependencies) => {
           sockets.delete(socket);
         });
       });
-      return new _Promise((resolve, reject) => {
+      return new Promise((resolve, reject) => {
         server.on("error", reject);
         server.on("listening", () => {
           server.removeListener("error", reject);
@@ -57,7 +59,7 @@ export default (dependencies) => {
         for (const socket of sockets) {
           socket.end();
         }
-        _setTimeout(() => {
+        setTimeout(() => {
           /* c8 ignore start */
           for (const socket of sockets) {
             logWarning("Socket failed to gracefully shutdown");

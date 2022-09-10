@@ -1,7 +1,10 @@
 import Module from "module";
 import { pathToFileURL } from "url";
 
-const { apply } = Reflect;
+const {
+  Reflect: {apply},
+} = globalThis;
+
 const { prototype } = Module;
 
 export default (dependencies) => {

@@ -1,3 +1,5 @@
+const {Error} = globalThis;
+
 export default (_dependencies) => {
   const payloads = {
     jump: {

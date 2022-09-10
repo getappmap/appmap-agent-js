@@ -1,9 +1,11 @@
 import { assert } from "./assert.mjs";
 
-const { apply } = Reflect;
-const _WeakMap = WeakMap;
+const {
+  Reflect: {apply},
+  WeakMap,
+} = globalThis;
 
-const cache = new _WeakMap();
+const cache = new WeakMap();
 
 export const noop = () => {};
 export const identity = (x) => x;
@@ -14,7 +16,7 @@ export const constant = (x) => () => x;
 
 export const memoize = (closure, argument) => {
   if (!cache.has(closure)) {
-    cache.set(closure, new _WeakMap());
+    cache.set(closure, new WeakMap());
   }
   let history = cache.get(closure);
   if (!history.has(argument)) {

@@ -6,6 +6,8 @@ import {
 import Serialization from "./index.mjs";
 
 const {
+  Symbol,
+  Error,
   Reflect: { defineProperty },
 } = globalThis;
 

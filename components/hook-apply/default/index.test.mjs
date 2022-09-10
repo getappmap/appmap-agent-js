@@ -1,4 +1,5 @@
 /* globals $uuid */
+/* eslint local/no-globals: ["error", "$uuid"] */
 
 import { assertDeepEqual } from "../../__fixture__.mjs";
 import {

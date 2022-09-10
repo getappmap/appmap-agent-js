@@ -1,4 +1,6 @@
-const { parse: parseJSON, stringify: stringifyJSON } = JSON;
+const {
+  JSON: { parse: parseJSON, stringify: stringifyJSON },
+} = globalThis;
 
 export default (_dependencies) => {
   return {

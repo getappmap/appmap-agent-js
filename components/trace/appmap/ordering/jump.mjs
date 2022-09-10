@@ -6,7 +6,11 @@
 
 import Matching from "./matching.mjs";
 
-const { from: toArray } = Array;
+const {
+  Array: { from: toArray },
+  Error,
+  Map,
+} = globalThis;
 
 export default (dependencies) => {
   const {

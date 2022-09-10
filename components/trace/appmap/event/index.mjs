@@ -1,6 +1,8 @@
 import Classmap from "../classmap/index.mjs";
 import Payload from "./payload.mjs";
 
+const {Error} = globalThis;
+
 export default (dependencies) => {
   const {
     util: { mapMaybe, createCounter, incrementCounter },

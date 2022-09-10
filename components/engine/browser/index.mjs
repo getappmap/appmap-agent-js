@@ -1,4 +1,7 @@
-const { userAgent: description } = navigator;
+
+const {
+  navigator: {userAgent: description},
+} = globalThis;
 
 const regexp = /^([^ \n\t/]+)\/([^ \n\t/]+) /;
 

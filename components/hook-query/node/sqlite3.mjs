@@ -1,9 +1,11 @@
 import Require from "./require.mjs";
 
-const { isArray } = Array;
-const { assign } = Object;
-const { apply } = Reflect;
-const _TypeError = TypeError;
+const {
+  Array: {isArray},
+  Object: {assign},
+  Reflect: {apply},
+  TypeError,
+} = globalThis;
 
 const throwIfNotNull = (error) => {
   /* c8 ignore start */
@@ -32,11 +34,11 @@ const extractEach = (args) => {
 
 const normalizeDatabaseArguments = (args) => {
   if (args.length === 0) {
-    throw new _TypeError("missing sql query string");
+    throw new TypeError("missing sql query string");
   }
   const sql = args[0];
   if (typeof sql !== "string") {
-    throw new _TypeError("first argument is expected to be a sql query string");
+    throw new TypeError("first argument is expected to be a sql query string");
   }
   for (let index = 1; index < args.length; index += 1) {
     args[index - 1] = args[index];

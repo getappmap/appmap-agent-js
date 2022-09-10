@@ -1,8 +1,11 @@
-const _Error = Error;
-const _Promise = Promise;
+
+const {
+  Error,
+  Promise,
+} = globalThis;
 
 export default (_dependencies) => {
-  class AppmapError extends _Error {
+  class AppmapError extends Error {
     constructor(message) {
       super(message);
       this.name = "AppmapError";
@@ -13,7 +16,7 @@ export default (_dependencies) => {
     throwViolation: (message) => {
       throw new AppmapError(message);
     },
-    throwViolationAsync: (message) => _Promise.reject(new AppmapError(message)),
+    throwViolationAsync: (message) => Promise.reject(new AppmapError(message)),
     catchViolation: (closure, recover) => {
       try {
         return closure();

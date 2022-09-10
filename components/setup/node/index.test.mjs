@@ -11,6 +11,12 @@ import { assertEqual, getFreshTemporaryURL } from "../../__fixture__.mjs";
 import { buildTestDependenciesAsync } from "../../build.mjs";
 import Setup from "./index.mjs";
 
+const {
+  URL,
+  process,
+  JSON: {stringify:stringifyJSON},
+} = globalThis;
+
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
 const { mainAsync } = Setup(dependencies);
 
@@ -21,7 +27,7 @@ await mkdirAsync(new URL(directory));
 assertEqual(await mainAsync({ ...process, version: "v12.34.56" }), false);
 process.stdout.write("\n");
 
-global.GLOBAL_PROMPTS = () => ({ value: false });
+globalThis.GLOBAL_PROMPTS = () => ({ value: false });
 
 {
   assertEqual(
@@ -76,7 +82,7 @@ await mkdirAsync(new URL(`${directory}/node_modules/@appland`));
   );
   await writeFileAsync(
     new URL(`${directory}/node_modules/@appland/appmap-agent-js/package.json`),
-    JSON.stringify({
+    stringifyJSON({
       name: "@appland/appmap-agent-js",
       version: "1.2.3",
     }),

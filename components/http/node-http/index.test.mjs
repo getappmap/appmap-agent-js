@@ -10,6 +10,8 @@ import {
 import { buildTestDependenciesAsync } from "../../build.mjs";
 import Request from "./index.mjs";
 
+const {Promise} = globalThis;
+
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
 
 const { generateRespond, requestAsync } = Request(dependencies);

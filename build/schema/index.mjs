@@ -8,9 +8,9 @@ import YAML from "yaml";
 import Ajv from "ajv";
 import GenerateStandaloneCode from "ajv/dist/standalone/index.js";
 
-const { default: generateStandaloneCode } = GenerateStandaloneCode;
+const {JSON:{ stringify: stringifyJSON }} = globalThis;
 
-const { stringify: stringifyJSON } = JSON;
+const { default: generateStandaloneCode } = GenerateStandaloneCode;
 const { parse: parseYAML } = YAML;
 
 const __filename = fileURLToPath(import.meta.url);

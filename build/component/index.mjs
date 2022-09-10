@@ -1,3 +1,5 @@
+const {Promise} = globalThis;
+
 import { mkdir as mkdirAsync } from "fs/promises";
 import { writeEntryPointAsync } from "./static.mjs";
 

@@ -3,6 +3,12 @@ import { mkdir as mkdirAsync, writeFile as writeFileAsync } from "fs/promises";
 import { buildTestDependenciesAsync } from "../../build.mjs";
 import Require from "./require.mjs";
 
+const {
+  URL,
+  Math: {random},
+  JSON: {stringify:stringifyJSON},
+} = globalThis;
+
 const { requireMaybe } = Require(
   await buildTestDependenciesAsync(import.meta.url),
 );
@@ -17,7 +23,7 @@ await mkdirAsync(new URL(`${directory}/node_modules/foo`));
 
 await writeFileAsync(
   new URL(`${directory}/node_modules/foo/package.json`),
-  JSON.stringify({
+  stringifyJSON({
     name: "foo",
     version: "1.2.3",
   }),
@@ -35,6 +41,6 @@ assertEqual(requireMaybe(true, directory, "foo"), 123);
 assertEqual(requireMaybe(false, directory, "foo"), null);
 
 assertEqual(
-  requireMaybe(true, directory, Math.random().toString(36).substring(2)),
+  requireMaybe(true, directory, random().toString(36).substring(2)),
   null,
 );

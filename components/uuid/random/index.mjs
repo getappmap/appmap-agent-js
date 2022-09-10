@@ -1,5 +1,8 @@
-const { now } = Date;
-const { random } = Math;
+
+const {
+  Date: {now},
+  Math: {random},
+} = globalThis;
 
 const getUUID = () =>
   `${now().toString(32).substr(-4)}${random().toString(32).substr(-4)}`;

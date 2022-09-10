@@ -6,7 +6,16 @@ parser: "@babel/eslint-parser"
 parserOptions:
   ecmaVersion: 2021
   sourceType: module
+plugins:
+  - local
 rules:
+  no-undef:
+    - error
+    - typeof: true
+  local/no-globals:
+    - error
+    - globalThis
+    - console
   no-unused-vars:
     - error
     - vars: all

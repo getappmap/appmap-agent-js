@@ -1,7 +1,7 @@
 import { strict as Assert } from "assert";
 const { throws: assertThrows } = Assert;
 
-global.EXPECT_TEST = null;
+globalThis.EXPECT_TEST = null;
 
 const { expect } = await import("./expect.mjs");
 

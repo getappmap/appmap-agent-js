@@ -13,6 +13,8 @@ import {
 } from "../../build.mjs";
 import Common from "./index.mjs";
 
+const {URL} = globalThis;
+
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
 const { createConfiguration } = await buildTestComponentAsync("configuration");
 const { testHookAsync } = await buildTestComponentAsync("hook-fixture");

@@ -2,8 +2,10 @@ import { spawnSync } from "child_process";
 import { readdirSync } from "fs";
 import { fileURLToPath } from "url";
 
-const _URL = URL;
-const _parseInt = parseInt;
+const {
+  URL,
+  parseInt,
+} = globalThis;
 
 export default (dependencies) => {
   const {
@@ -66,14 +68,14 @@ export default (dependencies) => {
       return 0;
     }
     /* c8 ignore stop */
-    return _parseInt(parts[2], 10);
+    return parseInt(parts[2], 10);
   };
 
   return {
     extractGitInformation: (url) => {
       if (
         !expectSuccess(
-          () => readdirSync(new _URL(url)),
+          () => readdirSync(new URL(url)),
           "could not read repository directory %j >> %O",
           url,
         ).includes(".git")

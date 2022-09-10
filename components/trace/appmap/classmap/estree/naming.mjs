@@ -1,12 +1,14 @@
-const _Map = Map;
-const _String = String;
+const {
+  Map,
+  String,
+} = globalThis;
 
 export default (dependencies) => {
   const {
     util: { incrementCounter },
   } = dependencies;
 
-  const tags = new _Map([
+  const tags = new Map([
     ["ArrowFunctionExpression", "arrow"],
     ["FunctionExpression", "function"],
     ["FunctionDeclaration", "function"],
@@ -16,7 +18,7 @@ export default (dependencies) => {
   ]);
 
   const getAnonymousName = ({ separator, counter }, { type }) =>
-    `${tags.has(type) ? tags.get(type) : "unknown"}${separator}${_String(
+    `${tags.has(type) ? tags.get(type) : "unknown"}${separator}${String(
       incrementCounter(counter),
     )}`;
 

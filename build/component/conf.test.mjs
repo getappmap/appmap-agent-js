@@ -4,9 +4,9 @@ import { tmpdir } from "os";
 import { loadConfAsync } from "./conf.mjs";
 const { equal: assertEqual, deepEqual: assertDeepEqual } = Assert;
 
-const { random } = Math;
+const {Math:{random}} = globalThis;
 
-global.EXPECT_TEST = null;
+globalThis.EXPECT_TEST = null;
 
 const path = `${tmpdir()}/${random().toString(36).substring(2)}`;
 

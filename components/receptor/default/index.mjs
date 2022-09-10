@@ -1,10 +1,10 @@
-const _Map = Map;
+const {Map} = globalThis;
 
 export default (dependencies) => {
   const {
     util: { assert },
   } = dependencies;
-  const recorders = new _Map([
+  const recorders = new Map([
     ["remote", "receptor-http"],
     ["process", "receptor-file"],
     ["mocha", "receptor-file"],

@@ -5,6 +5,10 @@ import {
 } from "../../build.mjs";
 import Questionnaire from "./index.mjs";
 
+const {
+  Symbol,
+} = globalThis;
+
 const BREAK = {};
 
 const { validateExternalConfiguration } = await buildTestComponentAsync(
@@ -19,7 +23,7 @@ const { questionConfigAsync } = Questionnaire(
 
 const runAsync = async (answers) => {
   const iterator = answers[Symbol.iterator]();
-  global.GLOBAL_PROMPTS = async ({ name, ...prompt }) => {
+  globalThis.GLOBAL_PROMPTS = async ({ name, ...prompt }) => {
     const answer = iterator.next().value(prompt);
     if (answer === BREAK) {
       return {};

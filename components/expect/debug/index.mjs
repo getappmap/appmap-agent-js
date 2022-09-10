@@ -1,4 +1,4 @@
-const _Error = Error;
+const {Error} = globalThis;
 
 export default (dependencies) => {
   const {
@@ -16,11 +16,11 @@ export default (dependencies) => {
       return expect(boolean, template, ...rest);
     },
     expectSuccess: (closure, template, ...rest) => {
-      format(template, [...rest, new _Error("DUMMY")]);
+      format(template, [...rest, new Error("DUMMY")]);
       return expectSuccess(closure, template, ...rest);
     },
     expectSuccessAsync: (promise, template, ...rest) => {
-      format(template, [...rest, new _Error("DUMMY")]);
+      format(template, [...rest, new Error("DUMMY")]);
       return expectSuccessAsync(promise, template, ...rest);
     },
     expectDeadcode,

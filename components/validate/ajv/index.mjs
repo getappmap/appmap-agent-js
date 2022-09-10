@@ -3,7 +3,8 @@ import Treeify from "treeify";
 import AjvErrorTree from "ajv-error-tree";
 import { schema } from "../../../dist/schema.mjs";
 
-const _Map = Map;
+const {Map} = globalThis;
+
 const { asTree } = Treeify;
 
 export default (dependencies) => {
@@ -11,7 +12,7 @@ export default (dependencies) => {
     util: { assert, coalesce },
     expect: { expect },
   } = dependencies;
-  const naming = new _Map([
+  const naming = new Map([
     ["serial", "serial"],
     ["payload", "payload"],
     ["external-configuration", "user-defined configuration"],

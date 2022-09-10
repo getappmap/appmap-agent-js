@@ -1,7 +1,9 @@
-const _URL = URL;
-const _RegExp = RegExp;
-const { entries: toEntries } = Object;
-const { stringify: stringifyJSON } = JSON;
+const {
+  URL,
+  RegExp,
+  Object: {entries:toEntries},
+  JSON: {stringify:stringifyJSON},
+} = globalThis;
 
 export default (dependencies) => {
   const {
@@ -163,7 +165,7 @@ export default (dependencies) => {
     getConfigurationScenarios: (configuration) => {
       const { scenarios, scenario } = configuration;
       const regexp = expectSuccess(
-        () => new _RegExp(scenario, "u"),
+        () => new RegExp(scenario, "u"),
         "Scenario configuration field is not a valid regexp: %j >> %O",
         scenario,
       );
@@ -273,7 +275,7 @@ export default (dependencies) => {
         argv: [...flags, command],
         options: {
           ...options,
-          cwd: new _URL(base),
+          cwd: new URL(base),
           env,
         },
       };

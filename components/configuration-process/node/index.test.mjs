@@ -9,6 +9,12 @@ import {
 import { buildTestDependenciesAsync } from "../../build.mjs";
 import ConfigurationProcess from "./index.mjs";
 
+const {
+  URL,
+  JSON: {stringify:stringifyJSON},
+  Reflect: {get},
+} = globalThis;
+
 const { loadProcessConfiguration } = ConfigurationProcess(
   await buildTestDependenciesAsync(import.meta.url),
 );
@@ -32,7 +38,7 @@ assertThrow(
   });
   await writeFileAsync(
     new URL(url),
-    JSON.stringify({ name: "app", "map-name": "name1" }),
+    stringifyJSON({ name: "app", "map-name": "name1" }),
     "utf8",
   );
   const {
@@ -80,7 +86,7 @@ assertThrow(
 }
 
 assertDeepEqual(
-  Reflect.get(
+  get(
     loadProcessConfiguration({
       env: {
         APPMAP_CONFIGURATION_PATH: fileURLToPath(getFreshTemporaryURL(".json")),

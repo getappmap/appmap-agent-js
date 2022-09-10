@@ -4,6 +4,8 @@ import {
 } from "../../build.mjs";
 import LoadEnvironmentConfiguration from "./index.mjs";
 
+const {JSON:{stringify:stringifyJSON}} = globalThis;
+
 const { createConfiguration } = await buildTestComponentAsync("configuration");
 
 const { loadEnvironmentConfiguration } = LoadEnvironmentConfiguration(
@@ -11,5 +13,5 @@ const { loadEnvironmentConfiguration } = LoadEnvironmentConfiguration(
 );
 
 loadEnvironmentConfiguration({
-  APPMAP_CONFIGURATION: JSON.stringify(createConfiguration("file:///home")),
+  APPMAP_CONFIGURATION: stringifyJSON(createConfiguration("file:///home")),
 });

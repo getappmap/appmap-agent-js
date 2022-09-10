@@ -1,4 +1,7 @@
-const { version } = process;
+
+const {
+  process: {version},
+} = globalThis;
 
 export default (_dependencies) => {
   return {

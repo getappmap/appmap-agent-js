@@ -1,6 +1,6 @@
 import Require from "./require.mjs";
 
-const { apply } = Reflect;
+const {Reflect:{ apply }} = globalThis;
 
 const DATABASE = "mysql";
 const VERSION = null;

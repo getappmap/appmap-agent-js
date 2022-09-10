@@ -6,6 +6,11 @@ import {
 } from "../../build.mjs";
 import HookHttpClient from "./index.mjs";
 
+const {
+  Promise,
+  String,
+} = globalThis;
+
 const { createServer } = Http;
 
 const dependencies = await buildTestDependenciesAsync(import.meta.url);

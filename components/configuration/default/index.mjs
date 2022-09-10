@@ -1,6 +1,9 @@
-const { isArray } = Array;
-const { ownKeys } = Reflect;
-const { entries: toEntries } = Object;
+
+const {
+  Array: {isArray},
+  Reflect: {ownKeys},
+  Object: { entries: toEntries }
+} = globalThis;
 
 const ANONYMOUS_NAME_SEPARATOR = "-";
 

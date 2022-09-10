@@ -3,12 +3,16 @@ import { assertEqual } from "../../__fixture__.mjs";
 import { buildTestDependenciesAsync } from "../../build.mjs";
 import JsDom from "jsdom";
 
+const {
+  undefined
+} = globalThis;
+
 const { JSDOM } = JsDom;
 
 const { window } = new JSDOM("", {
   runScripts: "dangerously",
 });
-global.document = window.document;
+globalThis.document = window.document;
 const { default: Interpretation } = await import("./index.mjs");
 const { runScript } = Interpretation(
   await buildTestDependenciesAsync(import.meta.url),

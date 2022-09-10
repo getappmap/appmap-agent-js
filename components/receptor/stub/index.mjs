@@ -1,5 +1,8 @@
-const _Promise = Promise;
-const _undefined = undefined;
+
+const {
+  Promise,
+  undefined,
+} = globalThis;
 
 export default (dependencies) => {
   const {
@@ -7,8 +10,8 @@ export default (dependencies) => {
   } = dependencies;
   return {
     minifyReceptorConfiguration: constant({}),
-    openReceptorAsync: constant(_Promise.resolve(_undefined)),
+    openReceptorAsync: constant(Promise.resolve(undefined)),
     adaptReceptorConfiguration: returnSecond,
-    closeReceptorAsync: constant(_Promise.resolve(_undefined)),
+    closeReceptorAsync: constant(Promise.resolve(undefined)),
   };
 };

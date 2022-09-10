@@ -1,5 +1,3 @@
-const _Promise = Promise;
-const _undefined = undefined;
 
 export default (dependencies) => {
   const {

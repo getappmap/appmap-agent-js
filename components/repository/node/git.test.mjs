@@ -9,7 +9,10 @@ import {
 import { buildTestDependenciesAsync } from "../../build.mjs";
 import Git from "./git.mjs";
 
-const { isArray } = Array;
+const {
+  URL,
+  Array: {isArray}
+} = globalThis;
 
 const { extractGitInformation } = Git(
   await buildTestDependenciesAsync(import.meta.url),

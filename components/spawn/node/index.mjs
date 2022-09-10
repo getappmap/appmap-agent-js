@@ -1,6 +1,8 @@
 import { spawn } from "child_process";
 import { fileURLToPath } from "url";
 
+const {process} = globalThis;
+
 export default (_dependencies) => {
   return {
     spawn: (exec, argv, options) =>

@@ -4,6 +4,11 @@ import { dirname } from "path";
 import { fileURLToPath } from "url";
 import glob from "glob";
 
+const {
+  parseInt,
+  process,
+} = globalThis;
+
 import Mocha from "mocha";
 
 export default (meta_url) => {

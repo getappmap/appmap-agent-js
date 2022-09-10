@@ -14,9 +14,19 @@ import {
   buildTestComponentAsync,
 } from "../../build.mjs";
 
+const {
+  Reflect: {getOwnPropertyDescriptor},
+  process,
+  Promise,
+  undefined,
+  String,
+  setTimeout,
+  URL,
+} = globalThis;
+
 // TODO investigate why this fails on travis.
 
-if (Reflect.getOwnPropertyDescriptor(process.env, "TRAVIS") !== undefined) {
+if (getOwnPropertyDescriptor(process.env, "TRAVIS") !== undefined) {
   process.exit(0);
 }
 
@@ -216,7 +226,7 @@ const proceedAsync = async () => {
   }
 };
 
-if (Reflect.getOwnPropertyDescriptor(process.env, "TRAVIS")) {
+if (getOwnPropertyDescriptor(process.env, "TRAVIS")) {
   proceedAsync();
 } else {
   assertDeepEqual(

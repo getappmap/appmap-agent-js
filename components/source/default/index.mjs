@@ -1,5 +1,7 @@
-const { parse: parseJSON } = JSON;
-const _URL = URL;
+const {
+  JSON: { parse: parseJSON },
+  URL,
+} = globalThis;
 
 export default (dependencies) => {
   const {
@@ -25,7 +27,7 @@ export default (dependencies) => {
       );
       return `file://${relative_url}`;
     }
-    const url_object = new _URL(url);
+    const url_object = new URL(url);
     // The source map spec https://sourcemaps.info/spec.html
     // Does not mention absolute windows paths in map.sources.
     // But typescript generate them in it with forward slashes.

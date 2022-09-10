@@ -4,8 +4,10 @@ import NetSocketMessaging from "net-socket-messaging";
 
 const { patch: patchSocket } = NetSocketMessaging;
 
-const _Map = Map;
-const { parse: parseJSON } = JSON;
+const {
+  Map,
+  JSON: { parse: parseJSON },
+} = globalThis;
 
 export default (dependencies) => {
   const {
@@ -41,7 +43,7 @@ export default (dependencies) => {
       assert(recorder === "remote", "invalid recorder for receptor-http");
       const trace_server = createTCPServer();
       const track_server = createHTTPServer();
-      const backends = new _Map();
+      const backends = new Map();
       track_server.on(
         "request",
         generateRespond(async (method, path, body) => {

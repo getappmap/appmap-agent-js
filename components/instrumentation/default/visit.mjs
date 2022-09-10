@@ -1,7 +1,10 @@
-const _String = String;
-const { isArray } = Array;
-const { fromEntries } = Object;
-const { ownKeys } = Reflect;
+
+const{
+  String,
+  Array:{isArray},
+  Object: {fromEntries},
+  Reflect: {ownKeys},
+} = globalThis;
 
 //////////////////////////////
 // Difficulties with groups //
@@ -279,7 +282,7 @@ export default (dependencies) => {
         ),
         node.params.map((param, index) => {
           const pattern = makeIdentifier(
-            `${context.runtime}_ARGUMENT_${_String(index)}`,
+            `${context.runtime}_ARGUMENT_${String(index)}`,
           );
           return param.type === "RestElement"
             ? makeRestElement(pattern)
@@ -340,7 +343,7 @@ export default (dependencies) => {
                 makeArrayExpression(
                   node.params.map((_param, index) =>
                     makeIdentifier(
-                      `${context.runtime}_ARGUMENT_${_String(index)}`,
+                      `${context.runtime}_ARGUMENT_${String(index)}`,
                     ),
                   ),
                 ),
@@ -373,7 +376,7 @@ export default (dependencies) => {
                               makeBinaryExpression(
                                 "===",
                                 makeIdentifier(
-                                  `${context.runtime}_ARGUMENT_${_String(
+                                  `${context.runtime}_ARGUMENT_${String(
                                     index,
                                   )}`,
                                 ),
@@ -381,7 +384,7 @@ export default (dependencies) => {
                               ),
                               param.right,
                               makeIdentifier(
-                                `${context.runtime}_ARGUMENT_${_String(index)}`,
+                                `${context.runtime}_ARGUMENT_${String(index)}`,
                               ),
                             ),
                           );
@@ -389,7 +392,7 @@ export default (dependencies) => {
                           return makeVariableDeclarator(
                             param,
                             makeIdentifier(
-                              `${context.runtime}_ARGUMENT_${_String(index)}`,
+                              `${context.runtime}_ARGUMENT_${String(index)}`,
                             ),
                           );
                         }
@@ -599,7 +602,7 @@ export default (dependencies) => {
             makeLiteral(
               appendURLSegment(
                 fromMaybe(location, context.url, getLocationFileURL),
-                `eval-${_String(incrementCounter(context.counter))}`,
+                `eval-${String(incrementCounter(context.counter))}`,
               ),
             ),
             visit(node.arguments[0], node, parent, closure, context),
