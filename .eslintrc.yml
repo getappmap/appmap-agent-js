@@ -29,6 +29,7 @@ rules:
   consistent-return: error
   no-lone-blocks: error
   no-mixed-operators: [error, {allowSamePrecedence: false}]
+  no-useless-rename: error
   object-shorthand: [error, always]
   prefer-const: [error, {destructuring: all}]
   prefer-rest-params: error

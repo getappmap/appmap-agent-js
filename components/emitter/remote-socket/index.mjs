@@ -13,7 +13,7 @@ export default (dependencies) => {
   return {
     openEmitter: (configuration) => {
       let {
-        host: host,
+        host,
         "trace-port": trace_port,
         "track-port": track_port,
         session,
