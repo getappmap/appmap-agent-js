@@ -7,7 +7,7 @@
   "main": "lib/node/recorder-api.mjs",
   "license": "MIT",
   "engines": {
-    "node": "14.x.x || 16.x.x || 17.x.x"
+    "node": "14.x.x || 16.x.x || 18.x.x"
   },
   "licence": "MIT",
   "keywords": [
@@ -28,14 +28,13 @@
   "scripts": {
     "prepare": "npm run build",
     "build": "node build/await/index.mjs && node build/index.mjs",
-    "lint": "npx eslint '**/*.@(mjs|js|cjs)'",
-    "test-unit-cov": "npx test-turtle --layout alongside -- /bin/sh test/unit/test-cov.sh",
-    "test-unit": "npx test-turtle --layout alongside -- node --unhandled-rejections=strict test/unit/test.mjs",
-    "test-unit-pass": "npx test-turtle --layout alongside -- node --unhandled-rejections=strict test/unit/test-pass.mjs",
-    "test-system": "node --unhandled-rejections=strict test/system/index.mjs",
     "format": "npx prettier -w '**/*.@(mjs|js|cjs)'",
-    "deploy": "npx semantic-release",
-    "tt": "npx test-turtle --layout alongside -- /bin/sh test/unit/test-dev.sh"
+    "lint": "npx eslint '**/*.@(mjs|js|cjs)'",
+    "test": "npx bercow",
+    "test-unit": "npx bercow .bercowrc-test-only.yaml",
+    "test-unit-cov": "npx bercow .bercowrc-test-only-cov.yaml",
+    "test-system": "node --unhandled-rejections=strict test/system/index.mjs",
+    "deploy": "npx semantic-release"
   },
   "optionalDependencies": {
     "posix-socket": "^1.1.3",
@@ -44,6 +43,12 @@
   "dependencies": {
     "@appland/appmap-validate": "^2.3.0",
     "@babel/parser": "^7.15.8",
+    "@bercow/core": "^0.1.6",
+    "@bercow/eslint": "^0.0.4",
+    "@bercow/link-adjacent": "^0.0.4",
+    "@bercow/order-esm-import": "^0.0.4",
+    "@bercow/prettier": "^0.0.4",
+    "@bercow/spawn": "^0.0.6",
     "acorn": "^8.5.0",
     "ajv": "^8.6.3",
     "ajv-error-tree": "0.0.5",

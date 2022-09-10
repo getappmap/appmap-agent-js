@@ -10,7 +10,7 @@ import {
 import {
   writeFile as writeFileAsync,
   mkdir as mkdirAsync,
-  rmdir as rmdirAsync,
+  rm as rmAsync,
 } from "fs/promises";
 import YAML from "yaml";
 import { tmpdir } from "os";
@@ -138,7 +138,7 @@ export const testAsync = async (type, module) => {
       throw new Error("Invalid type");
     }
   } finally {
-    await rmdirAsync(root, { recursive: true });
+    await rmAsync(root, { recursive: true });
   }
 };
 

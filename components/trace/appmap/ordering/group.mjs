@@ -1,4 +1,3 @@
-
 // Resolve groups.
 // Each top-level tree is associated to a group.
 // These trees are inserted into their corresponding group/ungroup event pair.
@@ -7,7 +6,6 @@
 const { from: toArray } = Array;
 
 export default (dependencies) => {
-
   const makeFrame = (enter, children, leave) => ({ enter, children, leave });
 
   const takeMap = (map, key) => {

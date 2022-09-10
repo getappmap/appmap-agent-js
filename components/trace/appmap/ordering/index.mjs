@@ -1,4 +1,3 @@
-
 // Beware, event ordering is by far the most difficult code to understand.
 // The ordering is mode in three passes:
 // 1) Rearrenge the event trace into an array of trees which each represent a top-level callstack.

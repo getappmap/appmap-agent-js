@@ -1,5 +1,5 @@
 import { spawn } from "child_process";
-import { rmdir as rmdirAsync } from "fs/promises";
+import { rm as rmAsync } from "fs/promises";
 import Pg from "pg";
 import { fileURLToPath } from "url";
 import {
@@ -268,6 +268,6 @@ if (Reflect.getOwnPropertyDescriptor(process.env, "TRAVIS")) {
   } finally {
     child.kill("SIGTERM");
     await termination;
-    await rmdirAsync(new URL(url), { recursive: true });
+    await rmAsync(new URL(url), { recursive: true });
   }
 }
