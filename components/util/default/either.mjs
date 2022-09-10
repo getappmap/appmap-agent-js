@@ -35,7 +35,7 @@ export const fromEither = (
     return transformRight(value);
   }
   /* c8 ignore start */
-  assert(false, "invalid either tag");
+  throw assert(false, "invalid either tag");
   /* c8 ignore stop */
 };
 

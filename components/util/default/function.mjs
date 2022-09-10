@@ -85,7 +85,7 @@ export const compose = (f, g) => {
       return (x1, x2, x3, y1, y2, y3) => g(f(x1, x2, x3), y1, y2, y3);
     }
   }
-  assert(false, "arity of out bounds");
+  throw assert(false, "arity of out bounds");
 };
 
 export const bind = (f, x1) => {
@@ -106,7 +106,7 @@ export const bind = (f, x1) => {
   if (l === 5) {
     return (x2, x3, x4, x5) => f(x1, x2, x3, x4, x5);
   }
-  assert(false, "arity of out bounds");
+  throw assert(false, "arity of out bounds");
 };
 
 export const spyOnce = (spy, forward) => {

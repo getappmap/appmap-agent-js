@@ -28,7 +28,7 @@ export default (dependencies) => {
       }
     }
     /* c8 ignore start */
-    assert(false, "missing matching specifier");
+    throw assert(false, "missing matching specifier");
     /* c8 ignore stop */
   };
 

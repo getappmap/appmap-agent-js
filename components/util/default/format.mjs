@@ -35,7 +35,7 @@ export const format = (template, values) => {
       if (marker === "o") {
         return print(value);
       }
-      assert(false, "invalid format marker");
+      throw assert(false, "invalid format marker");
     },
   );
   assert(index === length, "missing format marker");

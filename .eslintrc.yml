@@ -26,3 +26,4 @@ rules:
       caughtErrorsIgnorePattern: "^_"
       ignoreRestSiblings: false
   arrow-body-style: [error, as-needed]
+  consistent-return: error

@@ -30,7 +30,7 @@ export default (dependencies) => {
       return `//${value}`;
     }
     /* c8 ignore start */
-    assert(false, "invalid comment type");
+    throw assert(false, "invalid comment type");
     /* c8 ignore stop */
   };
 

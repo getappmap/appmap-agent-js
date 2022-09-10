@@ -22,9 +22,9 @@ export default (dependencies) => {
       if (parent.type === "class") {
         return `${parent.name}${entity.static ? "#" : "."}${entity.name}`;
       }
-      assert(false, "getName called on invalid parent entity");
+      throw assert(false, "getName called on invalid parent entity");
     }
-    assert(false, "getName called on invalid entity");
+    throw assert(false, "getName called on invalid entity");
   };
   const criteria = new Map([
     ["name", (pattern, { name }, _parent) => cache.get(pattern)(name)],
@@ -67,7 +67,7 @@ export default (dependencies) => {
         if (typeof pattern === "string") {
           return criteria.get(name)(pattern, entity, parent);
         }
-        assert(false, "invalid pattern type");
+        throw assert(false, "invalid pattern type");
       };
       if (exclusion.combinator === "and") {
         return criteria_name_array.every(isCriterionSatisfied);
@@ -75,7 +75,7 @@ export default (dependencies) => {
       if (exclusion.combinator === "or") {
         return criteria_name_array.some(isCriterionSatisfied);
       }
-      assert(false, "invalid exclusion combinator");
+      throw assert(false, "invalid exclusion combinator");
     },
     isExcluded: generateGet("excluded"),
     isRecursivelyExclued: generateGet("recursive"),

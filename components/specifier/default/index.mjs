@@ -95,7 +95,7 @@ export default (dependencies) => {
           flags: "",
         };
       }
-      assert(false, "invalid specifier options");
+      throw assert(false, "invalid specifier options");
     },
     matchSpecifier: (specifier, url) => {
       if (typeof specifier === "boolean") {

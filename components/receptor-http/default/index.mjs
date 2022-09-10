@@ -129,6 +129,9 @@ export default (dependencies) => {
               body: trace,
             };
           }
+          /* c8 ignore start */
+          throw assert(false, "invalid http method");
+          /* c8 ignore stop */
         }),
       );
       trace_server.on("connection", (socket) => {

@@ -39,12 +39,13 @@ export default (dependencies) => {
         //     content = fs.readFileSync(filename, 'utf8');
         //   }
         return content.toString("utf8");
+      } else {
+        throw expect(
+          false,
+          "Expected module content to be either: a string, a UintArray, a ArrayBuffer, a SharedArrayBuffer, or a Buffer. Got: %o",
+          content,
+        );
       }
-      expect(
-        false,
-        "Expected module content to be either: a string, a UintArray, a ArrayBuffer, a SharedArrayBuffer, or a Buffer. Got: %o",
-        content,
-      );
     },
   };
 };

@@ -21,7 +21,7 @@ export default (dependencies) => {
           };
         }
       }
-      assert(false, "missing matched exclusion");
+      throw assert(false, "missing matched exclusion");
     },
   };
 };
