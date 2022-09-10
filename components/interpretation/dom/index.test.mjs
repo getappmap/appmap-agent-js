@@ -1,7 +1,9 @@
 /* eslint-env node */
 import { assertEqual } from "../../__fixture__.mjs";
 import { buildTestDependenciesAsync } from "../../build.mjs";
+/* eslint-disable import/no-unresolved */
 import JsDom from "jsdom";
+/* eslint-enable import/no-unresolved */
 
 const { undefined } = globalThis;
 
