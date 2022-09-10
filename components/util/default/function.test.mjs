@@ -80,10 +80,12 @@ assertEqual(
     for (const m of [1, 2, 3, 4]) {
       setLength(g, m);
       const h = compose(f, g);
-      assertEqual(h.length, l + m - 1);
+      assertEqual(h.length, l + (m - 1));
       assertEqual(
         h(...numbers),
-        [...numbers.slice(0, l), "|", ...numbers.slice(l, l + m - 1)].join(""),
+        [...numbers.slice(0, l), "|", ...numbers.slice(l, l + (m - 1))].join(
+          "",
+        ),
       );
     }
   }
