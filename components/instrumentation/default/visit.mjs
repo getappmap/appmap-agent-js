@@ -250,6 +250,44 @@ export default (dependencies) => {
   const isEstreeKey = (key) =>
     key !== "loc" && key !== "start" && key !== "end";
 
+  /* eslint-disable no-use-before-define */
+  const visit = (node, parent, grand_parent, closure, context) => {
+    if (isArray(node)) {
+      return node.map((node) =>
+        visit(node, parent, grand_parent, closure, context),
+      );
+    } else if (
+      typeof node === "object" &&
+      node !== null &&
+      hasOwnProperty(node, "type")
+    ) {
+      if (hasOwnProperty(instrumenters, node.type)) {
+        const maybe_node = instrumenters[node.type](
+          node,
+          parent,
+          grand_parent,
+          closure,
+          context,
+        );
+        return maybe_node === null
+          ? visitGeneric(node, parent, grand_parent, closure, context)
+          : maybe_node;
+      } else {
+        return visitGeneric(node, parent, grand_parent, closure, context);
+      }
+    } else {
+      return node;
+    }
+  };
+  /* eslint-enable no-use-before-define */
+
+  const visitGeneric = (node, parent, _grand_parent, closure, context) =>
+    fromEntries(
+      ownKeys(node)
+        .filter(isEstreeKey)
+        .map((key) => [key, visit(node[key], node, parent, closure, context)]),
+    );
+
   const instrumentClosure = (node, parent, grand_parent, closure, context) => {
     const location = mapSource(
       context.mapping,
@@ -731,42 +769,6 @@ export default (dependencies) => {
     FunctionExpression: instrumentClosure,
     FunctionDeclaration: instrumentClosure,
     ArrowFunctionExpression: instrumentClosure,
-  };
-
-  const visitGeneric = (node, parent, _grand_parent, closure, context) =>
-    fromEntries(
-      ownKeys(node)
-        .filter(isEstreeKey)
-        .map((key) => [key, visit(node[key], node, parent, closure, context)]),
-    );
-
-  const visit = (node, parent, grand_parent, closure, context) => {
-    if (isArray(node)) {
-      return node.map((node) =>
-        visit(node, parent, grand_parent, closure, context),
-      );
-    } else if (
-      typeof node === "object" &&
-      node !== null &&
-      hasOwnProperty(node, "type")
-    ) {
-      if (hasOwnProperty(instrumenters, node.type)) {
-        const maybe_node = instrumenters[node.type](
-          node,
-          parent,
-          grand_parent,
-          closure,
-          context,
-        );
-        return maybe_node === null
-          ? visitGeneric(node, parent, grand_parent, closure, context)
-          : maybe_node;
-      } else {
-        return visitGeneric(node, parent, grand_parent, closure, context);
-      }
-    } else {
-      return node;
-    }
   };
 
   const initial_parent = { type: "File" };

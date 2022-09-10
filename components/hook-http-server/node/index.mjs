@@ -178,6 +178,14 @@ export default (dependencies) => {
     return tracking;
   };
 
+  const forwardTraffic = (
+    _state,
+    original_server_emit,
+    server,
+    request,
+    response,
+  ) => apply(original_server_emit, server, ["request", request, response]);
+
   const spyTraffic = (
     state,
     original_server_emit,
@@ -231,14 +239,6 @@ export default (dependencies) => {
       recordBeforeEvent(state.agent, getBox(jump_box), state.jump_payload);
     }
   };
-
-  const forwardTraffic = (
-    _state,
-    original_server_emit,
-    server,
-    request,
-    response,
-  ) => apply(original_server_emit, server, ["request", request, response]);
 
   const spyServer = (state, server, handleTraffic) => {
     patch(

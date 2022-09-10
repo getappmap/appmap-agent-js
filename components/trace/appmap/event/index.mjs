@@ -30,8 +30,10 @@ export default (dependencies) => {
   const digestEventTrace = (root, classmap) => {
     const counter = createCounter(0);
     const getClosureInfo = (location) => getClassmapClosure(classmap, location);
+    /* eslint-disable no-use-before-define */
     const digestTransparentBundle = ({ children }, _info) =>
       children.flatMap(loop);
+    /* eslint-enable no-use-before-define */
     const digestShallowBundle = ({ begin, end }, info) =>
       digestEventPair(
         begin,
@@ -40,6 +42,7 @@ export default (dependencies) => {
         incrementCounter(counter),
         info,
       );
+    /* eslint-disable no-use-before-define */
     const digestDeepBundle = ({ begin, children, end }, info) => {
       const id1 = incrementCounter(counter);
       const digest = children.flatMap(loop);
@@ -49,6 +52,7 @@ export default (dependencies) => {
       digest.push(event2);
       return digest;
     };
+    /* eslint-enable no-use-before-define */
     const loop = (node) => {
       if (node.type === "bundle") {
         const {

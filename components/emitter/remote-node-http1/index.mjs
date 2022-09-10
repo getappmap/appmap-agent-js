@@ -52,6 +52,18 @@ export default (dependencies) => {
 
   /* c8 ignore stop */
 
+  function onResponseData(_data) {
+    const { _appmap_client: client } = this;
+    rejectClientTermination(client, new Error("non empty http1 response body"));
+  }
+
+  function onResponseEnd() {
+    const { _appmap_client: client } = this;
+    const { pending } = client;
+    decrementCounter(pending);
+    resolveClientTermination(client);
+  }
+
   function onRequestResponse(response) {
     const { _appmap_client: client } = this;
     const { statusCode: status } = response;
@@ -65,18 +77,6 @@ export default (dependencies) => {
     response.on("error", onResponseError);
     response.on("data", onResponseData);
     response.on("end", onResponseEnd);
-  }
-
-  function onResponseData(_data) {
-    const { _appmap_client: client } = this;
-    rejectClientTermination(client, new Error("non empty http1 response body"));
-  }
-
-  function onResponseEnd() {
-    const { _appmap_client: client } = this;
-    const { pending } = client;
-    decrementCounter(pending);
-    resolveClientTermination(client);
   }
 
   return {

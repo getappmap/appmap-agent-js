@@ -35,7 +35,9 @@ export default (dependencies) => {
     const head_children = [];
     const body_children = [];
     for (const node of nodes) {
+      /* eslint-disable no-use-before-define */
       const { head, body } = visit(node, parent, grand_parent, context);
+      /* eslint-enable no-use-before-define */
       if (head !== null) {
         head_children.push(head);
       }

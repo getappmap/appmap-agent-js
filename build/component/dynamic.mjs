@@ -79,7 +79,9 @@ const visitComponentAsync = async (component, context) => {
     );
     cache.set(
       component,
+      /* eslint-disable no-use-before-define */
       Component(await visitComponentsAsync(dependencies, context)),
+      /* eslint-enable no-use-before-define */
     );
   }
   return cache.get(component);

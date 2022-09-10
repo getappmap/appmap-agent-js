@@ -44,88 +44,6 @@ export default (dependencies) => {
   const digestSearchMessage = (search) =>
     arrayFrom(new URLSearchParams(search).entries());
 
-  const digesters = {
-    // function //
-    apply: ({ this: _this, arguments: _arguments }, { link, parameters }) => ({
-      ...link,
-      // TODO: It would make more sense to allow receiver to be null.
-      // receiver: mapMaybe(this, digestParameterSerialThis),
-      receiver:
-        _this === null
-          ? digestParameterPrimitive("this", undefined)
-          : digestParameterSerial("this", _this),
-      parameters: zip(parameters, _arguments).map(digestParameterSerialTuple),
-    }),
-    return: ({ result }, _options) => ({
-      return_value: digestParameterSerial("return", result),
-      exceptions: null,
-    }),
-    throw: ({ error }, _options) => ({
-      return_value: null,
-      exceptions: [digestExceptionSerial(error)],
-    }),
-    // http //
-    request: ({ side, protocol, method, url, headers, route }, _options) => {
-      const { origin, pathname, search } = parseURL(url, headers);
-      if (side === "server") {
-        return {
-          http_server_request: {
-            protocol,
-            request_method: method,
-            path_info: pathname,
-            normalized_path_info: route,
-            headers,
-          },
-          message: [
-            ...(route === null
-              ? []
-              : zip(route.split("/"), pathname.split("/")).filter(
-                  isFirstColon,
-                )),
-            ...digestSearchMessage(search),
-          ].map(digestParameterPrimitiveTuple),
-        };
-      } else if (side === "client") {
-        return {
-          http_client_request: {
-            request_method: method,
-            url: `${origin}${pathname}`,
-            headers,
-          },
-          message: digestSearchMessage(search).map(
-            digestParameterPrimitiveTuple,
-          ),
-        };
-      } /* c8 ignore start */ else {
-        throw new Error("invalid request side");
-      } /* c8 ignore stop */
-    },
-    response: ({ side, status, headers, body }, _options) => ({
-      [`http_${side}_response`]: {
-        status_code: status,
-        headers,
-        return_value: mapMaybe(body, digestParameterSerialReturn),
-      },
-    }),
-    // sql //
-    query: ({ database, version, sql, parameters }, _options) => ({
-      sql_query: {
-        database_type: database,
-        server_version: version,
-        sql,
-        explain_sql: null,
-      },
-      message: toEntries(parameters).map(digestParameterSerialTuple),
-    }),
-    answer: ({}, _options) => ({}),
-  };
-
-  const digestPayload = (payload, options) => {
-    const { type } = payload;
-    assert(hasOwnProperty(digesters, type), "cannot digest payload");
-    return digesters[type](payload, options);
-  };
-
   const digestParameterPrimitive = (name, primitive) => ({
     name,
     class: typeof primitive,
@@ -207,6 +125,88 @@ export default (dependencies) => {
         lineno: null,
       };
     }
+  };
+
+  const digesters = {
+    // function //
+    apply: ({ this: _this, arguments: _arguments }, { link, parameters }) => ({
+      ...link,
+      // TODO: It would make more sense to allow receiver to be null.
+      // receiver: mapMaybe(this, digestParameterSerialThis),
+      receiver:
+        _this === null
+          ? digestParameterPrimitive("this", undefined)
+          : digestParameterSerial("this", _this),
+      parameters: zip(parameters, _arguments).map(digestParameterSerialTuple),
+    }),
+    return: ({ result }, _options) => ({
+      return_value: digestParameterSerial("return", result),
+      exceptions: null,
+    }),
+    throw: ({ error }, _options) => ({
+      return_value: null,
+      exceptions: [digestExceptionSerial(error)],
+    }),
+    // http //
+    request: ({ side, protocol, method, url, headers, route }, _options) => {
+      const { origin, pathname, search } = parseURL(url, headers);
+      if (side === "server") {
+        return {
+          http_server_request: {
+            protocol,
+            request_method: method,
+            path_info: pathname,
+            normalized_path_info: route,
+            headers,
+          },
+          message: [
+            ...(route === null
+              ? []
+              : zip(route.split("/"), pathname.split("/")).filter(
+                  isFirstColon,
+                )),
+            ...digestSearchMessage(search),
+          ].map(digestParameterPrimitiveTuple),
+        };
+      } else if (side === "client") {
+        return {
+          http_client_request: {
+            request_method: method,
+            url: `${origin}${pathname}`,
+            headers,
+          },
+          message: digestSearchMessage(search).map(
+            digestParameterPrimitiveTuple,
+          ),
+        };
+      } /* c8 ignore start */ else {
+        throw new Error("invalid request side");
+      } /* c8 ignore stop */
+    },
+    response: ({ side, status, headers, body }, _options) => ({
+      [`http_${side}_response`]: {
+        status_code: status,
+        headers,
+        return_value: mapMaybe(body, digestParameterSerialReturn),
+      },
+    }),
+    // sql //
+    query: ({ database, version, sql, parameters }, _options) => ({
+      sql_query: {
+        database_type: database,
+        server_version: version,
+        sql,
+        explain_sql: null,
+      },
+      message: toEntries(parameters).map(digestParameterSerialTuple),
+    }),
+    answer: ({}, _options) => ({}),
+  };
+
+  const digestPayload = (payload, options) => {
+    const { type } = payload;
+    assert(hasOwnProperty(digesters, type), "cannot digest payload");
+    return digesters[type](payload, options);
   };
 
   return {

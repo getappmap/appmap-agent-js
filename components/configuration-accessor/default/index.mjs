@@ -32,16 +32,17 @@ export default (dependencies) => {
     /* c8 ignore stop */
   };
 
+  const escapeShell = (token) => token.replace(/[^a-zA-Z0-9\-_./:@]/gu, "\\$&");
+
   /* c8 ignore start */
+  const escapeCmdExe = (token) =>
+    token.replace(/[^a-zA-Z0-9\-_./:@\\]/gu, "^$&");
   const generateEscape = (shell) =>
     shell.endsWith("cmd") || shell.endsWith("cmd.exe")
       ? escapeCmdExe
       : escapeShell;
-  const escapeCmdExe = (token) =>
-    token.replace(/[^a-zA-Z0-9\-_./:@\\]/gu, "^$&");
   /* c8 ignore stop */
 
-  const escapeShell = (token) => token.replace(/[^a-zA-Z0-9\-_./:@]/gu, "\\$&");
   const generateCommand = (shell, tokens) =>
     tokens.map(generateEscape(shell)).join(" ");
 
