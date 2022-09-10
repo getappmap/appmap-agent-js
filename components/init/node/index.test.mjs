@@ -1,3 +1,3 @@
-import runSpecs from "../../../components/test-helper.mjs";
+import runSpecs from "../../test-helper.mjs";
 
 runSpecs(import.meta.url);

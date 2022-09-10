@@ -37,3 +37,4 @@ rules:
   prefer-template: error
   require-unicode-regexp: error
   import/first: error
+  import/no-useless-path-segments: error
