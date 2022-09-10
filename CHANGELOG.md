@@ -1,3 +1,10 @@
+# [11.4.0](https://github.com/applandinc/appmap-agent-js/compare/v11.3.0...v11.4.0) (2022-09-10)
+
+
+### Features
+
+* support node18 ([caca2a4](https://github.com/applandinc/appmap-agent-js/commit/caca2a47a66c423ace3fa847f6da5c85ba2e20b8))
+
 # [11.3.0](https://github.com/applandinc/appmap-agent-js/compare/v11.2.0...v11.3.0) (2022-09-09)
 
 
