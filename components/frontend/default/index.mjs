@@ -45,7 +45,7 @@ export default (dependencies) => {
     getInstrumentationIdentifier: ({ instrumentation }) =>
       getInstrumentationIdentifier(instrumentation),
     instrument: (
-      { instrumentation, session },
+      { instrumentation },
       script_file,
       source_map_file,
     ) => {

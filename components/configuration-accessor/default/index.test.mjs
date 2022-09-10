@@ -275,7 +275,7 @@ const stripEnvironmentConfiguration = ({
   argv,
   options: {
     cwd,
-    env: { APPMAP_CONFIGURATION, ...env },
+    env: { APPMAP_CONFIGURATION: _, ...env },
   },
 }) => ({ exec, argv, cwd, env });
 

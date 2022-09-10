@@ -6,7 +6,7 @@ import {
 } from "../../build.mjs";
 import Batch from "./index.mjs";
 
-global.GLOBAL_SPY_SPAWN = (exec, argv, options) => {
+global.GLOBAL_SPY_SPAWN = (exec, argv, _options) => {
   const emitter = new EventEmitter();
   emitter.kill = (signal) => {
     emitter.emit("close", null, signal);

@@ -28,7 +28,7 @@ export default (dependencies) => {
   const digestEventTrace = (root, classmap) => {
     const counter = createCounter(0);
     const getClosureInfo = (location) => getClassmapClosure(classmap, location);
-    const digestTransparentBundle = ({ children }, info) =>
+    const digestTransparentBundle = ({ children }, _info) =>
       children.flatMap(loop);
     const digestShallowBundle = ({ begin, end }, info) =>
       digestEventPair(

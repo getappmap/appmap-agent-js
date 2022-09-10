@@ -71,7 +71,7 @@ export default (dependencies) => {
 
   /* c8 ignore stop */
 
-  const recordBegin = ({ agent, empty, jump_payload }, tab, request) => {
+  const recordBegin = ({ agent, empty }, tab, request) => {
     const { httpVersion: version, method, url, headers } = request;
     const protocol = `HTTP/${version}`;
     recordBeginEvent(
@@ -113,7 +113,7 @@ export default (dependencies) => {
     });
   };
 
-  const recordEnd = ({ agent, jump_payload }, tab, response, body) => {
+  const recordEnd = ({ agent }, tab, response, body) => {
     recordEndEvent(
       agent,
       tab,
@@ -231,7 +231,7 @@ export default (dependencies) => {
   };
 
   const forwardTraffic = (
-    state,
+    _state,
     original_server_emit,
     server,
     request,

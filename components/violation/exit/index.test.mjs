@@ -1,7 +1,7 @@
 import { assertEqual, assertFail, assertThrow } from "../../__fixture__.mjs";
 
 process.exit = () => {};
-global.setTimeout = (closure, timer) => {
+global.setTimeout = (closure, _timer) => {
   assertThrow(closure);
 };
 

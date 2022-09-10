@@ -240,7 +240,7 @@ export default (dependencies) => {
     location: { stringifyLocation, getLocationFileURL },
   } = dependencies;
 
-  const isSubclassConstructor = (node, parent, grand_parent) =>
+  const isSubclassConstructor = (_node, parent, grand_parent) =>
     parent.type === "MethodDefinition" &&
     parent.kind === "constructor" &&
     grand_parent.superClass !== null;
@@ -338,7 +338,7 @@ export default (dependencies) => {
                   ? makeRegularMemberExpression(context.runtime, "empty")
                   : makeThisExpression(),
                 makeArrayExpression(
-                  node.params.map((param, index) =>
+                  node.params.map((_param, index) =>
                     makeIdentifier(
                       `${context.runtime}_ARGUMENT_${_String(index)}`,
                     ),
@@ -495,7 +495,7 @@ export default (dependencies) => {
   };
 
   const instrumenters = {
-    AwaitExpression: (node, parent, grand_parent, closure, context) =>
+    AwaitExpression: (node, parent, _grand_parent, closure, context) =>
       closure.instrumented
         ? makeSequenceExpression([
             makeAssignmentExpression(
@@ -534,7 +534,7 @@ export default (dependencies) => {
             makeIdentifier(`${context.runtime}_AWAIT`),
           ])
         : null,
-    YieldExpression: (node, parent, grand_parent, closure, context) =>
+    YieldExpression: (node, parent, _grand_parent, closure, context) =>
       closure.instrumented
         ? makeSequenceExpression([
             makeAssignmentExpression(
@@ -567,7 +567,7 @@ export default (dependencies) => {
             makeUnaryExpression("void", makeLiteral(0)),
           ])
         : null,
-    ReturnStatement: (node, parent, grand_parent, closure, context) =>
+    ReturnStatement: (node, parent, _grand_parent, closure, context) =>
       closure.instrumented && node.argument !== null
         ? makeReturnStatement(
             makeAssignmentExpression(
@@ -576,7 +576,7 @@ export default (dependencies) => {
             ),
           )
         : null,
-    CallExpression: (node, parent, grand_parent, closure, context) => {
+    CallExpression: (node, parent, _grand_parent, closure, context) => {
       if (
         node.callee.type === "Identifier" &&
         context.evals.includes(node.callee.name) &&
@@ -612,7 +612,7 @@ export default (dependencies) => {
         return null;
       }
     },
-    TryStatement: (node, parent, grand_parent, closure, context) => {
+    TryStatement: (node, parent, _grand_parent, closure, context) => {
       if (
         closure.instrumented &&
         ((closure.node.type === "Program" &&
@@ -689,7 +689,7 @@ export default (dependencies) => {
         return null;
       }
     },
-    Identifier: (node, parent, grand_parent, closure, context) => {
+    Identifier: (node, _parent, _grand_parent, _closure, context) => {
       expect(
         !node.name.startsWith(context.runtime),
         "Identifier collision detected at %j line %j column %j >> identifier should not start with %j, got: %j",
@@ -701,7 +701,7 @@ export default (dependencies) => {
       );
       return null;
     },
-    Program: (node, parent, grand_parent, closure, context) =>
+    Program: (node, parent, _grand_parent, closure, context) =>
       closure.instrumented && node.sourceType === "module"
         ? makeProgram("module", [
             makeVariableDeclaration("let", [
@@ -731,7 +731,7 @@ export default (dependencies) => {
     ArrowFunctionExpression: instrumentClosure,
   };
 
-  const visitGeneric = (node, parent, grand_parent, closure, context) =>
+  const visitGeneric = (node, parent, _grand_parent, closure, context) =>
     fromEntries(
       ownKeys(node)
         .filter(isEstreeKey)

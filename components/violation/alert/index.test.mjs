@@ -3,7 +3,7 @@
 import { assertThrow, assertFail, assertEqual } from "../../__fixture__.mjs";
 
 global.alert = () => {};
-global.setTimeout = (closure, timer) => {
+global.setTimeout = (closure, _timer) => {
   assertThrow(closure);
 };
 

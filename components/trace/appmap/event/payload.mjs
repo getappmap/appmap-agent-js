@@ -57,16 +57,16 @@ export default (dependencies) => {
           : digestParameterSerial("this", _this),
       parameters: zip(parameters, _arguments).map(digestParameterSerialTuple),
     }),
-    return: ({ result }, options) => ({
+    return: ({ result }, _options) => ({
       return_value: digestParameterSerial("return", result),
       exceptions: null,
     }),
-    throw: ({ error }, options) => ({
+    throw: ({ error }, _options) => ({
       return_value: null,
       exceptions: [digestExceptionSerial(error)],
     }),
     // http //
-    request: ({ side, protocol, method, url, headers, route }, options) => {
+    request: ({ side, protocol, method, url, headers, route }, _options) => {
       const { origin, pathname, search } = parseURL(url, headers);
       if (side === "server") {
         return {
@@ -101,7 +101,7 @@ export default (dependencies) => {
         throw new Error("invalid request side");
       } /* c8 ignore stop */
     },
-    response: ({ side, status, headers, body }, options) => ({
+    response: ({ side, status, headers, body }, _options) => ({
       [`http_${side}_response`]: {
         status_code: status,
         headers,
@@ -109,7 +109,7 @@ export default (dependencies) => {
       },
     }),
     // sql //
-    query: ({ database, version, sql, parameters }, options) => ({
+    query: ({ database, version, sql, parameters }, _options) => ({
       sql_query: {
         database_type: database,
         server_version: version,
@@ -118,7 +118,7 @@ export default (dependencies) => {
       },
       message: toEntries(parameters).map(digestParameterSerialTuple),
     }),
-    answer: ({}, options) => ({}),
+    answer: ({}, _options) => ({}),
   };
 
   const digestPayload = (payload, options) => {

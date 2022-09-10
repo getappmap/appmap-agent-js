@@ -89,10 +89,10 @@ assertEqual(
 
 assertThrow(() =>
   compose(
-    (x1, x2, x3, x4) => {
+    (_x1, _x2, _x3, _x4) => {
       assertFail();
     },
-    (z, y1, y2, y3, y4) => {
+    (_z, _y1, _y2, _y3, _y4) => {
       assertFail();
     },
   ),
@@ -117,7 +117,7 @@ assertEqual(
 );
 
 assertThrow(() =>
-  bind((x1, x2, x3, x4, x5, x6) => {
+  bind((_x1, _x2, _x3, _x4, _x5, _x6) => {
     assertFail();
   }, "a"),
 );

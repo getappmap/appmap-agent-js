@@ -42,7 +42,7 @@ export const externals = {
 };
 /* c8 ignore stop */
 
-export default (dependencies) => {
+export default (_dependencies) => {
   const run = (root) => {
     const errors = [];
 

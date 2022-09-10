@@ -25,7 +25,7 @@ export default (dependencies) => {
     writable.write(`${prefix} ${message}${"\n"}`);
   };
   return {
-    mainAsync: async ({ version, platform, cwd, env, stdout, stderr }) => {
+    mainAsync: async ({ version, cwd, env, stdout, stderr }) => {
       const logSuccess = generateLog(chalkGreen("\u2714"), stdout);
       const logWarning = generateLog(chalkYellow("\u26A0"), stderr);
       const logFailure = generateLog(chalkRed("\u2716"), stderr);

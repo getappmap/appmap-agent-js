@@ -64,7 +64,7 @@ export default (dependencies) => {
     response.on("end", onResponseEnd);
   }
 
-  function onResponseData(data) {
+  function onResponseData(_data) {
     const { _appmap_client: client } = this;
     rejectClientTermination(
       client,

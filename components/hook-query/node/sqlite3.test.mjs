@@ -44,7 +44,7 @@ const testCaseAsync = (enabled, runAsync) =>
     runAsync,
   );
 
-const createTrace = (sql, parameters, error) => [
+const createTrace = (sql, parameters, _error) => [
   {
     type: "event",
     site: "begin",

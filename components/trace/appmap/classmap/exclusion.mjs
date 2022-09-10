@@ -26,7 +26,7 @@ export default (dependencies) => {
     assert(false, "getName called on invalid entity");
   };
   const criteria = new _Map([
-    ["name", (pattern, { name }, parent) => cache.get(pattern)(name)],
+    ["name", (pattern, { name }, _parent) => cache.get(pattern)(name)],
     [
       "qualified-name",
       (pattern, entity, parent) =>
@@ -34,12 +34,12 @@ export default (dependencies) => {
     ],
     [
       "some-label",
-      (pattern, { type, labels }, parent) =>
+      (pattern, { type, labels }, _parent) =>
         type !== "function" || labels.some(cache.get(pattern)),
     ],
     [
       "every-label",
-      (pattern, { type, labels }, parent) =>
+      (pattern, { type, labels }, _parent) =>
         type !== "function" || labels.every(cache.get(pattern)),
     ],
   ]);

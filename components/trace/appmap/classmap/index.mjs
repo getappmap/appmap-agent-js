@@ -171,7 +171,6 @@ export default (dependencies) => {
         closures,
         urls,
         naming,
-        root,
         configuration: {
           pruning,
           "function-name-placeholder": placeholder,

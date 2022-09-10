@@ -25,7 +25,7 @@ export default (dependencies) => {
   const readMaybeLinkAsync = async (link) => {
     try {
       return await readLinkAsync(link);
-    } catch (error) {
+    } catch {
       return null;
     }
   };

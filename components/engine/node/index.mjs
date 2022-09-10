@@ -1,6 +1,6 @@
 const { version } = process;
 
-export default (dependencies) => {
+export default (_dependencies) => {
   return {
     getEngine: () => `node@${version}`,
   };

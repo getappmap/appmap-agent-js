@@ -18,7 +18,7 @@ export default (dependencies) => {
       } else {
         const groups = new Set();
         const hook = createHook({
-          init: (id, description, origin) => {
+          init: (id, description, _origin) => {
             assert(!groups.has(id), "duplicate async id");
             groups.add(id);
             const tab = getFreshTab(agent);

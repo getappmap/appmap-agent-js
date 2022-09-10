@@ -21,7 +21,7 @@ export default (dependencies) => {
 
   const assign = (value1, value2) => ({ ...value1, ...value2 });
 
-  const overwrite = (value1, value2) => value2;
+  const overwrite = (_value1, value2) => value2;
 
   // const append = (value1, value2) => [...value1, ...value2];
 
@@ -40,7 +40,7 @@ export default (dependencies) => {
   // Normalize //
   ///////////////
 
-  const normalizeExclusion = (exclusion, base) => {
+  const normalizeExclusion = (exclusion, _base) => {
     if (typeof exclusion === "string") {
       exclusion = {
         "qualified-name": exclusion,
@@ -60,7 +60,7 @@ export default (dependencies) => {
     };
   };
 
-  const normalizeHooks = (hooks, base) => {
+  const normalizeHooks = (hooks, _base) => {
     if (hasOwnProperty(hooks, "eval")) {
       const { eval: whitelist } = hooks;
       return {
@@ -77,7 +77,7 @@ export default (dependencies) => {
     }
   };
 
-  const normalizeExclude = (exclusions, base) =>
+  const normalizeExclude = (exclusions, _base) =>
     exclusions.map(normalizeExclusion);
 
   const normalizeCommand = (command, base) => ({

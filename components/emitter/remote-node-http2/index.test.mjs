@@ -56,7 +56,7 @@ const { createClient, executeClientAsync, interruptClient, traceClient } =
 // http echec status //
 await testCaseAsync(
   0,
-  (body, stream) => {
+  (_body, stream) => {
     stream.respond({ ":status": 400 });
     stream.end();
   },
@@ -76,7 +76,7 @@ await testCaseAsync(
 // non-empty response body //
 await testCaseAsync(
   0,
-  (body, stream) => {
+  (_body, stream) => {
     stream.respond({ ":status": 200 });
     stream.write("unwanted-response-body", "utf8");
     stream.end();

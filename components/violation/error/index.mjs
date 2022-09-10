@@ -1,7 +1,7 @@
 const _Error = Error;
 const _Promise = Promise;
 
-export default (dependencies) => {
+export default (_dependencies) => {
   class AppmapError extends _Error {
     constructor(message) {
       super(message);

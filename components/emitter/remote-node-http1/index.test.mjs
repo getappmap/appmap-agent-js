@@ -56,7 +56,7 @@ const { createClient, executeClientAsync, interruptClient, traceClient } =
 // http echec status //
 await testCaseAsync(
   0,
-  (body, response) => {
+  (_body, response) => {
     response.writeHead(400);
     response.end();
   },
@@ -76,7 +76,7 @@ await testCaseAsync(
 // non-empty response body //
 await testCaseAsync(
   0,
-  (body, response) => {
+  (_body, response) => {
     response.writeHead(200);
     response.end("foo", "utf8");
   },

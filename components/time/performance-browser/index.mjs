@@ -2,6 +2,6 @@
 
 const { now } = performance;
 
-export default (dependencies) => {
+export default (_dependencies) => {
   return { now };
 };

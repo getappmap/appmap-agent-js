@@ -49,7 +49,7 @@ export default (dependencies) => {
               if (typeof values === "function") {
                 query.callback = values;
               } else {
-                query.callback = (error, result) => {
+                query.callback = (error, _result) => {
                   if (error !== null) {
                     query.emit("error", error);
                   }
@@ -81,7 +81,7 @@ export default (dependencies) => {
             ),
           );
           callback = query.callback;
-          query.callback = spyOnce((error, result) => {
+          query.callback = spyOnce((_error, _result) => {
             recordAfterEvent(agent, jump_tab, answer_payload);
             recordEndEvent(agent, bundle_tab, bundle_payload);
           }, callback);

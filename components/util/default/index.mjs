@@ -10,7 +10,7 @@ import * as Object from "./object.mjs";
 import * as Print from "./print.mjs";
 import * as Version from "./version.mjs";
 
-export default (dependencies) => {
+export default (_dependencies) => {
   return {
     ...Array,
     ...Assert,

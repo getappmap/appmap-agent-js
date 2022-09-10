@@ -10,7 +10,7 @@ const _URL = URL;
 const _String = String;
 const _Set = Set;
 
-export default (dependencies) => {
+export default (_dependencies) => {
   const {
     "configuration-accessor": { extendConfigurationPort },
     path: { makeSegment },
@@ -109,7 +109,7 @@ export default (dependencies) => {
       const urls = new _Set();
       server.on("connection", (socket) => {
         patchSocket(socket);
-        socket.on("message", (session) => {
+        socket.on("message", (_session) => {
           socket.removeAllListeners("message");
           socket.on("message", (content) => {
             socket.removeAllListeners("message");

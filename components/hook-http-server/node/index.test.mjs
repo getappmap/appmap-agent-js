@@ -29,7 +29,7 @@ const listenAsync = (server, port) =>
 const promiseCycleClosing = async (request, response) =>
   await Promise.all([
     new Promise((resolve) => {
-      response.on("close", resolve);
+      request.on("close", resolve);
     }),
     new Promise((resolve) => {
       response.on("close", resolve);

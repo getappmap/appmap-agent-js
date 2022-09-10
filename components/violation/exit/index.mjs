@@ -4,7 +4,7 @@ const _setTimeout = setTimeout;
 const { exit, stderr } = process;
 const { write } = stderr;
 
-export default (dependencies) => {
+export default (_dependencies) => {
   const signalViolation = (message) => {
     apply(write, stderr, [`${message}${"\n"}`]);
     exit(1);
@@ -23,7 +23,7 @@ export default (dependencies) => {
         new _Error(`Asynchronous violation notification >> ${message}`),
       );
     },
-    catchViolation: (closure, recover) => closure(),
-    catchViolationAsync: (promise, recover) => promise,
+    catchViolation: (closure, _recover) => closure(),
+    catchViolationAsync: (promise, _recover) => promise,
   };
 };

@@ -38,7 +38,7 @@ assertDeepEqual(
         const { source } = await APPMAP_ESM_HOOK.transformSource(
           "123;",
           { url: "file:///foo", format: "module" },
-          async (content, context, next) => ({ source: content }),
+          async (content, _context, _next) => ({ source: content }),
         );
         assertEqual(_eval(source), 123);
       }
@@ -47,7 +47,7 @@ assertDeepEqual(
         const { format, source } = await APPMAP_ESM_HOOK.load(
           "file:///bar",
           "context",
-          async (url, context, next) => ({ format: "module", source: "456;" }),
+          async (_url, _context, _next) => ({ format: "module", source: "456;" }),
         );
         assertEqual(format, "module");
         assertEqual(_eval(source), 456);
@@ -57,7 +57,7 @@ assertDeepEqual(
         const { format, source } = await APPMAP_ESM_HOOK.load(
           "file:///qux",
           "context",
-          async (url, context, next) => ({ format: "custom", source: "789;" }),
+          async (_url, _context, _next) => ({ format: "custom", source: "789;" }),
         );
         assertEqual(format, "custom");
         assertEqual(_eval(source), 789);
@@ -97,7 +97,7 @@ assertDeepEqual(
       const { source } = await APPMAP_ESM_HOOK.transformSource(
         "123;",
         { url: "file:///foo", format: "module" },
-        async (content, context, next) => ({ source: content }),
+        async (content, _context, _next) => ({ source: content }),
       );
       assertEqual(_eval(source), 123);
     },

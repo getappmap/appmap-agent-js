@@ -14,14 +14,16 @@ export default (dependencies) => {
     agent: { instrument },
     interpretation: { runScript },
   } = dependencies;
-  const forward = (url, content) => content;
+  const forward = (_url, content) => content;
   if (typeof APPMAP_HOOK_EVAL === "undefined") {
     runScript("let APPMAP_HOOK_EVAL = null;");
     APPMAP_HOOK_EVAL = forward;
   }
   return {
     unhook: (enabled) => {
-      APPMAP_HOOK_EVAL = forward;
+      if (enabled) {
+        APPMAP_HOOK_EVAL = forward;
+      }
     },
     hook: (agent, { hooks: { eval: whitelist } }) => {
       const enabled = whitelist.length > 0;

@@ -9,7 +9,7 @@ export const format = (template, values) => {
   const { length } = values;
   const message = template.replace(
     /(%+)($|[^%])/gu,
-    (match, escape, marker) => {
+    (_match, escape, marker) => {
       if (escape.length >= 2) {
         return `${escape.substring(1)}${marker}`;
       }

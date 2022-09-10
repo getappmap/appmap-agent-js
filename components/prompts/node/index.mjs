@@ -1,5 +1,5 @@
 import prompts from "prompts";
 
-export default (dependencies) => {
+export default (_dependencies) => {
   return { prompts };
 };

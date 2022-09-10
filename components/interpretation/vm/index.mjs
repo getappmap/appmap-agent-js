@@ -1,6 +1,6 @@
 import { runInThisContext } from "vm";
 
-export default (dependencies) => {
+export default (_dependencies) => {
   return {
     runScript: (content, url) => runInThisContext(content, { filename: url }),
   };

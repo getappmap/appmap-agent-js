@@ -60,7 +60,7 @@ const closeServerAsync = (server) =>
 // Unix Domain Socket + Null Body //
 {
   const server = createServer(
-    generateRespond(async (method, path, body) => ({
+    generateRespond(async (_method, _path, _body) => ({
       code: 200,
       message: "OK",
       body: null,
@@ -103,7 +103,7 @@ const closeServerAsync = (server) =>
 // Invalid Request Headers //
 {
   const server = createServer(
-    generateRespond(async (method, path, body) => {
+    generateRespond(async (_method, _path, _body) => {
       assert(false);
     }),
   );

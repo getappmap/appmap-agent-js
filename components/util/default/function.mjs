@@ -8,8 +8,8 @@ const cache = new _WeakMap();
 export const noop = () => {};
 export const identity = (x) => x;
 export const returnFirst = (x1) => x1;
-export const returnSecond = (x1, x2) => x2;
-export const returnThird = (x1, x2, x3) => x3;
+export const returnSecond = (_x1, x2) => x2;
+export const returnThird = (_x1, _x2, x3) => x3;
 export const constant = (x) => () => x;
 
 export const memoize = (closure, argument) => {

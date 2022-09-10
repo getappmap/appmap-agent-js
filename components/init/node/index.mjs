@@ -23,7 +23,7 @@ export const externals = {
 };
 /* c8 ignore stop */
 
-export default (dependencies) => {
+export default (_dependencies) => {
   const findDirsWithFiles = (root, pattern) => {
     const paths = new Set();
     const hasMatch = (item) => {

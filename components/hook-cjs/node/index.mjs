@@ -13,7 +13,7 @@ export default (dependencies) => {
     unhook: (backup) => {
       backup.forEach(assignProperty);
     },
-    hook: (agent, { hooks: { cjs }, repository: { directory } }) => {
+    hook: (agent, { hooks: { cjs } }) => {
       if (!cjs) {
         return [];
       }

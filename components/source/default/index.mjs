@@ -52,7 +52,7 @@ export default (dependencies) => {
       sources: sources.map((relative_url) =>
         normalizeURL(url, `${prefix === null ? "" : prefix}${relative_url}`),
       ),
-      sourcesContent: sources.map((url, index) =>
+      sourcesContent: sources.map((_url, index) =>
         coalesce(contents, index, null),
       ),
     };

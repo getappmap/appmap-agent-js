@@ -1,4 +1,4 @@
-export default (dependencies) => {
+export default (_dependencies) => {
   return {
     compileTrace: (configuration, messages) => ({
       head: configuration,

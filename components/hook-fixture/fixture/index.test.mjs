@@ -8,7 +8,7 @@ const { testHookAsync } = HookFixture(dependencies);
 assertDeepEqual(
   await testHookAsync(
     {
-      hook: (agent, configuration) => "hooking",
+      hook: (_agent, _configuration) => "hooking",
       unhook: (hooking) => {
         assertEqual(hooking, "hooking");
       },

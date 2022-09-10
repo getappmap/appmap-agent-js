@@ -1,7 +1,7 @@
 import { spawn } from "child_process";
 import { fileURLToPath } from "url";
 
-export default (dependencies) => {
+export default (_dependencies) => {
   return {
     spawn: (exec, argv, options) =>
       spawn(exec, argv, {

@@ -1,6 +1,6 @@
 const { parse: parseJSON, stringify: stringifyJSON } = JSON;
 
-export default (dependencies) => {
+export default (_dependencies) => {
   return {
     makeLocation: (url, line, column) => ({ url, line, column }),
     stringifyLocation: stringifyJSON,

@@ -5,7 +5,7 @@ const _Error = Error;
 const _setTimeout = setTimeout;
 const _Promise = Promise;
 
-export default (dependencies) => {
+export default (_dependencies) => {
   const notifyViolation = (message) => {
     _alert(
       `Something went wrong within the agent, the analysis is compromised and should be terminated (this is probably not a bug) >> ${message}`,
@@ -26,7 +26,7 @@ export default (dependencies) => {
         new _Error(`Asynchronous violation notification >> ${message}`),
       );
     },
-    catchViolation: (closure, recover) => closure(),
-    catchViolationAsync: (promise, recover) => promise,
+    catchViolation: (closure, _recover) => closure(),
+    catchViolationAsync: (promise, _recover) => promise,
   };
 };

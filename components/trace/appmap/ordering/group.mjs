@@ -5,7 +5,7 @@
 
 const { from: toArray } = Array;
 
-export default (dependencies) => {
+export default (_dependencies) => {
   const makeFrame = (enter, children, leave) => ({ enter, children, leave });
 
   const takeMap = (map, key) => {

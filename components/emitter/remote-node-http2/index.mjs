@@ -44,7 +44,7 @@ export default (dependencies) => {
     }
   }
 
-  function onStreamData(data) {
+  function onStreamData(_data) {
     const { _appmap_session: session } = this;
     session.emit("error", new _Error("non empty http2 response body"));
   }
