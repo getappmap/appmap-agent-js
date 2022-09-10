@@ -1,5 +1,3 @@
-export default (_dependencies) => {
-  return {
-    getUUID: () => `uuid`,
-  };
-};
+export default (_dependencies) => ({
+  getUUID: () => `uuid`,
+});

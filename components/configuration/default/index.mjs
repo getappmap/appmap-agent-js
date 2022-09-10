@@ -88,13 +88,12 @@ export default (dependencies) => {
     tokens: typeof command === "string" ? null : command,
   });
 
-  const normalizeScenarios = (scenarios, base) => {
-    return toEntries(scenarios).map(([key, value]) => ({
+  const normalizeScenarios = (scenarios, base) =>
+    toEntries(scenarios).map(([key, value]) => ({
       base,
       key,
       value,
     }));
-  };
 
   const normalizeLog = (log, base) => {
     if (typeof log === "string") {

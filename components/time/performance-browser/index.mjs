@@ -4,6 +4,4 @@ const {
   performance: { now },
 } = globalThis;
 
-export default (_dependencies) => {
-  return { now };
-};
+export default (_dependencies) => ({ now });

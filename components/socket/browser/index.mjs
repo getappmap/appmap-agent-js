@@ -10,7 +10,7 @@ export default (dependencies) => {
       return new WebSocket(`wss://${host}:${String(port)}`);
     },
     sendSocket: (socket, message) => {
-      return socket.send(message);
+      socket.send(message);
     },
     closeSocket: (socket) => {
       socket.close();

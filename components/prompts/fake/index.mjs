@@ -1,5 +1,3 @@
-export default (_dependencies) => {
-  return {
-    prompts: (prompt) => globalThis.GLOBAL_PROMPTS(prompt),
-  };
-};
+export default (_dependencies) => ({
+  prompts: (prompt) => globalThis.GLOBAL_PROMPTS(prompt),
+});

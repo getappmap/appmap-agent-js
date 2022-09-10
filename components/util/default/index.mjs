@@ -10,18 +10,16 @@ import * as Object from "./object.mjs";
 import * as Print from "./print.mjs";
 import * as Version from "./version.mjs";
 
-export default (_dependencies) => {
-  return {
-    ...Array,
-    ...Assert,
-    ...Box,
-    ...Counter,
-    ...Either,
-    ...Format,
-    ...Function,
-    ...Object,
-    ...Maybe,
-    ...Print,
-    ...Version,
-  };
-};
+export default (_dependencies) => ({
+  ...Array,
+  ...Assert,
+  ...Box,
+  ...Counter,
+  ...Either,
+  ...Format,
+  ...Function,
+  ...Object,
+  ...Maybe,
+  ...Print,
+  ...Version,
+});

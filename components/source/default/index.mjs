@@ -69,9 +69,11 @@ export default (dependencies) => {
       return normalizeURL(url, parts[1]);
     },
 
-    createMirrorSourceMap: ({ url, content }) => {
-      return { mirrored: true, url, content };
-    },
+    createMirrorSourceMap: ({ url, content }) => ({
+      mirrored: true,
+      url,
+      content,
+    }),
 
     createSourceMap: ({ url, content }) => {
       const payload = normalizePayload(
