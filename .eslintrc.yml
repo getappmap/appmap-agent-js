@@ -1,26 +1,7 @@
-root: true
-extends:
-  - eslint:recommended
-  - plugin:import/recommended
+
 globals:
   globalThis: readonly
   console: readonly
-  URL: readonly
-  URLSearchParams: readonly
-env:
-  es6: true
-  es2017: true
-rules:
-  no-shadow-restricted-names: off
-  no-empty-pattern: off
-  no-control-regex: off
-  no-debugger:
-    - warn
-  no-console:
-    - warn
-  no-unused-vars:
-    - error
-    - { args: none }
 parser: "@babel/eslint-parser"
 parserOptions:
   ecmaVersion: 2021
