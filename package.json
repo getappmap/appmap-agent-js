@@ -47,16 +47,16 @@
     "ajv": "^8.6.3",
     "ajv-error-tree": "0.0.5",
     "astring": "^1.8.3",
-    "glob": "^7.2.0",
+    "glob": "^8.0.3",
     "klaw-sync": "^6.0.0",
-    "minimatch": "^3.0.4",
+    "minimatch": "^5.1.0",
     "minimist": "^1.2.5",
     "net-socket-messaging": "^0.1.6",
     "prompts": "^2.4.2",
     "semver": "^7.3.5",
     "source-map": "^0.6.1",
     "treeify": "^1.1.0",
-    "yaml": "^1.10.2"
+    "yaml": "^2.1.1"
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.15.0",
@@ -73,12 +73,12 @@
     "eslint": "^8.2.0",
     "eslint-plugin-import": "^2.22.1",
     "express": "^4.17.1",
-    "mocha": "^9.1.3",
+    "mocha": "^10.0.0",
     "mysql": "^2.18.1",
     "pg": "^8.6.0",
     "prettier": "^2.2.1",
-    "semantic-release": "^18.0.0",
-    "sinon": "^12.0.1",
+    "semantic-release": "^19.0.5",
+    "sinon": "^14.0.0",
     "sqlite3": "^5.0.2"
   },
   "publishConfig": {
