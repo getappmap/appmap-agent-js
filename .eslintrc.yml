@@ -30,5 +30,6 @@ rules:
   no-lone-blocks: error
   no-mixed-operators: [error, {allowSamePrecedence: false}]
   prefer-const: [error, {destructuring: all}]
+  prefer-rest-params: error
   prefer-template: error
   require-unicode-regexp: error
