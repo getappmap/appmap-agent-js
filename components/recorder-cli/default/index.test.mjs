@@ -1,11 +1,5 @@
 /* eslint-env node */
 
-const {
-  Object: { assign },
-  Error,
-  process,
-} = globalThis;
-
 import { EventEmitter } from "events";
 import { pathToFileURL } from "url";
 import { assertThrow, assertEqual } from "../../__fixture__.mjs";
@@ -14,6 +8,12 @@ import {
   buildTestComponentAsync,
 } from "../../build.mjs";
 import RecorderCLI from "./index.mjs";
+
+const {
+  Object: { assign },
+  Error,
+  process,
+} = globalThis;
 
 const {
   createRecorder,

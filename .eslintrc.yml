@@ -36,3 +36,4 @@ rules:
   prefer-rest-params: error
   prefer-template: error
   require-unicode-regexp: error
+  import/first: error

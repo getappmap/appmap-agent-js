@@ -1,13 +1,13 @@
-const {
-  JSON: { stringify: stringifyJSON },
-} = globalThis;
-
 import {
   buildTestDependenciesAsync,
   buildTestComponentAsync,
 } from "../../build.mjs";
 import { assertDeepEqual } from "../../__fixture__.mjs";
 import Emitter from "./index.mjs";
+
+const {
+  JSON: { stringify: stringifyJSON },
+} = globalThis;
 
 const { createConfiguration, extendConfiguration } =
   await buildTestComponentAsync("configuration");

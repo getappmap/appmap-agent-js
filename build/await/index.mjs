@@ -1,5 +1,3 @@
-const { process, URL } = globalThis;
-
 import {
   writeFile as writeFileAsync,
   readFile as readFileAsync,
@@ -10,6 +8,8 @@ import { globAll } from "./glob.mjs";
 import { wrapFile } from "./transform.mjs";
 import { lintEspreeFileAsync } from "./lint.mjs";
 import { formatFileAsync } from "./format.mjs";
+
+const { process, URL } = globalThis;
 
 export default (async () => {
   if (!(await supportTopAwaitAsync())) {

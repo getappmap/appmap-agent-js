@@ -1,12 +1,12 @@
 /* eslint-env node */
 /* eslint-disable no-console */
+
 import { dirname } from "path";
 import { fileURLToPath } from "url";
 import glob from "glob";
+import Mocha from "mocha";
 
 const { parseInt, process } = globalThis;
-
-import Mocha from "mocha";
 
 export default (meta_url) => {
   // Instantiate a Mocha with options
