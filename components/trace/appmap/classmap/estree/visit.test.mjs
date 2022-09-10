@@ -75,7 +75,7 @@ assertDeepEqual(test("function f () {}", "@", []), [
           line: 1,
           column: 19,
           static: true,
-          comments: comments,
+          comments,
           range: [19, 26],
           parameters: [[20, 21]],
           labels: ["label-1", "label-2", "label-3"],

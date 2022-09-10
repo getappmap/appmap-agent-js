@@ -83,7 +83,7 @@ export default (dependencies) => {
           shallow,
           link: {
             method_id: placeholder,
-            path: path,
+            path,
             lineno: line,
             defined_class: name,
             static: _static,

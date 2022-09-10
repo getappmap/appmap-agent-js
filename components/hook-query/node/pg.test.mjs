@@ -57,8 +57,8 @@ const proceedAsync = async () => {
       async () => {
         const client = new Client({
           host: "localhost",
-          port: port,
-          user: user,
+          port,
+          user,
           database: "postgres",
         });
         try {
