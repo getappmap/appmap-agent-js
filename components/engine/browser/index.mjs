@@ -2,7 +2,7 @@ const {
   navigator: { userAgent: description },
 } = globalThis;
 
-const regexp = /^([^ \n\t/]+)\/([^ \n\t/]+) /;
+const regexp = /^([^ \n\t/]+)\/([^ \n\t/]+) /u;
 
 export default (dependencies) => {
   const {

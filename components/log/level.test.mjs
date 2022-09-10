@@ -1,7 +1,7 @@
 import { assertDeepEqual, assertThrow } from "../__fixture__.mjs";
 import { levelLog } from "./level.mjs";
 
-assertThrow(() => levelLog({}, "logMissing"), /^Error: missing map key/);
+assertThrow(() => levelLog({}, "logMissing"), /^Error: missing map key/u);
 
 const trace = [];
 

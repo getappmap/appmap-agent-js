@@ -13,4 +13,4 @@ assertThrow(() => {
     classMap: [],
     events: [],
   });
-}, /^AppmapError: failed to validate appmap/);
+}, /^AppmapError: failed to validate appmap/u);

@@ -14,11 +14,11 @@ const {
 
 assertEqual(expect(true, "%s", "foo"), undefined);
 
-assertThrow(() => expect(false, "%s", "foo"), /^AppmapError: foo/);
+assertThrow(() => expect(false, "%s", "foo"), /^AppmapError: foo/u);
 
 assertThrow(
   () => expectDeadcode("%s %s", "foo")("bar"),
-  /^AppmapError: foo bar/,
+  /^AppmapError: foo bar/u,
 );
 
 try {

@@ -51,7 +51,7 @@ describe("the status command", () => {
       assert.equal(result.errors[0].level, "error");
       assert.match(
         result.errors[0].message,
-        new RegExp(`Unsupported node version ${node_version}`),
+        new RegExp(`Unsupported node version ${node_version}`, "u"),
       );
     });
 

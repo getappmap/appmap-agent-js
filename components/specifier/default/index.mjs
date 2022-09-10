@@ -33,7 +33,7 @@ export default (dependencies) => {
   const escape = (char) => `\\${char}`;
 
   const sanitizeForRegExp = (string) =>
-    string.replace(/[/\\+*?.^$()[\]{}|]/g, escape);
+    string.replace(/[/\\+*?.^$()[\]{}|]/gu, escape);
 
   // const sanitizeForGlob = (string) => string.replace(/[*?[\]]/g, escape);
 

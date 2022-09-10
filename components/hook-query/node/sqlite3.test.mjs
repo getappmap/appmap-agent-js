@@ -116,7 +116,7 @@ assertDeepEqual(
       await promisify(database, "run", "INVALID SQL;");
       assertFail();
     } catch ({ message }) {
-      assertMatch(message, /^SQLITE_ERROR:/);
+      assertMatch(message, /^SQLITE_ERROR:/u);
     }
   }),
   createTrace("INVALID SQL;", [], {

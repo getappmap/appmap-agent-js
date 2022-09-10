@@ -9,5 +9,5 @@ expect(true, "foo");
 
 assertThrows(
   () => expect(false, "%s%s", "foo", "bar"),
-  /^Error: Expection failure/,
+  /^Error: Expection failure/u,
 );

@@ -28,3 +28,4 @@ rules:
   arrow-body-style: [error, as-needed]
   consistent-return: error
   prefer-template: error
+  require-unicode-regexp: error

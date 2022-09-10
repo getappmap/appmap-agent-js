@@ -31,7 +31,7 @@ export default (dependencies) => {
     // The source map spec https://sourcemaps.info/spec.html
     // Does not mention absolute windows paths in map.sources.
     // But typescript generate them in it with forward slashes.
-    if (relative_url[0] === "/" || /^[a-zA-Z]:/.test(relative_url)) {
+    if (relative_url[0] === "/" || /^[a-zA-Z]:/u.test(relative_url)) {
       url_object.pathname = relative_url;
     } else {
       const { pathname } = url_object;

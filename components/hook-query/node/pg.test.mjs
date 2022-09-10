@@ -180,7 +180,7 @@ const proceedAsync = async () => {
           });
           client.query(query);
           const { message } = await promise;
-          assertMatch(message, /^syntax error/);
+          assertMatch(message, /^syntax error/u);
         })
       )[1],
       {
@@ -204,7 +204,7 @@ const proceedAsync = async () => {
           try {
             await client.query("INVALID SQL;");
           } catch ({ message }) {
-            assertMatch(message, /^syntax error/);
+            assertMatch(message, /^syntax error/u);
           }
         })
       )[1],

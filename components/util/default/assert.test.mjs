@@ -5,6 +5,6 @@ const { undefined } = globalThis;
 
 assertEqual(assert(true, "foo"), undefined);
 
-assertThrow(() => assert(false, "foo"), /^AssertionError: foo/);
+assertThrow(() => assert(false, "foo"), /^AssertionError: foo/u);
 
-assertThrow(() => generateDeadcode("foo")("bar"), /^AssertionError: foo/);
+assertThrow(() => generateDeadcode("foo")("bar"), /^AssertionError: foo/u);

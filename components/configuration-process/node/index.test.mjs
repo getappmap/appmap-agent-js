@@ -26,7 +26,7 @@ assertThrow(
       argv: ["node", "main.mjs"],
       cwd: () => "cwd",
     }),
-  /^AppmapError: Unsupported configuration file extension/,
+  /^AppmapError: Unsupported configuration file extension/u,
 );
 
 {

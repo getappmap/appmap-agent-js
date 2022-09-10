@@ -47,7 +47,7 @@ export default (dependencies) => {
       let plugins = [];
       if (path.endsWith(".ts") || path.endsWith(".tsx")) {
         plugins = ["typescript"];
-      } else if (/^[ \t\n]*\/(\/[ \t]*|\*[ \t\n]*)@flow/.test(content)) {
+      } else if (/^[ \t\n]*\/(\/[ \t]*|\*[ \t\n]*)@flow/u.test(content)) {
         plugins = ["flow"];
       }
       plugins.push("estree", "jsx");
