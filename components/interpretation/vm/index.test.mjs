@@ -5,7 +5,7 @@ import { assertEqual } from "../../__fixture__.mjs";
 import { buildTestDependenciesAsync } from "../../build.mjs";
 import component from "./index.mjs";
 
-const {undefined} = globalThis;
+const { undefined } = globalThis;
 
 const { runScript } = component(
   await buildTestDependenciesAsync(import.meta.url),

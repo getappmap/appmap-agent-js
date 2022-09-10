@@ -1,11 +1,7 @@
 import { tmpdir as getTemporaryDirectory } from "os";
 import { pathToFileURL, fileURLToPath } from "url";
 
-const {
-  Promise,
-  Set,
-  setTimeout,
-} = globalThis;
+const { Promise, Set, setTimeout } = globalThis;
 
 export default (dependencies) => {
   const {

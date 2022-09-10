@@ -5,9 +5,9 @@ import YAML from "yaml";
 const {
   URL,
   Map,
-  JSON: {parse: parseJSON},
-  Reflect: {ownKeys},
-  Array: {isArray},
+  JSON: { parse: parseJSON },
+  Reflect: { ownKeys },
+  Array: { isArray },
 } = globalThis;
 
 const { parse: parseYAML } = YAML;

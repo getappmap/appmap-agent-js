@@ -1,4 +1,4 @@
-const {String, WebSocket} = globalThis;
+const { String, WebSocket } = globalThis;
 
 export default (dependencies) => {
   const {

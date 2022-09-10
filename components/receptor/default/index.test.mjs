@@ -8,7 +8,7 @@ import {
 
 import Receptor from "./index.mjs";
 
-const {URL} = globalThis;
+const { URL } = globalThis;
 
 const { createConfiguration, extendConfiguration } =
   await buildTestComponentAsync("configuration");

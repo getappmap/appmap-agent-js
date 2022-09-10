@@ -4,8 +4,8 @@ import Https from "https";
 const {
   RegExp,
   String,
-  process: {nextTick},
-  Reflect: {apply, construct},
+  process: { nextTick },
+  Reflect: { apply, construct },
   Proxy,
   undefined,
 } = globalThis;

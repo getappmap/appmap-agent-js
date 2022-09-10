@@ -5,8 +5,8 @@ import Require from "./require.mjs";
 
 const {
   URL,
-  Math: {random},
-  JSON: {stringify:stringifyJSON},
+  Math: { random },
+  JSON: { stringify: stringifyJSON },
 } = globalThis;
 
 const { requireMaybe } = Require(

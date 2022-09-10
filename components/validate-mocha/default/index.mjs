@@ -1,4 +1,4 @@
-const {undefined} = globalThis;
+const { undefined } = globalThis;
 
 export default (dependencies) => {
   const {

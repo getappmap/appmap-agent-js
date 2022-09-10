@@ -14,7 +14,7 @@ import HookHttpServer from "./index.mjs";
 const {
   Promise,
   Buffer,
-  JSON: {stringify:stringifyJSON, parse:parseJSON},
+  JSON: { stringify: stringifyJSON, parse: parseJSON },
   String,
 } = globalThis;
 

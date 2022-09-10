@@ -6,7 +6,7 @@ import {
 import RecorderProcess from "./index.mjs";
 
 const {
-  Object:{assign},
+  Object: { assign },
   Error,
 } = globalThis;
 

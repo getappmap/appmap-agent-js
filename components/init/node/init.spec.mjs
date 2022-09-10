@@ -9,7 +9,7 @@ import Mocha from "mocha";
 import * as sinon from "sinon";
 import Init, { externals } from "./index.mjs";
 
-const {Math, process, JSON, undefined} = globalThis;
+const { Math, process, JSON, undefined } = globalThis;
 
 const { afterEach, beforeEach, describe, it } = Mocha;
 

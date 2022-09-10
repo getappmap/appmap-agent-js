@@ -8,7 +8,7 @@ import {
 } from "../../build.mjs";
 import HookESM from "./index.mjs";
 
-const {eval:evalGlobal} = globalThis;
+const { eval: evalGlobal } = globalThis;
 
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
 const { testHookAsync } = await buildTestComponentAsync("hook-fixture");

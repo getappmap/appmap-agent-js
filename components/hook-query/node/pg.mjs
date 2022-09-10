@@ -2,7 +2,7 @@ import Require from "./require.mjs";
 
 const {
   undefined,
-  Reflect:{apply},
+  Reflect: { apply },
   Promise,
   TypeError,
 } = globalThis;

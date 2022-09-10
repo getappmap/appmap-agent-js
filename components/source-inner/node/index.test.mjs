@@ -3,7 +3,9 @@ import SourceMap from "source-map";
 import { buildTestDependenciesAsync } from "../../build.mjs";
 import SourceInner from "./index.mjs";
 
-const {JSON:{parse:parseJSON}} = globalThis;
+const {
+  JSON: { parse: parseJSON },
+} = globalThis;
 
 const { SourceMapGenerator } = SourceMap;
 

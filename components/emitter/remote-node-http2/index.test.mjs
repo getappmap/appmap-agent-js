@@ -9,7 +9,7 @@ import { buildTestDependenciesAsync } from "../../build.mjs";
 import Client from "./index.mjs";
 
 const {
-  JSON: {parse:parseJSON},
+  JSON: { parse: parseJSON },
   Promise,
   setTimeout,
 } = globalThis;

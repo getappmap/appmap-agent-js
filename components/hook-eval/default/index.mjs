@@ -8,7 +8,7 @@
 //   throw new Error("lib/emitter/hook/esm.js must be preloaded with --experimental loader");
 // }};
 
-const {String} = globalThis;
+const { String } = globalThis;
 
 export default (dependencies) => {
   const {

@@ -8,7 +8,7 @@ import {
 import { tmpdir as getTmpdir } from "os";
 import { fileURLToPath } from "url";
 
-const {SyntaxError, Math} = globalThis;
+const { SyntaxError, Math } = globalThis;
 
 const __dirname = getDirname(fileURLToPath(import.meta.url));
 

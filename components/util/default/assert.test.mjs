@@ -1,7 +1,7 @@
 import { assertEqual, assertThrow } from "../../__fixture__.mjs";
 import { assert, generateDeadcode } from "./assert.mjs";
 
-const {undefined} = globalThis;
+const { undefined } = globalThis;
 
 assertEqual(assert(true, "foo"), undefined);
 

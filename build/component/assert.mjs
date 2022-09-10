@@ -1,6 +1,6 @@
 import { format } from "util";
 
-const {Error} = globalThis;
+const { Error } = globalThis;
 
 export const assert = (boolean, template, ...rest) => {
   if (!boolean) {

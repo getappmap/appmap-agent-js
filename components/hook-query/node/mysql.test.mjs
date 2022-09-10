@@ -13,7 +13,7 @@ import {
 } from "../../build.mjs";
 
 const {
-  Reflect: {getOwnPropertyDescriptor},
+  Reflect: { getOwnPropertyDescriptor },
   process,
   Promise,
   String,

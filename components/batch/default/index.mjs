@@ -1,4 +1,3 @@
-
 const {
   Map,
   JSON: { stringify: stringifyJSON },

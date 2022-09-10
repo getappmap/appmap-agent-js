@@ -1,7 +1,6 @@
-
 const {
   Buffer,
-  Buffer: {from:toBuffer},
+  Buffer: { from: toBuffer },
   ArrayBuffer,
   SharedArrayBuffer,
   Uint8Array,

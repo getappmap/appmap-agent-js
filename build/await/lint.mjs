@@ -1,6 +1,6 @@
 import Eslint from "eslint";
 
-const {Error} = globalThis;
+const { Error } = globalThis;
 
 const { ESLint } = Eslint;
 

@@ -5,9 +5,7 @@ import {
 } from "../../build.mjs";
 import Questionnaire from "./index.mjs";
 
-const {
-  Symbol,
-} = globalThis;
+const { Symbol } = globalThis;
 
 const BREAK = {};
 

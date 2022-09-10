@@ -4,10 +4,7 @@
 import OperatingSystem from "os";
 const { platform: getPlatform } = OperatingSystem;
 
-const {
-  encodeURIComponent,
-  decodeURIComponent,
-} = globalThis;
+const { encodeURIComponent, decodeURIComponent } = globalThis;
 
 export default (dependencies) => {
   const {

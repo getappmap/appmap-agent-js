@@ -9,9 +9,7 @@ import {
   generateGet,
 } from "./object.mjs";
 
-const {
-  undefined
-} = globalThis;
+const { undefined } = globalThis;
 
 // assignProperty //
 {

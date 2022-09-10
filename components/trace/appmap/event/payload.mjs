@@ -1,10 +1,4 @@
-const {
-  Error,
-  URL,
-  URLSearchParams,
-  String,
-  undefined,
-} = globalThis;
+const { Error, URL, URLSearchParams, String, undefined } = globalThis;
 
 const {
   Object: { entries: toEntries },

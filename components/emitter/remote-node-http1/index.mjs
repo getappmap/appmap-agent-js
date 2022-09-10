@@ -5,7 +5,7 @@ const { Agent, request: connect } = Http;
 const {
   Error,
   String,
-  JSON: {stringify:stringifyJSON},
+  JSON: { stringify: stringifyJSON },
   Promise,
 } = globalThis;
 
@@ -69,10 +69,7 @@ export default (dependencies) => {
 
   function onResponseData(_data) {
     const { _appmap_client: client } = this;
-    rejectClientTermination(
-      client,
-      new Error("non empty http1 response body"),
-    );
+    rejectClientTermination(client, new Error("non empty http1 response body"));
   }
 
   function onResponseEnd() {

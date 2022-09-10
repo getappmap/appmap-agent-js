@@ -10,7 +10,7 @@ import {
 } from "../../build.mjs";
 import File from "./file.mjs";
 
-const {Buffer, encodeURIComponent, URL } =globalThis;
+const { Buffer, encodeURIComponent, URL } = globalThis;
 
 const { readFileSync } = File(
   await buildTestDependenciesAsync(import.meta.url),

@@ -4,7 +4,7 @@ import LogInner from "./index.mjs";
 
 const {
   process,
-  JSON: {stringify: stringifyJSON},
+  JSON: { stringify: stringifyJSON },
 } = globalThis;
 
 const testAsync = async () => {

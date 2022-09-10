@@ -4,7 +4,9 @@ import {
 } from "../../build.mjs";
 import LoadEnvironmentConfiguration from "./index.mjs";
 
-const {JSON:{stringify:stringifyJSON}} = globalThis;
+const {
+  JSON: { stringify: stringifyJSON },
+} = globalThis;
 
 const { createConfiguration } = await buildTestComponentAsync("configuration");
 

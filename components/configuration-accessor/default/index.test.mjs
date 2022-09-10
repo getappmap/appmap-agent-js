@@ -11,7 +11,7 @@ import { platform as getPlatform } from "os";
 import ConfigurationAccessor from "./index.mjs";
 
 const {
-  Reflect:{get},
+  Reflect: { get },
   URL,
 } = globalThis;
 

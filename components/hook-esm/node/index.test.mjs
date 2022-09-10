@@ -8,7 +8,7 @@ import {
 } from "../../build.mjs";
 import HookESM from "./index.mjs";
 
-const {eval:evalGlobal} = globalThis;
+const { eval: evalGlobal } = globalThis;
 
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
 const { testHookAsync } = await buildTestComponentAsync("hook-fixture");
@@ -31,7 +31,7 @@ assertDeepEqual(
       url: "file:///base",
     },
     async () => {
-      global.APPMAPuuid = {
+      globalThis.APPMAPuuid = {
         getFreshTab: () => 123,
       };
       // transformSource //
@@ -48,7 +48,10 @@ assertDeepEqual(
         const { format, source } = await APPMAP_ESM_HOOK.load(
           "file:///bar",
           "context",
-          async (_url, _context, _next) => ({ format: "module", source: "456;" }),
+          async (_url, _context, _next) => ({
+            format: "module",
+            source: "456;",
+          }),
         );
         assertEqual(format, "module");
         assertEqual(evalGlobal(source), 456);
@@ -58,7 +61,10 @@ assertDeepEqual(
         const { format, source } = await APPMAP_ESM_HOOK.load(
           "file:///qux",
           "context",
-          async (_url, _context, _next) => ({ format: "custom", source: "789;" }),
+          async (_url, _context, _next) => ({
+            format: "custom",
+            source: "789;",
+          }),
         );
         assertEqual(format, "custom");
         assertEqual(evalGlobal(source), 789);

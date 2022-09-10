@@ -4,11 +4,7 @@ import { createRequire } from "module";
 import semver from "semver";
 import { schema } from "../../../dist/schema.mjs";
 
-const {
-  Promise,
-  process,
-  JSON,
-} = globalThis;
+const { Promise, process, JSON } = globalThis;
 
 /* c8 ignore start */
 export const externals = {

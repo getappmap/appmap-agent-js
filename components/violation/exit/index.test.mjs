@@ -1,9 +1,6 @@
 import { assertEqual, assertFail, assertThrow } from "../../__fixture__.mjs";
 
-const {
-  process,
-  Promise,
-} = globalThis;
+const { process, Promise } = globalThis;
 
 process.exit = () => {};
 globalThis.setTimeout = (closure, _timer) => {

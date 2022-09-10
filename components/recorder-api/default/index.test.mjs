@@ -5,7 +5,7 @@ import {
 } from "../../build.mjs";
 import RecorderAPI from "./index.mjs";
 
-const {undefined} = globalThis;
+const { undefined } = globalThis;
 
 const { Appmap } = RecorderAPI(
   await buildTestDependenciesAsync(import.meta.url),

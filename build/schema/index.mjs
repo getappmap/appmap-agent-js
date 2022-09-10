@@ -8,7 +8,9 @@ import YAML from "yaml";
 import Ajv from "ajv";
 import GenerateStandaloneCode from "ajv/dist/standalone/index.js";
 
-const {JSON:{ stringify: stringifyJSON }} = globalThis;
+const {
+  JSON: { stringify: stringifyJSON },
+} = globalThis;
 
 const { default: generateStandaloneCode } = GenerateStandaloneCode;
 const { parse: parseYAML } = YAML;

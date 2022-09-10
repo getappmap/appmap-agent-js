@@ -6,7 +6,7 @@ import {
 } from "../../build.mjs";
 import Batch from "./index.mjs";
 
-const {setTimeout} = globalThis;
+const { setTimeout } = globalThis;
 
 globalThis.GLOBAL_SPY_SPAWN = (exec, argv, _options) => {
   const emitter = new EventEmitter();

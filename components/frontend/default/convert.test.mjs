@@ -2,7 +2,7 @@ import { assertEqual } from "../../__fixture__.mjs";
 
 import { toString, toInteger } from "./convert.mjs";
 
-const {Symbol} = globalThis;
+const { Symbol } = globalThis;
 
 assertEqual(toString("foo"), "foo");
 

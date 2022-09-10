@@ -9,7 +9,7 @@ import Receptor from "./index.mjs";
 
 const {
   Promise,
-  JSON: {stringify: stringifyJSON},
+  JSON: { stringify: stringifyJSON },
   setTimeout,
 } = globalThis;
 

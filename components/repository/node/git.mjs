@@ -2,10 +2,7 @@ import { spawnSync } from "child_process";
 import { readdirSync } from "fs";
 import { fileURLToPath } from "url";
 
-const {
-  URL,
-  parseInt,
-} = globalThis;
+const { URL, parseInt } = globalThis;
 
 export default (dependencies) => {
   const {

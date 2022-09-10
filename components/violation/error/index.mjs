@@ -1,8 +1,4 @@
-
-const {
-  Error,
-  Promise,
-} = globalThis;
+const { Error, Promise } = globalThis;
 
 export default (_dependencies) => {
   class AppmapError extends Error {

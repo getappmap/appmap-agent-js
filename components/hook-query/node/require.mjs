@@ -1,6 +1,6 @@
 import { createRequire } from "module";
 
-const {URL} = globalThis;
+const { URL } = globalThis;
 
 export default (dependencies) => {
   const {

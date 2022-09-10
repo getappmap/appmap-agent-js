@@ -2,7 +2,7 @@ import { format } from "util";
 
 const {
   Error,
-  process: {stderr, exit},
+  process: { stderr, exit },
 } = globalThis;
 
 export const expect = (boolean, template, ...rest) => {

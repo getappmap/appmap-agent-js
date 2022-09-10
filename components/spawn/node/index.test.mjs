@@ -2,13 +2,7 @@ import { pathToFileURL } from "url";
 import { buildTestDependenciesAsync } from "../../build.mjs";
 import Spawn from "./index.mjs";
 
-const {
-  Promise,
-  URL,
-  process,
-  Error,
-  undefined,
-} = globalThis;
+const { Promise, URL, process, Error, undefined } = globalThis;
 
 export default (async () => {
   const dependencies = await buildTestDependenciesAsync(import.meta.url);

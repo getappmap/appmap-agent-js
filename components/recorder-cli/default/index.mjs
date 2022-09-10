@@ -1,5 +1,4 @@
-
-const {Set, Error} = globalThis;
+const { Set, Error } = globalThis;
 
 export default (dependencies) => {
   const {

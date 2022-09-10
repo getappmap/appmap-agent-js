@@ -1,8 +1,4 @@
-
-const {
-  decodeURIComponent,
-  URL,
-} = globalThis;
+const { decodeURIComponent, URL } = globalThis;
 
 export default (dependencies) => {
   const {
@@ -101,8 +97,7 @@ export default (dependencies) => {
       while (
         segments.length > 0 &&
         base_segments.length > 0 &&
-        decodeURIComponent(segments[0]) ===
-          decodeURIComponent(base_segments[0])
+        decodeURIComponent(segments[0]) === decodeURIComponent(base_segments[0])
       ) {
         segments.shift();
         base_segments.shift();

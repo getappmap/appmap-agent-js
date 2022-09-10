@@ -1,4 +1,4 @@
-const {Error} = globalThis;
+const { Error } = globalThis;
 
 export default (_dependencies) => {
   const payloads = {

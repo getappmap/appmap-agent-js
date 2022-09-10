@@ -11,7 +11,7 @@ import Git from "./git.mjs";
 
 const {
   URL,
-  Array: {isArray}
+  Array: { isArray },
 } = globalThis;
 
 const { extractGitInformation } = Git(

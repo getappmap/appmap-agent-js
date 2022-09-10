@@ -6,10 +6,7 @@ import {
 } from "../../build.mjs";
 import HookHttpClient from "./index.mjs";
 
-const {
-  Promise,
-  String,
-} = globalThis;
+const { Promise, String } = globalThis;
 
 const { createServer } = Http;
 

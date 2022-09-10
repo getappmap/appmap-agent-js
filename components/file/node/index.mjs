@@ -1,7 +1,7 @@
 import { readFileSync } from "fs";
 import { readFile as readFileAsync } from "fs/promises";
 
-const {URL} = globalThis;
+const { URL } = globalThis;
 
 export default (_dependencies) => {
   return {

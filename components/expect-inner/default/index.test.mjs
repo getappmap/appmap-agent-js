@@ -2,11 +2,7 @@ import { assertEqual, assertThrow, assertFail } from "../../__fixture__.mjs";
 import { buildTestDependenciesAsync } from "../../build.mjs";
 import Expect from "./index.mjs";
 
-const {
-  Error,
-  undefined,
-  Promise,
-} = globalThis;
+const { Error, undefined, Promise } = globalThis;
 
 const {
   expect,

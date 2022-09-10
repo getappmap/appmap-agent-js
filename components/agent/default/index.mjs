@@ -1,4 +1,6 @@
-const {Object:{ fromEntries, entries: toEntries }} = globalThis;
+const {
+  Object: { fromEntries, entries: toEntries },
+} = globalThis;
 
 export default (dependencies) => {
   const {

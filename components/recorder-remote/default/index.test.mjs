@@ -7,7 +7,7 @@ import RecorderEmpty from "./index.mjs";
 
 const {
   Error,
-  Object:{assign},
+  Object: { assign },
 } = globalThis;
 
 const { main } = RecorderEmpty(

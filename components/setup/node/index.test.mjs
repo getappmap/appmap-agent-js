@@ -14,7 +14,7 @@ import Setup from "./index.mjs";
 const {
   URL,
   process,
-  JSON: {stringify:stringifyJSON},
+  JSON: { stringify: stringifyJSON },
 } = globalThis;
 
 const dependencies = await buildTestDependenciesAsync(import.meta.url);

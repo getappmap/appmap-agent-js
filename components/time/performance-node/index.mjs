@@ -1,7 +1,7 @@
 import { performance } from "perf_hooks";
 
 const {
-  Math: {round},
+  Math: { round },
 } = globalThis;
 
 const { now } = performance;

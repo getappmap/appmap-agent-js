@@ -2,7 +2,7 @@ import { assertEqual, assertFail } from "../../__fixture__.mjs";
 
 import { fromMaybe, mapMaybe, recoverMaybe } from "./maybe.mjs";
 
-const {String} = globalThis;
+const { String } = globalThis;
 
 // recoverMaybe //
 

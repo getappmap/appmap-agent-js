@@ -1,9 +1,4 @@
-
-const {
-  Set,
-  String,
-  URL,
-} = globalThis;
+const { Set, String, URL } = globalThis;
 
 export default (dependencies) => {
   const {

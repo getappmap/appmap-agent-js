@@ -2,7 +2,7 @@ import { strict as Assert } from "assert";
 import { tmpdir as getTemporaryDirectory, platform as getPlatform } from "os";
 import { pathToFileURL, fileURLToPath } from "url";
 
-const {Error, Infinity, Math} = globalThis;
+const { Error, Infinity, Math } = globalThis;
 
 Error.stackTraceLimit = Infinity;
 

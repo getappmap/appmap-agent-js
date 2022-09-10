@@ -4,7 +4,9 @@ import { tmpdir } from "os";
 import { loadConfAsync } from "./conf.mjs";
 const { equal: assertEqual, deepEqual: assertDeepEqual } = Assert;
 
-const {Math:{random}} = globalThis;
+const {
+  Math: { random },
+} = globalThis;
 
 globalThis.EXPECT_TEST = null;
 

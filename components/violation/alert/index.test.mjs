@@ -2,9 +2,7 @@
 
 import { assertThrow, assertFail, assertEqual } from "../../__fixture__.mjs";
 
-const {
-  Promise,
-} = globalThis;
+const { Promise } = globalThis;
 
 globalThis.alert = () => {};
 globalThis.setTimeout = (closure, _timer) => {

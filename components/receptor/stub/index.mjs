@@ -1,8 +1,4 @@
-
-const {
-  Promise,
-  undefined,
-} = globalThis;
+const { Promise, undefined } = globalThis;
 
 export default (dependencies) => {
   const {

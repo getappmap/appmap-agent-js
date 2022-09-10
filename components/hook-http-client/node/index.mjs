@@ -2,7 +2,7 @@ import Http from "http";
 import Https from "https";
 
 const {
-  Reflect: {apply, construct},
+  Reflect: { apply, construct },
   Proxy,
 } = globalThis;
 

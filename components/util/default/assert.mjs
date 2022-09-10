@@ -1,5 +1,4 @@
-
-const {Error} =globalThis;
+const { Error } = globalThis;
 
 class AssertionError extends Error {
   constructor(message) {

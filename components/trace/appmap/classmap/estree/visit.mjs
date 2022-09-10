@@ -1,8 +1,8 @@
 import Naming from "./naming.mjs";
 
 const {
-  Reflect: {ownKeys},
-  Array: {isArray},
+  Reflect: { ownKeys },
+  Array: { isArray },
 } = globalThis;
 
 export default (dependencies) => {

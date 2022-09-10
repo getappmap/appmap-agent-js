@@ -2,7 +2,7 @@ import { readFileSync } from "fs";
 import { fileURLToPath } from "url";
 
 const {
-  JSON: {stringify:stringifyJSON},
+  JSON: { stringify: stringifyJSON },
   Buffer,
   decodeURIComponent,
   URL,

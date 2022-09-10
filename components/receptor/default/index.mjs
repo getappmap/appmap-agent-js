@@ -1,4 +1,4 @@
-const {Map} = globalThis;
+const { Map } = globalThis;
 
 export default (dependencies) => {
   const {

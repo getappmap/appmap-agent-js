@@ -1,7 +1,7 @@
 /* eslint-env node */
 
 const {
-  Object: {assign},
+  Object: { assign },
   Error,
   process,
 } = globalThis;

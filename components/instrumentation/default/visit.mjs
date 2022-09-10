@@ -1,9 +1,8 @@
-
-const{
+const {
   String,
-  Array:{isArray},
-  Object: {fromEntries},
-  Reflect: {ownKeys},
+  Array: { isArray },
+  Object: { fromEntries },
+  Reflect: { ownKeys },
 } = globalThis;
 
 //////////////////////////////

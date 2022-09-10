@@ -5,7 +5,7 @@ const {
   Set,
   Map,
   undefined,
-  Array: {from:toArray},
+  Array: { from: toArray },
 } = globalThis;
 
 export default (dependencies) => {

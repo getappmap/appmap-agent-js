@@ -1,10 +1,12 @@
 const {
-  Reflect: {apply},
+  Reflect: { apply },
   String,
   undefined,
-  Object: {prototype: {toString: toStringBuiltin}},
-  Math: {round},
-  Number: {parseInt, isNaN},
+  Object: {
+    prototype: { toString: toStringBuiltin },
+  },
+  Math: { round },
+  Number: { parseInt, isNaN },
 } = globalThis;
 
 export const toInteger = (any) => {

@@ -1,8 +1,7 @@
-
 const {
-  Array: {isArray},
-  Reflect: {ownKeys},
-  Object: { entries: toEntries }
+  Array: { isArray },
+  Reflect: { ownKeys },
+  Object: { entries: toEntries },
 } = globalThis;
 
 const ANONYMOUS_NAME_SEPARATOR = "-";

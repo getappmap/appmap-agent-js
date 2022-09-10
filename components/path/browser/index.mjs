@@ -1,4 +1,4 @@
-const {encodeURIComponent} = globalThis;
+const { encodeURIComponent } = globalThis;
 
 export default (dependencies) => {
   const {

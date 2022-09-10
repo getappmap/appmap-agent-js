@@ -5,7 +5,7 @@ import Git from "./git.mjs";
 
 const {
   URL,
-  JSON: { parse: parseJSON }
+  JSON: { parse: parseJSON },
 } = globalThis;
 
 export default (dependencies) => {

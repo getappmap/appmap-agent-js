@@ -1,11 +1,6 @@
 /* eslint-env browser */
 
-const {
-  alert,
-  Error,
-  setTimeout,
-  Promise,
-} = globalThis;
+const { alert, Error, setTimeout, Promise } = globalThis;
 
 export default (_dependencies) => {
   const notifyViolation = (message) => {

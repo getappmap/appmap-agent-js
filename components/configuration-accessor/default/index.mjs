@@ -1,8 +1,8 @@
 const {
   URL,
   RegExp,
-  Object: {entries:toEntries},
-  JSON: {stringify:stringifyJSON},
+  Object: { entries: toEntries },
+  JSON: { stringify: stringifyJSON },
 } = globalThis;
 
 export default (dependencies) => {

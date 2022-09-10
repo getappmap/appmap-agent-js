@@ -1,13 +1,12 @@
-
 const {
-  Reflect: {apply},
+  Reflect: { apply },
   Error,
   Promise,
   setTimeout,
-  process: {exit, stderr},
+  process: { exit, stderr },
 } = globalThis;
 
-const {write} = stderr;
+const { write } = stderr;
 
 export default (_dependencies) => {
   const signalViolation = (message) => {

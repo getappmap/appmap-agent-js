@@ -6,11 +6,7 @@ import {
 } from "../../build.mjs";
 import SourceOuter from "./index.mjs";
 
-const {
-  Math,
-  URL,
-  JSON,
-} = globalThis;
+const { Math, URL, JSON } = globalThis;
 
 const { getSources } = await buildTestComponentAsync("source");
 const { extractSourceMap } = SourceOuter(

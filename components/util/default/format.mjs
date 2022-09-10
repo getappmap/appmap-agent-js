@@ -3,7 +3,7 @@ import { print } from "./print.mjs";
 
 const {
   String,
-  JSON: {stringify:stringifyJSON},
+  JSON: { stringify: stringifyJSON },
 } = globalThis;
 
 export const format = (template, values) => {

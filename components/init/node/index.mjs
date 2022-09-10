@@ -4,13 +4,7 @@ import klaw from "klaw-sync";
 import { basename as getBasename, join as joinPath } from "path";
 import YAML from "yaml";
 
-const {
-  Promise,
-  process,
-  Set,
-  Array,
-  JSON,
-} = globalThis;
+const { Promise, process, Set, Array, JSON } = globalThis;
 
 // Glob to match/exclude all the directories we should scan for source files:
 const GLOB = "!(node_modules)/";

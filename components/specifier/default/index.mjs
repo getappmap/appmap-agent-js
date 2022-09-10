@@ -1,9 +1,6 @@
 import Minimatch from "minimatch";
 
-const {
-  Map,
-  RegExp,
-} = globalThis;
+const { Map, RegExp } = globalThis;
 
 const { Minimatch: MinimatchClass } = Minimatch;
 

@@ -12,10 +12,7 @@ import {
   spyOnce,
 } from "./function.mjs";
 
-const {
-  undefined,
-  Reflect,
-} = globalThis;
+const { undefined, Reflect } = globalThis;
 
 // noop //
 

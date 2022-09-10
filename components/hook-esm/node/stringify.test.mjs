@@ -2,7 +2,7 @@ import { assertEqual, assertThrow } from "../../__fixture__.mjs";
 import { buildTestDependenciesAsync } from "../../build.mjs";
 import Stringify from "./stringify.mjs";
 
-const {TextEncoder} = globalThis;
+const { TextEncoder } = globalThis;
 
 const { stringifyContent } = Stringify(
   await buildTestDependenciesAsync(import.meta.url),

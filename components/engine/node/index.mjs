@@ -1,6 +1,5 @@
-
 const {
-  process: {version},
+  process: { version },
 } = globalThis;
 
 export default (_dependencies) => {

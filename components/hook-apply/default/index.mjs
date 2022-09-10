@@ -1,4 +1,4 @@
-const {eval:evalGlobal} = globalThis;
+const { eval: evalGlobal } = globalThis;
 
 export default (dependencies) => {
   const {

@@ -2,7 +2,7 @@ import Module from "module";
 import { pathToFileURL } from "url";
 
 const {
-  Reflect: {apply},
+  Reflect: { apply },
 } = globalThis;
 
 const { prototype } = Module;

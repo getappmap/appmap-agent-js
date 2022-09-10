@@ -1,6 +1,5 @@
-
 const {
-  Buffer: {from:toBuffer, concat:concatBuffer},
+  Buffer: { from: toBuffer, concat: concatBuffer },
   Object: { fromEntries },
   TextDecoder,
   Reflect: { apply },

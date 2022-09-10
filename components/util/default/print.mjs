@@ -1,10 +1,11 @@
-
 const {
   String,
   undefined,
-  JSON: {stringify:stringifyJSON},
-  Reflect: {apply},
-  Object: {prototype:{toString}},
+  JSON: { stringify: stringifyJSON },
+  Reflect: { apply },
+  Object: {
+    prototype: { toString },
+  },
 } = globalThis;
 
 export const print = (any) => {

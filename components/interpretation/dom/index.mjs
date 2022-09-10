@@ -1,4 +1,4 @@
-const {document} = globalThis;
+const { document } = globalThis;
 
 export default (_dependencies) => {
   return {

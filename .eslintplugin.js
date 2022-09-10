@@ -11,14 +11,14 @@ module.exports = {
         },
         schema: {
           type: "array",
-          items: {type: "string"},
+          items: { type: "string" },
         },
       },
       create: (context) => {
-        const {options:allowed} = context;
+        const { options: allowed } = context;
         const reportReference = (reference) => {
-          const {identifier} = reference;
-          const {name} = identifier;
+          const { identifier } = reference;
+          const { name } = identifier;
           if (!allowed.includes(name)) {
             context.report({
               node: identifier,
@@ -26,13 +26,13 @@ module.exports = {
             });
           }
         };
-        const reportVariable = ({references}) => {
+        const reportVariable = ({ references }) => {
           references.forEach(reportReference);
         };
-        const isVariableNotDefined = ({references:{length}}) => length > 0;
+        const isVariableNotDefined = ({ references: { length } }) => length > 0;
         return {
           Program: () => {
-            const {variables, through} = context.getScope();
+            const { variables, through } = context.getScope();
             variables.filter(isVariableNotDefined).forEach(reportVariable);
             // Duplicate with no-undef
             // through.forEach(reportReference);

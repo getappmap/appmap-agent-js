@@ -2,7 +2,7 @@ import { assert } from "./assert.mjs";
 
 const {
   Number: { isNaN, parseInt },
-  Math: {max},
+  Math: { max },
 } = globalThis;
 
 export const matchVersion = (actual, target) => {

@@ -1,7 +1,4 @@
-const {
-  Map,
-  String,
-} = globalThis;
+const { Map, String } = globalThis;
 
 export default (dependencies) => {
   const {

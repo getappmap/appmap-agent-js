@@ -1,7 +1,7 @@
 import { assert } from "./assert.mjs";
 
 const {
-  Reflect: {apply},
+  Reflect: { apply },
   WeakMap,
 } = globalThis;
 

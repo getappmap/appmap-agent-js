@@ -7,7 +7,7 @@ import {
 import Naming from "./naming.mjs";
 
 const {
-  Reflect: {getOwnPropertyDescriptor},
+  Reflect: { getOwnPropertyDescriptor },
   undefined,
 } = globalThis;
 

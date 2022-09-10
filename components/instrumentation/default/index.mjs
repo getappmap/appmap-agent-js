@@ -2,7 +2,7 @@ import * as Astring from "astring";
 import * as Acorn from "acorn";
 import Visit from "./visit.mjs";
 
-const {Set} = globalThis;
+const { Set } = globalThis;
 
 const { generate: generateEstree } = Astring;
 const { parse: parseEstree } = Acorn;

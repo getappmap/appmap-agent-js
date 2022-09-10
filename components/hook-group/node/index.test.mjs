@@ -6,10 +6,7 @@ import {
 } from "../../build.mjs";
 import HookGroup from "./index.mjs";
 
-const {
-  Promise,
-  setTimeout,
-} = globalThis;
+const { Promise, setTimeout } = globalThis;
 
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
 const { testHookAsync } = await buildTestComponentAsync("hook-fixture");

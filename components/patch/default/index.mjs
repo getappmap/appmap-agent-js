@@ -1,4 +1,3 @@
-
 const {
   Reflect: { getPrototypeOf, defineProperty, getOwnPropertyDescriptor },
   undefined,

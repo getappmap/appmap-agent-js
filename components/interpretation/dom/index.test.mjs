@@ -3,9 +3,7 @@ import { assertEqual } from "../../__fixture__.mjs";
 import { buildTestDependenciesAsync } from "../../build.mjs";
 import JsDom from "jsdom";
 
-const {
-  undefined
-} = globalThis;
+const { undefined } = globalThis;
 
 const { JSDOM } = JsDom;
 

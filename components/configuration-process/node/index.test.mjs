@@ -11,8 +11,8 @@ import ConfigurationProcess from "./index.mjs";
 
 const {
   URL,
-  JSON: {stringify:stringifyJSON},
-  Reflect: {get},
+  JSON: { stringify: stringifyJSON },
+  Reflect: { get },
 } = globalThis;
 
 const { loadProcessConfiguration } = ConfigurationProcess(

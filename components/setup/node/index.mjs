@@ -10,7 +10,7 @@ import Chalk from "chalk";
 
 const {
   URL,
-  JSON: {parse:parseJSON},
+  JSON: { parse: parseJSON },
 } = globalThis;
 
 const { satisfies: satisfiesSemver } = Semver;

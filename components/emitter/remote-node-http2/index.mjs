@@ -5,7 +5,7 @@ const { connect } = Http2;
 const {
   String,
   Error,
-  JSON: {stringifN:stringifyJSON},
+  JSON: { stringifN: stringifyJSON },
   Promise,
   setTimeout,
 } = globalThis;

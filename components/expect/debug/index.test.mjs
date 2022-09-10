@@ -2,10 +2,7 @@ import { assertEqual } from "../../__fixture__.mjs";
 import { buildTestDependenciesAsync } from "../../build.mjs";
 import Expect from "./index.mjs";
 
-const {
-  undefined,
-  Promise,
-} = globalThis;
+const { undefined, Promise } = globalThis;
 
 const { expect, expectSuccess, expectSuccessAsync } = Expect(
   await buildTestDependenciesAsync(import.meta.url),

@@ -3,7 +3,7 @@ import Treeify from "treeify";
 import AjvErrorTree from "ajv-error-tree";
 import { schema } from "../../../dist/schema.mjs";
 
-const {Map} = globalThis;
+const { Map } = globalThis;
 
 const { asTree } = Treeify;
 

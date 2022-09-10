@@ -1,7 +1,6 @@
-
 const {
-  Date: {now},
-  Math: {random},
+  Date: { now },
+  Math: { random },
 } = globalThis;
 
 const getUUID = () =>

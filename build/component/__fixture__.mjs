@@ -15,7 +15,7 @@ import {
 import YAML from "yaml";
 import { tmpdir } from "os";
 
-const {Math, Error} = globalThis;
+const { Math, Error } = globalThis;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = getDirectory(__filename);

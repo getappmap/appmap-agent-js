@@ -5,7 +5,9 @@ import {
 } from "../../build.mjs";
 import Backend from "./index.mjs";
 
-const {Array:{from:toArray}} = globalThis;
+const {
+  Array: { from: toArray },
+} = globalThis;
 
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
 const { createConfiguration, extendConfiguration } =

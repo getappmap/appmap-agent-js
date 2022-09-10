@@ -1,9 +1,9 @@
 import Require from "./require.mjs";
 
 const {
-  Array: {isArray},
-  Object: {assign},
-  Reflect: {apply},
+  Array: { isArray },
+  Object: { assign },
+  Reflect: { apply },
   TypeError,
 } = globalThis;
 

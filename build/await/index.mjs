@@ -1,5 +1,4 @@
-
-const {process, URL} = globalThis;
+const { process, URL } = globalThis;
 
 import {
   writeFile as writeFileAsync,

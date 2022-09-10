@@ -1,6 +1,5 @@
-
 const {
-  JSON: {stringify:stringifyJSON},
+  JSON: { stringify: stringifyJSON },
 } = globalThis;
 
 import {

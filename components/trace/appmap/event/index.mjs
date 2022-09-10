@@ -1,7 +1,7 @@
 import Classmap from "../classmap/index.mjs";
 import Payload from "./payload.mjs";
 
-const {Error} = globalThis;
+const { Error } = globalThis;
 
 export default (dependencies) => {
   const {
