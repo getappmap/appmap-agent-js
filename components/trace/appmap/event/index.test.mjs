@@ -109,47 +109,45 @@ assertDeepEqual(
 
 // apply //
 for (const shallow of [true, false]) {
-  {
-    const classmap = createClassmap(createConfiguration("file:///home"));
-    addClassmapSource(classmap, {
-      url: "file:///home/filename.js",
-      content: "function f (x) {}",
-      inline: false,
-      exclude: [
+  const classmap = createClassmap(createConfiguration("file:///home"));
+  addClassmapSource(classmap, {
+    url: "file:///home/filename.js",
+    content: "function f (x) {}",
+    inline: false,
+    exclude: [
+      {
+        combinator: "or",
+        "every-label": true,
+        "some-label": true,
+        "qualified-name": true,
+        name: true,
+        excluded: false,
+        recursive: true,
+      },
+    ],
+    shallow,
+  });
+  const location = makeLocation("file:///home/filename.js", 1, 0);
+  assertDeepEqual(
+    digestEventTrace(
+      [
         {
-          combinator: "or",
-          "every-label": true,
-          "some-label": true,
-          "qualified-name": true,
-          name: true,
-          excluded: false,
-          recursive: true,
+          type: "bundle",
+          begin: makeEvent("begin", 123, makeApplyPayload(location)),
+          children: [
+            {
+              type: "jump",
+              before: makeEvent("before", 456, makeQueryPayload()),
+              after: makeEvent("after", 456, makeAnswerPayload()),
+            },
+          ],
+          end: makeEvent("end", 123, makeReturnPayload(location)),
         },
       ],
-      shallow,
-    });
-    const location = makeLocation("file:///home/filename.js", 1, 0);
-    assertDeepEqual(
-      digestEventTrace(
-        [
-          {
-            type: "bundle",
-            begin: makeEvent("begin", 123, makeApplyPayload(location)),
-            children: [
-              {
-                type: "jump",
-                before: makeEvent("before", 456, makeQueryPayload()),
-                after: makeEvent("after", 456, makeAnswerPayload()),
-              },
-            ],
-            end: makeEvent("end", 123, makeReturnPayload(location)),
-          },
-        ],
-        classmap,
-      ).map(getEvent),
-      shallow ? ["call", "return"] : ["call", "call", "return", "return"],
-    );
-  }
+      classmap,
+    ).map(getEvent),
+    shallow ? ["call", "return"] : ["call", "call", "return", "return"],
+  );
 }
 
 // missing apply >> transparent //

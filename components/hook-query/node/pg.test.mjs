@@ -170,60 +170,59 @@ const proceedAsync = async () => {
   );
 
   // invalid sql //
-  {
-    assertDeepEqual(
-      (
-        await testCaseAsync(true, async (client) => {
-          const query = new Query("INVALID SQL;");
-          const promise = new Promise((resolve) => {
-            query.on("error", resolve);
-          });
-          client.query(query);
-          const { message } = await promise;
+  assertDeepEqual(
+    (
+      await testCaseAsync(true, async (client) => {
+        const query = new Query("INVALID SQL;");
+        const promise = new Promise((resolve) => {
+          query.on("error", resolve);
+        });
+        client.query(query);
+        const { message } = await promise;
+        assertMatch(message, /^syntax error/u);
+      })
+    )[1],
+    {
+      type: "event",
+      site: "before",
+      tab: 2,
+      group: 0,
+      time: 0,
+      payload: {
+        type: "query",
+        database: "postgres",
+        version: null,
+        sql: "INVALID SQL;",
+        parameters: {},
+      },
+    },
+  );
+
+  assertDeepEqual(
+    (
+      await testCaseAsync(true, async (client) => {
+        try {
+          await client.query("INVALID SQL;");
+        } catch ({ message }) {
           assertMatch(message, /^syntax error/u);
-        })
-      )[1],
-      {
-        type: "event",
-        site: "before",
-        tab: 2,
-        group: 0,
-        time: 0,
-        payload: {
-          type: "query",
-          database: "postgres",
-          version: null,
-          sql: "INVALID SQL;",
-          parameters: {},
-        },
+        }
+      })
+    )[1],
+    {
+      type: "event",
+      site: "before",
+      tab: 2,
+      group: 0,
+      time: 0,
+      payload: {
+        type: "query",
+        database: "postgres",
+        version: null,
+        sql: "INVALID SQL;",
+        parameters: {},
       },
-    );
-    assertDeepEqual(
-      (
-        await testCaseAsync(true, async (client) => {
-          try {
-            await client.query("INVALID SQL;");
-          } catch ({ message }) {
-            assertMatch(message, /^syntax error/u);
-          }
-        })
-      )[1],
-      {
-        type: "event",
-        site: "before",
-        tab: 2,
-        group: 0,
-        time: 0,
-        payload: {
-          type: "query",
-          database: "postgres",
-          version: null,
-          sql: "INVALID SQL;",
-          parameters: {},
-        },
-      },
-    );
-  }
+    },
+  );
 };
 
 if (getOwnPropertyDescriptor(process.env, "TRAVIS")) {
