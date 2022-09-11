@@ -12,7 +12,7 @@ assertDeepEqual(
   await testHookAsync(
     component,
     { configuration: { ordering: "chronological" } },
-    async () => null,
+    (_agent) => null,
   ),
   [],
 );

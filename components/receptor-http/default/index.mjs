@@ -47,7 +47,7 @@ export default (dependencies) => {
       const backends = new Map();
       track_server.on(
         "request",
-        generateRespond(async (method, path, body) => {
+        generateRespond((method, path, body) => {
           logDebug("Received remote recording request: %s %s", method, path);
           const parts = path.split("/");
           if (parts.length !== 3 || parts[0] !== "") {

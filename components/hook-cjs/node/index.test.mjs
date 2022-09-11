@@ -36,7 +36,7 @@ assertDeepEqual(
       },
       url: getTemporaryDirectoryURL(),
     },
-    async () => {
+    () => {
       assertEqual(require(fileURLToPath(url)), 123);
     },
   ),
@@ -58,7 +58,7 @@ assertDeepEqual(
       },
       url: getTemporaryDirectoryURL(),
     },
-    async () => {
+    () => {
       assertEqual(require(fileURLToPath(url)), 123);
     },
   ),

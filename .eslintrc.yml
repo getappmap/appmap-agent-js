@@ -273,7 +273,7 @@ rules:
   # quotes: [error, double] >> Prettier
   # radix >> No globals
   # require-atomic-updates >> Asynchronous and generator closures disabled by no-restricted-syntax
-  # require-await >> Asynchronous closures disabled by no-restricted-syntax
+  require-await: error
   require-unicode-regexp: error
   # require-yield >> Generator closures disabled by no-restrict-syntax
   # rest-spread-spacing: [error, never] >> Prettier

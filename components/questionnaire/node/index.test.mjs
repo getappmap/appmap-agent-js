@@ -21,7 +21,7 @@ const { questionConfigAsync } = Questionnaire(
 
 const runAsync = async (answers) => {
   const iterator = answers[Symbol.iterator]();
-  globalThis.GLOBAL_PROMPTS = async ({ name, ...prompt }) => {
+  globalThis.GLOBAL_PROMPTS = ({ name, ...prompt }) => {
     const answer = iterator.next().value(prompt);
     if (answer === BREAK) {
       return {};

@@ -98,7 +98,7 @@ assertDeepEqual(await testCaseAsync(false, async () => {}), []);
 
 // TypeError //
 assertDeepEqual(
-  await testCaseAsync(true, async () => {
+  await testCaseAsync(true, () => {
     assertThrow(() => database.run(), /^TypeError: missing sql query string/u);
     assertThrow(() => database.run(123), /^TypeError:/u);
   }),

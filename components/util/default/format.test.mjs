@@ -3,10 +3,7 @@ import { format } from "./format.mjs";
 
 const { Error } = globalThis;
 
-assertThrow(
-  () => format("%x", [123]),
-  /^Error: invalid format marker/u,
-);
+assertThrow(() => format("%x", [123]), /^Error: invalid format marker/u);
 
 assertThrow(() => format("%s", []), /^AssertionError: missing format value/u);
 

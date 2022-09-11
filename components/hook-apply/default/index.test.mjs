@@ -28,7 +28,7 @@ assertDeepEqual(
     await testHookAsync(
       component,
       { configuration: { hooks: { apply: true }, "hidden-identifier": "$" } },
-      async () => {
+      () => {
         {
           const tab = $uuid.getFreshTab();
           $uuid.recordApply(tab, "function", "this", ["argument"]);

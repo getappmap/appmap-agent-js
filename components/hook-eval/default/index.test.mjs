@@ -30,7 +30,7 @@ assertDeepEqual(
       },
       url: "file:///base",
     },
-    async () => {
+    () => {
       assertEqual(evalGlobal(APPMAP_HOOK_EVAL("file:///foo", "123;")), 123);
     },
   ),
@@ -55,7 +55,7 @@ assertDeepEqual(
         packages: [],
       },
     },
-    async () => {
+    () => {
       assertEqual(evalGlobal(APPMAP_HOOK_EVAL("file:///foo", "123;")), 123);
     },
   ),
