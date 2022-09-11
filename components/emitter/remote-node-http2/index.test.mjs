@@ -59,7 +59,7 @@ const { createClient, executeClientAsync, interruptClient, traceClient } =
   );
   assertDeepEqual(buffer, [123]);
 }
-// http echec status //
+// http failure status //
 await testCaseAsync(
   0,
   (_body, stream) => {
@@ -75,7 +75,7 @@ await testCaseAsync(
       await executeClientAsync(client);
       assertFail();
     } catch ({ message }) {
-      assertEqual(message, "http2 echec status code: 400");
+      assertEqual(message, "http2 status code: 400");
     }
   },
 );

@@ -71,7 +71,7 @@ export default (dependencies) => {
     if (status !== 200) {
       rejectClientTermination(
         client,
-        new Error(`http1 echec status code: ${String(status)}`),
+        new Error(`http1 status code: ${String(status)}`),
       );
     }
     response.on("error", onResponseError);

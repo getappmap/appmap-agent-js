@@ -43,7 +43,7 @@ export default (dependencies) => {
       const { _appmap_session: session } = this;
       session.emit(
         "error",
-        new Error(`http2 echec status code: ${String(status)}`),
+        new Error(`http2 status code: ${String(status)}`),
       );
     }
   }
