@@ -1,10 +1,12 @@
 import BabelParser from "@babel/parser";
 
+const { Error } = globalThis;
+
 const { parse: parseBabel } = BabelParser;
 
 export default (dependencies) => {
   const {
-    util: { assert, coalesce },
+    util: { coalesce },
     log: { logWarning, logError },
   } = dependencies;
 
@@ -30,7 +32,7 @@ export default (dependencies) => {
       return `//${value}`;
     }
     /* c8 ignore start */
-    throw assert(false, "invalid comment type");
+    throw new Error("invalid comment type");
     /* c8 ignore stop */
   };
 

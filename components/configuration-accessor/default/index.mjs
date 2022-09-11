@@ -1,4 +1,5 @@
 const {
+  Error,
   URL,
   RegExp,
   Object: { entries: toEntries },
@@ -28,7 +29,7 @@ export default (dependencies) => {
       }
     }
     /* c8 ignore start */
-    throw assert(false, "missing matching specifier");
+    throw new Error("missing matching specifier");
     /* c8 ignore stop */
   };
 

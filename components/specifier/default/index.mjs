@@ -1,6 +1,6 @@
 import Minimatch from "minimatch";
 
-const { Map, RegExp } = globalThis;
+const { Error, Map, RegExp } = globalThis;
 
 const { Minimatch: MinimatchClass } = Minimatch;
 
@@ -95,7 +95,7 @@ export default (dependencies) => {
           flags: "",
         };
       }
-      throw assert(false, "invalid specifier options");
+      throw new Error("invalid specifier options");
     },
     matchSpecifier: (specifier, url) => {
       if (typeof specifier === "boolean") {

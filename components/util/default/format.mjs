@@ -2,6 +2,7 @@ import { assert } from "./assert.mjs";
 import { print } from "./print.mjs";
 
 const {
+  Error,
   String,
   JSON: { stringify: stringifyJSON },
 } = globalThis;
@@ -35,7 +36,7 @@ export const format = (template, values) => {
       if (marker === "o") {
         return print(value);
       }
-      throw assert(false, "invalid format marker");
+      throw new Error("invalid format marker");
     },
   );
   assert(index === length, "missing format marker");

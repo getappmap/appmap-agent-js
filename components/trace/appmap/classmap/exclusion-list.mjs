@@ -1,9 +1,8 @@
 import Exclusion from "./exclusion.mjs";
 
+const { Error } = globalThis;
+
 export default (dependencies) => {
-  const {
-    util: { assert },
-  } = dependencies;
   const {
     compileExclusion,
     isExclusionMatched,
@@ -21,7 +20,7 @@ export default (dependencies) => {
           };
         }
       }
-      throw assert(false, "missing matched exclusion");
+      throw new Error("missing matched exclusion");
     },
   };
 };

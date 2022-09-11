@@ -5,6 +5,7 @@ import NetSocketMessaging from "net-socket-messaging";
 const { patch: patchSocket } = NetSocketMessaging;
 
 const {
+  Error,
   Map,
   JSON: { parse: parseJSON },
 } = globalThis;
@@ -130,7 +131,7 @@ export default (dependencies) => {
             };
           }
           /* c8 ignore start */
-          throw assert(false, "invalid http method");
+          throw new Error("invalid http method");
           /* c8 ignore stop */
         }),
       );
