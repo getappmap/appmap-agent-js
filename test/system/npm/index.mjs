@@ -9,7 +9,13 @@ import {
 } from "fs/promises";
 import { strict as Assert } from "assert";
 
-const { stdout } = process;
+const {
+  process: { stdout, env },
+  JSON,
+  Math,
+  undefined,
+  Reflect,
+} = globalThis;
 
 const { equal: assertEqual } = Assert;
 
@@ -68,7 +74,7 @@ await spawnStrictAsync("node", ["appmap/install-script.js"], {
   cwd: directory,
 });
 // TODO investigate why this fails on travis.
-if (Reflect.getOwnPropertyDescriptor(process.env, "TRAVIS") === undefined) {
+if (Reflect.getOwnPropertyDescriptor(env, "TRAVIS") === undefined) {
   await spawnStrictAsync(npm, ["run", "appmap-start"], {
     stdio: "inherit",
     cwd: directory,

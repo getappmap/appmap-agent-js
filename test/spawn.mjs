@@ -1,5 +1,7 @@
 import { spawn } from "child_process";
 
+const { Promise, Error } = globalThis;
+
 export const spawnAsync = (exec, argv, options) =>
   new Promise((resolve, reject) => {
     const child = spawn(exec, argv, options);

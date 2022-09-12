@@ -1,5 +1,8 @@
 import { loadAsync } from "../../build/await/load.mjs";
-const { stdout } = process;
+
+const {
+  process: { stdout },
+} = globalThis;
 
 for (const name of ["api", "cli", "npm"]) {
   stdout.write(`BEGIN ${name}${"\n"}`);

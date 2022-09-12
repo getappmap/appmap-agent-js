@@ -28,8 +28,8 @@
   "scripts": {
     "prepare": "npm run build",
     "build": "node build/await/index.mjs && node build/index.mjs",
-    "lint": "npx eslint 'bin/appmap-agent-js' 'build/**/*.mjs' 'components/**/*.mjs' 'lib/**/*.mjs' 'lib/node/abomination.js'",
     "format": "npx prettier -w bin/appmap-agent-js '**/*.@(mjs|js|cjs|json|yaml|yml)'",
+    "lint": "npx eslint bin/appmap-agent-js '**/*.@(mjs|js|cjs)'",
     "test": "npx bercow",
     "test-unit": "npx bercow .bercowrc-test-only.yaml",
     "test-unit-cov": "npx bercow .bercowrc-test-only-cov.yaml",
