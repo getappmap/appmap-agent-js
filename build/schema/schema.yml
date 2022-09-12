@@ -1,4 +1,3 @@
-
 ############
 ## Helper ##
 ############
@@ -147,7 +146,7 @@
   additionalProperties: false
   required: [name, version]
   properties:
-    name: {type: string}
+    name: { type: string }
     version:
       type: string
       nullable: true
@@ -168,8 +167,8 @@
   additionalProperties: false
   required: [defined-class, method-id]
   properties:
-    defined-class: {type: string}
-    method-id: {type: string}
+    defined-class: { type: string }
+    method-id: { type: string }
 
 - $id: recording
   anyOf:
@@ -190,36 +189,45 @@
 
 - $id: exclude
   type: array
-  items: {$ref: exclusion}
+  items: { $ref: exclusion }
 
 - $id: exclusion
   anyOf:
     - type: string
     - type: object
       properties:
-        combinator: {$ref: combinator}
-        qualified-name: {$ref: criteria}
-        name: {$ref: criteria}
-        every-label: {$ref: criteria}
-        some-label: {$ref: criteria}
-        excluded: {type: boolean}
-        recursive: {type: boolean}
+        combinator: { $ref: combinator }
+        qualified-name: { $ref: criteria }
+        name: { $ref: criteria }
+        every-label: { $ref: criteria }
+        some-label: { $ref: criteria }
+        excluded: { type: boolean }
+        recursive: { type: boolean }
 
 - $id: cooked-exclude
   type: array
-  items: {$ref: cooked-exclusion}
+  items: { $ref: cooked-exclusion }
 
 - $id: cooked-exclusion
   type: object
-  required: [combinator, qualified-name, name, every-label, some-label, excluded, recursive]
+  required:
+    [
+      combinator,
+      qualified-name,
+      name,
+      every-label,
+      some-label,
+      excluded,
+      recursive,
+    ]
   properties:
-    combinator: {$ref: combinator}
-    qualified-name: {$ref: criteria}
-    name: {$ref: criteria}
-    every-label: {$ref: criteria}
-    some-label: {$ref: criteria}
-    excluded: {type: boolean}
-    recursive: {type: boolean}
+    combinator: { $ref: combinator }
+    qualified-name: { $ref: criteria }
+    name: { $ref: criteria }
+    every-label: { $ref: criteria }
+    some-label: { $ref: criteria }
+    excluded: { type: boolean }
+    recursive: { type: boolean }
 
 # other #
 
@@ -235,19 +243,19 @@
       type: number
       nullable: true
       minimum: 0
-    impure-printing: {type: boolean}
-    impure-constructor-naming: {type: boolean}
-    impure-array-inspection: {type: boolean}
-    impure-error-inspection: {type: boolean}
-    impure-hash-inspection: {type: boolean}
+    impure-printing: { type: boolean }
+    impure-constructor-naming: { type: boolean }
+    impure-array-inspection: { type: boolean }
+    impure-error-inspection: { type: boolean }
+    impure-hash-inspection: { type: boolean }
 
 - $id: package
   type: object
   additionalProperties: false
   required: [name, version, homepage]
   properties:
-    name: {type: string}
-    version: {type: string}
+    name: { type: string }
+    version: { type: string }
     homepage:
       type: string
       nullable: true
@@ -259,17 +267,17 @@
       minItems: 3
       maxItems: 3
       items:
-        - {$ref: stdio-stream}
-        - {$ref: stdio-stream}
-        - {$ref: stdio-stream}
+        - { $ref: stdio-stream }
+        - { $ref: stdio-stream }
+        - { $ref: stdio-stream }
 
 - $id: log
   anyOf:
-    - {$ref: log-level}
+    - { $ref: log-level }
     - type: object
       additionalProperties: false
       properties:
-        level: {$ref: log-level}
+        level: { $ref: log-level }
         file:
           anyOf:
             - $ref: path
@@ -280,7 +288,7 @@
   type: object
   additionalProperties: false
   properties:
-    level: {$ref: log-level}
+    level: { $ref: log-level }
     file:
       anyOf:
         - $ref: url
@@ -291,7 +299,7 @@
   type: object
   additionalProperties: false
   patternProperties:
-    "^": {type: string}
+    "^": { type: string }
 
 ###############
 ## Specifier ##
@@ -303,11 +311,11 @@
       additionalProperties: false
       required: [regexp]
       properties:
-        regexp: {$ref: regexp}
-        flags: {type: string}
-        enabled: {type: boolean}
-        shallow: {type: boolean}
-        exclude: {$ref: exclude}
+        regexp: { $ref: regexp }
+        flags: { type: string }
+        enabled: { type: boolean }
+        shallow: { type: boolean }
+        exclude: { $ref: exclude }
         inline-source:
           type: boolean
           nullable: true
@@ -315,10 +323,10 @@
       additionalProperties: false
       required: [glob]
       properties:
-        glob: {type: string}
-        enabled: {type: boolean}
-        shallow: {type: boolean}
-        exclude: {$ref: exclude}
+        glob: { type: string }
+        enabled: { type: boolean }
+        shallow: { type: boolean }
+        exclude: { $ref: exclude }
         inline-source:
           type: boolean
           nullable: true
@@ -326,11 +334,11 @@
       additionalProperties: false
       required: [path]
       properties:
-        path: {type: string}
-        recursive: {type: boolean}
-        enabled: {type: boolean}
-        shallow: {type: boolean}
-        exclude: {$ref: exclude}
+        path: { type: string }
+        recursive: { type: boolean }
+        enabled: { type: boolean }
+        shallow: { type: boolean }
+        exclude: { $ref: exclude }
         inline-source:
           type: boolean
           nullable: true
@@ -338,12 +346,12 @@
       additionalProperties: false
       required: [dist]
       properties:
-        dist: {type: string}
-        recursive: {type: boolean}
-        external: {type: boolean}
-        enabled: {type: boolean}
-        shallow: {type: boolean}
-        exclude: {$ref: exclude}
+        dist: { type: string }
+        recursive: { type: boolean }
+        external: { type: boolean }
+        enabled: { type: boolean }
+        shallow: { type: boolean }
+        exclude: { $ref: exclude }
         inline-source:
           type: boolean
           nullable: true
@@ -358,15 +366,15 @@
     - type: boolean
     - type: string
     - allOf:
-      - $ref: specifier
-      - not:
-          anyOf:
-            - type: object
-              required: [shallow]
-            - type: object
-              required: [inline-source]
-            - type: object
-              required: [exclude]
+        - $ref: specifier
+        - not:
+            anyOf:
+              - type: object
+                required: [shallow]
+              - type: object
+                required: [inline-source]
+              - type: object
+                required: [exclude]
 
 - $id: cooked-specifier
   anyOf:
@@ -375,9 +383,9 @@
       additionalProperties: false
       required: [base, source, flags]
       properties:
-        base: {$ref: url}
-        source: {type: string}
-        flags: {type: string}
+        base: { $ref: url }
+        source: { type: string }
+        flags: { type: string }
 
 - $id: command-options
   type: object
@@ -386,15 +394,15 @@
     shell:
       type: array
       nullable: true
-      items: {type: string}
+      items: { type: string }
       minItems: 1
-    encoding: {$ref: encoding}
-    env: {$ref: env}
-    stdio: {$ref: stdio}
+    encoding: { $ref: encoding }
+    env: { $ref: env }
+    stdio: { $ref: stdio }
     timeout:
       type: integer
       minimum: 0
-    killSignal: {$ref: signal}
+    killSignal: { $ref: signal }
 
 - $id: cooked-command-options
   allOf:
@@ -411,15 +419,15 @@
   additionalProperties: false
   required: [directory, package]
   properties:
-    directory: {$ref: url}
-    package: {$ref: package}
+    directory: { $ref: url }
+    package: { $ref: package }
 
 - $id: repository
   type: object
   additionalProperties: false
   required: [directory, history, package]
   properties:
-    directory: {$ref: url}
+    directory: { $ref: url }
     history:
       type: object
       nullable: true
@@ -432,114 +440,114 @@
   type: object
   properties:
     # server
-    agent: {$ref: agent}
-    repository: {$ref: repository}
+    agent: { $ref: agent }
+    repository: { $ref: repository }
     scenarios:
       type: object
       additionalProperties: false
       patternProperties:
-        "^": {$ref: external-configuration}
-    scenario: {$ref: regexp}
-    recursive-process-recording: {type: boolean}
+        "^": { $ref: external-configuration }
+    scenario: { $ref: regexp }
+    recursive-process-recording: { type: boolean }
     command:
       anyOf:
         - type: string
         - type: array
-          items: {type: string}
-    command-options: {$ref: command-options}
+          items: { type: string }
+    command-options: { $ref: command-options }
     validate:
       type: object
       additionalProperties: false
       properties:
-        message: {type: boolean}
-        appmap: {type: boolean}
-    log: {$ref: log}
-    host: {const: localhost}
-    session: {$ref: basename}
-    trace-port: {$ref: port}
-    trace-protocol: {const: TCP}
-    track-port: {$ref: port}
-    track-protocol: {const: "HTTP/1.1"}
-    intercept-track-port: {$ref: regexp}
-    intercept-track-protocol: {const: "HTTP/1.1"}
+        message: { type: boolean }
+        appmap: { type: boolean }
+    log: { $ref: log }
+    host: { const: localhost }
+    session: { $ref: basename }
+    trace-port: { $ref: port }
+    trace-protocol: { const: TCP }
+    track-port: { $ref: port }
+    track-protocol: { const: "HTTP/1.1" }
+    intercept-track-port: { $ref: regexp }
+    intercept-track-protocol: { const: "HTTP/1.1" }
     # client
-    socket: {$ref: socket}
-    heartbeat: {$ref: heartbeat}
-    threshold: {$ref: threshold}
-    recorder: {$ref: recorder}
-    inline-source: {type: boolean}
+    socket: { $ref: socket }
+    heartbeat: { $ref: heartbeat }
+    threshold: { $ref: threshold }
+    recorder: { $ref: recorder }
+    inline-source: { type: boolean }
     hooks:
       type: object
       additionalProperties: false
       properties:
-        cjs: {type: boolean}
-        esm: {type: boolean}
+        cjs: { type: boolean }
+        esm: { type: boolean }
         eval:
           anyOf:
             - type: boolean
             - type: array
-              items: {type: string}
-        apply: {type: boolean}
-        http: {type: boolean}
-        mysql: {type: boolean}
-        pg: {type: boolean}
-        sqlite3: {type: boolean}
-    ordering: {$ref: ordering}
+              items: { type: string }
+        apply: { type: boolean }
+        http: { type: boolean }
+        mysql: { type: boolean }
+        pg: { type: boolean }
+        sqlite3: { type: boolean }
+    ordering: { $ref: ordering }
     processes:
       anyOf:
         - $ref: enabled-specifier
         - type: array
-          items: {$ref: enabled-specifier}
-    hidden-identifier: {$ref: regular-identifier}
-    main: {$ref: path}
-    engine: {type: string}
-    language: {$ref: language}
+          items: { $ref: enabled-specifier }
+    hidden-identifier: { $ref: regular-identifier }
+    main: { $ref: path }
+    engine: { type: string }
+    language: { $ref: language }
     packages:
       anyOf:
         - $ref: package-specifier
         - type: array
-          items: {$ref: package-specifier}
-    exclude: {$ref: exclude}
+          items: { $ref: package-specifier }
+    exclude: { $ref: exclude }
     # recording
-    anonymous-name-separator: {$ref: separator}
-    function-name-placeholder: {type: string}
-    collapse-package-hierachy: {type: boolean}
-    recording: {$ref: recording}
+    anonymous-name-separator: { $ref: separator }
+    function-name-placeholder: { type: string }
+    collapse-package-hierachy: { type: boolean }
+    recording: { $ref: recording }
     serialization:
       $ref: serialization
-    pruning: {type: boolean}
-    appmap_dir: {$ref: path}
-    appmap_file: {$ref: basename}
-    name: {type: string}
-    map-name: {type: string}
-    feature: {type: string}
-    feature-group: {type: string}
+    pruning: { type: boolean }
+    appmap_dir: { $ref: path }
+    appmap_file: { $ref: basename }
+    name: { type: string }
+    map-name: { type: string }
+    feature: { type: string }
+    feature-group: { type: string }
     labels:
       type: array
-      items: {type: string}
+      items: { type: string }
     frameworks:
       type: array
-      items: {$ref: name-version}
+      items: { $ref: name-version }
 
 - $id: internal-configuration
   type: object
   additionalProperties: false
   minProperties: 41
   properties:
-    socket: {$ref: socket}
-    heartbeat: {$ref: heartbeat}
-    threshold: {$ref: threshold}
-    scenario: {$ref: regexp}
+    socket: { $ref: socket }
+    heartbeat: { $ref: heartbeat }
+    threshold: { $ref: threshold }
+    scenario: { $ref: regexp }
     scenarios:
       type: array
       items:
         type: object
         required: [key, value, base]
         properties:
-          key: {type: string}
-          value: {$ref: external-configuration}
-          base: {$ref: url}
-    recursive-process-recording: {type: boolean}
+          key: { type: string }
+          value: { $ref: external-configuration }
+          base: { $ref: url }
+    recursive-process-recording: { type: boolean }
     command:
       type: object
       nullable: true
@@ -547,57 +555,57 @@
         tokens:
           type: array
           nullable: true
-          items: {type: string}
+          items: { type: string }
         script:
           type: string
           nullable: true
-        base: {$ref: url}
-    command-options: {$ref: cooked-command-options}
+        base: { $ref: url }
+    command-options: { $ref: cooked-command-options }
     validate:
       type: object
       additionalProperties: false
       required: [message, appmap]
       properties:
-        message: {type: boolean}
-        appmap: {type: boolean}
+        message: { type: boolean }
+        appmap: { type: boolean }
     agent:
       anyOf:
         - const: null
         - $ref: agent
-    repository: {$ref: repository}
-    log: {$ref: cooked-log}
-    host: {const: localhost}
+    repository: { $ref: repository }
+    log: { $ref: cooked-log }
+    host: { const: localhost }
     session:
       anyOf:
         - const: null
         - $ref: basename
-    trace-port: {$ref: cooked-port}
-    trace-protocol: {const: TCP}
-    track-port: {$ref: cooked-port}
-    track-protocol: {const: "HTTP/1.1"}
-    intercept-track-port: {$ref: regexp}
-    intercept-track-protocol: {const: "HTTP/1.1"}
+    trace-port: { $ref: cooked-port }
+    trace-protocol: { const: TCP }
+    track-port: { $ref: cooked-port }
+    track-protocol: { const: "HTTP/1.1" }
+    intercept-track-port: { $ref: regexp }
+    intercept-track-protocol: { const: "HTTP/1.1" }
     recorder:
       anyOf:
         - const: null
         - $ref: recorder
-    inline-source: {type: boolean}
+    inline-source: { type: boolean }
     hooks:
       type: object
       additionalProperties: false
       required: [cjs, esm, apply, http, mysql, pg, sqlite3]
       properties:
-        cjs: {type: boolean}
-        esm: {type: boolean}
+        cjs: { type: boolean }
+        esm: { type: boolean }
         eval:
           type: array
-          items: {type: string}
-        apply: {type: boolean}
-        http: {type: boolean}
-        mysql: {type: boolean}
-        pg: {type: boolean}
-        sqlite3: {type: boolean}
-    ordering: {$ref: ordering}
+          items: { type: string }
+        apply: { type: boolean }
+        http: { type: boolean }
+        mysql: { type: boolean }
+        pg: { type: boolean }
+        sqlite3: { type: boolean }
+    ordering: { $ref: ordering }
     processes:
       type: array
       items:
@@ -607,7 +615,7 @@
         items:
           - $ref: cooked-specifier
           - type: boolean
-    hidden-identifier: {$ref: regular-identifier}
+    hidden-identifier: { $ref: regular-identifier }
     main:
       anyOf:
         - const: null
@@ -615,7 +623,7 @@
     engine:
       type: string
       nullable: true
-    language: {$ref: language}
+    language: { $ref: language }
     packages:
       type: array
       items:
@@ -626,17 +634,17 @@
           - $ref: cooked-specifier
           - type: object
             properties:
-              enabled: {type: boolean}
-              shallow: {type: boolean}
+              enabled: { type: boolean }
+              shallow: { type: boolean }
               inline-source:
                 type: boolean
                 nullable: true
-              exclude: {$ref: cooked-exclude}
-    exclude: {$ref: cooked-exclude}
+              exclude: { $ref: cooked-exclude }
+    exclude: { $ref: cooked-exclude }
     # recording
-    anonymous-name-separator: {$ref: separator}
-    function-name-placeholder: {type: string}
-    collapse-package-hierachy: {type: boolean}
+    anonymous-name-separator: { $ref: separator }
+    function-name-placeholder: { type: string }
+    collapse-package-hierachy: { type: boolean }
     recording:
       anyOf:
         - const: null
@@ -653,8 +661,8 @@
             - impure-array-inspection
             - impure-error-inspection
             - impure-hash-inspection
-    pruning: {type: boolean}
-    appmap_dir: {$ref: url}
+    pruning: { type: boolean }
+    appmap_dir: { $ref: url }
     appmap_file:
       anyOf:
         - $ref: basename
@@ -673,10 +681,10 @@
       nullable: true
     labels:
       type: array
-      items: {type: string}
+      items: { type: string }
     frameworks:
       type: array
-      items: {$ref: name-version}
+      items: { $ref: name-version }
 
 ###########
 # message #
@@ -734,14 +742,14 @@
   additionalProperties: false
   required: [type, content, url, shallow, inline, exclude]
   properties:
-    type: {const: source}
-    content: {type: string}
-    url: {$ref: url}
-    shallow: {type: boolean}
-    inline: {type: boolean}
+    type: { const: source }
+    content: { type: string }
+    url: { $ref: url }
+    shallow: { type: boolean }
+    inline: { type: boolean }
     exclude:
       type: array
-      items: {$ref: cooked-exclusion}
+      items: { $ref: cooked-exclusion }
 
 - $id: amend-message
   type: object
@@ -814,7 +822,7 @@
   properties:
     type:
       enum:
-        - 'null'
+        - "null"
         - undefined
         - boolean
         - number

@@ -1,4 +1,3 @@
-
 globals:
   globalThis: readonly
   console: readonly
@@ -10,7 +9,6 @@ plugins:
   - local
   - import
 rules:
-
   ################
   # Core Complex #
   ################
@@ -57,7 +55,7 @@ rules:
   # default-case-last >> SwitchStatement disabled by no-restricted-syntax
   default-param-last: error # TODO: disable default parameters
   # dot-location: [error, object] >> Prettier
-  dot-notation: [error, {allowKeywords: true}]
+  dot-notation: [error, { allowKeywords: true }]
   # eol-last: [error, always] >> Prettier
   # eqeqeq >> BinaryExpression[!=|==] disabled by no-restricted-syntax
   # for-direction >> Heuristic
@@ -170,7 +168,7 @@ rules:
   # no-magic-numbers
   # no-misleading-character-class >> RegExp
   # no-mixed-spaces-and-tabs >> Prettier
-  no-mixed-operators: [error, {allowSamePrecedence: false}]
+  no-mixed-operators: [error, { allowSamePrecedence: false }]
   # no-mixed-requires >> deprecated
   # no-multi-assign: error >> AssignemntExpression disabled in this context by no-restricted-syntax
   # no-multi-spaces: error >> Prettier
@@ -218,7 +216,7 @@ rules:
   # no-throw-literal
   # no-trailing-spaces: error >> Prettier
   # no-undef-init >> I want explicit init
-  no-undef: [error, {typeof: true}]
+  no-undef: [error, { typeof: true }]
   # no-undefined >> I used local undefined variable
   # no-underscore-dangle >> redundant with camel-case
   # no-unexpected-multiline >> Prettier
@@ -258,7 +256,7 @@ rules:
   # padded-blocks >> Prettier
   # padding-line-between-statements >> Prettier
   # prefer-arrow-callback >> Function disabled by no-restricted-syntax
-  prefer-const: [error, {destructuring: all}]
+  prefer-const: [error, { destructuring: all }]
   # prefer-destructuring: error >> not intersted
   # prefer-exponentiation-operator >> heuristic
   # prefer-named-capture-group: error >> RegExp
@@ -297,7 +295,7 @@ rules:
   unicode-bom: [error, never]
   # use-isnan >> Heuristic
   # valid-jsdoc >> Deprecated
-  valid-typeof: [error, {requireStringLiterals: true}]
+  valid-typeof: [error, { requireStringLiterals: true }]
   # vars-on-top >> Variables are disabled by no-restricted-syntax
   # wrap-iife: [error, outside] >> Function disabled by no-restricted-syntax
   # wrap-regex: error
