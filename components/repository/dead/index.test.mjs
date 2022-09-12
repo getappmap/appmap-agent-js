@@ -7,5 +7,5 @@ const { extractRepositoryHistory } = Repository(
 );
 assertThrow(
   () => extractRepositoryHistory("file:///home"),
-  /^AssertionError: cannot extract/,
+  /^AssertionError: cannot extract/u,
 );

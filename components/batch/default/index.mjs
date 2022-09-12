@@ -1,5 +1,10 @@
-const _Map = Map;
-const { stringify: stringifyJSON } = JSON;
+const {
+  Map,
+  JSON: { stringify: stringifyJSON },
+  setTimeout,
+  clearTimeout,
+  Promise,
+} = globalThis;
 
 export default (dependencies) => {
   const {
@@ -46,7 +51,7 @@ export default (dependencies) => {
           subprocess.kill("SIGINT");
         }
       });
-      const receptors = new _Map();
+      const receptors = new Map();
       const createReceptorAsync = async (configuration) => {
         const receptor_configuration =
           minifyReceptorConfiguration(configuration);

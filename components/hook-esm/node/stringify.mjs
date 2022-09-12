@@ -1,9 +1,10 @@
-const _Buffer = Buffer;
-const _ArrayBuffer = ArrayBuffer;
-const _SharedArrayBuffer = SharedArrayBuffer;
-const _Uint8Array = Uint8Array;
-
-const { from: toBuffer } = Buffer;
+const {
+  Buffer,
+  Buffer: { from: toBuffer },
+  ArrayBuffer,
+  SharedArrayBuffer,
+  Uint8Array,
+} = globalThis;
 
 export default (dependencies) => {
   const {
@@ -14,16 +15,16 @@ export default (dependencies) => {
       if (typeof content === "string") {
         return content;
       }
-      if (content instanceof _Uint8Array) {
+      if (content instanceof Uint8Array) {
         content = content.buffer;
       }
       if (
-        content instanceof _SharedArrayBuffer ||
-        content instanceof _ArrayBuffer
+        content instanceof SharedArrayBuffer ||
+        content instanceof ArrayBuffer
       ) {
         content = toBuffer(content);
       }
-      if (content instanceof _Buffer) {
+      if (content instanceof Buffer) {
         // We assume utf8 encoding as node does:
         // https://github.com/nodejs/node/blob/c200106305f4367ba9ad8987af5139979c6cc40c/lib/internal/modules/cjs/loader.js#L1136
         //
@@ -38,12 +39,13 @@ export default (dependencies) => {
         //     content = fs.readFileSync(filename, 'utf8');
         //   }
         return content.toString("utf8");
+      } else {
+        throw expect(
+          false,
+          "Expected module content to be either: a string, a UintArray, a ArrayBuffer, a SharedArrayBuffer, or a Buffer. Got: %o",
+          content,
+        );
       }
-      expect(
-        false,
-        "Expected module content to be either: a string, a UintArray, a ArrayBuffer, a SharedArrayBuffer, or a Buffer. Got: %o",
-        content,
-      );
     },
   };
 };

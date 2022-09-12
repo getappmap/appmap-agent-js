@@ -4,8 +4,11 @@ import NetSocketMessaging from "net-socket-messaging";
 
 const { patch: patchSocket } = NetSocketMessaging;
 
-const _Map = Map;
-const { parse: parseJSON } = JSON;
+const {
+  Error,
+  Map,
+  JSON: { parse: parseJSON },
+} = globalThis;
 
 export default (dependencies) => {
   const {
@@ -41,10 +44,10 @@ export default (dependencies) => {
       assert(recorder === "remote", "invalid recorder for receptor-http");
       const trace_server = createTCPServer();
       const track_server = createHTTPServer();
-      const backends = new _Map();
+      const backends = new Map();
       track_server.on(
         "request",
-        generateRespond(async (method, path, body) => {
+        generateRespond((method, path, body) => {
           logDebug("Received remote recording request: %s %s", method, path);
           const parts = path.split("/");
           if (parts.length !== 3 || parts[0] !== "") {
@@ -127,6 +130,9 @@ export default (dependencies) => {
               body: trace,
             };
           }
+          /* c8 ignore start */
+          throw new Error("invalid http method");
+          /* c8 ignore stop */
         }),
       );
       trace_server.on("connection", (socket) => {

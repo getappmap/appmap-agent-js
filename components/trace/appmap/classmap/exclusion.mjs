@@ -1,13 +1,15 @@
-const _Map = Map;
-const _RegExp = RegExp;
+const {
+  Error,
+  Map,
+  RegExp,
+  Array: { from: toArray },
+} = globalThis;
 
-const { from: toArray } = Array;
-
-const cache = new _Map();
+const cache = new Map();
 
 export default (dependencies) => {
   const {
-    util: { assert, generateGet },
+    util: { generateGet },
   } = dependencies;
 
   const getQualifiedName = (entity, parent) => {
@@ -21,12 +23,12 @@ export default (dependencies) => {
       if (parent.type === "class") {
         return `${parent.name}${entity.static ? "#" : "."}${entity.name}`;
       }
-      assert(false, "getName called on invalid parent entity");
+      throw new Error("getName called on invalid parent entity");
     }
-    assert(false, "getName called on invalid entity");
+    throw new Error("getName called on invalid entity");
   };
-  const criteria = new _Map([
-    ["name", (pattern, { name }, parent) => cache.get(pattern)(name)],
+  const criteria = new Map([
+    ["name", (pattern, { name }, _parent) => cache.get(pattern)(name)],
     [
       "qualified-name",
       (pattern, entity, parent) =>
@@ -34,12 +36,12 @@ export default (dependencies) => {
     ],
     [
       "some-label",
-      (pattern, { type, labels }, parent) =>
+      (pattern, { type, labels }, _parent) =>
         type !== "function" || labels.some(cache.get(pattern)),
     ],
     [
       "every-label",
-      (pattern, { type, labels }, parent) =>
+      (pattern, { type, labels }, _parent) =>
         type !== "function" || labels.every(cache.get(pattern)),
     ],
   ]);
@@ -50,7 +52,7 @@ export default (dependencies) => {
         const pattern = exclusion[name];
         if (typeof pattern === "string") {
           if (!cache.has(pattern)) {
-            const regexp = new _RegExp(pattern, "u");
+            const regexp = new RegExp(pattern, "u");
             cache.set(pattern, (target) => regexp.test(target));
           }
         }
@@ -66,7 +68,7 @@ export default (dependencies) => {
         if (typeof pattern === "string") {
           return criteria.get(name)(pattern, entity, parent);
         }
-        assert(false, "invalid pattern type");
+        throw new Error("invalid pattern type");
       };
       if (exclusion.combinator === "and") {
         return criteria_name_array.every(isCriterionSatisfied);
@@ -74,7 +76,7 @@ export default (dependencies) => {
       if (exclusion.combinator === "or") {
         return criteria_name_array.some(isCriterionSatisfied);
       }
-      assert(false, "invalid exclusion combinator");
+      throw new Error("invalid exclusion combinator");
     },
     isExcluded: generateGet("excluded"),
     isRecursivelyExclued: generateGet("recursive"),

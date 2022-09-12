@@ -1,13 +1,12 @@
-const global_document = document;
+const { document } = globalThis;
 
-export default (dependencies) => {
-  return {
-    runScript: (script, url) => {
-      const element = global_document.createElement("script");
-      element.type = "text/javascript";
-      element.text = script;
-      // element.src = url;
-      global_document.body.appendChild(element);
-    },
-  };
-};
+export default (_dependencies) => ({
+  runScript: (script, _url) => {
+    const element = document.createElement("script");
+    element.type = "text/javascript";
+    element.text = script;
+    // TODO find out how to attach url to script element
+    // element.src = url;
+    document.body.appendChild(element);
+  },
+});

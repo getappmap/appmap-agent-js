@@ -1,9 +1,11 @@
 import Require from "./require.mjs";
 
-const { isArray } = Array;
-const { assign } = Object;
-const { apply } = Reflect;
-const _TypeError = TypeError;
+const {
+  Array: { isArray },
+  Object: { assign },
+  Reflect: { apply },
+  TypeError,
+} = globalThis;
 
 const throwIfNotNull = (error) => {
   /* c8 ignore start */
@@ -30,22 +32,6 @@ const extractEach = (args) => {
   return each;
 };
 
-const normalizeDatabaseArguments = (args) => {
-  if (args.length === 0) {
-    throw new _TypeError("missing sql query string");
-  }
-  const sql = args[0];
-  if (typeof sql !== "string") {
-    throw new _TypeError("first argument is expected to be a sql query string");
-  }
-  for (let index = 1; index < args.length; index += 1) {
-    args[index - 1] = args[index];
-  }
-  args.length -= 1;
-  const { parameters, callback } = normalizeStatementArguments(args);
-  return { sql, parameters, callback };
-};
-
 const normalizeStatementArguments = (args) => {
   if (args.length === 0 || typeof args[args.length - 1] !== "function") {
     args[args.length] = throwIfNotNull;
@@ -67,6 +53,22 @@ const normalizeStatementArguments = (args) => {
     parameters,
     callback,
   };
+};
+
+const normalizeDatabaseArguments = (args) => {
+  if (args.length === 0) {
+    throw new TypeError("missing sql query string");
+  }
+  const sql = args[0];
+  if (typeof sql !== "string") {
+    throw new TypeError("first argument is expected to be a sql query string");
+  }
+  for (let index = 1; index < args.length; index += 1) {
+    args[index - 1] = args[index];
+  }
+  args.length -= 1;
+  const { parameters, callback } = normalizeStatementArguments(args);
+  return { sql, parameters, callback };
 };
 
 const combine = (parameters1, parameters2) => {

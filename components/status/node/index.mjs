@@ -4,6 +4,8 @@ import { createRequire } from "module";
 import semver from "semver";
 import { schema } from "../../../dist/schema.mjs";
 
+const { Promise, process, JSON } = globalThis;
+
 /* c8 ignore start */
 export const externals = {
   lsPackage(root, pkg) {
@@ -20,7 +22,7 @@ export const externals = {
     }
   },
 
-  async showResults(s) {
+  showResults(s) {
     return new Promise((resolve, reject) => {
       process.stdout.write(s, (error) => {
         if (error) {
@@ -42,7 +44,7 @@ export const externals = {
 };
 /* c8 ignore stop */
 
-export default (dependencies) => {
+export default (_dependencies) => {
   const run = (root) => {
     const errors = [];
 

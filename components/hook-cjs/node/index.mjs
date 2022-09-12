@@ -1,7 +1,10 @@
 import Module from "module";
 import { pathToFileURL } from "url";
 
-const { apply } = Reflect;
+const {
+  Reflect: { apply },
+} = globalThis;
+
 const { prototype } = Module;
 
 export default (dependencies) => {
@@ -13,7 +16,7 @@ export default (dependencies) => {
     unhook: (backup) => {
       backup.forEach(assignProperty);
     },
-    hook: (agent, { hooks: { cjs }, repository: { directory } }) => {
+    hook: (agent, { hooks: { cjs } }) => {
       if (!cjs) {
         return [];
       }

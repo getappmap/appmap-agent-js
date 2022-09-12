@@ -4,7 +4,7 @@ export default (dependencies) => {
     expect: { expect },
   } = dependencies;
   return {
-    hook: (agent, { ordering }) => {
+    hook: (_agent, { ordering }) => {
       expect(
         ordering !== "causal",
         "expected configuration to disable group re-ordering",

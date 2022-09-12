@@ -2,6 +2,8 @@ import { assertEqual, assertThrow } from "../../__fixture__.mjs";
 import { buildTestDependenciesAsync } from "../../build.mjs";
 import Validation from "./index.mjs";
 
+const { undefined } = globalThis;
+
 const { validateExternalConfiguration } = Validation(
   await buildTestDependenciesAsync(import.meta.url),
 );

@@ -1,4 +1,4 @@
-const _Map = Map;
+const { Map } = globalThis;
 
 export default (dependencies) => {
   const {
@@ -11,8 +11,8 @@ export default (dependencies) => {
     createBackend: (configuration) => ({
       configuration,
       sources: [],
-      tracks: new _Map(),
-      traces: new _Map(),
+      tracks: new Map(),
+      traces: new Map(),
     }),
     getBackendTrackIterator: ({ tracks }) => tracks.keys(),
     getBackendTraceIterator: ({ traces }) => traces.keys(),

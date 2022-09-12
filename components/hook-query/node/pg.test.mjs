@@ -14,9 +14,19 @@ import {
   buildTestComponentAsync,
 } from "../../build.mjs";
 
+const {
+  Reflect: { getOwnPropertyDescriptor },
+  process,
+  Promise,
+  undefined,
+  String,
+  setTimeout,
+  URL,
+} = globalThis;
+
 // TODO investigate why this fails on travis.
 
-if (Reflect.getOwnPropertyDescriptor(process.env, "TRAVIS") !== undefined) {
+if (getOwnPropertyDescriptor(process.env, "TRAVIS") !== undefined) {
   process.exit(0);
 }
 
@@ -47,8 +57,8 @@ const proceedAsync = async () => {
       async () => {
         const client = new Client({
           host: "localhost",
-          port: port,
-          user: user,
+          port,
+          user,
           database: "postgres",
         });
         try {
@@ -160,63 +170,62 @@ const proceedAsync = async () => {
   );
 
   // invalid sql //
-  {
-    assertDeepEqual(
-      (
-        await testCaseAsync(true, async (client) => {
-          const query = new Query("INVALID SQL;");
-          const promise = new Promise((resolve) => {
-            query.on("error", resolve);
-          });
-          client.query(query);
-          const { message } = await promise;
-          assertMatch(message, /^syntax error/);
-        })
-      )[1],
-      {
-        type: "event",
-        site: "before",
-        tab: 2,
-        group: 0,
-        time: 0,
-        payload: {
-          type: "query",
-          database: "postgres",
-          version: null,
-          sql: "INVALID SQL;",
-          parameters: {},
-        },
+  assertDeepEqual(
+    (
+      await testCaseAsync(true, async (client) => {
+        const query = new Query("INVALID SQL;");
+        const promise = new Promise((resolve) => {
+          query.on("error", resolve);
+        });
+        client.query(query);
+        const { message } = await promise;
+        assertMatch(message, /^syntax error/u);
+      })
+    )[1],
+    {
+      type: "event",
+      site: "before",
+      tab: 2,
+      group: 0,
+      time: 0,
+      payload: {
+        type: "query",
+        database: "postgres",
+        version: null,
+        sql: "INVALID SQL;",
+        parameters: {},
       },
-    );
-    assertDeepEqual(
-      (
-        await testCaseAsync(true, async (client) => {
-          try {
-            await client.query("INVALID SQL;");
-          } catch ({ message }) {
-            assertMatch(message, /^syntax error/);
-          }
-        })
-      )[1],
-      {
-        type: "event",
-        site: "before",
-        tab: 2,
-        group: 0,
-        time: 0,
-        payload: {
-          type: "query",
-          database: "postgres",
-          version: null,
-          sql: "INVALID SQL;",
-          parameters: {},
-        },
+    },
+  );
+
+  assertDeepEqual(
+    (
+      await testCaseAsync(true, async (client) => {
+        try {
+          await client.query("INVALID SQL;");
+        } catch ({ message }) {
+          assertMatch(message, /^syntax error/u);
+        }
+      })
+    )[1],
+    {
+      type: "event",
+      site: "before",
+      tab: 2,
+      group: 0,
+      time: 0,
+      payload: {
+        type: "query",
+        database: "postgres",
+        version: null,
+        sql: "INVALID SQL;",
+        parameters: {},
       },
-    );
-  }
+    },
+  );
 };
 
-if (Reflect.getOwnPropertyDescriptor(process.env, "TRAVIS")) {
+if (getOwnPropertyDescriptor(process.env, "TRAVIS")) {
   proceedAsync();
 } else {
   assertDeepEqual(

@@ -1,7 +1,9 @@
 import { toString, toInteger } from "./convert.mjs";
 
-const { isArray, from: toArray } = Array;
-const { fromEntries, entries: toEntries } = Object;
+const {
+  Array: { isArray, from: toArray },
+  Object: { fromEntries, entries: toEntries },
+} = globalThis;
 
 export default (dependencies) => {
   const {

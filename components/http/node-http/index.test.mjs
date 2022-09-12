@@ -10,6 +10,8 @@ import {
 import { buildTestDependenciesAsync } from "../../build.mjs";
 import Request from "./index.mjs";
 
+const { Promise } = globalThis;
+
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
 
 const { generateRespond, requestAsync } = Request(dependencies);
@@ -29,7 +31,7 @@ const closeServerAsync = (server) =>
 // General //
 {
   const server = createServer(
-    generateRespond(async (method, path, body) => ({
+    generateRespond((method, path, body) => ({
       code: 200,
       message: "ok",
       body: { method, path, body },
@@ -60,7 +62,7 @@ const closeServerAsync = (server) =>
 // Unix Domain Socket + Null Body //
 {
   const server = createServer(
-    generateRespond(async (method, path, body) => ({
+    generateRespond((_method, _path, _body) => ({
       code: 200,
       message: "OK",
       body: null,
@@ -103,7 +105,7 @@ const closeServerAsync = (server) =>
 // Invalid Request Headers //
 {
   const server = createServer(
-    generateRespond(async (method, path, body) => {
+    generateRespond((_method, _path, _body) => {
       assert(false);
     }),
   );

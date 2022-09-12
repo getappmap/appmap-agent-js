@@ -1,9 +1,12 @@
 /* eslint-disable no-undef */
+
 import { strict as assert } from "assert";
 import * as sinon from "sinon";
 import { buildTestDependenciesAsync } from "../../build.mjs";
 
 import Status, { externals } from "./index.mjs";
+
+const { Object, JSON, process, RegExp, undefined } = globalThis;
 
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
 const { main, run } = Status(dependencies);
@@ -48,7 +51,7 @@ describe("the status command", () => {
       assert.equal(result.errors[0].level, "error");
       assert.match(
         result.errors[0].message,
-        new RegExp(`Unsupported node version ${node_version}`),
+        new RegExp(`Unsupported node version ${node_version}`, "u"),
       );
     });
 

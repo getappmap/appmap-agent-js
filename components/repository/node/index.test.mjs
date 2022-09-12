@@ -12,6 +12,8 @@ import {
 import { buildTestDependenciesAsync } from "../../build.mjs";
 import Repository from "./index.mjs";
 
+const { URL } = globalThis;
+
 const { extractRepositoryPackage, extractRepositoryDependency } = Repository(
   await buildTestDependenciesAsync(import.meta.url),
 );

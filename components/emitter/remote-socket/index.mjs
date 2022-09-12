@@ -1,4 +1,6 @@
-const { stringify: stringifyJSON } = JSON;
+const {
+  JSON: { stringify: stringifyJSON },
+} = globalThis;
 
 export default (dependencies) => {
   const {
@@ -11,7 +13,7 @@ export default (dependencies) => {
   return {
     openEmitter: (configuration) => {
       let {
-        host: host,
+        host,
         "trace-port": trace_port,
         "track-port": track_port,
         session,

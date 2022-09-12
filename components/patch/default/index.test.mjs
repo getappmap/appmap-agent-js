@@ -2,7 +2,10 @@ import { assertEqual } from "../../__fixture__.mjs";
 import { buildTestDependenciesAsync } from "../../build.mjs";
 import Patch from "./index.mjs";
 
-const { defineProperty } = Reflect;
+const {
+  Reflect: { defineProperty },
+  undefined,
+} = globalThis;
 
 const { patch } = Patch(await buildTestDependenciesAsync(import.meta.url));
 

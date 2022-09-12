@@ -5,6 +5,8 @@ import {
 } from "../../build.mjs";
 import Configuration from "./index.mjs";
 
+const { undefined } = globalThis;
+
 const { validateInternalConfiguration } = await buildTestComponentAsync(
   "validate",
 );

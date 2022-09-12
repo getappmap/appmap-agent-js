@@ -10,6 +10,8 @@ import { fileURLToPath } from "url";
 import { expect } from "./expect.mjs";
 import { loadConfAsync } from "./conf.mjs";
 
+const { Object, Map } = globalThis;
+
 const __filname = fileURLToPath(import.meta.url);
 const __dirname = getDirectory(__filname);
 const { entries: toEntries } = Object;
@@ -77,7 +79,9 @@ const visitComponentAsync = async (component, context) => {
     );
     cache.set(
       component,
+      /* eslint-disable no-use-before-define */
       Component(await visitComponentsAsync(dependencies, context)),
+      /* eslint-enable no-use-before-define */
     );
   }
   return cache.get(component);

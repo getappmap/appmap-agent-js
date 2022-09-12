@@ -10,6 +10,12 @@ import {
 import RecorderCLI from "./index.mjs";
 
 const {
+  Object: { assign },
+  Error,
+  process,
+} = globalThis;
+
+const {
   createRecorder,
   generateRequestAsync,
   recordStartTrack,
@@ -20,7 +26,7 @@ const { createConfiguration, extendConfiguration } =
   await buildTestComponentAsync("configuration");
 
 const mock_process = new EventEmitter();
-Object.assign(mock_process, {
+assign(mock_process, {
   pid: process.pid,
   cwd: process.cwd,
   argv: process.argv,

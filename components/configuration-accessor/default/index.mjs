@@ -1,7 +1,10 @@
-const _URL = URL;
-const _RegExp = RegExp;
-const { entries: toEntries } = Object;
-const { stringify: stringifyJSON } = JSON;
+const {
+  Error,
+  URL,
+  RegExp,
+  Object: { entries: toEntries },
+  JSON: { stringify: stringifyJSON },
+} = globalThis;
 
 export default (dependencies) => {
   const {
@@ -26,20 +29,21 @@ export default (dependencies) => {
       }
     }
     /* c8 ignore start */
-    assert(false, "missing matching specifier");
+    throw new Error("missing matching specifier");
     /* c8 ignore stop */
   };
 
+  const escapeShell = (token) => token.replace(/[^a-zA-Z0-9\-_./:@]/gu, "\\$&");
+
   /* c8 ignore start */
+  const escapeCmdExe = (token) =>
+    token.replace(/[^a-zA-Z0-9\-_./:@\\]/gu, "^$&");
   const generateEscape = (shell) =>
     shell.endsWith("cmd") || shell.endsWith("cmd.exe")
       ? escapeCmdExe
       : escapeShell;
-  const escapeCmdExe = (token) =>
-    token.replace(/[^a-zA-Z0-9\-_./:@\\]/gu, "^$&");
   /* c8 ignore stop */
 
-  const escapeShell = (token) => token.replace(/[^a-zA-Z0-9\-_./:@]/gu, "\\$&");
   const generateCommand = (shell, tokens) =>
     tokens.map(generateEscape(shell)).join(" ");
 
@@ -163,7 +167,7 @@ export default (dependencies) => {
     getConfigurationScenarios: (configuration) => {
       const { scenarios, scenario } = configuration;
       const regexp = expectSuccess(
-        () => new _RegExp(scenario, "u"),
+        () => new RegExp(scenario, "u"),
         "Scenario configuration field is not a valid regexp: %j >> %O",
         scenario,
       );
@@ -273,7 +277,7 @@ export default (dependencies) => {
         argv: [...flags, command],
         options: {
           ...options,
-          cwd: new _URL(base),
+          cwd: new URL(base),
           env,
         },
       };

@@ -4,7 +4,11 @@ import { assertDeepEqual } from "../../__fixture__.mjs";
 import { buildTestDependenciesAsync } from "../../build.mjs";
 import Spawn from "./index.mjs";
 
-global.GLOBAL_SPY_SPAWN = (exec, argv, options) => ({ exec, argv, options });
+globalThis.GLOBAL_SPY_SPAWN = (exec, argv, options) => ({
+  exec,
+  argv,
+  options,
+});
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
 const { spawn } = Spawn(dependencies);
 assertDeepEqual(spawn("exec", ["argv0"], {}), {

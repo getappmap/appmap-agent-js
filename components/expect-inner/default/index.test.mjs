@@ -2,6 +2,8 @@ import { assertEqual, assertThrow, assertFail } from "../../__fixture__.mjs";
 import { buildTestDependenciesAsync } from "../../build.mjs";
 import Expect from "./index.mjs";
 
+const { Error, undefined, Promise } = globalThis;
+
 const {
   expect,
   expectDeadcode,
@@ -12,11 +14,11 @@ const {
 
 assertEqual(expect(true, "%s", "foo"), undefined);
 
-assertThrow(() => expect(false, "%s", "foo"), /^AppmapError: foo/);
+assertThrow(() => expect(false, "%s", "foo"), /^AppmapError: foo/u);
 
 assertThrow(
   () => expectDeadcode("%s %s", "foo")("bar"),
-  /^AppmapError: foo bar/,
+  /^AppmapError: foo bar/u,
 );
 
 try {

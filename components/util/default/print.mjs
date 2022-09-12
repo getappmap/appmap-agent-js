@@ -1,13 +1,16 @@
-const _String = String;
-const _undefined = undefined;
-const { stringify } = JSON;
-const { apply } = Reflect;
-const { prototype } = Object;
-const { toString } = prototype;
+const {
+  String,
+  undefined,
+  JSON: { stringify: stringifyJSON },
+  Reflect: { apply },
+  Object: {
+    prototype: { toString },
+  },
+} = globalThis;
 
 export const print = (any) => {
   if (typeof any === "string") {
-    return stringify(any);
+    return stringifyJSON(any);
   }
   if (
     typeof any === "boolean" ||
@@ -15,9 +18,9 @@ export const print = (any) => {
     typeof any === "number" ||
     typeof any === "symbol" ||
     any === null ||
-    any === _undefined
+    any === undefined
   ) {
-    return _String(any);
+    return String(any);
   }
   return apply(toString, any, []);
 };

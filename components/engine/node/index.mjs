@@ -1,7 +1,7 @@
-const { version } = process;
+const {
+  process: { version },
+} = globalThis;
 
-export default (dependencies) => {
-  return {
-    getEngine: () => `node@${version}`,
-  };
-};
+export default (_dependencies) => ({
+  getEngine: () => `node@${version}`,
+});

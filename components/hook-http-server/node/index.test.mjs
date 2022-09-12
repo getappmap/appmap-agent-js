@@ -11,6 +11,13 @@ import {
 } from "../../build.mjs";
 import HookHttpServer from "./index.mjs";
 
+const {
+  Promise,
+  Buffer,
+  JSON: { stringify: stringifyJSON, parse: parseJSON },
+  String,
+} = globalThis;
+
 const { get } = Http;
 
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
@@ -29,7 +36,7 @@ const listenAsync = (server, port) =>
 const promiseCycleClosing = async (request, response) =>
   await Promise.all([
     new Promise((resolve) => {
-      response.on("close", resolve);
+      request.on("close", resolve);
     }),
     new Promise((resolve) => {
       response.on("close", resolve);
@@ -125,7 +132,7 @@ assertDeepEqual(
           res.setHeader("content-type", "application/json; charset=utf-8");
           req.on("data", () => {});
           req.on("end", () => {
-            res.send(JSON.stringify(req.params));
+            res.send(stringifyJSON(req.params));
           });
         });
         server.on("request", app);
@@ -146,7 +153,7 @@ assertDeepEqual(
           body += data.toString("utf8");
         });
         await promiseCycleClosing(request, response);
-        assertDeepEqual(JSON.parse(body), {
+        assertDeepEqual(parseJSON(body), {
           0: "foo",
           param1: "bar",
           param2: "qux",

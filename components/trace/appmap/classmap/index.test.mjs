@@ -5,6 +5,8 @@ import {
 } from "../../../build.mjs";
 import Classmap from "./index.mjs";
 
+const { Set } = globalThis;
+
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
 const { stringifyLocation, makeLocation } = await buildTestComponentAsync(
   "location",

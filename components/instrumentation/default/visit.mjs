@@ -1,7 +1,9 @@
-const _String = String;
-const { isArray } = Array;
-const { fromEntries } = Object;
-const { ownKeys } = Reflect;
+const {
+  String,
+  Array: { isArray },
+  Object: { fromEntries },
+  Reflect: { ownKeys },
+} = globalThis;
 
 //////////////////////////////
 // Difficulties with groups //
@@ -240,13 +242,51 @@ export default (dependencies) => {
     location: { stringifyLocation, getLocationFileURL },
   } = dependencies;
 
-  const isSubclassConstructor = (node, parent, grand_parent) =>
+  const isSubclassConstructor = (_node, parent, grand_parent) =>
     parent.type === "MethodDefinition" &&
     parent.kind === "constructor" &&
     grand_parent.superClass !== null;
 
   const isEstreeKey = (key) =>
     key !== "loc" && key !== "start" && key !== "end";
+
+  /* eslint-disable no-use-before-define */
+  const visit = (node, parent, grand_parent, closure, context) => {
+    if (isArray(node)) {
+      return node.map((node) =>
+        visit(node, parent, grand_parent, closure, context),
+      );
+    } else if (
+      typeof node === "object" &&
+      node !== null &&
+      hasOwnProperty(node, "type")
+    ) {
+      if (hasOwnProperty(instrumenters, node.type)) {
+        const maybe_node = instrumenters[node.type](
+          node,
+          parent,
+          grand_parent,
+          closure,
+          context,
+        );
+        return maybe_node === null
+          ? visitGeneric(node, parent, grand_parent, closure, context)
+          : maybe_node;
+      } else {
+        return visitGeneric(node, parent, grand_parent, closure, context);
+      }
+    } else {
+      return node;
+    }
+  };
+  /* eslint-enable no-use-before-define */
+
+  const visitGeneric = (node, parent, _grand_parent, closure, context) =>
+    fromEntries(
+      ownKeys(node)
+        .filter(isEstreeKey)
+        .map((key) => [key, visit(node[key], node, parent, closure, context)]),
+    );
 
   const instrumentClosure = (node, parent, grand_parent, closure, context) => {
     const location = mapSource(
@@ -279,7 +319,7 @@ export default (dependencies) => {
         ),
         node.params.map((param, index) => {
           const pattern = makeIdentifier(
-            `${context.runtime}_ARGUMENT_${_String(index)}`,
+            `${context.runtime}_ARGUMENT_${String(index)}`,
           );
           return param.type === "RestElement"
             ? makeRestElement(pattern)
@@ -338,9 +378,9 @@ export default (dependencies) => {
                   ? makeRegularMemberExpression(context.runtime, "empty")
                   : makeThisExpression(),
                 makeArrayExpression(
-                  node.params.map((param, index) =>
+                  node.params.map((_param, index) =>
                     makeIdentifier(
-                      `${context.runtime}_ARGUMENT_${_String(index)}`,
+                      `${context.runtime}_ARGUMENT_${String(index)}`,
                     ),
                   ),
                 ),
@@ -373,7 +413,7 @@ export default (dependencies) => {
                               makeBinaryExpression(
                                 "===",
                                 makeIdentifier(
-                                  `${context.runtime}_ARGUMENT_${_String(
+                                  `${context.runtime}_ARGUMENT_${String(
                                     index,
                                   )}`,
                                 ),
@@ -381,7 +421,7 @@ export default (dependencies) => {
                               ),
                               param.right,
                               makeIdentifier(
-                                `${context.runtime}_ARGUMENT_${_String(index)}`,
+                                `${context.runtime}_ARGUMENT_${String(index)}`,
                               ),
                             ),
                           );
@@ -389,7 +429,7 @@ export default (dependencies) => {
                           return makeVariableDeclarator(
                             param,
                             makeIdentifier(
-                              `${context.runtime}_ARGUMENT_${_String(index)}`,
+                              `${context.runtime}_ARGUMENT_${String(index)}`,
                             ),
                           );
                         }
@@ -495,7 +535,7 @@ export default (dependencies) => {
   };
 
   const instrumenters = {
-    AwaitExpression: (node, parent, grand_parent, closure, context) =>
+    AwaitExpression: (node, parent, _grand_parent, closure, context) =>
       closure.instrumented
         ? makeSequenceExpression([
             makeAssignmentExpression(
@@ -534,7 +574,7 @@ export default (dependencies) => {
             makeIdentifier(`${context.runtime}_AWAIT`),
           ])
         : null,
-    YieldExpression: (node, parent, grand_parent, closure, context) =>
+    YieldExpression: (node, parent, _grand_parent, closure, context) =>
       closure.instrumented
         ? makeSequenceExpression([
             makeAssignmentExpression(
@@ -567,7 +607,7 @@ export default (dependencies) => {
             makeUnaryExpression("void", makeLiteral(0)),
           ])
         : null,
-    ReturnStatement: (node, parent, grand_parent, closure, context) =>
+    ReturnStatement: (node, parent, _grand_parent, closure, context) =>
       closure.instrumented && node.argument !== null
         ? makeReturnStatement(
             makeAssignmentExpression(
@@ -576,7 +616,7 @@ export default (dependencies) => {
             ),
           )
         : null,
-    CallExpression: (node, parent, grand_parent, closure, context) => {
+    CallExpression: (node, parent, _grand_parent, closure, context) => {
       if (
         node.callee.type === "Identifier" &&
         context.evals.includes(node.callee.name) &&
@@ -599,7 +639,7 @@ export default (dependencies) => {
             makeLiteral(
               appendURLSegment(
                 fromMaybe(location, context.url, getLocationFileURL),
-                `eval-${_String(incrementCounter(context.counter))}`,
+                `eval-${String(incrementCounter(context.counter))}`,
               ),
             ),
             visit(node.arguments[0], node, parent, closure, context),
@@ -612,7 +652,7 @@ export default (dependencies) => {
         return null;
       }
     },
-    TryStatement: (node, parent, grand_parent, closure, context) => {
+    TryStatement: (node, parent, _grand_parent, closure, context) => {
       if (
         closure.instrumented &&
         ((closure.node.type === "Program" &&
@@ -689,7 +729,7 @@ export default (dependencies) => {
         return null;
       }
     },
-    Identifier: (node, parent, grand_parent, closure, context) => {
+    Identifier: (node, _parent, _grand_parent, _closure, context) => {
       expect(
         !node.name.startsWith(context.runtime),
         "Identifier collision detected at %j line %j column %j >> identifier should not start with %j, got: %j",
@@ -701,7 +741,7 @@ export default (dependencies) => {
       );
       return null;
     },
-    Program: (node, parent, grand_parent, closure, context) =>
+    Program: (node, parent, _grand_parent, closure, context) =>
       closure.instrumented && node.sourceType === "module"
         ? makeProgram("module", [
             makeVariableDeclaration("let", [
@@ -729,42 +769,6 @@ export default (dependencies) => {
     FunctionExpression: instrumentClosure,
     FunctionDeclaration: instrumentClosure,
     ArrowFunctionExpression: instrumentClosure,
-  };
-
-  const visitGeneric = (node, parent, grand_parent, closure, context) =>
-    fromEntries(
-      ownKeys(node)
-        .filter(isEstreeKey)
-        .map((key) => [key, visit(node[key], node, parent, closure, context)]),
-    );
-
-  const visit = (node, parent, grand_parent, closure, context) => {
-    if (isArray(node)) {
-      return node.map((node) =>
-        visit(node, parent, grand_parent, closure, context),
-      );
-    } else if (
-      typeof node === "object" &&
-      node !== null &&
-      hasOwnProperty(node, "type")
-    ) {
-      if (hasOwnProperty(instrumenters, node.type)) {
-        const maybe_node = instrumenters[node.type](
-          node,
-          parent,
-          grand_parent,
-          closure,
-          context,
-        );
-        return maybe_node === null
-          ? visitGeneric(node, parent, grand_parent, closure, context)
-          : maybe_node;
-      } else {
-        return visitGeneric(node, parent, grand_parent, closure, context);
-      }
-    } else {
-      return node;
-    }
   };
 
   const initial_parent = { type: "File" };

@@ -12,7 +12,7 @@ const {
 
 const { stdout } = process;
 
-const requestAsync = (host, port, method, path, body) =>
+const requestAsync = (_host, port, method, path, body) =>
   new Promise((resolve, reject) => {
     const content =
       body === null ? "" : Buffer.from(JSON.stringify(body), "utf8");
@@ -109,7 +109,7 @@ const testAsync = async (port_key, port, main) => {
         throw error;
       });
     },
-    async (directory) => {},
+    async (_directory) => {},
   );
 };
 

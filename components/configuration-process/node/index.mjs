@@ -2,12 +2,15 @@ import minimist from "minimist";
 import { readFileSync } from "fs";
 import YAML from "yaml";
 
-const _URL = URL;
-const _Map = Map;
+const {
+  URL,
+  Map,
+  JSON: { parse: parseJSON },
+  Reflect: { ownKeys },
+  Array: { isArray },
+} = globalThis;
+
 const { parse: parseYAML } = YAML;
-const { parse: parseJSON } = JSON;
-const { ownKeys } = Reflect;
-const { isArray } = Array;
 
 export default (dependencies) => {
   const {
@@ -17,7 +20,7 @@ export default (dependencies) => {
     configuration: { createConfiguration, extendConfiguration },
   } = dependencies;
 
-  const parsers = new _Map([
+  const parsers = new Map([
     ["json", parseJSON],
     ["yml", parseYAML],
     ["yaml", parseYAML],
@@ -38,7 +41,7 @@ export default (dependencies) => {
     const parse = parsers.get(extension);
     let content = null;
     try {
-      content = readFileSync(new _URL(url), "utf8");
+      content = readFileSync(new URL(url), "utf8");
     } catch (error) {
       const { code } = error;
       expect(
@@ -56,7 +59,7 @@ export default (dependencies) => {
     );
   };
 
-  const aliases = new _Map([
+  const aliases = new Map([
     ["appmap-dir", "appmap_dir"],
     ["app-port", "intercept-track-port"],
     ["alt-remote-port", "track-port"],
@@ -66,7 +69,7 @@ export default (dependencies) => {
 
   const wrapArray = (value) => (isArray(value) ? value : [value]);
 
-  const transformers = new _Map([
+  const transformers = new Map([
     ["packages", wrapArray],
     ["processes", wrapArray],
   ]);
@@ -87,7 +90,7 @@ export default (dependencies) => {
   };
 
   const extractConfig = (argv) => {
-    let { _: positional, ...config } = minimist(argv.slice(2));
+    const { _: positional, ...config } = minimist(argv.slice(2));
 
     if (positional.length > 0) {
       expect(

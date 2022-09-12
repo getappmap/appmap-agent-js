@@ -6,7 +6,11 @@
 
 import Matching from "./matching.mjs";
 
-const { from: toArray } = Array;
+const {
+  Array: { from: toArray },
+  Error,
+  Map,
+} = globalThis;
 
 export default (dependencies) => {
   const {
@@ -109,7 +113,9 @@ export default (dependencies) => {
   };
 
   const joinJump = (frames, jumps) => {
+    /* eslint-disable no-use-before-define */
     const mapBeginFrame = (frame) => manufactureBundleNode(mapFrame(frame));
+    /* eslint-enable no-use-before-define */
     const orphans = new Map();
     const mapFrame = (frame) => {
       const open = frame.enter;

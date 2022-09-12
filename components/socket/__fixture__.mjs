@@ -2,6 +2,8 @@ import { createServer as createTCPServer } from "net";
 import { convertPort } from "../__fixture__.mjs";
 import NetSocketMessaging from "net-socket-messaging";
 
+const { Promise } = globalThis;
+
 const { patch: patchSocket } = NetSocketMessaging;
 
 export const testAsync = async (port, runAsync) => {

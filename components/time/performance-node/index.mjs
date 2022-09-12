@@ -1,10 +1,11 @@
 import { performance } from "perf_hooks";
 
-const { now } = performance;
-const { round } = Math;
+const {
+  Math: { round },
+} = globalThis;
 
-export default (dependencies) => {
-  return {
-    now: () => round(1000 * now()) / 1000,
-  };
-};
+const { now } = performance;
+
+export default (_dependencies) => ({
+  now: () => round(1000 * now()) / 1000,
+});

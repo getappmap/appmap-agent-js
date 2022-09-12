@@ -9,7 +9,7 @@ const { openSocket, closeSocket, sendSocket } = SpySocket(
 const socket = openSocket("host", "port", {});
 sendSocket(socket, "message");
 closeSocket(socket);
-assertDeepEqual(global.SOCKET_TRACE, [
+assertDeepEqual(globalThis.SOCKET_TRACE, [
   { type: "open", host: "host", port: "port" },
   { type: "send", socket: "socket", message: "message" },
   { type: "close", socket: "socket" },

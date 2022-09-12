@@ -7,6 +7,12 @@ import {
 } from "../../build.mjs";
 import Receptor from "./index.mjs";
 
+const {
+  Promise,
+  JSON: { stringify: stringifyJSON },
+  setTimeout,
+} = globalThis;
+
 const { createMessage } = NetSocketMessaging;
 
 const { requestAsync } = await buildTestComponentAsync("http");
@@ -74,7 +80,7 @@ await assertRequestAsync("GET", "/_appmap/track", null, {
   socket.write(createMessage("session"));
   socket.write(
     createMessage(
-      JSON.stringify(
+      stringifyJSON(
         extendConfiguration(configuration, { recorder: "process" }, null),
       ),
     ),
@@ -95,7 +101,7 @@ await assertRequestAsync("GET", "/_appmap/track", null, {
   socket.write(createMessage("session"));
   socket.write(
     createMessage(
-      JSON.stringify(
+      stringifyJSON(
         extendConfiguration(configuration, { recorder: "remote" }, null),
       ),
     ),
@@ -151,7 +157,7 @@ await assertRequestAsync("GET", "/_appmap/track", null, {
   );
   socket.write(
     createMessage(
-      JSON.stringify({
+      stringifyJSON({
         type: "start",
         track: "track2",
         configuration: {},

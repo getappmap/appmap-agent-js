@@ -1,10 +1,13 @@
-// This is necessary to avoid infinite recursion when http-hook is true
+// This namespace import is necessary to avoid infinite recursion when http-hook is true
 import * as Http from "http";
 const { Agent, request: connect } = Http;
 
-const _Error = Error;
-const _String = String;
-const { stringify } = JSON;
+const {
+  Error,
+  String,
+  JSON: { stringify: stringifyJSON },
+  Promise,
+} = globalThis;
 
 export default (dependencies) => {
   const {
@@ -49,27 +52,9 @@ export default (dependencies) => {
 
   /* c8 ignore stop */
 
-  function onRequestResponse(response) {
+  function onResponseData(_data) {
     const { _appmap_client: client } = this;
-    const { statusCode: status } = response;
-    response._appmap_client = client;
-    if (status !== 200) {
-      rejectClientTermination(
-        client,
-        new _Error(`http1 echec status code: ${_String(status)}`),
-      );
-    }
-    response.on("error", onResponseError);
-    response.on("data", onResponseData);
-    response.on("end", onResponseEnd);
-  }
-
-  function onResponseData(data) {
-    const { _appmap_client: client } = this;
-    rejectClientTermination(
-      client,
-      new _Error("non empty http1 response body"),
-    );
+    rejectClientTermination(client, new Error("non empty http1 response body"));
   }
 
   function onResponseEnd() {
@@ -77,6 +62,21 @@ export default (dependencies) => {
     const { pending } = client;
     decrementCounter(pending);
     resolveClientTermination(client);
+  }
+
+  function onRequestResponse(response) {
+    const { _appmap_client: client } = this;
+    const { statusCode: status } = response;
+    response._appmap_client = client;
+    if (status !== 200) {
+      rejectClientTermination(
+        client,
+        new Error(`http1 status code: ${String(status)}`),
+      );
+    }
+    response.on("error", onResponseError);
+    response.on("data", onResponseData);
+    response.on("end", onResponseEnd);
   }
 
   return {
@@ -119,7 +119,7 @@ export default (dependencies) => {
         request._appmap_client = client;
         request.on("error", onRequestError);
         request.on("response", onRequestResponse);
-        request.end(stringify({ head, body: data }), "utf8");
+        request.end(stringifyJSON({ head, body: data }), "utf8");
       }
     },
   };

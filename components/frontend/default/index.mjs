@@ -44,11 +44,7 @@ export default (dependencies) => {
       getSerializationEmptyValue(serialization),
     getInstrumentationIdentifier: ({ instrumentation }) =>
       getInstrumentationIdentifier(instrumentation),
-    instrument: (
-      { instrumentation, session },
-      script_file,
-      source_map_file,
-    ) => {
+    instrument: ({ instrumentation }, script_file, source_map_file) => {
       const { url, content, sources } = instrument(
         instrumentation,
         script_file,

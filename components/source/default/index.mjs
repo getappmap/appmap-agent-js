@@ -1,5 +1,7 @@
-const { parse: parseJSON } = JSON;
-const _URL = URL;
+const {
+  JSON: { parse: parseJSON },
+  URL,
+} = globalThis;
 
 export default (dependencies) => {
   const {
@@ -25,11 +27,11 @@ export default (dependencies) => {
       );
       return `file://${relative_url}`;
     }
-    const url_object = new _URL(url);
+    const url_object = new URL(url);
     // The source map spec https://sourcemaps.info/spec.html
     // Does not mention absolute windows paths in map.sources.
     // But typescript generate them in it with forward slashes.
-    if (relative_url[0] === "/" || /^[a-zA-Z]:/.test(relative_url)) {
+    if (relative_url[0] === "/" || /^[a-zA-Z]:/u.test(relative_url)) {
       url_object.pathname = relative_url;
     } else {
       const { pathname } = url_object;
@@ -52,7 +54,7 @@ export default (dependencies) => {
       sources: sources.map((relative_url) =>
         normalizeURL(url, `${prefix === null ? "" : prefix}${relative_url}`),
       ),
-      sourcesContent: sources.map((url, index) =>
+      sourcesContent: sources.map((_url, index) =>
         coalesce(contents, index, null),
       ),
     };
@@ -67,9 +69,11 @@ export default (dependencies) => {
       return normalizeURL(url, parts[1]);
     },
 
-    createMirrorSourceMap: ({ url, content }) => {
-      return { mirrored: true, url, content };
-    },
+    createMirrorSourceMap: ({ url, content }) => ({
+      mirrored: true,
+      url,
+      content,
+    }),
 
     createSourceMap: ({ url, content }) => {
       const payload = normalizePayload(

@@ -1,4 +1,5 @@
 /* globals APPMAP_ESM_HOOK */
+/* eslint local/no-globals: ["error", "APPMAP_ESM_HOOK"] */
 
 // TODO: detect if preloaded with `--experimental-loader`
 // NB: since 15.x we can use module.preloading

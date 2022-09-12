@@ -4,12 +4,14 @@ import klaw from "klaw-sync";
 import { basename as getBasename, join as joinPath } from "path";
 import YAML from "yaml";
 
+const { Promise, process, Set, Array, JSON } = globalThis;
+
 // Glob to match/exclude all the directories we should scan for source files:
 const GLOB = "!(node_modules)/";
 
 /* c8 ignore start */
 export const externals = {
-  async showResults(s) {
+  showResults(s) {
     return new Promise((resolve, reject) => {
       process.stdout.write(s, (error) => {
         if (error) {
@@ -23,7 +25,7 @@ export const externals = {
 };
 /* c8 ignore stop */
 
-export default (dependencies) => {
+export default (_dependencies) => {
   const findDirsWithFiles = (root, pattern) => {
     const paths = new Set();
     const hasMatch = (item) => {

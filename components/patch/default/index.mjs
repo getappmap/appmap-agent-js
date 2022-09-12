@@ -1,6 +1,7 @@
-const { getPrototypeOf, defineProperty, getOwnPropertyDescriptor } = Reflect;
-
-const _undefined = undefined;
+const {
+  Reflect: { getPrototypeOf, defineProperty, getOwnPropertyDescriptor },
+  undefined,
+} = globalThis;
 
 export default (dependencies) => {
   const {
@@ -29,7 +30,7 @@ export default (dependencies) => {
         });
       } else {
         let prototype = getPrototypeOf(object);
-        let existing_value = _undefined;
+        let existing_value = undefined;
         while (prototype !== null) {
           if (hasOwnProperty(prototype, key)) {
             const descriptor = getOwnPropertyDescriptor(prototype, key);

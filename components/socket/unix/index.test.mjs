@@ -10,7 +10,7 @@ if (getPlatform() !== "win32") {
     await buildTestDependenciesAsync(import.meta.url),
   );
 
-  const runAsync = async (port) => {
+  const runAsync = (port) => {
     const socket = openSocket("127.0.0.1", port);
     sendSocket(socket, "message");
     closeSocket(socket);

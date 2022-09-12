@@ -1,4 +1,4 @@
-const _encodeURIComponent = encodeURIComponent;
+const { encodeURIComponent } = globalThis;
 
 export default (dependencies) => {
   const {
@@ -10,7 +10,7 @@ export default (dependencies) => {
     getShell: generateDeadcode(
       "platform.getShell should not be called on browser",
     ),
-    makeSegment: _encodeURIComponent,
+    makeSegment: encodeURIComponent,
     encodeSegment: (segment) => {
       assert(regexp.test(segment), "invalid uri path segment");
       return segment;

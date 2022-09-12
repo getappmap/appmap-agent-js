@@ -1,5 +1,5 @@
-const { now } = Date;
+const {
+  Date: { now },
+} = globalThis;
 
-export default (dependencies) => {
-  return { now };
-};
+export default (_dependencies) => ({ now });

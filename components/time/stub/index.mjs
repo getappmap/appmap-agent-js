@@ -1,5 +1,3 @@
 const now = () => 0;
 
-export default (dependencies) => {
-  return { now };
-};
+export default (_dependencies) => ({ now });

@@ -1,5 +1,5 @@
-import { executionAsyncId as getCurrentGroup } from "async_hooks";
+import { executionAsyncId } from "async_hooks";
 
-export default (dependencies) => {
-  return { getCurrentGroup };
-};
+export default (_dependencies) => ({
+  getCurrentGroup: executionAsyncId,
+});

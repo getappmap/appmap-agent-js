@@ -6,6 +6,11 @@ import {
 } from "../../../../build.mjs";
 import Naming from "./naming.mjs";
 
+const {
+  Reflect: { getOwnPropertyDescriptor },
+  undefined,
+} = globalThis;
+
 const { parse: parseAcorn } = Acorn;
 
 const { createCounter } = await buildTestComponentAsync("util");
@@ -21,7 +26,7 @@ const test = (content, keys, separator = "@") => {
     if (
       typeof node === "object" &&
       node !== null &&
-      Reflect.getOwnPropertyDescriptor(node, "type") !== undefined
+      getOwnPropertyDescriptor(node, "type") !== undefined
     ) {
       parent = child;
       child = node;

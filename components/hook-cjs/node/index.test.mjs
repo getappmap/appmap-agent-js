@@ -13,6 +13,8 @@ import {
 } from "../../build.mjs";
 import Common from "./index.mjs";
 
+const { URL } = globalThis;
+
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
 const { createConfiguration } = await buildTestComponentAsync("configuration");
 const { testHookAsync } = await buildTestComponentAsync("hook-fixture");
@@ -34,7 +36,7 @@ assertDeepEqual(
       },
       url: getTemporaryDirectoryURL(),
     },
-    async () => {
+    () => {
       assertEqual(require(fileURLToPath(url)), 123);
     },
   ),
@@ -56,7 +58,7 @@ assertDeepEqual(
       },
       url: getTemporaryDirectoryURL(),
     },
-    async () => {
+    () => {
       assertEqual(require(fileURLToPath(url)), 123);
     },
   ),

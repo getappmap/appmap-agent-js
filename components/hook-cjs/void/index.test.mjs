@@ -12,7 +12,7 @@ assertDeepEqual(
   await testHookAsync(
     component,
     { configuration: { hooks: { cjs: false } } },
-    async (state) => null,
+    (_state) => null,
   ),
   [],
 );

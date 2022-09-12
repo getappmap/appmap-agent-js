@@ -1,5 +1,4 @@
-const _decodeURIComponent = decodeURIComponent;
-const _URL = URL;
+const { decodeURIComponent, URL } = globalThis;
 
 export default (dependencies) => {
   const {
@@ -9,13 +8,13 @@ export default (dependencies) => {
   const isNotEmptyString = (any) => any !== "";
 
   const getLastURLSegment = (url) => {
-    const { pathname } = new _URL(url);
+    const { pathname } = new URL(url);
     const encoded_segments = pathname.split("/");
     return decodeSegment(encoded_segments[encoded_segments.length - 1]);
   };
 
   const appendURLPathname = (url, pathname) => {
-    const url_object = new _URL(url);
+    const url_object = new URL(url);
     url_object.pathname += `${
       url_object.pathname.endsWith("/") ? "" : "/"
     }${pathname}`;
@@ -23,7 +22,7 @@ export default (dependencies) => {
   };
 
   const setURLPathname = (url, pathname) => {
-    const url_object = new _URL(url);
+    const url_object = new URL(url);
     url_object.pathname = pathname;
     return url_object.toString();
   };
@@ -79,12 +78,12 @@ export default (dependencies) => {
   };
 
   const pathifyURL = (url, base_url, dot_prefix = false) => {
-    const { pathname, protocol, host } = new _URL(url);
+    const { pathname, protocol, host } = new URL(url);
     const {
       pathname: base_pathname,
       protocol: base_protocol,
       host: base_host,
-    } = new _URL(base_url);
+    } = new URL(base_url);
     if (
       protocol !== base_protocol ||
       host !== base_host ||
@@ -98,8 +97,7 @@ export default (dependencies) => {
       while (
         segments.length > 0 &&
         base_segments.length > 0 &&
-        _decodeURIComponent(segments[0]) ===
-          _decodeURIComponent(base_segments[0])
+        decodeURIComponent(segments[0]) === decodeURIComponent(base_segments[0])
       ) {
         segments.shift();
         base_segments.shift();

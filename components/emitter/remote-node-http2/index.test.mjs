@@ -8,6 +8,12 @@ import {
 import { buildTestDependenciesAsync } from "../../build.mjs";
 import Client from "./index.mjs";
 
+const {
+  JSON: { parse: parseJSON },
+  Promise,
+  setTimeout,
+} = globalThis;
+
 const testCaseAsync = async (port, respond, runAsync) => {
   const server = createServer();
   server.on("stream", (stream) => {
@@ -16,7 +22,7 @@ const testCaseAsync = async (port, respond, runAsync) => {
       buffer += data.toString("utf8");
     });
     stream.on("end", () => {
-      respond(JSON.parse(buffer), stream);
+      respond(parseJSON(buffer), stream);
     });
   });
   await new Promise((resolve) => {
@@ -34,7 +40,7 @@ const { createClient, executeClientAsync, interruptClient, traceClient } =
   Client(await buildTestDependenciesAsync(import.meta.url));
 // happy path (unix-domain-socket) //
 {
-  let buffer = [];
+  const buffer = [];
   await testCaseAsync(
     getFreshTemporaryPath(),
     (body, stream) => {
@@ -53,10 +59,10 @@ const { createClient, executeClientAsync, interruptClient, traceClient } =
   );
   assertDeepEqual(buffer, [123]);
 }
-// http echec status //
+// http failure status //
 await testCaseAsync(
   0,
-  (body, stream) => {
+  (_body, stream) => {
     stream.respond({ ":status": 400 });
     stream.end();
   },
@@ -69,14 +75,14 @@ await testCaseAsync(
       await executeClientAsync(client);
       assertFail();
     } catch ({ message }) {
-      assertEqual(message, "http2 echec status code: 400");
+      assertEqual(message, "http2 status code: 400");
     }
   },
 );
 // non-empty response body //
 await testCaseAsync(
   0,
-  (body, stream) => {
+  (_body, stream) => {
     stream.respond({ ":status": 200 });
     stream.write("unwanted-response-body", "utf8");
     stream.end();

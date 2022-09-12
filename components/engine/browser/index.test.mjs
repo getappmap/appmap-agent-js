@@ -3,7 +3,7 @@
 import { assertDeepEqual } from "../../__fixture__.mjs";
 import { buildTestDependenciesAsync } from "../../build.mjs";
 
-global.navigator = {
+globalThis.navigator = {
   userAgent: "name/version rest",
 };
 

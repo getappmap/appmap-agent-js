@@ -31,7 +31,7 @@ const readConfAsync = async (path) => {
   try {
     return parseYAML(await readFile(path, "utf8"));
   } catch ({ message }) {
-    expect(
+    throw expect(
       false,
       "failed to load configuration file from %j >> %s",
       path,

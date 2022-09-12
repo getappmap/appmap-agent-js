@@ -4,8 +4,7 @@
 import OperatingSystem from "os";
 const { platform: getPlatform } = OperatingSystem;
 
-const _encodeURIComponent = encodeURIComponent;
-const _decodeURIComponent = decodeURIComponent;
+const { encodeURIComponent, decodeURIComponent } = globalThis;
 
 export default (dependencies) => {
   const {
@@ -37,10 +36,10 @@ export default (dependencies) => {
       },
       encodeSegment: (segment) => {
         assertSegmentValidity(segment);
-        return _encodeURIComponent(segment);
+        return encodeURIComponent(segment);
       },
       decodeSegment: (encoded_segment) => {
-        const segment = _decodeURIComponent(encoded_segment);
+        const segment = decodeURIComponent(encoded_segment);
         assertSegmentValidity(segment);
         return segment;
       },

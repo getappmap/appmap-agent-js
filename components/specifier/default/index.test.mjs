@@ -8,7 +8,7 @@ const { createSpecifier, matchSpecifier } = Specifier(
 
 assertThrow(
   () => createSpecifier({}, "file:///base"),
-  /^AssertionError: invalid specifier options/,
+  /^Error: invalid specifier options/u,
 );
 
 ////////////

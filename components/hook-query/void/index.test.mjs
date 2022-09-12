@@ -12,7 +12,7 @@ assertDeepEqual(
   await testHookAsync(
     component,
     { configuration: { hooks: { mysql: false, sqlite3: false, pg: false } } },
-    async (frontend) => null,
+    (_agent) => null,
   ),
   [],
 );

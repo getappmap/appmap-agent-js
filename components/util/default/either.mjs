@@ -1,5 +1,7 @@
 import { assert } from "./assert.mjs";
 
+const { Error } = globalThis;
+
 const LEFT_TAG = false;
 const RIGHT_TAG = true;
 
@@ -35,7 +37,7 @@ export const fromEither = (
     return transformRight(value);
   }
   /* c8 ignore start */
-  assert(false, "invalid either tag");
+  throw new Error("invalid either tag");
   /* c8 ignore stop */
 };
 

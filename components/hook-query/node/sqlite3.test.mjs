@@ -12,6 +12,8 @@ import {
 } from "../../build.mjs";
 import HookSqlite3 from "./sqlite3.mjs";
 
+const { Promise, undefined, Error, setTimeout } = globalThis;
+
 const { Database, Statement } = Sqlite3;
 
 const promisify = (o, m, ...xs) =>
@@ -44,7 +46,7 @@ const testCaseAsync = (enabled, runAsync) =>
     runAsync,
   );
 
-const createTrace = (sql, parameters, error) => [
+const createTrace = (sql, parameters, _error) => [
   {
     type: "event",
     site: "begin",
@@ -96,7 +98,7 @@ assertDeepEqual(await testCaseAsync(false, async () => {}), []);
 
 // TypeError //
 assertDeepEqual(
-  await testCaseAsync(true, async () => {
+  await testCaseAsync(true, () => {
     assertThrow(() => database.run(), /^TypeError: missing sql query string/u);
     assertThrow(() => database.run(123), /^TypeError:/u);
   }),
@@ -114,7 +116,7 @@ assertDeepEqual(
       await promisify(database, "run", "INVALID SQL;");
       assertFail();
     } catch ({ message }) {
-      assertMatch(message, /^SQLITE_ERROR:/);
+      assertMatch(message, /^SQLITE_ERROR:/u);
     }
   }),
   createTrace("INVALID SQL;", [], {

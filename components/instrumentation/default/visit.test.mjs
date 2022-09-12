@@ -6,7 +6,12 @@ import {
 import { normalize, parse, generate } from "./__fixture__.mjs";
 import Visit from "./visit.mjs";
 
-const { stringify: stringifyJSON } = JSON;
+const {
+  Error,
+  JSON: { stringify: stringifyJSON },
+  Infinity,
+  Set,
+} = globalThis;
 
 Error.stackTraceLimit = Infinity;
 

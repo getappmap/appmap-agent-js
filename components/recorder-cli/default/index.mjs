@@ -1,3 +1,5 @@
+const { Set, Error } = globalThis;
+
 export default (dependencies) => {
   const {
     log: { logInfo },
@@ -55,7 +57,7 @@ export default (dependencies) => {
           );
           recordError(agent, name, message, stack);
         });
-        process.on("exit", (status, signal) => {
+        process.on("exit", (status, _signal) => {
           for (const track of tracks) {
             recordStopTrack(agent, track, status);
           }

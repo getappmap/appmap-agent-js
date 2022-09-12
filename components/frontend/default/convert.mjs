@@ -1,12 +1,13 @@
-const { apply } = Reflect;
-const _String = String;
-const _undefined = undefined;
 const {
-  prototype: { toString: toStringBuiltin },
-} = Object;
-
-const { round } = Math;
-const { parseInt, isNaN } = Number;
+  Reflect: { apply },
+  String,
+  undefined,
+  Object: {
+    prototype: { toString: toStringBuiltin },
+  },
+  Math: { round },
+  Number: { parseInt, isNaN },
+} = globalThis;
 
 export const toInteger = (any) => {
   if (typeof any === "string") {
@@ -28,9 +29,9 @@ export const toString = (any) => {
     typeof any === "number" ||
     typeof any === "symbol" ||
     any === null ||
-    any === _undefined
+    any === undefined
   ) {
-    return _String(any);
+    return String(any);
   } else {
     return apply(toStringBuiltin, any, []);
   }

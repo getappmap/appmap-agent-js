@@ -1,9 +1,12 @@
 import { readFileSync } from "fs";
 import { fileURLToPath } from "url";
 
-const _Buffer = Buffer;
-const _decodeURIComponent = decodeURIComponent;
-const _URL = URL;
+const {
+  JSON: { stringify: stringifyJSON },
+  Buffer,
+  decodeURIComponent,
+  URL,
+} = globalThis;
 
 export default (dependencies) => {
   const {
@@ -21,13 +24,13 @@ export default (dependencies) => {
         "Data url for source map is encoded as base64 and does not declare UTF-8 as its character encoding, will try to use UTF-8 anyway >> %s",
         path,
       );
-      return _Buffer.from(body, "base64").toString("utf8");
+      return Buffer.from(body, "base64").toString("utf8");
     }
-    return _decodeURIComponent(body);
+    return decodeURIComponent(body);
   };
   return {
     readFileSync: (url, base) => {
-      const { protocol, pathname: path } = new _URL(url);
+      const { protocol, pathname: path } = new URL(url);
       if (protocol === "data:") {
         return makeRight({ url: base, content: parseDataPath(path) });
       } else if (protocol === "file:") {
@@ -41,7 +44,7 @@ export default (dependencies) => {
         }
       } else {
         return makeLeft(
-          `Cannot read file url with a protocol different than 'data:' or 'file:', got: ${JSON.stringify(
+          `Cannot read file url with a protocol different than 'data:' or 'file:', got: ${stringifyJSON(
             url,
           )}`,
         );

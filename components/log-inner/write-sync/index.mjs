@@ -2,7 +2,11 @@
 //  infinite loop when async hooks are enabled.
 import { openSync, writeSync } from "fs";
 
-const { parse: parseJSON } = JSON;
+const {
+  URL,
+  process,
+  JSON: { parse: parseJSON },
+} = globalThis;
 
 export default (dependencies) => {
   const {

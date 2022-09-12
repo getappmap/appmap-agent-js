@@ -3,6 +3,8 @@ import { convertPort } from "../../__fixture__.mjs";
 import { buildTestDependenciesAsync } from "../../build.mjs";
 import Service from "./index.mjs";
 
+const { Promise, setTimeout } = globalThis;
+
 const { openServiceAsync, closeServiceAsync, getServicePort } = Service(
   await buildTestDependenciesAsync(import.meta.url),
 );

@@ -5,10 +5,12 @@ import NetSocketMessaging from "net-socket-messaging";
 
 const { patch: patchSocket } = NetSocketMessaging;
 
-const { parse: parseJSON, stringify: stringifyJSON } = JSON;
-const _URL = URL;
-const _String = String;
-const _Set = Set;
+const {
+  JSON: { parse: parseJSON, stringify: stringifyJSON },
+  URL,
+  String,
+  Set,
+} = globalThis;
 
 export default (dependencies) => {
   const {
@@ -29,7 +31,7 @@ export default (dependencies) => {
   } = dependencies;
   const isDirectoryAsync = async (directory) => {
     try {
-      return (await lstatAsync(new _URL(directory))).isDirectory();
+      return (await lstatAsync(new URL(directory))).isDirectory();
     } catch (error) {
       const { code } = error;
       expect(
@@ -50,7 +52,7 @@ export default (dependencies) => {
         "could not find any existing directory in the hiearchy of the storage directory",
       );
       await createDirectoryAsync(parent_directory);
-      await mkdirAsync(new _URL(directory));
+      await mkdirAsync(new URL(directory));
     } else {
       expect(
         is_directory,
@@ -77,7 +79,7 @@ export default (dependencies) => {
       counter += 1;
       url = appendURLSegment(
         directory,
-        makeSegment(`${basename}-${_String(counter)}.appmap.json`, "-"),
+        makeSegment(`${basename}-${String(counter)}.appmap.json`, "-"),
       );
     }
     urls.add(url);
@@ -106,10 +108,10 @@ export default (dependencies) => {
       const recorder_directory = appendURLSegment(directory, recorder);
       await createDirectoryAsync(recorder_directory);
       const server = createServer();
-      const urls = new _Set();
+      const urls = new Set();
       server.on("connection", (socket) => {
         patchSocket(socket);
-        socket.on("message", (session) => {
+        socket.on("message", (_session) => {
           socket.removeAllListeners("message");
           socket.on("message", (content) => {
             socket.removeAllListeners("message");

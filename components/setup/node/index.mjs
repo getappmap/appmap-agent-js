@@ -8,7 +8,11 @@ import YAML from "yaml";
 import Semver from "semver";
 import Chalk from "chalk";
 
-const _URL = URL;
+const {
+  URL,
+  JSON: { parse: parseJSON },
+} = globalThis;
+
 const { satisfies: satisfiesSemver } = Semver;
 const { green: chalkGreen, yellow: chalkYellow, red: chalkRed } = Chalk;
 const { parse: parseYAML, stringify: stringifyYAML } = YAML;
@@ -25,7 +29,7 @@ export default (dependencies) => {
     writable.write(`${prefix} ${message}${"\n"}`);
   };
   return {
-    mainAsync: async ({ version, platform, cwd, env, stdout, stderr }) => {
+    mainAsync: async ({ version, cwd, env, stdout, stderr }) => {
       const logSuccess = generateLog(chalkGreen("\u2714"), stdout);
       const logWarning = generateLog(chalkYellow("\u26A0"), stderr);
       const logFailure = generateLog(chalkRed("\u2716"), stderr);
@@ -46,7 +50,7 @@ export default (dependencies) => {
       }
       // node //
       {
-        const _package = JSON.parse(
+        const _package = parseJSON(
           await readFileAsync(
             new URL(appendURLSegment(agent_url, "package.json")),
             "utf8",
@@ -64,7 +68,7 @@ export default (dependencies) => {
       {
         let content;
         try {
-          content = await readFileAsync(new _URL(conf_url), "utf8");
+          content = await readFileAsync(new URL(conf_url), "utf8");
         } catch ({ code, message }) {
           /* c8 ignore start */
           if (code !== "ENOENT") {
@@ -91,7 +95,7 @@ export default (dependencies) => {
           /* c8 ignore start */
           content = stringifyYAML(await questionConfigAsync());
           try {
-            await writeFileAsync(new _URL(conf_url), content, "utf8");
+            await writeFileAsync(new URL(conf_url), content, "utf8");
           } catch ({ message }) {
             logFailure(`configuration file cannot not be written: ${message}`);
             return false;
@@ -118,7 +122,7 @@ export default (dependencies) => {
       // appmap-agent-js //
       {
         const { resolve } = createRequire(
-          new _URL(appendURLSegment(repo_url, "dummy.js")),
+          new URL(appendURLSegment(repo_url, "dummy.js")),
         );
         let agent_main = null;
         try {
@@ -145,7 +149,7 @@ export default (dependencies) => {
       {
         let success = true;
         try {
-          await readdirAsync(new _URL(appendURLSegment(repo_url, ".git")));
+          await readdirAsync(new URL(appendURLSegment(repo_url, ".git")));
         } catch ({ message }) {
           success = false;
           logWarning(

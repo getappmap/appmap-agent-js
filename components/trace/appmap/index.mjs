@@ -3,6 +3,8 @@ import Classmap from "./classmap/index.mjs";
 import Event from "./event/index.mjs";
 import Ordering from "./ordering/index.mjs";
 
+const { Error, Set } = globalThis;
+
 const VERSION = "1.8.0";
 
 export default (dependencies) => {

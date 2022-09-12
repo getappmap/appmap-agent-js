@@ -17,7 +17,7 @@ export default (dependencies) => {
   } = require("posix-socket");
   const { send: sendSocket } = require("posix-socket-messaging");
   return {
-    openSocket: (host, port, configuration) => {
+    openSocket: (host, port, _configuration) => {
       const fd = createSocket(
         typeof port === "number" ? AF_INET : AF_UNIX,
         SOCK_STREAM,

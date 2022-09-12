@@ -1,6 +1,8 @@
 import { mkdir as mkdirAsync } from "fs/promises";
 import { writeEntryPointAsync } from "./static.mjs";
 
+const { Promise } = globalThis;
+
 const generateWriteAsync = (branch) => async (component, blueprint) => {
   await writeEntryPointAsync(branch, component, { blueprint });
 };

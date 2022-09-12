@@ -1,6 +1,8 @@
 import Require from "./require.mjs";
 
-const { apply } = Reflect;
+const {
+  Reflect: { apply },
+} = globalThis;
 
 const DATABASE = "mysql";
 const VERSION = null;
@@ -45,7 +47,7 @@ export default (dependencies) => {
           jump_tab,
           formatQueryPayload(agent, DATABASE, VERSION, sql, values),
         );
-        query._callback = spyOnce((error, result, field) => {
+        query._callback = spyOnce((_error, _result, _field) => {
           recordAfterEvent(agent, jump_tab, answer_payload);
           recordEndEvent(agent, bundle_tab, bundle_payload);
         }, callback);

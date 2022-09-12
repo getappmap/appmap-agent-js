@@ -1,7 +1,7 @@
 /* eslint-env browser */
 
-const { now } = performance;
+const {
+  performance: { now },
+} = globalThis;
 
-export default (dependencies) => {
-  return { now };
-};
+export default (_dependencies) => ({ now });

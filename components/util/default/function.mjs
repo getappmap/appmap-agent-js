@@ -1,22 +1,25 @@
 import { assert } from "./assert.mjs";
 
-const { apply } = Reflect;
-const _WeakMap = WeakMap;
+const {
+  Error,
+  Reflect: { apply },
+  WeakMap,
+} = globalThis;
 
-const cache = new _WeakMap();
+const cache = new WeakMap();
 
 export const noop = () => {};
 export const identity = (x) => x;
 export const returnFirst = (x1) => x1;
-export const returnSecond = (x1, x2) => x2;
-export const returnThird = (x1, x2, x3) => x3;
+export const returnSecond = (_x1, x2) => x2;
+export const returnThird = (_x1, _x2, x3) => x3;
 export const constant = (x) => () => x;
 
 export const memoize = (closure, argument) => {
   if (!cache.has(closure)) {
-    cache.set(closure, new _WeakMap());
+    cache.set(closure, new WeakMap());
   }
-  let history = cache.get(closure);
+  const history = cache.get(closure);
   if (!history.has(argument)) {
     history.set(argument, closure(argument));
   }
@@ -83,7 +86,7 @@ export const compose = (f, g) => {
       return (x1, x2, x3, y1, y2, y3) => g(f(x1, x2, x3), y1, y2, y3);
     }
   }
-  assert(false, "arity of out bounds");
+  throw new Error("arity of out bounds");
 };
 
 export const bind = (f, x1) => {
@@ -104,7 +107,7 @@ export const bind = (f, x1) => {
   if (l === 5) {
     return (x2, x3, x4, x5) => f(x1, x2, x3, x4, x5);
   }
-  assert(false, "arity of out bounds");
+  throw new Error("arity of out bounds");
 };
 
 export const spyOnce = (spy, forward) => {

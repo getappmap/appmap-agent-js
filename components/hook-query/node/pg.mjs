@@ -1,9 +1,11 @@
 import Require from "./require.mjs";
 
-const _undefined = undefined;
-const { apply } = Reflect;
-const _Promise = Promise;
-const _TypeError = TypeError;
+const {
+  undefined,
+  Reflect: { apply },
+  Promise,
+  TypeError,
+} = globalThis;
 
 const VERSION = null;
 const DATABASE = "postgres";
@@ -39,17 +41,17 @@ export default (dependencies) => {
       const { query: original } = prototype;
       const { query } = {
         query(query, values, callback) {
-          if (query === null || query === _undefined) {
-            throw new _TypeError("Client was passed a null or undefined query");
+          if (query === null || query === undefined) {
+            throw new TypeError("Client was passed a null or undefined query");
           }
-          let result = _undefined;
+          let result = undefined;
           if (typeof query.submit === "function") {
             result = query;
             if (!query.callback) {
               if (typeof values === "function") {
                 query.callback = values;
               } else {
-                query.callback = (error, result) => {
+                query.callback = (error, _result) => {
                   if (error !== null) {
                     query.emit("error", error);
                   }
@@ -59,7 +61,7 @@ export default (dependencies) => {
           } else {
             query = new Query(query, values, callback);
             if (!query.callback) {
-              result = new _Promise((resolve, reject) => {
+              result = new Promise((resolve, reject) => {
                 query.callback = (error, result) => {
                   error ? reject(error) : resolve(result);
                 };
@@ -81,7 +83,7 @@ export default (dependencies) => {
             ),
           );
           callback = query.callback;
-          query.callback = spyOnce((error, result) => {
+          query.callback = spyOnce((_error, _result) => {
             recordAfterEvent(agent, jump_tab, answer_payload);
             recordEndEvent(agent, bundle_tab, bundle_payload);
           }, callback);

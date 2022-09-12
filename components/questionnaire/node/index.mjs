@@ -1,8 +1,8 @@
-const { parse: parseJSON } = JSON;
-const { parseInt } = Number;
-const { assign } = Object;
-
-const { fromEntries } = Object;
+const {
+  JSON: { parse: parseJSON },
+  Number: { parseInt },
+  Object: { assign, fromEntries },
+} = globalThis;
 
 export default (dependencies) => {
   const {
@@ -323,8 +323,9 @@ export default (dependencies) => {
       if (prompt !== null) {
         const { message, ...rest } = prompt;
         const result = await prompts({
-          message:
-            message.length === 1 ? message[0] : message.join("\n  ") + "\n",
+          message: `${
+            message.length === 1 ? message[0] : message.join("\n  ")
+          }\n`,
           ...rest,
         });
         if (hasOwnProperty(result, "value")) {

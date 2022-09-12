@@ -3,6 +3,8 @@ import { fileURLToPath } from "url";
 import { Buffer } from "buffer";
 import NetSocketMessaging from "net-socket-messaging";
 
+const { process, setInterval, clearInterval } = globalThis;
+
 const { concat: concatBuffer } = Buffer;
 const { createMessage } = NetSocketMessaging;
 

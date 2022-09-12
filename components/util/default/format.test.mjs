@@ -1,10 +1,9 @@
 import { assertEqual, assertThrow } from "../../__fixture__.mjs";
 import { format } from "./format.mjs";
 
-assertThrow(
-  () => format("%x", [123]),
-  /^AssertionError: invalid format marker/u,
-);
+const { Error } = globalThis;
+
+assertThrow(() => format("%x", [123]), /^Error: invalid format marker/u);
 
 assertThrow(() => format("%s", []), /^AssertionError: missing format value/u);
 

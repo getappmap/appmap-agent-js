@@ -1,4 +1,5 @@
 /* globals $uuid */
+/* eslint local/no-globals: ["error", "$uuid"] */
 
 import { assertDeepEqual } from "../../__fixture__.mjs";
 import {
@@ -27,7 +28,7 @@ assertDeepEqual(
     await testHookAsync(
       component,
       { configuration: { hooks: { apply: true }, "hidden-identifier": "$" } },
-      async () => {
+      () => {
         {
           const tab = $uuid.getFreshTab();
           $uuid.recordApply(tab, "function", "this", ["argument"]);

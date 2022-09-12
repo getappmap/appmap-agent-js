@@ -1,8 +1,10 @@
-const _Map = Map;
-const _Error = Error;
-const { entries: toEntries, fromEntries } = Object;
+const {
+  Map,
+  Error,
+  Object: { entries: toEntries, fromEntries },
+} = globalThis;
 
-const levels = new _Map([
+const levels = new Map([
   ["Debug", 1],
   ["Info", 2],
   ["Warning", 3],
@@ -12,7 +14,7 @@ const levels = new _Map([
 
 const get = (map, key) => {
   if (!map.has(key)) {
-    throw new _Error("missing map key");
+    throw new Error("missing map key");
   }
   return map.get(key);
 };

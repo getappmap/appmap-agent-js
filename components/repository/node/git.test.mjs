@@ -9,7 +9,10 @@ import {
 import { buildTestDependenciesAsync } from "../../build.mjs";
 import Git from "./git.mjs";
 
-const { isArray } = Array;
+const {
+  URL,
+  Array: { isArray },
+} = globalThis;
 
 const { extractGitInformation } = Git(
   await buildTestDependenciesAsync(import.meta.url),
@@ -18,7 +21,7 @@ const { extractGitInformation } = Git(
 const origin_url = "https://github.com/lachrist/sample.git";
 const url = getFreshTemporaryURL();
 
-assertThrow(() => extractGitInformation(url), /^AppmapError:.*ENOENT/);
+assertThrow(() => extractGitInformation(url), /^AppmapError:.*ENOENT/u);
 await mkdirAsync(new URL(url));
 assertEqual(extractGitInformation(url), null);
 execSync(`git clone ${origin_url} .`, {

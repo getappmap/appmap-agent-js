@@ -4,6 +4,8 @@
 //   - end/before events trigger a pop
 // Missing events at the beginning or at the end of the trace are manufactured to complete the first and last tree.
 
+const { Error } = globalThis;
+
 export default (dependencies) => {
   const {
     util: { createCounter, incrementCounter },

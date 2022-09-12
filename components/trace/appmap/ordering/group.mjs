@@ -3,9 +3,12 @@
 // These trees are inserted into their corresponding group/ungroup event pair.
 // NB: group/ungroup event pairs appear when asynchronous ressources are registered.
 
-const { from: toArray } = Array;
+const {
+  Array: { from: toArray },
+  Map,
+} = globalThis;
 
-export default (dependencies) => {
+export default (_dependencies) => {
   const makeFrame = (enter, children, leave) => ({ enter, children, leave });
 
   const takeMap = (map, key) => {

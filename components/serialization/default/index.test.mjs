@@ -6,6 +6,8 @@ import {
 import Serialization from "./index.mjs";
 
 const {
+  Symbol,
+  Error,
   Reflect: { defineProperty },
 } = globalThis;
 
@@ -101,9 +103,11 @@ validateSerial(
       "impure-constructor-naming": false,
       "impure-hash-inspection": false,
     },
+    /* eslint-disable prefer-rest-params */
     (function () {
       return arguments;
     })(),
+    /* eslint-enable prefer-rest-params */
   ),
 );
 

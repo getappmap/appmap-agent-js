@@ -8,6 +8,12 @@ import {
 } from "../../build.mjs";
 import Receptor from "./index.mjs";
 
+const {
+  Promise,
+  JSON: { stringify: stringifyJSON },
+  URL,
+} = globalThis;
+
 const { createMessage } = NetSocketMessaging;
 
 const { createConfiguration, extendConfiguration } =
@@ -29,9 +35,9 @@ const testAsync = async (port, configuration, messages) => {
     socket.on("connect", resolve);
   });
   socket.write(createMessage("session"));
-  socket.write(createMessage(JSON.stringify(configuration)));
+  socket.write(createMessage(stringifyJSON(configuration)));
   for (const message of messages) {
-    socket.write(createMessage(JSON.stringify(message)));
+    socket.write(createMessage(stringifyJSON(message)));
   }
   await new Promise((resolve) => {
     socket.on("close", resolve);

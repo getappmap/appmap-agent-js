@@ -1,8 +1,6 @@
-export default (dependencies) => {
-  return {
-    compileTrace: (configuration, messages) => ({
-      head: configuration,
-      body: messages,
-    }),
-  };
-};
+export default (_dependencies) => ({
+  compileTrace: (configuration, messages) => ({
+    head: configuration,
+    body: messages,
+  }),
+});

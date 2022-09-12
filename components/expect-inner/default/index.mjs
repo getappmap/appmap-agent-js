@@ -13,7 +13,7 @@ export default (dependencies) => {
       try {
         return closure();
       } catch (error) {
-        throwViolation(format(template, [...rest, error]));
+        throw throwViolation(format(template, [...rest, error]));
       }
     },
     expectSuccessAsync: async (promise, template, ...rest) => {

@@ -61,7 +61,7 @@ assertEqual(decodeSafe(Buffer.from("foo", "utf8"), "invalid", "bar"), "bar");
 
 {
   const readable = new Readable({
-    read: (size) => {},
+    read: (_size) => {},
   });
   let leak = null;
   spyReadable(readable, (buffer) => {
@@ -82,7 +82,7 @@ assertEqual(decodeSafe(Buffer.from("foo", "utf8"), "invalid", "bar"), "bar");
     construct: (callback) => {
       callback();
     },
-    write: (chunk, encoding, callback) => {
+    write: (_chunk, _encoding, callback) => {
       callback();
     },
     destroy: () => {},

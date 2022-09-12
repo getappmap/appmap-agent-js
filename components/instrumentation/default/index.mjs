@@ -1,12 +1,11 @@
 import * as Astring from "astring";
 import * as Acorn from "acorn";
+import Visit from "./visit.mjs";
+
+const { Set } = globalThis;
 
 const { generate: generateEstree } = Astring;
 const { parse: parseEstree } = Acorn;
-
-import Visit from "./visit.mjs";
-
-const _Set = Set;
 
 export default (dependencies) => {
   const {
@@ -25,7 +24,7 @@ export default (dependencies) => {
     createInstrumentation: (configuration) => ({
       configuration,
       runtime: `${configuration["hidden-identifier"]}${getUUID()}`,
-      done: new _Set(),
+      done: new Set(),
       counter: createCounter(0),
     }),
     getInstrumentationIdentifier: ({ runtime }) => runtime,
@@ -96,7 +95,7 @@ export default (dependencies) => {
               {
                 url,
                 runtime,
-                whitelist: new _Set(sources.map(getURL)),
+                whitelist: new Set(sources.map(getURL)),
                 evals: configuration.hooks.eval,
                 apply: configuration.hooks.apply,
                 mapping,

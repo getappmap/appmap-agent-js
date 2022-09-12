@@ -1,7 +1,7 @@
 import Minimatch from "minimatch";
 
-const _Map = Map;
-const _RegExp = RegExp;
+const { Error, Map, RegExp } = globalThis;
+
 const { Minimatch: MinimatchClass } = Minimatch;
 
 export default (dependencies) => {
@@ -12,7 +12,7 @@ export default (dependencies) => {
     expect: { expectSuccess },
   } = dependencies;
 
-  const regexps = new _Map();
+  const regexps = new Map();
 
   const makeRegExp = (source, flags) => {
     const key = `/${source}/${flags}`;
@@ -20,7 +20,7 @@ export default (dependencies) => {
       return regexps.get(key);
     } else {
       const regexp = expectSuccess(
-        () => new _RegExp(source, flags),
+        () => new RegExp(source, flags),
         "failed to compile regexp source = %j flags = %j >> %O",
         source,
         flags,
@@ -33,7 +33,7 @@ export default (dependencies) => {
   const escape = (char) => `\\${char}`;
 
   const sanitizeForRegExp = (string) =>
-    string.replace(/[/\\+*?.^$()[\]{}|]/g, escape);
+    string.replace(/[/\\+*?.^$()[\]{}|]/gu, escape);
 
   // const sanitizeForGlob = (string) => string.replace(/[*?[\]]/g, escape);
 
@@ -95,7 +95,7 @@ export default (dependencies) => {
           flags: "",
         };
       }
-      assert(false, "invalid specifier options");
+      throw new Error("invalid specifier options");
     },
     matchSpecifier: (specifier, url) => {
       if (typeof specifier === "boolean") {
