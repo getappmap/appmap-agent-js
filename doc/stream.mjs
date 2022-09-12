@@ -1,9 +1,8 @@
-
 export const createEmitterStream = (emitter, name, options) => {
-  const {resolutions, rejections} = {
+  const { resolutions, rejections } = {
     resolutions: [],
     rejections: [],
-    ... options
+    ...options,
   };
   return {
     type: "emitter",
@@ -38,44 +37,43 @@ export const combineStream = (left, right) => ({
   right,
 });
 
-const generateControlEmitterStream = (method) => ({emitter, name, resolutions, rejections}, {listen, listenResolution, listenRejection}) => {
-  emitter[method](name, listen);
-  for (let name of resolutions) {
-    emitter[method](name, listenResolution);
-  }
-  for (let name of rejections) {
-    emitter[method](name, listenRejection);
-  }
-};
+const generateControlEmitterStream =
+  (method) =>
+  (
+    { emitter, name, resolutions, rejections },
+    { listen, listenResolution, listenRejection },
+  ) => {
+    emitter[method](name, listen);
+    for (let name of resolutions) {
+      emitter[method](name, listenResolution);
+    }
+    for (let name of rejections) {
+      emitter[method](name, listenRejection);
+    }
+  };
 
 const startEmitterStream = generateControlEmitterStream("addListener");
 const stopEmitterStream = generateControlEmitterStream("removeListener");
 
 // State -> Stream Event -> (Event -> State -> ())
 export const consumeStreamAsync = (stream, state, consume) => {
-  const {type} = stream;
+  const { type } = stream;
   if (type === "map") {
-    const {argument, transform} = stream;
-    return consumeStreamAsync(
-      argument,
-      state,
-      (state, event) => { consume(state, transform(event)); }
-    );
+    const { argument, transform } = stream;
+    return consumeStreamAsync(argument, state, (state, event) => {
+      consume(state, transform(event));
+    });
   }
   if (type === "filter") {
-    const {argument, guard} = stream;
-    return consumeStreamAsync(
-      argument,
-      state,
-      (state, event) => {
-        if (guard(event)) {
-          consume(state, event);
-        }
+    const { argument, guard } = stream;
+    return consumeStreamAsync(argument, state, (state, event) => {
+      if (guard(event)) {
+        consume(state, event);
       }
-    );
+    });
   }
   if (type === "concat") {
-    const {left, right} = stream;
+    const { left, right } = stream;
     return Promise.all([
       consumeStreamAsync(left, state, combine),
       consumeStreamAsync(right, state, combine),
@@ -84,12 +82,14 @@ export const consumeStreamAsync = (stream, state, consume) => {
   if (type === "emitter") {
     return new Promise((resolve, reject) => {
       const listeners = {
-        listen: (event) => { consume(state, event); },
+        listen: (event) => {
+          consume(state, event);
+        },
         listenResolution: (result) => {
           stopEmitterStream(stream, listeners);
           resolve(result);
         },
-        listenRejection = (error) => {
+        listenRejection: (error) => {
           stopEmitterStream(stream, listeners);
           reject(error);
         },
@@ -98,11 +98,10 @@ export const consumeStreamAsync = (stream, state, consume) => {
     });
   }
   if (type === "hook") {
-
   }
 
   if (type === "start") {
-    const {names, start} = stream;
+    const { names, start } = stream;
     if (names.length === 0) {
       return start(() => {
         consume(state, null);
@@ -111,13 +110,13 @@ export const consumeStreamAsync = (stream, state, consume) => {
     if (names.length === 1) {
       const [name1] = names;
       return start((arg1) => {
-        consume(state, {[name1]:arg1});
+        consume(state, { [name1]: arg1 });
       });
     }
     if (names.length === 2) {
       const [name1, name2] = names;
       return start((arg1, arg2) => {
-        consume(state, {[name1]:arg1, [name2]:arg2});
+        consume(state, { [name1]: arg1, [name2]: arg2 });
       });
     }
   }

@@ -1,8 +1,8 @@
-import {createServer} from "http";
+import { createServer } from "http";
 const server = createServer();
-server.listen(0, function onListening () {
+server.listen(0, function onListening() {
   console.log(`listening to port ${server.address().port}`);
-  server.on("request", function onRequest (req, res) {
+  server.on("request", function onRequest(req, res) {
     setTimeout(function onTimeout1() {
       res.writeHead(200);
     }, 1000);

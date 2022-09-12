@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const {process, Map} = globalThis;
+const { process, Map } = globalThis;
 
 const routes = new Map([
   ["init", "../lib/node/init.mjs"],
