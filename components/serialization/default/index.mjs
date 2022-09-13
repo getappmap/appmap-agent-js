@@ -1,6 +1,6 @@
 const {
-  Reflect: { getPrototypeOf, apply, ownKeys },
-  Error,
+  Reflect: { getOwnPropertyDescriptor, getPrototypeOf, apply, ownKeys },
+  Error: { prototype: error_prototype },
   Infinity,
   Symbol,
   Symbol: { keyFor, for: symbolFor },
@@ -9,10 +9,10 @@ const {
   Set,
   String,
   undefined,
+  Math: { min },
   Object: {
     prototype: object_prototype,
     prototype: { toString },
-    entries: toEntries,
     fromEntries,
   },
   Array: { isArray },
@@ -23,24 +23,64 @@ const noargs = [];
 
 export default (dependencies) => {
   const {
-    util: { incrementCounter, createCounter },
+    util: { hasOwnProperty, incrementCounter, createCounter },
     log: { logDebug, logGuardDebug },
   } = dependencies;
-  const toEntriesSafe = (object) => {
+  const getOwnKeyArrayImpure = (object) => {
     try {
-      return toEntries(object);
+      return ownKeys(object);
     } catch (error) {
-      logDebug("Failed to called Object.entries on %o >> %e", object, error);
+      logDebug(
+        "Reflect.ownKeys(%o) threw %e (this should only happen when the object is a proxy)",
+        object,
+        error,
+      );
       return [];
     }
   };
-  const getSafe = (object, key) => {
+  const getPrototypeImpure = (object) => {
     try {
-      return object[key];
+      return getPrototypeOf(object);
     } catch (error) {
-      logDebug("Failed to lookup %j on %o >> %e", key, object, error);
+      logDebug(
+        "Reflect.getPrototypeOf(%o) threw %e (this should only happen when the object is a proxy)",
+        object,
+        error,
+      );
+      return null;
+    }
+  };
+  const getOwnPropertyDescriptorImpure = (object, key) => {
+    try {
+      return getOwnPropertyDescriptor(object, key);
+    } catch (error) {
+      logDebug(
+        "Reflect.getOwnPropertyDescriptor(%o, %j) threw %e (this should only happen when the object is a proxy)",
+        object,
+        key,
+        error,
+      );
       return undefined;
     }
+  };
+  const hasPrototypeImpure = (object, prototype) => {
+    while (object !== null) {
+      if (object === prototype) {
+        return true;
+      }
+      object = getPrototypeImpure(object);
+    }
+    return false;
+  };
+  const getDataPropertyImpure = (object, key) => {
+    while (object !== null) {
+      const descriptor = getOwnPropertyDescriptorImpure(object, key);
+      if (descriptor !== undefined && hasOwnProperty(descriptor, "value")) {
+        return descriptor.value;
+      }
+      object = getPrototypeImpure(object);
+    }
+    return undefined;
   };
   const empty = symbolFor("APPMAP_EMPTY_MARKER");
   const wellknown = new Set(
@@ -75,14 +115,14 @@ export default (dependencies) => {
   };
   const printImpure = (value) => {
     if (typeof value === "function") {
-      const name = getSafe(value, "name");
+      const name = getDataPropertyImpure(value, "name");
       logGuardDebug(
         name !== "string",
         "Name of function %o is not a string: %o",
         value,
         name,
       );
-      if (getSafe(value, "prototype") !== undefined) {
+      if (getDataPropertyImpure(value, "prototype") !== undefined) {
         if (typeof name === "string" && name !== "") {
           return `function ${name} (...) { ... }`;
         } else {
@@ -124,9 +164,9 @@ export default (dependencies) => {
     }
   };
   const getConstructorNameImpure = (object) => {
-    const _constructor = getSafe(object, "constructor");
+    const _constructor = getDataPropertyImpure(object, "constructor");
     if (typeof _constructor === "function") {
-      const name = getSafe(_constructor, "name");
+      const name = getDataPropertyImpure(_constructor, "name");
       logGuardDebug(
         typeof name !== "string",
         "Constructor name of %o is not a string: %o",
@@ -142,16 +182,15 @@ export default (dependencies) => {
     const tag = printPureFallback(value);
     return tag.substring(tag.indexOf(" ") + 1, tag.length - 1);
   };
-  const isEntryString = ({ 0: key }) => typeof key === "string";
-  const serializeEntry = ({ 0: key, 1: value }) => [
-    key,
-    getConstructorNamePure(value),
-  ];
+  const isString = (any) => typeof any === "string";
   const getSpecific = (serialization, object) => {
-    if (serialization.impure_error_inspection && object instanceof Error) {
-      const name = getSafe(object, "name");
-      const message = getSafe(object, "message");
-      const stack = getSafe(object, "stack");
+    if (
+      serialization.impure_error_inspection &&
+      hasPrototypeImpure(object, error_prototype)
+    ) {
+      const name = getDataPropertyImpure(object, "name");
+      const message = getDataPropertyImpure(object, "message");
+      const stack = getDataPropertyImpure(object, "stack");
       logGuardDebug(
         typeof name !== "string",
         "Name of error %o is not a string: %o",
@@ -172,27 +211,31 @@ export default (dependencies) => {
       );
       return {
         type: "error",
-        name: typeof name === "string" ? name : "",
-        message: typeof message === "string" ? message : "",
-        stack: typeof stack === "string" ? stack : "",
+        name: typeof name === "string" ? name : printPure(name),
+        message: typeof message === "string" ? message : printPure(name),
+        stack: typeof stack === "string" ? stack : printPure(name),
       };
     } else if (serialization.impure_array_inspection && isArray(object)) {
-      return { type: "array", length: getSafe(object, "length") };
+      return { type: "array", length: getDataPropertyImpure(object, "length") };
     } else if (
       serialization.impure_hash_inspection &&
-      (getPrototypeOf(object) === null ||
-        getPrototypeOf(object) === object_prototype)
+      (getPrototypeImpure(object) === null ||
+        getPrototypeImpure(object) === object_prototype)
     ) {
-      const entries = toEntriesSafe(object);
+      const keys = getOwnKeyArrayImpure(object).filter(isString);
+      const entries = [];
+      const length = min(keys.length, serialization.maximum_properties_length);
+      for (let index = 0; index < length; index += 1) {
+        const key = keys[index];
+        entries.push([
+          key,
+          getConstructorNamePure(getDataPropertyImpure(object, key)),
+        ]);
+      }
       return {
         type: "hash",
-        length: entries.length,
-        properties: fromEntries(
-          entries
-            .filter(isEntryString)
-            .slice(0, serialization.maximum_properties_length)
-            .map(serializeEntry),
-        ),
+        length,
+        properties: fromEntries(entries),
       };
     } else {
       return null;
