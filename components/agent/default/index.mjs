@@ -36,7 +36,7 @@ export default (dependencies) => {
   } = dependencies;
   const generateFormatPayload =
     (formatPayload) =>
-    // We avoid using reast and spread syntax here for two reasons:
+    // We avoid using rest and spread syntax here for two reasons:
     //   1) Spread use Array.prototype[@Symbol.iterator] which is unsafe
     //      because it can be overwritten by the user
     //   2) This is hot code so avoiding creating an array may have some
