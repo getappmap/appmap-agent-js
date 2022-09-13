@@ -175,16 +175,19 @@ validateSerial(
 // closure //
 /////////////
 
-// function named //
+// function pure //
+validateSerial(testSerialize({ "impure-printing": false }, function f() {}));
+
+// function impure named //
 validateSerial(testSerialize({}, function f() {}));
 
-// function anonymous //
+// function impure anonymous //
 validateSerial(testSerialize({}, function () {}));
 
-// arrow named //
+// arrow impure named //
 validateSerial(testSerialize({}, { f: () => {} }.f));
 
-// arrow anonymous //
+// arrow impure anonymous //
 validateSerial(testSerialize({}, () => {}));
 
 ///////////
