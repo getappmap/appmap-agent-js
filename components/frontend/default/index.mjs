@@ -73,6 +73,12 @@ export default (dependencies) => {
       message,
       stack,
     }),
+    formatGroup: ({}, group, child, description) => ({
+      type: "group",
+      group,
+      child,
+      description,
+    }),
     formatBeginEvent: generateFormatEvent("begin"),
     formatEndEvent: generateFormatEvent("end"),
     formatBeforeEvent: generateFormatEvent("before"),

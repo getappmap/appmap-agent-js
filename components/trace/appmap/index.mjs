@@ -44,6 +44,32 @@ export default (dependencies) => {
           errors.push(message);
         } else if (type === "event") {
           events.push(message);
+        } else if (type === "group") {
+          events.push(
+            {
+              type: "event",
+              site: "begin",
+              tab: 0,
+              group: message.group,
+              time: 0,
+              payload: {
+                type: "group",
+                group: message.child,
+                description: message.description,
+              },
+            },
+            {
+              type: "event",
+              site: "end",
+              tab: 0,
+              group: message.group,
+              time: 0,
+              payload: {
+                type: "ungroup",
+                group: message.child,
+              },
+            },
+          );
         } else if (type === "source") {
           sources.push(message);
         } else if (type === "amend") {

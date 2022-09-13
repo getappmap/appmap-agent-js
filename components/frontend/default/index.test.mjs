@@ -24,6 +24,7 @@ const {
   instrument,
   getFreshTab,
   getBundlePayload,
+  formatGroup,
   formatBeginEvent,
   formatBeginAmend,
 } = Frontend(dependencies);
@@ -44,6 +45,8 @@ const frontend = createFrontend(configuration);
 assertEqual(typeof getSerializationEmptyValue(frontend), "symbol");
 
 assertEqual(typeof getFreshTab(frontend), "number");
+
+validateMessage(formatGroup(frontend, 123, 456, "description"));
 
 validateMessage(formatStartTrack(frontend, "track", {}, null));
 

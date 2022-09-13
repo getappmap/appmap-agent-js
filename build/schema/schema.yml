@@ -775,6 +775,22 @@
     - before
     - after
 
+# Shorthand for group event pair to improve performance.
+# Group-related messages are a large part of the trace.
+- $id: group-message
+  type: object
+  additionalProperties: false
+  required: [type, group, child, description]
+  properties:
+    type:
+      const: group
+    group:
+      $ref: group
+    child:
+      $ref: group
+    description:
+      type: string
+
 - $id: event-message
   type: object
   additionalProperties: false
@@ -1147,6 +1163,7 @@
     - $ref: stop-message
     - $ref: error-message
     - $ref: source-message
+    - $ref: group-message
     - $ref: event-message
     - $ref: amend-message
 

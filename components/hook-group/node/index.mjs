@@ -5,13 +5,7 @@ const { Set } = globalThis;
 export default (dependencies) => {
   const {
     util: { assert },
-    agent: {
-      getFreshTab,
-      recordBeginEvent,
-      recordEndEvent,
-      formatGroupPayload,
-      formatUngroupPayload,
-    },
+    agent: { recordGroup },
   } = dependencies;
   return {
     hook: (agent, { ordering }) => {
@@ -23,13 +17,7 @@ export default (dependencies) => {
           init: (id, description, _origin) => {
             assert(!groups.has(id), "duplicate async id");
             groups.add(id);
-            const tab = getFreshTab(agent);
-            recordBeginEvent(
-              agent,
-              tab,
-              formatGroupPayload(agent, id, description),
-            );
-            recordEndEvent(agent, tab, formatUngroupPayload(agent, id));
+            recordGroup(agent, id, description);
           },
         });
         hook.enable();

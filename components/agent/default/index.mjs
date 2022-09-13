@@ -16,6 +16,7 @@ export default (dependencies) => {
       formatError,
       formatStartTrack,
       formatStopTrack,
+      formatGroup,
       formatBeginEvent,
       formatEndEvent,
       formatBeforeEvent,
@@ -95,6 +96,12 @@ export default (dependencies) => {
     requestRemoteAgentAsync: ({ emitter }, method, path, body) =>
       requestRemoteEmitterAsync(emitter, method, path, body),
     /* c8 ignore stop */
+    recordGroup: ({ emitter, frontend }, child, description) => {
+      sendEmitter(
+        emitter,
+        formatGroup(frontend, getCurrentGroup(), child, description),
+      );
+    },
     recordBeginAmend: generateRecord(formatBeginAmend),
     recordEndAmend: generateRecord(formatEndAmend),
     recordBeforeAmend: generateRecord(formatBeforeAmend),
