@@ -16,6 +16,7 @@ export default (dependencies) => {
       formatError,
       formatStartTrack,
       formatStopTrack,
+      formatGroup,
       formatBeginEvent,
       formatEndEvent,
       formatBeforeEvent,
@@ -36,7 +37,7 @@ export default (dependencies) => {
   } = dependencies;
   const generateFormatPayload =
     (formatPayload) =>
-    // We avoid using reast and spread syntax here for two reasons:
+    // We avoid using rest and spread syntax here for two reasons:
     //   1) Spread use Array.prototype[@Symbol.iterator] which is unsafe
     //      because it can be overwritten by the user
     //   2) This is hot code so avoiding creating an array may have some
@@ -95,6 +96,12 @@ export default (dependencies) => {
     requestRemoteAgentAsync: ({ emitter }, method, path, body) =>
       requestRemoteEmitterAsync(emitter, method, path, body),
     /* c8 ignore stop */
+    recordGroup: ({ emitter, frontend }, child, description) => {
+      sendEmitter(
+        emitter,
+        formatGroup(frontend, getCurrentGroup(), child, description),
+      );
+    },
     recordBeginAmend: generateRecord(formatBeginAmend),
     recordEndAmend: generateRecord(formatEndAmend),
     recordBeforeAmend: generateRecord(formatBeforeAmend),

@@ -41,10 +41,7 @@ export default (dependencies) => {
   function onStreamResponse({ ":status": status }) {
     if (status !== 200) {
       const { _appmap_session: session } = this;
-      session.emit(
-        "error",
-        new Error(`http2 status code: ${String(status)}`),
-      );
+      session.emit("error", new Error(`http2 status code: ${String(status)}`));
     }
   }
 

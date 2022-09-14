@@ -10,6 +10,8 @@ import {
 import YAML from "yaml";
 import { spawnStrictAsync } from "../../spawn.mjs";
 
+const { process, JSON, Math } = globalThis;
+
 const { cwd } = process;
 const { stringify: stringifyYAML } = YAML;
 const { stringify: stringifyJSON } = JSON;

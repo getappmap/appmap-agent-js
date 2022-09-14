@@ -13,6 +13,7 @@ const {
 export default (dependencies) => {
   const {
     util: {
+      toString,
       fromMaybe,
       spyOnce,
       createBox,
@@ -23,7 +24,14 @@ export default (dependencies) => {
       assignProperty,
       getOwnProperty,
     },
-    "hook-http": { parseContentType, decodeSafe, parseJSONSafe, spyWritable },
+    "hook-http": {
+      parseContentType,
+      decodeSafe,
+      parseJSONSafe,
+      spyWritable,
+      formatHeaders,
+      formatStatus,
+    },
     expect: { expect, expectSuccess },
     patch: { patch },
     agent: {
@@ -82,11 +90,11 @@ export default (dependencies) => {
       formatRequestPayload(
         agent,
         "server",
-        protocol,
-        method,
-        url,
+        toString(protocol),
+        toString(method),
+        toString(url),
         null,
-        headers,
+        formatHeaders(headers),
         empty,
       ),
     );
@@ -103,11 +111,11 @@ export default (dependencies) => {
           formatRequestPayload(
             agent,
             "server",
-            protocol,
-            method,
-            url,
+            toString(protocol),
+            toString(method),
+            toString(url),
             `${request.baseUrl}${request.route.path}`,
-            headers,
+            formatHeaders(headers),
             empty,
           ),
         );
@@ -122,9 +130,9 @@ export default (dependencies) => {
       formatResponsePayload(
         agent,
         "server",
-        response.statusCode,
-        response.statusMessage,
-        response.getHeaders(),
+        formatStatus(response.statusCode),
+        toString(response.statusMessage),
+        formatHeaders(response.getHeaders()),
         body,
       ),
     );

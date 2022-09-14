@@ -4,13 +4,22 @@ import { tmpdir } from "os";
 import { request as createRequest } from "http";
 import { strict as Assert } from "assert";
 import { runAsync } from "./__fixture__.mjs";
+import { Buffer } from "buffer";
+
+const {
+  JSON,
+  setTimeout,
+  undefined,
+  Math,
+  process: { stdout, env },
+  Promise,
+  Reflect,
+} = globalThis;
 
 const {
   deepEqual: assertDeepEqual,
   // equal: assertEqual
 } = Assert;
-
-const { stdout } = process;
 
 const requestAsync = (_host, port, method, path, body) =>
   new Promise((resolve, reject) => {
@@ -116,7 +125,7 @@ const testAsync = async (port_key, port, main) => {
 // Travis is taking too long for these timer to works.
 // I'm disabling this test for now.
 // It might be worthwhile to synchronize between node processes to avoid timers.
-if (Reflect.getOwnPropertyDescriptor(process.env, "TRAVIS") === undefined) {
+if (Reflect.getOwnPropertyDescriptor(env, "TRAVIS") === undefined) {
   stdout.write("\ntrack-port\n");
   await testAsync(
     "track-port",

@@ -1,11 +1,10 @@
-
 ordering-pattern: (?<!\.test)\.mjs$
 plugins:
-  '@bercow/link-adjacent': {}
-  '@bercow/prettier':
+  "@bercow/link-adjacent": {}
+  "@bercow/prettier":
     prettier-options: ./prettierrc.yml
-  '@bercow/eslint': {}
-  '@bercow/spawn':
+  "@bercow/eslint": {}
+  "@bercow/spawn":
     command: npx
     command-windows: npx.cmd
     argv:

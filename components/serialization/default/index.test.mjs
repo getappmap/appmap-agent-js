@@ -6,6 +6,7 @@ import {
 import Serialization from "./index.mjs";
 
 const {
+  Proxy,
   Symbol,
   Error,
   Reflect: { defineProperty },
@@ -174,16 +175,19 @@ validateSerial(
 // closure //
 /////////////
 
-// function named //
+// function pure //
+validateSerial(testSerialize({ "impure-printing": false }, function f() {}));
+
+// function impure named //
 validateSerial(testSerialize({}, function f() {}));
 
-// function anonymous //
+// function impure anonymous //
 validateSerial(testSerialize({}, function () {}));
 
-// arrow named //
+// arrow impure named //
 validateSerial(testSerialize({}, { f: () => {} }.f));
 
-// arrow anonymous //
+// arrow impure anonymous //
 validateSerial(testSerialize({}, () => {}));
 
 ///////////
@@ -210,10 +214,54 @@ validateSerial(
       __proto__: Error.prototype,
       name: 123,
       message: 456,
+      stack: 789,
+    },
+  ),
+);
+
+validateSerial(
+  testSerialize(
+    {},
+    {
+      __proto__: Error.prototype,
+      get name() {
+        throw new Error("NAME");
+      },
+      get message() {
+        throw new Error("MESSAGE");
+      },
       get stack() {
-        throw new Error("BOUM");
+        throw new Error("STACK");
       },
     },
+  ),
+);
+
+validateSerial(
+  testSerialize(
+    {},
+    new Proxy(
+      {},
+      {
+        getPrototypeOf: (_target) => {
+          throw new Error("getPrototypeOf");
+        },
+      },
+    ),
+  ),
+);
+
+validateSerial(
+  testSerialize(
+    {},
+    new Proxy(
+      { __proto__: Error.prototype },
+      {
+        getOwnPropertyDescriptor: (_target, _key) => {
+          throw new Error("getOwnPropertyDescriptor");
+        },
+      },
+    ),
   ),
 );
 
@@ -231,15 +279,17 @@ validateSerial(
   ),
 );
 
-// hash toEntriesSafe recovery //
 validateSerial(
   testSerialize(
     {},
-    {
-      get foo() {
-        throw new Error("BOUM");
+    new Proxy(
+      {},
+      {
+        ownKeys: (_target) => {
+          throw new Error("ownKeys");
+        },
       },
-    },
+    ),
   ),
 );
 

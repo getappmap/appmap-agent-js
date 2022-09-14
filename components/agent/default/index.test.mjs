@@ -21,6 +21,7 @@ const {
   getInstrumentationIdentifier,
   getSerializationEmptyValue,
   getFreshTab,
+  recordGroup,
   recordBeforeEvent,
   recordAfterEvent,
   formatQueryPayload,
@@ -40,6 +41,7 @@ getSerializationEmptyValue(agent);
 
 assertEqual(typeof getInstrumentationIdentifier(agent), "string");
 recordStartTrack(agent, "record", {}, null);
+recordGroup(agent, 123, "description");
 assertEqual(
   evalGlobal(
     instrument(agent, { url: "file:///base/main.js", content: "123;" }),
@@ -61,6 +63,12 @@ assertDeepEqual(takeLocalAgentTrace(agent, "record"), [
     track: "record",
     configuration: {},
     url: null,
+  },
+  {
+    type: "group",
+    group: 0,
+    child: 123,
+    description: "description",
   },
   {
     type: "source",

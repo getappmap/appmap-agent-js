@@ -1,5 +1,7 @@
 import { loadAsync } from "../../../build/await/load.mjs";
 
+const { process } = globalThis;
+
 const { stdout } = process;
 
 for (const name of [

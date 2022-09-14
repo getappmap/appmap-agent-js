@@ -18,10 +18,10 @@
 ### Requirements
 
 Supported platforms:
-* Unix-like os, tested on Linux and macOS; Windows is currently not supported
-* Node.js 14, 16 or 18
-* Express.js
-* git is highly recommended 
+* Mainstream os: linux distros, macOS, and windows
+* Node.js: 14, 16, 17 (end-of-life), or 18
+* Express.js: 4
+* git is highly recommended
 * mocha >= 8.0.0 is required for recording AppMaps from test cases (earlier versions do not support required root hooks)
 
 **Please [open a new GitHub ticket](https://github.com/applandinc/appmap-agent-js/issues/new) if your application does not satisfy the criteria or if you experience any problems with the agent.**

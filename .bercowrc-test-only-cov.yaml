@@ -1,8 +1,7 @@
-
 ordering-pattern: (?<!\.test)\.mjs$
 plugins:
-  '@bercow/link-adjacent': {}
-  '@bercow/spawn':
+  "@bercow/link-adjacent": {}
+  "@bercow/spawn":
     command: npx
     command-windows: npx.cmd
     argv:

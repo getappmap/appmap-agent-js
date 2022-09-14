@@ -23,13 +23,27 @@ export const externals = {
     });
   },
 };
+const missing_stats = {
+  missing: null,
+  isDirectory: () => false,
+};
+const statSyncSafe = (path) => {
+  try {
+    return fs.statSync(path);
+  } catch {
+    return missing_stats;
+  }
+};
 /* c8 ignore stop */
 
-export default (_dependencies) => {
+export default (dependencies) => {
+  const {
+    util: { hasOwnProperty },
+  } = dependencies;
   const findDirsWithFiles = (root, pattern) => {
     const paths = new Set();
     const hasMatch = (item) => {
-      if (!item.stats.isDirectory()) {
+      if (hasOwnProperty(item.stats, "missing") || !item.stats.isDirectory()) {
         return false;
       }
 
@@ -61,18 +75,24 @@ export default (_dependencies) => {
     const dirs = gs.found.map((d) => d.slice(0, -1));
     dirs.forEach((dir) => {
       const path = joinPath(root, dir);
-      const match_present = hasMatch({ path, stats: fs.statSync(path) });
+      const match_present = hasMatch({
+        path,
+        stats: statSyncSafe(path),
+      });
       if (!match_present) {
         // klaw-sync doesn't provide a way to suppress errors in the same way
         // that GlobSync does. So, arrange for klaw-sync to call GlobSync's
         // implementation of readdir.
-        const klaw_fs = { ...fs };
-        klaw_fs.readdirSync = (path, options) => {
-          let ret = glob.GlobSync.prototype._readdir.bind(gs)(path, options);
-          if (!ret) {
-            ret = [];
-          }
-          return ret;
+        const klaw_fs = {
+          ...fs,
+          readdirSync: (path, options) => {
+            let ret = glob.GlobSync.prototype._readdir.bind(gs)(path, options);
+            if (!ret) {
+              ret = [];
+            }
+            return ret;
+          },
+          statSync: statSyncSafe,
         };
 
         // Also, klaw-sync calls the filter function before checking if the item is a

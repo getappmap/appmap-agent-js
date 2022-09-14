@@ -6,6 +6,8 @@ import { strict as Assert } from "assert";
 import { join as joinPath } from "path";
 import { runAsync } from "./__fixture__.mjs";
 
+const { JSON } = globalThis;
+
 const { equal: assertEqual, deepEqual: assertDeepEqual } = Assert;
 
 await runAsync(

@@ -7,6 +7,8 @@ import { join as joinPath } from "path";
 import { runAsync } from "./__fixture__.mjs";
 import SourceMap from "source-map";
 
+const { JSON } = globalThis;
+
 const { SourceMapGenerator } = SourceMap;
 
 const {

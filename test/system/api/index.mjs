@@ -10,6 +10,8 @@ import {
 } from "fs/promises";
 import { createAppMap } from "../../../lib/node/recorder-api.mjs";
 
+const { Error, Infinity, process, JSON, Math, URL } = globalThis;
+
 Error.stackTraceLimit = Infinity;
 
 const { cwd } = process;

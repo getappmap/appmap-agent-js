@@ -7,6 +7,8 @@ import { strict as Assert } from "assert";
 import { join as joinPath } from "path";
 import { runAsync } from "./__fixture__.mjs";
 
+const { JSON, process } = globalThis;
+
 const { cwd } = process;
 const { deepEqual: assertDeepEqual } = Assert;
 

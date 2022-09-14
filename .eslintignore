@@ -1,6 +1,6 @@
+/.github
 /coverage
-/demo
+/dist
 /doc
 /node_modules
-/sample
-/yo*
+/tmp

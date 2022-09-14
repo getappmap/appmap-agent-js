@@ -1,5 +1,4 @@
-
-import {consumeStreamAsync} from "./stream.mjs";
+import { consumeStreamAsync } from "./stream.mjs";
 
 const createStreamPipe = (produce, consume) => ({
   type: "stream",
@@ -13,7 +12,7 @@ const createPromisePipe = (produce, consume) => ({
   consume,
 });
 
-const mapStatePipe = ({type, produce, consume}, transform) => ({
+const mapStatePipe = ({ type, produce, consume }, transform) => ({
   type,
   produce,
   consume: (state, event) => {
@@ -21,7 +20,7 @@ const mapStatePipe = ({type, produce, consume}, transform) => ({
   },
 });
 
-const mapEventPipe = ({type, produce, consume}, transform) => ({
+const mapEventPipe = ({ type, produce, consume }, transform) => ({
   type,
   produce,
   consume: (state, event) => {
@@ -29,8 +28,10 @@ const mapEventPipe = ({type, produce, consume}, transform) => ({
   },
 });
 
-const runPipeAsync = ({type, produce, consume}, state) => {
-  const handle = (event) => { consume(state, event); };
+const runPipeAsync = ({ type, produce, consume }, state) => {
+  const handle = (event) => {
+    consume(state, event);
+  };
   if (type === "promise") {
     return produce.then(handle);
   }

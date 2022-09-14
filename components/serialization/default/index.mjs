@@ -1,6 +1,6 @@
 const {
-  Reflect: { getPrototypeOf, apply, ownKeys },
-  Error,
+  Reflect: { getOwnPropertyDescriptor, getPrototypeOf, apply, ownKeys },
+  Error: { prototype: error_prototype },
   Infinity,
   Symbol,
   Symbol: { keyFor, for: symbolFor },
@@ -9,10 +9,10 @@ const {
   Set,
   String,
   undefined,
+  Math: { min },
   Object: {
     prototype: object_prototype,
     prototype: { toString },
-    entries: toEntries,
     fromEntries,
   },
   Array: { isArray },
@@ -21,178 +21,233 @@ const {
 
 const noargs = [];
 
+const empty = symbolFor("APPMAP_EMPTY_MARKER");
+
+const isSymbol = (any) => typeof any === "symbol";
+
+const isString = (any) => typeof any === "string";
+
+const wellknown = new Set(
+  ownKeys(Symbol)
+    .map((key) => Symbol[key])
+    .filter(isSymbol),
+);
+
 export default (dependencies) => {
   const {
-    util: { incrementCounter, createCounter },
+    util: { identity, hasOwnProperty, incrementCounter, createCounter },
     log: { logDebug, logGuardDebug },
   } = dependencies;
-  const toEntriesSafe = (object) => {
+  ////////////////////
+  // Reflect Helper //
+  ////////////////////
+  const getOwnKeyArrayImpure = (object) => {
     try {
-      return toEntries(object);
+      return ownKeys(object);
     } catch (error) {
-      logDebug("Failed to called Object.entries on %o >> %e", object, error);
+      logDebug(
+        "Reflect.ownKeys(%o) threw %e (this should only happen when the object is a proxy)",
+        object,
+        error,
+      );
       return [];
     }
   };
-  const getSafe = (object, key) => {
+  const getPrototypeImpure = (object) => {
     try {
-      return object[key];
+      return getPrototypeOf(object);
     } catch (error) {
-      logDebug("Failed to lookup %j on %o >> %e", key, object, error);
-      return undefined;
-    }
-  };
-  const empty = symbolFor("APPMAP_EMPTY_MARKER");
-  const wellknown = new Set(
-    ownKeys(Symbol)
-      .map((key) => Symbol[key])
-      .filter((value) => typeof value === "symbol"),
-  );
-  const printPureFallback = (value) => apply(toString, value, noargs);
-  const printPure = (value) => {
-    if (
-      value === null ||
-      value === undefined ||
-      typeof value === "boolean" ||
-      typeof value === "number"
-    ) {
-      return String(value);
-    } else if (typeof value === "string") {
-      return stringifyJSON(value);
-    } else if (typeof value === "bigint") {
-      return `${String(value)}n`;
-    } else if (typeof value === "symbol") {
-      if (wellknown.has(value)) {
-        return `well-known ${String(value)}`;
-      } else if (keyFor(value) !== undefined) {
-        return `global ${String(value)}`;
-      } else {
-        return String(value);
-      }
-    } else {
-      return printPureFallback(value);
-    }
-  };
-  const printImpure = (value) => {
-    if (typeof value === "function") {
-      const name = getSafe(value, "name");
-      logGuardDebug(
-        name !== "string",
-        "Name of function %o is not a string: %o",
-        value,
-        name,
-      );
-      if (getSafe(value, "prototype") !== undefined) {
-        if (typeof name === "string" && name !== "") {
-          return `function ${name} (...) { ... }`;
-        } else {
-          return `function (...) { ... }`;
-        }
-      } else {
-        if (typeof name === "string" && name !== "") {
-          return `${name} = (...) => { ... }`;
-        } else {
-          return `(...) => { ... }`;
-        }
-      }
-    } else if (typeof value === "object" && value !== null) {
-      let print = null;
-      try {
-        print = value.toString();
-      } catch (error) {
-        logDebug("%o.toString() failure >> %O", value, error);
-        return printPureFallback(value);
-      }
-      if (typeof print !== "string") {
-        logDebug("%o.toString() returned a non-string: %o", value, print);
-        return printPureFallback(value);
-      } else {
-        return print;
-      }
-    } else {
-      return printPure(value);
-    }
-  };
-  const getIndex = (map, counter, value) => {
-    const index = map.get(value);
-    if (index !== undefined) {
-      return index;
-    } else {
-      const new_index = incrementCounter(counter);
-      map.set(value, new_index);
-      return new_index;
-    }
-  };
-  const getConstructorNameImpure = (object) => {
-    const _constructor = getSafe(object, "constructor");
-    if (typeof _constructor === "function") {
-      const name = getSafe(_constructor, "name");
-      logGuardDebug(
-        typeof name !== "string",
-        "Constructor name of %o is not a string: %o",
+      logDebug(
+        "Reflect.getPrototypeOf(%o) threw %e (this should only happen when the object is a proxy)",
         object,
-        name,
+        error,
       );
-      return typeof name === "string" ? name : null;
-    } else {
       return null;
     }
   };
-  const getConstructorNamePure = (value) => {
-    const tag = printPureFallback(value);
-    return tag.substring(tag.indexOf(" ") + 1, tag.length - 1);
+  const getOwnPropertyDescriptorImpure = (object, key) => {
+    try {
+      return getOwnPropertyDescriptor(object, key);
+    } catch (error) {
+      logDebug(
+        "Reflect.getOwnPropertyDescriptor(%o, %j) threw %e (this should only happen when the object is a proxy)",
+        object,
+        key,
+        error,
+      );
+      return undefined;
+    }
   };
-  const isEntryString = ({ 0: key }) => typeof key === "string";
-  const serializeEntry = ({ 0: key, 1: value }) => [
-    key,
-    getConstructorNamePure(value),
-  ];
+  const hasPrototypeImpure = (object, prototype) => {
+    while (object !== null) {
+      if (object === prototype) {
+        return true;
+      }
+      object = getPrototypeImpure(object);
+    }
+    return false;
+  };
+  const getDataPropertyImpure = (object, key) => {
+    while (object !== null) {
+      const descriptor = getOwnPropertyDescriptorImpure(object, key);
+      if (descriptor !== undefined && hasOwnProperty(descriptor, "value")) {
+        return descriptor.value;
+      }
+      object = getPrototypeImpure(object);
+    }
+    return undefined;
+  };
+  const getTypeTagPure = (any) => apply(toString, any, noargs);
+  const getTagPure = (any) => {
+    const type_tag = getTypeTagPure(any);
+    return type_tag.substring(type_tag.indexOf(" ") + 1, type_tag.length - 1);
+  };
+  const toStringImpure = (object) => {
+    try {
+      return object.toString();
+    } catch (error) {
+      logDebug("%o.toString() failure >> %O", object, error);
+      return undefined;
+    }
+  };
+  ///////////
+  // Index //
+  ///////////
+  const generateGetIndex =
+    (name) =>
+    ({ [name]: map, counter }, value) => {
+      const index = map.get(value);
+      if (index !== undefined) {
+        return index;
+      } else {
+        const new_index = incrementCounter(counter);
+        map.set(value, new_index);
+        return new_index;
+      }
+    };
+  const getSymbolIndex = generateGetIndex("symbols");
+  const getReferenceIndex = generateGetIndex("references");
+  ////////////////////////
+  // getConstructorName //
+  ////////////////////////
+  const getConstructorName = ({ impure_constructor_naming }, object) => {
+    if (impure_constructor_naming) {
+      const _constructor = getDataPropertyImpure(object, "constructor");
+      if (typeof _constructor === "function") {
+        const name = getDataPropertyImpure(_constructor, "name");
+        logGuardDebug(
+          typeof name !== "string",
+          "Constructor name of %o is not a string: %o",
+          object,
+          name,
+        );
+        return typeof name === "string" ? name : getTagPure(object);
+      } else {
+        return getTagPure(object);
+      }
+    } else {
+      return getTagPure(object);
+    }
+  };
+  ///////////////
+  // stringify //
+  ///////////////
+  const generatePrint =
+    (printString) =>
+    ({ impure_printing }, any) => {
+      if (
+        any === null ||
+        any === undefined ||
+        typeof any === "boolean" ||
+        typeof any === "number"
+      ) {
+        return String(any);
+      } else if (typeof any === "string") {
+        return printString(any);
+      } else if (typeof any === "bigint") {
+        return `${String(any)}n`;
+      } else if (typeof any === "symbol") {
+        if (wellknown.has(any)) {
+          return `well-known ${String(any)}`;
+        } else if (keyFor(any) !== undefined) {
+          return `global ${String(any)}`;
+        } else {
+          return String(any);
+        }
+      } else if (typeof any === "function") {
+        if (impure_printing) {
+          const name = getDataPropertyImpure(any, "name");
+          if (getOwnPropertyDescriptorImpure(any, "prototype") !== undefined) {
+            if (typeof name === "string" && name !== "") {
+              return `function ${name} (...) { ... }`;
+            } else {
+              return `function (...) { ... }`;
+            }
+          } else {
+            if (typeof name === "string" && name !== "") {
+              return `${name} = (...) => { ... }`;
+            } else {
+              return `(...) => { ... }`;
+            }
+          }
+        } else {
+          return getTypeTagPure(any);
+        }
+      } else {
+        if (impure_printing) {
+          const representation = toStringImpure(any);
+          logGuardDebug(
+            typeof representation !== "string",
+            "%o.toString() did not return a string, got: %o",
+            any,
+            representation,
+          );
+          return typeof representation === "string"
+            ? representation
+            : getTypeTagPure(any);
+        } else {
+          return getTypeTagPure(any);
+        }
+      }
+    };
+  const print = generatePrint(stringifyJSON);
+  const show = generatePrint(identity);
+  //////////////////
+  // getSpecific  //
+  //////////////////
   const getSpecific = (serialization, object) => {
-    if (serialization.impure_error_inspection && object instanceof Error) {
-      const name = getSafe(object, "name");
-      const message = getSafe(object, "message");
-      const stack = getSafe(object, "stack");
-      logGuardDebug(
-        typeof name !== "string",
-        "Name of error %o is not a string: %o",
-        object,
-        name,
-      );
-      logGuardDebug(
-        typeof message !== "string",
-        "Message of error %o is not a string: %o",
-        object,
-        message,
-      );
-      logGuardDebug(
-        typeof stack !== "string",
-        "Stack of error %o is not a string: %o",
-        object,
-        stack,
-      );
+    if (
+      serialization.impure_error_inspection &&
+      hasPrototypeImpure(object, error_prototype)
+    ) {
       return {
         type: "error",
-        name: typeof name === "string" ? name : "",
-        message: typeof message === "string" ? message : "",
-        stack: typeof stack === "string" ? stack : "",
+        name: show(serialization, getDataPropertyImpure(object, "name")),
+        message: show(serialization, getDataPropertyImpure(object, "message")),
+        stack: show(serialization, getDataPropertyImpure(object, "stack")),
       };
     } else if (serialization.impure_array_inspection && isArray(object)) {
-      return { type: "array", length: getSafe(object, "length") };
+      // Proxies cannot change array's length so we know it will be a number.
+      return { type: "array", length: getDataPropertyImpure(object, "length") };
     } else if (
       serialization.impure_hash_inspection &&
-      (getPrototypeOf(object) === null ||
-        getPrototypeOf(object) === object_prototype)
+      (getPrototypeImpure(object) === null ||
+        getPrototypeImpure(object) === object_prototype)
     ) {
-      const entries = toEntriesSafe(object);
+      const keys = getOwnKeyArrayImpure(object).filter(isString);
+      const entries = [];
+      const length = min(keys.length, serialization.maximum_properties_length);
+      for (let index = 0; index < length; index += 1) {
+        const key = keys[index];
+        entries.push([
+          key,
+          getConstructorName(serialization, getDataPropertyImpure(object, key)),
+        ]);
+      }
       return {
         type: "hash",
-        length: entries.length,
-        properties: fromEntries(
-          entries
-            .filter(isEntryString)
-            .slice(0, serialization.maximum_properties_length)
-            .map(serializeEntry),
-        ),
+        length,
+        properties: fromEntries(entries),
       };
     } else {
       return null;
@@ -200,9 +255,7 @@ export default (dependencies) => {
   };
   const serializeNonEmpty = (serialization, value) => {
     const type = value === null ? "null" : typeof value;
-    const print = serialization.impure_printing
-      ? printImpure(value)
-      : printPure(value);
+    const representation = print(serialization, value);
     if (
       type === "null" ||
       type === "undefined" ||
@@ -211,21 +264,19 @@ export default (dependencies) => {
       type === "string" ||
       type === "bigint"
     ) {
-      return { type, print };
+      return { type, print: representation };
     } else if (type === "symbol") {
       return {
         type,
-        print,
-        index: getIndex(serialization.symbols, serialization.counter, value),
+        print: representation,
+        index: getSymbolIndex(serialization, value),
       };
     } else {
       return {
         type,
-        print,
-        index: getIndex(serialization.references, serialization.counter, value),
-        constructor: serialization.impure_constructor_naming
-          ? getConstructorNameImpure(value)
-          : getConstructorNamePure(value),
+        print: representation,
+        index: getReferenceIndex(serialization, value),
+        constructor: getConstructorName(serialization, value),
         specific: getSpecific(serialization, value),
       };
     }

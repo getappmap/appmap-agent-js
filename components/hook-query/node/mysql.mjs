@@ -1,6 +1,7 @@
 import Require from "./require.mjs";
 
 const {
+  Object,
   Reflect: { apply },
 } = globalThis;
 
@@ -9,7 +10,7 @@ const VERSION = null;
 
 export default (dependencies) => {
   const {
-    util: { spyOnce, assignProperty },
+    util: { toString, spyOnce, assignProperty },
     agent: {
       getFreshTab,
       recordBeginEvent,
@@ -38,19 +39,25 @@ export default (dependencies) => {
       const { query: original } = prototype;
       prototype.query = function query(sql, values, callback) {
         const query = createQuery(sql, values, callback);
-        ({ sql, values, _callback: callback } = { values: [], ...query });
         const bundle_tab = getFreshTab(agent);
         recordBeginEvent(agent, bundle_tab, bundle_payload);
         const jump_tab = getFreshTab(agent);
         recordBeforeEvent(
           agent,
           jump_tab,
-          formatQueryPayload(agent, DATABASE, VERSION, sql, values),
+          formatQueryPayload(
+            agent,
+            DATABASE,
+            VERSION,
+            toString(query.sql),
+            Object(query.values),
+          ),
         );
+        const { _callback: query_callback } = query;
         query._callback = spyOnce((_error, _result, _field) => {
           recordAfterEvent(agent, jump_tab, answer_payload);
           recordEndEvent(agent, bundle_tab, bundle_payload);
-        }, callback);
+        }, query_callback);
         return apply(original, this, [query]);
       };
       return [{ object: prototype, key: "query", value: original }];

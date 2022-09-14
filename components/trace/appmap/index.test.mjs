@@ -87,6 +87,12 @@ assertDeepEqual(
       },
     },
     {
+      type: "group",
+      group: 0,
+      child: 1,
+      description: "description",
+    },
+    {
       type: "event",
       site: "end",
       tab: tabs.event1,

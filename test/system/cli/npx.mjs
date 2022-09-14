@@ -5,6 +5,8 @@ import { join as joinPath } from "path";
 import { spawnStrictAsync } from "../../spawn.mjs";
 import { runAsync } from "./__fixture__.mjs";
 
+const { JSON } = globalThis;
+
 const { equal: assertEqual } = Assert;
 
 await runAsync(

@@ -2,7 +2,10 @@ import { lstat as lstatAsync, readdir as readdirAsync } from "fs/promises";
 import { join as joinPath } from "path";
 import { spawnAsync } from "../spawn.mjs";
 
-const { stdout } = process;
+const {
+  process: { stdout },
+  String,
+} = globalThis;
 
 const loop = async (path) => {
   if (path.endsWith(".test.mjs")) {
