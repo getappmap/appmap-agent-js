@@ -18,7 +18,7 @@
 ### Requirements
 
 Supported platforms:
-* Mainstream os: linux distros, osx, and windows
+* Mainstream os: linux distros, macOS, and windows
 * Node.js: 14, 16, 17 (end-of-life), or 18
 * Express.js: 4
 * git is highly recommended
