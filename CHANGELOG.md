@@ -1,3 +1,21 @@
+# [11.5.0](https://github.com/applandinc/appmap-agent-js/compare/v11.4.0...v11.5.0) (2022-09-14)
+
+
+### Bug Fixes
+
+* account for file changes between fs calls ([8fb5629](https://github.com/applandinc/appmap-agent-js/commit/8fb5629e2cd06d62384905b9b8d09da3bf6851be))
+* avoid calling getters during serialization ([7a23367](https://github.com/applandinc/appmap-agent-js/commit/7a23367254de55a8c4d2e1d0a1eef28e247c55bc))
+
+
+### Features
+
+* re-enable support for node 17 ([e554d6e](https://github.com/applandinc/appmap-agent-js/commit/e554d6ead0040771cc799c5e8804799fef7a9bb3))
+
+
+### Performance Improvements
+
+* shorthand for begin/end group event pair ([cf04077](https://github.com/applandinc/appmap-agent-js/commit/cf0407792810a48490c01cb357ae323e0e367b5a))
+
 # [11.4.0](https://github.com/applandinc/appmap-agent-js/compare/v11.3.0...v11.4.0) (2022-09-10)
 
 
