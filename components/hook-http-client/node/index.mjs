@@ -8,8 +8,15 @@ const {
 
 export default (dependencies) => {
   const {
-    util: { identity, assignProperty, getOwnProperty, spyOnce },
-    "hook-http": { parseContentType, decodeSafe, parseJSONSafe, spyReadable },
+    util: { toString, identity, assignProperty, getOwnProperty, spyOnce },
+    "hook-http": {
+      parseContentType,
+      decodeSafe,
+      parseJSONSafe,
+      spyReadable,
+      formatHeaders,
+      formatStatus,
+    },
     agent: {
       getSerializationEmptyValue,
       getFreshTab,
@@ -48,10 +55,10 @@ export default (dependencies) => {
               agent,
               "client",
               "HTTP/1.1",
-              request.method,
-              request.path,
+              toString(request.method),
+              toString(request.path),
               null,
-              request.getHeaders(),
+              formatHeaders(request.getHeaders()),
               empty,
             ),
           );
@@ -95,9 +102,9 @@ export default (dependencies) => {
                   formatResponsePayload(
                     agent,
                     "client",
-                    status,
-                    message,
-                    headers,
+                    formatStatus(status),
+                    toString(message),
+                    formatHeaders(headers),
                     body,
                   ),
                 );

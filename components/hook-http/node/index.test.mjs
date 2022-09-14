@@ -4,14 +4,35 @@ import { Writable, Readable } from "stream";
 import { buildTestDependenciesAsync } from "../../build.mjs";
 import HookHttp from "./index.mjs";
 
+const { Symbol } = globalThis;
+
 const dependencies = await buildTestDependenciesAsync(import.meta.url);
 const {
+  formatHeaders,
+  formatStatus,
   parseContentType,
   parseJSONSafe,
   decodeSafe,
   spyReadable,
   spyWritable,
 } = HookHttp(dependencies);
+
+////////////
+// format //
+////////////
+
+assertEqual(formatStatus("200.200"), 200);
+assertEqual(formatStatus("foo"), 0);
+
+assertDeepEqual(
+  formatHeaders({
+    "content-length": 123,
+    [Symbol("foo")]: 456,
+  }),
+  {
+    "content-length": "123",
+  },
+);
 
 //////////////////////
 // parseContentType //

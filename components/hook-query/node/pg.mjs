@@ -1,6 +1,7 @@
 import Require from "./require.mjs";
 
 const {
+  Object,
   undefined,
   Reflect: { apply },
   Promise,
@@ -12,7 +13,7 @@ const DATABASE = "postgres";
 
 export default (dependencies) => {
   const {
-    util: { spyOnce, assignProperty },
+    util: { toString, spyOnce, assignProperty },
     agent: {
       getFreshTab,
       recordBeginEvent,
@@ -40,6 +41,7 @@ export default (dependencies) => {
       const { prototype } = Client;
       const { query: original } = prototype;
       const { query } = {
+        // We use the method syntax to create a function that is not constructor.
         query(query, values, callback) {
           if (query === null || query === undefined) {
             throw new TypeError("Client was passed a null or undefined query");
@@ -78,15 +80,15 @@ export default (dependencies) => {
               agent,
               DATABASE,
               VERSION,
-              query.text,
-              query.values || {},
+              toString(query.text),
+              Object(query.values),
             ),
           );
-          callback = query.callback;
+          const { callback: query_callback } = query;
           query.callback = spyOnce((_error, _result) => {
             recordAfterEvent(agent, jump_tab, answer_payload);
             recordEndEvent(agent, bundle_tab, bundle_payload);
-          }, callback);
+          }, query_callback);
           apply(original, this, [query]);
           return result;
         },

@@ -1,6 +1,7 @@
 import Require from "./require.mjs";
 
 const {
+  Object,
   Array: { isArray },
   Object: { assign },
   Reflect: { apply },
@@ -86,7 +87,7 @@ const combine = (parameters1, parameters2) => {
 
 export default (dependencies) => {
   const {
-    util: { spyOnce, assignProperty },
+    util: { toString, spyOnce, assignProperty },
     agent: {
       getFreshTab,
       recordBeginEvent,
@@ -126,7 +127,13 @@ export default (dependencies) => {
         recordBeforeEvent(
           agent,
           jump_tab,
-          formatQueryPayload(agent, DATABASE, VERSION, sql, parameters),
+          formatQueryPayload(
+            agent,
+            DATABASE,
+            VERSION,
+            toString(sql),
+            Object(parameters),
+          ),
         );
         return spyOnce(() => {
           recordAfterEvent(agent, jump_tab, answer_payload);

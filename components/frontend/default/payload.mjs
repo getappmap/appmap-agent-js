@@ -1,5 +1,3 @@
-import { toString, toInteger } from "./convert.mjs";
-
 const {
   Array: { isArray, from: toArray },
   Object: { fromEntries, entries: toEntries },
@@ -7,16 +5,9 @@ const {
 
 export default (dependencies) => {
   const {
-    util: { constant, mapMaybe },
+    util: { constant },
     serialization: { serialize },
   } = dependencies;
-
-  const hasStringKey = ([key]) => typeof key === "string";
-
-  const printValue = ([key, value]) => [key, toString(value)];
-
-  const formatHeaders = (headers) =>
-    fromEntries(toEntries(headers).filter(hasStringKey).map(printValue));
 
   return {
     getJumpPayload: constant({ type: "jump" }),
@@ -68,11 +59,11 @@ export default (dependencies) => {
     ) => ({
       type: "request",
       side,
-      protocol: toString(protocol),
-      method: toString(method),
-      url: toString(url),
-      route: mapMaybe(route, toString),
-      headers: formatHeaders(headers),
+      protocol,
+      method,
+      url,
+      route,
+      headers,
       body: serialize(serialization, body),
     }),
     formatResponsePayload: (
@@ -85,9 +76,9 @@ export default (dependencies) => {
     ) => ({
       type: "response",
       side,
-      status: toInteger(status),
-      message: toString(message),
-      headers: formatHeaders(headers),
+      status,
+      message,
+      headers,
       body: serialize(serialization, body),
     }),
     formatQueryPayload: (
@@ -98,9 +89,9 @@ export default (dependencies) => {
       parameters,
     ) => ({
       type: "query",
-      database: mapMaybe(database, toString),
-      version: mapMaybe(version, toString),
-      sql: toString(sql),
+      database,
+      version,
+      sql,
       parameters: isArray(parameters)
         ? parameters.map((parameter) => serialize(serialization, parameter))
         : fromEntries(

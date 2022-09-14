@@ -1,14 +1,16 @@
 const {
   Buffer: { from: toBuffer, concat: concatBuffer },
-  Object: { fromEntries },
+  Object: { fromEntries, entries: toEntries },
   TextDecoder,
   Reflect: { apply },
   JSON: { parse: parseJSON },
+  Math: { round },
   undefined,
 } = globalThis;
 
 export default (dependencies) => {
   const {
+    util: { toNumber, jsonifyNumber, toString },
     log: { logWarning },
     patch: { patch },
   } = dependencies;
@@ -106,7 +108,27 @@ export default (dependencies) => {
     };
   };
 
+  const isStringKeyEntry = ({ 0: key }) => typeof key === "string";
+
+  const toStringValueEntry = ({ 0: key, 1: value }) => [key, toString(value)];
+
+  const formatHeaders = (headers) =>
+    fromEntries(
+      toEntries(headers).filter(isStringKeyEntry).map(toStringValueEntry),
+    );
+
+  const replacements = {
+    NaN: 0,
+    NEGATIVE_INFINITY: 0,
+    POSITIVE_INFINITY: 0,
+  };
+
+  const formatStatus = (any) =>
+    round(jsonifyNumber(toNumber(any), replacements));
+
   return {
+    formatStatus,
+    formatHeaders,
     parseContentType,
     parseJSONSafe,
     decodeSafe,
