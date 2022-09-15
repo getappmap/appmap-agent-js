@@ -126,13 +126,13 @@ export default (dependencies) => {
             } else {
               const backend = createBackend(configuration);
               socket.on("close", () => {
+                sendBackend(backend, {
+                  type: "error",
+                  name: "AppmapError",
+                  message: "disconnection",
+                  stack: "",
+                });
                 for (const key of getBackendTrackIterator(backend)) {
-                  sendBackend(backend, {
-                    type: "error",
-                    name: "AppmapError",
-                    message: "disconnection",
-                    stack: "",
-                  });
                   sendBackend(backend, {
                     type: "stop",
                     track: key,
