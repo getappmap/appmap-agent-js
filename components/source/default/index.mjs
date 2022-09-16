@@ -17,30 +17,30 @@ export default (dependencies) => {
   const normalizeURL = (url, relative_url) => {
     if (/^[a-z]+:/u.test(relative_url)) {
       return relative_url;
-    }
-    if (url.startsWith("data:")) {
+    } else if (url.startsWith("data:")) {
       expect(
         relative_url[0] === "/",
-        "Expected an unix absolute path because the reference url is a data url, got %j relative to %j",
+        "Expected a unix absolute path because the reference url is a data url, got %j relative to %j",
         relative_url,
         url,
       );
       return `file://${relative_url}`;
-    }
-    const url_object = new URL(url);
-    // The source map spec https://sourcemaps.info/spec.html
-    // Does not mention absolute windows paths in map.sources.
-    // But typescript generate them in it with forward slashes.
-    if (relative_url[0] === "/" || /^[a-zA-Z]:/u.test(relative_url)) {
-      url_object.pathname = relative_url;
     } else {
-      const { pathname } = url_object;
-      const segments = pathname.split("/");
-      segments.pop();
-      segments.push(...relative_url.split("/"));
-      url_object.pathname = segments.join("/");
+      const url_object = new URL(url);
+      // The source map spec https://sourcemaps.info/spec.html
+      // Does not mention absolute windows paths in map.sources.
+      // But typescript generate them in it with forward slashes.
+      if (relative_url[0] === "/" || /^[a-zA-Z]:/u.test(relative_url)) {
+        url_object.pathname = relative_url;
+      } else {
+        const { pathname } = url_object;
+        const segments = pathname.split("/");
+        segments.pop();
+        segments.push(...relative_url.split("/"));
+        url_object.pathname = segments.join("/");
+      }
+      return url_object.toString();
     }
-    return url_object.toString();
   };
 
   const normalizePayload = (url, payload) => {
