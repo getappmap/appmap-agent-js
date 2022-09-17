@@ -48,6 +48,7 @@ assertEqual(
   ),
   123,
 );
+
 const tab = getFreshTab(agent);
 recordBeforeEvent(
   agent,

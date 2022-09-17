@@ -1,4 +1,4 @@
-import { readFile as readFileAsync } from "fs/promises";
+import { readFileSync as readFile, writeFileSync as writeFile } from "fs";
 import { getFreshTemporaryURL } from "../../__fixture__.mjs";
 import { Socket } from "net";
 import NetSocketMessaging from "net-socket-messaging";
@@ -74,6 +74,44 @@ await testAsync(
   [],
 );
 
+{
+  const url = getFreshTemporaryURL();
+  writeFile(new URL(url), "content", "utf8");
+  await testAsync(
+    port,
+    extendConfiguration(
+      createConfiguration("file:///home"),
+      {
+        recorder: "process",
+      },
+      null,
+    ),
+    [
+      {
+        type: "start",
+        track: "track",
+        configuration: {},
+        url: null,
+      },
+      {
+        type: "source",
+        url,
+        content: null,
+        shallow: false,
+        inline: false,
+        exclude: [],
+      },
+      {
+        type: "stop",
+        track: "track",
+        status: 0,
+      },
+    ],
+  );
+}
+
+readFile(new URL(`${url}/directory/process/anonymous.appmap.json`));
+
 await testAsync(
   port,
   extendConfiguration(
@@ -90,38 +128,10 @@ await testAsync(
       configuration: {},
       url: null,
     },
-    {
-      type: "stop",
-      track: "track",
-      status: 0,
-    },
   ],
 );
 
-await readFileAsync(new URL(`${url}/directory/process/anonymous.appmap.json`));
-
-await testAsync(
-  port,
-  extendConfiguration(
-    createConfiguration("file:///home"),
-    {
-      recorder: "process",
-    },
-    null,
-  ),
-  [
-    {
-      type: "start",
-      track: "track",
-      configuration: {},
-      url: null,
-    },
-  ],
-);
-
-await readFileAsync(
-  new URL(`${url}/directory/process/anonymous-1.appmap.json`),
-);
+readFile(new URL(`${url}/directory/process/anonymous-1.appmap.json`));
 
 await testAsync(
   port,
@@ -143,6 +153,6 @@ await testAsync(
   ],
 );
 
-await readFileAsync(new URL(`${url}/directory/process/map-name.appmap.json`));
+readFile(new URL(`${url}/directory/process/map-name.appmap.json`));
 
 await closeReceptorAsync(receptor);

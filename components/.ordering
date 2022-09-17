@@ -30,7 +30,6 @@ location
 trace
 backend
 source
-source-outer
 instrumentation
 interpretation
 serialization

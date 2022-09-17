@@ -1,5 +1,5 @@
 import { lstat as lstatAsync, mkdir as mkdirAsync } from "fs/promises";
-import { writeFileSync } from "fs";
+import { writeFileSync as writeFile, readFileSync as readFile } from "fs";
 import { createServer } from "net";
 import NetSocketMessaging from "net-socket-messaging";
 
@@ -83,7 +83,7 @@ export default (dependencies) => {
       );
     }
     urls.add(url);
-    writeFileSync(new URL(url), stringifyJSON(trace, null, 2), "utf8");
+    writeFile(new URL(url), stringifyJSON(trace, null, 2), "utf8");
     logInfo("Trace written at: %s", url);
   };
   return {
@@ -149,6 +149,9 @@ export default (dependencies) => {
               });
               socket.on("message", (content) => {
                 const message = parseJSON(content);
+                if (message.type === "source" && message.content === null) {
+                  message.content = readFile(new URL(message.url), "utf8");
+                }
                 sendBackend(backend, message);
                 if (message.type === "stop") {
                   for (const key of getBackendTraceIterator(backend)) {

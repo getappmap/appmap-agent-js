@@ -1,5 +1,6 @@
-import { assertDeepEqual } from "../../__fixture__.mjs";
+import { getFreshTemporaryURL, assertDeepEqual } from "../../__fixture__.mjs";
 import { Socket } from "net";
+import { writeFileSync as writeFile } from "fs";
 import NetSocketMessaging from "net-socket-messaging";
 import {
   buildTestDependenciesAsync,
@@ -8,6 +9,7 @@ import {
 import Receptor from "./index.mjs";
 
 const {
+  URL,
   Promise,
   JSON: { stringify: stringifyJSON },
   setTimeout,
@@ -165,6 +167,20 @@ await assertRequestAsync("GET", "/_appmap/track", null, {
       }),
     ),
   );
+  const url = getFreshTemporaryURL();
+  writeFile(new URL(url), "content", "utf8");
+  socket.write(
+    createMessage(
+      stringifyJSON({
+        type: "source",
+        url,
+        content: null,
+        shallow: false,
+        inline: false,
+        exclude: [],
+      }),
+    ),
+  );
   await new Promise((resolve) => {
     socket.on("close", resolve);
     socket.end();
@@ -180,6 +196,14 @@ await assertRequestAsync("GET", "/_appmap/track", null, {
           track: "track2",
           configuration: {},
           url: null,
+        },
+        {
+          type: "source",
+          url,
+          content: "content",
+          shallow: false,
+          inline: false,
+          exclude: [],
         },
         {
           type: "error",

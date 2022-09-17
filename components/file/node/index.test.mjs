@@ -1,15 +1,27 @@
-import { getFreshTemporaryURL, assertEqual } from "../../__fixture__.mjs";
+import {
+  getFreshTemporaryURL,
+  assertEqual,
+  assertThrow,
+} from "../../__fixture__.mjs";
 import { writeFile as writeFileAsync } from "fs/promises";
 import { buildTestDependenciesAsync } from "../../build.mjs";
 import File from "./index.mjs";
 
 const { URL } = globalThis;
 
-const { readFileSync, readFileAsync } = File(
-  await buildTestDependenciesAsync(import.meta.url),
+const { readFile } = File(await buildTestDependenciesAsync(import.meta.url));
+
+{
+  const url = getFreshTemporaryURL();
+  await writeFileAsync(new URL(url), "content", "utf8");
+  assertEqual(readFile(url), "content");
+}
+
+assertEqual(readFile("data:,Hello%2C%20World%21"), "Hello, World!");
+
+assertEqual(
+  readFile("data:text/plain;base64,SGVsbG8sIFdvcmxkIQ=="),
+  "Hello, World!",
 );
 
-const url = getFreshTemporaryURL();
-await writeFileAsync(new URL(url), "content", "utf8");
-assertEqual(readFileSync(url), "content");
-assertEqual(await readFileAsync(url), "content");
+assertThrow(() => readFile("http://locahost/"), /Error: unsupported protocol/u);
