@@ -1,135 +1,154 @@
+import { decode as decodeVLQ } from "vlq";
+
 const {
+  Error,
   JSON: { parse: parseJSON },
-  URL,
 } = globalThis;
 
 export default (dependencies) => {
   const {
-    expect: { expect, expectSuccess },
-    util: { assert, coalesce },
+    expect: { expectSuccess },
+    url: { urlifyPath, removeLastURLSegment },
+    log: { logInfo },
+    util: { identity },
     validate: { validateSourceMap },
-    "source-inner": { compileSourceMap, mapSource },
-    location: { makeLocation },
   } = dependencies;
 
-  // TODO: this method has been changed multiple time and is source of bugs.
-  // It might be good to refactor it and/or move it in the module url.
-  const normalizeURL = (url, relative_url) => {
-    if (/^[a-z]+:/u.test(relative_url)) {
-      return relative_url;
-    } else if (url.startsWith("data:")) {
-      expect(
-        relative_url[0] === "/",
-        "Expected a unix absolute path because the reference url is a data url, got %j relative to %j",
-        relative_url,
-        url,
-      );
-      return `file://${relative_url}`;
+  const normalizeEitherPathURL = (either, base) =>
+    /^[a-z]{2,}:/u.test(either) ? either : urlifyPath(either, base);
+
+  const extractSourceMapURL = ({ url, content }) => {
+    const parts = /\/\/[#@] sourceMappingURL=(.*)[\r\n]*$/u.exec(content);
+    if (parts === null) {
+      return null;
     } else {
-      const url_object = new URL(url);
-      // The source map spec https://sourcemaps.info/spec.html
-      // Does not mention absolute windows paths in map.sources.
-      // But typescript generate them in it with forward slashes.
-      if (relative_url[0] === "/" || /^[a-zA-Z]:/u.test(relative_url)) {
-        url_object.pathname = relative_url;
-      } else {
-        const { pathname } = url_object;
-        const segments = pathname.split("/");
-        segments.pop();
-        segments.push(...relative_url.split("/"));
-        url_object.pathname = segments.join("/");
-      }
-      return url_object.toString();
+      return normalizeEitherPathURL(parts[1], removeLastURLSegment(url));
     }
   };
 
-  const normalizePayload = (url, payload) => {
+  const createMirrorSourceMap = (file) => ({
+    type: "mirror",
+    source: file,
+  });
+
+  const createSourceMap = ({ url, content }) => {
+    const payload = expectSuccess(
+      () => parseJSON(content),
+      "Invalid JSON format for source map at %j >> %O",
+      url,
+    );
     validateSourceMap(payload);
-    const { sources } = payload;
-    const prefix = coalesce(payload, "sourceRoot", null);
-    const contents = coalesce(payload, "sourcesContent", null);
-    return {
+    const base = removeLastURLSegment(url);
+    const {
+      sourceRoot: head,
+      sources: urls,
+      contents,
+      mappings,
+    } = {
+      sourceRoot: null,
+      contents: null,
       ...payload,
-      sourceRoot: "",
-      sources: sources.map((relative_url) =>
-        normalizeURL(url, `${prefix === null ? "" : prefix}${relative_url}`),
-      ),
-      sourcesContent: sources.map((_url, index) =>
-        coalesce(contents, index, null),
-      ),
+    };
+    return {
+      type: "normal",
+      base,
+      sources: urls
+        .map(head === null ? identity : (body) => `${head}${body}`)
+        .map((either) => normalizeEitherPathURL(either, base))
+        .map(
+          contents === null
+            ? (url) => ({ url, content: null })
+            : (url, index) => ({
+                url,
+                content: index < contents.length ? contents[index] : null,
+              }),
+        ),
+      groups: mappings.split(";"),
     };
   };
 
-  return {
-    extractSourceMapURL: ({ url, content }) => {
-      const parts = /\/\/# sourceMappingURL=(.*)$/u.exec(content);
-      if (parts === null) {
+  const mapSource = (mapping, line, column) => {
+    if (mapping.type === "mirror") {
+      return { url: mapping.source.url, line, column };
+    } else if (mapping.type === "normal") {
+      if (line <= mapping.groups.length) {
+        let group = mapping.groups[line - 1];
+        if (typeof group === "string") {
+          group = group.split(",").map(decodeVLQ);
+          mapping.groups[line - 1] = group;
+        }
+        const { length } = group;
+        let source_index = 0;
+        let gen_column = 0;
+        let src_line = 0;
+        let src_column = 0;
+        if (length > 0) {
+          let index = 0;
+          do {
+            const segment = group[index];
+            gen_column += segment[0];
+            if (segment.length >= 4) {
+              source_index += segment[1];
+              src_line += segment[2];
+              src_column += segment[3];
+            }
+            index += 1;
+          } while (index < length && gen_column < column);
+        }
+        if (gen_column === column) {
+          if (source_index >= 0 && source_index < mapping.sources.length) {
+            return {
+              url: mapping.sources[source_index].url,
+              line: src_line + 1,
+              column: src_column,
+            };
+          } else {
+            logInfo(
+              "Source map out of range %j at file %j, line %j, and %column %j",
+              source_index,
+              mapping.base,
+              line,
+              column,
+            );
+            return null;
+          }
+        } else {
+          logInfo(
+            "Missing source map segment at file %j, line %j, and %column %j",
+            mapping.base,
+            line,
+            column,
+          );
+          return null;
+        }
+      } else {
+        logInfo(
+          "Missing source map group at file %j and line %j",
+          mapping.base,
+          line,
+        );
         return null;
       }
-      return normalizeURL(url, parts[1]);
-    },
+    } /* c8 ignore start */ else {
+      throw new Error("invalid mapping type");
+    } /* c8 ignore stop */
+  };
 
-    createMirrorSourceMap: ({ url, content }) => ({
-      mirrored: true,
-      url,
-      content,
-    }),
+  const getSources = (mapping) => {
+    if (mapping.type === "mirror") {
+      return [mapping.source];
+    } else if (mapping.type === "normal") {
+      return mapping.sources;
+    } /* c8 ignore start */ else {
+      throw new Error("invalid mapping type");
+    } /* c8 ignore stop */
+  };
 
-    createSourceMap: ({ url, content }) => {
-      const payload = normalizePayload(
-        url,
-        expectSuccess(
-          () => parseJSON(content),
-          "Invalid JSON format for source map at %j >> %O",
-          url,
-        ),
-      );
-      return {
-        mirrored: false,
-        payload,
-        map: compileSourceMap(payload),
-      };
-    },
-
-    mapSource: (mapping, line, column) => {
-      const { mirrored } = mapping;
-      if (mirrored) {
-        const { url } = mapping;
-        return makeLocation(url, line, column);
-      } else {
-        const { map } = mapping;
-        return mapSource(map, line, column);
-      }
-    },
-
-    setSourceContent: (mapping, { url, content }) => {
-      const { mirrored } = mapping;
-      assert(!mirrored, "mirrored source mapping should never be completed");
-      const {
-        payload: { sourcesContent: contents, sources: urls },
-      } = mapping;
-      const index = urls.indexOf(url);
-      assert(index !== -1, "missing source url to set content");
-      assert(
-        contents[index] === null,
-        "source content has already been assigned",
-      );
-      contents[index] = content;
-    },
-
-    getSources: (mapping) => {
-      const { mirrored } = mapping;
-      if (mirrored) {
-        const { url, content } = mapping;
-        return [{ url, content }];
-      }
-      const {
-        payload: { sources: urls, sourcesContent: contents },
-      } = mapping;
-      return urls.map((url, index) => ({
-        url,
-        content: contents[index],
-      }));
-    },
+  return {
+    extractSourceMapURL,
+    createMirrorSourceMap,
+    createSourceMap,
+    mapSource,
+    getSources,
   };
 };

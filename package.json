@@ -55,8 +55,8 @@
     "net-socket-messaging": "^0.1.6",
     "prompts": "^2.4.2",
     "semver": "^7.3.5",
-    "source-map": "^0.6.1",
     "treeify": "^1.1.0",
+    "vlq": "^2.0.4",
     "yaml": "^2.1.1"
   },
   "devDependencies": {
@@ -81,6 +81,7 @@
     "prettier": "^2.2.1",
     "semantic-release": "^19.0.5",
     "sinon": "^14.0.0",
+    "source-map": "^0.7.4",
     "sqlite3": "^5.0.2"
   },
   "publishConfig": {

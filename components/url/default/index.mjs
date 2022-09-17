@@ -3,6 +3,7 @@ const { decodeURIComponent, URL } = globalThis;
 export default (dependencies) => {
   const {
     path: { encodeSegment, decodeSegment, splitPath, isAbsolutePath },
+    expect: { expect },
   } = dependencies;
 
   const isNotEmptyString = (any) => any !== "";
@@ -24,6 +25,14 @@ export default (dependencies) => {
   const setURLPathname = (url, pathname) => {
     const url_object = new URL(url);
     url_object.pathname = pathname;
+    return url_object.toString();
+  };
+
+  const removeLastURLSegment = (url) => {
+    const url_object = new URL(url);
+    const segments = url_object.pathname.split("/");
+    segments.pop();
+    url_object.pathname = segments.join("/");
     return url_object.toString();
   };
 
@@ -124,6 +133,7 @@ export default (dependencies) => {
   return {
     pathifyURL,
     urlifyPath,
+    removeLastURLSegment,
     appendURLSegment,
     appendURLSegmentArray,
     getLastURLSegment,

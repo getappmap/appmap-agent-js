@@ -1,7 +1,7 @@
 branches: [test, node, browser]
 dependencies:
   - util
+  - log
+  - url
   - expect
   - validate
-  - source-inner
-  - location
