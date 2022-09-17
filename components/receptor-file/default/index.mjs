@@ -148,7 +148,9 @@ export default (dependencies) => {
                 }
               });
               socket.on("message", (content) => {
-                if (sendBackend(backend, parseJSON(content))) {
+                const message = parseJSON(content);
+                sendBackend(backend, message);
+                if (message.type === "stop") {
                   for (const key of getBackendTraceIterator(backend)) {
                     store(
                       urls,

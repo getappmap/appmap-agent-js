@@ -6,6 +6,7 @@ import {
 import Backend from "./index.mjs";
 
 const {
+  undefined,
   Array: { from: toArray },
 } = globalThis;
 
@@ -39,7 +40,7 @@ const configuration = extendConfiguration(
       inline: false,
       exclude: [],
     }),
-    false,
+    undefined,
   );
   assertEqual(
     sendBackend(backend, {
@@ -48,7 +49,7 @@ const configuration = extendConfiguration(
       configuration: { name: "name2" },
       url: null,
     }),
-    false,
+    undefined,
   );
   assertEqual(
     sendBackend(backend, {
@@ -57,7 +58,7 @@ const configuration = extendConfiguration(
       message: "message",
       stack: "stack",
     }),
-    false,
+    undefined,
   );
   assertEqual(hasBackendTrace(backend, "record"), false);
   assertDeepEqual(toArray(getBackendTrackIterator(backend)), ["record"]);
@@ -67,7 +68,7 @@ const configuration = extendConfiguration(
       track: "record",
       status: 0,
     }),
-    true,
+    undefined,
   );
   assertDeepEqual(toArray(getBackendTraceIterator(backend)), ["record"]);
   assertEqual(hasBackendTrack(backend, "record"), false);
