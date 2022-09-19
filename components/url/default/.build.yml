@@ -1,2 +1,4 @@
 branches: [node, test, browser]
-dependencies: [path]
+dependencies:
+  - path
+  - expect

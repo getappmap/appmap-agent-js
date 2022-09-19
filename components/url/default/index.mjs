@@ -54,6 +54,12 @@ export default (dependencies) => {
   // getUNCAddress(pathname) !== getUNCAddress(base_pathname)))
 
   const urlifyPath = (path, base_url) => {
+    expect(
+      !base_url.startsWith("data:"),
+      "cannot transform path %j to a url based on data url %j",
+      path,
+      base_url,
+    );
     const segments = splitPath(path);
     if (isAbsolutePath(path)) {
       if (segments[0].length === 2 && segments[0][1] === ":") {
