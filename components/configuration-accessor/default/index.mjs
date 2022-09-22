@@ -233,6 +233,21 @@ export default (dependencies) => {
               base,
               true,
             )}`,
+            ...(configuration.hooks.esm
+              ? [
+                  `--experimental-loader=${generateEscape(exec)(
+                    pathifyURL(
+                      appendURLSegmentArray(directory, [
+                        "lib",
+                        "node",
+                        "loader.mjs",
+                      ]),
+                      base,
+                      true,
+                    ),
+                  )}`,
+                ]
+              : /* c8 ignore start */ []) /* c8 ignore stop */,
             `--experimental-loader=${generateEscape(exec)(
               pathifyURL(
                 appendURLSegmentArray(directory, [
@@ -258,8 +273,20 @@ export default (dependencies) => {
           "Could not find node exectuable in command %j",
           command,
         );
-        command = `${
-          parts.groups.before
+        command = `${parts.groups.before} ${
+          configuration.hooks.esm
+            ? `--experimental-loader ${generateEscape(exec)(
+                pathifyURL(
+                  appendURLSegmentArray(directory, [
+                    "lib",
+                    "node",
+                    "loader.mjs",
+                  ]),
+                  base,
+                  true,
+                ),
+              )}`
+            : /* c8 ignore start */ "" /* c8 ignore stop */
         } --experimental-loader ${generateEscape(exec)(
           pathifyURL(
             appendURLSegmentArray(directory, [

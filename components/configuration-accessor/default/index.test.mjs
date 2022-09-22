@@ -299,6 +299,9 @@ assertDeepEqual(
               homepage: null,
             },
           },
+          hooks: {
+            esm: true,
+          },
           "recursive-process-recording": true,
           command: "command",
           recorder: "process",
@@ -321,6 +324,7 @@ assertDeepEqual(
       NODE_OPTIONS: [
         "--node-key=node-value",
         "--require=../agent/lib/node/abomination.js",
+        "--experimental-loader=../agent/lib/node/loader.mjs",
         "--experimental-loader=../agent/lib/node/recorder-process.mjs",
       ].join(" "),
       VAR1: "VAL1",
@@ -344,6 +348,9 @@ assertDeepEqual(
               homepage: null,
             },
           },
+          hooks: {
+            esm: true,
+          },
           "recursive-process-recording": false,
           command: ["node", "main.js", "argv1"],
           "command-options": {
@@ -360,7 +367,13 @@ assertDeepEqual(
     exec: "/bin/sh",
     argv: [
       "-c",
-      "node --experimental-loader ../agent/lib/node/recorder-process.mjs main.js argv1",
+      [
+        "node",
+        "--experimental-loader",
+        "../agent/lib/node/loader.mjs",
+        "--experimental-loader",
+        "../agent/lib/node/recorder-process.mjs main.js argv1",
+      ].join(" "),
     ],
     cwd: new URL("file:///base"),
     env: {},
@@ -406,6 +419,7 @@ assertDeepEqual(
           NODE_OPTIONS: [
             "",
             "--require=../agent/lib/node/abomination.js",
+            "--experimental-loader=../agent/lib/node/loader.mjs",
             "--experimental-loader=../agent/lib/node/mocha-loader.mjs",
           ].join(" "),
         },

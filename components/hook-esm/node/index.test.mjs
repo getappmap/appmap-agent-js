@@ -100,14 +100,7 @@ assertDeepEqual(
         packages: [],
       },
     },
-    async () => {
-      const { source } = await APPMAP_ESM_HOOK.transformSource(
-        "123;",
-        { url: "file:///foo", format: "module" },
-        (content, _context, _next) => ({ source: content }),
-      );
-      assertEqual(evalGlobal(source), 123);
-    },
+    () => {},
   ),
   [],
 );
