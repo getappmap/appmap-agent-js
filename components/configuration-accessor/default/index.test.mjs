@@ -420,7 +420,7 @@ assertDeepEqual(
             "",
             "--require=../agent/lib/node/abomination.js",
             "--experimental-loader=../agent/lib/node/loader.mjs",
-            "--experimental-loader=../agent/lib/node/mocha-loader.mjs",
+            "--experimental-loader=../agent/lib/node/mocha-validate.mjs",
           ].join(" "),
         },
       },

@@ -254,7 +254,7 @@ export default (dependencies) => {
                   "lib",
                   "node",
                   recorder === "mocha"
-                    ? "mocha-loader.mjs"
+                    ? "mocha-validate.mjs"
                     : `recorder-${recorder}.mjs`,
                 ]),
                 base,
