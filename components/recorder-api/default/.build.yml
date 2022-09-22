@@ -5,7 +5,6 @@ dependencies:
   - expect
   - uuid
   - configuration-accessor
-  - source-outer
   - interpretation
   - agent
   - hook

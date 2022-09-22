@@ -29,9 +29,7 @@ configuration-environment
 location
 trace
 backend
-source-inner
 source
-source-outer
 instrumentation
 interpretation
 serialization

@@ -3,6 +3,7 @@ const { decodeURIComponent, URL } = globalThis;
 export default (dependencies) => {
   const {
     path: { encodeSegment, decodeSegment, splitPath, isAbsolutePath },
+    expect: { expect },
   } = dependencies;
 
   const isNotEmptyString = (any) => any !== "";
@@ -24,6 +25,14 @@ export default (dependencies) => {
   const setURLPathname = (url, pathname) => {
     const url_object = new URL(url);
     url_object.pathname = pathname;
+    return url_object.toString();
+  };
+
+  const removeLastURLSegment = (url) => {
+    const url_object = new URL(url);
+    const segments = url_object.pathname.split("/");
+    segments.pop();
+    url_object.pathname = segments.join("/");
     return url_object.toString();
   };
 
@@ -54,6 +63,12 @@ export default (dependencies) => {
   // getUNCAddress(pathname) !== getUNCAddress(base_pathname)))
 
   const urlifyPath = (path, base_url) => {
+    expect(
+      !base_url.startsWith("data:"),
+      "cannot transform path %j to a url based on data url %j",
+      path,
+      base_url,
+    );
     const segments = splitPath(path);
     if (isAbsolutePath(path)) {
       if (segments[0].length === 2 && segments[0][1] === ":") {
@@ -118,6 +133,7 @@ export default (dependencies) => {
   return {
     pathifyURL,
     urlifyPath,
+    removeLastURLSegment,
     appendURLSegment,
     appendURLSegmentArray,
     getLastURLSegment,

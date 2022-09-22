@@ -48,7 +48,6 @@ export default (dependencies) => {
           messages.push(message);
         }
       }
-      return type === "stop";
     },
   };
 };

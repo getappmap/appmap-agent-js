@@ -529,6 +529,11 @@
       type: array
       items: { $ref: name-version }
 
+# Alias for the installer
+# https://github.com/getappmap/appmap-js/blob/f917b055dca17065b307620c67c8917457826fd9/packages/cli/src/service/config/validator.ts#L26
+- $id: config
+  $ref: external-configuration
+
 - $id: internal-configuration
   type: object
   additionalProperties: false
@@ -742,14 +747,21 @@
   additionalProperties: false
   required: [type, content, url, shallow, inline, exclude]
   properties:
-    type: { const: source }
-    content: { type: string }
-    url: { $ref: url }
-    shallow: { type: boolean }
-    inline: { type: boolean }
+    type:
+      const: source
+    content:
+      type: string
+      nullable: true
+    url:
+      $ref: url
+    shallow:
+      type: boolean
+    inline:
+      type: boolean
     exclude:
       type: array
-      items: { $ref: cooked-exclusion }
+      items:
+        $ref: cooked-exclusion
 
 - $id: amend-message
   type: object

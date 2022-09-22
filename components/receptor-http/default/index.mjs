@@ -1,10 +1,12 @@
 import { createServer as createTCPServer } from "net";
+import { readFileSync as readFile } from "fs";
 import { createServer as createHTTPServer } from "http";
 import NetSocketMessaging from "net-socket-messaging";
 
 const { patch: patchSocket } = NetSocketMessaging;
 
 const {
+  URL,
   Error,
   Map,
   JSON: { parse: parseJSON },
@@ -153,13 +155,13 @@ export default (dependencies) => {
               const backend = createBackend(configuration);
               backends.set(session, backend);
               socket.on("close", () => {
+                sendBackend(backend, {
+                  type: "error",
+                  name: "AppmapError",
+                  message: "disconnection",
+                  stack: "",
+                });
                 for (const key of getBackendTrackIterator(backend)) {
-                  sendBackend(backend, {
-                    type: "error",
-                    name: "AppmapError",
-                    message: "disconnection",
-                    stack: "",
-                  });
                   sendBackend(backend, {
                     type: "stop",
                     track: key,
@@ -168,7 +170,11 @@ export default (dependencies) => {
                 }
               });
               socket.on("message", (content) => {
-                sendBackend(backend, parseJSON(content));
+                const message = parseJSON(content);
+                if (message.type === "source" && message.content === null) {
+                  message.content = readFile(new URL(message.url), "utf8");
+                }
+                sendBackend(backend, message);
               });
             }
           });

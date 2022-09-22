@@ -1,3 +1,5 @@
+import SourceMap from "./source-map.mjs";
+
 const {
   Object: { fromEntries, entries: toEntries },
 } = globalThis;
@@ -6,7 +8,6 @@ export default (dependencies) => {
   const {
     time: { now },
     group: { getCurrentGroup },
-    "source-outer": { extractSourceMap },
     frontend: {
       createFrontend,
       getFreshTab,
@@ -35,6 +36,7 @@ export default (dependencies) => {
       takeLocalEmitterTrace,
     },
   } = dependencies;
+  const { loadSourceMap } = SourceMap(dependencies);
   const generateFormatPayload =
     (formatPayload) =>
     // We avoid using rest and spread syntax here for two reasons:
@@ -80,15 +82,15 @@ export default (dependencies) => {
     getSerializationEmptyValue: ({ frontend }) =>
       getSerializationEmptyValue(frontend),
     instrument: ({ frontend, emitter }, file) => {
-      const { messages, content: instrumented_content } = instrument(
+      const { messages, content } = instrument(
         frontend,
         file,
-        extractSourceMap(file),
+        loadSourceMap(file),
       );
       for (const message of messages) {
         sendEmitter(emitter, message);
       }
-      return instrumented_content;
+      return content;
     },
     takeLocalAgentTrace: ({ emitter }, key) =>
       takeLocalEmitterTrace(emitter, key),

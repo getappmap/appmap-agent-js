@@ -12,10 +12,16 @@ platform = "darwin";
   const {
     pathifyURL,
     urlifyPath,
+    removeLastURLSegment,
     appendURLSegment,
     appendURLSegmentArray,
     getLastURLSegment,
   } = URL(await buildTestDependenciesAsync(import.meta.url));
+  // removeLastURLSegment //
+  assertEqual(
+    removeLastURLSegment("http://host/directory/filename"),
+    "http://host/directory",
+  );
   // pathifyURL //
   assertEqual(pathifyURL("http://host1/foo/bar", "http://host2/qux"), null);
   assertEqual(
