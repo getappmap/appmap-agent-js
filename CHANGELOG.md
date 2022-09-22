@@ -1,3 +1,17 @@
+## [11.5.1](https://github.com/applandinc/appmap-agent-js/compare/v11.5.0...v11.5.1) (2022-09-22)
+
+
+### Bug Fixes
+
+* restore config id in schema for external installer ([618ef2a](https://github.com/applandinc/appmap-agent-js/commit/618ef2a45827ebbb37627ae9ba606d31a17654fb))
+* send only one error to the backend on disconnect ([1b42487](https://github.com/applandinc/appmap-agent-js/commit/1b424872dcbcac6bd54e8106f3980663f6f9d8a1))
+
+
+### Performance Improvements
+
+* lightweight source mapping ([5f057f9](https://github.com/applandinc/appmap-agent-js/commit/5f057f9186c54a3789da12e204beb6cbfe544dd3))
+* load sources in the backend ([521b293](https://github.com/applandinc/appmap-agent-js/commit/521b293154607259f9ce640a6c9b05383abbceb1))
+
 # [11.5.0](https://github.com/applandinc/appmap-agent-js/compare/v11.4.0...v11.5.0) (2022-09-14)
 
 
