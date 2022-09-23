@@ -240,7 +240,7 @@ export default (dependencies) => {
                       appendURLSegmentArray(directory, [
                         "lib",
                         "node",
-                        "loader.mjs",
+                        "loader.cjs",
                       ]),
                       base,
                       true,
@@ -280,7 +280,7 @@ export default (dependencies) => {
                   appendURLSegmentArray(directory, [
                     "lib",
                     "node",
-                    "loader.mjs",
+                    "loader.cjs",
                   ]),
                   base,
                   true,

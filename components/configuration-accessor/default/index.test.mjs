@@ -324,7 +324,7 @@ assertDeepEqual(
       NODE_OPTIONS: [
         "--node-key=node-value",
         "--require=../agent/lib/node/abomination.js",
-        "--experimental-loader=../agent/lib/node/loader.mjs",
+        "--experimental-loader=../agent/lib/node/loader.cjs",
         "--experimental-loader=../agent/lib/node/recorder-process.mjs",
       ].join(" "),
       VAR1: "VAL1",
@@ -370,7 +370,7 @@ assertDeepEqual(
       [
         "node",
         "--experimental-loader",
-        "../agent/lib/node/loader.mjs",
+        "../agent/lib/node/loader.cjs",
         "--experimental-loader",
         "../agent/lib/node/recorder-process.mjs main.js argv1",
       ].join(" "),
@@ -419,7 +419,7 @@ assertDeepEqual(
           NODE_OPTIONS: [
             "",
             "--require=../agent/lib/node/abomination.js",
-            "--experimental-loader=../agent/lib/node/loader.mjs",
+            "--experimental-loader=../agent/lib/node/loader.cjs",
             "--experimental-loader=../agent/lib/node/mocha-validate.mjs",
           ].join(" "),
         },
