@@ -1,5 +1,6 @@
 /.github
 /coverage
+/components/*/index.mjs
 /dist
 /doc
 /node_modules
