@@ -1,3 +1,10 @@
+## [11.5.2](https://github.com/applandinc/appmap-agent-js/compare/v11.5.1...v11.5.2) (2022-09-27)
+
+
+### Bug Fixes
+
+* resolve invalid format marker and detect future occurences ([f7a4205](https://github.com/applandinc/appmap-agent-js/commit/f7a4205e6d929c7c86e23884036c1c76d755527c))
+
 ## [11.5.1](https://github.com/applandinc/appmap-agent-js/compare/v11.5.0...v11.5.1) (2022-09-22)
 
 
