@@ -1,9 +1,0 @@
-branches: [test, node]
-dependencies:
-  - util
-  - hook-http
-  - expect
-  - patch
-  - http
-  - log
-  - agent

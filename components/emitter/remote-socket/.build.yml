@@ -1,7 +1,0 @@
-branches: [node, browser]
-dependencies:
-  - util
-  - uuid
-  - http
-  - log
-  - socket

@@ -1,4 +1,0 @@
-branches: [node, test]
-dependencies:
-  - prompts
-  - util

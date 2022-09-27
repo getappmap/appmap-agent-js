@@ -1,8 +1,0 @@
-branches: [test, node]
-dependencies:
-  - path
-  - util
-  - log
-  - expect
-  - interpretation
-  - agent
