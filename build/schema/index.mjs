@@ -2,25 +2,23 @@ import {
   readFile as readFileAsync,
   writeFile as writeFileAsync,
 } from "fs/promises";
-import { fileURLToPath } from "url";
-import { dirname as getDirectory } from "path";
 import YAML from "yaml";
 
 const {
+  URL,
   JSON: { stringify: stringifyJSON },
 } = globalThis;
 
 const { parse: parseYAML } = YAML;
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = getDirectory(__filename);
+const { url } = import.meta;
 
 const schema = parseYAML(
-  await readFileAsync(`${__dirname}/schema.yml`, "utf8"),
+  await readFileAsync(new URL("schema.yml", url), "utf8"),
 );
 
 await writeFileAsync(
-  `${__dirname}/../../dist/schema.mjs`,
+  new URL("../../dist/schema.mjs", url),
   `export const schema = ${stringifyJSON(schema, null, 2)};`,
   "utf8",
 );
