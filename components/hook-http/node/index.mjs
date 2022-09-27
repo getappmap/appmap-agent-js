@@ -64,7 +64,7 @@ export default (dependencies) => {
     try {
       return parseJSON(string);
     } catch (error) {
-      logWarning("Could not parse as JSON %j >> %e", string, error);
+      logWarning("Could not parse as JSON %j >> %O", string, error);
       return recovery;
     }
   };
@@ -73,7 +73,7 @@ export default (dependencies) => {
     try {
       return new TextDecoder(encoding).decode(buffer);
     } catch (error) {
-      logWarning("Could not decode as %j buffer >> %e", encoding, error);
+      logWarning("Could not decode as %j buffer >> %O", encoding, error);
       return recovery;
     }
   };

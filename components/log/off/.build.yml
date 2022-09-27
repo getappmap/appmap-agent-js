@@ -1,2 +1,2 @@
-branches: [test, node, browser]
+branches: [node, browser]
 dependencies: [log-inner]

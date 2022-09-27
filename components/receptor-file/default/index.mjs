@@ -119,7 +119,7 @@ export default (dependencies) => {
             const { recorder } = configuration;
             if (recorder !== "process" && recorder !== "mocha") {
               logError(
-                "File receptor expected process/mocha recorder but got: ",
+                "File receptor expected process/mocha recorder but got: %j",
                 recorder,
               );
               socket.destroy();

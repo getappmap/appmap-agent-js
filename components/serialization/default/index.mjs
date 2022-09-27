@@ -46,7 +46,7 @@ export default (dependencies) => {
       return ownKeys(object);
     } catch (error) {
       logDebug(
-        "Reflect.ownKeys(%o) threw %e (this should only happen when the object is a proxy)",
+        "Reflect.ownKeys(%o) threw %O (this should only happen when the object is a proxy)",
         object,
         error,
       );
@@ -58,7 +58,7 @@ export default (dependencies) => {
       return getPrototypeOf(object);
     } catch (error) {
       logDebug(
-        "Reflect.getPrototypeOf(%o) threw %e (this should only happen when the object is a proxy)",
+        "Reflect.getPrototypeOf(%o) threw %O (this should only happen when the object is a proxy)",
         object,
         error,
       );
@@ -70,7 +70,7 @@ export default (dependencies) => {
       return getOwnPropertyDescriptor(object, key);
     } catch (error) {
       logDebug(
-        "Reflect.getOwnPropertyDescriptor(%o, %j) threw %e (this should only happen when the object is a proxy)",
+        "Reflect.getOwnPropertyDescriptor(%o, %j) threw %O (this should only happen when the object is a proxy)",
         object,
         key,
         error,

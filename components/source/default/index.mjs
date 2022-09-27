@@ -104,7 +104,7 @@ export default (dependencies) => {
             };
           } else {
             logInfo(
-              "Source map out of range %j at file %j, line %j, and %column %j",
+              "Source map out of range %j at file %j, line %j, and column %j",
               source_index,
               mapping.base,
               line,
@@ -114,7 +114,7 @@ export default (dependencies) => {
           }
         } else {
           logInfo(
-            "Missing source map segment at file %j, line %j, and %column %j",
+            "Missing source map segment at file %j, line %j, and column %j",
             mapping.base,
             line,
             column,

@@ -147,7 +147,7 @@ export default (dependencies) => {
             const { recorder } = configuration;
             if (recorder !== "remote") {
               logError(
-                "Http receptor expected remote recorder but got: ",
+                "Http receptor expected remote recorder but got: %j",
                 recorder,
               );
               socket.destroy();
