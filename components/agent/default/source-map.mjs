@@ -15,7 +15,7 @@ export default (dependencies) => {
           content = readFile(maybe_url);
         } catch (error) {
           logWarning(
-            "Cannot read source-map file at %j extracted from %j >> %e",
+            "Cannot read source-map file at %j extracted from %j >> %O",
             maybe_url,
             file.url,
             error,

@@ -1,2 +1,2 @@
-branches: [test, node]
+branches: [node]
 dependencies: [util, expect]

@@ -5,10 +5,7 @@ import {
 } from "../build/component/dynamic.mjs";
 
 const generate = (buildAsync) => (specifier, blueprint) =>
-  buildAsync("test", specifier, {
-    log: "off",
-    ...blueprint,
-  });
+  buildAsync("test", specifier, blueprint);
 
 export const buildTestDependenciesAsync = generate(buildDependenciesAsync);
 export const buildTestComponentsAsync = generate(buildComponentsAsync);
