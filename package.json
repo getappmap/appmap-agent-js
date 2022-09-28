@@ -20,10 +20,10 @@
     "recording",
     "testing"
   ],
-  "homepage": "https://github.com/applandinc/appmap-agent-js.git/#readme",
+  "homepage": "https://github.com/getappmap/appmap-agent-js.git/#readme",
   "repository": {
     "type": "git",
-    "url": "https://github.com/applandinc/appmap-agent-js.git"
+    "url": "https://github.com/getappmap/appmap-agent-js.git"
   },
   "scripts": {
     "prepare": "npm run build",
