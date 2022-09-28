@@ -1,6 +1,8 @@
-.DS_Store
-/components/*/index.mjs
 /coverage
+/components/*/index.mjs
+/components/*/*/.eslintrc.json
 /dist
 /node_modules/
 /tmp
+
+.DS_Store
