@@ -1,28 +1,16 @@
-const {
-  URL,
-  process,
-  JSON: { parse: parseJSON },
-} = globalThis;
+const { URL, parseInt } = globalThis;
 
-const { search: __search } = new URL(import.meta.url);
+const { search: __search, searchParams: __params } = new URL(import.meta.url);
 
 // NB: Synchronous loggin is important to avoid
 //  infinite loop when async hooks are enabled.
 import { openSync, writeSync } from "fs";
-const { format, hasOwnProperty } = await import(
-  `../../util/index.mjs${__search}`
-);
+const { format } = await import(`../../util/index.mjs${__search}`);
 
-let fd;
+const openLogFile = (name) =>
+  /^[0-9]+$/u.test(name) ? parseInt(name) : openSync(new URL(name), "w");
 
-export const reloadLogFile = () => {
-  const file = hasOwnProperty(process.env, "APPMAP_LOG_FILE")
-    ? parseJSON(process.env.APPMAP_LOG_FILE)
-    : 2;
-  fd = typeof file === "number" ? file : openSync(new URL(file), "w");
-};
-
-reloadLogFile();
+const fd = __params.has("log-file") ? openLogFile(__params.get("log-file")) : 1;
 
 const generateLog =
   (name) =>

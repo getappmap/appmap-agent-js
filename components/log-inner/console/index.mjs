@@ -1,9 +1,7 @@
 const { URL } = globalThis;
 const { search: __search } = new URL(import.meta.url);
 
-const { format, generateDeadcode, noop } = await import(
-  `../../util/index.mjs${__search}`
-);
+const { format, noop } = await import(`../../util/index.mjs${__search}`);
 
 const generateLog =
   (name) =>
@@ -20,7 +18,3 @@ export const logInfo = generateLog("info");
 export const logWarning = generateLog("warn");
 
 export const logError = generateLog("error");
-
-export const reloadLogFile = generateDeadcode(
-  "reloadLogFile called on log-inner/console",
-);

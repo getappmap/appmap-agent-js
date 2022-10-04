@@ -1,15 +1,16 @@
+const { encodeURIComponent } = globalThis;
+
 import { getFreshTemporaryURL } from "../../__fixture__.mjs";
-import { logInfo, reloadLogFile } from "./index.mjs?env=test";
 
-const {
-  process,
-  JSON: { stringify: stringifyJSON },
-} = globalThis;
+const testAsync = async (url) => {
+  const { logInfo } = await import(url);
+  logInfo("foo %s", "bar");
+};
 
-logInfo("foo %s", "bar");
+await testAsync("./index.mjs?env=test");
 
-process.env.APPMAP_LOG_FILE = stringifyJSON(getFreshTemporaryURL());
+await testAsync("./index.mjs?env=test&log-file=2");
 
-reloadLogFile();
-
-logInfo("foo %s", "bar");
+await testAsync(
+  `./index.mjs?env=test&log-file=${encodeURIComponent(getFreshTemporaryURL())}`,
+);
