@@ -1,10 +1,5 @@
 import { assertEqual, assertThrow } from "../../__fixture__.mjs";
-import { buildTestDependenciesAsync } from "../../build.mjs";
-import Specifier from "./index.mjs";
-
-const { createSpecifier, matchSpecifier } = Specifier(
-  await buildTestDependenciesAsync(import.meta.url),
-);
+import { createSpecifier, matchSpecifier } from "./index.mjs?env=test";
 
 assertThrow(
   () => createSpecifier({}, "file:///base"),

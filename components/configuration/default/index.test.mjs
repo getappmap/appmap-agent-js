@@ -1,21 +1,9 @@
 import { assertDeepEqual, assertEqual } from "../../__fixture__.mjs";
-import {
-  buildTestDependenciesAsync,
-  buildTestComponentAsync,
-} from "../../build.mjs";
-import Configuration from "./index.mjs";
+import { validateInternalConfiguration } from "../../validate/index.mjs?env=test";
+import { matchSpecifier } from "../../specifier/index.mjs?env=test";
+import { createConfiguration, extendConfiguration } from "./index.mjs?env=test";
 
 const { undefined } = globalThis;
-
-const { validateInternalConfiguration } = await buildTestComponentAsync(
-  "validate",
-);
-
-const { matchSpecifier } = await buildTestComponentAsync("specifier");
-
-const { createConfiguration, extendConfiguration } = Configuration(
-  await buildTestDependenciesAsync(import.meta.url),
-);
 
 validateInternalConfiguration(createConfiguration("file:///home"));
 

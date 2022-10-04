@@ -1,10 +1,5 @@
 import { assertDeepEqual } from "../../../../__fixture__.mjs";
-import { buildTestDependenciesAsync } from "../../../../build.mjs";
-import Parse from "./parse.mjs";
-
-const { parse, getLeadingCommentArray } = Parse(
-  await buildTestDependenciesAsync(import.meta.url),
-);
+import { parse, getLeadingCommentArray } from "./parse.mjs?env=test";
 
 parse("script.mjs", "export const x = 123;");
 parse("script.mjs", "export const x = 123; delete x;");

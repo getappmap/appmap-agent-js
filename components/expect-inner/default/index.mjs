@@ -1,41 +1,43 @@
-export default (dependencies) => {
-  const {
-    util: { format },
-    violation: { throwViolation, throwViolationAsync },
-  } = dependencies;
-  return {
-    expect: (boolean, template, ...rest) => {
-      if (!boolean) {
-        throwViolation(format(template, rest));
-      }
-    },
-    expectSuccess: (closure, template, ...rest) => {
-      try {
-        return closure();
-      } catch (error) {
-        throw throwViolation(format(template, [...rest, error]));
-      }
-    },
-    expectSuccessAsync: async (promise, template, ...rest) => {
-      try {
-        return await promise;
-      } catch (error) {
-        return throwViolationAsync(format(template, [...rest, error]));
-      }
-    },
-    expectDeadcode:
-      (template, ...rest1) =>
-      (...rest2) => {
-        throwViolation(format(template, [...rest1, ...rest2]));
-      },
-    expectDeadcodeAsync:
-      (reject, template, ...rest1) =>
-      (...rest2) =>
-        throwViolationAsync(format(template, [...rest1, ...rest2])).catch(
-          reject,
-        ),
-  };
+const { URL } = globalThis;
+const { search: __search } = new URL(import.meta.url);
+
+const { format } = await import(`../../util/index.mjs${__search}`);
+const { throwViolation, throwViolationAsync } = await import(
+  `../../violation/index.mjs${__search}`
+);
+
+export const expect = (boolean, template, ...rest) => {
+  if (!boolean) {
+    throwViolation(format(template, rest));
+  }
 };
+
+export const expectSuccess = (closure, template, ...rest) => {
+  try {
+    return closure();
+  } catch (error) {
+    throw throwViolation(format(template, [...rest, error]));
+  }
+};
+
+export const expectSuccessAsync = async (promise, template, ...rest) => {
+  try {
+    return await promise;
+  } catch (error) {
+    return throwViolationAsync(format(template, [...rest, error]));
+  }
+};
+
+export const expectDeadcode =
+  (template, ...rest1) =>
+  (...rest2) => {
+    throwViolation(format(template, [...rest1, ...rest2]));
+  };
+
+export const expectDeadcodeAsync =
+  (reject, template, ...rest1) =>
+  (...rest2) =>
+    throwViolationAsync(format(template, [...rest1, ...rest2])).catch(reject);
 
 //                 | InternalError | ExternalError  | InnerExternalError   | OuterExternalError |
 // ==============================================================================================

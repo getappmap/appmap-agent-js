@@ -6,53 +6,52 @@
 const {
   Array: { from: toArray },
   Map,
+  URL,
 } = globalThis;
 
-export default (_dependencies) => {
-  const makeFrame = (enter, children, leave) => ({ enter, children, leave });
+const { search: __search } = new URL(import.meta.url);
 
-  const takeMap = (map, key) => {
-    const value = map.get(key);
-    map.delete(key);
-    return value;
-  };
+const makeFrame = (enter, children, leave) => ({ enter, children, leave });
 
-  const groupStack = (root) => {
-    const groups2 = new Map();
-    const groups1 = new Map();
-    for (const node of root) {
-      const {
-        enter: { group },
-      } = node;
-      if (groups1.has(group)) {
-        groups1.get(group).push(node);
-      } else {
-        groups1.set(group, [node]);
-      }
+const takeMap = (map, key) => {
+  const value = map.get(key);
+  map.delete(key);
+  return value;
+};
+
+export const groupStack = (root) => {
+  const groups2 = new Map();
+  const groups1 = new Map();
+  for (const node of root) {
+    const {
+      enter: { group },
+    } = node;
+    if (groups1.has(group)) {
+      groups1.get(group).push(node);
+    } else {
+      groups1.set(group, [node]);
     }
-    const mapping = ({ enter, children, leave }) => {
-      children = children.map(mapping);
-      if (enter.site === "begin" && enter.payload.type === "group") {
-        const {
-          payload: { group },
-        } = enter;
-        if (groups1.has(group)) {
-          for (const async_child of takeMap(groups1, group)) {
-            children.push(mapping(async_child));
-          }
-        } else if (groups2.has(group)) {
-          for (const async_child of takeMap(groups2, group)) {
-            children.push(async_child);
-          }
+  }
+  const mapping = ({ enter, children, leave }) => {
+    children = children.map(mapping);
+    if (enter.site === "begin" && enter.payload.type === "group") {
+      const {
+        payload: { group },
+      } = enter;
+      if (groups1.has(group)) {
+        for (const async_child of takeMap(groups1, group)) {
+          children.push(mapping(async_child));
+        }
+      } else if (groups2.has(group)) {
+        for (const async_child of takeMap(groups2, group)) {
+          children.push(async_child);
         }
       }
-      return makeFrame(enter, children, leave);
-    };
-    for (const group of groups1.keys()) {
-      groups2.set(group, takeMap(groups1, group).map(mapping));
     }
-    return toArray(groups2.values()).flat(1);
+    return makeFrame(enter, children, leave);
   };
-
-  return { groupStack };
+  for (const group of groups1.keys()) {
+    groups2.set(group, takeMap(groups1, group).map(mapping));
+  }
+  return toArray(groups2.values()).flat(1);
 };

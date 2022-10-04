@@ -1,23 +1,10 @@
 import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
-import {
-  buildTestDependenciesAsync,
-  buildTestComponentAsync,
-} from "../../build.mjs";
-import Questionnaire from "./index.mjs";
+import { validateExternalConfiguration } from "../../validate/index.mjs?env=test";
+import { questionConfigAsync } from "./index.mjs?env=test";
 
 const { Symbol } = globalThis;
 
 const BREAK = {};
-
-const { validateExternalConfiguration } = await buildTestComponentAsync(
-  "validate",
-);
-
-const { questionConfigAsync } = Questionnaire(
-  await buildTestDependenciesAsync(import.meta.url, {
-    prompts: "fake",
-  }),
-);
 
 const runAsync = async (answers) => {
   const iterator = answers[Symbol.iterator]();

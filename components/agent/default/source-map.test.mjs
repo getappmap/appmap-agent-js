@@ -1,21 +1,13 @@
 import { writeFile as writeFileAsync } from "node:fs/promises";
 import { getFreshTemporaryURL, assertDeepEqual } from "../../__fixture__.mjs";
-import {
-  buildTestDependenciesAsync,
-  buildTestComponentAsync,
-} from "../../build.mjs";
-import SourceMap from "./source-map.mjs";
+import { mapSource } from "../../source/index.mjs?env=test";
+import { loadSourceMap } from "./source-map.mjs?env=test";
 
 const {
   encodeURIComponent,
   URL,
   JSON: { stringify: stringifyJSON },
 } = globalThis;
-
-const { loadSourceMap } = SourceMap(
-  await buildTestDependenciesAsync(import.meta.url),
-);
-const { mapSource } = await buildTestComponentAsync("source");
 
 assertDeepEqual(
   mapSource(

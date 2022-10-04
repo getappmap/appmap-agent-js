@@ -1,10 +1,11 @@
 import { assertEqual, assertThrow } from "../../__fixture__.mjs";
-import { buildTestDependenciesAsync } from "../../build.mjs";
-import Path from "./index.mjs";
+import {
+  encodeSegment,
+  joinPath,
+  splitPath,
+  getShell,
+} from "./index.mjs?env=test";
 
-const { encodeSegment, joinPath, splitPath, getShell } = Path(
-  await buildTestDependenciesAsync(import.meta.url),
-);
 assertThrow(() => getShell({}));
 assertThrow(() => encodeSegment("foo\\bar"));
 assertThrow(() => encodeSegment("foo/bar"));

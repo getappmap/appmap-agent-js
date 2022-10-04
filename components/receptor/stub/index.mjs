@@ -1,13 +1,15 @@
-const { Promise, undefined } = globalThis;
+const { Promise, undefined, URL } = globalThis;
 
-export default (dependencies) => {
-  const {
-    util: { constant, returnSecond },
-  } = dependencies;
-  return {
-    minifyReceptorConfiguration: constant({}),
-    openReceptorAsync: constant(Promise.resolve(undefined)),
-    adaptReceptorConfiguration: returnSecond,
-    closeReceptorAsync: constant(Promise.resolve(undefined)),
-  };
-};
+const { search: __search } = new URL(import.meta.url);
+
+const { constant, returnSecond } = await import(
+  `../../util/index.mjs${__search}`
+);
+
+export const minifyReceptorConfiguration = constant({});
+
+export const openReceptorAsync = constant(Promise.resolve(undefined));
+
+export const adaptReceptorConfiguration = returnSecond;
+
+export const closeReceptorAsync = constant(Promise.resolve(undefined));

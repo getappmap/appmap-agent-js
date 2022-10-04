@@ -1,6 +1,16 @@
-import { levelLog } from "../level.mjs";
+const { URL } = globalThis;
+const { search: __search } = new URL(import.meta.url);
 
-export default (dependencies) => {
-  const { "log-inner": logs } = dependencies;
-  return levelLog(logs, "Error");
-};
+const { levelLog } = await import(`../level.mjs${__search}`);
+const Log = await import(`../../log-inner/index.mjs${__search}`);
+
+export const {
+  logDebug,
+  logGuardDebug,
+  logInfo,
+  logGuardInfo,
+  logWarning,
+  logGuardWarning,
+  logError,
+  logGuardError,
+} = levelLog(Log, "Error");

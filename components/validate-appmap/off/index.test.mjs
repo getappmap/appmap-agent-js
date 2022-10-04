@@ -1,4 +1,2 @@
-import { buildTestDependenciesAsync } from "../../build.mjs";
-import ValidateAppmap from "./index.mjs";
-
-ValidateAppmap(await buildTestDependenciesAsync(import.meta.url));
+import "../../__fixture__.mjs";
+import "./index.mjs?env=test";

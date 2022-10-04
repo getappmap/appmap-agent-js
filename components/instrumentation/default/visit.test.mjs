@@ -1,27 +1,17 @@
 import { assertEqual } from "../../__fixture__.mjs";
 import {
-  buildTestDependenciesAsync,
-  buildTestComponentAsync,
-} from "../../build.mjs";
+  makeLocation,
+  stringifyLocation,
+} from "../../location/index.mjs?env=test";
+import { createCounter } from "../../util/index.mjs?env=test";
+import { createMirrorSourceMap } from "../../source/index.mjs?env=test";
 import { normalize, parse, generate } from "./__fixture__.mjs";
-import Visit from "./visit.mjs";
+import { visit } from "./visit.mjs?env=test";
 
 const {
-  Error,
   JSON: { stringify: stringifyJSON },
-  Infinity,
   Set,
 } = globalThis;
-
-Error.stackTraceLimit = Infinity;
-
-const dependencies = await buildTestDependenciesAsync(import.meta.url);
-const { visit } = Visit(dependencies);
-const { makeLocation, stringifyLocation } = await buildTestComponentAsync(
-  "location",
-);
-const { createCounter } = await buildTestComponentAsync("util");
-const { createMirrorSourceMap } = await buildTestComponentAsync("source");
 
 const instrument = (file, whitelist) =>
   generate(

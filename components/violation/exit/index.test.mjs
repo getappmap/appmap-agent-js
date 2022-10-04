@@ -7,13 +7,13 @@ globalThis.setTimeout = (closure, _timer) => {
   assertThrow(closure);
 };
 
-const { default: Violation } = await import("./index.mjs");
 const {
   throwViolation,
   throwViolationAsync,
   catchViolation,
   catchViolationAsync,
-} = Violation({});
+} = await import("./index.mjs?env=test");
+
 try {
   throwViolation("foo");
   assertFail();

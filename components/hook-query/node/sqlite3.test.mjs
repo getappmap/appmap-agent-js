@@ -6,11 +6,8 @@ import {
   assertThrow,
 } from "../../__fixture__.mjs";
 import Sqlite3 from "sqlite3";
-import {
-  buildTestDependenciesAsync,
-  buildTestComponentAsync,
-} from "../../build.mjs";
-import HookSqlite3 from "./sqlite3.mjs";
+import { testHookAsync } from "../../hook-fixture/index.mjs?env=test";
+import * as HookSqlite3 from "./sqlite3.mjs?env=test";
 
 const { Promise, undefined, Error, setTimeout } = globalThis;
 
@@ -35,13 +32,9 @@ const promisify = (o, m, ...xs) =>
 
 const database = new Database(":memory:");
 
-const dependencies = await buildTestDependenciesAsync(import.meta.url);
-const { testHookAsync } = await buildTestComponentAsync("hook-fixture");
-const component = HookSqlite3(dependencies);
-
 const testCaseAsync = (enabled, runAsync) =>
   testHookAsync(
-    component,
+    HookSqlite3,
     { configuration: { hooks: { sqlite3: enabled } } },
     runAsync,
   );

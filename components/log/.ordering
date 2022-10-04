@@ -1,6 +1,2 @@
 level.mjs
-debug
-info
-warning
-error
-off
+!(level.mjs)

@@ -1,10 +1,5 @@
 import { assertDeepEqual } from "../../../__fixture__.mjs";
-import { buildTestDependenciesAsync } from "../../../build.mjs";
-
-import Stack from "./stack.mjs";
-
-const dependencies = await buildTestDependenciesAsync(import.meta.url);
-const { stackify } = Stack(dependencies);
+import { stackify } from "./stack.mjs?env=test";
 
 export const generateMakeEvent = (site, type) => (tab) => ({
   type: "event",

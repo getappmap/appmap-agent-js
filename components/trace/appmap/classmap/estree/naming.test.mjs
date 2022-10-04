@@ -1,10 +1,7 @@
-import { assertEqual } from "../../../../__fixture__.mjs";
 import * as Acorn from "acorn";
-import {
-  buildTestDependenciesAsync,
-  buildTestComponentAsync,
-} from "../../../../build.mjs";
-import Naming from "./naming.mjs";
+import { assertEqual } from "../../../../__fixture__.mjs";
+import { createCounter } from "../../../../util/index.mjs?env=test";
+import { getName } from "./naming.mjs?env=test";
 
 const {
   Reflect: { getOwnPropertyDescriptor },
@@ -12,10 +9,6 @@ const {
 } = globalThis;
 
 const { parse: parseAcorn } = Acorn;
-
-const { createCounter } = await buildTestComponentAsync("util");
-
-const { getName } = Naming(await buildTestDependenciesAsync(import.meta.url));
 
 const test = (content, keys, separator = "@") => {
   let node = parseAcorn(content, { ecmaVersion: 2021, sourceType: "module" });

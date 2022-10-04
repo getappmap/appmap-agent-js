@@ -1,13 +1,12 @@
 import { createServer, Socket } from "net";
 import { convertPort } from "../../__fixture__.mjs";
-import { buildTestDependenciesAsync } from "../../build.mjs";
-import Service from "./index.mjs";
+import {
+  openServiceAsync,
+  closeServiceAsync,
+  getServicePort,
+} from "./index.mjs?env=test";
 
 const { Promise, setTimeout } = globalThis;
-
-const { openServiceAsync, closeServiceAsync, getServicePort } = Service(
-  await buildTestDependenciesAsync(import.meta.url),
-);
 
 {
   const service = await openServiceAsync(createServer(), 0);

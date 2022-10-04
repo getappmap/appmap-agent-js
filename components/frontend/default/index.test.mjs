@@ -1,20 +1,11 @@
 import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
+import { createMirrorSourceMap } from "../../source/index.mjs?env=test";
+import { validateMessage } from "../../validate/index.mjs?env=test";
 import {
-  buildTestDependenciesAsync,
-  buildTestComponentAsync,
-} from "../../build.mjs";
-import Frontend from "./index.mjs";
-
-const dependencies = await buildTestDependenciesAsync(import.meta.url);
-
-const { createMirrorSourceMap } = await buildTestComponentAsync("source");
-
-const { validateMessage } = await buildTestComponentAsync("validate");
-
-const { createConfiguration, extendConfiguration } =
-  await buildTestComponentAsync("configuration", "test");
-
-const {
+  createConfiguration,
+  extendConfiguration,
+} from "../../configuration/index.mjs?env=test";
+import {
   createFrontend,
   formatStartTrack,
   formatStopTrack,
@@ -27,7 +18,8 @@ const {
   formatGroup,
   formatBeginEvent,
   formatBeginAmend,
-} = Frontend(dependencies);
+} from "./index.mjs?env=test";
+
 const configuration = extendConfiguration(
   createConfiguration("file:///home"),
   {

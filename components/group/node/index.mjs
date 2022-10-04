@@ -1,5 +1,4 @@
-import { executionAsyncId } from "async_hooks";
+const { URL } = globalThis;
+const { search: __search } = new URL(import.meta.url);
 
-export default (_dependencies) => ({
-  getCurrentGroup: executionAsyncId,
-});
+export { executionAsyncId as getCurrentGroup } from "async_hooks";

@@ -8,35 +8,35 @@
 //   throw new Error("lib/emitter/hook/esm.js must be preloaded with --experimental loader");
 // }};
 
-const { String } = globalThis;
+const { String, URL } = globalThis;
 
-export default (dependencies) => {
-  const {
-    agent: { instrument },
-    interpretation: { runScript },
-  } = dependencies;
-  const forward = (_url, content) => content;
-  if (typeof APPMAP_HOOK_EVAL === "undefined") {
-    runScript("let APPMAP_HOOK_EVAL = null;");
+const { search: __search } = new URL(import.meta.url);
+
+const { instrument } = await import(`../../agent/index.mjs${__search}`);
+const { runScript } = await import(`../../interpretation/index.mjs${__search}`);
+
+const forward = (_url, content) => content;
+
+if (typeof APPMAP_HOOK_EVAL === "undefined") {
+  runScript("let APPMAP_HOOK_EVAL = null;");
+  APPMAP_HOOK_EVAL = forward;
+}
+
+export const unhook = (enabled) => {
+  if (enabled) {
     APPMAP_HOOK_EVAL = forward;
   }
-  return {
-    unhook: (enabled) => {
-      if (enabled) {
-        APPMAP_HOOK_EVAL = forward;
-      }
-    },
-    hook: (agent, { hooks: { eval: whitelist } }) => {
-      const enabled = whitelist.length > 0;
-      if (enabled) {
-        APPMAP_HOOK_EVAL = (url, content) =>
-          instrument(agent, {
-            url,
-            type: "script",
-            content: String(content),
-          });
-      }
-      return enabled;
-    },
-  };
+};
+
+export const hook = (agent, { hooks: { eval: whitelist } }) => {
+  const enabled = whitelist.length > 0;
+  if (enabled) {
+    APPMAP_HOOK_EVAL = (url, content) =>
+      instrument(agent, {
+        url,
+        type: "script",
+        content: String(content),
+      });
+  }
+  return enabled;
 };

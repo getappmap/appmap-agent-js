@@ -1,18 +1,16 @@
+const { URL } = globalThis;
+
+const { search: __search } = new URL(import.meta.url);
+
 import AppmapValidate from "@appland/appmap-validate";
+const { expectSuccess } = await import(`../../expect/index.mjs${__search}`);
 
-const { validate: validateAppmap } = AppmapValidate;
+const { validate: validateAppmapInner } = AppmapValidate;
 
-export default (dependencies) => {
-  const {
-    expect: { expectSuccess },
-  } = dependencies;
-  return {
-    validateAppmap: (data) => {
-      expectSuccess(
-        () => validateAppmap(data, { version: "1.8.0" }),
-        "failed to validate appmap\n%j\n%O",
-        data,
-      );
-    },
-  };
+export const validateAppmap = (data) => {
+  expectSuccess(
+    () => validateAppmapInner(data, { version: "1.8.0" }),
+    "failed to validate appmap\n%j\n%O",
+    data,
+  );
 };

@@ -9,14 +9,12 @@ import {
   assertDeepEqual,
   getFreshTemporaryURL,
 } from "../../__fixture__.mjs";
-import { buildTestDependenciesAsync } from "../../build.mjs";
-import Repository from "./index.mjs";
+import {
+  extractRepositoryPackage,
+  extractRepositoryDependency,
+} from "./index.mjs?env=test";
 
 const { URL } = globalThis;
-
-const { extractRepositoryPackage, extractRepositoryDependency } = Repository(
-  await buildTestDependenciesAsync(import.meta.url),
-);
 
 const url = getFreshTemporaryURL();
 await mkdirAsync(new URL(url));

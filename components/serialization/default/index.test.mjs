@@ -1,9 +1,14 @@
 import { assertDeepEqual } from "../../__fixture__.mjs";
 import {
-  buildTestDependenciesAsync,
-  buildTestComponentAsync,
-} from "../../build.mjs";
-import Serialization from "./index.mjs";
+  createConfiguration,
+  extendConfiguration,
+} from "../../configuration/index.mjs?env=test";
+import { validateSerial } from "../../validate/index.mjs?env=test";
+import {
+  createSerialization,
+  getSerializationEmptyValue,
+  serialize,
+} from "./index.mjs?env=test";
 
 const {
   Proxy,
@@ -11,16 +16,6 @@ const {
   Error,
   Reflect: { defineProperty },
 } = globalThis;
-
-const dependencies = await buildTestDependenciesAsync(import.meta.url);
-
-const { createConfiguration, extendConfiguration } =
-  await buildTestComponentAsync("configuration");
-
-const { validateSerial } = await buildTestComponentAsync("validate");
-
-const { createSerialization, getSerializationEmptyValue, serialize } =
-  Serialization(dependencies);
 
 const setupSerialization = (config) =>
   createSerialization(

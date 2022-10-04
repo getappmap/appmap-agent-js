@@ -1,14 +1,12 @@
 import { assertEqual, assertFail } from "../../__fixture__.mjs";
-import Violation from "./index.mjs";
-
-const { Error, Promise } = globalThis;
-
-const {
+import {
   throwViolation,
   throwViolationAsync,
   catchViolation,
   catchViolationAsync,
-} = Violation({});
+} from "./index.mjs?env=test";
+
+const { Error, Promise } = globalThis;
 
 assertEqual(
   catchViolation(

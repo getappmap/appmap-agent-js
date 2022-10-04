@@ -1,14 +1,9 @@
 import { assertDeepEqual, assertEqual } from "../../__fixture__.mjs";
 import {
-  buildTestDependenciesAsync,
-  buildTestComponentAsync,
-} from "../../build.mjs";
-import Metadata from "./metadata.mjs";
-
-const dependencies = await buildTestDependenciesAsync(import.meta.url);
-const { createConfiguration, extendConfiguration } =
-  await buildTestComponentAsync("configuration", "test");
-const { compileMetadata } = Metadata(dependencies);
+  createConfiguration,
+  extendConfiguration,
+} from "../../configuration/index.mjs?env=test";
+import { compileMetadata } from "./metadata.mjs?env=test";
 
 const test = (conf, url, errors = [], status = 0) => {
   let configuration = createConfiguration(url);

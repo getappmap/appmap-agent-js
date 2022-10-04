@@ -6,17 +6,12 @@ import {
   assertThrow,
   getFreshTemporaryURL,
 } from "../../__fixture__.mjs";
-import { buildTestDependenciesAsync } from "../../build.mjs";
-import Git from "./git.mjs";
+import { extractGitInformation } from "./git.mjs?env=test";
 
 const {
   URL,
   Array: { isArray },
 } = globalThis;
-
-const { extractGitInformation } = Git(
-  await buildTestDependenciesAsync(import.meta.url),
-);
 
 const origin_url = "https://github.com/lachrist/sample.git";
 const url = getFreshTemporaryURL();

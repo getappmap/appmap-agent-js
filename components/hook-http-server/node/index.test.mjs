@@ -5,11 +5,8 @@ import {
   getFreshTemporaryURL,
   convertPort,
 } from "../../__fixture__.mjs";
-import {
-  buildTestDependenciesAsync,
-  buildTestComponentAsync,
-} from "../../build.mjs";
-import HookHttpServer from "./index.mjs";
+import { testHookAsync } from "../../hook-fixture/index.mjs?env=test";
+import * as HookHttpServer from "./index.mjs?env=test";
 
 const {
   Promise,
@@ -19,10 +16,6 @@ const {
 } = globalThis;
 
 const { get } = Http;
-
-const dependencies = await buildTestDependenciesAsync(import.meta.url);
-const { testHookAsync } = await buildTestComponentAsync("hook-fixture");
-const component = HookHttpServer(dependencies);
 
 const listenAsync = (server, port) =>
   new Promise((resolve, reject) => {
@@ -80,7 +73,7 @@ const requestAsync = (request) =>
 // Empty //
 assertDeepEqual(
   await testHookAsync(
-    component,
+    HookHttpServer,
     {
       configuration: {
         recorder: "process",
@@ -123,7 +116,7 @@ assertDeepEqual(
   };
   const events = (
     await testHookAsync(
-      component,
+      HookHttpServer,
       { configuration: { recorder: "process", hooks: { http: true } } },
       async () => {
         const server = Http.createServer();
@@ -255,7 +248,7 @@ assertDeepEqual(
   const port = getFreshTemporaryURL();
   assertDeepEqual(
     await testHookAsync(
-      component,
+      HookHttpServer,
       {
         configuration: {
           recorder: "remote",

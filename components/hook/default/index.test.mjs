@@ -1,17 +1,10 @@
 import { assertDeepEqual } from "../../__fixture__.mjs";
-import {
-  buildTestDependenciesAsync,
-  buildTestComponentAsync,
-} from "../../build.mjs";
-import Hook from "./index.mjs";
-
-const dependencies = await buildTestDependenciesAsync(import.meta.url);
-const { testHookAsync } = await buildTestComponentAsync("hook-fixture");
-const component = Hook(dependencies);
+import { testHookAsync } from "../../hook-fixture/index.mjs?env=test";
+import * as Hook from "./index.mjs?env=test";
 
 assertDeepEqual(
   await testHookAsync(
-    component,
+    Hook,
     {
       configuration: {
         ordering: "chronological",

@@ -1,16 +1,11 @@
-/* eslint-env node */
-
 import { assertDeepEqual } from "../../__fixture__.mjs";
+import { createConfiguration } from "../../configuration/index.mjs?env=test";
 import {
-  buildTestDependenciesAsync,
-  buildTestComponentAsync,
-} from "../../build.mjs";
-import Emitter from "./index.mjs";
-
-const dependencies = await buildTestDependenciesAsync(import.meta.url);
-const { createConfiguration } = await buildTestComponentAsync("configuration");
-const { openEmitter, closeEmitter, sendEmitter, takeLocalEmitterTrace } =
-  Emitter(dependencies);
+  openEmitter,
+  closeEmitter,
+  sendEmitter,
+  takeLocalEmitterTrace,
+} from "./index.mjs?env=test";
 
 const configuration = createConfiguration("file:///home");
 

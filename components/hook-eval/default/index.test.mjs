@@ -2,22 +2,15 @@
 /* eslint local/no-globals: ["error", "globalThis", "APPMAP_HOOK_EVAL"] */
 
 import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
-import {
-  buildTestDependenciesAsync,
-  buildTestComponentAsync,
-} from "../../build.mjs";
-import HookESM from "./index.mjs";
+import { createConfiguration } from "../../configuration/index.mjs?env=test";
+import { testHookAsync } from "../../hook-fixture/index.mjs?env=test";
+import * as HookEval from "./index.mjs?env=test";
 
 const { eval: evalGlobal } = globalThis;
 
-const dependencies = await buildTestDependenciesAsync(import.meta.url);
-const { testHookAsync } = await buildTestComponentAsync("hook-fixture");
-const { createConfiguration } = await buildTestComponentAsync("configuration");
-const component = HookESM(dependencies);
-
 assertDeepEqual(
   await testHookAsync(
-    component,
+    HookEval,
     {
       configuration: {
         hooks: { eval: ["eval"] },
@@ -48,7 +41,7 @@ assertDeepEqual(
 
 assertDeepEqual(
   await testHookAsync(
-    component,
+    HookEval,
     {
       configuration: {
         hooks: { eval: [] },

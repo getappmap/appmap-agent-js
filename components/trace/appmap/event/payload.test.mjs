@@ -1,14 +1,10 @@
 import { assertDeepEqual } from "../../../__fixture__.mjs";
-import { buildTestDependenciesAsync } from "../../../build.mjs";
-import Payload from "./payload.mjs";
-
-const dependencies = await buildTestDependenciesAsync(import.meta.url);
-const {
+import {
   digestParameterPrimitive,
   digestExceptionSerial,
   digestParameterSerial,
   digestPayload,
-} = Payload(dependencies);
+} from "./payload.mjs?env=test";
 
 ///////////////////////////
 // digestParameterSerial //

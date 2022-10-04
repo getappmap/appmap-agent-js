@@ -1,5 +1,2 @@
-import { buildTestDependenciesAsync } from "../../build.mjs";
-
-import Receptor from "./index.mjs";
-
-Receptor(await buildTestDependenciesAsync(import.meta.url));
+import "../../__fixture__.mjs";
+import "./index.mjs?env=test";

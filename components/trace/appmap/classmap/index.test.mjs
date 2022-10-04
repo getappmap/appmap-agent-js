@@ -1,24 +1,20 @@
 import { assertDeepEqual, assertEqual } from "../../../__fixture__.mjs";
 import {
-  buildTestDependenciesAsync,
-  buildTestComponentAsync,
-} from "../../../build.mjs";
-import Classmap from "./index.mjs";
-
-const { Set } = globalThis;
-
-const dependencies = await buildTestDependenciesAsync(import.meta.url);
-const { stringifyLocation, makeLocation } = await buildTestComponentAsync(
-  "location",
-);
-const { createConfiguration, extendConfiguration } =
-  await buildTestComponentAsync("configuration");
-const {
+  stringifyLocation,
+  makeLocation,
+} from "../../../location/index.mjs?env=test";
+import {
+  createConfiguration,
+  extendConfiguration,
+} from "../../../configuration/index.mjs?env=test";
+import {
   createClassmap,
   addClassmapSource,
   compileClassmap,
   getClassmapClosure,
-} = Classmap(dependencies);
+} from "./index.mjs?env=test";
+
+const { Set } = globalThis;
 
 const placeholder = "$";
 

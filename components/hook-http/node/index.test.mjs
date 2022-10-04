@@ -1,13 +1,7 @@
 import { assertDeepEqual, assertEqual } from "../../__fixture__.mjs";
 import { Buffer } from "buffer";
 import { Writable, Readable } from "stream";
-import { buildTestDependenciesAsync } from "../../build.mjs";
-import HookHttp from "./index.mjs";
-
-const { Symbol } = globalThis;
-
-const dependencies = await buildTestDependenciesAsync(import.meta.url);
-const {
+import {
   formatHeaders,
   formatStatus,
   parseContentType,
@@ -15,7 +9,9 @@ const {
   decodeSafe,
   spyReadable,
   spyWritable,
-} = HookHttp(dependencies);
+} from "./index.mjs?env=test";
+
+const { Symbol } = globalThis;
 
 ////////////
 // format //

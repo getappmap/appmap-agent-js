@@ -3,10 +3,15 @@ import { getFreshTemporaryURL } from "../../__fixture__.mjs";
 import { Socket } from "net";
 import NetSocketMessaging from "net-socket-messaging";
 import {
-  buildTestDependenciesAsync,
-  buildTestComponentAsync,
-} from "../../build.mjs";
-import Receptor from "./index.mjs";
+  createConfiguration,
+  extendConfiguration,
+} from "../../configuration/index.mjs?env=test";
+import {
+  openReceptorAsync,
+  adaptReceptorConfiguration,
+  minifyReceptorConfiguration,
+  closeReceptorAsync,
+} from "./index.mjs?env=test";
 
 const {
   Promise,
@@ -15,16 +20,6 @@ const {
 } = globalThis;
 
 const { createMessage } = NetSocketMessaging;
-
-const { createConfiguration, extendConfiguration } =
-  await buildTestComponentAsync("configuration");
-
-const {
-  openReceptorAsync,
-  adaptReceptorConfiguration,
-  minifyReceptorConfiguration,
-  closeReceptorAsync,
-} = Receptor(await buildTestDependenciesAsync(import.meta.url));
 
 const url = getFreshTemporaryURL();
 

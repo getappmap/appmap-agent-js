@@ -1,25 +1,11 @@
-import * as Array from "./array.mjs";
-import * as Assert from "./assert.mjs";
-import * as Box from "./box.mjs";
-import * as Convert from "./convert.mjs";
-import * as Counter from "./counter.mjs";
-import * as Either from "./either.mjs";
-import * as Format from "./format.mjs";
-import * as Function from "./function.mjs";
-import * as Maybe from "./maybe.mjs";
-import * as Object from "./object.mjs";
-import * as Version from "./version.mjs";
-
-export default (_dependencies) => ({
-  ...Array,
-  ...Assert,
-  ...Box,
-  ...Convert,
-  ...Counter,
-  ...Either,
-  ...Format,
-  ...Function,
-  ...Object,
-  ...Maybe,
-  ...Version,
-});
+export * from "./array.mjs";
+export * from "./assert.mjs";
+export * from "./box.mjs";
+export * from "./convert.mjs";
+export * from "./counter.mjs";
+export * from "./either.mjs";
+export * from "./format.mjs";
+export * from "./function.mjs";
+export * from "./maybe.mjs";
+export * from "./object.mjs";
+export * from "./version.mjs";

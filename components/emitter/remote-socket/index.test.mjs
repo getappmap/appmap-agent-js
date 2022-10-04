@@ -1,20 +1,13 @@
-import {
-  buildTestDependenciesAsync,
-  buildTestComponentAsync,
-} from "../../build.mjs";
 import { assertDeepEqual } from "../../__fixture__.mjs";
-import Emitter from "./index.mjs";
+import {
+  createConfiguration,
+  extendConfiguration,
+} from "../../configuration/index.mjs?env=test";
+import { openEmitter, closeEmitter, sendEmitter } from "./index.mjs?env=test";
 
 const {
   JSON: { stringify: stringifyJSON },
 } = globalThis;
-
-const { createConfiguration, extendConfiguration } =
-  await buildTestComponentAsync("configuration");
-
-const { openEmitter, closeEmitter, sendEmitter } = Emitter(
-  await buildTestDependenciesAsync(import.meta.url),
-);
 
 const configuration = extendConfiguration(
   createConfiguration("file:///home"),

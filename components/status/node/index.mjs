@@ -1,8 +1,11 @@
+const { URL } = globalThis;
+const { search: __search } = new URL(import.meta.url);
+
 import { execSync } from "child_process";
 import os from "os";
 import { createRequire } from "module";
 import semver from "semver";
-import { schema } from "../../../dist/schema.mjs";
+const { schema } = await import(`../../../dist/schema.mjs${__search}`);
 
 const { Promise, process, JSON } = globalThis;
 
@@ -44,51 +47,45 @@ export const externals = {
 };
 /* c8 ignore stop */
 
-export default (_dependencies) => {
-  const run = (root) => {
-    const errors = [];
+export const run = (root) => {
+  const errors = [];
 
-    const node_version = externals.getNodeVersion();
-    const require = createRequire(import.meta.url);
-    const versions = require("../../../package.json").engines.node;
-    if (!semver.satisfies(node_version, versions)) {
+  const node_version = externals.getNodeVersion();
+  const require = createRequire(import.meta.url);
+  const versions = require("../../../package.json").engines.node;
+  if (!semver.satisfies(node_version, versions)) {
+    errors.push({
+      level: "error",
+      message: `Unsupported node version ${node_version}, wanted ${versions}`,
+    });
+  }
+
+  const mocha_info = externals.lsPackage(root, "mocha");
+  const package_json = JSON.parse(mocha_info);
+  // It's possible we'll be run in a pre-14 Node VM, so don't use the
+  // optional-chaining operator here.
+  const deps = package_json.dependencies;
+  const mocha = deps && deps.mocha;
+  const mocha_version = mocha && mocha.version;
+  if (mocha_version) {
+    if (!semver.satisfies(mocha_version, ">= 8")) {
       errors.push({
         level: "error",
-        message: `Unsupported node version ${node_version}, wanted ${versions}`,
+        message: `Unsupported mocha version ${mocha_version}`,
       });
     }
+  }
 
-    const mocha_info = externals.lsPackage(root, "mocha");
-    const package_json = JSON.parse(mocha_info);
-    // It's possible we'll be run in a pre-14 Node VM, so don't use the
-    // optional-chaining operator here.
-    const deps = package_json.dependencies;
-    const mocha = deps && deps.mocha;
-    const mocha_version = mocha && mocha.version;
-    if (mocha_version) {
-      if (!semver.satisfies(mocha_version, ">= 8")) {
-        errors.push({
-          level: "error",
-          message: `Unsupported mocha version ${mocha_version}`,
-        });
-      }
-    }
-
-    const result = {
-      errors,
-      schema,
-    };
-
-    return JSON.stringify(result, null, 2);
+  const result = {
+    errors,
+    schema,
   };
 
-  return {
-    run,
+  return JSON.stringify(result, null, 2);
+};
 
-    main: async (root) => {
-      const json = run(root);
-      await externals.showResults(json);
-      return 0;
-    },
-  };
+export const main = async (root) => {
+  const json = run(root);
+  await externals.showResults(json);
+  return 0;
 };

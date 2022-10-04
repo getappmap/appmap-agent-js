@@ -1,7 +1,7 @@
 import { assertDeepEqual, assertThrow } from "../__fixture__.mjs";
 import { levelLog } from "./level.mjs";
 
-assertThrow(() => levelLog({}, "logMissing"), /^Error: missing map key/u);
+assertThrow(() => levelLog("Missing"), /^Error: missing map key/u);
 
 const trace = [];
 
@@ -17,6 +17,7 @@ const { logDebug, logInfo, logGuardInfo, logWarning, logGuardWarning } =
       logWarning: (message) => {
         trace.push(["warning", message]);
       },
+      reloadLogFile: () => {},
     },
     "Info",
   );

@@ -1,20 +1,19 @@
 import { encode as encodeVLQ } from "vlq";
 import SourceMap from "source-map";
 import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
-import { buildTestDependenciesAsync } from "../../build.mjs";
-import Source from "./index.mjs";
-
-const { JSON } = globalThis;
-
-const { SourceMapGenerator } = SourceMap;
-
-const {
+import {
   extractSourceMapURL,
   createMirrorSourceMap,
   createSourceMap,
   mapSource,
   getSources,
-} = Source(await buildTestDependenciesAsync(import.meta.url));
+} from "./index.mjs?env=test";
+
+const {
+  JSON: { stringify: stringifyJSON },
+} = globalThis;
+
+const { SourceMapGenerator } = SourceMap;
 
 /////////////////////////
 // extractSourceMapURL //
@@ -99,7 +98,7 @@ assertEqual(
   mapSource(
     createSourceMap({
       url: "http://host/directory/map.json",
-      content: JSON.stringify({
+      content: stringifyJSON({
         version: 3,
         sources: [],
         names: [],
@@ -116,7 +115,7 @@ assertDeepEqual(
   getSources(
     createSourceMap({
       url: "http://host/directory/map.json",
-      content: JSON.stringify({
+      content: stringifyJSON({
         version: 3,
         sourceRoot: "root/",
         sources: ["source1.js", "source2.js"],
@@ -136,7 +135,7 @@ assertDeepEqual(
   getSources(
     createSourceMap({
       url: "http://host/directory/map.json",
-      content: JSON.stringify({
+      content: stringifyJSON({
         version: 3,
         sources: ["source.js"],
         names: [],

@@ -1,10 +1,10 @@
 import { assertEqual } from "../../__fixture__.mjs";
 import { EventEmitter } from "events";
 import {
-  buildTestDependenciesAsync,
-  buildTestComponentAsync,
-} from "../../build.mjs";
-import Batch from "./index.mjs";
+  createConfiguration,
+  extendConfiguration,
+} from "../../configuration/index.mjs?env=test";
+import { mainAsync } from "./index.mjs?env=test";
 
 const { setTimeout } = globalThis;
 
@@ -27,15 +27,6 @@ globalThis.GLOBAL_SPY_SPAWN = (exec, argv, _options) => {
   }
   return emitter;
 };
-
-const { mainAsync } = Batch(
-  await buildTestDependenciesAsync(import.meta.url, {
-    spawn: "spy",
-  }),
-);
-
-const { createConfiguration, extendConfiguration } =
-  await buildTestComponentAsync("configuration");
 
 const configuration = createConfiguration("file:///home");
 

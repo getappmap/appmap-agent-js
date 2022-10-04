@@ -1,6 +1,4 @@
 import { assertEqual } from "../../__fixture__.mjs";
-import { buildTestDependenciesAsync } from "../../build.mjs";
-import Time from "./index.mjs";
+import { now } from "./index.mjs?env=test";
 
-const { now } = Time(await buildTestDependenciesAsync(import.meta.url));
 assertEqual(typeof now(), "number");

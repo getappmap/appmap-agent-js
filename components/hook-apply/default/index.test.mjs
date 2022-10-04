@@ -2,19 +2,12 @@
 /* eslint local/no-globals: ["error", "$uuid"] */
 
 import { assertDeepEqual } from "../../__fixture__.mjs";
-import {
-  buildTestDependenciesAsync,
-  buildTestComponentAsync,
-} from "../../build.mjs";
-import HookApply from "./index.mjs";
-
-const dependencies = await buildTestDependenciesAsync(import.meta.url);
-const { testHookAsync } = await buildTestComponentAsync("hook-fixture");
-const component = HookApply(dependencies);
+import { testHookAsync } from "../../hook-fixture/index.mjs?env=test";
+import * as HookApply from "./index.mjs?env=test";
 
 assertDeepEqual(
   await testHookAsync(
-    component,
+    HookApply,
     { configuration: { hooks: { apply: false } } },
     async () => {},
   ),
@@ -26,7 +19,7 @@ const summarize = ({ site, payload: { type } }) => `${site}/${type}`;
 assertDeepEqual(
   (
     await testHookAsync(
-      component,
+      HookApply,
       { configuration: { hooks: { apply: true }, "hidden-identifier": "$" } },
       () => {
         {

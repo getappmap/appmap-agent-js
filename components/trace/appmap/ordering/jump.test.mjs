@@ -1,12 +1,5 @@
 import { assertDeepEqual } from "../../../__fixture__.mjs";
-import { buildTestDependenciesAsync } from "../../../build.mjs";
-import Jump from "./jump.mjs";
-
-const dependencies = await buildTestDependenciesAsync(import.meta.url);
-const {
-  jumpify,
-  // flatenJumpNode,
-} = Jump(dependencies);
+import { jumpify } from "./jump.mjs?env=test";
 
 export const generateMakeEvent = (site, type) => (tab) => ({
   type: "event",

@@ -3,22 +3,12 @@ import {
   assertEqual,
   assertThrow,
 } from "../../__fixture__.mjs";
-import {
-  buildTestDependenciesAsync,
-  buildTestComponentAsync,
-} from "../../build.mjs";
 import { platform as getPlatform } from "os";
-import ConfigurationAccessor from "./index.mjs";
-
-const {
-  Reflect: { get },
-  URL,
-} = globalThis;
-
-const { createConfiguration, extendConfiguration } =
-  await buildTestComponentAsync("configuration");
-
-const {
+import {
+  createConfiguration,
+  extendConfiguration,
+} from "../../configuration/index.mjs?env=test";
+import {
   resolveConfigurationRepository,
   resolveConfigurationAutomatedRecorder,
   resolveConfigurationManualRecorder,
@@ -28,7 +18,12 @@ const {
   getConfigurationPackage,
   getConfigurationScenarios,
   compileConfigurationCommand,
-} = ConfigurationAccessor(await buildTestDependenciesAsync(import.meta.url));
+} from "./index.mjs?env=test";
+
+const {
+  Reflect: { get },
+  URL,
+} = globalThis;
 
 ////////////////////////////////////////
 // resolveConfigurationManualRecorder //

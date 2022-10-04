@@ -1,14 +1,13 @@
-import Parse from "./parse.mjs";
-import Visit from "./visit.mjs";
+const { URL } = globalThis;
+const { search: __search } = new URL(import.meta.url);
 
-export default (dependencies) => {
-  const { visit } = Visit(dependencies);
-  const { parse, getLeadingCommentArray } = Parse(dependencies);
-  return {
-    extractEstreeEntityArray: (path, content, naming) =>
-      visit(parse(path, content), {
-        naming,
-        getLeadingCommentArray,
-      }),
-  };
-};
+const { parse, getLeadingCommentArray } = await import(
+  `./parse.mjs${__search}`
+);
+const { visit } = await import(`./visit.mjs${__search}`);
+
+export const extractEstreeEntityArray = (path, content, naming) =>
+  visit(parse(path, content), {
+    naming,
+    getLeadingCommentArray,
+  });

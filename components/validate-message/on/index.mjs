@@ -1,8 +1,6 @@
-export default (dependencies) => {
-  const {
-    validate: { validateMessage },
-  } = dependencies;
-  return {
-    validateMessage,
-  };
-};
+const { URL } = globalThis;
+const { search: __search } = new URL(import.meta.url);
+
+export const { validateMessage } = await import(
+  `../../validate/index.mjs${__search}`
+);

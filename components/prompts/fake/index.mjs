@@ -1,3 +1,4 @@
-export default (_dependencies) => ({
-  prompts: (prompt) => globalThis.GLOBAL_PROMPTS(prompt),
-});
+const { URL } = globalThis;
+const { search: __search } = new URL(import.meta.url);
+
+export const prompts = (prompt) => globalThis.GLOBAL_PROMPTS(prompt);
