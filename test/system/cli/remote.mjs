@@ -131,8 +131,11 @@ if (Reflect.getOwnPropertyDescriptor(env, "TRAVIS") === undefined) {
     "track-port",
     joinPath(tmpdir(), Math.random().toString(36).substring(2)),
     `
-      const interval = setInterval(function heartbeat () {}, 100);
+      const interval = setInterval(function heartbeat () {
+        console.log("beat");
+      }, 1000);
       setTimeout(() => {
+        console.log("stop");
         clearInterval(interval);
       }, 9000);
     `,
@@ -144,14 +147,17 @@ if (Reflect.getOwnPropertyDescriptor(env, "TRAVIS") === undefined) {
       "intercept-track-port",
       port,
       `
-        import {createServer} from "http";
-        const server = createServer();
+        import Http from "http";
+        const server = Http.createServer();
         server.unref();
         server.listen(${JSON.stringify(port)});
-        const interval = setInterval(function heartbeat () {}, 100);
+        const interval = setInterval(function heartbeat () {
+          console.log("beat");
+        }, 1000);
         setTimeout(() => {
+          console.log("stop");
           clearInterval(interval);
-        }, 6000);
+        }, 9000);
       `,
     );
   }
