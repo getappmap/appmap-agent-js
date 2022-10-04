@@ -26,7 +26,8 @@ const generateReadFile = (readFile) => (url) => {
     const { head, body } = splitDataPath(path);
     if (head.endsWith(";base64")) {
       logGuardWarning(
-        !head.toLowerCase().includes(";charset=utf-8;"),
+        !head.toLowerCase().includes(";charset=utf-8;") &&
+          !head.toLowerCase().includes(";charset=utf8;"),
         "Data url is encoded as base64 and does not declare UTF-8 as its character encoding, will try to use UTF-8 anyway >> %s",
         path,
       );
