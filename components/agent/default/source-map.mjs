@@ -4,7 +4,7 @@ const { search: __search } = new URL(import.meta.url);
 const { extractSourceMapURL, createMirrorSourceMap, createSourceMap } =
   await import(`../../source/index.mjs${__search}`);
 const { readFile } = await import(`../../file/index.mjs${__search}`);
-const { logWarning } = await import(`../../log/index.mjs${__search}`);
+const { logDebug } = await import(`../../log/index.mjs${__search}`);
 
 export const loadSourceMap = (file) => {
   const maybe_url = extractSourceMapURL(file);
@@ -15,7 +15,7 @@ export const loadSourceMap = (file) => {
     try {
       content = readFile(maybe_url);
     } catch (error) {
-      logWarning(
+      logDebug(
         "Cannot read source-map file at %j extracted from %j >> %O",
         maybe_url,
         file.url,
