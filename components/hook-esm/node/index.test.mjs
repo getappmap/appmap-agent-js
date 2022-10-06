@@ -10,7 +10,7 @@ assertDeepEqual(
     HookEsm,
     {
       configuration: {
-        hooks: { esm: "GLOBAL" },
+        hooks: { apply: false, esm: "GLOBAL" },
         packages: [
           {
             regexp: "^",
@@ -21,9 +21,6 @@ assertDeepEqual(
       url: "file:///base",
     },
     async () => {
-      globalThis.APPMAPuuid = {
-        getFreshTab: () => 123,
-      };
       // transformSource //
       {
         const { source } = await globalThis.GLOBAL.transformSource(
