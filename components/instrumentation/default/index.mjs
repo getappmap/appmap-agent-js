@@ -4,14 +4,15 @@ const { search: __search } = new URL(import.meta.url);
 
 import * as Astring from "astring";
 import * as Acorn from "acorn";
-const { logDebug } = await import(`../../log/index.mjs${__search}`);
+const { logDebug, logGuardDebug } = await import(
+  `../../log/index.mjs${__search}`
+);
 const { generateGet, createCounter, recoverMaybe } = await import(
   `../../util/index.mjs${__search}`
 );
 const { getConfigurationPackage } = await import(
   `../../configuration-accessor/index.mjs${__search}`
 );
-const { getUUID } = await import(`../../uuid/index.mjs${__search}`);
 const { expectSuccess } = await import(`../../expect/index.mjs${__search}`);
 const { getSources } = await import(`../../source/index.mjs${__search}`);
 const { visit } = await import(`./visit.mjs${__search}`);
@@ -25,15 +26,12 @@ const getURL = generateGet("url");
 
 export const createInstrumentation = (configuration) => ({
   configuration,
-  runtime: `${configuration["hidden-identifier"]}${getUUID()}`,
   done: new Set(),
   counter: createCounter(0),
 });
 
-export const getInstrumentationIdentifier = ({ runtime }) => runtime;
-
 export const instrument = (
-  { configuration, runtime, done, counter },
+  { configuration, done, counter },
   { type, url, content },
   mapping,
 ) => {
@@ -71,10 +69,17 @@ export const instrument = (
   }
   if (
     excluded ||
-    (configuration.hooks.eval.length === 0 && !configuration.hooks.apply)
+    (configuration.hooks.eval.length === 0 &&
+      configuration.hooks.apply === null)
   ) {
-    logDebug(
-      "Not instrumenting file %j because it has no allowed sources or because instrumentation hooks (apply and eval) are disabled.",
+    logGuardDebug(
+      excluded,
+      "Not instrumenting file %j because it has no allowed sources",
+      url,
+    );
+    logGuardDebug(
+      !excluded,
+      "Not instrumenting file %j because instrumentation hooks (apply and eval) are disabled",
       url,
     );
     return { url, content, sources };
@@ -98,7 +103,6 @@ export const instrument = (
           ),
           {
             url,
-            runtime,
             whitelist: new Set(sources.map(getURL)),
             evals: configuration.hooks.eval,
             apply: configuration.hooks.apply,

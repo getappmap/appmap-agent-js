@@ -63,6 +63,19 @@ assertDeepEqual(extend("hooks", {}, "file:///base").esm, "APPMAP_HOOK_ESM");
 
 assertDeepEqual(extend("hooks", { esm: "FOO" }, "file:///base").esm, "FOO");
 
+// hooks.apply //
+
+assertDeepEqual(
+  extend("hooks", { apply: true }, "file:///base").apply,
+  "APPMAP_HOOK_APPLY",
+);
+
+assertDeepEqual(extend("hooks", { apply: false }, "file:///base").apply, null);
+
+assertDeepEqual(extend("hooks", {}, "file:///base").apply, "APPMAP_HOOK_APPLY");
+
+assertDeepEqual(extend("hooks", { apply: "FOO" }, "file:///base").apply, "FOO");
+
 // scenarios //
 assertDeepEqual(
   extend(

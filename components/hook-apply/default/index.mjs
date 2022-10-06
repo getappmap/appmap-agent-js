@@ -1,15 +1,16 @@
-const { URL, eval: evalGlobal } = globalThis;
+const {
+  URL,
+  Reflect: { defineProperty },
+} = globalThis;
 
 const { search: __search } = new URL(import.meta.url);
 
-const { noop, assignProperty } = await import(
+const { assert, noop, assignProperty, hasOwnProperty } = await import(
   `../../util/index.mjs${__search}`
 );
-const { runScript } = await import(`../../interpretation/index.mjs${__search}`);
 const {
   getFreshTab,
   getSerializationEmptyValue,
-  getInstrumentationIdentifier,
   recordBeginEvent,
   recordEndEvent,
   recordBeforeEvent,
@@ -28,61 +29,58 @@ export const unhook = (backup) => {
   backup.forEach(assignProperty);
 };
 
-export const hook = (agent, { hooks: { apply } }) => {
-  if (!apply) {
+export const hook = (agent, { hooks: { apply: apply_hook_variable } }) => {
+  if (apply_hook_variable === null) {
     return [];
   } else {
-    const identifier = getInstrumentationIdentifier(agent);
-    runScript(
-      `
-            const ${identifier}_APPLY_ID = 0;
-            const ${identifier} = {
-              empty: null,
-              getFreshTab: null,
-              recordApply: null,
-              recordReturn: null,
-              recordThrow: null,
-              recordAwait: null,
-              recordResolve: null,
-              recordReject: null,
-              recordYield: null,
-              recordResume: null,
-            };
-          `,
-      "file:///appmap-setup.js",
+    assert(
+      !hasOwnProperty(globalThis, apply_hook_variable),
+      "global apply hook variable already defined",
     );
     const resume_payload = getResumePayload(agent);
-    const runtime = evalGlobal(identifier);
-    runtime.empty = getSerializationEmptyValue(agent);
-    runtime.getFreshTab = () => getFreshTab(agent);
-    runtime.recordApply = (tab, _function, _this, _arguments) => {
-      recordBeginEvent(
-        agent,
-        tab,
-        formatApplyPayload(agent, _function, _this, _arguments),
-      );
+    const runtime = {
+      empty: getSerializationEmptyValue(agent),
+      getFreshTab: () => getFreshTab(agent),
+      recordApply: (tab, _function, _this, _arguments) => {
+        recordBeginEvent(
+          agent,
+          tab,
+          formatApplyPayload(agent, _function, _this, _arguments),
+        );
+      },
+      recordReturn: (tab, _function, result) => {
+        recordEndEvent(
+          agent,
+          tab,
+          formatReturnPayload(agent, _function, result),
+        );
+      },
+      recordThrow: (tab, _function, error) => {
+        recordEndEvent(agent, tab, formatThrowPayload(agent, _function, error));
+      },
+      recordAwait: (tab, promise) => {
+        recordBeforeEvent(agent, tab, formatAwaitPayload(agent, promise));
+      },
+      recordResolve: (tab, result) => {
+        recordAfterEvent(agent, tab, formatResolvePayload(agent, result));
+      },
+      recordReject: (tab, error) => {
+        recordAfterEvent(agent, tab, formatRejectPayload(agent, error));
+      },
+      recordYield: (tab, iterator) => {
+        recordBeforeEvent(agent, tab, formatYieldPayload(agent, iterator));
+      },
+      recordResume: (tab) => {
+        recordAfterEvent(agent, tab, resume_payload);
+      },
     };
-    runtime.recordReturn = (tab, _function, result) => {
-      recordEndEvent(agent, tab, formatReturnPayload(agent, _function, result));
-    };
-    runtime.recordThrow = (tab, _function, error) => {
-      recordEndEvent(agent, tab, formatThrowPayload(agent, _function, error));
-    };
-    runtime.recordAwait = (tab, promise) => {
-      recordBeforeEvent(agent, tab, formatAwaitPayload(agent, promise));
-    };
-    runtime.recordResolve = (tab, result) => {
-      recordAfterEvent(agent, tab, formatResolvePayload(agent, result));
-    };
-    runtime.recordReject = (tab, error) => {
-      recordAfterEvent(agent, tab, formatRejectPayload(agent, error));
-    };
-    runtime.recordYield = (tab, iterator) => {
-      recordBeforeEvent(agent, tab, formatYieldPayload(agent, iterator));
-    };
-    runtime.recordResume = (tab) => {
-      recordAfterEvent(agent, tab, resume_payload);
-    };
+    defineProperty(globalThis, apply_hook_variable, {
+      __proto__: null,
+      writable: false,
+      enumerable: false,
+      configurable: true,
+      value: runtime,
+    });
     return [
       "getFreshTab",
       "recordApply",

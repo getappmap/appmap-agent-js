@@ -24,8 +24,7 @@ const instrument = (file, whitelist) =>
       }),
       {
         url: file.url,
-        runtime: "$",
-        apply: true,
+        apply: "$",
         evals: ["eval"],
         mapping: createMirrorSourceMap(file),
         whitelist: new Set(whitelist),

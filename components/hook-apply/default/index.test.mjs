@@ -1,6 +1,3 @@
-/* globals $uuid */
-/* eslint local/no-globals: ["error", "$uuid"] */
-
 import { assertDeepEqual } from "../../__fixture__.mjs";
 import { testHookAsync } from "../../hook-fixture/index.mjs?env=test";
 import * as HookApply from "./index.mjs?env=test";
@@ -20,28 +17,28 @@ assertDeepEqual(
   (
     await testHookAsync(
       HookApply,
-      { configuration: { hooks: { apply: true }, "hidden-identifier": "$" } },
+      { configuration: { hooks: { apply: "$" } } },
       () => {
         {
-          const tab = $uuid.getFreshTab();
-          $uuid.recordApply(tab, "function", "this", ["argument"]);
-          $uuid.recordAwait(tab, "promise");
-          $uuid.recordResolve(tab, "result");
-          $uuid.recordReturn(tab, "function", "result");
+          const tab = globalThis.$.getFreshTab();
+          globalThis.$.recordApply(tab, "function", "this", ["argument"]);
+          globalThis.$.recordAwait(tab, "promise");
+          globalThis.$.recordResolve(tab, "result");
+          globalThis.$.recordReturn(tab, "function", "result");
         }
         {
-          const tab = $uuid.getFreshTab();
-          $uuid.recordApply(tab, "function", "this", ["argument"]);
-          $uuid.recordAwait(tab, "promise");
-          $uuid.recordReject(tab, "error");
-          $uuid.recordThrow(tab, "function", "error");
+          const tab = globalThis.$.getFreshTab();
+          globalThis.$.recordApply(tab, "function", "this", ["argument"]);
+          globalThis.$.recordAwait(tab, "promise");
+          globalThis.$.recordReject(tab, "error");
+          globalThis.$.recordThrow(tab, "function", "error");
         }
         {
-          const tab = $uuid.getFreshTab();
-          $uuid.recordApply(tab, "function", "this", ["argument"]);
-          $uuid.recordYield(tab, "iterator");
-          $uuid.recordResume(tab);
-          $uuid.recordReturn(tab, "function", "result");
+          const tab = globalThis.$.getFreshTab();
+          globalThis.$.recordApply(tab, "function", "this", ["argument"]);
+          globalThis.$.recordYield(tab, "iterator");
+          globalThis.$.recordResume(tab);
+          globalThis.$.recordReturn(tab, "function", "result");
         }
       },
     )

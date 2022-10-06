@@ -308,7 +308,7 @@ const instrumentClosure = (node, parent, grand_parent, closure, context) => {
   closure = {
     node,
     instrumented:
-      context.apply &&
+      context.apply !== null &&
       location !== null &&
       context.whitelist.has(getLocationFileURL(location)),
   };
@@ -323,7 +323,7 @@ const instrumentClosure = (node, parent, grand_parent, closure, context) => {
       ),
       node.params.map((param, index) => {
         const pattern = makeIdentifier(
-          `${context.runtime}_ARGUMENT_${String(index)}`,
+          `${context.apply}_ARGUMENT_${String(index)}`,
         );
         return param.type === "RestElement"
           ? makeRestElement(pattern)
@@ -332,28 +332,28 @@ const instrumentClosure = (node, parent, grand_parent, closure, context) => {
       makeBlockStatement([
         makeVariableDeclaration("var", [
           makeVariableDeclarator(
-            makeIdentifier(`${context.runtime}_BUNDLE_TAB`),
+            makeIdentifier(`${context.apply}_BUNDLE_TAB`),
             makeCallExpression(
-              makeRegularMemberExpression(context.runtime, "getFreshTab"),
+              makeRegularMemberExpression(context.apply, "getFreshTab"),
               [],
             ),
           ),
           makeVariableDeclarator(
-            makeIdentifier(`${context.runtime}_RETURN`),
+            makeIdentifier(`${context.apply}_RETURN`),
             null,
           ),
           makeVariableDeclarator(
-            makeIdentifier(`${context.runtime}_RETURNED`),
+            makeIdentifier(`${context.apply}_RETURNED`),
             makeLiteral(true),
           ),
           ...(node.generator
             ? [
                 makeVariableDeclarator(
-                  makeIdentifier(`${context.runtime}_YIELD`),
+                  makeIdentifier(`${context.apply}_YIELD`),
                   null,
                 ),
                 makeVariableDeclarator(
-                  makeIdentifier(`${context.runtime}_YIELD_TAB`),
+                  makeIdentifier(`${context.apply}_YIELD_TAB`),
                   null,
                 ),
               ]
@@ -361,11 +361,11 @@ const instrumentClosure = (node, parent, grand_parent, closure, context) => {
           ...(node.async
             ? [
                 makeVariableDeclarator(
-                  makeIdentifier(`${context.runtime}_AWAIT`),
+                  makeIdentifier(`${context.apply}_AWAIT`),
                   null,
                 ),
                 makeVariableDeclarator(
-                  makeIdentifier(`${context.runtime}_AWAIT_TAB`),
+                  makeIdentifier(`${context.apply}_AWAIT_TAB`),
                   null,
                 ),
               ]
@@ -373,19 +373,17 @@ const instrumentClosure = (node, parent, grand_parent, closure, context) => {
         ]),
         makeExpressionStatement(
           makeCallExpression(
-            makeRegularMemberExpression(context.runtime, "recordApply"),
+            makeRegularMemberExpression(context.apply, "recordApply"),
             [
-              makeIdentifier(`${context.runtime}_BUNDLE_TAB`),
+              makeIdentifier(`${context.apply}_BUNDLE_TAB`),
               makeLiteral(stringifyLocation(location)),
               node.type === "ArrowFunctionExpression" ||
               isSubclassConstructor(node, parent, grand_parent)
-                ? makeRegularMemberExpression(context.runtime, "empty")
+                ? makeRegularMemberExpression(context.apply, "empty")
                 : makeThisExpression(),
               makeArrayExpression(
                 node.params.map((_param, index) =>
-                  makeIdentifier(
-                    `${context.runtime}_ARGUMENT_${String(index)}`,
-                  ),
+                  makeIdentifier(`${context.apply}_ARGUMENT_${String(index)}`),
                 ),
               ),
             ],
@@ -417,13 +415,13 @@ const instrumentClosure = (node, parent, grand_parent, closure, context) => {
                             makeBinaryExpression(
                               "===",
                               makeIdentifier(
-                                `${context.runtime}_ARGUMENT_${String(index)}`,
+                                `${context.apply}_ARGUMENT_${String(index)}`,
                               ),
                               makeUnaryExpression("void", makeLiteral(0)),
                             ),
                             param.right,
                             makeIdentifier(
-                              `${context.runtime}_ARGUMENT_${String(index)}`,
+                              `${context.apply}_ARGUMENT_${String(index)}`,
                             ),
                           ),
                         );
@@ -431,7 +429,7 @@ const instrumentClosure = (node, parent, grand_parent, closure, context) => {
                         return makeVariableDeclarator(
                           param,
                           makeIdentifier(
-                            `${context.runtime}_ARGUMENT_${String(index)}`,
+                            `${context.apply}_ARGUMENT_${String(index)}`,
                           ),
                         );
                       }
@@ -441,33 +439,33 @@ const instrumentClosure = (node, parent, grand_parent, closure, context) => {
             node.expression
               ? makeReturnStatement(
                   makeAssignmentExpression(
-                    makeIdentifier(`${context.runtime}_RETURN`),
+                    makeIdentifier(`${context.apply}_RETURN`),
                     visitNode(node.body, node, parent, closure, context),
                   ),
                 )
               : visitNode(node.body, node, parent, closure, context),
           ]),
           makeCatchClause(
-            makeIdentifier(`${context.runtime}_ERROR`),
+            makeIdentifier(`${context.apply}_ERROR`),
             makeBlockStatement([
               ...(node.async
                 ? [
                     makeIfStatement(
                       makeBinaryExpression(
                         "!==",
-                        makeIdentifier(`${context.runtime}_AWAIT_TAB`),
+                        makeIdentifier(`${context.apply}_AWAIT_TAB`),
                         makeUnaryExpression("void", makeLiteral(0)),
                       ),
                       makeBlockStatement([
                         makeStatement(
                           makeCallExpression(
                             makeRegularMemberExpression(
-                              context.runtime,
+                              context.apply,
                               "recordReject",
                             ),
                             [
-                              makeIdentifier(`${context.runtime}_AWAIT_TAB`),
-                              makeIdentifier(`${context.runtime}_ERROR`),
+                              makeIdentifier(`${context.apply}_AWAIT_TAB`),
+                              makeIdentifier(`${context.apply}_ERROR`),
                             ],
                           ),
                         ),
@@ -478,37 +476,34 @@ const instrumentClosure = (node, parent, grand_parent, closure, context) => {
                 : []),
               makeExpressionStatement(
                 makeAssignmentExpression(
-                  makeIdentifier(`${context.runtime}_RETURNED`),
+                  makeIdentifier(`${context.apply}_RETURNED`),
                   makeLiteral(false),
                 ),
               ),
               makeExpressionStatement(
                 makeCallExpression(
-                  makeRegularMemberExpression(context.runtime, "recordThrow"),
+                  makeRegularMemberExpression(context.apply, "recordThrow"),
                   [
-                    makeIdentifier(`${context.runtime}_BUNDLE_TAB`),
+                    makeIdentifier(`${context.apply}_BUNDLE_TAB`),
                     makeLiteral(stringifyLocation(location)),
-                    makeIdentifier(`${context.runtime}_ERROR`),
+                    makeIdentifier(`${context.apply}_ERROR`),
                   ],
                 ),
               ),
-              makeThrowStatement(makeIdentifier(`${context.runtime}_ERROR`)),
+              makeThrowStatement(makeIdentifier(`${context.apply}_ERROR`)),
             ]),
           ),
           makeBlockStatement([
             makeIfStatement(
-              makeIdentifier(`${context.runtime}_RETURNED`),
+              makeIdentifier(`${context.apply}_RETURNED`),
               makeBlockStatement([
                 makeExpressionStatement(
                   makeCallExpression(
-                    makeRegularMemberExpression(
-                      context.runtime,
-                      "recordReturn",
-                    ),
+                    makeRegularMemberExpression(context.apply, "recordReturn"),
                     [
-                      makeIdentifier(`${context.runtime}_BUNDLE_TAB`),
+                      makeIdentifier(`${context.apply}_BUNDLE_TAB`),
                       makeLiteral(stringifyLocation(location)),
-                      makeIdentifier(`${context.runtime}_RETURN`),
+                      makeIdentifier(`${context.apply}_RETURN`),
                     ],
                   ),
                 ),
@@ -541,70 +536,70 @@ const instrumenters = {
     closure.instrumented
       ? makeSequenceExpression([
           makeAssignmentExpression(
-            makeIdentifier(`${context.runtime}_AWAIT`),
+            makeIdentifier(`${context.apply}_AWAIT`),
             visitNode(node.argument, node, parent, closure, context),
           ),
           makeAssignmentExpression(
-            makeIdentifier(`${context.runtime}_AWAIT_TAB`),
+            makeIdentifier(`${context.apply}_AWAIT_TAB`),
             makeCallExpression(
-              makeRegularMemberExpression(context.runtime, "getFreshTab"),
+              makeRegularMemberExpression(context.apply, "getFreshTab"),
               [],
             ),
           ),
           makeCallExpression(
-            makeRegularMemberExpression(context.runtime, "recordAwait"),
+            makeRegularMemberExpression(context.apply, "recordAwait"),
             [
-              makeIdentifier(`${context.runtime}_AWAIT_TAB`),
-              makeIdentifier(`${context.runtime}_AWAIT`),
+              makeIdentifier(`${context.apply}_AWAIT_TAB`),
+              makeIdentifier(`${context.apply}_AWAIT`),
             ],
           ),
           makeAssignmentExpression(
-            makeIdentifier(`${context.runtime}_AWAIT`),
-            makeAwaitExpression(makeIdentifier(`${context.runtime}_AWAIT`)),
+            makeIdentifier(`${context.apply}_AWAIT`),
+            makeAwaitExpression(makeIdentifier(`${context.apply}_AWAIT`)),
           ),
           makeCallExpression(
-            makeRegularMemberExpression(context.runtime, "recordResolve"),
+            makeRegularMemberExpression(context.apply, "recordResolve"),
             [
-              makeIdentifier(`${context.runtime}_AWAIT_TAB`),
-              makeIdentifier(`${context.runtime}_AWAIT`),
+              makeIdentifier(`${context.apply}_AWAIT_TAB`),
+              makeIdentifier(`${context.apply}_AWAIT`),
             ],
           ),
           makeAssignmentExpression(
-            makeIdentifier(`${context.runtime}_AWAIT_TAB`),
+            makeIdentifier(`${context.apply}_AWAIT_TAB`),
             makeUnaryExpression("void", makeLiteral(0)),
           ),
-          makeIdentifier(`${context.runtime}_AWAIT`),
+          makeIdentifier(`${context.apply}_AWAIT`),
         ])
       : null,
   YieldExpression: (node, parent, _grand_parent, closure, context) =>
     closure.instrumented
       ? makeSequenceExpression([
           makeAssignmentExpression(
-            makeIdentifier(`${context.runtime}_YIELD`),
+            makeIdentifier(`${context.apply}_YIELD`),
             visitNode(node.argument, node, parent, closure, context),
           ),
           makeAssignmentExpression(
-            makeIdentifier(`${context.runtime}_YIELD_TAB`),
+            makeIdentifier(`${context.apply}_YIELD_TAB`),
             makeCallExpression(
-              makeRegularMemberExpression(context.runtime, "getFreshTab"),
+              makeRegularMemberExpression(context.apply, "getFreshTab"),
               [],
             ),
           ),
           makeCallExpression(
-            makeRegularMemberExpression(context.runtime, "recordYield"),
+            makeRegularMemberExpression(context.apply, "recordYield"),
             [
-              makeIdentifier(`${context.runtime}_YIELD_TAB`),
+              makeIdentifier(`${context.apply}_YIELD_TAB`),
               makeLiteral(node.delegate),
-              makeIdentifier(`${context.runtime}_YIELD`),
+              makeIdentifier(`${context.apply}_YIELD`),
             ],
           ),
           makeYieldExpression(
             node.delegate,
-            makeIdentifier(`${context.runtime}_YIELD`),
+            makeIdentifier(`${context.apply}_YIELD`),
           ),
           makeCallExpression(
-            makeRegularMemberExpression(context.runtime, "recordResume"),
-            [makeIdentifier(`${context.runtime}_YIELD_TAB`)],
+            makeRegularMemberExpression(context.apply, "recordResume"),
+            [makeIdentifier(`${context.apply}_YIELD_TAB`)],
           ),
           makeUnaryExpression("void", makeLiteral(0)),
         ])
@@ -613,7 +608,7 @@ const instrumenters = {
     closure.instrumented && node.argument !== null
       ? makeReturnStatement(
           makeAssignmentExpression(
-            makeIdentifier(`${context.runtime}_RETURN`),
+            makeIdentifier(`${context.apply}_RETURN`),
             visitNode(node.argument, node, parent, closure, context),
           ),
         )
@@ -666,30 +661,27 @@ const instrumenters = {
       return makeTryStatement(
         visitNode(node.block, node, parent, closure, context),
         makeCatchClause(
-          makeIdentifier(`${context.runtime}_ERROR`),
+          makeIdentifier(`${context.apply}_ERROR`),
           makeBlockStatement([
             makeIfStatement(
               makeBinaryExpression(
                 "!==",
-                makeIdentifier(`${context.runtime}_AWAIT_TAB`),
+                makeIdentifier(`${context.apply}_AWAIT_TAB`),
                 makeUnaryExpression("void", makeLiteral(0)),
               ),
               makeBlockStatement([
                 makeStatement(
                   makeCallExpression(
-                    makeRegularMemberExpression(
-                      context.runtime,
-                      "recordReject",
-                    ),
+                    makeRegularMemberExpression(context.apply, "recordReject"),
                     [
-                      makeIdentifier(`${context.runtime}_AWAIT_TAB`),
-                      makeIdentifier(`${context.runtime}_ERROR`),
+                      makeIdentifier(`${context.apply}_AWAIT_TAB`),
+                      makeIdentifier(`${context.apply}_ERROR`),
                     ],
                   ),
                 ),
                 makeStatement(
                   makeAssignmentExpression(
-                    makeIdentifier(`${context.runtime}_AWAIT_TAB`),
+                    makeIdentifier(`${context.apply}_AWAIT_TAB`),
                     makeUnaryExpression("void", makeLiteral(0)),
                   ),
                 ),
@@ -711,7 +703,7 @@ const instrumenters = {
                               closure,
                               context,
                             ),
-                            makeIdentifier(`${context.runtime}_ERROR`),
+                            makeIdentifier(`${context.apply}_ERROR`),
                           ),
                         ]),
                       ]),
@@ -735,12 +727,12 @@ const instrumenters = {
   },
   Identifier: (node, _parent, _grand_parent, _closure, context) => {
     expect(
-      !node.name.startsWith(context.runtime),
+      !node.name.startsWith(context.apply),
       "Identifier collision detected at %j line %j column %j >> identifier should not start with %j, got: %j",
       context.url,
       node.loc.start.line,
       node.loc.start.column,
-      context.runtime,
+      context.apply,
       node.name,
     );
     return null;
@@ -750,18 +742,18 @@ const instrumenters = {
       ? makeProgram("module", [
           makeVariableDeclaration("let", [
             makeVariableDeclarator(
-              makeIdentifier(`${context.runtime}_BUNDLE_TAB`),
+              makeIdentifier(`${context.apply}_BUNDLE_TAB`),
               makeCallExpression(
-                makeRegularMemberExpression(context.runtime, "getFreshTab"),
+                makeRegularMemberExpression(context.apply, "getFreshTab"),
                 [],
               ),
             ),
             makeVariableDeclarator(
-              makeIdentifier(`${context.runtime}_AWAIT`),
+              makeIdentifier(`${context.apply}_AWAIT`),
               null,
             ),
             makeVariableDeclarator(
-              makeIdentifier(`${context.runtime}_AWAIT_TAB`),
+              makeIdentifier(`${context.apply}_AWAIT_TAB`),
               null,
             ),
           ]),
@@ -789,7 +781,7 @@ export const visit = (node, context) => {
     initial_grand_parent,
     {
       node,
-      instrumented: context.apply && node.sourceType === "module",
+      instrumented: context.apply !== null && node.sourceType === "module",
     },
     context,
   );

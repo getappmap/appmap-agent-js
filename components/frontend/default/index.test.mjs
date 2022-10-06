@@ -10,7 +10,6 @@ import {
   formatStartTrack,
   formatStopTrack,
   formatError,
-  getInstrumentationIdentifier,
   getSerializationEmptyValue,
   instrument,
   getFreshTab,
@@ -31,7 +30,7 @@ const configuration = extendConfiguration(
   },
   "file:///base",
 );
-const { "hidden-identifier": identifier } = configuration;
+
 const frontend = createFrontend(configuration);
 
 assertEqual(typeof getSerializationEmptyValue(frontend), "symbol");
@@ -51,11 +50,6 @@ validateMessage(
 );
 
 validateMessage(formatBeginAmend(frontend, 123, getBundlePayload(frontend)));
-
-assertEqual(
-  getInstrumentationIdentifier(frontend).startsWith(identifier),
-  true,
-);
 
 {
   const file = { url: "file:///filename.js", content: "123;", type: "script" };

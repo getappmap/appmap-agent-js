@@ -21,6 +21,8 @@ const { createSpecifier } = await import(
 
 const HOOK_ESM_GLOBAL = "APPMAP_HOOK_ESM";
 
+const HOOK_APPLY_GLOBAL = "APPMAP_HOOK_APPLY";
+
 const ANONYMOUS_NAME_SEPARATOR = "-";
 
 const EXPECTED_EXTRA_PROPERTIES = ["test_recording"];
@@ -86,6 +88,14 @@ const normalizeHooks = (hooks, _base) => {
           ? HOOK_ESM_GLOBAL
           : null
         : hooks.esm;
+  }
+  if (hasOwnProperty(hooks, "apply")) {
+    hooks.apply =
+      typeof hooks.apply === "boolean"
+        ? hooks.apply
+          ? HOOK_APPLY_GLOBAL
+          : null
+        : hooks.apply;
   }
   return hooks;
 };
@@ -325,10 +335,6 @@ const fields = {
     extend: assign,
     normalize: identity,
   },
-  "hidden-identifier": {
-    extend: overwrite,
-    normalize: identity,
-  },
   main: {
     extend: overwrite,
     normalize: urlifyPath,
@@ -449,7 +455,7 @@ export const createConfiguration = (home) => ({
   recorder: null,
   "inline-source": false,
   hooks: {
-    apply: true,
+    apply: HOOK_APPLY_GLOBAL,
     eval: [],
     esm: HOOK_ESM_GLOBAL,
     cjs: true,
@@ -470,7 +476,6 @@ export const createConfiguration = (home) => ({
     "impure-error-inspection": true,
     "impure-hash-inspection": true,
   },
-  "hidden-identifier": "APPMAP",
   language: "javascript",
   packages: [
     [

@@ -491,7 +491,11 @@
             - type: boolean
             - type: array
               items: { type: string }
-        apply: { type: boolean }
+        apply:
+          anyOf:
+            - type: boolean
+            - const: null
+            - $ref: regular-identifier
         http: { type: boolean }
         mysql: { type: boolean }
         pg: { type: boolean }
@@ -502,7 +506,6 @@
         - $ref: enabled-specifier
         - type: array
           items: { $ref: enabled-specifier }
-    hidden-identifier: { $ref: regular-identifier }
     main: { $ref: path }
     engine: { type: string }
     language: { $ref: language }
@@ -541,7 +544,7 @@
 - $id: internal-configuration
   type: object
   additionalProperties: false
-  minProperties: 41
+  minProperties: 40
   properties:
     socket: { $ref: socket }
     heartbeat: { $ref: heartbeat }
@@ -612,7 +615,10 @@
         eval:
           type: array
           items: { type: string }
-        apply: { type: boolean }
+        apply:
+          anyOf:
+            - const: null
+            - $ref: regular-identifier
         http: { type: boolean }
         mysql: { type: boolean }
         pg: { type: boolean }
@@ -627,7 +633,6 @@
         items:
           - $ref: cooked-specifier
           - type: boolean
-    hidden-identifier: { $ref: regular-identifier }
     main:
       anyOf:
         - const: null

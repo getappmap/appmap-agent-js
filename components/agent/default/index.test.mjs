@@ -10,7 +10,6 @@ import {
   takeLocalAgentTrace,
   recordStartTrack,
   recordStopTrack,
-  getInstrumentationIdentifier,
   getSerializationEmptyValue,
   getFreshTab,
   recordGroup,
@@ -34,7 +33,6 @@ const agent = openAgent(
 
 getSerializationEmptyValue(agent);
 
-assertEqual(typeof getInstrumentationIdentifier(agent), "string");
 recordStartTrack(agent, "record", {}, null);
 recordGroup(agent, 123, "description");
 assertEqual(

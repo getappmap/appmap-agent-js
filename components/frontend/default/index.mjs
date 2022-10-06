@@ -4,11 +4,9 @@ const { search: __search } = new URL(import.meta.url);
 const { createCounter, incrementCounter } = await import(
   `../../util/index.mjs${__search}`
 );
-const {
-  createInstrumentation,
-  instrument: instrumentInner,
-  getInstrumentationIdentifier: getInstrumentationIdentifierInner,
-} = await import(`../../instrumentation/index.mjs${__search}`);
+const { createInstrumentation, instrument: instrumentInner } = await import(
+  `../../instrumentation/index.mjs${__search}`
+);
 const {
   createSerialization,
   getSerializationEmptyValue: getSerializationEmptyValueInner,
@@ -68,9 +66,6 @@ export const getFreshTab = ({ counter }) => incrementCounter(counter);
 
 export const getSerializationEmptyValue = ({ serialization }) =>
   getSerializationEmptyValueInner(serialization);
-
-export const getInstrumentationIdentifier = ({ instrumentation }) =>
-  getInstrumentationIdentifierInner(instrumentation);
 
 export const instrument = (
   { instrumentation },

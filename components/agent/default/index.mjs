@@ -8,7 +8,6 @@ const {
   createFrontend,
   getFreshTab: getFrontendFreshTab,
   instrument: instrumentFrontend,
-  getInstrumentationIdentifier: getFrontendInstrumentationIdentifier,
   getSerializationEmptyValue: getFrontendSerializationEmptyValue,
   formatError,
   formatStartTrack,
@@ -58,9 +57,6 @@ export const closeAgent = ({ emitter }) => {
 };
 
 export const getFreshTab = ({ frontend }) => getFrontendFreshTab(frontend);
-
-export const getInstrumentationIdentifier = ({ frontend }) =>
-  getFrontendInstrumentationIdentifier(frontend);
 
 export const getSerializationEmptyValue = ({ frontend }) =>
   getFrontendSerializationEmptyValue(frontend);
