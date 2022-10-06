@@ -24,8 +24,8 @@ const instrument = (file, whitelist) =>
       }),
       {
         url: file.url,
-        apply: "$",
-        evals: ["eval"],
+        apply: "APPLY",
+        eval: { hidden: "EVAL", aliases: ["eval"] },
         mapping: createMirrorSourceMap(file),
         whitelist: new Set(whitelist),
         counter: createCounter(0),
@@ -50,31 +50,31 @@ assertEqual(
     `
       (() => {
         var
-          $_BUNDLE_TAB = $.getFreshTab(),
-          $_RETURN,
-          $_RETURNED = true;
-        $.recordApply(
-          $_BUNDLE_TAB,
+          APPLY_BUNDLE_TAB = APPLY.getFreshTab(),
+          APPLY_RETURN,
+          APPLY_RETURNED = true;
+        APPLY.recordApply(
+          APPLY_BUNDLE_TAB,
           ${makeCodeLocation("file:///script.js", 1, 1)},
-          $.empty,
+          APPLY.empty,
           [],
         );
         try {
-          return $_RETURN = 123;
-        } catch ($_ERROR) {
-          $_RETURNED = false;
-          $.recordThrow(
-            $_BUNDLE_TAB,
+          return APPLY_RETURN = 123;
+        } catch (APPLY_ERROR) {
+          APPLY_RETURNED = false;
+          APPLY.recordThrow(
+            APPLY_BUNDLE_TAB,
             ${makeCodeLocation("file:///script.js", 1, 1)},
-            $_ERROR,
+            APPLY_ERROR,
           );
-          throw $_ERROR;
+          throw APPLY_ERROR;
         } finally {
-          if ($_RETURNED) {
-            $.recordReturn(
-              $_BUNDLE_TAB,
+          if (APPLY_RETURNED) {
+            APPLY.recordReturn(
+              APPLY_BUNDLE_TAB,
               ${makeCodeLocation("file:///script.js", 1, 1)},
-              $_RETURN,
+              APPLY_RETURN,
             );
           }
         }
@@ -98,33 +98,33 @@ assertEqual(
     `
       (class C extends D { constructor () {
         var
-          $_BUNDLE_TAB = $.getFreshTab(),
-          $_RETURN,
-          $_RETURNED = true;
-        $.recordApply(
-          $_BUNDLE_TAB,
+          APPLY_BUNDLE_TAB = APPLY.getFreshTab(),
+          APPLY_RETURN,
+          APPLY_RETURNED = true;
+        APPLY.recordApply(
+          APPLY_BUNDLE_TAB,
           ${makeCodeLocation("file:///script.js", 2, 12)},
-          $.empty,
+          APPLY.empty,
           [],
         );
         try {
           {
             123;
           }
-        } catch ($_ERROR) {
-          $_RETURNED = false;
-          $.recordThrow(
-            $_BUNDLE_TAB,
+        } catch (APPLY_ERROR) {
+          APPLY_RETURNED = false;
+          APPLY.recordThrow(
+            APPLY_BUNDLE_TAB,
             ${makeCodeLocation("file:///script.js", 2, 12)},
-            $_ERROR,
+            APPLY_ERROR,
           );
-          throw $_ERROR;
+          throw APPLY_ERROR;
         } finally {
-          if ($_RETURNED) {
-            $.recordReturn(
-              $_BUNDLE_TAB,
+          if (APPLY_RETURNED) {
+            APPLY.recordReturn(
+              APPLY_BUNDLE_TAB,
               ${makeCodeLocation("file:///script.js", 2, 12)},
-              $_RETURN,
+              APPLY_RETURN,
             );
           }
         }
@@ -147,39 +147,39 @@ assertEqual(
   ),
   normalize(
     `
-      (($_ARGUMENT_0, $_ARGUMENT_1, ...$_ARGUMENT_2) => {
+      ((APPLY_ARGUMENT_0, APPLY_ARGUMENT_1, ...APPLY_ARGUMENT_2) => {
         var
-          $_BUNDLE_TAB = $.getFreshTab(),
-          $_RETURN,
-          $_RETURNED = true;
-        $.recordApply(
-          $_BUNDLE_TAB,
+          APPLY_BUNDLE_TAB = APPLY.getFreshTab(),
+          APPLY_RETURN,
+          APPLY_RETURNED = true;
+        APPLY.recordApply(
+          APPLY_BUNDLE_TAB,
           ${makeCodeLocation("file:///script.js", 1, 1)},
-          $.empty,
-          [$_ARGUMENT_0, $_ARGUMENT_1, $_ARGUMENT_2],
+          APPLY.empty,
+          [APPLY_ARGUMENT_0, APPLY_ARGUMENT_1, APPLY_ARGUMENT_2],
         );
         try {
           var
-            x = $_ARGUMENT_0,
-            y = $_ARGUMENT_1 === void 0 ? 123 : $_ARGUMENT_1,
-            rest = $_ARGUMENT_2;
+            x = APPLY_ARGUMENT_0,
+            y = APPLY_ARGUMENT_1 === void 0 ? 123 : APPLY_ARGUMENT_1,
+            rest = APPLY_ARGUMENT_2;
           {
-            return $_RETURN = 456;
+            return APPLY_RETURN = 456;
           }
-        } catch ($_ERROR) {
-          $_RETURNED = false;
-          $.recordThrow(
-            $_BUNDLE_TAB,
+        } catch (APPLY_ERROR) {
+          APPLY_RETURNED = false;
+          APPLY.recordThrow(
+            APPLY_BUNDLE_TAB,
             ${makeCodeLocation("file:///script.js", 1, 1)},
-            $_ERROR,
+            APPLY_ERROR,
           );
-          throw $_ERROR;
+          throw APPLY_ERROR;
         } finally {
-          if ($_RETURNED) {
-            $.recordReturn(
-              $_BUNDLE_TAB,
+          if (APPLY_RETURNED) {
+            APPLY.recordReturn(
+              APPLY_BUNDLE_TAB,
               ${makeCodeLocation("file:///script.js", 1, 1)},
-              $_RETURN,
+              APPLY_RETURN,
             );
           }
         }
@@ -203,13 +203,13 @@ assertEqual(
     `
       (function* () {
         var
-          $_BUNDLE_TAB = $.getFreshTab(),
-          $_RETURN,
-          $_RETURNED = true,
-          $_YIELD,
-          $_YIELD_TAB;
-        $.recordApply(
-          $_BUNDLE_TAB,
+          APPLY_BUNDLE_TAB = APPLY.getFreshTab(),
+          APPLY_RETURN,
+          APPLY_RETURNED = true,
+          APPLY_YIELD,
+          APPLY_YIELD_TAB;
+        APPLY.recordApply(
+          APPLY_BUNDLE_TAB,
           ${makeCodeLocation("file:///script.js", 1, 1)},
           this,
           [],
@@ -217,28 +217,28 @@ assertEqual(
         try {
           {
             (
-              $_YIELD = 123,
-              $_YIELD_TAB = $.getFreshTab(),
-              $.recordYield($_YIELD_TAB, true, $_YIELD),
-              yield* $_YIELD,
-              $.recordResume($_YIELD_TAB),
+              APPLY_YIELD = 123,
+              APPLY_YIELD_TAB = APPLY.getFreshTab(),
+              APPLY.recordYield(APPLY_YIELD_TAB, true, APPLY_YIELD),
+              yield* APPLY_YIELD,
+              APPLY.recordResume(APPLY_YIELD_TAB),
               void 0
             );
           }
-        } catch ($_ERROR) {
-          $_RETURNED = false;
-          $.recordThrow(
-            $_BUNDLE_TAB,
+        } catch (APPLY_ERROR) {
+          APPLY_RETURNED = false;
+          APPLY.recordThrow(
+            APPLY_BUNDLE_TAB,
             ${makeCodeLocation("file:///script.js", 1, 1)},
-            $_ERROR,
+            APPLY_ERROR,
           );
-          throw $_ERROR;
+          throw APPLY_ERROR;
         } finally {
-          if ($_RETURNED) {
-            $.recordReturn(
-              $_BUNDLE_TAB,
+          if (APPLY_RETURNED) {
+            APPLY.recordReturn(
+              APPLY_BUNDLE_TAB,
               ${makeCodeLocation("file:///script.js", 1, 1)},
-              $_RETURN,
+              APPLY_RETURN,
             );
           }
         }
@@ -266,35 +266,35 @@ assertEqual(
     `
       (async () => {
         var
-          $_BUNDLE_TAB = $.getFreshTab(),
-          $_RETURN,
-          $_RETURNED = true,
-          $_AWAIT,
-          $_AWAIT_TAB;
-        $.recordApply(
-          $_BUNDLE_TAB,
+          APPLY_BUNDLE_TAB = APPLY.getFreshTab(),
+          APPLY_RETURN,
+          APPLY_RETURNED = true,
+          APPLY_AWAIT,
+          APPLY_AWAIT_TAB;
+        APPLY.recordApply(
+          APPLY_BUNDLE_TAB,
           ${makeCodeLocation("file:///script.js", 1, 1)},
-          $.empty,
+          APPLY.empty,
           [],
         );
         try {
           {
             try {
               (
-                $_AWAIT = 123,
-                $_AWAIT_TAB = $.getFreshTab(),
-                $.recordAwait($_AWAIT_TAB, $_AWAIT),
-                $_AWAIT = await $_AWAIT,
-                $.recordResolve($_AWAIT_TAB, $_AWAIT),
-                $_AWAIT_TAB = void 0,
-                $_AWAIT
+                APPLY_AWAIT = 123,
+                APPLY_AWAIT_TAB = APPLY.getFreshTab(),
+                APPLY.recordAwait(APPLY_AWAIT_TAB, APPLY_AWAIT),
+                APPLY_AWAIT = await APPLY_AWAIT,
+                APPLY.recordResolve(APPLY_AWAIT_TAB, APPLY_AWAIT),
+                APPLY_AWAIT_TAB = void 0,
+                APPLY_AWAIT
               );
-            } catch ($_ERROR) {
-              if ($_AWAIT_TAB !== void 0) {
-                $.recordReject($_AWAIT_TAB, $_ERROR);
-                $_AWAIT_TAB = void 0;
+            } catch (APPLY_ERROR) {
+              if (APPLY_AWAIT_TAB !== void 0) {
+                APPLY.recordReject(APPLY_AWAIT_TAB, APPLY_ERROR);
+                APPLY_AWAIT_TAB = void 0;
               }
-              let error = $_ERROR;
+              let error = APPLY_ERROR;
               {
                 456;
               }
@@ -302,23 +302,23 @@ assertEqual(
               789;
             }
           }
-        } catch ($_ERROR) {
-          if ($_AWAIT_TAB !== void 0) {
-            $.recordReject($_AWAIT_TAB, $_ERROR);
+        } catch (APPLY_ERROR) {
+          if (APPLY_AWAIT_TAB !== void 0) {
+            APPLY.recordReject(APPLY_AWAIT_TAB, APPLY_ERROR);
           }
-          $_RETURNED = false;
-          $.recordThrow(
-            $_BUNDLE_TAB,
+          APPLY_RETURNED = false;
+          APPLY.recordThrow(
+            APPLY_BUNDLE_TAB,
             ${makeCodeLocation("file:///script.js", 1, 1)},
-            $_ERROR,
+            APPLY_ERROR,
           );
-          throw $_ERROR;
+          throw APPLY_ERROR;
         } finally {
-          if ($_RETURNED) {
-            $.recordReturn(
-              $_BUNDLE_TAB,
+          if (APPLY_RETURNED) {
+            APPLY.recordReturn(
+              APPLY_BUNDLE_TAB,
               ${makeCodeLocation("file:///script.js", 1, 1)},
-              $_RETURN,
+              APPLY_RETURN,
             );
           }
         }
@@ -371,15 +371,15 @@ assertEqual(
   normalize(
     `
       let
-        $_BUNDLE_TAB = $.getFreshTab(),
-        $_AWAIT,
-        $_AWAIT_TAB;
+        APPLY_BUNDLE_TAB = APPLY.getFreshTab(),
+        APPLY_AWAIT,
+        APPLY_AWAIT_TAB;
       try {
         123;
-      } catch ($_ERROR) {
-        if ($_AWAIT_TAB !== void 0) {
-          $.recordReject($_AWAIT_TAB, $_ERROR);
-          $_AWAIT_TAB = void 0;
+      } catch (APPLY_ERROR) {
+        if (APPLY_AWAIT_TAB !== void 0) {
+          APPLY.recordReject(APPLY_AWAIT_TAB, APPLY_ERROR);
+          APPLY_AWAIT_TAB = void 0;
         }
         {
           456;
@@ -403,15 +403,15 @@ assertEqual(
   normalize(
     `
       let
-        $_BUNDLE_TAB = $.getFreshTab(),
-        $_AWAIT,
-        $_AWAIT_TAB;
+        APPLY_BUNDLE_TAB = APPLY.getFreshTab(),
+        APPLY_AWAIT,
+        APPLY_AWAIT_TAB;
       try {
         123;
-      } catch ($_ERROR) {
-        if ($_AWAIT_TAB !== void 0) {
-          $.recordReject($_AWAIT_TAB, $_ERROR);
-          $_AWAIT_TAB = void 0;
+      } catch (APPLY_ERROR) {
+        if (APPLY_AWAIT_TAB !== void 0) {
+          APPLY.recordReject(APPLY_AWAIT_TAB, APPLY_ERROR);
+          APPLY_AWAIT_TAB = void 0;
         }
       } finally {
         456;
@@ -446,7 +446,7 @@ assertEqual(
   ),
   normalize(
     `eval(
-      APPMAP_HOOK_EVAL(
+      EVAL(
         "file:///script.js/eval-1#hash",
         123,
       ),
@@ -469,47 +469,47 @@ assertEqual(
 //   ),
 //   normalize(
 //     `
-//       (async ($_ARGUMENT_0, $_ARGUMENT_1, ...$_ARGUMENT_2) => {
+//       (async (APPLY_ARGUMENT_0, APPLY_ARGUMENT_1, ...APPLY_ARGUMENT_2) => {
 //         var
-//           $_BUNDLE_TAB = $.getFreshTab(),
-//           $_RETURN,
-//           $_RETURNED = true,
-//           $_YIELD,
-//           $_AWAIT,
-//           $_AWAITED = false;
-//         $.recordApply(
-//           $_BUNDLE_TAB,
+//           APPLY_BUNDLE_TAB = APPLY.getFreshTab(),
+//           APPLY_RETURN,
+//           APPLY_RETURNED = true,
+//           APPLY_YIELD,
+//           APPLY_AWAIT,
+//           APPLY_AWAITED = false;
+//         APPLY.recordApply(
+//           APPLY_BUNDLE_TAB,
 //           ${stringifyJSON(
 //             stringifyLocation(makeLocation("file:///script.js", 1, 1)),
 //           )},
-//           $.empty,
-//           [$_ARGUMENT_0, $_ARGUMENT_1, $_ARGUMENT_2],
+//           APPLY.empty,
+//           [APPLY_ARGUMENT_0, APPLY_ARGUMENT_1, APPLY_ARGUMENT_2],
 //         );
 //         try {
 //           var
-//             x = $_ARGUMENT_0,
-//             y = $_ARGUMENT_1 === void 0 ? null : $_ARGUMENT_1,
-//             z = $_ARGUMENT_2;
-//           return $_RETURN = (
-//             $_AWAIT = 123,
-//             $.recordAwait($_BUNDLE_TAB, $_AWAIT),
-//             $_AWAITED = true,
-//             $_AWAIT = await $_AWAIT,
-//             $_AWAITED = false,
-//             $.recordResolve($_BUNDLE_TAB, $_AWAIT),
-//             $_AWAIT
+//             x = APPLY_ARGUMENT_0,
+//             y = APPLY_ARGUMENT_1 === void 0 ? null : APPLY_ARGUMENT_1,
+//             z = APPLY_ARGUMENT_2;
+//           return APPLY_RETURN = (
+//             APPLY_AWAIT = 123,
+//             APPLY.recordAwait(APPLY_BUNDLE_TAB, APPLY_AWAIT),
+//             APPLY_AWAITED = true,
+//             APPLY_AWAIT = await APPLY_AWAIT,
+//             APPLY_AWAITED = false,
+//             APPLY.recordResolve(APPLY_BUNDLE_TAB, APPLY_AWAIT),
+//             APPLY_AWAIT
 //           );
-//         } catch ($_ERROR) {
-//           if ($_AWAITED) {
-//             $.recordReject($_BUNDLE_TAB, $_ERROR);
-//             $_AWAITED = false;
+//         } catch (APPLY_ERROR) {
+//           if (APPLY_AWAITED) {
+//             APPLY.recordReject(APPLY_BUNDLE_TAB, APPLY_ERROR);
+//             APPLY_AWAITED = false;
 //           }
-//           $_RETURNED = false;
-//           $.recordThrow($_BUNDLE_TAB, $_ERROR);
-//           throw $_ERROR;
+//           APPLY_RETURNED = false;
+//           APPLY.recordThrow(APPLY_BUNDLE_TAB, APPLY_ERROR);
+//           throw APPLY_ERROR;
 //         } finally {
-//           if ($_RETURNED) {
-//             $.recordReturn($_BUNDLE_TAB, $_RETURN);
+//           if (APPLY_RETURNED) {
+//             APPLY.recordReturn(APPLY_BUNDLE_TAB, APPLY_RETURN);
 //           }
 //         }
 //       });
@@ -540,14 +540,14 @@ assertEqual(
 //       `
 //       function* f () {
 //         var
-//           $_BUNDLE_TAB = $.getFreshTab(),
-//           $_RETURN,
-//           $_RETURNED = true,
-//           $_YIELD,
-//           $_AWAIT,
-//           $_AWAITED = false;
-//         $.recordApply(
-//           $_BUNDLE_TAB,
+//           APPLY_BUNDLE_TAB = APPLY.getFreshTab(),
+//           APPLY_RETURN,
+//           APPLY_RETURNED = true,
+//           APPLY_YIELD,
+//           APPLY_AWAIT,
+//           APPLY_AWAITED = false;
+//         APPLY.recordApply(
+//           APPLY_BUNDLE_TAB,
 //           ${stringifyJSON(
 //             stringifyLocation(makeLocation("file:///script.js", 1, 0)),
 //           )},
@@ -556,23 +556,23 @@ assertEqual(
 //         )
 //         try {
 //           (
-//             $_YIELD = 123,
-//             $.recordYield($_BUNDLE_TAB, true, $_YIELD),
-//             yield* $_YIELD,
-//             $.recordResume($_BUNDLE_TAB),
+//             APPLY_YIELD = 123,
+//             APPLY.recordYield(APPLY_BUNDLE_TAB, true, APPLY_YIELD),
+//             yield* APPLY_YIELD,
+//             APPLY.recordResume(APPLY_BUNDLE_TAB),
 //             void 0
 //           );
-//           return $_SUCCESS = ${code2};
-//         } catch ($_ERROR) {
-//           if ($_AWAITED) {
-//             $.recordReject($_BUNDLE_TAB, $_ERROR);
+//           return APPLY_SUCCESS = ${code2};
+//         } catch (APPLY_ERROR) {
+//           if (APPLY_AWAITED) {
+//             APPLY.recordReject(APPLY_BUNDLE_TAB, APPLY_ERROR);
 //           }
-//           $_RETURNED = false;
-//           $.recordThrow($_BUNDLE_TAB, $_ERROR);
-//           throw $_ERROR;
+//           APPLY_RETURNED = false;
+//           APPLY.recordThrow(APPLY_BUNDLE_TAB, APPLY_ERROR);
+//           throw APPLY_ERROR;
 //         } finally {
-//           if ($_RETURNED) {
-//             $.recordReturn($_BUNDLE_TAB, $_FAILURE, $_RETURN);
+//           if (APPLY_RETURNED) {
+//             APPLY.recordReturn(APPLY_BUNDLE_TAB, APPLY_FAILURE, APPLY_RETURN);
 //           }
 //         }
 //       };
@@ -598,32 +598,32 @@ assertEqual(
 //       class C extends Object {
 //         constructor () {
 //           var
-//             $_BUNDLE_TAB = $.getFreshTab(),
-//             $_RETURN,
-//             $_RETURNED = true,
-//             $_YIELD,
-//             $_AWAIT,
-//             $_AWAITED = false;
-//           $.recordApply(
-//             $_BUNDLE_TAB,
+//             APPLY_BUNDLE_TAB = APPLY.getFreshTab(),
+//             APPLY_RETURN,
+//             APPLY_RETURNED = true,
+//             APPLY_YIELD,
+//             APPLY_AWAIT,
+//             APPLY_AWAITED = false;
+//           APPLY.recordApply(
+//             APPLY_BUNDLE_TAB,
 //             ${stringifyJSON(
 //               stringifyLocation(makeLocation("file:///script.js", 2, 0)),
 //             )},
-//             $.empty,
+//             APPLY.empty,
 //             [],
 //           )
 //           try {
 //             super();
-//           } catch ($_ERROR) {
-//             if ($_AWAITED) {
-//               $.recordReject($_BUNDLE_TAB, $_ERROR);
+//           } catch (APPLY_ERROR) {
+//             if (APPLY_AWAITED) {
+//               APPLY.recordReject(APPLY_BUNDLE_TAB, APPLY_ERROR);
 //             }
-//             $_RETURNED = false;
-//             $.recordThrow($_BUNDLE_TAB, $_ERROR);
-//             throw $_ERROR;
+//             APPLY_RETURNED = false;
+//             APPLY.recordThrow(APPLY_BUNDLE_TAB, APPLY_ERROR);
+//             throw APPLY_ERROR;
 //           } finally {
-//             if ($_RETURNED) {
-//               $.recordReturn($_BUNDLE_TAB, $_RETURN);
+//             if (APPLY_RETURNED) {
+//               APPLY.recordReturn(APPLY_BUNDLE_TAB, APPLY_RETURN);
 //             }
 //           }
 //         }
@@ -649,23 +649,23 @@ assertEqual(
 //   normalize(
 //     `
 //       let
-//         $_BUNDLE_TAB = $.getFreshTab()
-//         $_AWAIT,
-//         $_AWAITED = false;
-//       try { } catch ($_ERROR) {
-//         if ($_AWAITED) {
-//           $.recordReject($_BUNDLE_TAB, $_ERROR);
-//           $_AWAITED = false;
+//         APPLY_BUNDLE_TAB = APPLY.getFreshTab()
+//         APPLY_AWAIT,
+//         APPLY_AWAITED = false;
+//       try { } catch (APPLY_ERROR) {
+//         if (APPLY_AWAITED) {
+//           APPLY.recordReject(APPLY_BUNDLE_TAB, APPLY_ERROR);
+//           APPLY_AWAITED = false;
 //         }
-//         let error = $_ERROR;
+//         let error = APPLY_ERROR;
 //         {
 //           123;
 //         }
 //       }
-//       try { } catch ($_ERROR) {
-//         if ($_AWAITED) {
-//           $.recordReject($_BUNDLE_TAB, $_ERROR);
-//           $_AWAITED = false;
+//       try { } catch (APPLY_ERROR) {
+//         if (APPLY_AWAITED) {
+//           APPLY.recordReject(APPLY_BUNDLE_TAB, APPLY_ERROR);
+//           APPLY_AWAITED = false;
 //         }
 //       } finally {
 //         123;

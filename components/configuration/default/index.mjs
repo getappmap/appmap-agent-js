@@ -23,6 +23,8 @@ const HOOK_ESM_GLOBAL = "APPMAP_HOOK_ESM";
 
 const HOOK_APPLY_GLOBAL = "APPMAP_HOOK_APPLY";
 
+const HOOK_EVAL_GLOBAL = "APPMAP_HOOK_EVAL";
+
 const ANONYMOUS_NAME_SEPARATOR = "-";
 
 const EXPECTED_EXTRA_PROPERTIES = ["test_recording"];
@@ -76,9 +78,10 @@ const normalizeHooks = (hooks, _base) => {
   if (hasOwnProperty(hooks, "eval")) {
     hooks.eval =
       typeof hooks.eval === "boolean"
-        ? hooks.eval
-          ? ["eval"]
-          : []
+        ? {
+            hidden: HOOK_EVAL_GLOBAL,
+            aliases: hooks.eval ? ["eval"] : [],
+          }
         : hooks.eval;
   }
   if (hasOwnProperty(hooks, "esm")) {
@@ -456,7 +459,10 @@ export const createConfiguration = (home) => ({
   "inline-source": false,
   hooks: {
     apply: HOOK_APPLY_GLOBAL,
-    eval: [],
+    eval: {
+      hidden: HOOK_EVAL_GLOBAL,
+      aliases: [],
+    },
     esm: HOOK_ESM_GLOBAL,
     cjs: true,
     http: true,

@@ -616,7 +616,7 @@ const instrumenters = {
   CallExpression: (node, parent, _grand_parent, closure, context) => {
     if (
       node.callee.type === "Identifier" &&
-      context.evals.includes(node.callee.name) &&
+      context.eval.aliases.includes(node.callee.name) &&
       node.arguments.length > 0
     ) {
       const location = mapSource(
@@ -632,7 +632,7 @@ const instrumenters = {
         node.loc.start.column,
       );
       return makeCallExpression(makeIdentifier(node.callee.name), [
-        makeCallExpression(makeIdentifier("APPMAP_HOOK_EVAL"), [
+        makeCallExpression(makeIdentifier(context.eval.hidden), [
           makeLiteral(
             appendURLSegment(
               fromMaybe(location, context.url, getLocationFileURL),

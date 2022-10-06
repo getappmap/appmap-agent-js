@@ -40,15 +40,29 @@ const extend = (
 
 // hooks.eval //
 
-assertDeepEqual(extend("hooks", { eval: true }, "file:///base").eval, ["eval"]);
+assertDeepEqual(extend("hooks", { eval: true }, "file:///base").eval, {
+  hidden: "APPMAP_HOOK_EVAL",
+  aliases: ["eval"],
+});
 
-assertDeepEqual(extend("hooks", { eval: false }, "file:///base").eval, []);
+assertDeepEqual(extend("hooks", { eval: false }, "file:///base").eval, {
+  hidden: "APPMAP_HOOK_EVAL",
+  aliases: [],
+});
 
-assertDeepEqual(extend("hooks", {}, "file:///base").eval, []);
+assertDeepEqual(extend("hooks", {}, "file:///base").eval, {
+  hidden: "APPMAP_HOOK_EVAL",
+  aliases: [],
+});
 
-assertDeepEqual(extend("hooks", { eval: ["foo"] }, "file:///base").eval, [
-  "foo",
-]);
+assertDeepEqual(
+  extend("hooks", { eval: { hidden: "foo", aliases: ["bar"] } }, "file:///base")
+    .eval,
+  {
+    hidden: "foo",
+    aliases: ["bar"],
+  },
+);
 
 // hooks.esm //
 

@@ -489,8 +489,14 @@
         eval:
           anyOf:
             - type: boolean
-            - type: array
-              items: { type: string }
+            - type: object
+              properties:
+                hidden:
+                  $ref: regular-identifier
+                aliases:
+                  type: array
+                  items:
+                    type: string
         apply:
           anyOf:
             - type: boolean
@@ -613,8 +619,14 @@
             - const: null
             - $ref: regular-identifier
         eval:
-          type: array
-          items: { type: string }
+          type: object
+          properties:
+            hidden:
+              $ref: regular-identifier
+            aliases:
+              type: array
+              items:
+                type: string
         apply:
           anyOf:
             - const: null

@@ -1,6 +1,3 @@
-/* globals APPMAP_HOOK_EVAL */
-/* eslint local/no-globals: ["error", "globalThis", "APPMAP_HOOK_EVAL"] */
-
 import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
 import { createConfiguration } from "../../configuration/index.mjs?env=test";
 import { testHookAsync } from "../../hook-fixture/index.mjs?env=test";
@@ -13,7 +10,7 @@ assertDeepEqual(
     HookEval,
     {
       configuration: {
-        hooks: { eval: ["eval"] },
+        hooks: { eval: { hidden: "EVAL", aliases: ["eval"] } },
         packages: [
           {
             regexp: "^",
@@ -24,7 +21,7 @@ assertDeepEqual(
       url: "file:///base",
     },
     () => {
-      assertEqual(evalGlobal(APPMAP_HOOK_EVAL("file:///foo", "123;")), 123);
+      assertEqual(evalGlobal(globalThis.EVAL("file:///foo", "123;")), 123);
     },
   ),
   [
@@ -39,18 +36,18 @@ assertDeepEqual(
   ],
 );
 
+assertEqual(evalGlobal(globalThis.EVAL("file:///foo", "123;")), 123);
+
 assertDeepEqual(
   await testHookAsync(
     HookEval,
     {
       configuration: {
-        hooks: { eval: [] },
+        hooks: { eval: false },
         packages: [],
       },
     },
-    () => {
-      assertEqual(evalGlobal(APPMAP_HOOK_EVAL("file:///foo", "123;")), 123);
-    },
+    () => {},
   ),
   [],
 );

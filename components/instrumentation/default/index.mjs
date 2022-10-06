@@ -69,7 +69,7 @@ export const instrument = (
   }
   if (
     excluded ||
-    (configuration.hooks.eval.length === 0 &&
+    (configuration.hooks.eval.aliases.length === 0 &&
       configuration.hooks.apply === null)
   ) {
     logGuardDebug(
@@ -104,7 +104,7 @@ export const instrument = (
           {
             url,
             whitelist: new Set(sources.map(getURL)),
-            evals: configuration.hooks.eval,
+            eval: configuration.hooks.eval,
             apply: configuration.hooks.apply,
             mapping,
             counter,
