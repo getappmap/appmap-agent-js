@@ -1,6 +1,3 @@
-/* globals APPMAP_ESM_HOOK */
-/* eslint local/no-globals: ["error", "globalThis", "APPMAP_ESM_HOOK"] */
-
 import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
 import { createConfiguration } from "../../configuration/index.mjs?env=test";
 import { testHookAsync } from "../../hook-fixture/index.mjs?env=test";
@@ -13,7 +10,7 @@ assertDeepEqual(
     HookEsm,
     {
       configuration: {
-        hooks: { esm: true },
+        hooks: { esm: "GLOBAL" },
         packages: [
           {
             regexp: "^",
@@ -29,7 +26,7 @@ assertDeepEqual(
       };
       // transformSource //
       {
-        const { source } = await APPMAP_ESM_HOOK.transformSource(
+        const { source } = await globalThis.GLOBAL.transformSource(
           "123;",
           { url: "file:///foo", format: "module" },
           (content, _context, _next) => ({ source: content }),
@@ -38,7 +35,7 @@ assertDeepEqual(
       }
       // load //
       {
-        const { format, source } = await APPMAP_ESM_HOOK.load(
+        const { format, source } = await globalThis.GLOBAL.load(
           "file:///bar",
           "context",
           (_url, _context, _next) => ({
@@ -51,7 +48,7 @@ assertDeepEqual(
       }
       // bypass //
       {
-        const { format, source } = await APPMAP_ESM_HOOK.load(
+        const { format, source } = await globalThis.GLOBAL.load(
           "file:///qux",
           "context",
           (_url, _context, _next) => ({
@@ -82,25 +79,4 @@ assertDeepEqual(
       inline: false,
     },
   ],
-);
-
-assertDeepEqual(
-  await testHookAsync(
-    HookEsm,
-    {
-      configuration: {
-        hooks: { esm: false },
-        packages: [],
-      },
-    },
-    async () => {
-      const { source } = await APPMAP_ESM_HOOK.transformSource(
-        "123;",
-        { url: "file:///foo", format: "module" },
-        (content, _context, _next) => ({ source: content }),
-      );
-      assertEqual(evalGlobal(source), 123);
-    },
-  ),
-  [],
 );

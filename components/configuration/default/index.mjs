@@ -19,6 +19,8 @@ const { createSpecifier } = await import(
   `../../specifier/index.mjs${__search}`
 );
 
+const HOOK_ESM_GLOBAL = "APPMAP_HOOK_ESM";
+
 const ANONYMOUS_NAME_SEPARATOR = "-";
 
 const EXPECTED_EXTRA_PROPERTIES = ["test_recording"];
@@ -70,19 +72,22 @@ const normalizeExclusion = (exclusion, _base) => {
 
 const normalizeHooks = (hooks, _base) => {
   if (hasOwnProperty(hooks, "eval")) {
-    const { eval: whitelist } = hooks;
-    return {
-      ...hooks,
-      eval:
-        typeof whitelist === "boolean"
-          ? whitelist
-            ? ["eval"]
-            : []
-          : whitelist,
-    };
-  } else {
-    return hooks;
+    hooks.eval =
+      typeof hooks.eval === "boolean"
+        ? hooks.eval
+          ? ["eval"]
+          : []
+        : hooks.eval;
   }
+  if (hasOwnProperty(hooks, "esm")) {
+    hooks.esm =
+      typeof hooks.esm === "boolean"
+        ? hooks.esm
+          ? HOOK_ESM_GLOBAL
+          : null
+        : hooks.esm;
+  }
+  return hooks;
 };
 
 const normalizeExclude = (exclusions, _base) =>
@@ -446,7 +451,7 @@ export const createConfiguration = (home) => ({
   hooks: {
     apply: true,
     eval: [],
-    esm: true,
+    esm: HOOK_ESM_GLOBAL,
     cjs: true,
     http: true,
     mysql: true,

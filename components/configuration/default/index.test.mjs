@@ -38,7 +38,7 @@ const extend = (
   assertEqual(matchSpecifier(specifier, "file:///base/src/foo.js"), false);
 }
 
-// hooks //
+// hooks.eval //
 
 assertDeepEqual(extend("hooks", { eval: true }, "file:///base").eval, ["eval"]);
 
@@ -49,6 +49,19 @@ assertDeepEqual(extend("hooks", {}, "file:///base").eval, []);
 assertDeepEqual(extend("hooks", { eval: ["foo"] }, "file:///base").eval, [
   "foo",
 ]);
+
+// hooks.esm //
+
+assertDeepEqual(
+  extend("hooks", { esm: true }, "file:///base").esm,
+  "APPMAP_HOOK_ESM",
+);
+
+assertDeepEqual(extend("hooks", { esm: false }, "file:///base").esm, null);
+
+assertDeepEqual(extend("hooks", {}, "file:///base").esm, "APPMAP_HOOK_ESM");
+
+assertDeepEqual(extend("hooks", { esm: "FOO" }, "file:///base").esm, "FOO");
 
 // scenarios //
 assertDeepEqual(

@@ -481,7 +481,11 @@
       additionalProperties: false
       properties:
         cjs: { type: boolean }
-        esm: { type: boolean }
+        esm:
+          anyOf:
+            - type: boolean
+            - const: null
+            - $ref: regular-identifier
         eval:
           anyOf:
             - type: boolean
@@ -601,7 +605,10 @@
       required: [cjs, esm, apply, http, mysql, pg, sqlite3]
       properties:
         cjs: { type: boolean }
-        esm: { type: boolean }
+        esm:
+          anyOf:
+            - const: null
+            - $ref: regular-identifier
         eval:
           type: array
           items: { type: string }
