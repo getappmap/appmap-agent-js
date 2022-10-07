@@ -315,7 +315,6 @@ assertDeepEqual(
     env: {
       NODE_OPTIONS: [
         "--node-key=node-value",
-        "--require=../agent/lib/node/abomination.js",
         "--experimental-loader=../agent/lib/node/recorder-process.mjs",
       ].join(" "),
       VAR1: "VAL1",
@@ -400,7 +399,6 @@ assertDeepEqual(
         env: {
           NODE_OPTIONS: [
             "",
-            "--require=../agent/lib/node/abomination.js",
             "--experimental-loader=../agent/lib/node/mocha-loader.mjs",
           ].join(" "),
         },

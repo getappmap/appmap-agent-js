@@ -231,12 +231,6 @@ export const compileConfigurationCommand = (configuration, env) => {
       ...env,
       NODE_OPTIONS: [
         coalesce(env, "NODE_OPTIONS", ""),
-        // abomination: https://github.com/mochajs/mocha/issues/4720
-        `--require=${pathifyURL(
-          appendURLSegmentArray(directory, ["lib", "node", "abomination.js"]),
-          base,
-          true,
-        )}`,
         `--experimental-loader=${generateEscape(exec)(
           pathifyURL(
             appendURLSegmentArray(directory, [
