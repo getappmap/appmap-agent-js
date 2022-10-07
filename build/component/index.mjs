@@ -10,7 +10,6 @@ import { EOL } from "node:os";
 
 import {
   filterAsync,
-  isFirstOccurence,
   isNotEmptyString,
   isArrayShallowEqual,
   makeTrueEntry,
@@ -21,6 +20,7 @@ import { toEslintEnvs } from "./eslint.mjs";
 import { extractExportAsync } from "./export.mjs";
 
 const {
+  Set,
   Promise,
   undefined,
   Object: { fromEntries },
@@ -39,7 +39,11 @@ const loadEnvironmentsAsync = async (home, component, instance) => {
   const envs = parseEnv(
     await readFileAsync(new URL(`${component}/${instance}/.env`, home), "utf8"),
   );
-  if (envs.every(isFirstOccurence)) {
+  if (new Set(envs).size < envs.length) {
+    throw new Error(
+      `Duplicate environment entry at ${component}/${instance}/.env`,
+    );
+  } else {
     const eslint_envs = toEslintEnvs(envs);
     if (eslint_envs.length === 0) {
       try {
@@ -64,12 +68,8 @@ const loadEnvironmentsAsync = async (home, component, instance) => {
         "utf8",
       );
     }
-  } else {
-    throw new Error(
-      `Duplicate environment entry at ${component}/${instance}/.env`,
-    );
+    return envs;
   }
-  return envs;
 };
 
 const loadSignatureAsync = async (home, component, instance) => {

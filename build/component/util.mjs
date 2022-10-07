@@ -21,15 +21,6 @@ export const filterAsync = async (array, predicateAsync) => {
   return filtered_array;
 };
 
-export const isFirstOccurence = (element1, index1, array) => {
-  for (let index2 = 0; index2 < index1; index2 += 1) {
-    if (array[index2] === element1) {
-      return false;
-    }
-  }
-  return true;
-};
-
 export const doesNotInclude = (array, element) => !array.includes(element);
 
 export const isNotEmptyString = (any) => any !== "";
