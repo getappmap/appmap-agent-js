@@ -1,3 +1,11 @@
+## [11.5.3](https://github.com/getappmap/appmap-agent-js/compare/v11.5.2...v11.5.3) (2022-10-07)
+
+
+### Bug Fixes
+
+* test for both utf8 and utf-8 in data url ([50d9584](https://github.com/getappmap/appmap-agent-js/commit/50d9584857e1aa83cf98c3b22c735c3d9830d1cd))
+* update github link ([e7ff866](https://github.com/getappmap/appmap-agent-js/commit/e7ff86617ab708e3d97d84d08a82f9ddbc2d4f4e))
+
 ## [11.5.2](https://github.com/applandinc/appmap-agent-js/compare/v11.5.1...v11.5.2) (2022-09-27)
 
 
