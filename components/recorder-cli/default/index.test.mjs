@@ -1,13 +1,16 @@
-/* eslint-env node */
-
 import { EventEmitter } from "events";
 import { pathToFileURL } from "url";
 import { assertThrow, assertEqual } from "../../__fixture__.mjs";
 import {
-  buildTestDependenciesAsync,
-  buildTestComponentAsync,
-} from "../../build.mjs";
-import RecorderCLI from "./index.mjs";
+  createConfiguration,
+  extendConfiguration,
+} from "../../configuration/index.mjs?env=test";
+import {
+  createRecorder,
+  generateRequestAsync,
+  recordStartTrack,
+  recordStopTrack,
+} from "./index.mjs?env=test";
 
 const {
   Object: { assign },
@@ -15,17 +18,8 @@ const {
   process,
 } = globalThis;
 
-const {
-  createRecorder,
-  generateRequestAsync,
-  recordStartTrack,
-  recordStopTrack,
-} = RecorderCLI(await buildTestDependenciesAsync(import.meta.url));
-
-const { createConfiguration, extendConfiguration } =
-  await buildTestComponentAsync("configuration");
-
 const mock_process = new EventEmitter();
+
 assign(mock_process, {
   pid: process.pid,
   cwd: process.cwd,
@@ -65,11 +59,17 @@ const configuration = extendConfiguration(
 const recorder = createRecorder(mock_process, configuration);
 
 recordStartTrack(recorder, "track1", {}, null);
+
 const requestAsync = generateRequestAsync(recorder);
+
 assertThrow(() => {
   requestAsync("GET", "/", {});
 });
+
 recordStopTrack(recorder, "track1", 123);
+
 mock_process.emit("uncaughtExceptionMonitor", new Error("BOUM"));
+
 recordStartTrack(recorder, "track2", {}, null);
+
 mock_process.emit("exit", 1, null);

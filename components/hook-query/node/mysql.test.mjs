@@ -7,10 +7,8 @@ import {
   assertEqual,
   assertDeepEqual,
 } from "../../__fixture__.mjs";
-import {
-  buildTestDependenciesAsync,
-  buildTestComponentAsync,
-} from "../../build.mjs";
+import { testHookAsync } from "../../hook-fixture/index.mjs?env=test";
+import * as HookMysql from "./mysql.mjs?env=test";
 
 const {
   Reflect: { getOwnPropertyDescriptor },
@@ -23,12 +21,9 @@ const {
 } = globalThis;
 
 // TODO investigate why this fails on travis.
-
 if (getOwnPropertyDescriptor(process.env, "TRAVIS") !== undefined) {
   process.exit(0);
 }
-
-const { default: HookMysql } = await import("./mysql.mjs");
 
 const promiseTermination = (child) =>
   new Promise((resolve, reject) => {
@@ -40,12 +35,9 @@ const port = 3306;
 const url = getFreshTemporaryURL();
 
 const proceedAsync = async () => {
-  const dependencies = await buildTestDependenciesAsync(import.meta.url);
-  const { testHookAsync } = await buildTestComponentAsync("hook-fixture");
-  const component = HookMysql(dependencies);
   assertDeepEqual(
     await testHookAsync(
-      component,
+      HookMysql,
       { configuration: { hooks: { mysql: false } } },
       async () => {},
     ),
@@ -53,7 +45,7 @@ const proceedAsync = async () => {
   );
   assertDeepEqual(
     await testHookAsync(
-      component,
+      HookMysql,
       { configuration: { hooks: { mysql: true } } },
       async () => {
         const connection = Mysql.createConnection({

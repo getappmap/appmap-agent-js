@@ -1,15 +1,11 @@
 /* eslint-disable no-undef */
 
-import { strict as assert } from "assert";
-import * as sinon from "sinon";
-import { buildTestDependenciesAsync } from "../../build.mjs";
-
-import Status, { externals } from "./index.mjs";
-
 const { Object, JSON, process, RegExp, undefined } = globalThis;
 
-const dependencies = await buildTestDependenciesAsync(import.meta.url);
-const { main, run } = Status(dependencies);
+import { strict as assert } from "assert";
+import * as sinon from "sinon";
+import "../../__fixture__.mjs";
+import { main, run, externals } from "./index.mjs?env=test";
 
 describe("the status command", () => {
   beforeEach(() => {

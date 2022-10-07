@@ -1,21 +1,9 @@
 import { assertDeepEqual, assertEqual } from "../../__fixture__.mjs";
-import {
-  buildTestDependenciesAsync,
-  buildTestComponentAsync,
-} from "../../build.mjs";
-import Configuration from "./index.mjs";
+import { validateInternalConfiguration } from "../../validate/index.mjs?env=test";
+import { matchSpecifier } from "../../specifier/index.mjs?env=test";
+import { createConfiguration, extendConfiguration } from "./index.mjs?env=test";
 
 const { undefined } = globalThis;
-
-const { validateInternalConfiguration } = await buildTestComponentAsync(
-  "validate",
-);
-
-const { matchSpecifier } = await buildTestComponentAsync("specifier");
-
-const { createConfiguration, extendConfiguration } = Configuration(
-  await buildTestDependenciesAsync(import.meta.url),
-);
 
 validateInternalConfiguration(createConfiguration("file:///home"));
 
@@ -50,17 +38,57 @@ const extend = (
   assertEqual(matchSpecifier(specifier, "file:///base/src/foo.js"), false);
 }
 
-// hooks //
+// hooks.eval //
 
-assertDeepEqual(extend("hooks", { eval: true }, "file:///base").eval, ["eval"]);
+assertDeepEqual(extend("hooks", { eval: true }, "file:///base").eval, {
+  hidden: "APPMAP_HOOK_EVAL",
+  aliases: ["eval"],
+});
 
-assertDeepEqual(extend("hooks", { eval: false }, "file:///base").eval, []);
+assertDeepEqual(extend("hooks", { eval: false }, "file:///base").eval, {
+  hidden: "APPMAP_HOOK_EVAL",
+  aliases: [],
+});
 
-assertDeepEqual(extend("hooks", {}, "file:///base").eval, []);
+assertDeepEqual(extend("hooks", {}, "file:///base").eval, {
+  hidden: "APPMAP_HOOK_EVAL",
+  aliases: [],
+});
 
-assertDeepEqual(extend("hooks", { eval: ["foo"] }, "file:///base").eval, [
-  "foo",
-]);
+assertDeepEqual(
+  extend("hooks", { eval: { hidden: "foo", aliases: ["bar"] } }, "file:///base")
+    .eval,
+  {
+    hidden: "foo",
+    aliases: ["bar"],
+  },
+);
+
+// hooks.esm //
+
+assertDeepEqual(
+  extend("hooks", { esm: true }, "file:///base").esm,
+  "APPMAP_HOOK_ESM",
+);
+
+assertDeepEqual(extend("hooks", { esm: false }, "file:///base").esm, null);
+
+assertDeepEqual(extend("hooks", {}, "file:///base").esm, "APPMAP_HOOK_ESM");
+
+assertDeepEqual(extend("hooks", { esm: "FOO" }, "file:///base").esm, "FOO");
+
+// hooks.apply //
+
+assertDeepEqual(
+  extend("hooks", { apply: true }, "file:///base").apply,
+  "APPMAP_HOOK_APPLY",
+);
+
+assertDeepEqual(extend("hooks", { apply: false }, "file:///base").apply, null);
+
+assertDeepEqual(extend("hooks", {}, "file:///base").apply, "APPMAP_HOOK_APPLY");
+
+assertDeepEqual(extend("hooks", { apply: "FOO" }, "file:///base").apply, "FOO");
 
 // scenarios //
 assertDeepEqual(

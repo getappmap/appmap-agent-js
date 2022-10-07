@@ -1,18 +1,10 @@
-import {
-  buildTestDependenciesAsync,
-  buildTestComponentAsync,
-} from "../../build.mjs";
-import LoadEnvironmentConfiguration from "./index.mjs";
+import "../../__fixture__.mjs";
+import { createConfiguration } from "../../configuration/index.mjs?env=test";
+import { loadEnvironmentConfiguration } from "./index.mjs?env=test";
 
 const {
   JSON: { stringify: stringifyJSON },
 } = globalThis;
-
-const { createConfiguration } = await buildTestComponentAsync("configuration");
-
-const { loadEnvironmentConfiguration } = LoadEnvironmentConfiguration(
-  await buildTestDependenciesAsync(import.meta.url),
-);
 
 loadEnvironmentConfiguration({
   APPMAP_CONFIGURATION: stringifyJSON(createConfiguration("file:///home")),

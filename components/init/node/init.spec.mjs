@@ -3,18 +3,15 @@ import { basename as getBasename, join as joinPath } from "path";
 import { tmpdir } from "os";
 import { strict as assert } from "assert";
 import { mkdir } from "fs/promises";
-import { buildTestDependenciesAsync } from "../../build.mjs";
 import YAML from "yaml";
 import Mocha from "mocha";
 import * as sinon from "sinon";
-import Init, { externals } from "./index.mjs";
+import "../../__fixture__.mjs";
+import { externals, main, run } from "./index.mjs?env=test";
 
 const { Math, process, JSON, undefined } = globalThis;
 
 const { afterEach, beforeEach, describe, it } = Mocha;
-
-const dependencies = await buildTestDependenciesAsync(import.meta.url);
-const { main, run } = Init(dependencies);
 
 describe("the init command", () => {
   let directory;

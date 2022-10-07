@@ -1,18 +1,11 @@
 import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
 import {
-  buildTestDependenciesAsync,
-  buildTestComponentAsync,
-} from "../../build.mjs";
-import RecorderAPI from "./index.mjs";
+  createConfiguration,
+  extendConfiguration,
+} from "../../configuration/index.mjs?env=test";
+import { Appmap } from "./index.mjs?env=test";
 
 const { undefined } = globalThis;
-
-const { Appmap } = RecorderAPI(
-  await buildTestDependenciesAsync(import.meta.url),
-);
-
-const { createConfiguration, extendConfiguration } =
-  await buildTestComponentAsync("configuration");
 
 const configuration = extendConfiguration(
   createConfiguration("file:///home"),

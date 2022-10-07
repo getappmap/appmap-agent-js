@@ -1,9 +1,5 @@
 import { assertDeepEqual, assertEqual } from "../../__fixture__.mjs";
-import { buildTestDependenciesAsync } from "../../build.mjs";
-import HookFixture from "./index.mjs";
-
-const dependencies = await buildTestDependenciesAsync(import.meta.url);
-const { testHookAsync } = HookFixture(dependencies);
+import { testHookAsync } from "./index.mjs?env=test";
 
 assertDeepEqual(
   await testHookAsync(

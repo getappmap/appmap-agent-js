@@ -1,21 +1,15 @@
 import { EventEmitter } from "events";
+import "../../__fixture__.mjs";
 import {
-  buildTestDependenciesAsync,
-  buildTestComponentAsync,
-} from "../../build.mjs";
-import RecorderEmpty from "./index.mjs";
+  createConfiguration,
+  extendConfiguration,
+} from "../../configuration/index.mjs?env=test";
+import { main } from "./index.mjs?env=test";
 
 const {
   Error,
   Object: { assign },
 } = globalThis;
-
-const { main } = RecorderEmpty(
-  await buildTestDependenciesAsync(import.meta.url),
-);
-
-const { createConfiguration, extendConfiguration } =
-  await buildTestComponentAsync("configuration");
 
 const configuration = createConfiguration("file:///home");
 

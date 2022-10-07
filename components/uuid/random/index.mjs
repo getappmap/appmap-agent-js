@@ -1,9 +1,10 @@
 const {
   Date: { now },
   Math: { random },
+  URL,
 } = globalThis;
 
-const getUUID = () =>
-  `${now().toString(32).substr(-4)}${random().toString(32).substr(-4)}`;
+const { search: __search } = new URL(import.meta.url);
 
-export default (_dependencies) => ({ getUUID });
+export const getUUID = () =>
+  `${now().toString(32).substr(-4)}${random().toString(32).substr(-4)}`;

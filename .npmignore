@@ -1,12 +1,10 @@
-
-/~/
-/build/
-/coverage/
-/doc/
-/node_modules/
-/test/
+/build
+/coverage
+/doc
+/node_modules
+/test
+/tmp
 /babel.config.json
-/yo*
 
-**/.*
-**/*.test.mjs
+.*
+*.test.mjs

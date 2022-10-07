@@ -1,10 +1,5 @@
 import { assertEqual, assertThrow } from "../../../__fixture__.mjs";
-import { buildTestDependenciesAsync } from "../../../build.mjs";
-import Exclusion from "./exclusion.mjs";
-
-const { compileExclusion, isExclusionMatched } = Exclusion(
-  await buildTestDependenciesAsync(import.meta.url),
-);
+import { compileExclusion, isExclusionMatched } from "./exclusion.mjs?env=test";
 
 const testExclusion = (exclusion, entity, parent) =>
   isExclusionMatched(compileExclusion(exclusion), entity, parent);

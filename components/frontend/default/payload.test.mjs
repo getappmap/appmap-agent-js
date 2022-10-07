@@ -1,16 +1,8 @@
 import "../../__fixture__.mjs";
+import { createConfiguration } from "../../configuration/index.mjs?env=test";
+import { createSerialization } from "../../serialization/index.mjs?env=test";
+import { validatePayload } from "../../validate/index.mjs?env=test";
 import {
-  buildTestDependenciesAsync,
-  buildTestComponentAsync,
-} from "../../build.mjs";
-import Payload from "./payload.mjs";
-
-const dependencies = await buildTestDependenciesAsync(import.meta.url);
-const { createConfiguration } = await buildTestComponentAsync("configuration");
-const { createSerialization } = await buildTestComponentAsync("serialization");
-const { validatePayload } = await buildTestComponentAsync("validate");
-
-const {
   getBundlePayload,
   getJumpPayload,
   formatApplyPayload,
@@ -27,7 +19,7 @@ const {
   formatResponsePayload,
   formatGroupPayload,
   formatUngroupPayload,
-} = Payload(dependencies);
+} from "./payload.mjs?env=test";
 
 const configuration = createConfiguration("file:///home");
 

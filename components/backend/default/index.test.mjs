@@ -1,19 +1,9 @@
 import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
 import {
-  buildTestDependenciesAsync,
-  buildTestComponentAsync,
-} from "../../build.mjs";
-import Backend from "./index.mjs";
-
-const {
-  undefined,
-  Array: { from: toArray },
-} = globalThis;
-
-const dependencies = await buildTestDependenciesAsync(import.meta.url);
-const { createConfiguration, extendConfiguration } =
-  await buildTestComponentAsync("configuration", "test");
-const {
+  createConfiguration,
+  extendConfiguration,
+} from "../../configuration/index.mjs?env=test";
+import {
   createBackend,
   sendBackend,
   getBackendTrackIterator,
@@ -21,7 +11,12 @@ const {
   hasBackendTrace,
   hasBackendTrack,
   takeBackendTrace,
-} = Backend(dependencies);
+} from "./index.mjs?env=test";
+
+const {
+  undefined,
+  Array: { from: toArray },
+} = globalThis;
 
 const configuration = extendConfiguration(
   createConfiguration("file:///home"),

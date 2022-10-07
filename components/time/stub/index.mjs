@@ -1,3 +1,7 @@
-const now = () => 0;
+const { URL } = globalThis;
 
-export default (_dependencies) => ({ now });
+const { search: __search } = new URL(import.meta.url);
+
+const { constant } = await import(`../../util/index.mjs${__search}`);
+
+export const now = constant(0);

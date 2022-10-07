@@ -1,14 +1,12 @@
-import { buildTestDependenciesAsync } from "../../build.mjs";
 import { assertDeepEqual } from "../../__fixture__.mjs";
-import SpySocket from "./index.mjs";
-
-const { openSocket, closeSocket, sendSocket } = SpySocket(
-  await buildTestDependenciesAsync(import.meta.url),
-);
+import { openSocket, closeSocket, sendSocket } from "./index.mjs?env=test";
 
 const socket = openSocket("host", "port", {});
+
 sendSocket(socket, "message");
+
 closeSocket(socket);
+
 assertDeepEqual(globalThis.SOCKET_TRACE, [
   { type: "open", host: "host", port: "port" },
   { type: "send", socket: "socket", message: "message" },

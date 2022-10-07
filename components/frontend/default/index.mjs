@@ -1,92 +1,128 @@
-import Payload from "./payload.mjs";
+const { URL } = globalThis;
+const { search: __search } = new URL(import.meta.url);
 
-export default (dependencies) => {
-  const {
-    util: { createCounter, incrementCounter },
-    instrumentation: {
-      createInstrumentation,
-      instrument,
-      getInstrumentationIdentifier,
-    },
-    serialization: { createSerialization, getSerializationEmptyValue },
-  } = dependencies;
-  const FormatPayloadLibrary = Payload(dependencies);
-  const toSourceMessage = (source) => ({
-    type: "source",
-    ...source,
+const { createCounter, incrementCounter } = await import(
+  `../../util/index.mjs${__search}`
+);
+const { createInstrumentation, instrument: instrumentInner } = await import(
+  `../../instrumentation/index.mjs${__search}`
+);
+const {
+  createSerialization,
+  getSerializationEmptyValue: getSerializationEmptyValueInner,
+} = await import(`../../serialization/index.mjs${__search}`);
+
+export const {
+  getJumpPayload,
+  getBundlePayload,
+  formatApplyPayload,
+  formatReturnPayload,
+  formatThrowPayload,
+  formatAwaitPayload,
+  formatResolvePayload,
+  formatRejectPayload,
+  formatYieldPayload,
+  getResumePayload,
+  formatRequestPayload,
+  formatResponsePayload,
+  formatQueryPayload,
+  getAnswerPayload,
+  formatGroupPayload,
+  formatUngroupPayload,
+} = await import(`./payload.mjs${__search}`);
+
+const toSourceMessage = (source) => ({
+  type: "source",
+  ...source,
+});
+
+const generateFormatAmend =
+  (site) =>
+  ({}, tab, payload) => ({
+    type: "amend",
+    site,
+    tab,
+    payload,
   });
-  const generateFormatAmend =
-    (site) =>
-    ({}, tab, payload) => ({
-      type: "amend",
-      site,
-      tab,
-      payload,
-    });
-  const generateFormatEvent =
-    (site) =>
-    ({}, tab, group, time, payload) => ({
-      type: "event",
-      site,
-      tab,
-      time,
-      group,
-      payload,
-    });
+
+const generateFormatEvent =
+  (site) =>
+  ({}, tab, group, time, payload) => ({
+    type: "event",
+    site,
+    tab,
+    time,
+    group,
+    payload,
+  });
+
+export const createFrontend = (configuration) => ({
+  counter: createCounter(0),
+  serialization: createSerialization(configuration),
+  instrumentation: createInstrumentation(configuration),
+});
+
+export const getFreshTab = ({ counter }) => incrementCounter(counter);
+
+export const getSerializationEmptyValue = ({ serialization }) =>
+  getSerializationEmptyValueInner(serialization);
+
+export const instrument = (
+  { instrumentation },
+  script_file,
+  source_map_file,
+) => {
+  const { url, content, sources } = instrumentInner(
+    instrumentation,
+    script_file,
+    source_map_file,
+  );
   return {
-    createFrontend: (configuration) => ({
-      counter: createCounter(0),
-      serialization: createSerialization(configuration),
-      instrumentation: createInstrumentation(configuration),
-    }),
-    getFreshTab: ({ counter }) => incrementCounter(counter),
-    getSerializationEmptyValue: ({ serialization }) =>
-      getSerializationEmptyValue(serialization),
-    getInstrumentationIdentifier: ({ instrumentation }) =>
-      getInstrumentationIdentifier(instrumentation),
-    instrument: ({ instrumentation }, script_file, source_map_file) => {
-      const { url, content, sources } = instrument(
-        instrumentation,
-        script_file,
-        source_map_file,
-      );
-      return {
-        url,
-        content,
-        messages: sources.map(toSourceMessage),
-      };
-    },
-    formatStartTrack: ({}, track, configuration, url) => ({
-      type: "start",
-      track,
-      configuration,
-      url,
-    }),
-    formatStopTrack: ({}, track, status) => ({
-      type: "stop",
-      track,
-      status,
-    }),
-    formatError: ({}, name, message, stack) => ({
-      type: "error",
-      name,
-      message,
-      stack,
-    }),
-    formatGroup: ({}, group, child, description) => ({
-      type: "group",
-      group,
-      child,
-      description,
-    }),
-    formatBeginEvent: generateFormatEvent("begin"),
-    formatEndEvent: generateFormatEvent("end"),
-    formatBeforeEvent: generateFormatEvent("before"),
-    formatAfterEvent: generateFormatEvent("after"),
-    formatBeginAmend: generateFormatAmend("begin"),
-    formatEndAmend: generateFormatAmend("end"),
-    formatBeforeAmend: generateFormatAmend("before"),
-    formatAfterAmend: generateFormatAmend("after"),
-    ...FormatPayloadLibrary,
+    url,
+    content,
+    messages: sources.map(toSourceMessage),
   };
 };
+
+export const formatStartTrack = ({}, track, configuration, url) => ({
+  type: "start",
+  track,
+  configuration,
+  url,
+});
+
+export const formatStopTrack = ({}, track, status) => ({
+  type: "stop",
+  track,
+  status,
+});
+
+export const formatError = ({}, name, message, stack) => ({
+  type: "error",
+  name,
+  message,
+  stack,
+});
+
+export const formatGroup = ({}, group, child, description) => ({
+  type: "group",
+  group,
+  child,
+  description,
+});
+
+export const formatBeginEvent = generateFormatEvent("begin");
+
+export const formatEndEvent = generateFormatEvent("end");
+
+export const formatBeforeEvent = generateFormatEvent("before");
+
+export const formatAfterEvent = generateFormatEvent("after");
+
+export const formatBeginAmend = generateFormatAmend("begin");
+
+export const formatEndAmend = generateFormatAmend("end");
+
+export const formatBeforeAmend = generateFormatAmend("before");
+
+export const formatAfterAmend = generateFormatAmend("after");

@@ -8,17 +8,13 @@ import {
   writeFile as writeFileAsync,
 } from "fs/promises";
 import { assertEqual, getFreshTemporaryURL } from "../../__fixture__.mjs";
-import { buildTestDependenciesAsync } from "../../build.mjs";
-import Setup from "./index.mjs";
+import { mainAsync } from "./index.mjs?env=test";
 
 const {
   URL,
   process,
   JSON: { stringify: stringifyJSON },
 } = globalThis;
-
-const dependencies = await buildTestDependenciesAsync(import.meta.url);
-const { mainAsync } = Setup(dependencies);
 
 const directory = getFreshTemporaryURL();
 const cwd = () => fileURLToPath(directory);

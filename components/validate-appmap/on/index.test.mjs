@@ -1,10 +1,5 @@
 import { assertThrow } from "../../__fixture__.mjs";
-import { buildTestDependenciesAsync } from "../../build.mjs";
-import ValidateAppmap from "./index.mjs";
-
-const { validateAppmap } = ValidateAppmap(
-  await buildTestDependenciesAsync(import.meta.url),
-);
+import { validateAppmap } from "./index.mjs?env=test";
 
 assertThrow(() => {
   validateAppmap({

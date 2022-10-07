@@ -1,10 +1,5 @@
 import { assertDeepEqual } from "../../../__fixture__.mjs";
-import { buildTestDependenciesAsync } from "../../../build.mjs";
-import Ordering from "./index.mjs";
-
-const dependencies = await buildTestDependenciesAsync(import.meta.url);
-
-const { orderEventArray } = Ordering(dependencies);
+import { orderEventArray } from "./index.mjs?env=test";
 
 export const generateMakeEvent = (site, type) => (tab) => ({
   type: "event",

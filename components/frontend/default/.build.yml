@@ -1,7 +1,0 @@
-branches: [test, node, browser]
-dependencies:
-  - util
-  - expect
-  - log
-  - instrumentation
-  - serialization

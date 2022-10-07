@@ -1,9 +1,0 @@
-branches: [node, browser]
-dependencies:
-  - util
-  - url
-  - expect
-  - validate-appmap
-  - log
-  - location
-  - configuration

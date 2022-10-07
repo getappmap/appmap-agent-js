@@ -1,20 +1,16 @@
-import { buildTestDependenciesAsync } from "../../build.mjs";
+const { encodeURIComponent } = globalThis;
+
 import { getFreshTemporaryURL } from "../../__fixture__.mjs";
-import LogInner from "./index.mjs";
 
-const {
-  process,
-  JSON: { stringify: stringifyJSON },
-} = globalThis;
-
-const testAsync = async () => {
-  const { logInfo } = LogInner(
-    await buildTestDependenciesAsync(import.meta.url),
-  );
+const testAsync = async (url) => {
+  const { logInfo } = await import(url);
   logInfo("foo %s", "bar");
 };
 
-await testAsync();
+await testAsync("./index.mjs?env=test");
 
-process.env.APPMAP_LOG_FILE = stringifyJSON(getFreshTemporaryURL());
-await testAsync();
+await testAsync("./index.mjs?env=test&log-file=2");
+
+await testAsync(
+  `./index.mjs?env=test&log-file=${encodeURIComponent(getFreshTemporaryURL())}`,
+);

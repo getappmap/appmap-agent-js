@@ -1,18 +1,6 @@
 import { assertDeepEqual } from "../../__fixture__.mjs";
-import {
-  buildTestDependenciesAsync,
-  buildTestComponentAsync,
-} from "../../build.mjs";
-import Trace from "./index.mjs";
-
-const { createConfiguration } = await buildTestComponentAsync(
-  "configuration",
-  "test",
-);
-
-const dependencies = await buildTestDependenciesAsync(import.meta.url);
-
-const { compileTrace } = Trace(dependencies);
+import { createConfiguration } from "../../configuration/index.mjs?env=test";
+import { compileTrace } from "./index.mjs?env=test";
 
 const configuration = createConfiguration("file:///home");
 

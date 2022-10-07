@@ -1,5 +1,3 @@
-import { loadAsync } from "../../../build/await/load.mjs";
-
 const { process } = globalThis;
 
 const { stdout } = process;
@@ -17,5 +15,5 @@ for (const name of [
   "remote",
 ]) {
   stdout.write(`${"\n"}${name}${"\n"}`);
-  await loadAsync(import(`./${name}.mjs`));
+  await import(`./${name}.mjs`);
 }

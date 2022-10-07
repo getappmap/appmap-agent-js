@@ -1,16 +1,11 @@
-import { assertDeepEqual, assertEqual } from "../../__fixture__.mjs";
+import { assertDeepEqual } from "../../__fixture__.mjs";
+import { createMirrorSourceMap } from "../../source/index.mjs?env=test";
 import {
-  buildTestDependenciesAsync,
-  buildTestComponentAsync,
-} from "../../build.mjs";
+  createConfiguration,
+  extendConfiguration,
+} from "../../configuration/index.mjs?env=test";
 import { normalize } from "./__fixture__.mjs";
-import Instrumentation from "./index.mjs";
-
-const { createMirrorSourceMap } = await buildTestComponentAsync("source");
-const { createConfiguration, extendConfiguration } =
-  await buildTestComponentAsync("configuration");
-const { createInstrumentation, instrument, getInstrumentationIdentifier } =
-  Instrumentation(await buildTestDependenciesAsync(import.meta.url));
+import { createInstrumentation, instrument } from "./index.mjs?env=test";
 
 const and_exclusion = {
   combinator: "and",
@@ -38,9 +33,8 @@ const instrumentation = createInstrumentation(
   extendConfiguration(
     createConfiguration("file:///home"),
     {
-      "hidden-identifier": "$",
       "inline-source": false,
-      hooks: { eval: false },
+      hooks: { apply: "$", eval: false },
       packages: [
         {
           path: "foo.js",
@@ -62,8 +56,6 @@ const instrumentation = createInstrumentation(
     "file:///base",
   ),
 );
-
-assertEqual(getInstrumentationIdentifier(instrumentation), "$uuid");
 
 {
   const file = {

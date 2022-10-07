@@ -1,3 +1,4 @@
-import prompts from "prompts";
+const { URL } = globalThis;
+const { search: __search } = new URL(import.meta.url);
 
-export default (_dependencies) => ({ prompts });
+export { default as prompts } from "prompts";

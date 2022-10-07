@@ -1,20 +1,12 @@
 import { assertDeepEqual } from "../../__fixture__.mjs";
-// import { executionAsyncId } from "async_hooks";
-import {
-  buildTestDependenciesAsync,
-  buildTestComponentAsync,
-} from "../../build.mjs";
-import HookGroup from "./index.mjs";
+import { testHookAsync } from "../../hook-fixture/index.mjs?env=test";
+import * as HookGroup from "./index.mjs?env=test";
 
 const { Promise, setTimeout } = globalThis;
 
-const dependencies = await buildTestDependenciesAsync(import.meta.url);
-const { testHookAsync } = await buildTestComponentAsync("hook-fixture");
-const component = HookGroup(dependencies);
-
 assertDeepEqual(
   await testHookAsync(
-    component,
+    HookGroup,
     { configuration: { ordering: "chronological" } },
     async () => {
       await new Promise((resolve) => {
@@ -25,9 +17,11 @@ assertDeepEqual(
   [],
 );
 
-setTimeout(() => {}, 100); // provide an unknown async id
+// provide an unknown async id
+setTimeout(() => {}, 100);
+
 await testHookAsync(
-  component,
+  HookGroup,
   { configuration: { ordering: "causal" } },
   async () => {
     await new Promise((resolve) => {

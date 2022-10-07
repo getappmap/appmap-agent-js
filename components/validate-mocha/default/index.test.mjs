@@ -1,7 +1,4 @@
-import { buildTestDependenciesAsync } from "../../build.mjs";
-import ValidateMocha from "./index.mjs";
+import "../../__fixture__.mjs";
+import { validateMocha } from "./index.mjs?env=test";
 
-const { validateMocha } = ValidateMocha(
-  await buildTestDependenciesAsync(import.meta.url),
-);
 validateMocha({ prototype: { version: "8.1.2" } });

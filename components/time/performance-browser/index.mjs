@@ -1,7 +1,7 @@
-/* eslint-env browser */
+const { URL } = globalThis;
 
-const {
+const { search: __search } = new URL(import.meta.url);
+
+export const {
   performance: { now },
 } = globalThis;
-
-export default (_dependencies) => ({ now });

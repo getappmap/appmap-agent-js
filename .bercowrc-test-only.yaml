@@ -1,4 +1,3 @@
-ordering-pattern: (?<!\.test)\.mjs$
 plugins:
   "@bercow/link-adjacent": {}
   "@bercow/spawn":

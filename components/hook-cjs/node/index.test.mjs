@@ -7,24 +7,21 @@ import {
 import { createRequire } from "module";
 import { writeFile as writeFileAsync } from "fs/promises";
 import { pathToFileURL, fileURLToPath } from "url";
-import {
-  buildTestDependenciesAsync,
-  buildTestComponentAsync,
-} from "../../build.mjs";
-import Common from "./index.mjs";
+import { createConfiguration } from "../../configuration/index.mjs?env=test";
+import { testHookAsync } from "../../hook-fixture/index.mjs?env=test";
+import * as HookCjs from "./index.mjs?env=test";
 
 const { URL } = globalThis;
 
-const dependencies = await buildTestDependenciesAsync(import.meta.url);
-const { createConfiguration } = await buildTestComponentAsync("configuration");
-const { testHookAsync } = await buildTestComponentAsync("hook-fixture");
-const component = Common(dependencies);
 const require = createRequire(new URL(import.meta.url));
+
 const url = getFreshTemporaryURL();
+
 await writeFileAsync(new URL(url), "module.exports = 123;", "utf8");
+
 assertDeepEqual(
   await testHookAsync(
-    component,
+    HookCjs,
     {
       configuration: {
         hooks: { cjs: false },
@@ -42,10 +39,12 @@ assertDeepEqual(
   ),
   [],
 );
+
 delete require.cache[require.resolve(fileURLToPath(url))];
+
 assertDeepEqual(
   await testHookAsync(
-    component,
+    HookCjs,
     {
       configuration: {
         hooks: { cjs: true },

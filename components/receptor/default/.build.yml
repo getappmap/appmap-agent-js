@@ -1,5 +1,0 @@
-branches: [node]
-dependencies:
-  - util
-  - receptor-http
-  - receptor-file

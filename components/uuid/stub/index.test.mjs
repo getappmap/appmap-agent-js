@@ -1,5 +1,2 @@
-import { assertEqual } from "../../__fixture__.mjs";
-import UUID from "./index.mjs";
-
-const { getUUID } = UUID({});
-assertEqual(getUUID(), "uuid");
+import "../../__fixture__.mjs";
+import "./index.mjs?env=test";

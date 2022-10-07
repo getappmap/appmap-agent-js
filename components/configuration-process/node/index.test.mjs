@@ -6,18 +6,13 @@ import {
   assertEqual,
   getFreshTemporaryURL,
 } from "../../__fixture__.mjs";
-import { buildTestDependenciesAsync } from "../../build.mjs";
-import ConfigurationProcess from "./index.mjs";
+import { loadProcessConfiguration } from "./index.mjs?env=test";
 
 const {
   URL,
   JSON: { stringify: stringifyJSON },
   Reflect: { get },
 } = globalThis;
-
-const { loadProcessConfiguration } = ConfigurationProcess(
-  await buildTestDependenciesAsync(import.meta.url),
-);
 
 assertThrow(
   () =>

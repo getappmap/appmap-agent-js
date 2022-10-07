@@ -1,21 +1,14 @@
 import { assertDeepEqual } from "../../../__fixture__.mjs";
 import {
-  buildTestDependenciesAsync,
-  buildTestComponentAsync,
-} from "../../../build.mjs";
-import Classmap from "../classmap/index.mjs";
-import Event from "./index.mjs";
-
-const dependencies = await buildTestDependenciesAsync(import.meta.url);
-const { createClassmap, addClassmapSource } = Classmap(dependencies);
-const { makeLocation, stringifyLocation } = await buildTestComponentAsync(
-  "location",
-);
-const { createConfiguration } = await buildTestComponentAsync(
-  "configuration",
-  "test",
-);
-const { digestEventTrace } = Event(dependencies);
+  makeLocation,
+  stringifyLocation,
+} from "../../../location/index.mjs?env=test";
+import { createConfiguration } from "../../../configuration/index.mjs?env=test";
+import {
+  createClassmap,
+  addClassmapSource,
+} from "../classmap/index.mjs?env=test";
+import { digestEventTrace } from "./index.mjs?env=test";
 
 const makeEvent = (site, tab, payload) => ({
   type: "event",

@@ -1,30 +1,44 @@
-/* globals APPMAP_ESM_HOOK */
-/* eslint local/no-globals: ["error", "APPMAP_ESM_HOOK"] */
-
-// TODO: detect if preloaded with `--experimental-loader`
-// NB: since 15.x we can use module.preloading
+// NB: This module only set a global variable and should be paired with `--loader`.
+// It could be worthwhile to detect if this is indeed the case.
+// Since 15.x we can use module.preloading
 // const preloaded = Path.join(__dirname, "esm.js") in require.cache;
 // preloaded ? : {hookESM: (instrumentAsync) => {
 //   throw new Error("lib/emitter/hook/esm.js must be preloaded with --experimental loader");
 // }};
 
-import Stringify from "./stringify.mjs";
+// NB: We could avoid using globals by making recorder components export `transformSource` and `load`.
+// But this would complicate the interface of many components.
+// Plus, all the other hooks have global side effects which cannot be avoided.
 
-export default (dependencies) => {
-  const {
-    util: { assert },
-    log: { logInfo },
-    agent: { instrument },
-    interpretation: { runScript },
-  } = dependencies;
-  const { stringifyContent } = Stringify(dependencies);
-  const forward = (arg1, arg2, next) => next(arg1, arg2, next);
-  const disable = (hook) => {
-    hook.enabled = false;
-    hook.transformSource = forward;
-    hook.load = forward;
-  };
-  const enable = (hook, agent) => {
+const {
+  URL,
+  Reflect: { defineProperty },
+} = globalThis;
+
+const { search: __search } = new URL(import.meta.url);
+
+const { assert, hasOwnProperty } = await import(
+  `../../util/index.mjs${__search}`
+);
+const { instrument } = await import(`../../agent/index.mjs${__search}`);
+const { stringifyContent } = await import(`./stringify.mjs${__search}`);
+
+export const unhook = (esm_hook_variable) => {
+  if (esm_hook_variable !== null) {
+    assert(
+      hasOwnProperty(globalThis, esm_hook_variable),
+      "global esm hook variable not defined",
+    );
+    delete globalThis[esm_hook_variable];
+  }
+};
+
+export const hook = (agent, { hooks: { esm: esm_hook_variable } }) => {
+  if (esm_hook_variable !== null) {
+    assert(
+      !hasOwnProperty(globalThis, esm_hook_variable),
+      "global esm hook variable already defined",
+    );
     const transformModule = (url, format, content) =>
       format === "module"
         ? instrument(agent, {
@@ -33,45 +47,28 @@ export default (dependencies) => {
             content: stringifyContent(content),
           })
         : content;
-    hook.enabled = true;
-    hook.transformSource = async (content, context, nextAsync) => {
-      const { format, url } = context;
-      const { source } = await nextAsync(content, context, nextAsync);
-      return {
-        source: transformModule(url, format, source),
-      };
-    };
-    hook.load = async (url, context, nextAsync) => {
-      const { format, source } = await nextAsync(url, context, nextAsync);
-      return {
-        format,
-        source: transformModule(url, format, source),
-      };
-    };
-  };
-  if (typeof APPMAP_ESM_HOOK === "undefined") {
-    logInfo(
-      "Please, ignore node's deprecated warning about outdated transformSource loader hook (if present).",
-    );
-    runScript("const APPMAP_ESM_HOOK = {__proto__:null};");
-    disable(APPMAP_ESM_HOOK);
+    defineProperty(globalThis, esm_hook_variable, {
+      __proto__: null,
+      writable: false,
+      configurable: true,
+      enumerable: false,
+      value: {
+        transformSource: async (content, context, nextAsync) => {
+          const { format, url } = context;
+          const { source } = await nextAsync(content, context, nextAsync);
+          return {
+            source: transformModule(url, format, source),
+          };
+        },
+        load: async (url, context, nextAsync) => {
+          const { format, source } = await nextAsync(url, context, nextAsync);
+          return {
+            format,
+            source: transformModule(url, format, source),
+          };
+        },
+      },
+    });
   }
-  return {
-    unhook: (enabled) => {
-      assert(
-        APPMAP_ESM_HOOK.enabled === enabled,
-        "unexpected native modules hooking during unhooking",
-      );
-      if (enabled) {
-        disable(APPMAP_ESM_HOOK);
-      }
-    },
-    hook: (agent, { hooks: { esm: enabled } }) => {
-      assert(!APPMAP_ESM_HOOK.enabled, "native modules should not be hooked");
-      if (enabled) {
-        enable(APPMAP_ESM_HOOK, agent);
-      }
-      return enabled;
-    },
-  };
+  return esm_hook_variable;
 };

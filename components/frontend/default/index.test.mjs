@@ -1,25 +1,15 @@
 import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
+import { createMirrorSourceMap } from "../../source/index.mjs?env=test";
+import { validateMessage } from "../../validate/index.mjs?env=test";
 import {
-  buildTestDependenciesAsync,
-  buildTestComponentAsync,
-} from "../../build.mjs";
-import Frontend from "./index.mjs";
-
-const dependencies = await buildTestDependenciesAsync(import.meta.url);
-
-const { createMirrorSourceMap } = await buildTestComponentAsync("source");
-
-const { validateMessage } = await buildTestComponentAsync("validate");
-
-const { createConfiguration, extendConfiguration } =
-  await buildTestComponentAsync("configuration", "test");
-
-const {
+  createConfiguration,
+  extendConfiguration,
+} from "../../configuration/index.mjs?env=test";
+import {
   createFrontend,
   formatStartTrack,
   formatStopTrack,
   formatError,
-  getInstrumentationIdentifier,
   getSerializationEmptyValue,
   instrument,
   getFreshTab,
@@ -27,7 +17,8 @@ const {
   formatGroup,
   formatBeginEvent,
   formatBeginAmend,
-} = Frontend(dependencies);
+} from "./index.mjs?env=test";
+
 const configuration = extendConfiguration(
   createConfiguration("file:///home"),
   {
@@ -39,7 +30,7 @@ const configuration = extendConfiguration(
   },
   "file:///base",
 );
-const { "hidden-identifier": identifier } = configuration;
+
 const frontend = createFrontend(configuration);
 
 assertEqual(typeof getSerializationEmptyValue(frontend), "symbol");
@@ -59,11 +50,6 @@ validateMessage(
 );
 
 validateMessage(formatBeginAmend(frontend, 123, getBundlePayload(frontend)));
-
-assertEqual(
-  getInstrumentationIdentifier(frontend).startsWith(identifier),
-  true,
-);
 
 {
   const file = { url: "file:///filename.js", content: "123;", type: "script" };

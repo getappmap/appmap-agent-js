@@ -1,12 +1,7 @@
 import { assertEqual, assertThrow } from "../../__fixture__.mjs";
-import { buildTestDependenciesAsync } from "../../build.mjs";
-import Validation from "./index.mjs";
+import { validateExternalConfiguration } from "./index.mjs?env=test";
 
 const { undefined } = globalThis;
-
-const { validateExternalConfiguration } = Validation(
-  await buildTestDependenciesAsync(import.meta.url),
-);
 
 assertEqual(
   validateExternalConfiguration({ extra: "extra-root-property" }),

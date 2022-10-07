@@ -5,14 +5,9 @@ import {
   readlink as readLinkAsync,
 } from "fs/promises";
 import { fileURLToPath } from "url";
-import { buildTestDependenciesAsync } from "../../build.mjs";
 import { getFreshTemporaryURL, assertEqual } from "../../__fixture__.mjs";
 import { basename as getBasename } from "path";
-import Abomination from "./index.mjs";
-
-const { addLinkExtensionAsync } = Abomination(
-  await buildTestDependenciesAsync(import.meta.url),
-);
+import { addLinkExtensionAsync } from "./index.mjs?env=test";
 
 const path1 = fileURLToPath(getFreshTemporaryURL());
 const path2 = fileURLToPath(getFreshTemporaryURL());

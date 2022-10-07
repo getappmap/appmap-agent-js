@@ -3,10 +3,16 @@ import { Socket } from "net";
 import { writeFileSync as writeFile } from "fs";
 import NetSocketMessaging from "net-socket-messaging";
 import {
-  buildTestDependenciesAsync,
-  buildTestComponentAsync,
-} from "../../build.mjs";
-import Receptor from "./index.mjs";
+  createConfiguration,
+  extendConfiguration,
+} from "../../configuration/index.mjs?env=test";
+import { requestAsync } from "../../http/index.mjs?env=test";
+import {
+  openReceptorAsync,
+  adaptReceptorConfiguration,
+  minifyReceptorConfiguration,
+  closeReceptorAsync,
+} from "./index.mjs?env=test";
 
 const {
   URL,
@@ -16,18 +22,6 @@ const {
 } = globalThis;
 
 const { createMessage } = NetSocketMessaging;
-
-const { requestAsync } = await buildTestComponentAsync("http");
-
-const { createConfiguration, extendConfiguration } =
-  await buildTestComponentAsync("configuration");
-
-const {
-  openReceptorAsync,
-  adaptReceptorConfiguration,
-  minifyReceptorConfiguration,
-  closeReceptorAsync,
-} = Receptor(await buildTestDependenciesAsync(import.meta.url));
 
 const configuration = extendConfiguration(
   createConfiguration("file:///home"),

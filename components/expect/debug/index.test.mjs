@@ -1,12 +1,12 @@
 import { assertEqual } from "../../__fixture__.mjs";
-import { buildTestDependenciesAsync } from "../../build.mjs";
-import Expect from "./index.mjs";
+import {
+  expect,
+  expectSuccess,
+  expectSuccessAsync,
+} from "./index.mjs?env=test";
 
 const { undefined, Promise } = globalThis;
 
-const { expect, expectSuccess, expectSuccessAsync } = Expect(
-  await buildTestDependenciesAsync(import.meta.url),
-);
 assertEqual(expect(true, "%s", "foo"), undefined);
 assertEqual(
   expectSuccess(() => 123, "%O"),

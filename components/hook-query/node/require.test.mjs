@@ -1,17 +1,12 @@
 import { getFreshTemporaryURL, assertEqual } from "../../__fixture__.mjs";
 import { mkdir as mkdirAsync, writeFile as writeFileAsync } from "fs/promises";
-import { buildTestDependenciesAsync } from "../../build.mjs";
-import Require from "./require.mjs";
+import { requireMaybe } from "./require.mjs?env=test";
 
 const {
   URL,
   Math: { random },
   JSON: { stringify: stringifyJSON },
 } = globalThis;
-
-const { requireMaybe } = Require(
-  await buildTestDependenciesAsync(import.meta.url),
-);
 
 const directory = getFreshTemporaryURL();
 

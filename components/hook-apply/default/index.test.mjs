@@ -1,20 +1,10 @@
-/* globals $uuid */
-/* eslint local/no-globals: ["error", "$uuid"] */
-
 import { assertDeepEqual } from "../../__fixture__.mjs";
-import {
-  buildTestDependenciesAsync,
-  buildTestComponentAsync,
-} from "../../build.mjs";
-import HookApply from "./index.mjs";
-
-const dependencies = await buildTestDependenciesAsync(import.meta.url);
-const { testHookAsync } = await buildTestComponentAsync("hook-fixture");
-const component = HookApply(dependencies);
+import { testHookAsync } from "../../hook-fixture/index.mjs?env=test";
+import * as HookApply from "./index.mjs?env=test";
 
 assertDeepEqual(
   await testHookAsync(
-    component,
+    HookApply,
     { configuration: { hooks: { apply: false } } },
     async () => {},
   ),
@@ -26,29 +16,29 @@ const summarize = ({ site, payload: { type } }) => `${site}/${type}`;
 assertDeepEqual(
   (
     await testHookAsync(
-      component,
-      { configuration: { hooks: { apply: true }, "hidden-identifier": "$" } },
+      HookApply,
+      { configuration: { hooks: { apply: "$" } } },
       () => {
         {
-          const tab = $uuid.getFreshTab();
-          $uuid.recordApply(tab, "function", "this", ["argument"]);
-          $uuid.recordAwait(tab, "promise");
-          $uuid.recordResolve(tab, "result");
-          $uuid.recordReturn(tab, "function", "result");
+          const tab = globalThis.$.getFreshTab();
+          globalThis.$.recordApply(tab, "function", "this", ["argument"]);
+          globalThis.$.recordAwait(tab, "promise");
+          globalThis.$.recordResolve(tab, "result");
+          globalThis.$.recordReturn(tab, "function", "result");
         }
         {
-          const tab = $uuid.getFreshTab();
-          $uuid.recordApply(tab, "function", "this", ["argument"]);
-          $uuid.recordAwait(tab, "promise");
-          $uuid.recordReject(tab, "error");
-          $uuid.recordThrow(tab, "function", "error");
+          const tab = globalThis.$.getFreshTab();
+          globalThis.$.recordApply(tab, "function", "this", ["argument"]);
+          globalThis.$.recordAwait(tab, "promise");
+          globalThis.$.recordReject(tab, "error");
+          globalThis.$.recordThrow(tab, "function", "error");
         }
         {
-          const tab = $uuid.getFreshTab();
-          $uuid.recordApply(tab, "function", "this", ["argument"]);
-          $uuid.recordYield(tab, "iterator");
-          $uuid.recordResume(tab);
-          $uuid.recordReturn(tab, "function", "result");
+          const tab = globalThis.$.getFreshTab();
+          globalThis.$.recordApply(tab, "function", "this", ["argument"]);
+          globalThis.$.recordYield(tab, "iterator");
+          globalThis.$.recordResume(tab);
+          globalThis.$.recordReturn(tab, "function", "result");
         }
       },
     )

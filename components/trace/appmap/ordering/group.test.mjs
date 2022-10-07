@@ -1,10 +1,5 @@
 import { assertDeepEqual } from "../../../__fixture__.mjs";
-import { buildTestDependenciesAsync } from "../../../build.mjs";
-import Group from "./group.mjs";
-
-const dependencies = await buildTestDependenciesAsync(import.meta.url);
-
-const { groupStack } = Group(dependencies);
+import { groupStack } from "./group.mjs?env=test";
 
 const makeEvent = (site, group, payload) => ({
   type: "event",

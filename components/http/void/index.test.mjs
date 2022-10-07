@@ -1,6 +1,2 @@
-import { buildTestDependenciesAsync } from "../../build.mjs";
-import Request from "./index.mjs";
-
-const dependencies = await buildTestDependenciesAsync(import.meta.url);
-
-Request(dependencies);
+import "../../__fixture__.mjs";
+import "./index.mjs?env=test";

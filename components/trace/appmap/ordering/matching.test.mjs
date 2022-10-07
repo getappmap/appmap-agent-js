@@ -3,12 +3,10 @@ import {
   assertEqual,
   assertThrow,
 } from "../../../__fixture__.mjs";
-import { buildTestDependenciesAsync } from "../../../build.mjs";
-import Matching from "./matching.mjs";
-
-const { isMatchingEvent, manufactureMatchingEvent } = Matching(
-  await buildTestDependenciesAsync(import.meta.url),
-);
+import {
+  isMatchingEvent,
+  manufactureMatchingEvent,
+} from "./matching.mjs?env=test";
 
 const event1 = {
   type: "event",

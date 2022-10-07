@@ -2,7 +2,11 @@ import { strict as Assert } from "assert";
 import { tmpdir as getTemporaryDirectory, platform as getPlatform } from "os";
 import { pathToFileURL, fileURLToPath } from "url";
 
-const { Error, Infinity, Math } = globalThis;
+const {
+  Error,
+  Infinity,
+  Math: { random },
+} = globalThis;
 
 Error.stackTraceLimit = Infinity;
 
@@ -17,7 +21,7 @@ export const getTemporaryDirectoryURL = () =>
   pathToFileURL(getTemporaryDirectory());
 
 export const getFreshTemporaryURL = (extension = "") =>
-  `${getTemporaryDirectoryURL()}/${Math.random()
+  `${getTemporaryDirectoryURL()}/${random()
     .toString(36)
     .substring(2)}${extension}`;
 

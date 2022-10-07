@@ -1,5 +1,4 @@
-import { buildTestDependenciesAsync } from "../../build.mjs";
-import LogInner from "./index.mjs";
+import "../../__fixture__.mjs";
+import { logInfo } from "./index.mjs?env=test";
 
-const { logInfo } = LogInner(await buildTestDependenciesAsync(import.meta.url));
 logInfo("foo %s", "bar");

@@ -1,7 +1,6 @@
 import { assertEqual, assertNotEqual } from "../../__fixture__.mjs";
-import UUID from "./index.mjs";
+import { getUUID } from "./index.mjs?env=test";
 
-const { getUUID } = UUID({});
 assertEqual(typeof getUUID(), "string");
 assertEqual(getUUID().length, 8);
 assertNotEqual(getUUID(), getUUID());

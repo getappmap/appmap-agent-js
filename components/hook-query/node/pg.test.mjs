@@ -9,10 +9,8 @@ import {
   assertFail,
   assertMatch,
 } from "../../__fixture__.mjs";
-import {
-  buildTestDependenciesAsync,
-  buildTestComponentAsync,
-} from "../../build.mjs";
+import { testHookAsync } from "../../hook-fixture/index.mjs?env=test";
+import * as HookPg from "./pg.mjs?env=test";
 
 const {
   Reflect: { getOwnPropertyDescriptor },
@@ -25,12 +23,9 @@ const {
 } = globalThis;
 
 // TODO investigate why this fails on travis.
-
 if (getOwnPropertyDescriptor(process.env, "TRAVIS") !== undefined) {
   process.exit(0);
 }
-
-const { default: HookPg } = await import("./pg.mjs");
 
 const { Client, Query } = Pg;
 
@@ -45,14 +40,9 @@ const user = "postgres";
 const url = getFreshTemporaryURL();
 
 const proceedAsync = async () => {
-  const dependencies = await buildTestDependenciesAsync(import.meta.url);
-  const { testHookAsync } = await buildTestComponentAsync("hook-fixture");
-
-  const component = HookPg(dependencies);
-
   const testCaseAsync = (enabled, runAsync) =>
     testHookAsync(
-      component,
+      HookPg,
       { configuration: { hooks: { pg: enabled } } },
       async () => {
         const client = new Client({

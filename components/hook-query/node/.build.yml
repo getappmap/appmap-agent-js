@@ -1,6 +1,0 @@
-branches: [test, node]
-dependencies:
-  - util
-  - log
-  - url
-  - agent

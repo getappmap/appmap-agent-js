@@ -1,3 +1,2 @@
-import Engine from "./index.mjs";
-const { getEngine } = Engine({});
-getEngine();
+import "../../__fixture__.mjs";
+import "./index.mjs?env=test";

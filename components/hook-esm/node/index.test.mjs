@@ -1,26 +1,16 @@
-/* globals APPMAP_ESM_HOOK */
-/* eslint local/no-globals: ["error", "globalThis", "APPMAP_ESM_HOOK"] */
-
 import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
-import {
-  buildTestDependenciesAsync,
-  buildTestComponentAsync,
-} from "../../build.mjs";
-import HookESM from "./index.mjs";
+import { createConfiguration } from "../../configuration/index.mjs?env=test";
+import { testHookAsync } from "../../hook-fixture/index.mjs?env=test";
+import * as HookEsm from "./index.mjs?env=test";
 
 const { eval: evalGlobal } = globalThis;
 
-const dependencies = await buildTestDependenciesAsync(import.meta.url);
-const { testHookAsync } = await buildTestComponentAsync("hook-fixture");
-const { createConfiguration } = await buildTestComponentAsync("configuration");
-const component = HookESM(dependencies);
-
 assertDeepEqual(
   await testHookAsync(
-    component,
+    HookEsm,
     {
       configuration: {
-        hooks: { esm: true },
+        hooks: { apply: false, esm: "GLOBAL" },
         packages: [
           {
             regexp: "^",
@@ -31,12 +21,9 @@ assertDeepEqual(
       url: "file:///base",
     },
     async () => {
-      globalThis.APPMAPuuid = {
-        getFreshTab: () => 123,
-      };
       // transformSource //
       {
-        const { source } = await APPMAP_ESM_HOOK.transformSource(
+        const { source } = await globalThis.GLOBAL.transformSource(
           "123;",
           { url: "file:///foo", format: "module" },
           (content, _context, _next) => ({ source: content }),
@@ -45,7 +32,7 @@ assertDeepEqual(
       }
       // load //
       {
-        const { format, source } = await APPMAP_ESM_HOOK.load(
+        const { format, source } = await globalThis.GLOBAL.load(
           "file:///bar",
           "context",
           (_url, _context, _next) => ({
@@ -58,7 +45,7 @@ assertDeepEqual(
       }
       // bypass //
       {
-        const { format, source } = await APPMAP_ESM_HOOK.load(
+        const { format, source } = await globalThis.GLOBAL.load(
           "file:///qux",
           "context",
           (_url, _context, _next) => ({
@@ -89,25 +76,4 @@ assertDeepEqual(
       inline: false,
     },
   ],
-);
-
-assertDeepEqual(
-  await testHookAsync(
-    component,
-    {
-      configuration: {
-        hooks: { esm: false },
-        packages: [],
-      },
-    },
-    async () => {
-      const { source } = await APPMAP_ESM_HOOK.transformSource(
-        "123;",
-        { url: "file:///foo", format: "module" },
-        (content, _context, _next) => ({ source: content }),
-      );
-      assertEqual(evalGlobal(source), 123);
-    },
-  ),
-  [],
 );

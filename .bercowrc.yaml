@@ -1,4 +1,3 @@
-ordering-pattern: (?<!\.test)\.mjs$
 plugins:
   "@bercow/link-adjacent": {}
   "@bercow/prettier":
@@ -6,7 +5,7 @@ plugins:
   "@bercow/eslint": {}
   "@bercow/spawn":
     command: npx
-    command-windows: npx.cmd
+    command-win32: npx.cmd
     argv:
       - c8
       - --100

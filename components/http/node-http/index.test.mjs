@@ -7,14 +7,9 @@ import {
   getFreshTemporaryURL,
   convertPort,
 } from "../../__fixture__.mjs";
-import { buildTestDependenciesAsync } from "../../build.mjs";
-import Request from "./index.mjs";
+import { generateRespond, requestAsync } from "./index.mjs?env=test";
 
 const { Promise } = globalThis;
-
-const dependencies = await buildTestDependenciesAsync(import.meta.url);
-
-const { generateRespond, requestAsync } = Request(dependencies);
 
 const listenServerAsync = (server, port) =>
   new Promise((resolve) => {

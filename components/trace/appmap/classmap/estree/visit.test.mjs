@@ -1,16 +1,9 @@
 import { assertDeepEqual } from "../../../../__fixture__.mjs";
 import * as Acorn from "acorn";
-import {
-  buildTestDependenciesAsync,
-  buildTestComponentAsync,
-} from "../../../../build.mjs";
-import Visit from "./visit.mjs";
+import { createCounter } from "../../../../util/index.mjs?env=test";
+import { visit } from "./visit.mjs?env=test";
 
 const { parse: parseAcorn } = Acorn;
-
-const { createCounter } = await buildTestComponentAsync("util");
-
-const { visit } = Visit(await buildTestDependenciesAsync(import.meta.url));
 
 const test = (content, separator, comments) =>
   visit(

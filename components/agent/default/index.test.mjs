@@ -1,24 +1,15 @@
-/* eslint-env node */
 import { assertDeepEqual, assertEqual } from "../../__fixture__.mjs";
 import {
-  buildTestDependenciesAsync,
-  buildTestComponentAsync,
-} from "../../build.mjs";
-import Agent from "./index.mjs";
-
-const { eval: evalGlobal } = globalThis;
-
-const dependencies = await buildTestDependenciesAsync(import.meta.url);
-const { createConfiguration, extendConfiguration } =
-  await buildTestComponentAsync("configuration", "test");
-const {
+  createConfiguration,
+  extendConfiguration,
+} from "../../configuration/index.mjs?env=test";
+import {
   openAgent,
   closeAgent,
   instrument,
   takeLocalAgentTrace,
   recordStartTrack,
   recordStopTrack,
-  getInstrumentationIdentifier,
   getSerializationEmptyValue,
   getFreshTab,
   recordGroup,
@@ -26,7 +17,10 @@ const {
   recordAfterEvent,
   formatQueryPayload,
   getAnswerPayload,
-} = Agent(dependencies);
+} from "./index.mjs?env=test";
+
+const { eval: evalGlobal } = globalThis;
+
 const agent = openAgent(
   extendConfiguration(
     createConfiguration("file:///home"),
@@ -39,7 +33,6 @@ const agent = openAgent(
 
 getSerializationEmptyValue(agent);
 
-assertEqual(typeof getInstrumentationIdentifier(agent), "string");
 recordStartTrack(agent, "record", {}, null);
 recordGroup(agent, 123, "description");
 assertEqual(
