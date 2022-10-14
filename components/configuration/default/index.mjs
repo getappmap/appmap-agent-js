@@ -103,6 +103,14 @@ const normalizeHooks = (hooks, _base) => {
   return hooks;
 };
 
+const normalizeAgent = ({ directory, package: _package }, base) => ({
+  directory: toDirectoryUrl(toAbsoluteUrl(directory, base)),
+  package: _package,
+});
+
+const normalizeDirectoryUrl = (url, base) =>
+  toDirectoryUrl(toAbsoluteUrl(url, base));
+
 const normalizeExclude = (exclusions, _base) =>
   exclusions.map(normalizeExclusion);
 
@@ -236,7 +244,7 @@ const fields = {
   },
   agent: {
     extend: overwrite,
-    normalize: identity,
+    normalize: normalizeAgent,
   },
   repository: {
     extend: overwrite,

@@ -287,7 +287,7 @@ assertDeepEqual(
         createConfiguration("file:///home"),
         {
           agent: {
-            directory: "file:///agent",
+            directory: "agent",
             package: {
               name: "@appmap-agent-js",
               version: "1.2.3",
@@ -315,7 +315,7 @@ assertDeepEqual(
     env: {
       NODE_OPTIONS: [
         "--node-key=node-value",
-        "--experimental-loader=../agent/lib/node/recorder-process.mjs",
+        "--experimental-loader=./agent/lib/node/recorder-process.mjs",
       ].join(" "),
       VAR1: "VAL1",
       VAR2: "VAL2",
@@ -331,7 +331,7 @@ assertDeepEqual(
         createConfiguration("file:///home"),
         {
           agent: {
-            directory: "file:///agent",
+            directory: "agent",
             package: {
               name: "@appmap-agent-js",
               version: "1.2.3",
@@ -354,7 +354,7 @@ assertDeepEqual(
     exec: "/bin/sh",
     argv: [
       "-c",
-      "node --experimental-loader ../agent/lib/node/recorder-process.mjs main.js argv1",
+      "node --experimental-loader ./agent/lib/node/recorder-process.mjs main.js argv1",
     ],
     cwd: new URL("file:///base"),
     env: {},
@@ -371,7 +371,7 @@ assertDeepEqual(
             createConfiguration("file:///home"),
             {
               agent: {
-                directory: "file:///agent",
+                directory: "agent",
                 package: {
                   name: "@appmap-agent-js",
                   version: "1.2.3",
@@ -393,13 +393,13 @@ assertDeepEqual(
         exec: "/bin/sh",
         argv: [
           "-c",
-          `${command} --require ../agent/lib/node/recorder-mocha.mjs`,
+          `${command} --require ./agent/lib/node/recorder-mocha.mjs`,
         ],
         cwd: new URL("file:///base"),
         env: {
           NODE_OPTIONS: [
             "",
-            "--experimental-loader=../agent/lib/node/mocha-loader.mjs",
+            "--experimental-loader=./agent/lib/node/mocha-loader.mjs",
           ].join(" "),
         },
       },

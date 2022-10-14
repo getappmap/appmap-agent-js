@@ -419,6 +419,14 @@
   additionalProperties: false
   required: [directory, package]
   properties:
+    directory: { $ref: path }
+    package: { $ref: package }
+
+- $id: cooked-agent
+  type: object
+  additionalProperties: false
+  required: [directory, package]
+  properties:
     directory: { $ref: url }
     package: { $ref: package }
 
@@ -589,7 +597,7 @@
     agent:
       anyOf:
         - const: null
-        - $ref: agent
+        - $ref: cooked-agent
     repository: { $ref: repository }
     log: { $ref: cooked-log }
     host: { const: localhost }

@@ -23,6 +23,26 @@ const extend = (
   return value2;
 };
 
+// agent //
+assertDeepEqual(
+  extend(
+    "agent",
+    {
+      directory: "agent",
+      package: { name: "appmap-agent-js", version: "1.2.3", homepage: null },
+    },
+    "file:///w:/base/",
+  ),
+  {
+    directory: "file:///w:/base/agent/",
+    package: {
+      name: "appmap-agent-js",
+      version: "1.2.3",
+      homepage: null,
+    },
+  },
+);
+
 // packages //
 
 {
