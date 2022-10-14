@@ -316,7 +316,7 @@ assertDeepEqual(
   {
     exec: getPlatform() === "win32" ? "cmd.exe" : "/bin/sh",
     argv: getPlatform() === "win32" ? ["/c", "command"] : ["-c", "command"],
-    cwd: new URL("file:///base"),
+    cwd: "file:///w:/base/",
     env: {
       NODE_OPTIONS: [
         "--node-key=node-value",
@@ -365,7 +365,7 @@ assertDeepEqual(
         "file:///w:/base/agent/lib/node/recorder-process.mjs",
       )} main.js argv1`,
     ],
-    cwd: new URL("file:///base"),
+    cwd: "file:///w:/base/",
     env: {},
   },
 );
@@ -406,7 +406,7 @@ assertDeepEqual(
             "file:///w:/base/agent/lib/node/recorder-mocha.mjs",
           )}`,
         ],
-        cwd: new URL("file:///base"),
+        cwd: "file:///w:/base/",
         env: {
           NODE_OPTIONS: [
             "",

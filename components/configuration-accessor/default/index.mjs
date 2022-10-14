@@ -263,7 +263,7 @@ export const compileConfigurationCommand = (configuration, env) => {
     argv: [...flags, command],
     options: {
       ...options,
-      cwd: new URL(base),
+      cwd: base,
       env,
     },
   };
