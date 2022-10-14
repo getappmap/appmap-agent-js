@@ -6,5 +6,5 @@ const {
 
 const { search: __search } = new URL(import.meta.url);
 
-export const getUUID = () =>
+export const getUuid = () =>
   `${now().toString(32).substr(-4)}${random().toString(32).substr(-4)}`;

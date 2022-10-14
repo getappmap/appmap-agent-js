@@ -20,7 +20,7 @@ const { validateSourceMap } = await import(
 const normalizeEitherPathURL = (either, base) =>
   /^[a-z]{2,}:/u.test(either) ? either : urlifyPath(either, base);
 
-export const extractSourceMapURL = ({ url, content }) => {
+export const extractSourceMapUrl = ({ url, content }) => {
   const parts = /\/\/[#@] sourceMappingURL=(.*)[\r\n]*$/u.exec(content);
   if (parts === null) {
     return null;

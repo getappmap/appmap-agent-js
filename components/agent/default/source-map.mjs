@@ -1,13 +1,13 @@
 const { URL } = globalThis;
 const { search: __search } = new URL(import.meta.url);
 
-const { extractSourceMapURL, createMirrorSourceMap, createSourceMap } =
+const { extractSourceMapUrl, createMirrorSourceMap, createSourceMap } =
   await import(`../../source/index.mjs${__search}`);
 const { readFile } = await import(`../../file/index.mjs${__search}`);
 const { logDebug } = await import(`../../log/index.mjs${__search}`);
 
 export const loadSourceMap = (file) => {
-  const maybe_url = extractSourceMapURL(file);
+  const maybe_url = extractSourceMapUrl(file);
   if (maybe_url === null) {
     return createMirrorSourceMap(file);
   } else {

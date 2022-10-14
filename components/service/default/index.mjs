@@ -9,7 +9,7 @@ const { appendURLSegment } = await import(`../../url/index.mjs${__search}`);
 const { toIPCPath, fromIPCPath } = await import(
   `../../path/index.mjs${__search}`
 );
-const { getUUID } = await import(`../../uuid/index.mjs${__search}`);
+const { getUuid } = await import(`../../uuid/index.mjs${__search}`);
 
 export const openServiceAsync = (server, port) => {
   const sockets = new Set();
@@ -33,7 +33,7 @@ export const openServiceAsync = (server, port) => {
     if (port === "") {
       port = appendURLSegment(
         pathToFileURL(getTemporaryDirectory()),
-        getUUID(),
+        getUuid(),
       );
     }
     server.listen(
