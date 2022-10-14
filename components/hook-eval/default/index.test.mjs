@@ -18,25 +18,25 @@ assertDeepEqual(
           },
         ],
       },
-      url: "file:///base",
+      url: "file:///w:/base",
     },
     () => {
-      assertEqual(evalGlobal(globalThis.EVAL("file:///foo", "123;")), 123);
+      assertEqual(evalGlobal(globalThis.EVAL("file:///w:/foo", "123;")), 123);
     },
   ),
   [
     {
       type: "source",
-      url: "file:///foo",
+      url: "file:///w:/foo",
       content: "123;",
       shallow: true,
-      exclude: createConfiguration("file:///home").exclude,
+      exclude: createConfiguration("file:///w:/home").exclude,
       inline: false,
     },
   ],
 );
 
-assertEqual(evalGlobal(globalThis.EVAL("file:///foo", "123;")), 123);
+assertEqual(evalGlobal(globalThis.EVAL("file:///w:/foo", "123;")), 123);
 
 assertDeepEqual(
   await testHookAsync(

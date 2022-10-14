@@ -19,7 +19,7 @@ const {
 } = globalThis;
 
 const configuration = extendConfiguration(
-  createConfiguration("file:///home"),
+  createConfiguration("file:///w:/home"),
   { name: "name1" },
   null,
 );
@@ -29,7 +29,7 @@ const configuration = extendConfiguration(
   assertEqual(
     sendBackend(backend, {
       type: "source",
-      url: "file:///cwd/main.js",
+      url: "file:///w:/cwd/main.js",
       content: "function main () {}",
       shallow: false,
       inline: false,
@@ -72,7 +72,7 @@ const configuration = extendConfiguration(
     body: [
       {
         type: "source",
-        url: "file:///cwd/main.js",
+        url: "file:///w:/cwd/main.js",
         content: "function main () {}",
         shallow: false,
         inline: false,

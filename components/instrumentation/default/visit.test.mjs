@@ -40,11 +40,11 @@ const makeCodeLocation = (url, line, column) =>
 assertEqual(
   instrument(
     {
-      url: "file:///script.js",
+      url: "file:///w:/script.js",
       content: "(() => 123);",
       type: "script",
     },
-    ["file:///script.js"],
+    ["file:///w:/script.js"],
   ),
   normalize(
     `
@@ -55,7 +55,7 @@ assertEqual(
           APPLY_RETURNED = true;
         APPLY.recordApply(
           APPLY_BUNDLE_TAB,
-          ${makeCodeLocation("file:///script.js", 1, 1)},
+          ${makeCodeLocation("file:///w:/script.js", 1, 1)},
           APPLY.empty,
           [],
         );
@@ -65,7 +65,7 @@ assertEqual(
           APPLY_RETURNED = false;
           APPLY.recordThrow(
             APPLY_BUNDLE_TAB,
-            ${makeCodeLocation("file:///script.js", 1, 1)},
+            ${makeCodeLocation("file:///w:/script.js", 1, 1)},
             APPLY_ERROR,
           );
           throw APPLY_ERROR;
@@ -73,7 +73,7 @@ assertEqual(
           if (APPLY_RETURNED) {
             APPLY.recordReturn(
               APPLY_BUNDLE_TAB,
-              ${makeCodeLocation("file:///script.js", 1, 1)},
+              ${makeCodeLocation("file:///w:/script.js", 1, 1)},
               APPLY_RETURN,
             );
           }
@@ -88,11 +88,11 @@ assertEqual(
 assertEqual(
   instrument(
     {
-      url: "file:///script.js",
+      url: "file:///w:/script.js",
       content: "(class C extends D {\nconstructor () { 123; } })",
       type: "script",
     },
-    ["file:///script.js"],
+    ["file:///w:/script.js"],
   ),
   normalize(
     `
@@ -103,7 +103,7 @@ assertEqual(
           APPLY_RETURNED = true;
         APPLY.recordApply(
           APPLY_BUNDLE_TAB,
-          ${makeCodeLocation("file:///script.js", 2, 12)},
+          ${makeCodeLocation("file:///w:/script.js", 2, 12)},
           APPLY.empty,
           [],
         );
@@ -115,7 +115,7 @@ assertEqual(
           APPLY_RETURNED = false;
           APPLY.recordThrow(
             APPLY_BUNDLE_TAB,
-            ${makeCodeLocation("file:///script.js", 2, 12)},
+            ${makeCodeLocation("file:///w:/script.js", 2, 12)},
             APPLY_ERROR,
           );
           throw APPLY_ERROR;
@@ -123,7 +123,7 @@ assertEqual(
           if (APPLY_RETURNED) {
             APPLY.recordReturn(
               APPLY_BUNDLE_TAB,
-              ${makeCodeLocation("file:///script.js", 2, 12)},
+              ${makeCodeLocation("file:///w:/script.js", 2, 12)},
               APPLY_RETURN,
             );
           }
@@ -139,11 +139,11 @@ assertEqual(
 assertEqual(
   instrument(
     {
-      url: "file:///script.js",
+      url: "file:///w:/script.js",
       content: "((x, y = 123, ...rest) => { return 456; });",
       type: "script",
     },
-    ["file:///script.js"],
+    ["file:///w:/script.js"],
   ),
   normalize(
     `
@@ -154,7 +154,7 @@ assertEqual(
           APPLY_RETURNED = true;
         APPLY.recordApply(
           APPLY_BUNDLE_TAB,
-          ${makeCodeLocation("file:///script.js", 1, 1)},
+          ${makeCodeLocation("file:///w:/script.js", 1, 1)},
           APPLY.empty,
           [APPLY_ARGUMENT_0, APPLY_ARGUMENT_1, APPLY_ARGUMENT_2],
         );
@@ -170,7 +170,7 @@ assertEqual(
           APPLY_RETURNED = false;
           APPLY.recordThrow(
             APPLY_BUNDLE_TAB,
-            ${makeCodeLocation("file:///script.js", 1, 1)},
+            ${makeCodeLocation("file:///w:/script.js", 1, 1)},
             APPLY_ERROR,
           );
           throw APPLY_ERROR;
@@ -178,7 +178,7 @@ assertEqual(
           if (APPLY_RETURNED) {
             APPLY.recordReturn(
               APPLY_BUNDLE_TAB,
-              ${makeCodeLocation("file:///script.js", 1, 1)},
+              ${makeCodeLocation("file:///w:/script.js", 1, 1)},
               APPLY_RETURN,
             );
           }
@@ -193,11 +193,11 @@ assertEqual(
 assertEqual(
   instrument(
     {
-      url: "file:///script.js",
+      url: "file:///w:/script.js",
       content: "(function* () { yield* 123; });",
       type: "script",
     },
-    ["file:///script.js"],
+    ["file:///w:/script.js"],
   ),
   normalize(
     `
@@ -210,7 +210,7 @@ assertEqual(
           APPLY_YIELD_TAB;
         APPLY.recordApply(
           APPLY_BUNDLE_TAB,
-          ${makeCodeLocation("file:///script.js", 1, 1)},
+          ${makeCodeLocation("file:///w:/script.js", 1, 1)},
           this,
           [],
         );
@@ -229,7 +229,7 @@ assertEqual(
           APPLY_RETURNED = false;
           APPLY.recordThrow(
             APPLY_BUNDLE_TAB,
-            ${makeCodeLocation("file:///script.js", 1, 1)},
+            ${makeCodeLocation("file:///w:/script.js", 1, 1)},
             APPLY_ERROR,
           );
           throw APPLY_ERROR;
@@ -237,7 +237,7 @@ assertEqual(
           if (APPLY_RETURNED) {
             APPLY.recordReturn(
               APPLY_BUNDLE_TAB,
-              ${makeCodeLocation("file:///script.js", 1, 1)},
+              ${makeCodeLocation("file:///w:/script.js", 1, 1)},
               APPLY_RETURN,
             );
           }
@@ -252,7 +252,7 @@ assertEqual(
 assertEqual(
   instrument(
     {
-      url: "file:///script.js",
+      url: "file:///w:/script.js",
       content: `(async () => {
         try { await 123; }
         catch (error) { 456; }
@@ -260,7 +260,7 @@ assertEqual(
       });`,
       type: "script",
     },
-    ["file:///script.js"],
+    ["file:///w:/script.js"],
   ),
   normalize(
     `
@@ -273,7 +273,7 @@ assertEqual(
           APPLY_AWAIT_TAB;
         APPLY.recordApply(
           APPLY_BUNDLE_TAB,
-          ${makeCodeLocation("file:///script.js", 1, 1)},
+          ${makeCodeLocation("file:///w:/script.js", 1, 1)},
           APPLY.empty,
           [],
         );
@@ -309,7 +309,7 @@ assertEqual(
           APPLY_RETURNED = false;
           APPLY.recordThrow(
             APPLY_BUNDLE_TAB,
-            ${makeCodeLocation("file:///script.js", 1, 1)},
+            ${makeCodeLocation("file:///w:/script.js", 1, 1)},
             APPLY_ERROR,
           );
           throw APPLY_ERROR;
@@ -317,7 +317,7 @@ assertEqual(
           if (APPLY_RETURNED) {
             APPLY.recordReturn(
               APPLY_BUNDLE_TAB,
-              ${makeCodeLocation("file:///script.js", 1, 1)},
+              ${makeCodeLocation("file:///w:/script.js", 1, 1)},
               APPLY_RETURN,
             );
           }
@@ -332,7 +332,7 @@ assertEqual(
 assertEqual(
   instrument(
     {
-      url: "file:///script.js",
+      url: "file:///w:/script.js",
       content: `
         (async function* () {
           await 'promise';
@@ -362,11 +362,11 @@ assertEqual(
 assertEqual(
   instrument(
     {
-      url: "file:///script.js",
+      url: "file:///w:/script.js",
       content: "try { 123; } catch { 456; }",
       type: "module",
     },
-    ["file:///script.js"],
+    ["file:///w:/script.js"],
   ),
   normalize(
     `
@@ -394,11 +394,11 @@ assertEqual(
 assertEqual(
   instrument(
     {
-      url: "file:///script.js",
+      url: "file:///w:/script.js",
       content: "try { 123; } finally { 456; }",
       type: "module",
     },
-    ["file:///script.js"],
+    ["file:///w:/script.js"],
   ),
   normalize(
     `
@@ -425,7 +425,7 @@ assertEqual(
 assertEqual(
   instrument(
     {
-      url: "file:///script.js#hash",
+      url: "file:///w:/script.js#hash",
       content: "f();",
       type: "script",
     },
@@ -438,7 +438,7 @@ assertEqual(
 assertEqual(
   instrument(
     {
-      url: "file:///script.js#hash",
+      url: "file:///w:/script.js#hash",
       content: "eval(123, 456);",
       type: "script",
     },
@@ -447,7 +447,7 @@ assertEqual(
   normalize(
     `eval(
       EVAL(
-        "file:///script.js/eval-1#hash",
+        "file:///w:/script.js#eval-1",
         123,
       ),
       456,
@@ -461,11 +461,11 @@ assertEqual(
 // assertEqual(
 //   instrument(
 //     {
-//       url: "file:///script.js",
+//       url: "file:///w:/script.js",
 //       content: "(async (x, y = null, ...z) => await 123);",
 //       type: "script",
 //     },
-//     ["file:///script.js"],
+//     ["file:///w:/script.js"],
 //   ),
 //   normalize(
 //     `
@@ -480,7 +480,7 @@ assertEqual(
 //         APPLY.recordApply(
 //           APPLY_BUNDLE_TAB,
 //           ${stringifyJSON(
-//             stringifyLocation(makeLocation("file:///script.js", 1, 1)),
+//             stringifyLocation(makeLocation("file:///w:/script.js", 1, 1)),
 //           )},
 //           APPLY.empty,
 //           [APPLY_ARGUMENT_0, APPLY_ARGUMENT_1, APPLY_ARGUMENT_2],
@@ -527,14 +527,14 @@ assertEqual(
 //   assertEqual(
 //     instrument(
 //       {
-//         url: "file:///script.js",
+//         url: "file:///w:/script.js",
 //         content: `function* f () {
 //           yield* 123;
 //           return ${code1};
 //         };`,
 //         type: "script",
 //       },
-//       ["file:///script.js"],
+//       ["file:///w:/script.js"],
 //     ),
 //     normalize(
 //       `
@@ -549,7 +549,7 @@ assertEqual(
 //         APPLY.recordApply(
 //           APPLY_BUNDLE_TAB,
 //           ${stringifyJSON(
-//             stringifyLocation(makeLocation("file:///script.js", 1, 0)),
+//             stringifyLocation(makeLocation("file:///w:/script.js", 1, 0)),
 //           )},
 //           this,
 //           []
@@ -587,11 +587,11 @@ assertEqual(
 // assertEqual(
 //   instrument(
 //     {
-//       url: "file:///script.js",
+//       url: "file:///w:/script.js",
 //       content: "class C extends Object {constructor\n() { super(); } }",
 //       type: "script",
 //     },
-//     ["file:///script.js"],
+//     ["file:///w:/script.js"],
 //   ),
 //   normalize(
 //     `
@@ -607,7 +607,7 @@ assertEqual(
 //           APPLY.recordApply(
 //             APPLY_BUNDLE_TAB,
 //             ${stringifyJSON(
-//               stringifyLocation(makeLocation("file:///script.js", 2, 0)),
+//               stringifyLocation(makeLocation("file:///w:/script.js", 2, 0)),
 //             )},
 //             APPLY.empty,
 //             [],
@@ -637,14 +637,14 @@ assertEqual(
 // assertEqual(
 //   instrument(
 //     {
-//       url: "file:///script.js",
+//       url: "file:///w:/script.js",
 //       content: `
 //         try { } catch (error) { 123; }
 //         try { } finally { 123; }
 //       `,
 //       type: "module",
 //     },
-//     ["file:///script.js"],
+//     ["file:///w:/script.js"],
 //   ),
 //   normalize(
 //     `
@@ -678,7 +678,7 @@ assertEqual(
 // assertEqual(
 //   instrument(
 //     {
-//       url: "file:///script.js",
+//       url: "file:///w:/script.js",
 //       content: "function g () { return 123; };",
 //       type: "script",
 //     },

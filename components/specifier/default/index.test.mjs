@@ -1,8 +1,10 @@
+const { encodeURIComponent } = globalThis;
+
 import { assertEqual, assertThrow } from "../../__fixture__.mjs";
 import { createSpecifier, matchSpecifier } from "./index.mjs?env=test";
 
 assertThrow(
-  () => createSpecifier({}, "file:///base"),
+  () => createSpecifier({}, "protocol://host/base/"),
   /^Error: invalid specifier options/u,
 );
 
@@ -12,42 +14,46 @@ assertThrow(
 
 assertEqual(
   matchSpecifier(
-    createSpecifier({ regexp: "^file\\." }, "file:///base"),
-    "file:///base/file.ext",
+    createSpecifier({ regexp: "^file\\." }, "protocol://host/base/"),
+    "protocol://host/base/file.ext",
   ),
   true,
 );
 
 assertEqual(
   matchSpecifier(
-    createSpecifier({ regexp: "^file\\." }, "file:///base"),
-    "file:///base/FILE.ext",
+    createSpecifier({ regexp: "^file1\\." }, "protocol://host/base/"),
+    "protocol://host/base/file2.ext",
   ),
   false,
 );
 
 assertEqual(
   matchSpecifier(
-    createSpecifier({ regexp: "^file\\." }, "file:///base"),
-    "file:///BASE/file.ext",
+    createSpecifier({ regexp: "^file\\." }, "protocol://host/base1/"),
+    "protocol://host/base2/file.ext",
   ),
   false,
 );
 
 assertEqual(
   matchSpecifier(
-    createSpecifier({ regexp: "^\\.\\./BASE/file\\." }, "file:///base"),
-    "file:///BASE/file.ext",
+    createSpecifier(
+      { regexp: "^\\.\\./base2/file2\\." },
+      "protocol://host/base1/",
+    ),
+    "protocol://host/base2/file2.ext",
   ),
   true,
 );
 
-assertEqual(
-  matchSpecifier(
-    createSpecifier({ regexp: "^" }, "file://host1/base"),
-    "file://host2/base/file.ext",
-  ),
-  false,
+assertThrow(
+  () =>
+    matchSpecifier(
+      createSpecifier({ regexp: "^" }, "protocol://host1/base/"),
+      "protocol://host2/base/file.ext",
+    ),
+  /^AppmapError: could not express/u,
 );
 
 //////////
@@ -58,32 +64,32 @@ assertEqual(
 
 assertEqual(
   matchSpecifier(
-    createSpecifier({ glob: "*.ext" }, "file:///base"),
-    "file:///base/file.ext",
+    createSpecifier({ glob: "*.ext" }, "protocol://host/base/"),
+    "protocol://host/base/file.ext",
   ),
   true,
 );
 
 assertEqual(
   matchSpecifier(
-    createSpecifier({ glob: "*.ext" }, "file:///base"),
-    "file:///base/dir/file.ext",
+    createSpecifier({ glob: "*.ext" }, "protocol://host/base/"),
+    "protocol://host/base/dir/file.ext",
   ),
   false,
 );
 
 assertEqual(
   matchSpecifier(
-    createSpecifier({ glob: "**/*.ext" }, "file:///base"),
-    "file:///base/dir/file.ext",
+    createSpecifier({ glob: "**/*.ext" }, "protocol://host/base/"),
+    "protocol://host/base/dir/file.ext",
   ),
   true,
 );
 
 assertEqual(
   matchSpecifier(
-    createSpecifier({ glob: "**/*.js" }, "file:///base"),
-    "file:///base/../file.ext",
+    createSpecifier({ glob: "**/*.js" }, "protocol://host/base/"),
+    "protocol://host/base/../file.ext",
   ),
   false,
 );
@@ -96,16 +102,19 @@ assertEqual(
 
 assertEqual(
   matchSpecifier(
-    createSpecifier({ path: "path" }, "file:///base"),
-    "file:///base/path",
+    createSpecifier({ path: "path" }, "protocol://host/base/"),
+    "protocol://host/base/path",
   ),
   true,
 );
 
 assertEqual(
   matchSpecifier(
-    createSpecifier({ path: "][" }, "file:///base"),
-    "file:///base/%5D%5B",
+    createSpecifier(
+      { path: `][ ${encodeURIComponent("#?")}` },
+      "protocol://host/base/",
+    ),
+    `protocol://host/base/${encodeURIComponent("][ #?")}`,
   ),
   true,
 );
@@ -114,8 +123,8 @@ assertEqual(
 
 assertEqual(
   matchSpecifier(
-    createSpecifier({ path: "path" }, "file:///base"),
-    "file:///base/path/file.ext",
+    createSpecifier({ path: "path" }, "protocol://host/base/"),
+    "protocol://host/base/path/file.ext",
   ),
   true,
 );
@@ -124,16 +133,19 @@ assertEqual(
 
 assertEqual(
   matchSpecifier(
-    createSpecifier({ path: "path", recursive: false }, "file:///base"),
-    "file:///base/path/dir/file.ext",
+    createSpecifier(
+      { path: "path", recursive: false },
+      "protocol://host/base/",
+    ),
+    "protocol://host/base/path/dir/file.ext",
   ),
   false,
 );
 
 assertEqual(
   matchSpecifier(
-    createSpecifier({ path: "path", recursive: true }, "file:///base"),
-    "file:///base/path/dir/file.ext",
+    createSpecifier({ path: "path", recursive: true }, "protocol://host/base/"),
+    "protocol://host/base/path/dir/file.ext",
   ),
   true,
 );
@@ -146,8 +158,8 @@ assertEqual(
 
 assertEqual(
   matchSpecifier(
-    createSpecifier({ dist: "dist" }, "file:///base"),
-    "file:///base/node_modules/dist/file.ext",
+    createSpecifier({ dist: "dist" }, "protocol://host/base/"),
+    "protocol://host/base/node_modules/dist/file.ext",
   ),
   true,
 );
@@ -156,16 +168,19 @@ assertEqual(
 
 assertEqual(
   matchSpecifier(
-    createSpecifier({ dist: "dist", recursive: false }, "file:///base"),
-    "file:///base/node_modules/dist/dir/file.ext",
+    createSpecifier(
+      { dist: "dist", recursive: false },
+      "protocol://host/base/",
+    ),
+    "protocol://host/base/node_modules/dist/dir/file.ext",
   ),
   false,
 );
 
 assertEqual(
   matchSpecifier(
-    createSpecifier({ dist: "dist", recursive: true }, "file:///base"),
-    "file:///base/node_modules/dist/dir/file.ext",
+    createSpecifier({ dist: "dist", recursive: true }, "protocol://host/base/"),
+    "protocol://host/base/node_modules/dist/dir/file.ext",
   ),
   true,
 );
@@ -174,22 +189,22 @@ assertEqual(
 
 assertEqual(
   matchSpecifier(
-    createSpecifier({ dist: "dist" }, "file:///base"),
-    "file:///node_modules/dist/file.ext",
+    createSpecifier({ dist: "dist" }, "protocol://host/base/"),
+    "protocol://host/node_modules/dist/file.ext",
   ),
   false,
 );
 
 assertEqual(
   matchSpecifier(
-    createSpecifier({ dist: "dist", external: true }, "file:///base"),
-    "file:///node_modules/dist/file.ext",
+    createSpecifier({ dist: "dist", external: true }, "protocol://host/base/"),
+    "protocol://host/node_modules/dist/file.ext",
   ),
   true,
 );
 
 // constant //
 
-assertEqual(matchSpecifier(true, "file:///file.ext"), true);
+assertEqual(matchSpecifier(true, "protocol://host/file.ext"), true);
 
-assertEqual(matchSpecifier(false, "file:///file.ext"), false);
+assertEqual(matchSpecifier(false, "protocol://host/file.ext"), false);

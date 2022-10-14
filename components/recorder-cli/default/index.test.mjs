@@ -31,7 +31,7 @@ assertEqual(
   createRecorder(
     mock_process,
     extendConfiguration(
-      createConfiguration("file:///home"),
+      createConfiguration("file:///w:/home/"),
       {
         processes: false,
       },
@@ -42,7 +42,7 @@ assertEqual(
 );
 
 const configuration = extendConfiguration(
-  createConfiguration("file:///home"),
+  createConfiguration("file:///w:/home/"),
   {
     hooks: {
       cjs: false,
@@ -53,7 +53,7 @@ const configuration = extendConfiguration(
       mysql: false,
     },
   },
-  "file:///base",
+  "file:///w:/base/",
 );
 
 const recorder = createRecorder(mock_process, configuration);

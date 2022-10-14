@@ -31,7 +31,7 @@ const {
 
 assertEqual(
   get(
-    resolveConfigurationManualRecorder(createConfiguration("file:///home")),
+    resolveConfigurationManualRecorder(createConfiguration("file:///w:/home/")),
     "recorder",
   ),
   "manual",
@@ -44,17 +44,17 @@ assertEqual(
 assertDeepEqual(
   getConfigurationScenarios(
     extendConfiguration(
-      createConfiguration("file:///home"),
+      createConfiguration("file:///w:/home/"),
       {
         scenario: "^f",
         scenarios: { foo: { name: "foo" }, bar: { name: "bar" } },
       },
-      "file:///base",
+      "file:///w:/base/",
     ),
   ),
   [
     extendConfiguration(
-      createConfiguration("file:///home"),
+      createConfiguration("file:///w:/home/"),
       { scenario: "^f", name: "foo" },
       null,
     ),
@@ -65,7 +65,7 @@ assertDeepEqual(
 // resolveConfigurationRepository //
 ////////////////////////////////////
 
-resolveConfigurationRepository(createConfiguration("file:///home"));
+resolveConfigurationRepository(createConfiguration("file:///w:/home/"));
 
 /////////////////////////////
 // extendConfigurationPort //
@@ -75,12 +75,12 @@ assertEqual(
   get(
     extendConfigurationPort(
       extendConfiguration(
-        createConfiguration("file:///home"),
+        createConfiguration("file:///w:/home/"),
         {
           "trace-port": "",
           "track-port": 8000,
         },
-        "file:///base",
+        "file:///w:/base/",
       ),
       {
         "trace-port": "ipc",
@@ -89,7 +89,7 @@ assertEqual(
     ),
     "trace-port",
   ),
-  "file:///home/ipc",
+  "file:///w:/home/ipc",
 );
 
 ///////////////////////////////////////////
@@ -100,11 +100,11 @@ assertEqual(
   get(
     resolveConfigurationAutomatedRecorder(
       extendConfiguration(
-        createConfiguration("file:///home"),
+        createConfiguration("file:///w:/home/"),
         {
           command: ["mocha"],
         },
-        "file:///base",
+        "file:///w:/base/",
       ),
     ),
     "recorder",
@@ -116,11 +116,11 @@ assertEqual(
   get(
     resolveConfigurationAutomatedRecorder(
       extendConfiguration(
-        createConfiguration("file:///home"),
+        createConfiguration("file:///w:/home/"),
         {
           command: ["npx", "mocha"],
         },
-        "file:///base",
+        "file:///w:/base/",
       ),
     ),
     "recorder",
@@ -132,11 +132,11 @@ assertEqual(
   get(
     resolveConfigurationAutomatedRecorder(
       extendConfiguration(
-        createConfiguration("file:///home"),
+        createConfiguration("file:///w:/home/"),
         {
           command: ["npm", "exec", "mocha"],
         },
-        "file:///base",
+        "file:///w:/base/",
       ),
     ),
     "recorder",
@@ -148,11 +148,11 @@ assertEqual(
   get(
     resolveConfigurationAutomatedRecorder(
       extendConfiguration(
-        createConfiguration("file:///home"),
+        createConfiguration("file:///w:/home/"),
         {
           command: "node main.js",
         },
-        "file:///base",
+        "file:///w:/base/",
       ),
     ),
     "recorder",
@@ -165,10 +165,14 @@ assertEqual(
 ////////////////////////////
 
 {
-  const configuration = createConfiguration("file:///home");
+  const configuration = createConfiguration("file:///w:/home/");
   assertEqual(
     isConfigurationEnabled(
-      extendConfiguration(configuration, { main: "main.js" }, "file:///base"),
+      extendConfiguration(
+        configuration,
+        { main: "main.js" },
+        "file:///w:/base/",
+      ),
     ),
     true,
   );
@@ -183,7 +187,7 @@ assertEqual(
           },
           main: "main.js",
         },
-        "file:///base",
+        "file:///w:/base/",
       ),
     ),
     false,
@@ -196,7 +200,7 @@ assertEqual(
 
 assertDeepEqual(
   getConfigurationPackage(
-    createConfiguration("file:///home"),
+    createConfiguration("file:///w:/home/"),
     "http://host/file.txt",
   ),
   {
@@ -208,8 +212,8 @@ assertDeepEqual(
 );
 assertDeepEqual(
   getConfigurationPackage(
-    createConfiguration("file:///home"),
-    "file:///directory/foo",
+    createConfiguration("file:///w:/home/"),
+    "file:///w:/directory/foo",
   ),
   {
     enabled: false,
@@ -221,16 +225,16 @@ assertDeepEqual(
 assertDeepEqual(
   getConfigurationPackage(
     extendConfiguration(
-      createConfiguration("file:///home"),
+      createConfiguration("file:///w:/home/"),
       {
         packages: [
           { glob: "*", exclude: ["exclude1"] },
           { glob: "**/*", exclude: ["exclude2"] },
         ],
       },
-      "file:///base",
+      "file:///w:/base/",
     ),
-    "file:///base/foo/bar",
+    "file:///w:/base/foo/bar",
   ),
   {
     enabled: true,
@@ -256,14 +260,14 @@ assertDeepEqual(
 
 assertEqual(
   get(
-    extendConfigurationNode(createConfiguration("file:///home"), {
+    extendConfigurationNode(createConfiguration("file:///w:/home/"), {
       version: "v1.2.3",
       argv: ["node", "main.js"],
-      cwd: () => "cwd",
+      cwd: () => convertFileUrlToPath("file:///w:/cwd"),
     }),
     "main",
   ),
-  "file:///home/cwd/main.js",
+  "file:///w:/cwd/main.js",
 );
 
 /////////////////////////////////
@@ -284,7 +288,7 @@ assertDeepEqual(
   stripEnvironmentConfiguration(
     compileConfigurationCommand(
       extendConfiguration(
-        createConfiguration("file:///home"),
+        createConfiguration("file:///w:/home/"),
         {
           agent: {
             directory: "agent",
@@ -301,7 +305,7 @@ assertDeepEqual(
             env: { VAR1: "VAL1", NODE_OPTIONS: "--node-key=node-value" },
           },
         },
-        "file:///base",
+        "file:///w:/base/",
       ),
       {
         VAR2: "VAL2",
@@ -328,7 +332,7 @@ assertDeepEqual(
   stripEnvironmentConfiguration(
     compileConfigurationCommand(
       extendConfiguration(
-        createConfiguration("file:///home"),
+        createConfiguration("file:///w:/home/"),
         {
           agent: {
             directory: "agent",
@@ -345,7 +349,7 @@ assertDeepEqual(
           },
           recorder: "process",
         },
-        "file:///base",
+        "file:///w:/base/",
       ),
       {},
     ),
@@ -368,7 +372,7 @@ assertDeepEqual(
       stripEnvironmentConfiguration(
         compileConfigurationCommand(
           extendConfiguration(
-            createConfiguration("file:///home"),
+            createConfiguration("file:///w:/home/"),
             {
               agent: {
                 directory: "agent",
@@ -384,7 +388,7 @@ assertDeepEqual(
               },
               recorder: "mocha",
             },
-            "file:///base",
+            "file:///w:/base/",
           ),
           {},
         ),

@@ -7,5 +7,5 @@ const {
 } = globalThis;
 
 loadEnvironmentConfiguration({
-  APPMAP_CONFIGURATION: stringifyJSON(createConfiguration("file:///home")),
+  APPMAP_CONFIGURATION: stringifyJSON(createConfiguration("file:///w:/home")),
 });

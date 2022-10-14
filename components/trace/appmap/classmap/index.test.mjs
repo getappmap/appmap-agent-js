@@ -41,18 +41,18 @@ const and_exclude = {
 {
   const classmap = createClassmap(
     extendConfiguration(
-      createConfiguration("file:///home"),
+      createConfiguration("file:///w:/home/"),
       {
         pruning: true,
         "function-name-placeholder": placeholder,
         "collapse-package-hierachy": true,
       },
-      "file:///base",
+      "file:///w:/base/",
     ),
   );
 
   addClassmapSource(classmap, {
-    url: `file:///home/directory/function.js`,
+    url: "file:///w:/home/directory/function.js",
     content:
       "const o = { f: \n function (x) {} , g: \n function (y) {} , h: \n function (z) {} , i : \n function (t) { function j () {} } }; const p = {};",
     inline: false,
@@ -78,7 +78,7 @@ const and_exclude = {
     getClassmapClosure(
       classmap,
       stringifyLocation(
-        makeLocation(`file:///home/directory/function.js`, 1, 1),
+        makeLocation("file:///w:/home/directory/function.js", 1, 1),
       ),
     ),
     null,
@@ -88,7 +88,7 @@ const and_exclude = {
     getClassmapClosure(
       classmap,
       stringifyLocation(
-        makeLocation(`file:///home/directory/function.js`, 2, 1),
+        makeLocation("file:///w:/home/directory/function.js", 2, 1),
       ),
     ),
     {
@@ -108,7 +108,7 @@ const and_exclude = {
     getClassmapClosure(
       classmap,
       stringifyLocation(
-        makeLocation(`file:///home/directory/function.js`, 3, 1),
+        makeLocation("file:///w:/home/directory/function.js", 3, 1),
       ),
     ),
     null,
@@ -118,13 +118,13 @@ const and_exclude = {
     getClassmapClosure(
       classmap,
       stringifyLocation(
-        makeLocation(`file:///home/directory/function.js`, 2, 0),
+        makeLocation("file:///w:/home/directory/function.js", 2, 0),
       ),
     ),
     getClassmapClosure(
       classmap,
       stringifyLocation(
-        makeLocation(`file:///home/directory/function.js`, 2, 1),
+        makeLocation("file:///w:/home/directory/function.js", 2, 1),
       ),
     ),
   );
@@ -134,10 +134,10 @@ const and_exclude = {
       classmap,
       new Set([
         stringifyLocation(
-          makeLocation(`file:///home/directory/function.js`, 2, 0),
+          makeLocation("file:///w:/home/directory/function.js", 2, 0),
         ),
         stringifyLocation(
-          makeLocation(`file:///home/directory/function.js`, 2, 1),
+          makeLocation("file:///w:/home/directory/function.js", 2, 1),
         ),
       ]),
     ),
@@ -176,18 +176,18 @@ const and_exclude = {
 {
   const classmap = createClassmap(
     extendConfiguration(
-      createConfiguration("file:///home"),
+      createConfiguration("file:///w:/home/"),
       {
         pruning: false,
         "function-name-placeholder": placeholder,
         "collapse-package-hierachy": false,
       },
-      "file:///base",
+      "file:///w:/base/",
     ),
   );
 
   addClassmapSource(classmap, {
-    url: `file:///home/directory/function.js`,
+    url: "file:///w:/home/directory/function.js",
     content:
       "function f () {} /* comment1 */ \n function g () {} /* comment2 */ /* comment3 */ \n function h () {}",
     inline: true,

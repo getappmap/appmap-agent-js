@@ -24,7 +24,7 @@ const configuration = createConfiguration("file:///home");
     extendConfiguration(
       configuration,
       { recorder: "mocha", processes: false, main: "foo.js" },
-      "file:///base",
+      "file:///w:/base/",
     ),
   );
 }
@@ -43,7 +43,7 @@ const configuration = createConfiguration("file:///home");
         recorder: "mocha",
         hooks: { cjs: false, esm: false, apply: false, http: false },
       },
-      "file:///base",
+      "file:///w:/base/",
     ),
   );
   beforeEach.call({

@@ -66,7 +66,7 @@ assertDeepEqual(
       type: "source",
       url: pathToFileURL(require.resolve(fileURLToPath(url))).toString(),
       content: "module.exports = 123;",
-      exclude: createConfiguration("file:///home").exclude,
+      exclude: createConfiguration("file:///w:/home").exclude,
       shallow: true,
       inline: false,
     },

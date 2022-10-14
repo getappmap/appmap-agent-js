@@ -31,7 +31,7 @@ const normalizeContent = ({ content, ...rest }, source) => ({
 
 const instrumentation = createInstrumentation(
   extendConfiguration(
-    createConfiguration("file:///home"),
+    createConfiguration("file:///w:/home/"),
     {
       "inline-source": false,
       hooks: { apply: "$", eval: false },
@@ -53,13 +53,13 @@ const instrumentation = createInstrumentation(
       ],
       exclude: ["qux"],
     },
-    "file:///base",
+    "file:///w:/base/",
   ),
 );
 
 {
   const file = {
-    url: "file:///base/foo.js",
+    url: "file:///w:/base/foo.js",
     content: "123;",
     type: "script",
   };
@@ -68,18 +68,18 @@ const instrumentation = createInstrumentation(
       instrument(instrumentation, file, createMirrorSourceMap(file)),
     ),
     {
-      url: "file:///base/foo.js",
+      url: "file:///w:/base/foo.js",
       content: normalize("123;", "script"),
       sources: [
         {
-          url: "file:///base/foo.js",
+          url: "file:///w:/base/foo.js",
           content: "123;",
           shallow: true,
           inline: true,
           exclude: [
             makeExclusion("foo"),
             makeExclusion("qux"),
-            ...createConfiguration("file:///home").exclude,
+            ...createConfiguration("file:///w:/home").exclude,
           ],
         },
       ],
@@ -89,7 +89,7 @@ const instrumentation = createInstrumentation(
 
 {
   const file = {
-    url: "file:///base/bar.js",
+    url: "file:///w:/base/bar.js",
     content: "456;",
     type: "script",
   };
@@ -98,7 +98,7 @@ const instrumentation = createInstrumentation(
       instrument(instrumentation, file, createMirrorSourceMap(file)),
     ),
     {
-      url: "file:///base/bar.js",
+      url: "file:///w:/base/bar.js",
       content: normalize("456;", "script"),
       sources: [],
     },

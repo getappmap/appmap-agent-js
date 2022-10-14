@@ -28,7 +28,7 @@ globalThis.GLOBAL_SPY_SPAWN = (exec, argv, _options) => {
   return emitter;
 };
 
-const configuration = createConfiguration("file:///home");
+const configuration = createConfiguration("file:///w:/home");
 
 // no child
 {
@@ -55,7 +55,7 @@ const configuration = createConfiguration("file:///home");
           key2: { command: ["sleep"], "command-options": { shell: ["shell"] } },
         },
       },
-      "file:///base",
+      "file:///w:/base",
     ),
   );
 }
@@ -78,7 +78,7 @@ const configuration = createConfiguration("file:///home");
           },
         },
       },
-      "file:///base",
+      "file:///w:/base",
     ),
   );
 }
@@ -105,7 +105,7 @@ const configuration = createConfiguration("file:///home");
           },
         },
       },
-      "file:///base",
+      "file:///w:/base",
     ),
   );
 }

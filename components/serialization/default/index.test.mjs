@@ -19,7 +19,7 @@ const {
 
 const setupSerialization = (config) =>
   createSerialization(
-    extendConfiguration(createConfiguration("file:///home"), {
+    extendConfiguration(createConfiguration("file:///w:/home"), {
       serialization: config,
     }),
   );

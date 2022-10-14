@@ -5,13 +5,13 @@ import { createConfiguration, extendConfiguration } from "./index.mjs?env=test";
 
 const { undefined } = globalThis;
 
-validateInternalConfiguration(createConfiguration("file:///home"));
+validateInternalConfiguration(createConfiguration("file:///w:/home/"));
 
 const extend = (
   name,
   value1,
-  base = "file:///dummy",
-  home = "file:///dummy",
+  base = "http://host/base/",
+  home = "http://host/home/",
 ) => {
   const configuration = extendConfiguration(
     createConfiguration(home),
@@ -46,38 +46,41 @@ assertDeepEqual(
 // packages //
 
 {
-  const [specifier, value] = extend("packages", "lib/*.js", "file:///base")[0];
+  const [specifier, value] = extend(
+    "packages",
+    "lib/*.js",
+    "file:///w:/base/",
+  )[0];
   assertDeepEqual(value, {
     "inline-source": null,
     enabled: true,
     exclude: [],
     shallow: false,
   });
-  assertEqual(matchSpecifier(specifier, "file:///base/lib/foo.js"), true);
-  assertEqual(matchSpecifier(specifier, "file:///base/lib/foo.mjs"), false);
-  assertEqual(matchSpecifier(specifier, "file:///base/src/foo.js"), false);
+  assertEqual(matchSpecifier(specifier, "file:///w:/base/lib/foo.js"), true);
+  assertEqual(matchSpecifier(specifier, "file:///w:/base/lib/foo.mjs"), false);
+  assertEqual(matchSpecifier(specifier, "file:///w:/base/src/foo.js"), false);
 }
 
 // hooks.eval //
 
-assertDeepEqual(extend("hooks", { eval: true }, "file:///base").eval, {
+assertDeepEqual(extend("hooks", { eval: true }).eval, {
   hidden: "APPMAP_HOOK_EVAL",
   aliases: ["eval"],
 });
 
-assertDeepEqual(extend("hooks", { eval: false }, "file:///base").eval, {
+assertDeepEqual(extend("hooks", { eval: false }).eval, {
   hidden: "APPMAP_HOOK_EVAL",
   aliases: [],
 });
 
-assertDeepEqual(extend("hooks", {}, "file:///base").eval, {
+assertDeepEqual(extend("hooks", {}).eval, {
   hidden: "APPMAP_HOOK_EVAL",
   aliases: [],
 });
 
 assertDeepEqual(
-  extend("hooks", { eval: { hidden: "foo", aliases: ["bar"] } }, "file:///base")
-    .eval,
+  extend("hooks", { eval: { hidden: "foo", aliases: ["bar"] } }).eval,
   {
     hidden: "foo",
     aliases: ["bar"],
@@ -86,40 +89,34 @@ assertDeepEqual(
 
 // hooks.esm //
 
-assertDeepEqual(
-  extend("hooks", { esm: true }, "file:///base").esm,
-  "APPMAP_HOOK_ESM",
-);
+assertDeepEqual(extend("hooks", { esm: true }).esm, "APPMAP_HOOK_ESM");
 
-assertDeepEqual(extend("hooks", { esm: false }, "file:///base").esm, null);
+assertDeepEqual(extend("hooks", { esm: false }).esm, null);
 
-assertDeepEqual(extend("hooks", {}, "file:///base").esm, "APPMAP_HOOK_ESM");
+assertDeepEqual(extend("hooks", {}).esm, "APPMAP_HOOK_ESM");
 
-assertDeepEqual(extend("hooks", { esm: "FOO" }, "file:///base").esm, "FOO");
+assertDeepEqual(extend("hooks", { esm: "FOO" }).esm, "FOO");
 
 // hooks.apply //
 
-assertDeepEqual(
-  extend("hooks", { apply: true }, "file:///base").apply,
-  "APPMAP_HOOK_APPLY",
-);
+assertDeepEqual(extend("hooks", { apply: true }).apply, "APPMAP_HOOK_APPLY");
 
-assertDeepEqual(extend("hooks", { apply: false }, "file:///base").apply, null);
+assertDeepEqual(extend("hooks", { apply: false }).apply, null);
 
-assertDeepEqual(extend("hooks", {}, "file:///base").apply, "APPMAP_HOOK_APPLY");
+assertDeepEqual(extend("hooks", {}).apply, "APPMAP_HOOK_APPLY");
 
-assertDeepEqual(extend("hooks", { apply: "FOO" }, "file:///base").apply, "FOO");
+assertDeepEqual(extend("hooks", { apply: "FOO" }).apply, "FOO");
 
 // scenarios //
 assertDeepEqual(
   extend(
     "scenarios",
     { key: { command: ["node", "main.js"] } },
-    "file:///base",
+    "file:///w:/base/",
   ),
   [
     {
-      base: "file:///base",
+      base: "file:///w:/base/",
       key: "key",
       value: { command: ["node", "main.js"] },
     },
@@ -142,20 +139,20 @@ assertDeepEqual(
 // main //
 
 assertDeepEqual(
-  extend("main", "foo.js", "file:///base"),
-  "file:///base/foo.js",
+  extend("main", "foo.js", "file:///w:/base/"),
+  "file:///w:/base/foo.js",
 );
 
 // port //
 
 assertDeepEqual(
-  extend("trace-port", "unix-domain-socket", "file:///base"),
-  "file:///base/unix-domain-socket",
+  extend("trace-port", "unix-domain-socket", "file:///w:/base/"),
+  "file:///w:/base/unix-domain-socket",
 );
 
-assertDeepEqual(extend("trace-port", "", "file:///base"), "");
+assertDeepEqual(extend("trace-port", "", "file:///w:/base/"), "");
 
-assertDeepEqual(extend("trace-port", 8080, "file:///base"), 8080);
+assertDeepEqual(extend("trace-port", 8080, "file:///w:/base/"), 8080);
 
 // language //
 
@@ -168,9 +165,9 @@ assertDeepEqual(extend("log", "warning"), {
   file: 2,
 });
 
-assertDeepEqual(extend("log", { file: "log" }, "file:///base"), {
+assertDeepEqual(extend("log", { file: "log" }, "file:///w:/base/"), {
   level: "error",
-  file: "file:///base/log",
+  file: "file:///w:/base/log",
 });
 
 // recording //
@@ -211,44 +208,53 @@ assertDeepEqual(
 
 // processes //
 
-assertDeepEqual(extend("processes", true, "file:///base", "file:///home"), [
-  [{ base: "file:///base", source: "^", flags: "u" }, true],
-  [true, true],
-]);
+assertDeepEqual(
+  extend("processes", true, "file:///w:/base/", "file:///w:/home"),
+  [
+    [{ base: "file:///w:/base/", source: "^", flags: "u" }, true],
+    [true, true],
+  ],
+);
 
-assertDeepEqual(extend("processes", "/foo", "file:///base", "file:///home"), [
-  [{ base: "file:///base", source: "^(?:\\/foo)$", flags: "" }, true],
-  [true, true],
-]);
+assertDeepEqual(
+  extend("processes", "/foo", "file:///w:/base/", "file:///w:/home"),
+  [
+    [{ base: "file:///w:/base/", source: "^(?:\\/foo)$", flags: "" }, true],
+    [true, true],
+  ],
+);
 
 // command //
 
-assertDeepEqual(extend("command", ["token1", "token2"], "file:///base"), {
+assertDeepEqual(extend("command", ["token1", "token2"], "file:///w:/base/"), {
   tokens: ["token1", "token2"],
   script: null,
-  base: "file:///base",
+  base: "file:///w:/base/",
 });
 
-assertDeepEqual(extend("command", "script", "file:///base"), {
+assertDeepEqual(extend("command", "script", "file:///w:/base/"), {
   tokens: null,
   script: "script",
-  base: "file:///base",
+  base: "file:///w:/base/",
 });
 
 // exclude //
 
-assertDeepEqual(extend("exclude", ["foo\\.bar"]), [
-  {
-    combinator: "and",
-    "every-label": true,
-    "some-label": true,
-    name: true,
-    "qualified-name": "foo\\.bar",
-    excluded: true,
-    recursive: true,
-  },
-  ...createConfiguration("file:///home").exclude,
-]);
+assertDeepEqual(
+  extend("exclude", ["foo\\.bar"], undefined, "file:///w:/home/"),
+  [
+    {
+      combinator: "and",
+      "every-label": true,
+      "some-label": true,
+      name: true,
+      "qualified-name": "foo\\.bar",
+      excluded: true,
+      recursive: true,
+    },
+    ...createConfiguration("file:///w:/home/").exclude,
+  ],
+);
 
 // additional //
 

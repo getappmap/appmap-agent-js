@@ -95,16 +95,16 @@ assertDeepEqual(
         end: makeEvent("end", 123, makeBundlePayload()),
       },
     ],
-    createClassmap(createConfiguration("file:///home")),
+    createClassmap(createConfiguration("file:///w:/home")),
   ).map(getEvent),
   [],
 );
 
 // apply //
 for (const shallow of [true, false]) {
-  const classmap = createClassmap(createConfiguration("file:///home"));
+  const classmap = createClassmap(createConfiguration("file:///w:/home"));
   addClassmapSource(classmap, {
-    url: "file:///home/filename.js",
+    url: "file:///w:/home/filename.js",
     content: "function f (x) {}",
     inline: false,
     exclude: [
@@ -120,7 +120,7 @@ for (const shallow of [true, false]) {
     ],
     shallow,
   });
-  const location = makeLocation("file:///home/filename.js", 1, 0);
+  const location = makeLocation("file:///w:/home/filename.js", 1, 0);
   assertDeepEqual(
     digestEventTrace(
       [
@@ -145,7 +145,7 @@ for (const shallow of [true, false]) {
 
 // missing apply >> transparent //
 {
-  const location = makeLocation("file:///home/filename.js", 1, 0);
+  const location = makeLocation("file:///w:/home/filename.js", 1, 0);
   assertDeepEqual(
     digestEventTrace(
       [
@@ -162,7 +162,7 @@ for (const shallow of [true, false]) {
           end: makeEvent("end", 123, makeReturnPayload(location)),
         },
       ],
-      createClassmap(createConfiguration("file:///home")),
+      createClassmap(createConfiguration("file:///w:/home")),
     ).map(getEvent),
     ["call", "return"],
   );
@@ -185,7 +185,7 @@ assertDeepEqual(
         end: makeEvent("end", 123, makeResponsePayload("server")),
       },
     ],
-    createClassmap(createConfiguration("file:///home")),
+    createClassmap(createConfiguration("file:///w:/home")),
   ).map(getEvent),
   ["call", "call", "return", "return"],
 );

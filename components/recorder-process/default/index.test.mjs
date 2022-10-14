@@ -27,7 +27,7 @@ const configuration = createConfiguration("file:///home");
         recorder: "process",
         hooks: { cjs: false, esm: false, apply: false, http: false },
       },
-      "file:///base",
+      "file:///w:/base/",
     ),
   );
   emitter.emit("uncaughtExceptionMonitor", new Error("BOUM"));
