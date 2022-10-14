@@ -1,23 +1,24 @@
-import { getFreshTemporaryURL, assertEqual } from "../../__fixture__.mjs";
 import { mkdir as mkdirAsync, writeFile as writeFileAsync } from "fs/promises";
+import { assertEqual } from "../../__fixture__.mjs";
+
+import { getTmpUrl } from "../../path/index.mjs?env=test";
+import { getUuid } from "../../uuid/random/index.mjs?env=test";
+import { toAbsoluteUrl } from "../../url/index.mjs?env=test";
 import { requireMaybe } from "./require.mjs?env=test";
 
 const {
   URL,
-  Math: { random },
   JSON: { stringify: stringifyJSON },
 } = globalThis;
 
-const directory = getFreshTemporaryURL();
+const uuid = getUuid();
 
-await mkdirAsync(new URL(directory));
-
-await mkdirAsync(new URL(`${directory}/node_modules`));
-
-await mkdirAsync(new URL(`${directory}/node_modules/foo`));
+await mkdirAsync(new URL(`${uuid}/node_modules/foo`, getTmpUrl()), {
+  recursive: true,
+});
 
 await writeFileAsync(
-  new URL(`${directory}/node_modules/foo/package.json`),
+  new URL(`${uuid}/node_modules/foo/package.json`, getTmpUrl()),
   stringifyJSON({
     name: "foo",
     version: "1.2.3",
@@ -26,16 +27,22 @@ await writeFileAsync(
 );
 
 await writeFileAsync(
-  new URL(`${directory}/node_modules/foo/index.js`),
+  new URL(`${uuid}/node_modules/foo/index.js`, getTmpUrl()),
   "module.exports = 123;",
   "utf8",
 );
 
-assertEqual(requireMaybe(true, directory, "foo"), 123);
-
-assertEqual(requireMaybe(false, directory, "foo"), null);
+assertEqual(
+  requireMaybe(true, toAbsoluteUrl(`${uuid}/`, getTmpUrl()), "foo"),
+  123,
+);
 
 assertEqual(
-  requireMaybe(true, directory, random().toString(36).substring(2)),
+  requireMaybe(false, toAbsoluteUrl(`${uuid}/`, getTmpUrl()), "foo"),
+  null,
+);
+
+assertEqual(
+  requireMaybe(true, toAbsoluteUrl(`${uuid}/`, getTmpUrl()), getUuid()),
   null,
 );

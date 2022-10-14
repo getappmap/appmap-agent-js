@@ -1,5 +1,6 @@
 import { createServer, Socket } from "net";
-import { convertPort } from "../../__fixture__.mjs";
+import "../../__fixture__.mjs";
+import { toIpcPath, convertFileUrlToPath } from "../../path/index.mjs?env=test";
 import {
   openServiceAsync,
   closeServiceAsync,
@@ -14,7 +15,7 @@ const { Promise, setTimeout } = globalThis;
   await new Promise((resolve, reject) => {
     socket.on("connect", resolve);
     socket.on("error", reject);
-    socket.connect(convertPort(getServicePort(service)));
+    socket.connect(getServicePort(service));
   });
   // Wait for server to process connection
   await new Promise((resolve) => {
@@ -29,7 +30,7 @@ const { Promise, setTimeout } = globalThis;
   await new Promise((resolve, reject) => {
     socket.on("connect", resolve);
     socket.on("error", reject);
-    socket.connect(convertPort(getServicePort(service)));
+    socket.connect(toIpcPath(convertFileUrlToPath(getServicePort(service))));
   });
   await new Promise((resolve, reject) => {
     socket.on("close", resolve);

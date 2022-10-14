@@ -1,12 +1,10 @@
 import { spawn } from "child_process";
 import { rm as rmAsync } from "fs/promises";
-import { fileURLToPath } from "url";
 import Mysql from "mysql";
-import {
-  getFreshTemporaryURL,
-  assertEqual,
-  assertDeepEqual,
-} from "../../__fixture__.mjs";
+import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
+import { getUuid } from "../../uuid/random/index.mjs?env=test";
+import { toAbsoluteUrl } from "../../url/index.mjs?env=test";
+import { getTmpUrl, convertFileUrlToPath } from "../../path/index.mjs?env=test";
 import { testHookAsync } from "../../hook-fixture/index.mjs?env=test";
 import * as HookMysql from "./mysql.mjs?env=test";
 
@@ -32,7 +30,7 @@ const promiseTermination = (child) =>
   });
 
 const port = 3306;
-const url = getFreshTemporaryURL();
+const url = toAbsoluteUrl(getUuid(), getTmpUrl());
 
 const proceedAsync = async () => {
   assertDeepEqual(
@@ -145,7 +143,7 @@ if (getOwnPropertyDescriptor(process.env, "TRAVIS") !== undefined) {
           "--initialize-insecure",
           "--default-authentication-plugin=mysql_native_password",
           "--datadir",
-          fileURLToPath(url),
+          convertFileUrlToPath(url),
         ],
         { stdio: "inherit" },
       ),
@@ -154,7 +152,7 @@ if (getOwnPropertyDescriptor(process.env, "TRAVIS") !== undefined) {
   );
   const child = spawn(
     "/usr/local/mysql/bin/mysqld",
-    ["--port", String(port), "--datadir", fileURLToPath(url)],
+    ["--port", String(port), "--datadir", convertFileUrlToPath(url)],
     { stdio: "inherit" },
   );
   const termination = promiseTermination(child);

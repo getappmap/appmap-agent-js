@@ -1,9 +1,10 @@
-import { pathToFileURL } from "url";
+import "../../__fixture__.mjs";
+import { getTmpUrl } from "../../path/index.mjs?env=test";
 import { spawn } from "./index.mjs?env=test";
 
-const { Promise, URL, process, Error, undefined } = globalThis;
+const { Promise, Error, undefined } = globalThis;
 
-for (const options of [{}, { cwd: new URL(pathToFileURL(process.cwd())) }]) {
+for (const options of [{}, { cwd: getTmpUrl() }]) {
   await new Promise((resolve, reject) => {
     const child = spawn("node", ["--version"], options);
     child.on("error", reject);

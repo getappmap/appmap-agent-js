@@ -1,5 +1,6 @@
 import { createServer as createTCPServer } from "net";
-import { convertPort } from "../__fixture__.mjs";
+import "../__fixture__.mjs";
+import { toIpcPath, convertFileUrlToPath } from "../path/index.mjs?env=test";
 import NetSocketMessaging from "net-socket-messaging";
 
 const { Promise } = globalThis;
@@ -21,7 +22,9 @@ export const testAsync = async (port, runAsync) => {
       server.close();
     });
   });
-  server.listen(convertPort(port));
+  server.listen(
+    typeof port === "number" ? port : toIpcPath(convertFileUrlToPath(port)),
+  );
   await new Promise((resolve) => {
     server.on("listening", resolve);
   });

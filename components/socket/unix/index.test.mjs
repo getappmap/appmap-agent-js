@@ -1,5 +1,8 @@
 import { platform as getPlatform } from "os";
-import { getFreshTemporaryURL, assertDeepEqual } from "../../__fixture__.mjs";
+import { assertDeepEqual } from "../../__fixture__.mjs";
+import { getUuid } from "../../uuid/random/index.mjs?env=test";
+import { getTmpUrl } from "../../path/index.mjs?env=test";
+import { toAbsoluteUrl } from "../../url/index.mjs?env=test";
 import { testAsync } from "../__fixture__.mjs";
 
 if (getPlatform() !== "win32") {
@@ -15,7 +18,8 @@ if (getPlatform() !== "win32") {
 
   assertDeepEqual(await testAsync(0, runAsync), ["message"]);
 
-  assertDeepEqual(await testAsync(getFreshTemporaryURL(), runAsync), [
-    "message",
-  ]);
+  assertDeepEqual(
+    await testAsync(toAbsoluteUrl(getUuid(), getTmpUrl()), runAsync),
+    ["message"],
+  );
 }

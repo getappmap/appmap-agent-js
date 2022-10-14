@@ -447,7 +447,7 @@ assertEqual(
   normalize(
     `eval(
       EVAL(
-        "file:///w:/script.js#eval-1",
+        "file:///w:/script.js/eval-1",
         123,
       ),
       456,

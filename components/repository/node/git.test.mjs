@@ -1,11 +1,9 @@
 import { mkdir as mkdirAsync } from "fs/promises";
-import { fileURLToPath } from "url";
 import { execSync } from "child_process";
-import {
-  assertEqual,
-  assertThrow,
-  getFreshTemporaryURL,
-} from "../../__fixture__.mjs";
+import { assertEqual, assertThrow } from "../../__fixture__.mjs";
+import { getUuid } from "../../uuid/random/index.mjs?env=test";
+import { getTmpUrl } from "../../path/index.mjs?env=test";
+import { toAbsoluteUrl } from "../../url/index.mjs?env=test";
 import { extractGitInformation } from "./git.mjs?env=test";
 
 const {
@@ -14,13 +12,13 @@ const {
 } = globalThis;
 
 const origin_url = "https://github.com/lachrist/sample.git";
-const url = getFreshTemporaryURL();
+const url = toAbsoluteUrl(getUuid(), getTmpUrl());
 
 assertThrow(() => extractGitInformation(url), /^AppmapError:.*ENOENT/u);
 await mkdirAsync(new URL(url));
 assertEqual(extractGitInformation(url), null);
 execSync(`git clone ${origin_url} .`, {
-  cwd: fileURLToPath(url),
+  cwd: new URL(url),
   stdio: "ignore",
 });
 

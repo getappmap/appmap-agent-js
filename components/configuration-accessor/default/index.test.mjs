@@ -1,9 +1,11 @@
+import { platform as getPlatform } from "node:os";
+
 import {
   assertDeepEqual,
   assertEqual,
   assertThrow,
 } from "../../__fixture__.mjs";
-import { platform as getPlatform } from "os";
+import { convertFileUrlToPath } from "../../path/index.mjs?env=test";
 import {
   createConfiguration,
   extendConfiguration,
@@ -22,7 +24,6 @@ import {
 
 const {
   Reflect: { get },
-  URL,
 } = globalThis;
 
 ////////////////////////////////////////
@@ -319,7 +320,9 @@ assertDeepEqual(
     env: {
       NODE_OPTIONS: [
         "--node-key=node-value",
-        "--experimental-loader=./agent/lib/node/recorder-process.mjs",
+        `--experimental-loader=${convertFileUrlToPath(
+          "file:///w:/base/agent/lib/node/recorder-process.mjs",
+        )}`,
       ].join(" "),
       VAR1: "VAL1",
       VAR2: "VAL2",
@@ -358,7 +361,9 @@ assertDeepEqual(
     exec: "/bin/sh",
     argv: [
       "-c",
-      "node --experimental-loader ./agent/lib/node/recorder-process.mjs main.js argv1",
+      `node --experimental-loader ${convertFileUrlToPath(
+        "file:///w:/base/agent/lib/node/recorder-process.mjs",
+      )} main.js argv1`,
     ],
     cwd: new URL("file:///base"),
     env: {},
@@ -397,13 +402,17 @@ assertDeepEqual(
         exec: "/bin/sh",
         argv: [
           "-c",
-          `${command} --require ./agent/lib/node/recorder-mocha.mjs`,
+          `${command} --require ${convertFileUrlToPath(
+            "file:///w:/base/agent/lib/node/recorder-mocha.mjs",
+          )}`,
         ],
         cwd: new URL("file:///base"),
         env: {
           NODE_OPTIONS: [
             "",
-            "--experimental-loader=./agent/lib/node/mocha-loader.mjs",
+            `--experimental-loader=${convertFileUrlToPath(
+              "file:///w:/base/agent/lib/node/mocha-loader.mjs",
+            )}`,
           ].join(" "),
         },
       },

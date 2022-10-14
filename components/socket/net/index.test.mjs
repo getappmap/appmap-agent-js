@@ -1,4 +1,7 @@
-import { assertDeepEqual, getFreshTemporaryURL } from "../../__fixture__.mjs";
+import { assertDeepEqual } from "../../__fixture__.mjs";
+import { getUuid } from "../../uuid/random/index.mjs?env=test";
+import { getTmpUrl } from "../../path/index.mjs?env=test";
+import { toAbsoluteUrl } from "../../url/index.mjs?env=test";
 import { openSocket, closeSocket, sendSocket } from "./index.mjs?env=test";
 import { testAsync } from "../__fixture__.mjs";
 
@@ -24,7 +27,7 @@ const runAsync = async (port) => {
 
 assertDeepEqual(await testAsync(0, runAsync), ["message1", "message2"]);
 
-assertDeepEqual(await testAsync(getFreshTemporaryURL(), runAsync), [
-  "message1",
-  "message2",
-]);
+assertDeepEqual(
+  await testAsync(toAbsoluteUrl(getUuid(), getTmpUrl()), runAsync),
+  ["message1", "message2"],
+);

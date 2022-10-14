@@ -1,11 +1,12 @@
 import { writeFile as writeFileAsync } from "fs/promises";
-import { fileURLToPath } from "url";
+
 import {
   assertThrow,
   assertDeepEqual,
   assertEqual,
-  getFreshTemporaryURL,
 } from "../../__fixture__.mjs";
+import { getUuid } from "../../uuid/random/index.mjs?env=test";
+import { getTmpPath, getTmpUrl } from "../../path/index.mjs?env=test";
 import { loadProcessConfiguration } from "./index.mjs?env=test";
 
 const {
@@ -17,22 +18,22 @@ const {
 assertThrow(
   () =>
     loadProcessConfiguration({
-      env: { APPMAP_CONFIGURATION_PATH: "foo" },
+      env: { APPMAP_CONFIGURATION_PATH: getUuid() },
       argv: ["node", "main.mjs"],
-      cwd: () => "cwd",
+      cwd: getTmpPath,
     }),
   /^AppmapError: Unsupported configuration file extension/u,
 );
 
 {
-  const url = getFreshTemporaryURL(".json");
+  const filename = `${getUuid()}.json`;
   loadProcessConfiguration({
-    env: { APPMAP_CONFIGURATION_PATH: fileURLToPath(url) },
+    env: { APPMAP_CONFIGURATION_PATH: filename },
     argv: ["node", "main.mjs"],
-    cwd: () => "cwd",
+    cwd: getTmpPath,
   });
   await writeFileAsync(
-    new URL(url),
+    new URL(filename, getTmpUrl()),
     stringifyJSON({ name: "app", "map-name": "name1" }),
     "utf8",
   );
@@ -45,7 +46,7 @@ assertThrow(
     log,
     "track-port": track_port,
   } = loadProcessConfiguration({
-    env: { APPMAP_CONFIGURATION_PATH: fileURLToPath(url) },
+    env: { APPMAP_CONFIGURATION_PATH: filename },
     argv: [
       ["node", "agent.mjs"],
       ["--track-port", "8080"],
@@ -57,7 +58,7 @@ assertThrow(
       ["--process", "'*'"],
       ["--", "exec", "arg1", "arg2"],
     ].flat(),
-    cwd: () => "cwd",
+    cwd: getTmpPath,
   });
   assertEqual(packages.length, 3);
   assertEqual(processes.length, 2);
@@ -74,7 +75,7 @@ assertThrow(
       command: {
         script: null,
         tokens: ["exec", "arg1", "arg2"],
-        base: "file:///cwd",
+        base: getTmpUrl(),
       },
     },
   );
@@ -84,19 +85,19 @@ assertDeepEqual(
   get(
     loadProcessConfiguration({
       env: {
-        APPMAP_CONFIGURATION_PATH: fileURLToPath(getFreshTemporaryURL(".json")),
+        APPMAP_CONFIGURATION_PATH: `${getUuid()}.json`,
       },
       argv: [
         ["node", "agent.mjs"],
         ["--command", "exec arg1 arg2"],
       ].flat(),
-      cwd: () => "cwd",
+      cwd: getTmpPath,
     }),
     "command",
   ),
   {
     script: "exec arg1 arg2",
     tokens: null,
-    base: "file:///cwd",
+    base: getTmpUrl(),
   },
 );

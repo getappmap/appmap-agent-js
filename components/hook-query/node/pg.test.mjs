@@ -1,14 +1,15 @@
 import { spawn } from "child_process";
 import { rm as rmAsync } from "fs/promises";
 import Pg from "pg";
-import { fileURLToPath } from "url";
 import {
-  getFreshTemporaryURL,
   assertEqual,
   assertDeepEqual,
   assertFail,
   assertMatch,
 } from "../../__fixture__.mjs";
+import { getUuid } from "../../uuid/random/index.mjs?env=test";
+import { toAbsoluteUrl } from "../../url/index.mjs?env=test";
+import { getTmpUrl, convertFileUrlToPath } from "../../path/index.mjs?env=test";
 import { testHookAsync } from "../../hook-fixture/index.mjs?env=test";
 import * as HookPg from "./pg.mjs?env=test";
 
@@ -37,7 +38,7 @@ const promiseTermination = (child) =>
 
 const port = 5432;
 const user = "postgres";
-const url = getFreshTemporaryURL();
+const url = toAbsoluteUrl(getUuid(), getTmpUrl());
 
 const proceedAsync = async () => {
   const testCaseAsync = (enabled, runAsync) =>
@@ -227,7 +228,7 @@ if (getOwnPropertyDescriptor(process.env, "TRAVIS")) {
           "--encoding",
           "UTF-8",
           "--pgdata",
-          fileURLToPath(url),
+          convertFileUrlToPath(url),
           "--username",
           user,
         ],
@@ -238,7 +239,7 @@ if (getOwnPropertyDescriptor(process.env, "TRAVIS")) {
   );
   const child = spawn(
     "postgres",
-    ["-D", fileURLToPath(url), "-p", String(port)],
+    ["-D", convertFileUrlToPath(url), "-p", String(port)],
     {
       stdio: "inherit",
     },
