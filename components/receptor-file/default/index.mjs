@@ -8,7 +8,7 @@ const {
 
 const { search: __search } = new URL(import.meta.url);
 
-import { lstat as lstatAsync, mkdir as mkdirAsync } from "fs/promises";
+import { mkdir as mkdirAsync } from "fs/promises";
 import { writeFileSync as writeFile, readFileSync as readFile } from "fs";
 import { createServer } from "net";
 import NetSocketMessaging from "net-socket-messaging";
@@ -23,7 +23,6 @@ const { assert } = await import(`../../util/index.mjs${__search}`);
 const { logDebug, logInfo, logError } = await import(
   `../../log/index.mjs${__search}`
 );
-const { expect } = await import(`../../expect/index.mjs${__search}`);
 const { openServiceAsync, closeServiceAsync, getServicePort } = await import(
   `../../service/index.mjs${__search}`
 );
@@ -36,40 +35,6 @@ const {
 } = await import(`../../backend/index.mjs${__search}`);
 
 const { patch: patchSocket } = NetSocketMessaging;
-
-const isDirectoryAsync = async (directory) => {
-  try {
-    return (await lstatAsync(new URL(directory))).isDirectory();
-  } catch (error) {
-    const { code } = error;
-    expect(
-      code === "ENOENT",
-      "cannot read directory status %j >> %O",
-      directory,
-      error,
-    );
-    return null;
-  }
-};
-
-const createDirectoryAsync = async (directory) => {
-  const is_directory = await isDirectoryAsync(directory);
-  if (is_directory === null) {
-    const parent_directory = appendURLSegment(directory, "..");
-    expect(
-      parent_directory !== directory,
-      "could not find any existing directory in the hiearchy of the storage directory",
-    );
-    await createDirectoryAsync(parent_directory);
-    await mkdirAsync(new URL(directory));
-  } else {
-    expect(
-      is_directory,
-      "cannot create directory %j because it is a file",
-      directory,
-    );
-  }
-};
 
 const store = (
   urls,
@@ -118,8 +83,8 @@ export const openReceptorAsync = async ({
     recorder === "mocha" || recorder === "process",
     "invalid recorder for receptor-file",
   );
-  await createDirectoryAsync(recorder_directory);
   const base = toAbsoluteUrl(`${recorder}/`, directory);
+  await mkdirAsync(new URL(base), { recursive: true });
   const server = createServer();
   const urls = new Set();
   server.on("connection", (socket) => {
