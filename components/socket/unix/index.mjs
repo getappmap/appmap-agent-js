@@ -2,10 +2,12 @@ const { URL } = globalThis;
 
 const { search: __search } = new URL(import.meta.url);
 
-import { fileURLToPath } from "url";
 // Dynamically import optional dependencies
 import { createRequire } from "module";
-const { toIPCPath } = await import(`../../path/index.mjs${__search}`);
+
+const { toIpcPath, convertFileUrlToPath } = await import(
+  `../../path/index.mjs${__search}`
+);
 
 const require = createRequire(import.meta.url);
 
@@ -31,7 +33,10 @@ export const openSocket = (host, port, _configuration) => {
     fd,
     typeof port === "number"
       ? { sin_family: AF_INET, sin_port: port, sin_addr: host }
-      : { sun_family: AF_UNIX, sun_path: toIPCPath(fileURLToPath(port)) },
+      : {
+          sun_family: AF_UNIX,
+          sun_path: toIpcPath(convertFileUrlToPath(port)),
+        },
   );
   return fd;
 };

@@ -8,12 +8,14 @@ const {
 
 const { search: __search } = new URL(import.meta.url);
 
-import Http from "http";
-import { fileURLToPath } from "url";
+import Http from "node:http";
+
 const { noop, hasOwnProperty } = await import(
   `../../util/index.mjs${__search}`
 );
-const { toIPCPath } = await import(`../../path/index.mjs${__search}`);
+const { toIpcPath, convertFileUrlToPath } = await import(
+  `../../path/index.mjs${__search}`
+);
 
 const { request: createRequest } = Http;
 
@@ -61,7 +63,7 @@ export const requestAsync = (host, port, method, path, data) =>
       host,
       port: typeof port === "number" ? port : null,
       socketPath:
-        typeof port === "string" ? toIPCPath(fileURLToPath(port)) : null,
+        typeof port === "string" ? toIpcPath(convertFileUrlToPath(port)) : null,
       method,
       path,
       headers: createHeaders(buffer),

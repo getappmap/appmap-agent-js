@@ -11,7 +11,9 @@ const { logGuardInfo } = await import(`../../log/index.mjs${__search}`);
 const { hasOwnProperty, coalesce, identity } = await import(
   `../../util/index.mjs${__search}`
 );
-const { urlifyPath } = await import(`../../url/index.mjs${__search}`);
+const { toAbsoluteUrl, toDirectoryUrl } = await import(
+  `../../url/index.mjs${__search}`
+);
 const { validateExternalConfiguration } = await import(
   `../../validate/index.mjs${__search}`
 );
@@ -28,6 +30,8 @@ const HOOK_EVAL_GLOBAL = "APPMAP_HOOK_EVAL";
 const ANONYMOUS_NAME_SEPARATOR = "-";
 
 const EXPECTED_EXTRA_PROPERTIES = ["test_recording"];
+
+const resolveUrl = (url, base) => new URL(url, base).href;
 
 ////////////
 // Extend //
@@ -132,14 +136,14 @@ const normalizeLog = (log, base) => {
     log = { level: log };
   }
   if (hasOwnProperty(log, "file") && typeof log.file !== "number") {
-    log.file = urlifyPath(log.file, base);
+    log.file = resolveUrl(log.file, base);
   }
   return log;
 };
 
 const normalizePort = (port, base) => {
   if (typeof port === "string" && port !== "") {
-    port = urlifyPath(port, base);
+    port = resolveUrl(port, base);
   }
   return port;
 };
@@ -348,7 +352,7 @@ const fields = {
   },
   main: {
     extend: overwrite,
-    normalize: urlifyPath,
+    normalize: toAbsoluteUrl,
   },
   language: {
     extend: overwrite,
@@ -372,7 +376,7 @@ const fields = {
   },
   appmap_dir: {
     extend: overwrite,
-    normalize: urlifyPath,
+    normalize: normalizeDirectoryUrl,
   },
   appmap_file: {
     extend: overwrite,
@@ -429,7 +433,7 @@ export const createConfiguration = (home) => ({
   // overwritten by the agent
   agent: null,
   repository: {
-    directory: home,
+    directory: toAbsoluteUrl(".", home),
     history: null,
     package: null,
   },
@@ -460,7 +464,7 @@ export const createConfiguration = (home) => ({
     level: "error",
     file: 2,
   },
-  appmap_dir: urlifyPath("tmp/appmap", home),
+  appmap_dir: toAbsoluteUrl("tmp/appmap/", home),
   appmap_file: null,
   processes: [[true, true]],
   recorder: null,

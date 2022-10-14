@@ -4,7 +4,9 @@ const { search: __search } = new URL(import.meta.url);
 
 import { spawnSync } from "child_process";
 import { readdirSync } from "fs";
-import { fileURLToPath } from "url";
+const { convertFileUrlToPath } = await import(
+  `../../path/index.mjs${__search}`
+);
 const { expect, expectSuccess } = await import(
   `../../expect/index.mjs${__search}`
 );
@@ -15,7 +17,7 @@ const trim = (string) => string.trim();
 
 const run = (command, url) => {
   const result = spawnSync(command.split(" ")[0], command.split(" ").slice(1), {
-    cwd: fileURLToPath(url),
+    cwd: convertFileUrlToPath(url),
     encoding: "utf8",
     timeout: 1000,
     stdio: ["ignore", "pipe", "pipe"],

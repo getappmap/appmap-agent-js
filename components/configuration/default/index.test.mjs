@@ -238,6 +238,13 @@ assertDeepEqual(extend("command", "script", "file:///w:/base/"), {
   base: "file:///w:/base/",
 });
 
+// appmap_dir //
+
+assertDeepEqual(
+  extend("appmap_dir", "tmp/appmap", "file:///w:/base/"),
+  "file:///w:/base/tmp/appmap/",
+);
+
 // exclude //
 
 assertDeepEqual(

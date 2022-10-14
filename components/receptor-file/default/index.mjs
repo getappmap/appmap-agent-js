@@ -1,6 +1,7 @@
 const {
   JSON: { parse: parseJSON, stringify: stringifyJSON },
   URL,
+  encodeURIComponent,
   String,
   Set,
 } = globalThis;
@@ -11,11 +12,13 @@ import { lstat as lstatAsync, mkdir as mkdirAsync } from "fs/promises";
 import { writeFileSync as writeFile, readFileSync as readFile } from "fs";
 import { createServer } from "net";
 import NetSocketMessaging from "net-socket-messaging";
+const { toAbsoluteUrl } = await import(`../../url/index.mjs${__search}`);
 const { extendConfigurationPort } = await import(
   `../../configuration-accessor/index.mjs${__search}`
 );
-const { makeSegment } = await import(`../../path/index.mjs${__search}`);
-const { appendURLSegment } = await import(`../../url/index.mjs${__search}`);
+const { sanitizePathFilename } = await import(
+  `../../path/index.mjs${__search}`
+);
 const { assert } = await import(`../../util/index.mjs${__search}`);
 const { logDebug, logInfo, logError } = await import(
   `../../log/index.mjs${__search}`
@@ -70,23 +73,25 @@ const createDirectoryAsync = async (directory) => {
 
 const store = (
   urls,
-  directory,
+  base,
   { head: { appmap_file: basename, "map-name": map_name }, body: trace },
 ) => {
   if (basename === null) {
     basename = map_name === null ? "anonymous" : map_name;
   }
-  basename = basename.replace(/[\t\n ]/gu, "");
-  let url = appendURLSegment(
-    directory,
-    makeSegment(`${basename}.appmap.json`, "-"),
+  basename = basename.replace(/\s+/gu, "-");
+  let url = toAbsoluteUrl(
+    encodeURIComponent(sanitizePathFilename(`${basename}.appmap.json`)),
+    base,
   );
   let counter = 0;
   while (urls.has(url)) {
     counter += 1;
-    url = appendURLSegment(
-      directory,
-      makeSegment(`${basename}-${String(counter)}.appmap.json`, "-"),
+    url = toAbsoluteUrl(
+      encodeURIComponent(
+        sanitizePathFilename(`${basename}-${String(counter)}.appmap.json`),
+      ),
+      base,
     );
   }
   urls.add(url);
@@ -113,8 +118,8 @@ export const openReceptorAsync = async ({
     recorder === "mocha" || recorder === "process",
     "invalid recorder for receptor-file",
   );
-  const recorder_directory = appendURLSegment(directory, recorder);
   await createDirectoryAsync(recorder_directory);
+  const base = toAbsoluteUrl(`${recorder}/`, directory);
   const server = createServer();
   const urls = new Set();
   server.on("connection", (socket) => {
@@ -148,7 +153,7 @@ export const openReceptorAsync = async ({
               });
             }
             for (const key of getBackendTraceIterator(backend)) {
-              store(urls, recorder_directory, takeBackendTrace(backend, key));
+              store(urls, base, takeBackendTrace(backend, key));
             }
           });
           socket.on("message", (content) => {
@@ -159,7 +164,7 @@ export const openReceptorAsync = async ({
             sendBackend(backend, message);
             if (message.type === "stop") {
               for (const key of getBackendTraceIterator(backend)) {
-                store(urls, recorder_directory, takeBackendTrace(backend, key));
+                store(urls, base, takeBackendTrace(backend, key));
               }
             }
           });

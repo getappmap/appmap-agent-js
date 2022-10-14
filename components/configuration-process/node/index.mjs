@@ -8,13 +8,16 @@ const {
 
 const { search: __search } = new URL(import.meta.url);
 
+import { readFileSync } from "node:fs";
+
 import minimist from "minimist";
-import { readFileSync } from "fs";
 import YAML from "yaml";
+
 const { hasOwnProperty, coalesce } = await import(
   `../../util/index.mjs${__search}`
 );
-const { urlifyPath, getLastURLSegment, appendURLSegment } = await import(
+const { getCwdUrl } = await import(`../../path/index.mjs${__search}`);
+const { toAbsoluteUrl, getUrlExtension, toDirectoryUrl } = await import(
   `../../url/index.mjs${__search}`
 );
 const { expect, expectSuccess } = await import(
@@ -27,18 +30,13 @@ const { createConfiguration, extendConfiguration } = await import(
 const { parse: parseYAML } = YAML;
 
 const parsers = new Map([
-  ["json", parseJSON],
-  ["yml", parseYAML],
-  ["yaml", parseYAML],
+  [".json", parseJSON],
+  [".yml", parseYAML],
+  [".yaml", parseYAML],
 ]);
 
-const getExtension = (url) => {
-  const parts = getLastURLSegment(url).split(".");
-  return parts.length === 1 ? "" : parts[parts.length - 1];
-};
-
 const loadConfigFile = (url) => {
-  const extension = getExtension(url);
+  const extension = getUrlExtension(url);
   expect(
     parsers.has(extension),
     "Unsupported configuration file extension: %j.",
@@ -134,23 +132,26 @@ const extractConfig = (argv) => {
   return config;
 };
 
-export const loadProcessConfiguration = ({ env, argv, cwd }) => {
-  const url = urlifyPath(
-    coalesce(env, "APPMAP_CONFIGURATION_PATH", "appmap.yml"),
-    urlifyPath(cwd(), "file:///"),
+export const loadProcessConfiguration = (process) => {
+  const cwd = getCwdUrl(process);
+  const url = toAbsoluteUrl(
+    coalesce(process.env, "APPMAP_CONFIGURATION_PATH", "appmap.yml"),
+    cwd,
   );
   return extendConfiguration(
     extendConfiguration(
       createConfiguration(
-        urlifyPath(
-          coalesce(env, "APPMAP_REPOSITORY_DIRECTORY", "."),
-          urlifyPath(cwd(), "file:///"),
+        toDirectoryUrl(
+          toAbsoluteUrl(
+            coalesce(process.env, "APPMAP_REPOSITORY_DIRECTORY", "."),
+            cwd,
+          ),
         ),
       ),
       loadConfigFile(url),
-      appendURLSegment(url, ".."),
+      url,
     ),
-    extractConfig(argv),
-    urlifyPath(cwd(), "file:///"),
+    extractConfig(process.argv),
+    cwd,
   );
 };

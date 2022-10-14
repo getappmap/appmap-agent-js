@@ -9,7 +9,6 @@ const {
 const { search: __search } = new URL(import.meta.url);
 
 const { expect } = await import(`../../expect/index.mjs${__search}`);
-const { appendURLSegment } = await import(`../../url/index.mjs${__search}`);
 const {
   mapMaybe,
   fromMaybe,
@@ -18,6 +17,9 @@ const {
   coalesce,
   incrementCounter,
 } = await import(`../../util/index.mjs${__search}`);
+const { toAbsoluteUrl, toDirectoryUrl } = await import(
+  `../../url/index.mjs${__search}`
+);
 const { mapSource } = await import(`../../source/index.mjs${__search}`);
 const { logGuardDebug } = await import(`../../log/index.mjs${__search}`);
 const { stringifyLocation, getLocationFileUrl } = await import(
@@ -634,9 +636,11 @@ const instrumenters = {
       return makeCallExpression(makeIdentifier(node.callee.name), [
         makeCallExpression(makeIdentifier(context.eval.hidden), [
           makeLiteral(
-            appendURLSegment(
-              fromMaybe(location, context.url, getLocationFileUrl),
+            toAbsoluteUrl(
               `eval-${String(incrementCounter(context.counter))}`,
+              toDirectoryUrl(
+                fromMaybe(location, context.url, getLocationFileUrl),
+              ),
             ),
           ),
           visitNode(node.arguments[0], node, parent, closure, context),

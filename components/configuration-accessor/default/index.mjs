@@ -8,11 +8,15 @@ const {
 
 const { search: __search } = new URL(import.meta.url);
 
-const { getShell } = await import(`../../path/index.mjs${__search}`);
+const { toAbsoluteUrl } = await import(`../../url/index.mjs${__search}`);
+const {
+  toDirectoryPath,
+  convertFileUrlToPath,
+  convertPathToFileUrl,
+  getShell,
+  toAbsolutePath,
+} = await import(`../../path/index.mjs${__search}`);
 const { assert, coalesce } = await import(`../../util/index.mjs${__search}`);
-const { pathifyURL, urlifyPath, appendURLSegmentArray } = await import(
-  `../../url/index.mjs${__search}`
-);
 const { expect, expectSuccess } = await import(
   `../../expect/index.mjs${__search}`
 );
@@ -73,10 +77,7 @@ export const resolveConfigurationRepository = (configuration) => {
   return extendConfiguration(
     configuration,
     {
-      agent: extractRepositoryDependency(directory, [
-        "@appland",
-        "appmap-agent-js",
-      ]),
+      agent: extractRepositoryDependency(directory, "@appland/appmap-agent-js"),
       repository: {
         directory,
         history: extractRepositoryHistory(directory),
@@ -145,14 +146,11 @@ export const extendConfigurationNode = (
   assert(argv.length >= 2, "expected at least two argv");
   const [, main] = argv;
   assert(version.startsWith("v"), "expected version to start with v");
-  return extendConfiguration(
-    configuration,
-    {
-      engine: `node@${version.substring(1)}`,
-      main,
-    },
-    urlifyPath(cwd(), configuration.repository.directory),
-  );
+  return {
+    ...configuration,
+    engine: `node@${version.substring(1)}`,
+    main: convertPathToFileUrl(toAbsolutePath(main, toDirectoryPath(cwd()))),
+  };
 };
 
 export const extendConfigurationPort = (configuration, ports) => {
@@ -192,6 +190,11 @@ export const getConfigurationScenarios = (configuration) => {
     );
 };
 
+const getLoaderUrl = (recorder) =>
+  recorder === "mocha"
+    ? "lib/node/mocha-loader.mjs"
+    : `lib/node/recorder-${recorder}.mjs`;
+
 export const compileConfigurationCommand = (configuration, env) => {
   assert(configuration.agent !== null, "missing agent in configuration");
   assert(configuration.command !== null, "missing command in configuration");
@@ -213,6 +216,7 @@ export const compileConfigurationCommand = (configuration, env) => {
     recursive && recorder === "mocha",
     "The mocha recorder cannot recursively record processes.",
   );
+  const escape = generateEscape(exec);
   if (recursive || recorder === "mocha") {
     if (recorder === "mocha") {
       const groups = splitMocha(command);
@@ -221,27 +225,19 @@ export const compileConfigurationCommand = (configuration, env) => {
         "Could not parse the command %j as a mocha command",
         tokens,
       );
-      command = `${groups.before} --require ${pathifyURL(
-        appendURLSegmentArray(directory, ["lib", "node", "recorder-mocha.mjs"]),
-        base,
-        true,
+      command = `${groups.before} --require ${escape(
+        convertFileUrlToPath(
+          toAbsoluteUrl("lib/node/recorder-mocha.mjs", directory),
+        ),
       )}${groups.after}`;
     }
     env = {
       ...env,
       NODE_OPTIONS: [
         coalesce(env, "NODE_OPTIONS", ""),
-        `--experimental-loader=${generateEscape(exec)(
-          pathifyURL(
-            appendURLSegmentArray(directory, [
-              "lib",
-              "node",
-              recorder === "mocha"
-                ? "mocha-loader.mjs"
-                : `recorder-${recorder}.mjs`,
-            ]),
-            base,
-            true,
+        `--experimental-loader=${escape(
+          convertFileUrlToPath(
+            toAbsoluteUrl(getLoaderUrl(recorder), directory),
           ),
         )}`,
       ].join(" "),
@@ -256,17 +252,9 @@ export const compileConfigurationCommand = (configuration, env) => {
       "Could not find node exectuable in command %j",
       command,
     );
-    command = `${parts.groups.before} --experimental-loader ${generateEscape(
-      exec,
-    )(
-      pathifyURL(
-        appendURLSegmentArray(directory, [
-          "lib",
-          "node",
-          `recorder-${recorder}.mjs`,
-        ]),
-        base,
-        true,
+    command = `${parts.groups.before} --experimental-loader ${escape(
+      convertFileUrlToPath(
+        toAbsoluteUrl(`lib/node/recorder-${recorder}.mjs`, directory),
       ),
     )}${parts.groups.after}`;
   }
