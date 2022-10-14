@@ -1,117 +1,208 @@
 import { assertEqual } from "../../__fixture__.mjs";
-import { platform as getPlatform } from "os";
+
 import {
-  pathifyURL,
-  urlifyPath,
-  removeLastURLSegment,
-  appendURLSegment,
-  appendURLSegmentArray,
-  getLastURLSegment,
-} from "./index.mjs?env=test";
+  toAbsoluteUrl,
+  toRelativeUrl,
+  toDirectoryUrl,
+  getUrlFilename,
+  getUrlBasename,
+  getUrlExtension,
+} from "./index.mjs?env=test.mjs";
 
-// removeLastURLSegment //
-assertEqual(
-  removeLastURLSegment("http://host/directory/filename"),
-  "http://host/directory",
-);
+////////////////////
+// getUrlFilename //
+////////////////////
 
-// pathifyURL //
-assertEqual(pathifyURL("http://host1/foo/bar", "http://host2/qux"), null);
+assertEqual(getUrlFilename("protocol://host/directory/#hash"), null);
+
+assertEqual(getUrlFilename("protocol://host#hash"), null);
+
 assertEqual(
-  pathifyURL("http://localhost/foo/bar/q%75x", "http://localhost/foo", true),
-  "./bar/qux",
-);
-assertEqual(
-  pathifyURL("http://localhost/foo//bar/qux/", "http://localhost//foo", false),
-  "bar/qux",
-);
-assertEqual(
-  pathifyURL("http://localhost/foo/bar", "http://localhost/foo/bar"),
-  ".",
-);
-assertEqual(
-  pathifyURL("http://localhost/foo/bar/qux", "http://localhost//foo/bar/buz"),
-  "../qux",
+  getUrlFilename("protocol://host/directory/filename#hash"),
+  "filename",
 );
 
-// pathifyURL UNC //
-// assertEqual(
-//   pathifyURL("file:////host/shared/foo/bar/qux", "file:////host/shared/foo"),
-//   "bar/qux",
-// );
-// assertEqual(
-//   pathifyURL(
-//     "file:////host1/shared/foo/bar/qux",
-//     "file:////host2/shared/foo",
-//   ),
-//   null,
-// );
-// assertEqual(
-//   pathifyURL(
-//     "file:////host/shared1/foo/bar/qux",
-//     "file:////host/shared2/foo",
-//   ),
-//   null,
-// );
+////////////////////
+// getUrlBasename //
+////////////////////
 
-// pathifyURL Windows Drive //
-assertEqual(pathifyURL("file:///C:/foo/bar/qux", "file:///C:/foo"), "bar/qux");
-assertEqual(pathifyURL("file:///C:/foo/bar/qux", "file:////D:/foo"), null);
+assertEqual(getUrlBasename("protocol://host/directory/#hash"), null);
 
-// appendURLSegment //
 assertEqual(
-  appendURLSegment("http://localhost/foo", "bar"),
-  "http://localhost/foo/bar",
-);
-assertEqual(
-  appendURLSegment("http://localhost/foo/", "bar"),
-  "http://localhost/foo/bar",
-);
-assertEqual(
-  appendURLSegment("http://localhost/foo", "bar qux"),
-  "http://localhost/foo/bar%20qux",
-);
-assertEqual(
-  appendURLSegment("http://localhost/foo", "."),
-  "http://localhost/foo/",
-);
-assertEqual(
-  appendURLSegment("http://localhost/foo/bar", ".."),
-  "http://localhost/foo/",
+  getUrlBasename("protocol://host/directory/filename#hash"),
+  "filename",
 );
 
-// appendURLSegmentArray
 assertEqual(
-  appendURLSegmentArray("http://localhost/foo", ["bar", "qux"]),
-  "http://localhost/foo/bar/qux",
+  getUrlBasename("protocol://host/directory/basename.extension#hash"),
+  "basename",
 );
 
-// getLastURLSegment
-assertEqual(getLastURLSegment("http://localhost/foo/bar%20qux"), "bar qux");
+/////////////////////
+// getUrlExtension //
+/////////////////////
 
-if (getPlatform() === "win32") {
-  assertEqual(
-    urlifyPath("foo\\bar", "file://host/qux"),
-    "file://host/qux/foo/bar",
-  );
-  assertEqual(urlifyPath("C:\\foo\\bar", "file:///qux"), "file:///C:/foo/bar");
-  // https://github.com/nodejs/node/issues/41371
-  // assertEqual(
-  //   urlifyPath("C:\\foo\\bar", "file://host/qux"),
-  //   "file://host/C:/foo/bar",
-  // );
-} else {
-  // urlifyPath //
-  assertEqual(
-    urlifyPath("foo/bar", "http://localhost/qux"),
-    "http://localhost/qux/foo/bar",
-  );
-  assertEqual(
-    urlifyPath("/foo/bar", "http://localhost/qux"),
-    "http://localhost/foo/bar",
-  );
-  assertEqual(
-    urlifyPath("/foo bar", "http://localhost/"),
-    "http://localhost/foo%20bar",
-  );
-}
+assertEqual(getUrlExtension("protocol://host/directory/#hash"), null);
+
+assertEqual(getUrlExtension("protocol://host/directory/filename#hash"), null);
+
+assertEqual(
+  getUrlExtension(
+    "protocol://host/directory/basename.extension1.extension2#hash",
+  ),
+  ".extension1.extension2",
+);
+
+////////////////////
+// toDirectoryUrl //
+////////////////////
+
+assertEqual(
+  toDirectoryUrl("protocol://host/directory/#hash"),
+  "protocol://host/directory/#hash",
+);
+
+assertEqual(
+  toDirectoryUrl("protocol://host/directory#hash"),
+  "protocol://host/directory/#hash",
+);
+
+/////////////////////////////
+// toRelativeUrl >> special //
+/////////////////////////////
+
+assertEqual(
+  toRelativeUrl(
+    "protocol1://host/directory/filename#hash",
+    "protocol2://host/directory/filename#hash",
+  ),
+  null,
+);
+
+assertEqual(
+  toRelativeUrl(
+    "protocol://host1/directory/filename#hash",
+    "protocol://host2/directory/filename#hash",
+  ),
+  null,
+);
+
+assertEqual(
+  toRelativeUrl(
+    "file://host/v:/directory/filename#hash",
+    "file://host/w:/directory/filename#hash",
+  ),
+  null,
+);
+
+assertEqual(
+  toRelativeUrl(
+    "file://host/W:/DIRECTORY/FILENAME#HASH",
+    "file://host/w:/directory/#hash",
+  ),
+  "filename#HASH",
+);
+
+assertEqual(
+  toRelativeUrl("file://host/directory/filename#hash", "file://host/#hash"),
+  "directory/filename#hash",
+);
+
+assertEqual(
+  toRelativeUrl(
+    "protocol://host/directory /filename1 #hash1",
+    "PROTOCOL://HOST/directory%20/filename2%20#hash2",
+  ),
+  "filename1%20#hash1",
+);
+
+///////////////////////////
+// toRelativeUrl >> basic //
+///////////////////////////
+
+const test = (url, base, relative, alternative_url = url) => {
+  assertEqual(toRelativeUrl(url, base), relative);
+  assertEqual(toAbsoluteUrl(relative, base), alternative_url);
+};
+
+// common directory //
+
+test(
+  "protocol://host/directory/filename1#hash1",
+  "protocol://host/directory/filename2#hash2",
+  "filename1#hash1",
+);
+
+test(
+  "protocol://host/directory/#hash1",
+  "protocol://host/directory/filename#hash2",
+  ".#hash1",
+);
+
+test(
+  "protocol://host/directory#hash1",
+  "protocol://host/directory/filename#hash2",
+  ".#hash1",
+  "protocol://host/directory/#hash1",
+);
+
+// child //
+
+test(
+  "protocol://host/directory1/directory2/filename1#hash1",
+  "protocol://host/directory1/filename2#hash2",
+  "directory2/filename1#hash1",
+);
+
+test(
+  "protocol://host/directory1/directory2/#hash1",
+  "protocol://host/directory1/filename#hash2",
+  "directory2/#hash1",
+);
+
+test(
+  "protocol://host/directory1/directory2#hash1",
+  "protocol://host/directory1/filename#hash2",
+  "directory2#hash1",
+);
+
+// parent //
+
+test(
+  "protocol://host/directory1/filename1#hash1",
+  "protocol://host/directory1/directory2/filename2#hash2",
+  "../filename1#hash1",
+);
+
+test(
+  "protocol://host/directory1/#hash1",
+  "protocol://host/directory1/directory2/filename#hash2",
+  "../#hash1",
+);
+
+test(
+  "protocol://host/directory1#hash1",
+  "protocol://host/directory1/directory2/filename#hash2",
+  "..#hash1",
+  "protocol://host/directory1/#hash1",
+);
+
+// sibling //
+
+test(
+  "protocol://host/directory1/directory2/filename1#hash1",
+  "protocol://host/directory1/directory3/filename2#hash2",
+  "../directory2/filename1#hash1",
+);
+
+test(
+  "protocol://host/directory1/directory2/#hash1",
+  "protocol://host/directory1/directory3/filename#hash2",
+  "../directory2/#hash1",
+);
+
+test(
+  "protocol://host/directory1/directory2#hash1",
+  "protocol://host/directory1/directory3/filename#hash2",
+  "../directory2#hash1",
+);
