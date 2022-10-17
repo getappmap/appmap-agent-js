@@ -103,7 +103,7 @@ export const resolveConfigurationAutomatedRecorder = (configuration) => {
               ? configuration.command.tokens.join(" ")
               : configuration.command.script,
           ) === null
-            ? "remote"
+            ? "process"
             : "mocha",
       },
       configuration.repository.directory,

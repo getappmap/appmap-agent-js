@@ -158,7 +158,7 @@ assertEqual(
     ),
     "recorder",
   ),
-  "remote",
+  "process",
 );
 
 ////////////////////////////
