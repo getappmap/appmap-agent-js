@@ -497,9 +497,35 @@ export const createConfiguration = (home) => ({
   language: "javascript",
   packages: [
     [
-      true,
+      {
+        base: toAbsoluteUrl(".", home),
+        source: "(^|/)node_modules/",
+        flags: "u",
+      },
       {
         enabled: false,
+        shallow: false,
+        exclude: [],
+        "inline-source": null,
+      },
+    ],
+    [
+      {
+        base: toAbsoluteUrl(".", home),
+        source: "^\\.\\./",
+        flags: "u",
+      },
+      {
+        enabled: false,
+        shallow: false,
+        exclude: [],
+        "inline-source": null,
+      },
+    ],
+    [
+      true,
+      {
+        enabled: true,
         shallow: false,
         exclude: [],
         "inline-source": null,

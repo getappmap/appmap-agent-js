@@ -202,7 +202,7 @@ assertEqual(
 assertDeepEqual(
   getConfigurationPackage(
     createConfiguration("file:///w:/home/"),
-    "http://host/file.txt",
+    "file:///w:/home/node_modules/dep.js",
   ),
   {
     enabled: false,
@@ -211,18 +211,33 @@ assertDeepEqual(
     "inline-source": null,
   },
 );
+
+assertDeepEqual(
+  getConfigurationPackage(
+    createConfiguration("file:///w:/home1/"),
+    "file:///w:/home2/main.js",
+  ),
+  {
+    enabled: false,
+    shallow: false,
+    exclude: [],
+    "inline-source": null,
+  },
+);
+
 assertDeepEqual(
   getConfigurationPackage(
     createConfiguration("file:///w:/home/"),
-    "file:///w:/directory/foo",
+    "file:///w:/home/main.js",
   ),
   {
-    enabled: false,
+    enabled: true,
     shallow: false,
     exclude: [],
     "inline-source": null,
   },
 );
+
 assertDeepEqual(
   getConfigurationPackage(
     extendConfiguration(

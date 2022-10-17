@@ -60,7 +60,7 @@ assertThrow(
     ].flat(),
     cwd: getTmpPath,
   });
-  assertEqual(packages.length, 3);
+  assertEqual(packages.length, 5);
   assertEqual(processes.length, 2);
   assertDeepEqual(
     { app_name, map_name, command, log, track_port },
