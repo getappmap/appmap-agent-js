@@ -535,12 +535,12 @@ export const createConfiguration = (home) => ({
   "anonymous-name-separator": ANONYMOUS_NAME_SEPARATOR,
   exclude: [
     {
-      combinator: "or",
-      name: `^[^${ANONYMOUS_NAME_SEPARATOR}]*$`,
-      "qualified-name": false,
-      "every-label": false,
-      "some-label": "^",
-      excluded: false,
+      combinator: "and",
+      name: ANONYMOUS_NAME_SEPARATOR,
+      "qualified-name": true,
+      "every-label": "^\\b$", // do not exclude when label is present
+      "some-label": true,
+      excluded: true,
       recursive: false,
     },
     {
@@ -549,7 +549,7 @@ export const createConfiguration = (home) => ({
       "qualified-name": true,
       "every-label": true,
       "some-label": true,
-      excluded: true,
+      excluded: false,
       recursive: false,
     },
   ],
