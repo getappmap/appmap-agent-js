@@ -243,10 +243,7 @@ const getSpecific = (serialization, object) => {
     const length = min(keys.length, serialization.maximum_properties_length);
     for (let index = 0; index < length; index += 1) {
       const key = keys[index];
-      entries.push([
-        key,
-        getConstructorName(serialization, getDataPropertyImpure(object, key)),
-      ]);
+      entries.push([key, getTagPure(getDataPropertyImpure(object, key))]);
     }
     return {
       type: "hash",
