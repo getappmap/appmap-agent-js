@@ -22,6 +22,7 @@ import {
 } from "./index.mjs?env=test";
 
 const {
+  URL,
   Reflect: { get },
 } = globalThis;
 
@@ -344,7 +345,7 @@ const testCompileCommand = ({
     {
       exec,
       argv,
-      cwd: base,
+      cwd: new URL(base).href,
       env: {
         NODE_OPTIONS:
           options === null
@@ -368,9 +369,8 @@ testCompileCommand({
   exec: "node",
   argv: ["main.js", "argv1"],
   base: "file:///w:/base/",
-  options: `--experimental-loader=${convertFileUrlToPath(
-    "file:///w:/base/agent/lib/node/recorder-process.mjs",
-  )}`,
+  options:
+    "--experimental-loader=file:///w:/base/agent/lib/node/recorder-process.mjs",
 });
 
 // node >> env >> source //
@@ -383,9 +383,8 @@ testCompileCommand({
   exec: "exec",
   argv: ["flag", "node main.js argv1"],
   base: "file:///w:/base/",
-  options: `--experimental-loader=${convertFileUrlToPath(
-    "file:///w:/base/agent/lib/node/recorder-process.mjs",
-  )}`,
+  options:
+    "--experimental-loader=file:///w:/base/agent/lib/node/recorder-process.mjs",
 });
 
 // node >> cli >> tokens //
@@ -461,12 +460,11 @@ testCompileCommand({
     "argv1",
   ],
   base: "file:///w:/base/",
-  options: `--experimental-loader=${convertFileUrlToPath(
-    "file:///w:/base/agent/lib/node/mocha-loader.mjs",
-  )}`,
+  options:
+    "--experimental-loader=file:///w:/base/agent/lib/node/mocha-loader.mjs",
 });
 
-// mocha >> source && resolve shell && spaces //
+// mocha >> source && resolve shell //
 testCompileCommand({
   recursive: true,
   recorder: "mocha",
@@ -482,10 +480,9 @@ testCompileCommand({
         : "/w:/\\ base\\ /agent/lib/node/recorder-mocha.mjs"
     } argv1`,
   ],
-  base: "file:///w:/%20base%20/",
-  options: `--experimental-loader="${convertFileUrlToPath(
-    "file:///w:/%20base%20/agent/lib/node/mocha-loader.mjs",
-  )}"`,
+  base: "file:///w:/ base /",
+  options:
+    "--experimental-loader=file:///w:/%20base%20/agent/lib/node/mocha-loader.mjs",
 });
 
 assertThrow(() => {
