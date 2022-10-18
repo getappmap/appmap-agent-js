@@ -328,7 +328,10 @@ const testCompileCommand = ({
             recorder,
             "command-options": {
               shell,
-              env: { VAR1: "VAL1", NODE_OPTIONS: "--node-key=node-value" },
+              env: {
+                VAR1: "VAL1",
+                NODE_OPTIONS: "--node-key=node-value",
+              },
             },
           },
           base,
@@ -376,8 +379,8 @@ testCompileCommand({
   recorder: "process",
   directory: "agent",
   command: "node main.js argv1",
-  shell: ["shell", "flag"],
-  exec: "shell",
+  shell: ["exec", "flag"],
+  exec: "exec",
   argv: ["flag", "node main.js argv1"],
   base: "file:///w:/base/",
   options: `--experimental-loader=${convertFileUrlToPath(
@@ -401,19 +404,43 @@ testCompileCommand({
   base: "file:///w:/base/",
 });
 
-// node >> cli >> source //
+// node >> cli >> source >> posix //
 testCompileCommand({
   recursive: false,
   recorder: "process",
   directory: "agent",
   command: "node main.js argv1",
-  shell: ["shell", "flag"],
-  exec: "shell",
+  shell: ["/bin/sh", "-c"],
+  exec: "/bin/sh",
   argv: [
-    "flag",
-    `node --experimental-loader=${convertFileUrlToPath(
-      "file:///w:/base/agent/lib/node/recorder-process.mjs",
-    )} main.js argv1`,
+    "-c",
+    `node --experimental-loader=${
+      // explicit platform specific because of shell escape
+      getPlatform() === "win32"
+        ? "w:\\\\base\\\\agent\\\\lib\\\\node\\\\recorder-process.mjs"
+        : "/w:/base/agent/lib/node/recorder-process.mjs"
+    } main.js argv1`,
+  ],
+  base: "file:///w:/base/",
+});
+
+// node >> cli >> source >> win32 //
+// Enable in posix for coverage
+testCompileCommand({
+  recursive: false,
+  recorder: "process",
+  directory: "agent",
+  command: "node main.js argv1",
+  shell: ["cmd.exe", "/c"],
+  exec: "cmd.exe",
+  argv: [
+    "/c",
+    `node --experimental-loader=${
+      // explicit platform specific because of shell escape
+      getPlatform() === "win32"
+        ? "w:\\base\\agent\\lib\\node\\recorder-process.mjs"
+        : "/w:/base/agent/lib/node/recorder-process.mjs"
+    } main.js argv1`,
   ],
   base: "file:///w:/base/",
 });
@@ -439,18 +466,21 @@ testCompileCommand({
   )}`,
 });
 
-// mocha >> source //
+// mocha >> source && resolve shell && spaces //
 testCompileCommand({
   recursive: true,
   recorder: "mocha",
   directory: "agent",
   command: "npx mocha argv1",
-  exec: getPlatform() === "win32" ? "cmd.ex" : "/bin/sh",
+  exec: getPlatform() === "win32" ? "cmd.exe" : "/bin/sh",
   argv: [
-    getPlatform() === "win32" ? "\\c" : "-c",
-    `npx mocha --require ${convertFileUrlToPath(
-      "file:///w:/%20base%20/agent/lib/node/recorder-mocha.mjs",
-    ).replace(/ /gu, "\\ ")} argv1`,
+    getPlatform() === "win32" ? "/c" : "-c",
+    `npx mocha --require ${
+      // explicit platform specific because of shell escape
+      getPlatform() === "win32"
+        ? "w:\\^ base^ \\agent\\lib\\node\\recorder-mocha.mjs"
+        : "/w:/\\ base\\ /agent/lib/node/recorder-mocha.mjs"
+    } argv1`,
   ],
   base: "file:///w:/%20base%20/",
   options: `--experimental-loader="${convertFileUrlToPath(

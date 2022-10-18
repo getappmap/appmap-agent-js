@@ -44,21 +44,18 @@ const getSpecifierValue = (pairs, key) => {
   /* c8 ignore stop */
 };
 
-const escapePosix = (token) => token.replace(/[^a-zA-Z0-9\-_./:@]/gu, "\\$&");
+const escapePosix = (token) => token.replace(/[^a-zA-Z0-9\-_./:]/gu, "\\$&");
 
-/* c8 ignore start */
-const escapeWin32 = (token) => token.replace(/[^a-zA-Z0-9\-_./:@\\]/gu, "^$&");
-/* c8 ignore stop */
+// https://ss64.com/nt/syntax-esc.html
+const escapeWin32 = (token) => token.replace(/[^a-zA-Z0-9\-_./:\\]/gu, "^$&");
 
 const resolveShell = (maybe_shell, env) =>
   maybe_shell === null ? getShell(env) : maybe_shell;
 
 const escapeShell = ([exec], token) =>
   exec.endsWith("cmd") || exec.endsWith("cmd.exe")
-    ? /* c8 ignore start */
-      escapeWin32(token)
+    ? escapeWin32(token)
     : escapePosix(token);
-/* c8 ignore stop */
 
 const mocha_regexp_array = [
   /^(?<before>mocha)(?<after>($|\s[\s\S]*$))/u,
@@ -252,7 +249,9 @@ export const getConfigurationScenarios = (configuration) => {
 };
 
 // NODE_OPTIONS format is not platform-specific
-// It is also not well documented
+// It is also not well documented but it seems it uses backslash for escaping.
+// - https://github.com/nodejs/node/issues/12971
+// - https://github.com/nodejs/node/commit/2eb627301c1f6681ec51f43b84e37f3908514853
 // - https://nodejs.org/api/cli.html#node_optionsoptions
 // - https://github.com/nodejs/node/blob/80270994d6ba6019a6a74adc1b97a0cc1bd343ed/src/node_options.cc
 const escapeNodeOption = (token) =>
