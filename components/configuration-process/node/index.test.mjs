@@ -75,7 +75,6 @@ assertThrow(
       command: {
         source: null,
         tokens: ["exec", "arg1", "arg2"],
-        base: getTmpUrl(),
       },
     },
   );
@@ -98,6 +97,5 @@ assertDeepEqual(
   {
     source: "exec arg1 arg2",
     tokens: null,
-    base: getTmpUrl(),
   },
 );

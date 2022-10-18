@@ -396,6 +396,7 @@
       nullable: true
       items: { type: string }
       minItems: 1
+    cwd: { $ref: path }
     encoding: { $ref: encoding }
     env: { $ref: env }
     stdio: { $ref: stdio }
@@ -408,7 +409,7 @@
   allOf:
     - $ref: command-options
     - type: object
-      required: [shell, encoding, env, stdio, timeout, killSignal]
+      required: [shell, cwd, encoding, env, stdio, timeout, killSignal]
 
 #################
 # Configuration #
@@ -585,7 +586,6 @@
         source:
           type: string
           nullable: true
-        base: { $ref: url }
     command-options: { $ref: cooked-command-options }
     validate:
       type: object

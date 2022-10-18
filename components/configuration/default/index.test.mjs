@@ -125,8 +125,13 @@ assertDeepEqual(
 
 // command-options //
 assertDeepEqual(
-  extend("command-options", { env: { FOO: "BAR" }, timeout: 123 }),
+  extend(
+    "command-options",
+    { env: { FOO: "BAR" }, timeout: 123 },
+    "file:///w:/base/conf.yml",
+  ),
   {
+    cwd: "file:///w:/base/",
     shell: null,
     encoding: "utf8",
     env: { FOO: "BAR" },
@@ -135,6 +140,16 @@ assertDeepEqual(
     killSignal: "SIGTERM",
   },
 );
+
+assertDeepEqual(extend("command-options", { cwd: "cwd" }, "file:///w:/base/"), {
+  cwd: "file:///w:/base/cwd/",
+  shell: null,
+  encoding: "utf8",
+  env: {},
+  stdio: "inherit",
+  timeout: 0,
+  killSignal: "SIGTERM",
+});
 
 // main //
 
@@ -226,16 +241,14 @@ assertDeepEqual(
 
 // command //
 
-assertDeepEqual(extend("command", ["token1", "token2"], "file:///w:/base/"), {
+assertDeepEqual(extend("command", ["token1", "token2"]), {
   tokens: ["token1", "token2"],
   source: null,
-  base: "file:///w:/base/",
 });
 
-assertDeepEqual(extend("command", "source", "file:///w:/base/"), {
+assertDeepEqual(extend("command", "source"), {
   tokens: null,
   source: "source",
-  base: "file:///w:/base/",
 });
 
 // appmap_dir //

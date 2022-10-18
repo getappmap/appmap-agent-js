@@ -403,7 +403,6 @@ export const compileConfigurationCommand = (configuration, env) => {
   const {
     recorder,
     "recursive-process-recording": recursive,
-    command: { base },
     "command-options": options,
   } = configuration;
   env = {
@@ -421,7 +420,6 @@ export const compileConfigurationCommand = (configuration, env) => {
     argv,
     options: {
       ...options,
-      cwd: base,
       env: compileEnvironment(configuration, env),
     },
   };

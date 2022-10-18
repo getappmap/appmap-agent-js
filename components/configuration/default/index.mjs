@@ -78,6 +78,19 @@ const normalizeExclusion = (exclusion, _base) => {
   };
 };
 
+const normalizeCommandOptions = (options, base) => ({
+  shell: null,
+  encoding: "utf8",
+  env: {},
+  stdio: "inherit",
+  timeout: 0,
+  killSignal: "SIGTERM",
+  ...options,
+  cwd: hasOwnProperty(options, "cwd")
+    ? toDirectoryUrl(toAbsoluteUrl(options.cwd, base))
+    : toAbsoluteUrl(".", base),
+});
+
 const normalizeHooks = (hooks, _base) => {
   if (hasOwnProperty(hooks, "eval")) {
     hooks.eval =
@@ -118,8 +131,7 @@ const normalizeDirectoryUrl = (url, base) =>
 const normalizeExclude = (exclusions, _base) =>
   exclusions.map(normalizeExclusion);
 
-const normalizeCommand = (command, base) => ({
-  base,
+const normalizeCommand = (command, _base) => ({
   source: typeof command === "string" ? command : null,
   tokens: typeof command === "string" ? null : command,
 });
@@ -272,7 +284,7 @@ const fields = {
   },
   "command-options": {
     extend: extendCommandOptions,
-    normalize: identity,
+    normalize: normalizeCommandOptions,
   },
   validate: {
     extend: assign,
@@ -423,6 +435,7 @@ export const createConfiguration = (home) => ({
   "recursive-process-recording": true,
   command: null,
   "command-options": {
+    cwd: toAbsoluteUrl(".", home),
     shell: null,
     encoding: "utf8",
     env: {},
