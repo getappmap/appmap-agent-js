@@ -51,8 +51,8 @@ const configuration = createConfiguration("file:///w:/home");
       {
         scenario: "^",
         scenarios: {
-          key1: { command: ["sleep"], "command-options": { shell: ["shell"] } },
-          key2: { command: ["sleep"], "command-options": { shell: ["shell"] } },
+          key1: { command: "sleep", "command-options": { shell: ["shell"] } },
+          key2: { command: "sleep", "command-options": { shell: ["shell"] } },
         },
       },
       "file:///w:/base",
@@ -73,7 +73,7 @@ const configuration = createConfiguration("file:///w:/home");
         scenario: "^",
         scenarios: {
           key: {
-            command: ["success"],
+            command: "success",
             "command-options": { shell: ["shell"] },
           },
         },
@@ -96,11 +96,11 @@ const configuration = createConfiguration("file:///w:/home");
         scenario: "^",
         scenarios: {
           key1: {
-            command: ["success"],
+            command: "success",
             "command-options": { shell: ["shell"] },
           },
           key2: {
-            command: ["failure"],
+            command: "failure",
             "command-options": { shell: ["shell"] },
           },
         },

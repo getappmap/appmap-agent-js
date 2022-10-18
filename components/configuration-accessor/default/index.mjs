@@ -20,7 +20,9 @@ const { assert, coalesce } = await import(`../../util/index.mjs${__search}`);
 const { expect, expectSuccess } = await import(
   `../../expect/index.mjs${__search}`
 );
-const { logGuardWarning } = await import(`../../log/index.mjs${__search}`);
+const { logGuardWarning, logWarning } = await import(
+  `../../log/index.mjs${__search}`
+);
 const {
   extractRepositoryDependency,
   extractRepositoryHistory,
@@ -42,33 +44,89 @@ const getSpecifierValue = (pairs, key) => {
   /* c8 ignore stop */
 };
 
-const escapeShell = (token) => token.replace(/[^a-zA-Z0-9\-_./:@]/gu, "\\$&");
+const escapePosix = (token) => token.replace(/[^a-zA-Z0-9\-_./:@]/gu, "\\$&");
 
 /* c8 ignore start */
-const escapeCmdExe = (token) => token.replace(/[^a-zA-Z0-9\-_./:@\\]/gu, "^$&");
-const generateEscape = (shell) =>
-  shell.endsWith("cmd") || shell.endsWith("cmd.exe")
-    ? escapeCmdExe
-    : escapeShell;
+const escapeWin32 = (token) => token.replace(/[^a-zA-Z0-9\-_./:@\\]/gu, "^$&");
 /* c8 ignore stop */
 
-const generateCommand = (shell, tokens) =>
-  tokens.map(generateEscape(shell)).join(" ");
+const resolveShell = (maybe_shell, env) =>
+  maybe_shell === null ? getShell(env) : maybe_shell;
 
-const mocha_regexps = [
+const escapeShell = ([exec], token) =>
+  exec.endsWith("cmd") || exec.endsWith("cmd.exe")
+    ? /* c8 ignore start */
+      escapeWin32(token)
+    : escapePosix(token);
+/* c8 ignore stop */
+
+const mocha_regexp_array = [
   /^(?<before>mocha)(?<after>($|\s[\s\S]*$))/u,
   /^(?<before>npx\s+mocha)(?<after>($|\s[\s\S]*$))/u,
   /^(?<before>npm\s+exec\s+mocha)(?<after>($|\s[\s\S]*$))/u,
 ];
 
-const splitMocha = (command) => {
-  for (const regexp of mocha_regexps) {
-    const result = regexp.exec(command);
+const parseMochaCommand = (source) => {
+  for (const regexp of mocha_regexp_array) {
+    const result = regexp.exec(source);
     if (result !== null) {
       return result.groups;
     }
   }
-  return null;
+  return expect(false, "Could not parse %j as a mocha command", source);
+};
+
+const mocha_prefix_array = [
+  ["mocha"],
+  ["npx", "mocha"],
+  ["npm", "exec", "mocha"],
+];
+
+const isPrefixArray = (prefix, array) => {
+  const { length } = prefix;
+  if (length > array.length) {
+    return false;
+  } else {
+    for (let index = 0; index < length; index += 1) {
+      if (prefix[index] !== array[index]) {
+        return false;
+      }
+    }
+    return true;
+  }
+};
+
+const splitMochaCommand = (tokens) => {
+  for (const prefix of mocha_prefix_array) {
+    if (isPrefixArray(prefix, tokens)) {
+      return {
+        before: prefix,
+        after: tokens.slice(prefix.length),
+      };
+    }
+  }
+  return expect(false, "Could not recognize %j as a mocha command", tokens);
+};
+
+const parseNodeCommand = (source) => {
+  const result =
+    /^(?<before>\s*\S*node(.[a-zA-Z]+)?)(?<after>($|\s[\s\S]*$))$/u.exec(
+      source,
+    );
+  expect(result !== null, "Could not parse %j as a node command", source);
+  return result.groups;
+};
+
+const splitNodeCommand = (tokens) => {
+  expect(
+    tokens.length > 0 && tokens[0].startsWith("node"),
+    "Could not recognize %j as a node command",
+    tokens,
+  );
+  return {
+    before: tokens.slice(0, 1),
+    after: tokens.slice(1),
+  };
 };
 
 export const resolveConfigurationRepository = (configuration) => {
@@ -97,14 +155,17 @@ export const resolveConfigurationAutomatedRecorder = (configuration) => {
     configuration = extendConfiguration(
       configuration,
       {
-        recorder:
-          splitMocha(
-            configuration.command.script === null
-              ? configuration.command.tokens.join(" ")
-              : configuration.command.script,
-          ) === null
-            ? "process"
-            : "mocha",
+        recorder: (
+          configuration.command.tokens === null
+            ? mocha_regexp_array.some((regexp) =>
+                regexp.test(configuration.command.source),
+              )
+            : mocha_prefix_array.some((prefix) =>
+                isPrefixArray(prefix, configuration.command.tokens),
+              )
+        )
+          ? "mocha"
+          : "process",
       },
       configuration.repository.directory,
     );
@@ -190,81 +251,178 @@ export const getConfigurationScenarios = (configuration) => {
     );
 };
 
-const getLoaderUrl = (recorder) =>
-  recorder === "mocha"
-    ? "lib/node/mocha-loader.mjs"
-    : `lib/node/recorder-${recorder}.mjs`;
+// NODE_OPTIONS format is not platform-specific
+// It is also not well documented
+// - https://nodejs.org/api/cli.html#node_optionsoptions
+// - https://github.com/nodejs/node/blob/80270994d6ba6019a6a74adc1b97a0cc1bd343ed/src/node_options.cc
+const escapeNodeOption = (token) =>
+  token.includes(" ") ? `"${token.replace(/"/u, '\\"')}"` : token;
+
+const compilers = {
+  mocha: {
+    cli: {
+      compileCommand: (
+        {
+          command: { source, tokens },
+          "command-options": { shell },
+          agent: { directory },
+        },
+        env,
+      ) => {
+        if (tokens === null) {
+          const groups = parseMochaCommand(source);
+          expect(
+            groups !== null,
+            "Could not parse the command %j as a mocha command",
+            tokens,
+          );
+          const resolved_shell = resolveShell(shell, env);
+          return [
+            ...resolved_shell,
+            `${groups.before} --require ${escapeShell(
+              resolved_shell,
+              convertFileUrlToPath(
+                toAbsoluteUrl("lib/node/recorder-mocha.mjs", directory),
+              ),
+            )}${groups.after}`,
+          ];
+        } else {
+          const { before, after } = splitMochaCommand(tokens);
+          return [
+            ...before,
+            "--require",
+            convertFileUrlToPath(
+              toAbsoluteUrl("lib/node/recorder-mocha.mjs", directory),
+            ),
+            ...after,
+          ];
+        }
+      },
+      compileEnvironment: ({ agent: { directory } }, env) => ({
+        ...env,
+        NODE_OPTIONS: `${coalesce(
+          env,
+          "NODE_OPTIONS",
+          "",
+        )} --experimental-loader=${escapeNodeOption(
+          convertFileUrlToPath(
+            toAbsoluteUrl("lib/node/mocha-loader.mjs", directory),
+          ),
+        )}`,
+      }),
+    },
+    env: {
+      compileCommand: (configuration, env) => {
+        logWarning(
+          "Cannot recursively record mocha processes: %j",
+          configuration.command,
+        );
+        return compilers.mocha.cli.compileCommand(configuration, env);
+      },
+      compileEnvironment: (configuration, env) =>
+        compilers.mocha.cli.compileEnvironment(configuration, env),
+    },
+  },
+  node: {
+    cli: {
+      compileCommand: (
+        {
+          recorder,
+          agent: { directory },
+          command: { source, tokens },
+          "command-options": { shell },
+        },
+        env,
+      ) => {
+        if (tokens === null) {
+          const groups = parseNodeCommand(source);
+          expect(
+            groups !== null,
+            "Could not find node exectuable in command %j",
+            source,
+          );
+          const resolved_shell = resolveShell(shell, env);
+          return [
+            ...resolved_shell,
+            `${groups.before} --experimental-loader=${escapeShell(
+              resolved_shell,
+              convertFileUrlToPath(
+                toAbsoluteUrl(`lib/node/recorder-${recorder}.mjs`, directory),
+              ),
+            )}${groups.after}`,
+          ];
+        } else {
+          const { before, after } = splitNodeCommand(tokens);
+          return [
+            ...before,
+            "--experimental-loader",
+            convertFileUrlToPath(
+              toAbsoluteUrl(`lib/node/recorder-${recorder}.mjs`, directory),
+            ),
+            ...after,
+          ];
+        }
+      },
+      compileEnvironment: (_configuration, env) => env,
+    },
+    env: {
+      compileCommand: (
+        { command: { source, tokens }, "command-options": { shell } },
+        env,
+      ) => {
+        if (tokens === null) {
+          return [...resolveShell(shell, env), source];
+        } else {
+          logGuardWarning(
+            shell !== null,
+            "There is no need to provide a shell if the command is already parsed: %j",
+            tokens,
+          );
+          return tokens;
+        }
+      },
+      compileEnvironment: ({ agent: { directory }, recorder }, env) => ({
+        ...env,
+        NODE_OPTIONS: `${coalesce(
+          env,
+          "NODE_OPTIONS",
+          "",
+        )} --experimental-loader=${escapeNodeOption(
+          convertFileUrlToPath(
+            toAbsoluteUrl(`lib/node/recorder-${recorder}.mjs`, directory),
+          ),
+        )}`,
+      }),
+    },
+  },
+};
 
 export const compileConfigurationCommand = (configuration, env) => {
   assert(configuration.agent !== null, "missing agent in configuration");
   assert(configuration.command !== null, "missing command in configuration");
   const {
-    command: { base, script, tokens },
     recorder,
-    "command-options": { shell, ...options },
     "recursive-process-recording": recursive,
-    agent: { directory },
+    command: { base },
+    "command-options": options,
   } = configuration;
   env = {
     ...env,
     ...options.env,
     APPMAP_CONFIGURATION: stringifyJSON(configuration),
   };
-  const [exec, ...flags] = shell === null ? getShell(env) : shell;
-  let command = script === null ? generateCommand(exec, tokens) : script;
-  logGuardWarning(
-    recursive && recorder === "mocha",
-    "The mocha recorder cannot recursively record processes.",
-  );
-  const escape = generateEscape(exec);
-  if (recursive || recorder === "mocha") {
-    if (recorder === "mocha") {
-      const groups = splitMocha(command);
-      expect(
-        groups !== null,
-        "Could not parse the command %j as a mocha command",
-        tokens,
-      );
-      command = `${groups.before} --require ${escape(
-        convertFileUrlToPath(
-          toAbsoluteUrl("lib/node/recorder-mocha.mjs", directory),
-        ),
-      )}${groups.after}`;
-    }
-    env = {
-      ...env,
-      NODE_OPTIONS: [
-        coalesce(env, "NODE_OPTIONS", ""),
-        `--experimental-loader=${escape(
-          convertFileUrlToPath(
-            toAbsoluteUrl(getLoaderUrl(recorder), directory),
-          ),
-        )}`,
-      ].join(" "),
-    };
-  } else {
-    const parts =
-      /^(?<before>\s*\S*node(.[a-zA-Z]+)?)(?<after>($|\s[\s\S]*$))$/u.exec(
-        command,
-      );
-    expect(
-      parts !== null,
-      "Could not find node exectuable in command %j",
-      command,
-    );
-    command = `${parts.groups.before} --experimental-loader ${escape(
-      convertFileUrlToPath(
-        toAbsoluteUrl(`lib/node/recorder-${recorder}.mjs`, directory),
-      ),
-    )}${parts.groups.after}`;
-  }
+  const { compileCommand, compileEnvironment } =
+    compilers[recorder === "mocha" ? "mocha" : "node"][
+      recursive ? "env" : "cli"
+    ];
+  const [exec, ...argv] = compileCommand(configuration, env);
   return {
     exec,
-    argv: [...flags, command],
+    argv,
     options: {
       ...options,
       cwd: base,
-      env,
+      env: compileEnvironment(configuration, env),
     },
   };
 };

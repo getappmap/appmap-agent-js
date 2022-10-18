@@ -120,7 +120,7 @@ const normalizeExclude = (exclusions, _base) =>
 
 const normalizeCommand = (command, base) => ({
   base,
-  script: typeof command === "string" ? command : null,
+  source: typeof command === "string" ? command : null,
   tokens: typeof command === "string" ? null : command,
 });
 

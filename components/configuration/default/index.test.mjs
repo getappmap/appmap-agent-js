@@ -228,13 +228,13 @@ assertDeepEqual(
 
 assertDeepEqual(extend("command", ["token1", "token2"], "file:///w:/base/"), {
   tokens: ["token1", "token2"],
-  script: null,
+  source: null,
   base: "file:///w:/base/",
 });
 
-assertDeepEqual(extend("command", "script", "file:///w:/base/"), {
+assertDeepEqual(extend("command", "source", "file:///w:/base/"), {
   tokens: null,
-  script: "script",
+  source: "source",
   base: "file:///w:/base/",
 });
 

@@ -582,7 +582,7 @@
           type: array
           nullable: true
           items: { type: string }
-        script:
+        source:
           type: string
           nullable: true
         base: { $ref: url }

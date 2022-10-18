@@ -1,5 +1,4 @@
 import { platform as getPlatform } from "node:os";
-
 import {
   assertDeepEqual,
   assertEqual,
@@ -299,142 +298,178 @@ const stripEnvironmentConfiguration = ({
   },
 }) => ({ exec, argv, cwd, env });
 
-// recursive-process-recording: true //
-assertDeepEqual(
-  stripEnvironmentConfiguration(
-    compileConfigurationCommand(
-      extendConfiguration(
-        createConfiguration("file:///w:/home/"),
-        {
-          agent: {
-            directory: "agent",
-            package: {
-              name: "@appmap-agent-js",
-              version: "1.2.3",
-              homepage: null,
+const testCompileCommand = ({
+  base = "file:///w:/base/",
+  directory = "agent",
+  recursive = true,
+  command = "command",
+  recorder = "process",
+  exec = "exec",
+  argv = ["argv"],
+  shell = null,
+  options = null,
+}) => {
+  assertDeepEqual(
+    stripEnvironmentConfiguration(
+      compileConfigurationCommand(
+        extendConfiguration(
+          createConfiguration("file:///w:/home/"),
+          {
+            agent: {
+              directory,
+              package: {
+                name: "@appmap-agent-js",
+                version: "1.2.3",
+                homepage: null,
+              },
+            },
+            "recursive-process-recording": recursive,
+            command,
+            recorder,
+            "command-options": {
+              shell,
+              env: { VAR1: "VAL1", NODE_OPTIONS: "--node-key=node-value" },
             },
           },
-          "recursive-process-recording": true,
-          command: "command",
-          recorder: "process",
-          "command-options": {
-            env: { VAR1: "VAL1", NODE_OPTIONS: "--node-key=node-value" },
-          },
+          base,
+        ),
+        {
+          VAR2: "VAL2",
         },
-        "file:///w:/base/",
       ),
-      {
+    ),
+    {
+      exec,
+      argv,
+      cwd: base,
+      env: {
+        NODE_OPTIONS:
+          options === null
+            ? "--node-key=node-value"
+            : `${"--node-key=node-value"} ${options}`,
+        VAR1: "VAL1",
         VAR2: "VAL2",
       },
-    ),
-  ),
-  {
-    exec: getPlatform() === "win32" ? "cmd.exe" : "/bin/sh",
-    argv: getPlatform() === "win32" ? ["/c", "command"] : ["-c", "command"],
-    cwd: "file:///w:/base/",
-    env: {
-      NODE_OPTIONS: [
-        "--node-key=node-value",
-        `--experimental-loader=${convertFileUrlToPath(
-          "file:///w:/base/agent/lib/node/recorder-process.mjs",
-        )}`,
-      ].join(" "),
-      VAR1: "VAL1",
-      VAR2: "VAL2",
     },
-  },
-);
+  );
+};
 
-// recursive-process-recording: false //
-assertDeepEqual(
-  stripEnvironmentConfiguration(
-    compileConfigurationCommand(
-      extendConfiguration(
-        createConfiguration("file:///w:/home/"),
-        {
-          agent: {
-            directory: "agent",
-            package: {
-              name: "@appmap-agent-js",
-              version: "1.2.3",
-              homepage: null,
-            },
-          },
-          "recursive-process-recording": false,
-          command: ["node", "main.js", "argv1"],
-          "command-options": {
-            shell: ["/bin/sh", "-c"],
-          },
-          recorder: "process",
-        },
-        "file:///w:/base/",
-      ),
-      {},
-    ),
-  ),
-  {
-    exec: "/bin/sh",
-    argv: [
-      "-c",
-      `node --experimental-loader ${convertFileUrlToPath(
-        "file:///w:/base/agent/lib/node/recorder-process.mjs",
-      )} main.js argv1`,
-    ],
-    cwd: "file:///w:/base/",
-    env: {},
-  },
-);
+// node //
+
+// node >> env >> tokens //
+testCompileCommand({
+  recursive: true,
+  recorder: "process",
+  directory: "agent",
+  command: ["node", "main.js", "argv1"],
+  exec: "node",
+  argv: ["main.js", "argv1"],
+  base: "file:///w:/base/",
+  options: `--experimental-loader=${convertFileUrlToPath(
+    "file:///w:/base/agent/lib/node/recorder-process.mjs",
+  )}`,
+});
+
+// node >> env >> source //
+testCompileCommand({
+  recursive: true,
+  recorder: "process",
+  directory: "agent",
+  command: "node main.js argv1",
+  shell: ["shell", "flag"],
+  exec: "shell",
+  argv: ["flag", "node main.js argv1"],
+  base: "file:///w:/base/",
+  options: `--experimental-loader=${convertFileUrlToPath(
+    "file:///w:/base/agent/lib/node/recorder-process.mjs",
+  )}`,
+});
+
+// node >> cli >> tokens //
+testCompileCommand({
+  recursive: false,
+  recorder: "process",
+  directory: "agent",
+  command: ["node", "main.js", "argv1"],
+  exec: "node",
+  argv: [
+    "--experimental-loader",
+    convertFileUrlToPath("file:///w:/base/agent/lib/node/recorder-process.mjs"),
+    "main.js",
+    "argv1",
+  ],
+  base: "file:///w:/base/",
+});
+
+// node >> cli >> source //
+testCompileCommand({
+  recursive: false,
+  recorder: "process",
+  directory: "agent",
+  command: "node main.js argv1",
+  shell: ["shell", "flag"],
+  exec: "shell",
+  argv: [
+    "flag",
+    `node --experimental-loader=${convertFileUrlToPath(
+      "file:///w:/base/agent/lib/node/recorder-process.mjs",
+    )} main.js argv1`,
+  ],
+  base: "file:///w:/base/",
+});
 
 // mocha //
-{
-  const testMocha = (command) => {
-    assertDeepEqual(
-      stripEnvironmentConfiguration(
-        compileConfigurationCommand(
-          extendConfiguration(
-            createConfiguration("file:///w:/home/"),
-            {
-              agent: {
-                directory: "agent",
-                package: {
-                  name: "@appmap-agent-js",
-                  version: "1.2.3",
-                  homepage: null,
-                },
-              },
-              command,
-              "command-options": {
-                shell: ["/bin/sh", "-c"],
-              },
-              recorder: "mocha",
-            },
-            "file:///w:/base/",
-          ),
-          {},
-        ),
-      ),
-      {
-        exec: "/bin/sh",
-        argv: [
-          "-c",
-          `${command} --require ${convertFileUrlToPath(
-            "file:///w:/base/agent/lib/node/recorder-mocha.mjs",
-          )}`,
-        ],
-        cwd: "file:///w:/base/",
-        env: {
-          NODE_OPTIONS: [
-            "",
-            `--experimental-loader=${convertFileUrlToPath(
-              "file:///w:/base/agent/lib/node/mocha-loader.mjs",
-            )}`,
-          ].join(" "),
-        },
-      },
-    );
-  };
-  testMocha("mocha");
-  testMocha("npx mocha");
-  testMocha("npm exec mocha");
-  assertThrow(() => testMocha("foo"), /^AppmapError/u);
-}
+
+// mocha >> tokens //
+testCompileCommand({
+  recursive: true,
+  recorder: "mocha",
+  directory: "agent",
+  command: ["npx", "mocha", "argv1"],
+  exec: "npx",
+  argv: [
+    "mocha",
+    "--require",
+    convertFileUrlToPath("file:///w:/base/agent/lib/node/recorder-mocha.mjs"),
+    "argv1",
+  ],
+  base: "file:///w:/base/",
+  options: `--experimental-loader=${convertFileUrlToPath(
+    "file:///w:/base/agent/lib/node/mocha-loader.mjs",
+  )}`,
+});
+
+// mocha >> source //
+testCompileCommand({
+  recursive: true,
+  recorder: "mocha",
+  directory: "agent",
+  command: "npx mocha argv1",
+  exec: getPlatform() === "win32" ? "cmd.ex" : "/bin/sh",
+  argv: [
+    getPlatform() === "win32" ? "\\c" : "-c",
+    `npx mocha --require ${convertFileUrlToPath(
+      "file:///w:/%20base%20/agent/lib/node/recorder-mocha.mjs",
+    ).replace(/ /gu, "\\ ")} argv1`,
+  ],
+  base: "file:///w:/%20base%20/",
+  options: `--experimental-loader="${convertFileUrlToPath(
+    "file:///w:/%20base%20/agent/lib/node/mocha-loader.mjs",
+  )}"`,
+});
+
+assertThrow(() => {
+  testCompileCommand({
+    recursive: true,
+    recorder: "mocha",
+    command: "foo bar",
+  });
+}, /^AppmapError: Could not parse /u);
+
+assertThrow(() => {
+  testCompileCommand({
+    recursive: true,
+    recorder: "mocha",
+    command: ["foo", "bar"],
+  });
+}, /^AppmapError: Could not recognize /u);

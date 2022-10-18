@@ -73,7 +73,7 @@ assertThrow(
       },
       map_name: "name2",
       command: {
-        script: null,
+        source: null,
         tokens: ["exec", "arg1", "arg2"],
         base: getTmpUrl(),
       },
@@ -96,7 +96,7 @@ assertDeepEqual(
     "command",
   ),
   {
-    script: "exec arg1 arg2",
+    source: "exec arg1 arg2",
     tokens: null,
     base: getTmpUrl(),
   },
