@@ -1,14 +1,14 @@
 const {
   URL,
   Map,
-  JSON: { parse: parseJSON },
+  JSON: { parse: parseJSON, stringify: stringifyJSON },
   Reflect: { ownKeys },
   Array: { isArray },
 } = globalThis;
 
 const { search: __search } = new URL(import.meta.url);
 
-import { readFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 
 import minimist from "minimist";
 import YAML from "yaml";
@@ -27,13 +27,45 @@ const { createConfiguration, extendConfiguration } = await import(
   `../../configuration/index.mjs${__search}`
 );
 
-const { parse: parseYAML } = YAML;
+const { parse: parseYAML, stringify: stringifyYAML } = YAML;
 
 const parsers = new Map([
   [".json", parseJSON],
   [".yml", parseYAML],
   [".yaml", parseYAML],
 ]);
+
+const stringifiers = new Map([
+  [".json", stringifyJSON],
+  [".yml", stringifyYAML],
+  [".yaml", stringifyYAML],
+]);
+
+const default_external_configuration = {
+  packages: [
+    {
+      glob: "**/node_modules/**/*",
+      enabled: false,
+    },
+    {
+      glob: "../**/*",
+      enabled: false,
+    },
+  ],
+  "default-package": {
+    enabled: true,
+  },
+  "anonymous-name-separator": "-",
+  exclude: [
+    {
+      combinator: "and",
+      name: "-",
+      "every-label": "^\\b$",
+      excluded: true,
+      recursive: false,
+    },
+  ],
+};
 
 const loadConfigFile = (url) => {
   const extension = getUrlExtension(url);
@@ -54,7 +86,13 @@ const loadConfigFile = (url) => {
       url,
       error,
     );
-    return {};
+    const stringify = stringifiers.get(extension);
+    writeFileSync(
+      new URL(url),
+      stringify(default_external_configuration),
+      "utf8",
+    );
+    return default_external_configuration;
   }
   return expectSuccess(
     () => parse(content),

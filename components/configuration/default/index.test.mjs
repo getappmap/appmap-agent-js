@@ -43,6 +43,14 @@ assertDeepEqual(
   },
 );
 
+// default-package //
+assertDeepEqual(extend("default-package", true, "file:///w:/base/"), {
+  enabled: true,
+  shallow: false,
+  "inline-source": null,
+  exclude: [],
+});
+
 // packages //
 
 {
@@ -224,19 +232,8 @@ assertDeepEqual(
 // processes //
 
 assertDeepEqual(
-  extend("processes", true, "file:///w:/base/", "file:///w:/home"),
-  [
-    [{ base: "file:///w:/base/", source: "^", flags: "u" }, true],
-    [true, true],
-  ],
-);
-
-assertDeepEqual(
   extend("processes", "/foo", "file:///w:/base/", "file:///w:/home"),
-  [
-    [{ base: "file:///w:/base/", source: "^(?:\\/foo)$", flags: "" }, true],
-    [true, true],
-  ],
+  [[{ base: "file:///w:/base/", source: "^(?:\\/foo)$", flags: "" }, true]],
 );
 
 // command //

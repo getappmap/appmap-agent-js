@@ -120,6 +120,19 @@ const normalizeHooks = (hooks, _base) => {
   return hooks;
 };
 
+const normalizeDefaultPackage = (package_, _base) => {
+  if (typeof package_ === "boolean") {
+    package_ = { enabled: package_ };
+  }
+  return {
+    enabled: true,
+    shallow: false,
+    exclude: [],
+    "inline-source": null,
+    ...package_,
+  };
+};
+
 const normalizeAgent = ({ directory, package: _package }, base) => ({
   directory: toDirectoryUrl(toAbsoluteUrl(directory, base)),
   package: _package,
@@ -222,8 +235,6 @@ const normalizePackages = (specifiers, base) => {
 const normalizeProcessSpecifier = (specifier, base) => {
   if (typeof specifier === "string") {
     specifier = { glob: specifier };
-  } else if (typeof specifier === "boolean") {
-    specifier = { regexp: "^", flags: "u", enabled: specifier };
   }
   const { enabled, ...rest } = {
     enabled: true,
@@ -330,6 +341,10 @@ const fields = {
     extend: overwrite,
     normalize: identity,
   },
+  "default-process": {
+    extend: overwrite,
+    normalize: identity,
+  },
   processes: {
     extend: prepend,
     normalize: normalizeProcesses,
@@ -373,6 +388,10 @@ const fields = {
   engine: {
     extend: overwrite,
     normalize: identity,
+  },
+  "default-package": {
+    extend: overwrite,
+    normalize: normalizeDefaultPackage,
   },
   packages: {
     extend: prepend,
@@ -479,7 +498,8 @@ export const createConfiguration = (home) => ({
   },
   appmap_dir: toAbsoluteUrl("tmp/appmap/", home),
   appmap_file: null,
-  processes: [[true, true]],
+  "default-process": true,
+  processes: [],
   recorder: null,
   "inline-source": false,
   hooks: {
@@ -508,54 +528,15 @@ export const createConfiguration = (home) => ({
     "impure-hash-inspection": true,
   },
   language: "javascript",
-  packages: [
-    [
-      {
-        base: toAbsoluteUrl(".", home),
-        source: "(^|/)node_modules/",
-        flags: "u",
-      },
-      {
-        enabled: false,
-        shallow: false,
-        exclude: [],
-        "inline-source": null,
-      },
-    ],
-    [
-      {
-        base: toAbsoluteUrl(".", home),
-        source: "^\\.\\./",
-        flags: "u",
-      },
-      {
-        enabled: false,
-        shallow: false,
-        exclude: [],
-        "inline-source": null,
-      },
-    ],
-    [
-      true,
-      {
-        enabled: true,
-        shallow: false,
-        exclude: [],
-        "inline-source": null,
-      },
-    ],
-  ],
+  "default-package": {
+    enabled: false,
+    shallow: false,
+    exclude: [],
+    "inline-source": null,
+  },
+  packages: [],
   "anonymous-name-separator": ANONYMOUS_NAME_SEPARATOR,
   exclude: [
-    {
-      combinator: "and",
-      name: ANONYMOUS_NAME_SEPARATOR,
-      "qualified-name": true,
-      "every-label": "^\\b$", // do not exclude when label is present
-      "some-label": true,
-      excluded: true,
-      recursive: false,
-    },
     {
       combinator: "or",
       name: true,

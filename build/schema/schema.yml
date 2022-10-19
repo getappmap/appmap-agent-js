@@ -305,8 +305,9 @@
 ## Specifier ##
 ###############
 
-- $id: specifier
+- $id: module-specifier
   anyOf:
+    - type: string
     - type: object
       additionalProperties: false
       required: [regexp]
@@ -356,25 +357,37 @@
           type: boolean
           nullable: true
 
-- $id: package-specifier
+- $id: process-specifier
   anyOf:
     - type: string
-    - $ref: specifier
-
-- $id: enabled-specifier
-  anyOf:
-    - type: boolean
-    - type: string
-    - allOf:
-        - $ref: specifier
-        - not:
-            anyOf:
-              - type: object
-                required: [shallow]
-              - type: object
-                required: [inline-source]
-              - type: object
-                required: [exclude]
+    - type: object
+      additionalProperties: false
+      required: [regexp]
+      properties:
+        regexp: { $ref: regexp }
+        flags: { type: string }
+        enabled: { type: boolean }
+    - type: object
+      additionalProperties: false
+      required: [glob]
+      properties:
+        glob: { type: string }
+        enabled: { type: boolean }
+    - type: object
+      additionalProperties: false
+      required: [path]
+      properties:
+        path: { type: string }
+        recursive: { type: boolean }
+        enabled: { type: boolean }
+    - type: object
+      additionalProperties: false
+      required: [dist]
+      properties:
+        dist: { type: string }
+        recursive: { type: boolean }
+        external: { type: boolean }
+        enabled: { type: boolean }
 
 - $id: cooked-specifier
   anyOf:
@@ -386,6 +399,10 @@
         base: { $ref: url }
         source: { type: string }
         flags: { type: string }
+
+#################
+# Configuration #
+#################
 
 - $id: command-options
   type: object
@@ -411,9 +428,36 @@
     - type: object
       required: [shell, cwd, encoding, env, stdio, timeout, killSignal]
 
-#################
-# Configuration #
-#################
+- $id: module
+  anyOf:
+    - type: boolean
+    - type: object
+      additionalProperties: false
+      properties:
+        enabled:
+          type: boolean
+        shallow:
+          type: boolean
+        inline-source:
+          type: boolean
+          nullable: true
+        exclude:
+          $ref: exclude
+
+- $id: cooked-module
+  type: object
+  additionalProperties: false
+  required: [enabled, shallow, inline-source, exclude]
+  properties:
+    enabled:
+      type: boolean
+    shallow:
+      type: boolean
+    inline-source:
+      type: boolean
+      nullable: true
+    exclude:
+      $ref: cooked-exclude
 
 - $id: agent
   type: object
@@ -516,19 +560,23 @@
         pg: { type: boolean }
         sqlite3: { type: boolean }
     ordering: { $ref: ordering }
+    default-process:
+      type: boolean
     processes:
       anyOf:
-        - $ref: enabled-specifier
+        - $ref: process-specifier
         - type: array
-          items: { $ref: enabled-specifier }
+          items: { $ref: process-specifier }
     main: { $ref: path }
     engine: { type: string }
     language: { $ref: language }
+    default-package:
+      $ref: module
     packages:
       anyOf:
-        - $ref: package-specifier
+        - $ref: module-specifier
         - type: array
-          items: { $ref: package-specifier }
+          items: { $ref: module-specifier }
     exclude: { $ref: exclude }
     # recording
     anonymous-name-separator: { $ref: separator }
@@ -559,7 +607,7 @@
 - $id: internal-configuration
   type: object
   additionalProperties: false
-  minProperties: 40
+  minProperties: 42
   properties:
     socket: { $ref: socket }
     heartbeat: { $ref: heartbeat }
@@ -644,6 +692,8 @@
         pg: { type: boolean }
         sqlite3: { type: boolean }
     ordering: { $ref: ordering }
+    default-process:
+      type: boolean
     processes:
       type: array
       items:
@@ -661,6 +711,8 @@
       type: string
       nullable: true
     language: { $ref: language }
+    default-package:
+      $ref: cooked-module
     packages:
       type: array
       items:
@@ -669,14 +721,7 @@
         maxItems: 2
         items:
           - $ref: cooked-specifier
-          - type: object
-            properties:
-              enabled: { type: boolean }
-              shallow: { type: boolean }
-              inline-source:
-                type: boolean
-                nullable: true
-              exclude: { $ref: cooked-exclude }
+          - $ref: cooked-module
     exclude: { $ref: cooked-exclude }
     # recording
     anonymous-name-separator: { $ref: separator }

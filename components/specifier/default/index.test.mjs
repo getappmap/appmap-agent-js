@@ -202,9 +202,3 @@ assertEqual(
   ),
   true,
 );
-
-// constant //
-
-assertEqual(matchSpecifier(true, "protocol://host/file.ext"), true);
-
-assertEqual(matchSpecifier(false, "protocol://host/file.ext"), false);

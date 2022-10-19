@@ -121,12 +121,22 @@ await runAsync(
         {
           event: "call",
           id: 11,
-          defined_class: "timeoutCallback",
+          defined_class: "arrow-1",
         },
         {
           event: "return",
           id: 12,
           parent_id: 11,
+        },
+        {
+          event: "call",
+          id: 13,
+          defined_class: "timeoutCallback",
+        },
+        {
+          event: "return",
+          id: 14,
+          parent_id: 13,
         },
       ],
     );

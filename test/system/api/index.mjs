@@ -45,7 +45,7 @@ const appmap = createAppMap(
   {
     name: "name",
     recorder: "manual",
-    packages: "*",
+    packages: "**/*",
     hooks: {
       esm: false,
       cjs: true,

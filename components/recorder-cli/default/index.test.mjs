@@ -34,7 +34,7 @@ assertEqual(
     extendConfiguration(
       createConfiguration("file:///w:/home/"),
       {
-        processes: false,
+        "default-process": false,
       },
       "file:///w:/base/",
     ),

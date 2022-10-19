@@ -1,5 +1,4 @@
 const {
-  Error,
   URL,
   RegExp,
   Object: { entries: toEntries },
@@ -33,15 +32,13 @@ const { extendConfiguration } = await import(
   `../../configuration/index.mjs${__search}`
 );
 
-const getSpecifierValue = (pairs, key) => {
+const getSpecifierValue = (pairs, key, def) => {
   for (const [specifier, value] of pairs) {
     if (matchSpecifier(specifier, key)) {
       return value;
     }
   }
-  /* c8 ignore start */
-  throw new Error("missing matching specifier");
-  /* c8 ignore stop */
+  return def;
 };
 
 const escapePosix = (token) => token.replace(/[^a-zA-Z0-9\-_./:]/gu, "\\$&");
@@ -228,11 +225,16 @@ export const extendConfigurationPort = (configuration, ports) => {
   return configuration;
 };
 
-export const isConfigurationEnabled = ({ processes, main }) =>
-  main === null || getSpecifierValue(processes, main);
+export const isConfigurationEnabled = ({
+  processes,
+  main,
+  "default-process": default_process,
+}) => main === null || getSpecifierValue(processes, main, default_process);
 
-export const getConfigurationPackage = ({ packages }, url) =>
-  getSpecifierValue(packages, url);
+export const getConfigurationPackage = (
+  { packages, "default-package": default_package },
+  url,
+) => getSpecifierValue(packages, url, default_package);
 
 export const getConfigurationScenarios = (configuration) => {
   const { scenarios, scenario } = configuration;

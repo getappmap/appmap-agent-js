@@ -107,32 +107,18 @@ const escapeCharacter = (match) => escaping[match];
 const escapeSegment = (segment) => segment.replace(/[/#?]/gu, escapeCharacter);
 
 export const matchSpecifier = (specifier, url) => {
-  if (typeof specifier === "boolean") {
-    logDebug(
-      "url %j %s constant specifier",
-      url,
-      specifier ? "matched" : "did not match",
-    );
-    return specifier;
-  } else {
-    const { base, source, flags } = specifier;
-    const relative = toRelativeUrl(url, base, escapeSegment);
-    expect(
-      relative !== null,
-      "could not express %j relatively to %j",
-      url,
-      base,
-    );
-    const matched = makeRegExp(source, flags).test(relative);
-    logDebug(
-      "url %j which resolves to %j relatively to %j %s regexp specifier %j with flags %j",
-      url,
-      relative,
-      base,
-      matched ? "matched" : "did not match",
-      source,
-      flags,
-    );
-    return matched;
-  }
+  const { base, source, flags } = specifier;
+  const relative = toRelativeUrl(url, base, escapeSegment);
+  expect(relative !== null, "could not express %j relatively to %j", url, base);
+  const matched = makeRegExp(source, flags).test(relative);
+  logDebug(
+    "url %j which resolves to %j relatively to %j %s regexp specifier %j with flags %j",
+    url,
+    relative,
+    base,
+    matched ? "matched" : "did not match",
+    source,
+    flags,
+  );
+  return matched;
 };

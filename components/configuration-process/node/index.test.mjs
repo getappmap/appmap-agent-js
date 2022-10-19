@@ -5,14 +5,15 @@ import {
   assertDeepEqual,
   assertEqual,
 } from "../../__fixture__.mjs";
+import { toAbsoluteUrl } from "../../url/index.mjs?env=test";
 import { getUuid } from "../../uuid/random/index.mjs?env=test";
 import { getTmpPath, getTmpUrl } from "../../path/index.mjs?env=test";
+import { getConfigurationPackage } from "../../configuration-accessor/index.mjs?env=test";
 import { loadProcessConfiguration } from "./index.mjs?env=test";
 
 const {
   URL,
   JSON: { stringify: stringifyJSON },
-  Reflect: { get },
 } = globalThis;
 
 assertThrow(
@@ -25,6 +26,7 @@ assertThrow(
   /^AppmapError: Unsupported configuration file extension/u,
 );
 
+// present configuration file //
 {
   const filename = `${getUuid()}.json`;
   loadProcessConfiguration({
@@ -60,8 +62,8 @@ assertThrow(
     ].flat(),
     cwd: getTmpPath,
   });
-  assertEqual(packages.length, 5);
-  assertEqual(processes.length, 2);
+  assertEqual(packages.length, 2);
+  assertEqual(processes.length, 1);
   assertDeepEqual(
     { app_name, map_name, command, log, track_port },
     {
@@ -80,22 +82,56 @@ assertThrow(
   );
 }
 
-assertDeepEqual(
-  get(
-    loadProcessConfiguration({
-      env: {
-        APPMAP_CONFIGURATION_PATH: `${getUuid()}.json`,
-      },
-      argv: [
-        ["node", "agent.mjs"],
-        ["--command", "exec arg1 arg2"],
-      ].flat(),
-      cwd: getTmpPath,
-    }),
-    "command",
-  ),
-  {
+// missing configuration file && rest command //
+{
+  const configuration = loadProcessConfiguration({
+    env: {
+      APPMAP_CONFIGURATION_PATH: `${getUuid()}.json`,
+    },
+    argv: [
+      ["node", "agent.mjs"],
+      ["--command", "exec arg1 arg2"],
+    ].flat(),
+    cwd: getTmpPath,
+  });
+  assertDeepEqual(configuration.command, {
     source: "exec arg1 arg2",
     tokens: null,
-  },
-);
+  });
+  assertDeepEqual(
+    getConfigurationPackage(
+      configuration,
+      toAbsoluteUrl("package.js", getTmpUrl()),
+    ),
+    {
+      enabled: true,
+      shallow: false,
+      exclude: [],
+      "inline-source": null,
+    },
+  );
+  assertDeepEqual(
+    getConfigurationPackage(
+      configuration,
+      toAbsoluteUrl("../package.js", getTmpUrl()),
+    ),
+    {
+      enabled: false,
+      shallow: false,
+      exclude: [],
+      "inline-source": null,
+    },
+  );
+  assertDeepEqual(
+    getConfigurationPackage(
+      configuration,
+      toAbsoluteUrl("node_modules/package.js", getTmpUrl()),
+    ),
+    {
+      enabled: false,
+      shallow: false,
+      exclude: [],
+      "inline-source": null,
+    },
+  );
+}

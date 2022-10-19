@@ -202,36 +202,10 @@ assertEqual(
 assertDeepEqual(
   getConfigurationPackage(
     createConfiguration("file:///w:/home/"),
-    "file:///w:/home/node_modules/dep.js",
-  ),
-  {
-    enabled: false,
-    shallow: false,
-    exclude: [],
-    "inline-source": null,
-  },
-);
-
-assertDeepEqual(
-  getConfigurationPackage(
-    createConfiguration("file:///w:/home1/"),
-    "file:///w:/home2/main.js",
-  ),
-  {
-    enabled: false,
-    shallow: false,
-    exclude: [],
-    "inline-source": null,
-  },
-);
-
-assertDeepEqual(
-  getConfigurationPackage(
-    createConfiguration("file:///w:/home/"),
     "file:///w:/home/main.js",
   ),
   {
-    enabled: true,
+    enabled: false,
     shallow: false,
     exclude: [],
     "inline-source": null,

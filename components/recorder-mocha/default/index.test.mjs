@@ -27,7 +27,7 @@ const mock = {
     emitter,
     extendConfiguration(
       configuration,
-      { recorder: "mocha", processes: false, main: "foo.js" },
+      { recorder: "mocha", "default-process": false, main: "foo.js" },
       "file:///w:/base/",
     ),
   );
