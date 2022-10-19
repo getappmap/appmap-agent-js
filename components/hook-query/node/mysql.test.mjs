@@ -1,4 +1,5 @@
 import { spawn } from "child_process";
+import { platform as getPlatform } from "node:os";
 import { rm as rmAsync } from "fs/promises";
 import Mysql from "mysql";
 import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
@@ -18,19 +19,18 @@ const {
   undefined,
 } = globalThis;
 
-// TODO investigate why this fails on travis.
-if (getOwnPropertyDescriptor(process.env, "TRAVIS") !== undefined) {
-  process.exit(0);
-}
-
 const promiseTermination = (child) =>
   new Promise((resolve, reject) => {
     child.on("exit", (status, signal) => resolve({ status, signal }));
     child.on("error", reject);
   });
 
-const port = 3306;
-const url = toAbsoluteUrl(getUuid(), getTmpUrl());
+const auth = {
+  host: "localhost",
+  port: 3306,
+  user: "root",
+  password: "",
+};
 
 const proceedAsync = async () => {
   assertDeepEqual(
@@ -46,11 +46,7 @@ const proceedAsync = async () => {
       HookMysql,
       { configuration: { hooks: { mysql: true } } },
       async () => {
-        const connection = Mysql.createConnection({
-          host: "localhost",
-          port,
-          user: "root",
-        });
+        const connection = Mysql.createConnection(auth);
         try {
           await new Promise((resolve, reject) => {
             try {
@@ -133,8 +129,13 @@ const proceedAsync = async () => {
 };
 
 if (getOwnPropertyDescriptor(process.env, "TRAVIS") !== undefined) {
-  await proceedAsync();
-} else {
+  // TODO: Investigate why it fails on travis/windows
+  // > ECONNREFUSED 127.0.0.1:3306
+  if (getPlatform() !== "win32") {
+    await proceedAsync();
+  }
+} else if (getPlatform() !== "win32") {
+  const url = toAbsoluteUrl(getUuid(), getTmpUrl());
   assertDeepEqual(
     await promiseTermination(
       spawn(
@@ -152,40 +153,37 @@ if (getOwnPropertyDescriptor(process.env, "TRAVIS") !== undefined) {
   );
   const child = spawn(
     "/usr/local/mysql/bin/mysqld",
-    ["--port", String(port), "--datadir", convertFileUrlToPath(url)],
+    ["--port", String(auth.port), "--datadir", convertFileUrlToPath(url)],
     { stdio: "inherit" },
   );
   const termination = promiseTermination(child);
-  while (
-    /* eslint-disable no-constant-condition */ true /* eslint-enable no-constant-condition */
-  ) {
+  let status = 1,
+    signal = null;
+  while (status !== 0) {
     await new Promise((resolve) => {
       setTimeout(resolve, 1000);
     });
-    const { status, signal } = await promiseTermination(
+    ({ status, signal } = await promiseTermination(
       spawn(
         "/usr/local/mysql/bin/mysqladmin",
         [
           "--host",
           "localhost",
           "--port",
-          String(port),
+          String(auth.port),
           "--user",
-          "root",
+          auth.user,
           "status",
         ],
         { stdio: "inherit" },
       ),
-    );
+    ));
     assertEqual(signal, null);
-    if (status === 0) {
-      break;
-    }
   }
   try {
     await proceedAsync();
   } finally {
-    // SIGKILL will leave stuff in /tmp which prevent next mysqld to run
+    // SIGKILL leaves stuff in /tmp which prevent next mysqld to run
     child.kill("SIGTERM");
     await termination;
     await rmAsync(new URL(url), { recursive: true });
