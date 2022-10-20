@@ -2,11 +2,12 @@ const {
   URL,
   RegExp,
   Object: { entries: toEntries },
-  JSON: { stringify: stringifyJSON },
+  JSON: { stringify: stringifyJSON, parse: parseJSON },
 } = globalThis;
 
 const { search: __search } = new URL(import.meta.url);
 
+import { readFileSync } from "node:fs";
 const { toAbsoluteUrl } = await import(`../../url/index.mjs${__search}`);
 const {
   toDirectoryPath,
@@ -22,11 +23,9 @@ const { expect, expectSuccess } = await import(
   `../../expect/index.mjs${__search}`
 );
 const { logGuardWarning } = await import(`../../log/index.mjs${__search}`);
-const {
-  extractRepositoryDependency,
-  extractRepositoryHistory,
-  extractRepositoryPackage,
-} = await import(`../../repository/index.mjs${__search}`);
+const { extractRepositoryHistory, extractRepositoryPackage } = await import(
+  `../../repository/index.mjs${__search}`
+);
 const { matchSpecifier } = await import(`../../specifier/index.mjs${__search}`);
 const { extendConfiguration } = await import(
   `../../configuration/index.mjs${__search}`
@@ -133,10 +132,17 @@ const splitNodeCommand = (tokens) => {
 export const resolveConfigurationRepository = (configuration) => {
   assert(configuration.agent === null, "duplicate respository resolution");
   const { directory } = configuration.repository;
+  const agent_directory = toAbsoluteUrl("../../../", import.meta.url);
+  const { name, version, homepage } = parseJSON(
+    readFileSync(new URL("package.json", agent_directory), "utf8"),
+  );
   return extendConfiguration(
     configuration,
     {
-      agent: extractRepositoryDependency(directory, "@appland/appmap-agent-js"),
+      agent: {
+        directory: agent_directory,
+        package: { name, version, homepage },
+      },
       repository: {
         directory,
         history: extractRepositoryHistory(directory),

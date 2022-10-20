@@ -72,6 +72,7 @@ export const extractRepositoryHistory = extractGitInformation;
 
 export const extractRepositoryPackage = createPackage;
 
+// TODO cleanup deadcode when we are sure we won't use it anymore
 export const extractRepositoryDependency = (home, request) => {
   const { resolve } = createRequire(new URL(home));
   let url = toAbsoluteUrl(
