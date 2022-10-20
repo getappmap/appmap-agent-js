@@ -393,6 +393,10 @@ const fields = {
     extend: overwrite,
     normalize: normalizeDefaultPackage,
   },
+  "anonymous-name-separator": {
+    extend: overwrite,
+    normalize: identity,
+  },
   packages: {
     extend: prepend,
     normalize: normalizePackages,
