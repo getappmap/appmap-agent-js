@@ -18,14 +18,14 @@ assertDeepEqual(
           },
         ],
       },
-      url: "file:///w:/base",
+      url: "protocol://host/base",
     },
     async () => {
       // transformSource //
       {
         const { source } = await globalThis.GLOBAL.transformSource(
           "123;",
-          { url: "file:///w:/foo", format: "module" },
+          { url: "protocol://host/foo", format: "module" },
           (content, _context, _next) => ({ source: content }),
         );
         assertEqual(evalGlobal(source), 123);
@@ -33,7 +33,7 @@ assertDeepEqual(
       // load //
       {
         const { format, source } = await globalThis.GLOBAL.load(
-          "file:///w:/bar",
+          "protocol://host/bar",
           "context",
           (_url, _context, _next) => ({
             format: "module",
@@ -46,7 +46,7 @@ assertDeepEqual(
       // bypass //
       {
         const { format, source } = await globalThis.GLOBAL.load(
-          "file:///w:/qux",
+          "protocol://host/qux",
           "context",
           (_url, _context, _next) => ({
             format: "custom",
@@ -61,18 +61,18 @@ assertDeepEqual(
   [
     {
       type: "source",
-      url: "file:///w:/foo",
+      url: "protocol://host/foo",
       content: "123;",
       shallow: true,
-      exclude: createConfiguration("file:///w:/home").exclude,
+      exclude: createConfiguration("protocol://host/home").exclude,
       inline: false,
     },
     {
       type: "source",
-      url: "file:///w:/bar",
+      url: "protocol://host/bar",
       content: "456;",
       shallow: true,
-      exclude: createConfiguration("file:///w:/home").exclude,
+      exclude: createConfiguration("protocol://host/home").exclude,
       inline: false,
     },
   ],

@@ -69,7 +69,7 @@ assertDeepEqual(
       type: "source",
       url: convertPathToFileUrl(await realpathAsync(new URL(url))),
       content: "module.exports = 123;",
-      exclude: createConfiguration("file:///w:/home").exclude,
+      exclude: createConfiguration("protocol://host/home").exclude,
       shallow: true,
       inline: false,
     },

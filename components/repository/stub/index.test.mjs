@@ -3,9 +3,9 @@ import { assertDeepEqual } from "../../__fixture__.mjs";
 import { extractRepositoryDependency } from "./index.mjs?env=test";
 
 assertDeepEqual(
-  extractRepositoryDependency("file:///w:/home/", "./foo/bar.mjs"),
+  extractRepositoryDependency("protocol://host/home/", "./foo/bar.mjs"),
   {
-    directory: "file:///w:/home/",
+    directory: "protocol://host/home/",
     package: {
       name: "./foo/bar.mjs",
       version: "0.0.0",

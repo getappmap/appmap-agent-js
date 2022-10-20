@@ -16,6 +16,6 @@ globalThis.document = window.document;
 
 const { runScript } = await import("./index.mjs?env=test");
 
-assertEqual(runScript("var x = 123;", "file:///w:/script.js"), undefined);
+assertEqual(runScript("var x = 123;", "protocol://host/script.js"), undefined);
 
 assertEqual(window.x, 123);

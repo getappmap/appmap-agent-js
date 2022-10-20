@@ -32,7 +32,9 @@ const {
 
 assertEqual(
   get(
-    resolveConfigurationManualRecorder(createConfiguration("file:///w:/home/")),
+    resolveConfigurationManualRecorder(
+      createConfiguration("protocol://host/home/"),
+    ),
     "recorder",
   ),
   "manual",
@@ -45,17 +47,17 @@ assertEqual(
 assertDeepEqual(
   getConfigurationScenarios(
     extendConfiguration(
-      createConfiguration("file:///w:/home/"),
+      createConfiguration("protocol://host/home/"),
       {
         scenario: "^f",
         scenarios: { foo: { name: "foo" }, bar: { name: "bar" } },
       },
-      "file:///w:/base/",
+      "protocol://host/base/",
     ),
   ),
   [
     extendConfiguration(
-      createConfiguration("file:///w:/home/"),
+      createConfiguration("protocol://host/home/"),
       { scenario: "^f", name: "foo" },
       null,
     ),
@@ -66,7 +68,7 @@ assertDeepEqual(
 // resolveConfigurationRepository //
 ////////////////////////////////////
 
-resolveConfigurationRepository(createConfiguration("file:///w:/home/"));
+resolveConfigurationRepository(createConfiguration("protocol://host/home/"));
 
 /////////////////////////////
 // extendConfigurationPort //
@@ -76,12 +78,12 @@ assertEqual(
   get(
     extendConfigurationPort(
       extendConfiguration(
-        createConfiguration("file:///w:/home/"),
+        createConfiguration("protocol://host/home/"),
         {
           "trace-port": "",
           "track-port": 8000,
         },
-        "file:///w:/base/",
+        "protocol://host/base/",
       ),
       {
         "trace-port": "ipc",
@@ -90,7 +92,7 @@ assertEqual(
     ),
     "trace-port",
   ),
-  "file:///w:/home/ipc",
+  "protocol://host/home/ipc",
 );
 
 ///////////////////////////////////////////
@@ -101,11 +103,11 @@ assertEqual(
   get(
     resolveConfigurationAutomatedRecorder(
       extendConfiguration(
-        createConfiguration("file:///w:/home/"),
+        createConfiguration("protocol://host/home/"),
         {
           command: ["mocha"],
         },
-        "file:///w:/base/",
+        "protocol://host/base/",
       ),
     ),
     "recorder",
@@ -117,11 +119,11 @@ assertEqual(
   get(
     resolveConfigurationAutomatedRecorder(
       extendConfiguration(
-        createConfiguration("file:///w:/home/"),
+        createConfiguration("protocol://host/home/"),
         {
           command: ["npx", "mocha"],
         },
-        "file:///w:/base/",
+        "protocol://host/base/",
       ),
     ),
     "recorder",
@@ -133,11 +135,11 @@ assertEqual(
   get(
     resolveConfigurationAutomatedRecorder(
       extendConfiguration(
-        createConfiguration("file:///w:/home/"),
+        createConfiguration("protocol://host/home/"),
         {
           command: ["npm", "exec", "mocha"],
         },
-        "file:///w:/base/",
+        "protocol://host/base/",
       ),
     ),
     "recorder",
@@ -149,11 +151,11 @@ assertEqual(
   get(
     resolveConfigurationAutomatedRecorder(
       extendConfiguration(
-        createConfiguration("file:///w:/home/"),
+        createConfiguration("protocol://host/home/"),
         {
           command: "node main.js",
         },
-        "file:///w:/base/",
+        "protocol://host/base/",
       ),
     ),
     "recorder",
@@ -166,13 +168,13 @@ assertEqual(
 ////////////////////////////
 
 {
-  const configuration = createConfiguration("file:///w:/home/");
+  const configuration = createConfiguration("protocol://host/home/");
   assertEqual(
     isConfigurationEnabled(
       extendConfiguration(
         configuration,
         { main: "main.js" },
-        "file:///w:/base/",
+        "protocol://host/base/",
       ),
     ),
     true,
@@ -188,7 +190,7 @@ assertEqual(
           },
           main: "main.js",
         },
-        "file:///w:/base/",
+        "protocol://host/base/",
       ),
     ),
     false,
@@ -201,8 +203,8 @@ assertEqual(
 
 assertDeepEqual(
   getConfigurationPackage(
-    createConfiguration("file:///w:/home/"),
-    "file:///w:/home/main.js",
+    createConfiguration("protocol://host/home/"),
+    "protocol://host/home/main.js",
   ),
   {
     enabled: false,
@@ -215,16 +217,16 @@ assertDeepEqual(
 assertDeepEqual(
   getConfigurationPackage(
     extendConfiguration(
-      createConfiguration("file:///w:/home/"),
+      createConfiguration("protocol://host/home/"),
       {
         packages: [
           { glob: "*", exclude: ["exclude1"] },
           { glob: "**/*", exclude: ["exclude2"] },
         ],
       },
-      "file:///w:/base/",
+      "protocol://host/base/",
     ),
-    "file:///w:/base/foo/bar",
+    "protocol://host/base/foo/bar",
   ),
   {
     enabled: true,
@@ -250,7 +252,7 @@ assertDeepEqual(
 
 assertEqual(
   get(
-    extendConfigurationNode(createConfiguration("file:///w:/home/"), {
+    extendConfigurationNode(createConfiguration("protocol://host/home/"), {
       version: "v1.2.3",
       argv: ["node", "main.js"],
       cwd: () => convertFileUrlToPath("file:///w:/cwd"),
@@ -274,7 +276,7 @@ const stripEnvironmentConfiguration = ({
 }) => ({ exec, argv, cwd, env });
 
 const testCompileCommand = ({
-  base = "file:///w:/base/",
+  base = "protocol://host/base/",
   directory = "agent",
   recursive = true,
   command = "command",
@@ -288,7 +290,7 @@ const testCompileCommand = ({
     stripEnvironmentConfiguration(
       compileConfigurationCommand(
         extendConfiguration(
-          createConfiguration("file:///w:/home/"),
+          createConfiguration("protocol://host/home/"),
           {
             agent: {
               directory,
@@ -342,9 +344,9 @@ testCompileCommand({
   command: ["node", "main.js", "argv1"],
   exec: "node",
   argv: ["main.js", "argv1"],
-  base: "file:///w:/base/",
+  base: "protocol://host/base/",
   options:
-    "--experimental-loader=file:///w:/base/agent/lib/node/recorder-process.mjs",
+    "--experimental-loader=protocol://host/base/agent/lib/node/recorder-process.mjs",
 });
 
 // node >> env >> source //
@@ -356,9 +358,9 @@ testCompileCommand({
   shell: "shell",
   exec: "node main.js argv1",
   argv: [],
-  base: "file:///w:/base/",
+  base: "protocol://host/base/",
   options:
-    "--experimental-loader=file:///w:/base/agent/lib/node/recorder-process.mjs",
+    "--experimental-loader=protocol://host/base/agent/lib/node/recorder-process.mjs",
 });
 
 // node >> cli >> tokens //

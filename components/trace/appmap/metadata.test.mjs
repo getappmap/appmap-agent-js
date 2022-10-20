@@ -21,7 +21,7 @@ const test = (conf, url, errors = [], status = 0) => {
         },
       },
     },
-    "file:///w:/base/",
+    "protocol://host/base/",
   );
   return compileMetadata(configuration, errors, status);
 };
@@ -44,7 +44,7 @@ const default_meta_data = {
   exception: null,
 };
 
-assertDeepEqual(test({}, "file:///w:/base/"), default_meta_data);
+assertDeepEqual(test({}, "protocol://host/base/"), default_meta_data);
 
 // history //
 assertEqual(
@@ -57,13 +57,13 @@ assertEqual(
         package: null,
       },
     },
-    "file:///w:/base/",
+    "protocol://host/base/",
   ).git.repository,
   "string",
 );
 
 // recorder //
-assertDeepEqual(test({ recorder: "process" }, "file:///w:/base/"), {
+assertDeepEqual(test({ recorder: "process" }, "protocol://host/base/"), {
   ...default_meta_data,
   recorder: { name: "process" },
 });
@@ -73,7 +73,7 @@ assertDeepEqual(test({ recorder: "process" }, "file:///w:/base/"), {
 assertDeepEqual(
   test(
     {},
-    "file:///w:/base/",
+    "protocol://host/base/",
     [
       {
         name: "error-name",
@@ -91,27 +91,30 @@ assertDeepEqual(
 
 // app //
 
-assertDeepEqual(test({ name: "app-name" }, "file:///w:/base/"), {
+assertDeepEqual(test({ name: "app-name" }, "protocol://host/base/"), {
   ...default_meta_data,
   app: "app-name",
 });
 
 // name //
 
-assertDeepEqual(test({ "map-name": "map-name" }, "file:///w:/base/"), {
+assertDeepEqual(test({ "map-name": "map-name" }, "protocol://host/base/"), {
   ...default_meta_data,
   name: "map-name",
 });
 
-assertDeepEqual(test({ appmap_file: "basename" }, "file:///w:/base/"), {
+assertDeepEqual(test({ appmap_file: "basename" }, "protocol://host/base/"), {
   ...default_meta_data,
   name: "basename",
 });
 
-assertDeepEqual(test({ main: "/directory/filename.js" }, "file:///w:/base/"), {
-  ...default_meta_data,
-  name: "filename",
-});
+assertDeepEqual(
+  test({ main: "/directory/filename.js" }, "protocol://host/base/"),
+  {
+    ...default_meta_data,
+    name: "filename",
+  },
+);
 
 // recording //
 
@@ -123,7 +126,7 @@ assertDeepEqual(
         "method-id": "method-id",
       },
     },
-    "file:///w:/base/",
+    "protocol://host/base/",
   ),
   {
     ...default_meta_data,

@@ -44,7 +44,7 @@ const testAsync = async (port, configuration, messages) => {
 };
 
 const receptor_configuration = extendConfiguration(
-  createConfiguration("file:///w:/home"),
+  createConfiguration("protocol://host/home"),
   {
     recorder: "process",
     appmap_dir: "directory",
@@ -63,7 +63,7 @@ const port = adaptReceptorConfiguration(receptor, receptor_configuration)[
 await testAsync(
   port,
   extendConfiguration(
-    createConfiguration("file:///w:/home"),
+    createConfiguration("protocol://host/home"),
     {
       recorder: "remote",
     },
@@ -78,7 +78,7 @@ await testAsync(
   await testAsync(
     port,
     extendConfiguration(
-      createConfiguration("file:///w:/home"),
+      createConfiguration("protocol://host/home"),
       {
         recorder: "process",
       },
@@ -113,7 +113,7 @@ readFile(new URL("directory/process/anonymous.appmap.json", base));
 await testAsync(
   port,
   extendConfiguration(
-    createConfiguration("file:///w:/home"),
+    createConfiguration("protocol://host/home"),
     {
       recorder: "process",
     },
@@ -134,7 +134,7 @@ readFile(new URL("directory/process/anonymous-1.appmap.json", base));
 await testAsync(
   port,
   extendConfiguration(
-    createConfiguration("file:///w:/home"),
+    createConfiguration("protocol://host/home"),
     {
       recorder: "process",
       "map-name": "map  name",

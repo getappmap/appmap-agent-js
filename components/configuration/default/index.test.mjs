@@ -5,7 +5,7 @@ import { createConfiguration, extendConfiguration } from "./index.mjs?env=test";
 
 const { undefined } = globalThis;
 
-validateInternalConfiguration(createConfiguration("file:///w:/home/"));
+validateInternalConfiguration(createConfiguration("protocol://host/home/"));
 
 const extend = (
   name,
@@ -31,10 +31,10 @@ assertDeepEqual(
       directory: "agent",
       package: { name: "appmap-agent-js", version: "1.2.3", homepage: null },
     },
-    "file:///w:/base/",
+    "protocol://host/base/",
   ),
   {
-    directory: "file:///w:/base/agent/",
+    directory: "protocol://host/base/agent/",
     package: {
       name: "appmap-agent-js",
       version: "1.2.3",
@@ -44,7 +44,7 @@ assertDeepEqual(
 );
 
 // default-package //
-assertDeepEqual(extend("default-package", true, "file:///w:/base/"), {
+assertDeepEqual(extend("default-package", true, "protocol://host/base/"), {
   enabled: true,
   shallow: false,
   "inline-source": null,
@@ -57,7 +57,7 @@ assertDeepEqual(extend("default-package", true, "file:///w:/base/"), {
   const [specifier, value] = extend(
     "packages",
     "lib/*.js",
-    "file:///w:/base/",
+    "protocol://host/base/",
   )[0];
   assertDeepEqual(value, {
     "inline-source": null,
@@ -65,9 +65,18 @@ assertDeepEqual(extend("default-package", true, "file:///w:/base/"), {
     exclude: [],
     shallow: false,
   });
-  assertEqual(matchSpecifier(specifier, "file:///w:/base/lib/foo.js"), true);
-  assertEqual(matchSpecifier(specifier, "file:///w:/base/lib/foo.mjs"), false);
-  assertEqual(matchSpecifier(specifier, "file:///w:/base/src/foo.js"), false);
+  assertEqual(
+    matchSpecifier(specifier, "protocol://host/base/lib/foo.js"),
+    true,
+  );
+  assertEqual(
+    matchSpecifier(specifier, "protocol://host/base/lib/foo.mjs"),
+    false,
+  );
+  assertEqual(
+    matchSpecifier(specifier, "protocol://host/base/src/foo.js"),
+    false,
+  );
 }
 
 // hooks.eval //
@@ -120,11 +129,11 @@ assertDeepEqual(
   extend(
     "scenarios",
     { key: { command: ["node", "main.js"] } },
-    "file:///w:/base/",
+    "protocol://host/base/",
   ),
   [
     {
-      base: "file:///w:/base/",
+      base: "protocol://host/base/",
       key: "key",
       value: { command: ["node", "main.js"] },
     },
@@ -136,10 +145,10 @@ assertDeepEqual(
   extend(
     "command-options",
     { env: { FOO: "BAR" }, timeout: 123 },
-    "file:///w:/base/conf.yml",
+    "protocol://host/base/conf.yml",
   ),
   {
-    cwd: "file:///w:/base/",
+    cwd: "protocol://host/base/",
     shell: true,
     encoding: "utf8",
     env: { FOO: "BAR" },
@@ -149,33 +158,36 @@ assertDeepEqual(
   },
 );
 
-assertDeepEqual(extend("command-options", { cwd: "cwd" }, "file:///w:/base/"), {
-  cwd: "file:///w:/base/cwd/",
-  shell: true,
-  encoding: "utf8",
-  env: {},
-  stdio: "inherit",
-  timeout: 0,
-  killSignal: "SIGTERM",
-});
+assertDeepEqual(
+  extend("command-options", { cwd: "cwd" }, "protocol://host/base/"),
+  {
+    cwd: "protocol://host/base/cwd/",
+    shell: true,
+    encoding: "utf8",
+    env: {},
+    stdio: "inherit",
+    timeout: 0,
+    killSignal: "SIGTERM",
+  },
+);
 
 // main //
 
 assertDeepEqual(
-  extend("main", "foo.js", "file:///w:/base/"),
-  "file:///w:/base/foo.js",
+  extend("main", "foo.js", "protocol://host/base/"),
+  "protocol://host/base/foo.js",
 );
 
 // port //
 
 assertDeepEqual(
-  extend("trace-port", "unix-domain-socket", "file:///w:/base/"),
-  "file:///w:/base/unix-domain-socket",
+  extend("trace-port", "unix-domain-socket", "protocol://host/base/"),
+  "protocol://host/base/unix-domain-socket",
 );
 
-assertDeepEqual(extend("trace-port", "", "file:///w:/base/"), "");
+assertDeepEqual(extend("trace-port", "", "protocol://host/base/"), "");
 
-assertDeepEqual(extend("trace-port", 8080, "file:///w:/base/"), 8080);
+assertDeepEqual(extend("trace-port", 8080, "protocol://host/base/"), 8080);
 
 // language //
 
@@ -188,9 +200,9 @@ assertDeepEqual(extend("log", "warning"), {
   file: 2,
 });
 
-assertDeepEqual(extend("log", { file: "log" }, "file:///w:/base/"), {
+assertDeepEqual(extend("log", { file: "log" }, "protocol://host/base/"), {
   level: "error",
-  file: "file:///w:/base/log",
+  file: "protocol://host/base/log",
 });
 
 // recording //
@@ -232,8 +244,13 @@ assertDeepEqual(
 // processes //
 
 assertDeepEqual(
-  extend("processes", "/foo", "file:///w:/base/", "file:///w:/home"),
-  [[{ base: "file:///w:/base/", source: "^(?:\\/foo)$", flags: "" }, true]],
+  extend("processes", "/foo", "protocol://host/base/", "protocol://host/home"),
+  [
+    [
+      { base: "protocol://host/base/", source: "^(?:\\/foo)$", flags: "" },
+      true,
+    ],
+  ],
 );
 
 // command //
@@ -251,14 +268,14 @@ assertDeepEqual(extend("command", "source"), {
 // appmap_dir //
 
 assertDeepEqual(
-  extend("appmap_dir", "tmp/appmap", "file:///w:/base/"),
-  "file:///w:/base/tmp/appmap/",
+  extend("appmap_dir", "tmp/appmap", "protocol://host/base/"),
+  "protocol://host/base/tmp/appmap/",
 );
 
 // exclude //
 
 assertDeepEqual(
-  extend("exclude", ["foo\\.bar"], undefined, "file:///w:/home/"),
+  extend("exclude", ["foo\\.bar"], undefined, "protocol://host/home/"),
   [
     {
       combinator: "and",
@@ -269,7 +286,7 @@ assertDeepEqual(
       excluded: true,
       recursive: true,
     },
-    ...createConfiguration("file:///w:/home/").exclude,
+    ...createConfiguration("protocol://host/home/").exclude,
   ],
 );
 

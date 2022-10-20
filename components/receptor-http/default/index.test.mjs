@@ -27,11 +27,11 @@ const {
 const { createMessage } = NetSocketMessaging;
 
 const configuration = extendConfiguration(
-  createConfiguration("file:///w:/home/"),
+  createConfiguration("protocol://host/home/"),
   {
     recorder: "remote",
   },
-  "file:///w:/base/",
+  "protocol://host/base/",
 );
 const receptor = await openReceptorAsync(
   minifyReceptorConfiguration(configuration),

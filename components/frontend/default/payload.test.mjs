@@ -21,7 +21,7 @@ import {
   formatUngroupPayload,
 } from "./payload.mjs?env=test";
 
-const configuration = createConfiguration("file:///w:/home");
+const configuration = createConfiguration("protocol://host/home");
 
 const serialization = createSerialization(configuration);
 

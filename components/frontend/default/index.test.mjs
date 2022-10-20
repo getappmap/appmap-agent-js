@@ -20,7 +20,7 @@ import {
 } from "./index.mjs?env=test";
 
 const configuration = extendConfiguration(
-  createConfiguration("file:///w:/home"),
+  createConfiguration("protocol://host/home"),
   {
     packages: [
       {
@@ -28,7 +28,7 @@ const configuration = extendConfiguration(
       },
     ],
   },
-  "file:///w:/base",
+  "protocol://host/base",
 );
 
 const frontend = createFrontend(configuration);
@@ -53,19 +53,19 @@ validateMessage(formatBeginAmend(frontend, 123, getBundlePayload(frontend)));
 
 {
   const file = {
-    url: "file:///w:/filename.js",
+    url: "protocol://host/filename.js",
     content: "123;",
     type: "script",
   };
   assertDeepEqual(instrument(frontend, file, createMirrorSourceMap(file)), {
-    url: "file:///w:/filename.js",
+    url: "protocol://host/filename.js",
     content: "123;\n",
     messages: [
       {
         type: "source",
-        url: "file:///w:/filename.js",
+        url: "protocol://host/filename.js",
         content: "123;",
-        exclude: createConfiguration("file:///w:/home").exclude,
+        exclude: createConfiguration("protocol://host/home").exclude,
         shallow: false,
         inline: false,
       },

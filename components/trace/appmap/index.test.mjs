@@ -10,12 +10,12 @@ import {
 import { compileTrace } from "./index.mjs?env=test";
 
 const configuration = extendConfiguration(
-  createConfiguration("file:///w:/home/"),
+  createConfiguration("protocol://host/home/"),
   {
     name: "name",
     recorder: "process",
     agent: {
-      directory: "file:///w:/agent/",
+      directory: "protocol://host/agent/",
       package: {
         name: "agent",
         version: "1.2.3",
@@ -25,7 +25,7 @@ const configuration = extendConfiguration(
     pruning: true,
     "function-name-placeholder": "$",
   },
-  "file:///w:/base/",
+  "protocol://host/base/",
 );
 
 const tabs = {
@@ -36,7 +36,7 @@ const tabs = {
 };
 
 const location = stringifyLocation(
-  makeLocation("file:///w:/home/filename.js", 1, 0),
+  makeLocation("protocol://host/home/filename.js", 1, 0),
 );
 
 assertDeepEqual(
@@ -50,7 +50,7 @@ assertDeepEqual(
     },
     {
       type: "source",
-      url: "file:///w:/home/filename.js",
+      url: "protocol://host/home/filename.js",
       content: "function f (x) {}",
       shallow: false,
       exclude: [

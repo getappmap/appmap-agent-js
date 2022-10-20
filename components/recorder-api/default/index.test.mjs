@@ -8,31 +8,31 @@ import { Appmap } from "./index.mjs?env=test";
 const { undefined } = globalThis;
 
 const configuration = extendConfiguration(
-  createConfiguration("file:///w:/home/"),
+  createConfiguration("protocol://host/home/"),
   {
     name: "name1",
     recorder: "manual",
     packages: ["*"],
     hooks: { cjs: false, esm: false, apply: false, http: false },
   },
-  "file:///w:/base/",
+  "protocol://host/base/",
 );
 
 const appmap = new Appmap(configuration);
 assertEqual(
-  typeof appmap.instrumentModule("123;", "file:///w:/base/main.js"),
+  typeof appmap.instrumentModule("123;", "protocol://host/base/main.js"),
   "string",
 );
 
 const track = appmap.startRecording(null, { name: "name2" }, null);
-assertEqual(appmap.recordScript("123;", "file:///w:/base/main.js"), 123);
+assertEqual(appmap.recordScript("123;", "protocol://host/base/main.js"), 123);
 assertEqual(appmap.recordError("name", "message", "stack"), undefined);
 assertDeepEqual(appmap.stopRecording(track, 123), [
   {
     type: "source",
-    url: "file:///w:/base/main.js",
+    url: "protocol://host/base/main.js",
     content: "123;",
-    exclude: createConfiguration("file:///w:/home/").exclude,
+    exclude: createConfiguration("protocol://host/home/").exclude,
     shallow: false,
     inline: false,
   },

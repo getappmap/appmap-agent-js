@@ -24,11 +24,7 @@ const {
 
 let global_running = false;
 
-const makeFile = (
-  type,
-  content,
-  url = "file:///w:/missing-script-missing.mjs",
-) => {
+const makeFile = (type, content, url = "file:///w:/missing-file-url.mjs") => {
   content = String(content);
   url = String(url);
   expectSuccess(
