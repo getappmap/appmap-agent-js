@@ -13,6 +13,15 @@ assertThrow(() =>
 
 assertEqual(format("%%", []), "%");
 
+// %f //
+
+assertEqual(format("%f", [() => "foo"]), "foo");
+
+assertThrow(
+  () => format("%f", [() => 123]),
+  /^AssertionError: expected a string as result/u,
+);
+
 // %s //
 
 assertEqual(format("%s", ["foo"]), "foo");
