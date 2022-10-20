@@ -11,7 +11,10 @@ const normalizeCase = (pathname, drive) =>
   drive === null ? pathname : pathname.toLowerCase();
 
 export const toAbsoluteUrl = (relative, base_url) =>
-  new URL(relative, base_url).href;
+  new URL(
+    /^[a-zA-Z]:\/[^/]/u.test(relative) ? `/${relative}` : relative,
+    base_url,
+  ).href;
 
 export const toRelativeUrl = (
   url,

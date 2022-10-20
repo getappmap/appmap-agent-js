@@ -116,6 +116,25 @@ assertEqual(
   "filename1%20#hash1",
 );
 
+///////////////////
+// toAbsoluteUrl //
+///////////////////
+
+assertEqual(
+  toAbsoluteUrl("w:/directory1/filename1", "file:///v:/directory2/filename2"),
+  "file:///w:/directory1/filename1",
+);
+
+assertEqual(
+  toAbsoluteUrl("w://directory1/filename1", "file:///v:/directory2/filename2"),
+  "w://directory1/filename1",
+);
+
+assertEqual(
+  toAbsoluteUrl("ww:/directory1/filename1", "file:///v:/directory2/filename2"),
+  "ww:/directory1/filename1",
+);
+
 ///////////////////////////
 // toRelativeUrl >> basic //
 ///////////////////////////
