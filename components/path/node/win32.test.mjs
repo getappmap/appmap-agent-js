@@ -17,9 +17,9 @@ import {
 
 // getShell //
 
-assertDeepEqual(getShell({}), ["cmd.exe", "/c"]);
+assertDeepEqual(getShell({}), "cmd.exe");
 
-assertDeepEqual(getShell({ comspec: "powershell" }), ["powershell", "-c"]);
+assertDeepEqual(getShell({ comspec: "powershell" }), "powershell");
 
 // fromIpcPath && toIpcPath //
 

@@ -15,13 +15,13 @@ const {
   getShell,
   toAbsolutePath,
 } = await import(`../../path/index.mjs${__search}`);
-const { assert, coalesce } = await import(`../../util/index.mjs${__search}`);
+const { assert, coalesce, generateDeadcode } = await import(
+  `../../util/index.mjs${__search}`
+);
 const { expect, expectSuccess } = await import(
   `../../expect/index.mjs${__search}`
 );
-const { logGuardWarning, logWarning } = await import(
-  `../../log/index.mjs${__search}`
-);
+const { logGuardWarning } = await import(`../../log/index.mjs${__search}`);
 const {
   extractRepositoryDependency,
   extractRepositoryHistory,
@@ -46,13 +46,20 @@ const escapePosix = (token) => token.replace(/[^a-zA-Z0-9\-_./:]/gu, "\\$&");
 // https://ss64.com/nt/syntax-esc.html
 const escapeWin32 = (token) => token.replace(/[^a-zA-Z0-9\-_./:\\]/gu, "^$&");
 
-const resolveShell = (maybe_shell, env) =>
-  maybe_shell === null ? getShell(env) : maybe_shell;
+const escapeDead = generateDeadcode("escape without shell");
 
-const escapeShell = ([exec], token) =>
-  exec.endsWith("cmd") || exec.endsWith("cmd.exe")
-    ? escapeWin32(token)
-    : escapePosix(token);
+const generateEscape = (shell, env) => {
+  if (shell === false) {
+    return escapeDead;
+  } else {
+    if (shell === true) {
+      shell = getShell(env);
+    }
+    return shell.endsWith("cmd") || shell.endsWith("cmd.exe")
+      ? escapeWin32
+      : escapePosix;
+  }
+};
 
 const mocha_regexp_array = [
   /^(?<before>mocha)(?<after>($|\s[\s\S]*$))/u,
@@ -261,138 +268,85 @@ const escapeNodeOption = (token) => {
   return token;
 };
 
-const compilers = {
-  mocha: {
-    cli: {
-      compileCommand: (
-        {
-          command: { source, tokens },
-          "command-options": { shell },
-          agent: { directory },
-        },
-        env,
-      ) => {
-        if (tokens === null) {
-          const groups = parseMochaCommand(source);
-          expect(
-            groups !== null,
-            "Could not parse the command %j as a mocha command",
-            tokens,
-          );
-          const resolved_shell = resolveShell(shell, env);
-          return [
-            ...resolved_shell,
-            `${groups.before} --require ${escapeShell(
-              resolved_shell,
-              convertFileUrlToPath(
-                toAbsoluteUrl("lib/node/recorder-mocha.mjs", directory),
-              ),
-            )}${groups.after}`,
-          ];
-        } else {
-          const { before, after } = splitMochaCommand(tokens);
-          return [
-            ...before,
-            "--require",
-            convertFileUrlToPath(
-              toAbsoluteUrl("lib/node/recorder-mocha.mjs", directory),
-            ),
-            ...after,
-          ];
-        }
-      },
-      compileEnvironment: ({ agent: { directory } }, env) => ({
-        ...env,
-        NODE_OPTIONS: `${coalesce(
-          env,
-          "NODE_OPTIONS",
-          "",
-        )} --experimental-loader=${escapeNodeOption(
-          toAbsoluteUrl("lib/node/mocha-loader.mjs", directory),
-        )}`,
-      }),
+const generateNodeHooker = (recorder) => ({
+  cli: {
+    hookCommandSource: (source, escape, base) => {
+      const groups = parseNodeCommand(source);
+      return [
+        `${groups.before} --experimental-loader=${escape(
+          convertFileUrlToPath(
+            toAbsoluteUrl(`lib/node/recorder-${recorder}.mjs`, base),
+          ),
+        )}${groups.after}`,
+      ];
     },
-    env: {
-      compileCommand: (configuration, env) => {
-        logWarning(
-          "Cannot recursively record mocha processes: %j",
-          configuration.command,
-        );
-        return compilers.mocha.cli.compileCommand(configuration, env);
-      },
-      compileEnvironment: (configuration, env) =>
-        compilers.mocha.cli.compileEnvironment(configuration, env),
+    hookCommandTokens: (tokens, _escape, base) => {
+      const { before, after } = splitNodeCommand(tokens);
+      return [
+        ...before,
+        "--experimental-loader",
+        convertFileUrlToPath(
+          toAbsoluteUrl(`lib/node/recorder-${recorder}.mjs`, base),
+        ),
+        ...after,
+      ];
     },
+    hookEnvironment: (env, _base) => env,
   },
-  node: {
-    cli: {
-      compileCommand: (
-        {
-          recorder,
-          agent: { directory },
-          command: { source, tokens },
-          "command-options": { shell },
-        },
+  env: {
+    hookCommandSource: (source, _escape, _base) => [source],
+    hookCommandTokens: (tokens, _escape, _base) => tokens,
+    hookEnvironment: (env, base) => ({
+      ...env,
+      NODE_OPTIONS: `${coalesce(
         env,
-      ) => {
-        if (tokens === null) {
-          const groups = parseNodeCommand(source);
-          expect(
-            groups !== null,
-            "Could not find node exectuable in command %j",
-            source,
-          );
-          const resolved_shell = resolveShell(shell, env);
-          return [
-            ...resolved_shell,
-            `${groups.before} --experimental-loader=${escapeShell(
-              resolved_shell,
-              convertFileUrlToPath(
-                toAbsoluteUrl(`lib/node/recorder-${recorder}.mjs`, directory),
-              ),
-            )}${groups.after}`,
-          ];
-        } else {
-          const { before, after } = splitNodeCommand(tokens);
-          return [
-            ...before,
-            "--experimental-loader",
-            convertFileUrlToPath(
-              toAbsoluteUrl(`lib/node/recorder-${recorder}.mjs`, directory),
-            ),
-            ...after,
-          ];
-        }
-      },
-      compileEnvironment: (_configuration, env) => env,
-    },
-    env: {
-      compileCommand: (
-        { command: { source, tokens }, "command-options": { shell } },
-        env,
-      ) => {
-        if (tokens === null) {
-          return [...resolveShell(shell, env), source];
-        } else {
-          logGuardWarning(
-            shell !== null,
-            "There is no need to provide a shell if the command is already parsed: %j",
-            tokens,
-          );
-          return tokens;
-        }
-      },
-      compileEnvironment: ({ agent: { directory }, recorder }, env) => ({
-        ...env,
-        NODE_OPTIONS: `${coalesce(
-          env,
-          "NODE_OPTIONS",
-          "",
-        )} --experimental-loader=${escapeNodeOption(
-          toAbsoluteUrl(`lib/node/recorder-${recorder}.mjs`, directory),
-        )}`,
-      }),
-    },
+        "NODE_OPTIONS",
+        "",
+      )} --experimental-loader=${escapeNodeOption(
+        toAbsoluteUrl(`lib/node/recorder-${recorder}.mjs`, base),
+      )}`,
+    }),
+  },
+});
+
+const mocha_hooker = {
+  hookCommandSource: (source, escape, base) => {
+    const groups = parseMochaCommand(source);
+    return [
+      `${groups.before} --require ${escape(
+        convertFileUrlToPath(
+          toAbsoluteUrl("lib/node/recorder-mocha.mjs", base),
+        ),
+      )}${groups.after}`,
+    ];
+  },
+  hookCommandTokens: (tokens, _escape, base) => {
+    const { before, after } = splitMochaCommand(tokens);
+    return [
+      ...before,
+      "--require",
+      convertFileUrlToPath(toAbsoluteUrl("lib/node/recorder-mocha.mjs", base)),
+      ...after,
+    ];
+  },
+  hookEnvironment: (env, base) => ({
+    ...env,
+    NODE_OPTIONS: `${coalesce(
+      env,
+      "NODE_OPTIONS",
+      "",
+    )} --experimental-loader=${escapeNodeOption(
+      toAbsoluteUrl("lib/node/mocha-loader.mjs", base),
+    )}`,
+  }),
+};
+
+const hookers = {
+  process: generateNodeHooker("process"),
+  remote: generateNodeHooker("remote"),
+  mocha: {
+    cli: mocha_hooker,
+    env: mocha_hooker,
   },
 };
 
@@ -400,26 +354,34 @@ export const compileConfigurationCommand = (configuration, env) => {
   assert(configuration.agent !== null, "missing agent in configuration");
   assert(configuration.command !== null, "missing command in configuration");
   const {
+    agent: { directory },
     recorder,
     "recursive-process-recording": recursive,
+    command: { source, tokens },
     "command-options": options,
   } = configuration;
+  expect(
+    tokens !== null || options.shell !== false,
+    "A shell must be provided in order to hook unparsed command, please set `command-options.shell` to `true` or provide a parsed command as an array of tokens",
+  );
   env = {
     ...env,
     ...options.env,
     APPMAP_CONFIGURATION: stringifyJSON(configuration),
   };
-  const { compileCommand, compileEnvironment } =
-    compilers[recorder === "mocha" ? "mocha" : "node"][
-      recursive ? "env" : "cli"
-    ];
-  const [exec, ...argv] = compileCommand(configuration, env);
+  const { hookCommandSource, hookCommandTokens, hookEnvironment } =
+    hookers[recorder][recursive ? "env" : "cli"];
+  const escape = generateEscape(options.shell, env);
+  const [exec, ...argv] =
+    tokens === null
+      ? hookCommandSource(source, escape, directory)
+      : hookCommandTokens(tokens, escape, directory);
   return {
     exec,
     argv,
     options: {
       ...options,
-      env: compileEnvironment(configuration, env),
+      env: hookEnvironment(env, directory),
     },
   };
 };

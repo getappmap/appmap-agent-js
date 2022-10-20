@@ -79,7 +79,7 @@ const normalizeExclusion = (exclusion, _base) => {
 };
 
 const normalizeCommandOptions = (options, base) => ({
-  shell: null,
+  shell: true,
   encoding: "utf8",
   env: {},
   stdio: "inherit",
@@ -455,7 +455,7 @@ export const createConfiguration = (home) => ({
   command: null,
   "command-options": {
     cwd: toAbsoluteUrl(".", home),
-    shell: null,
+    shell: true,
     encoding: "utf8",
     env: {},
     stdio: "inherit",

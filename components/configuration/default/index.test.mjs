@@ -140,7 +140,7 @@ assertDeepEqual(
   ),
   {
     cwd: "file:///w:/base/",
-    shell: null,
+    shell: true,
     encoding: "utf8",
     env: { FOO: "BAR" },
     stdio: "inherit",
@@ -151,7 +151,7 @@ assertDeepEqual(
 
 assertDeepEqual(extend("command-options", { cwd: "cwd" }, "file:///w:/base/"), {
   cwd: "file:///w:/base/cwd/",
-  shell: null,
+  shell: true,
   encoding: "utf8",
   env: {},
   stdio: "inherit",

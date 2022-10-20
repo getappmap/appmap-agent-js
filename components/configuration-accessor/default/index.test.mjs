@@ -281,7 +281,7 @@ const testCompileCommand = ({
   recorder = "process",
   exec = "exec",
   argv = ["argv"],
-  shell = null,
+  shell = false,
   options = null,
 }) => {
   assertDeepEqual(
@@ -353,9 +353,9 @@ testCompileCommand({
   recorder: "process",
   directory: "agent",
   command: "node main.js argv1",
-  shell: ["exec", "flag"],
-  exec: "exec",
-  argv: ["flag", "node main.js argv1"],
+  shell: "shell",
+  exec: "node main.js argv1",
+  argv: [],
   base: "file:///w:/base/",
   options:
     "--experimental-loader=file:///w:/base/agent/lib/node/recorder-process.mjs",
@@ -383,17 +383,14 @@ testCompileCommand({
   recorder: "process",
   directory: "agent",
   command: "node main.js argv1",
-  shell: ["/bin/sh", "-c"],
-  exec: "/bin/sh",
-  argv: [
-    "-c",
-    `node --experimental-loader=${
-      // explicit platform specific because of shell escape
-      getPlatform() === "win32"
-        ? "w:\\\\base\\\\agent\\\\lib\\\\node\\\\recorder-process.mjs"
-        : "/w:/base/agent/lib/node/recorder-process.mjs"
-    } main.js argv1`,
-  ],
+  shell: "/bin/sh",
+  exec: `node --experimental-loader=${
+    // explicit platform specific because of shell escape
+    getPlatform() === "win32"
+      ? "w:\\\\base\\\\agent\\\\lib\\\\node\\\\recorder-process.mjs"
+      : "/w:/base/agent/lib/node/recorder-process.mjs"
+  } main.js argv1`,
+  argv: [],
   base: "file:///w:/base/",
 });
 
@@ -404,17 +401,14 @@ testCompileCommand({
   recorder: "process",
   directory: "agent",
   command: "node main.js argv1",
-  shell: ["cmd.exe", "/c"],
-  exec: "cmd.exe",
-  argv: [
-    "/c",
-    `node --experimental-loader=${
-      // explicit platform specific because of shell escape
-      getPlatform() === "win32"
-        ? "w:\\base\\agent\\lib\\node\\recorder-process.mjs"
-        : "/w:/base/agent/lib/node/recorder-process.mjs"
-    } main.js argv1`,
-  ],
+  shell: "cmd.exe",
+  exec: `node --experimental-loader=${
+    // explicit platform specific because of shell escape
+    getPlatform() === "win32"
+      ? "w:\\base\\agent\\lib\\node\\recorder-process.mjs"
+      : "/w:/base/agent/lib/node/recorder-process.mjs"
+  } main.js argv1`,
+  argv: [],
   base: "file:///w:/base/",
 });
 
@@ -444,16 +438,14 @@ testCompileCommand({
   recorder: "mocha",
   directory: "agent",
   command: "npx mocha argv1",
-  exec: getPlatform() === "win32" ? "cmd.exe" : "/bin/sh",
-  argv: [
-    getPlatform() === "win32" ? "/c" : "-c",
-    `npx mocha --require ${
-      // explicit platform specific because of shell escape
-      getPlatform() === "win32"
-        ? "w:\\^ base^ \\agent\\lib\\node\\recorder-mocha.mjs"
-        : "/w:/\\ base\\ /agent/lib/node/recorder-mocha.mjs"
-    } argv1`,
-  ],
+  shell: true,
+  exec: `npx mocha --require ${
+    // explicit platform specific because of shell escape
+    getPlatform() === "win32"
+      ? "w:\\^ base^ \\agent\\lib\\node\\recorder-mocha.mjs"
+      : "/w:/\\ base\\ /agent/lib/node/recorder-mocha.mjs"
+  } argv1`,
+  argv: [],
   base: "file:///w:/ base /",
   options:
     "--experimental-loader=file:///w:/%20base%20/agent/lib/node/mocha-loader.mjs",
@@ -461,15 +453,14 @@ testCompileCommand({
 
 assertThrow(() => {
   testCompileCommand({
-    recursive: true,
     recorder: "mocha",
     command: "foo bar",
+    shell: true,
   });
 }, /^AppmapError: Could not parse /u);
 
 assertThrow(() => {
   testCompileCommand({
-    recursive: true,
     recorder: "mocha",
     command: ["foo", "bar"],
   });

@@ -13,7 +13,7 @@ import {
 
 // getShell //
 
-assertDeepEqual(getShell(), ["/bin/sh", "-c"]);
+assertDeepEqual(getShell({}), "/bin/sh");
 
 // fromIpcPath && toIpcPath //
 

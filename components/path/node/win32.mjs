@@ -55,10 +55,8 @@ export const sanitizePathFilename = (filename) => {
   return filename;
 };
 
-export const getShell = (env) => {
-  const exec = hasOwn(env, "comspec") ? env.comspec : "cmd.exe";
-  return [exec, exec.endsWith("cmd") || exec.endsWith("cmd.exe") ? "/c" : "-c"];
-};
+export const getShell = (env) =>
+  hasOwn(env, "comspec") ? env.comspec : "cmd.exe";
 
 const ipc = "\\\\.\\pipe\\";
 

@@ -1,4 +1,4 @@
-import { assertEqual } from "../../__fixture__.mjs";
+import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
 import { EventEmitter } from "events";
 import {
   createConfiguration,
@@ -13,17 +13,17 @@ globalThis.GLOBAL_SPY_SPAWN = (exec, argv, _options) => {
   emitter.kill = (signal) => {
     emitter.emit("close", null, signal);
   };
-  assertEqual(exec, "shell");
-  if (argv[0] === "success") {
+  assertDeepEqual(argv, []);
+  if (exec === "success") {
     setTimeout(() => {
       emitter.emit("close", 0, null);
     }, 0);
-  } else if (argv[0] === "failure") {
+  } else if (exec === "failure") {
     setTimeout(() => {
       emitter.emit("close", 1, null);
     }, 0);
   } else {
-    assertEqual(argv[0], "sleep");
+    assertEqual(exec, "sleep");
   }
   return emitter;
 };
@@ -51,8 +51,8 @@ const configuration = createConfiguration("file:///w:/home");
       {
         scenario: "^",
         scenarios: {
-          key1: { command: "sleep", "command-options": { shell: ["shell"] } },
-          key2: { command: "sleep", "command-options": { shell: ["shell"] } },
+          key1: { command: "sleep" },
+          key2: { command: "sleep" },
         },
       },
       "file:///w:/base",
@@ -74,7 +74,6 @@ const configuration = createConfiguration("file:///w:/home");
         scenarios: {
           key: {
             command: "success",
-            "command-options": { shell: ["shell"] },
           },
         },
       },
@@ -97,11 +96,9 @@ const configuration = createConfiguration("file:///w:/home");
         scenarios: {
           key1: {
             command: "success",
-            "command-options": { shell: ["shell"] },
           },
           key2: {
             command: "failure",
-            "command-options": { shell: ["shell"] },
           },
         },
       },

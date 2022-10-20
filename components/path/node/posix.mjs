@@ -7,9 +7,7 @@ export const sanitizePathFilename = (filename) =>
     ? `...${filename}`
     : filename.replace(/\\/gu, "\\\\").replace(/\//gu, "\\");
 
-const constant = (any) => () => any;
-
-export const getShell = constant(["/bin/sh", "-c"]);
+export const getShell = (_env) => "/bin/sh";
 
 export const toIpcPath = (path) => path;
 

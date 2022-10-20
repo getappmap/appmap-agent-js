@@ -409,10 +409,9 @@
   additionalProperties: false
   properties:
     shell:
-      type: array
-      nullable: true
-      items: { type: string }
-      minItems: 1
+      anyOf:
+        - type: boolean
+        - type: string
     cwd: { $ref: path }
     encoding: { $ref: encoding }
     env: { $ref: env }
