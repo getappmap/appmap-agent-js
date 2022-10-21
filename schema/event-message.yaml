@@ -1,0 +1,37 @@
+type: object
+additionalProperties: false
+required:
+  - type
+  - site
+  - tab
+  - group
+  - time
+  - payload
+properties:
+  type:
+    const: event
+  # The type of event.
+  # We do not call this field `type` because it is independent from the other fields.
+  # In fancy terms, we keep type fields for algebraic data types.
+  # The site of an event condition its effect on the stack:
+  #  - begin and after events are pushes
+  #  - end and before events are pops
+  site:
+    $ref: site
+  # An identifier that associate a pair of matching event together.
+  # - begin events are associated to end events
+  # - before events are associated to after events
+  tab:
+    $ref: tab
+  # An identifier that groups top-level stack together.
+  # On node it is the current execution id.
+  group:
+    $ref: group
+  # The time when the event occured.
+  # It can be since the launch of the application.
+  # Or since any point in time before that.
+  time:
+    type: number
+  # The data carried by the event which is not used during event re-ordering.
+  payload:
+    $ref: payload

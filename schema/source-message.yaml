@@ -1,0 +1,25 @@
+type: object
+additionalProperties: false
+required:
+  - type
+  - content
+  - url
+  - shallow
+  - inline
+  - exclude
+properties:
+  type:
+    const: source
+  content:
+    type: string
+    nullable: true
+  url:
+    $ref: url
+  shallow:
+    type: boolean
+  inline:
+    type: boolean
+  exclude:
+    type: array
+    items:
+      $ref: cooked-exclusion

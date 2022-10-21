@@ -335,7 +335,7 @@ rules:
   import/no-mutable-exports: error
   # import/no-named-as-default-member: error
   # import/no-named-as-default: error
-  import/no-named-default: error
+  # import/no-named-default: error
   # import/no-named-export: error
   # import/no-namespace: error
   # import/no-nodejs-modules: error

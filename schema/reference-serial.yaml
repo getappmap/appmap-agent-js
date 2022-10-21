@@ -1,0 +1,26 @@
+type: object
+additionalProperties: false
+required:
+  - type
+  - print
+  - index
+  - constructor
+  - specific
+properties:
+  type:
+    enum:
+      - object
+      - function
+  print:
+    type: string
+  index:
+    $ref: natural
+  constructor:
+    type: string
+    nullable: true
+  specific:
+    anyOf:
+      - const: null
+      - $ref: error-specific
+      - $ref: array-specific
+      - $ref: hash-specific

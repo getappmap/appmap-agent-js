@@ -1,0 +1,5 @@
+enum:
+  - process
+  - mocha
+  - manual
+  - remote

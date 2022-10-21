@@ -1,0 +1,12 @@
+anyOf:
+  - $ref: log-level
+  - type: object
+    additionalProperties: false
+    properties:
+      level:
+        $ref: log-level
+      file:
+        anyOf:
+          - $ref: path
+          - const: 1
+          - const: 2

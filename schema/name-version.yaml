@@ -1,0 +1,3 @@
+anyOf:
+  - $ref: name-version-string
+  - $ref: name-version-object

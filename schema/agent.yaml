@@ -1,0 +1,10 @@
+type: object
+additionalProperties: false
+required:
+  - directory
+  - package
+properties:
+  directory:
+    $ref: path
+  package:
+    $ref: package

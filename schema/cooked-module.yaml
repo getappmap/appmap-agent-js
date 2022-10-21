@@ -1,0 +1,17 @@
+type: object
+additionalProperties: false
+required:
+  - enabled
+  - shallow
+  - inline-source
+  - exclude
+properties:
+  enabled:
+    type: boolean
+  shallow:
+    type: boolean
+  inline-source:
+    type: boolean
+    nullable: true
+  exclude:
+    $ref: cooked-exclude

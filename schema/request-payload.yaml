@@ -1,0 +1,29 @@
+type: object
+additionalProperties: false
+required:
+  - type
+  - side
+  - protocol
+  - method
+  - url
+  - route
+  - headers
+  - body
+properties:
+  type:
+    const: request
+  side:
+    $ref: side
+  protocol:
+    type: string
+  method:
+    type: string
+  url:
+    type: string
+  route:
+    type: string
+    nullable: true
+  headers:
+    $ref: headers
+  body:
+    $ref: serial

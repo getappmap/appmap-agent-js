@@ -1,0 +1,29 @@
+type: object
+additionalProperties: false
+required:
+  - type
+  - database
+  - version
+  - sql
+  - parameters
+properties:
+  type:
+    const: query
+  database:
+    type: string
+    nullable: true
+  version:
+    type: string
+    nullable: true
+  sql:
+    type: string
+  parameters:
+    anyOf:
+      - type: array
+        items:
+          $ref: serial
+      - type: object
+        additionalProperties: false
+        patternProperties:
+          ^:
+            $ref: serial

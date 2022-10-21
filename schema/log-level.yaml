@@ -1,0 +1,6 @@
+enum:
+  - debug
+  - info
+  - warning
+  - error
+  - off

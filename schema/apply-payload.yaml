@@ -1,0 +1,18 @@
+type: object
+additionalProperties: false
+required:
+  - type
+  - function
+  - this
+  - arguments
+properties:
+  type:
+    const: apply
+  function:
+    type: string
+  this:
+    $ref: serial
+  arguments:
+    type: array
+    items:
+      $ref: serial

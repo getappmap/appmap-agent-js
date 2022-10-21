@@ -1,0 +1,16 @@
+type: object
+additionalProperties: false
+required:
+  - directory
+  - history
+  - package
+properties:
+  directory:
+    $ref: url
+  history:
+    type: object
+    nullable: true
+  package:
+    anyOf:
+      - const: null
+      - $ref: package
