@@ -48,7 +48,7 @@ export const sanitizePathFilename = (filename) => {
     filename === "" ||
     filename.endsWith(".") ||
     filename.endsWith(" ") ||
-    forbidden.has(getBasename(filename))
+    forbidden.has(getBasename(filename).toUpperCase())
   ) {
     filename = `_${filename}_`;
   }
