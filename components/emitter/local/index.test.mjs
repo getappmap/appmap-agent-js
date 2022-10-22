@@ -7,7 +7,7 @@ import {
   takeLocalEmitterTrace,
 } from "./index.mjs?env=test";
 
-const configuration = createConfiguration("file:///home");
+const configuration = createConfiguration("protocol://host/home");
 
 const emitter = openEmitter(configuration);
 

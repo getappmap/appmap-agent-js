@@ -1,7 +1,10 @@
 import { readFileSync as readFile, writeFileSync as writeFile } from "fs";
-import { getFreshTemporaryURL } from "../../__fixture__.mjs";
 import { Socket } from "net";
 import NetSocketMessaging from "net-socket-messaging";
+import "../../__fixture__.mjs";
+import { getUuid } from "../../uuid/random/index.mjs?env=test";
+import { getTmpUrl } from "../../path/index.mjs?env=test";
+import { toAbsoluteUrl } from "../../url/index.mjs?env=test";
 import {
   createConfiguration,
   extendConfiguration,
@@ -21,7 +24,7 @@ const {
 
 const { createMessage } = NetSocketMessaging;
 
-const url = getFreshTemporaryURL();
+const base = toAbsoluteUrl(`${getUuid()}/`, getTmpUrl());
 
 const testAsync = async (port, configuration, messages) => {
   const socket = new Socket();
@@ -41,12 +44,12 @@ const testAsync = async (port, configuration, messages) => {
 };
 
 const receptor_configuration = extendConfiguration(
-  createConfiguration("file:///home"),
+  createConfiguration("protocol://host/home"),
   {
     recorder: "process",
     appmap_dir: "directory",
   },
-  url,
+  base,
 );
 
 const receptor = await openReceptorAsync(
@@ -60,7 +63,7 @@ const port = adaptReceptorConfiguration(receptor, receptor_configuration)[
 await testAsync(
   port,
   extendConfiguration(
-    createConfiguration("file:///home"),
+    createConfiguration("protocol://host/home"),
     {
       recorder: "remote",
     },
@@ -70,12 +73,12 @@ await testAsync(
 );
 
 {
-  const url = getFreshTemporaryURL();
-  writeFile(new URL(url), "content", "utf8");
+  const filename = getUuid();
+  writeFile(new URL(filename, base), "content", "utf8");
   await testAsync(
     port,
     extendConfiguration(
-      createConfiguration("file:///home"),
+      createConfiguration("protocol://host/home"),
       {
         recorder: "process",
       },
@@ -90,7 +93,7 @@ await testAsync(
       },
       {
         type: "source",
-        url,
+        url: new URL(filename, base).href,
         content: null,
         shallow: false,
         inline: false,
@@ -105,12 +108,12 @@ await testAsync(
   );
 }
 
-readFile(new URL(`${url}/directory/process/anonymous.appmap.json`));
+readFile(new URL("directory/process/anonymous.appmap.json", base));
 
 await testAsync(
   port,
   extendConfiguration(
-    createConfiguration("file:///home"),
+    createConfiguration("protocol://host/home"),
     {
       recorder: "process",
     },
@@ -126,15 +129,15 @@ await testAsync(
   ],
 );
 
-readFile(new URL(`${url}/directory/process/anonymous-1.appmap.json`));
+readFile(new URL("directory/process/anonymous-1.appmap.json", base));
 
 await testAsync(
   port,
   extendConfiguration(
-    createConfiguration("file:///home"),
+    createConfiguration("protocol://host/home"),
     {
       recorder: "process",
-      "map-name": "map / name",
+      "map-name": "map  name",
     },
     null,
   ),
@@ -148,6 +151,6 @@ await testAsync(
   ],
 );
 
-readFile(new URL(`${url}/directory/process/map-name.appmap.json`));
+readFile(new URL("directory/process/map-name.appmap.json", base));
 
 await closeReceptorAsync(receptor);

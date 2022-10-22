@@ -21,7 +21,10 @@ const { questionConfigAsync } = await import(
   `../../questionnaire/index.mjs${__search}`
 );
 const { hasOwnProperty } = await import(`../../util/index.mjs${__search}`);
-const { urlifyPath, appendURLSegment, appendURLSegmentArray } = await import(
+const { convertPathToFileUrl, toAbsolutePath, getCwdPath } = await import(
+  `../../path/index.mjs${__search}`
+);
+const { toDirectoryUrl, toAbsoluteUrl } = await import(
   `../../url/index.mjs${__search}`
 );
 const { prompts } = await import(`../../prompts/index.mjs${__search}`);
@@ -34,25 +37,34 @@ const generateLog = (prefix, writable) => (message) => {
   writable.write(`${prefix} ${message}${"\n"}`);
 };
 
-export const mainAsync = async ({ version, cwd, env, stdout, stderr }) => {
+export const mainAsync = async (
+  { version, cwd, env, stdout, stderr },
+  import_meta_url = import.meta.url,
+) => {
   const logSuccess = generateLog(chalkGreen("\u2714"), stdout);
   const logWarning = generateLog(chalkYellow("\u26A0"), stderr);
   const logFailure = generateLog(chalkRed("\u2716"), stderr);
-  const cwd_url = urlifyPath(cwd(), "file:///");
-  const { href: agent_url } = new URL("../../..", import.meta.url);
-  let conf_url = appendURLSegment(cwd_url, "appmap.yml");
+  const cwd_url = toDirectoryUrl(convertPathToFileUrl(cwd()));
+  const agent_url = toAbsoluteUrl("../../../", import_meta_url);
+  let conf_url = toAbsoluteUrl("appmap.yml", cwd_url);
   if (hasOwnProperty(env, "APPMAP_CONFIGURATION_PATH")) {
-    conf_url = urlifyPath(env.APPMAP_CONFIGURATION_PATH, cwd_url);
+    conf_url = convertPathToFileUrl(
+      toAbsolutePath(env.APPMAP_CONFIGURATION_PATH, getCwdPath({ cwd })),
+    );
   }
   let repo_url = cwd_url;
   if (hasOwnProperty(env, "APPMAP_REPOSITORY_DIRECTORY")) {
-    repo_url = urlifyPath(env.APPMAP_REPOSITORY_DIRECTORY, cwd_url);
+    repo_url = toDirectoryUrl(
+      convertPathToFileUrl(
+        toAbsolutePath(env.APPMAP_REPOSITORY_DIRECTORY, getCwdPath({ cwd })),
+      ),
+    );
   }
   // node //
   {
     const _package = parseJSON(
       await readFileAsync(
-        new URL(appendURLSegment(agent_url, "package.json")),
+        new URL(toAbsoluteUrl("package.json", agent_url)),
         "utf8",
       ),
     );
@@ -121,35 +133,29 @@ export const mainAsync = async ({ version, cwd, env, stdout, stderr }) => {
   }
   // appmap-agent-js //
   {
-    const { resolve } = createRequire(
-      new URL(appendURLSegment(repo_url, "dummy.js")),
-    );
-    let agent_main = null;
+    const { resolve } = createRequire(repo_url);
+    let agent_main_path = null;
     try {
-      agent_main = resolve("@appland/appmap-agent-js");
+      agent_main_path = resolve("@appland/appmap-agent-js");
     } catch ({ message }) {
       logFailure(`cannot resolve appmap-agent-js module: ${message}`);
       return false;
     }
-    logSuccess("appmap-agent-js module is available");
-    const resolved_agent_url = appendURLSegmentArray(
-      urlifyPath(agent_main, "file:///"),
-      ["..", "..", ".."],
-    );
-    /* c8 ignore start */
+    const agent_main_url = convertPathToFileUrl(agent_main_path);
+    const resolved_agent_url = toAbsoluteUrl("../../", agent_main_url);
     if (agent_url !== resolved_agent_url) {
       logFailure(
         `agent location mismatch, expected agent to resolve to ${agent_url} but got ${resolved_agent_url}`,
       );
       return false;
     }
-    /* c8 ignore stop */
+    logSuccess("appmap-agent-js module is available");
   }
   // git repository //
   {
     let success = true;
     try {
-      await readdirAsync(new URL(appendURLSegment(repo_url, ".git")));
+      await readdirAsync(new URL(toAbsoluteUrl(".git", repo_url)));
     } catch ({ message }) {
       success = false;
       logWarning(
@@ -165,7 +171,7 @@ export const mainAsync = async ({ version, cwd, env, stdout, stderr }) => {
     let success = true;
     try {
       await readFileAsync(
-        new URL(appendURLSegment(repo_url, "package.json")),
+        new URL(toAbsoluteUrl("package.json", repo_url)),
         "utf8",
       );
     } catch ({ code, message }) {

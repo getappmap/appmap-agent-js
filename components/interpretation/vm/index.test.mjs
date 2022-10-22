@@ -6,6 +6,9 @@ import { runScript } from "./index.mjs?env=test";
 
 const { undefined } = globalThis;
 
-assertEqual(runScript("let hidden = 123;", "file:///script.js"), undefined);
+assertEqual(
+  runScript("let hidden = 123;", "protocol://host/script.js"),
+  undefined,
+);
 
 assertEqual(hidden, 123);

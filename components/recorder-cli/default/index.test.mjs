@@ -1,6 +1,7 @@
 import { EventEmitter } from "events";
-import { pathToFileURL } from "url";
+
 import { assertThrow, assertEqual } from "../../__fixture__.mjs";
+import { convertFileUrlToPath } from "../../path/index.mjs?env=test";
 import {
   createConfiguration,
   extendConfiguration,
@@ -13,36 +14,36 @@ import {
 } from "./index.mjs?env=test";
 
 const {
+  process: { version },
   Object: { assign },
   Error,
-  process,
 } = globalThis;
 
 const mock_process = new EventEmitter();
 
 assign(mock_process, {
-  pid: process.pid,
-  cwd: process.cwd,
-  argv: process.argv,
-  version: process.version,
+  pid: 1234,
+  cwd: () => convertFileUrlToPath("file:///w:/cwd"),
+  argv: ["node", "main.js"],
+  version,
 });
 
 assertEqual(
   createRecorder(
     mock_process,
     extendConfiguration(
-      createConfiguration("file:///home"),
+      createConfiguration("file:///w:/home/"),
       {
-        processes: false,
+        "default-process": false,
       },
-      pathToFileURL(process.cwd()),
+      "file:///w:/base/",
     ),
   ),
   null,
 );
 
 const configuration = extendConfiguration(
-  createConfiguration("file:///home"),
+  createConfiguration("file:///w:/home/"),
   {
     hooks: {
       cjs: false,
@@ -53,7 +54,7 @@ const configuration = extendConfiguration(
       mysql: false,
     },
   },
-  "file:///base",
+  "file:///w:/base/",
 );
 
 const recorder = createRecorder(mock_process, configuration);

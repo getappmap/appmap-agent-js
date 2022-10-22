@@ -18,18 +18,17 @@ const splitDataPath = (path) => {
 };
 
 const generateReadFile = (readFile) => (url) => {
-  const url_object = new URL(url);
-  const { protocol, pathname: path } = url_object;
-  if (protocol === "file:") {
-    return readFile(url_object, "utf8");
-  } else if (protocol === "data:") {
-    const { head, body } = splitDataPath(path);
+  const url_obj = new URL(url);
+  if (url_obj.protocol === "file:") {
+    return readFile(url_obj, "utf8");
+  } else if (url_obj.protocol === "data:") {
+    const { head, body } = splitDataPath(url_obj.pathname);
     if (head.endsWith(";base64")) {
       logGuardWarning(
         !head.toLowerCase().includes(";charset=utf-8;") &&
           !head.toLowerCase().includes(";charset=utf8;"),
         "Data url is encoded as base64 and does not declare UTF-8 as its character encoding, will try to use UTF-8 anyway >> %s",
-        path,
+        url,
       );
       return toBuffer(body, "base64").toString("utf8");
     } else {

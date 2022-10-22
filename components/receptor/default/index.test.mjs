@@ -1,5 +1,8 @@
-import { getFreshTemporaryURL } from "../../__fixture__.mjs";
 import { mkdir as mkdirAsync } from "fs/promises";
+import "../../__fixture__.mjs";
+import { getUuid } from "../../uuid/random/index.mjs?env=test";
+import { getTmpUrl } from "../../path/index.mjs?env=test";
+import { toAbsoluteUrl } from "../../url/index.mjs?env=test";
 import {
   createConfiguration,
   extendConfiguration,
@@ -13,12 +16,12 @@ import {
 
 const { URL } = globalThis;
 
-const directory = getFreshTemporaryURL();
-await mkdirAsync(new URL(directory));
+const base = toAbsoluteUrl(`${getUuid()}/`, getTmpUrl());
+await mkdirAsync(new URL(base));
 const configuration = extendConfiguration(
-  createConfiguration(directory),
+  createConfiguration(base),
   { recorder: "process", appmap_dir: "directory" },
-  directory,
+  base,
 );
 
 const receptor = await openReceptorAsync(

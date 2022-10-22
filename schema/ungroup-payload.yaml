@@ -1,0 +1,10 @@
+type: object
+additionalProperties: false
+required:
+  - type
+  - group
+properties:
+  type:
+    const: ungroup
+  group:
+    $ref: group

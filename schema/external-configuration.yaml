@@ -1,0 +1,153 @@
+type: object
+properties:
+  agent:
+    $ref: agent
+  repository:
+    $ref: repository
+  scenarios:
+    type: object
+    additionalProperties: false
+    patternProperties:
+      ^:
+        $ref: external-configuration
+  scenario:
+    $ref: regexp
+  recursive-process-recording:
+    type: boolean
+  command:
+    anyOf:
+      - type: string
+      - type: array
+        items:
+          type: string
+  command-options:
+    $ref: command-options
+  validate:
+    type: object
+    additionalProperties: false
+    properties:
+      message:
+        type: boolean
+      appmap:
+        type: boolean
+  log:
+    $ref: log
+  host:
+    const: localhost
+  session:
+    $ref: basename
+  trace-port:
+    $ref: port
+  trace-protocol:
+    const: TCP
+  track-port:
+    $ref: port
+  track-protocol:
+    const: HTTP/1.1
+  intercept-track-port:
+    $ref: regexp
+  intercept-track-protocol:
+    const: HTTP/1.1
+  socket:
+    $ref: socket
+  heartbeat:
+    $ref: heartbeat
+  threshold:
+    $ref: threshold
+  recorder:
+    $ref: recorder
+  inline-source:
+    type: boolean
+  hooks:
+    type: object
+    additionalProperties: false
+    properties:
+      cjs:
+        type: boolean
+      esm:
+        anyOf:
+          - type: boolean
+          - const: null
+          - $ref: regular-identifier
+      eval:
+        anyOf:
+          - type: boolean
+          - type: object
+            properties:
+              hidden:
+                $ref: regular-identifier
+              aliases:
+                type: array
+                items:
+                  type: string
+      apply:
+        anyOf:
+          - type: boolean
+          - const: null
+          - $ref: regular-identifier
+      http:
+        type: boolean
+      mysql:
+        type: boolean
+      pg:
+        type: boolean
+      sqlite3:
+        type: boolean
+  ordering:
+    $ref: ordering
+  default-process:
+    type: boolean
+  processes:
+    anyOf:
+      - $ref: process-specifier
+      - type: array
+        items:
+          $ref: process-specifier
+  main:
+    $ref: path
+  engine:
+    type: string
+  language:
+    $ref: language
+  default-package:
+    $ref: module
+  packages:
+    anyOf:
+      - $ref: module-specifier
+      - type: array
+        items:
+          $ref: module-specifier
+  exclude:
+    $ref: exclude
+  anonymous-name-separator:
+    $ref: separator
+  function-name-placeholder:
+    type: string
+  collapse-package-hierachy:
+    type: boolean
+  recording:
+    $ref: recording
+  serialization:
+    $ref: serialization
+  pruning:
+    type: boolean
+  appmap_dir:
+    $ref: path
+  appmap_file:
+    $ref: basename
+  name:
+    type: string
+  map-name:
+    type: string
+  feature:
+    type: string
+  feature-group:
+    type: string
+  labels:
+    type: array
+    items:
+      type: string
+  frameworks:
+    type: array
+    items:
+      $ref: name-version

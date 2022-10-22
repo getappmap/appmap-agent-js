@@ -1,5 +1,8 @@
 import { writeFile as writeFileAsync } from "node:fs/promises";
-import { getFreshTemporaryURL, assertDeepEqual } from "../../__fixture__.mjs";
+import { assertDeepEqual } from "../../__fixture__.mjs";
+import { getUuid } from "../../uuid/random/index.mjs?env=test";
+import { getTmpUrl } from "../../path/index.mjs?env=test";
+import { toAbsoluteUrl } from "../../url/index.mjs?env=test";
 import { mapSource } from "../../source/index.mjs?env=test";
 import { loadSourceMap } from "./source-map.mjs?env=test";
 
@@ -46,7 +49,7 @@ assertDeepEqual(
   null,
 );
 
-const url = getFreshTemporaryURL();
+const url = toAbsoluteUrl(getUuid(), getTmpUrl());
 
 assertDeepEqual(
   mapSource(

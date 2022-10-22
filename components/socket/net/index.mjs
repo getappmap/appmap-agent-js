@@ -3,10 +3,11 @@ const { URL, process, setInterval, clearInterval } = globalThis;
 const { search: __search } = new URL(import.meta.url);
 
 import { connect } from "net";
-import { fileURLToPath } from "url";
 import { Buffer } from "buffer";
 import NetSocketMessaging from "net-socket-messaging";
-const { toIPCPath } = await import(`../../path/index.mjs${__search}`);
+const { toIpcPath, convertFileUrlToPath } = await import(
+  `../../path/index.mjs${__search}`
+);
 const { mapMaybe } = await import(`../../util/index.mjs${__search}`);
 const { logGuardWarning, logWarning } = await import(
   `../../log/index.mjs${__search}`
@@ -28,7 +29,7 @@ const flush = (socket, messages) => {
 export const openSocket = (host, port, { heartbeat, threshold }) => {
   const socket =
     typeof port === "string"
-      ? connect(toIPCPath(fileURLToPath(port)))
+      ? connect(toIpcPath(convertFileUrlToPath(port)))
       : connect(port, host);
   socket.unref();
   const messages = [];

@@ -1,0 +1,5 @@
+anyOf:
+  - const: 0
+  - const: ""
+  - $ref: port-number
+  - $ref: path

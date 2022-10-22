@@ -1,0 +1,10 @@
+type: object
+additionalProperties: false
+required:
+  - type
+  - iterator
+properties:
+  type:
+    const: yield
+  iterator:
+    $ref: serial

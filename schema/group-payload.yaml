@@ -1,0 +1,13 @@
+type: object
+additionalProperties: false
+required:
+  - type
+  - group
+  - description
+properties:
+  type:
+    const: group
+  group:
+    $ref: group
+  description:
+    type: string

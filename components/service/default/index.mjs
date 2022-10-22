@@ -2,14 +2,16 @@ const { URL, Promise, Set, setTimeout } = globalThis;
 
 const { search: __search } = new URL(import.meta.url);
 
-import { tmpdir as getTemporaryDirectory } from "os";
-import { pathToFileURL, fileURLToPath } from "url";
+import { tmpdir as getTemporaryDirectory } from "node:os";
+
 const { logWarning } = await import(`../../log/index.mjs${__search}`);
-const { appendURLSegment } = await import(`../../url/index.mjs${__search}`);
-const { toIPCPath, fromIPCPath } = await import(
-  `../../path/index.mjs${__search}`
+const { toDirectoryUrl, toAbsoluteUrl } = await import(
+  `../../url/index.mjs${__search}`
 );
-const { getUUID } = await import(`../../uuid/index.mjs${__search}`);
+
+const { toIpcPath, fromIpcPath, convertPathToFileUrl, convertFileUrlToPath } =
+  await import(`../../path/index.mjs${__search}`);
+const { getUuid } = await import(`../../uuid/index.mjs${__search}`);
 
 export const openServiceAsync = (server, port) => {
   const sockets = new Set();
@@ -31,13 +33,13 @@ export const openServiceAsync = (server, port) => {
       resolve({ server, sockets });
     });
     if (port === "") {
-      port = appendURLSegment(
-        pathToFileURL(getTemporaryDirectory()),
-        getUUID(),
+      port = toAbsoluteUrl(
+        getUuid(),
+        toDirectoryUrl(convertPathToFileUrl(getTemporaryDirectory())),
       );
     }
     server.listen(
-      typeof port === "string" ? toIPCPath(fileURLToPath(port)) : port,
+      typeof port === "string" ? toIpcPath(convertFileUrlToPath(port)) : port,
     );
   });
 };
@@ -45,7 +47,7 @@ export const openServiceAsync = (server, port) => {
 export const getServicePort = ({ server }) => {
   const address = server.address();
   return typeof address === "string"
-    ? pathToFileURL(fromIPCPath(address)).toString()
+    ? convertPathToFileUrl(fromIpcPath(address))
     : address.port;
 };
 

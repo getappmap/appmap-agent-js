@@ -1,0 +1,20 @@
+type: object
+additionalProperties: false
+properties:
+  shell:
+    anyOf:
+      - type: boolean
+      - type: string
+  cwd:
+    $ref: path
+  encoding:
+    $ref: encoding
+  env:
+    $ref: env
+  stdio:
+    $ref: stdio
+  timeout:
+    type: integer
+    minimum: 0
+  killSignal:
+    $ref: signal

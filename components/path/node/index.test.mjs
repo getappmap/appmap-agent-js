@@ -1,43 +1,41 @@
+const { process } = globalThis;
+
+import { assertEqual } from "../../__fixture__.mjs";
+
 import {
-  assertEqual,
-  assertThrow,
-  assertDeepEqual,
-} from "../../__fixture__.mjs";
-import { platform as getPlatform } from "os";
-import {
-  getShell,
-  toIPCPath,
-  fromIPCPath,
-  makeSegment,
-  encodeSegment,
-  decodeSegment,
-  joinPath,
-  splitPath,
-  isAbsolutePath,
+  getTmpPath,
+  getTmpUrl,
+  getCwdPath,
+  getCwdUrl,
+  toAbsolutePath,
+  convertPathToFileUrl,
+  convertFileUrlToPath,
+  getPathBasename,
+  getPathExtension,
 } from "./index.mjs?env=test";
 
-if (getPlatform() === "win32") {
-  assertDeepEqual(getShell({}), ["cmd.exe", "/c"]);
-  assertDeepEqual(getShell({ comspec: "powershell.exe" }), [
-    "powershell.exe",
-    "-c",
-  ]);
-  assertEqual(fromIPCPath(toIPCPath("C:\\foo")), "C:\\foo");
-  assertEqual(makeSegment("foo\\bar/qux", "-"), "foo-bar-qux");
-  assertThrow(() => encodeSegment("foo\\bar"));
-  assertThrow(() => encodeSegment("foo/bar"));
-  assertEqual(decodeSegment(encodeSegment("foo#bar")), "foo#bar");
-  assertEqual(joinPath(splitPath("foo\\bar/qux")), "foo\\bar\\qux");
-  assertEqual(isAbsolutePath("C:\\foo"), true);
-  assertEqual(isAbsolutePath("\\\\foo"), true);
-  assertEqual(isAbsolutePath("foo"), false);
-} else {
-  assertDeepEqual(getShell({}), ["/bin/sh", "-c"]);
-  assertEqual(fromIPCPath(toIPCPath("/foo")), "/foo");
-  assertEqual(makeSegment("foo\\bar/qux", "-"), "foo\\bar-qux");
-  assertThrow(() => encodeSegment("foo/bar"));
-  assertEqual(decodeSegment(encodeSegment("foo\\bar")), "foo\\bar");
-  assertEqual(joinPath(splitPath("foo\\bar/qux")), "foo\\bar/qux");
-  assertEqual(isAbsolutePath("/foo"), true);
-  assertEqual(isAbsolutePath("foo"), false);
+const base = getCwdPath(process);
+
+assertEqual(convertPathToFileUrl(base), getCwdUrl(process));
+
+assertEqual(convertFileUrlToPath(getCwdUrl(process)), base);
+
+assertEqual(convertPathToFileUrl(getTmpPath()), getTmpUrl());
+
+assertEqual(convertFileUrlToPath(getTmpUrl()), getTmpPath());
+
+assertEqual(getPathBasename(base), null);
+
+assertEqual(getPathExtension(base), null);
+
+{
+  const path = toAbsolutePath("basename.ext.ext", base);
+  assertEqual(getPathBasename(path), "basename");
+  assertEqual(getPathExtension(path), ".ext.ext");
+}
+
+{
+  const path = toAbsolutePath("basename", base);
+  assertEqual(getPathBasename(path), "basename");
+  assertEqual(getPathExtension(path), null);
 }

@@ -1,10 +1,13 @@
 import Http from "http";
 import createApp from "express";
+import { assertDeepEqual } from "../../__fixture__.mjs";
 import {
-  assertDeepEqual,
-  getFreshTemporaryURL,
-  convertPort,
-} from "../../__fixture__.mjs";
+  toIpcPath,
+  getTmpUrl,
+  convertFileUrlToPath,
+} from "../../path/index.mjs?env=test";
+import { getUuid } from "../../uuid/random/index.mjs?env=test";
+import { toAbsoluteUrl } from "../../url/index.mjs?env=test";
 import { testHookAsync } from "../../hook-fixture/index.mjs?env=test";
 import * as HookHttpServer from "./index.mjs?env=test";
 
@@ -23,7 +26,9 @@ const listenAsync = (server, port) =>
     server.on("listening", () => {
       resolve(port === 0 ? server.address().port : port);
     });
-    server.listen(convertPort(port));
+    server.listen(
+      typeof port === "number" ? port : toIpcPath(convertFileUrlToPath(port)),
+    );
   });
 
 const promiseCycleClosing = async (request, response) =>
@@ -245,7 +250,7 @@ assertDeepEqual(
 
 // Track Port && http.Server //
 {
-  const port = getFreshTemporaryURL();
+  const port = toAbsoluteUrl(getUuid(), getTmpUrl());
   assertDeepEqual(
     await testHookAsync(
       HookHttpServer,
@@ -267,7 +272,7 @@ assertDeepEqual(
         assertDeepEqual(
           await requestAsync(
             Http.get({
-              socketPath: convertPort(port),
+              socketPath: toIpcPath(convertFileUrlToPath(port)),
               path: "/foo/bar",
             }),
           ),

@@ -1,38 +1,41 @@
 import { writeFile as writeFileAsync } from "fs/promises";
-import { fileURLToPath } from "url";
+
 import {
   assertThrow,
   assertDeepEqual,
   assertEqual,
-  getFreshTemporaryURL,
 } from "../../__fixture__.mjs";
+import { toAbsoluteUrl } from "../../url/index.mjs?env=test";
+import { getUuid } from "../../uuid/random/index.mjs?env=test";
+import { getTmpPath, getTmpUrl } from "../../path/index.mjs?env=test";
+import { getConfigurationPackage } from "../../configuration-accessor/index.mjs?env=test";
 import { loadProcessConfiguration } from "./index.mjs?env=test";
 
 const {
   URL,
   JSON: { stringify: stringifyJSON },
-  Reflect: { get },
 } = globalThis;
 
 assertThrow(
   () =>
     loadProcessConfiguration({
-      env: { APPMAP_CONFIGURATION_PATH: "foo" },
+      env: { APPMAP_CONFIGURATION_PATH: getUuid() },
       argv: ["node", "main.mjs"],
-      cwd: () => "cwd",
+      cwd: getTmpPath,
     }),
   /^AppmapError: Unsupported configuration file extension/u,
 );
 
+// present configuration file //
 {
-  const url = getFreshTemporaryURL(".json");
+  const filename = `${getUuid()}.json`;
   loadProcessConfiguration({
-    env: { APPMAP_CONFIGURATION_PATH: fileURLToPath(url) },
+    env: { APPMAP_CONFIGURATION_PATH: filename },
     argv: ["node", "main.mjs"],
-    cwd: () => "cwd",
+    cwd: getTmpPath,
   });
   await writeFileAsync(
-    new URL(url),
+    new URL(filename, getTmpUrl()),
     stringifyJSON({ name: "app", "map-name": "name1" }),
     "utf8",
   );
@@ -45,7 +48,7 @@ assertThrow(
     log,
     "track-port": track_port,
   } = loadProcessConfiguration({
-    env: { APPMAP_CONFIGURATION_PATH: fileURLToPath(url) },
+    env: { APPMAP_CONFIGURATION_PATH: filename },
     argv: [
       ["node", "agent.mjs"],
       ["--track-port", "8080"],
@@ -57,10 +60,10 @@ assertThrow(
       ["--process", "'*'"],
       ["--", "exec", "arg1", "arg2"],
     ].flat(),
-    cwd: () => "cwd",
+    cwd: getTmpPath,
   });
-  assertEqual(packages.length, 3);
-  assertEqual(processes.length, 2);
+  assertEqual(packages.length, 2);
+  assertEqual(processes.length, 1);
   assertDeepEqual(
     { app_name, map_name, command, log, track_port },
     {
@@ -72,31 +75,63 @@ assertThrow(
       },
       map_name: "name2",
       command: {
-        script: null,
+        source: null,
         tokens: ["exec", "arg1", "arg2"],
-        base: "file:///cwd",
       },
     },
   );
 }
 
-assertDeepEqual(
-  get(
-    loadProcessConfiguration({
-      env: {
-        APPMAP_CONFIGURATION_PATH: fileURLToPath(getFreshTemporaryURL(".json")),
-      },
-      argv: [
-        ["node", "agent.mjs"],
-        ["--command", "exec arg1 arg2"],
-      ].flat(),
-      cwd: () => "cwd",
-    }),
-    "command",
-  ),
-  {
-    script: "exec arg1 arg2",
+// missing configuration file && rest command //
+{
+  const configuration = loadProcessConfiguration({
+    env: {
+      APPMAP_CONFIGURATION_PATH: `${getUuid()}.json`,
+    },
+    argv: [
+      ["node", "agent.mjs"],
+      ["--command", "exec arg1 arg2"],
+    ].flat(),
+    cwd: getTmpPath,
+  });
+  assertDeepEqual(configuration.command, {
+    source: "exec arg1 arg2",
     tokens: null,
-    base: "file:///cwd",
-  },
-);
+  });
+  assertDeepEqual(
+    getConfigurationPackage(
+      configuration,
+      toAbsoluteUrl("package.js", getTmpUrl()),
+    ),
+    {
+      enabled: true,
+      shallow: false,
+      exclude: [],
+      "inline-source": null,
+    },
+  );
+  assertDeepEqual(
+    getConfigurationPackage(
+      configuration,
+      toAbsoluteUrl("../package.js", getTmpUrl()),
+    ),
+    {
+      enabled: false,
+      shallow: false,
+      exclude: [],
+      "inline-source": null,
+    },
+  );
+  assertDeepEqual(
+    getConfigurationPackage(
+      configuration,
+      toAbsoluteUrl("node_modules/package.js", getTmpUrl()),
+    ),
+    {
+      enabled: false,
+      shallow: false,
+      exclude: [],
+      "inline-source": null,
+    },
+  );
+}

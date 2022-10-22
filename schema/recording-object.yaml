@@ -1,0 +1,10 @@
+type: object
+additionalProperties: false
+required:
+  - defined-class
+  - method-id
+properties:
+  defined-class:
+    type: string
+  method-id:
+    type: string

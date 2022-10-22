@@ -1,5 +1,0 @@
-default:
-  test: vm
-  node: vm
-  browser: dom
-dependencies: []

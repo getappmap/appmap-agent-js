@@ -1,0 +1,210 @@
+type: object
+additionalProperties: false
+minProperties: 42
+properties:
+  socket:
+    $ref: socket
+  heartbeat:
+    $ref: heartbeat
+  threshold:
+    $ref: threshold
+  scenario:
+    $ref: regexp
+  scenarios:
+    type: array
+    items:
+      type: object
+      required:
+        - key
+        - value
+        - base
+      properties:
+        key:
+          type: string
+        value:
+          $ref: external-configuration
+        base:
+          $ref: url
+  recursive-process-recording:
+    type: boolean
+  command:
+    type: object
+    nullable: true
+    properties:
+      tokens:
+        type: array
+        nullable: true
+        items:
+          type: string
+      source:
+        type: string
+        nullable: true
+  command-options:
+    $ref: cooked-command-options
+  validate:
+    type: object
+    additionalProperties: false
+    required:
+      - message
+      - appmap
+    properties:
+      message:
+        type: boolean
+      appmap:
+        type: boolean
+  agent:
+    anyOf:
+      - const: null
+      - $ref: cooked-agent
+  repository:
+    $ref: repository
+  log:
+    $ref: cooked-log
+  host:
+    const: localhost
+  session:
+    anyOf:
+      - const: null
+      - $ref: basename
+  trace-port:
+    $ref: cooked-port
+  trace-protocol:
+    const: TCP
+  track-port:
+    $ref: cooked-port
+  track-protocol:
+    const: HTTP/1.1
+  intercept-track-port:
+    $ref: regexp
+  intercept-track-protocol:
+    const: HTTP/1.1
+  recorder:
+    anyOf:
+      - const: null
+      - $ref: recorder
+  inline-source:
+    type: boolean
+  hooks:
+    type: object
+    additionalProperties: false
+    required:
+      - cjs
+      - esm
+      - apply
+      - http
+      - mysql
+      - pg
+      - sqlite3
+    properties:
+      cjs:
+        type: boolean
+      esm:
+        anyOf:
+          - const: null
+          - $ref: regular-identifier
+      eval:
+        type: object
+        properties:
+          hidden:
+            $ref: regular-identifier
+          aliases:
+            type: array
+            items:
+              type: string
+      apply:
+        anyOf:
+          - const: null
+          - $ref: regular-identifier
+      http:
+        type: boolean
+      mysql:
+        type: boolean
+      pg:
+        type: boolean
+      sqlite3:
+        type: boolean
+  ordering:
+    $ref: ordering
+  default-process:
+    type: boolean
+  processes:
+    type: array
+    items:
+      type: array
+      minItems: 2
+      maxItems: 2
+      items:
+        - $ref: cooked-specifier
+        - type: boolean
+  main:
+    anyOf:
+      - const: null
+      - $ref: url
+  engine:
+    type: string
+    nullable: true
+  language:
+    $ref: language
+  default-package:
+    $ref: cooked-module
+  packages:
+    type: array
+    items:
+      type: array
+      minItems: 2
+      maxItems: 2
+      items:
+        - $ref: cooked-specifier
+        - $ref: cooked-module
+  exclude:
+    $ref: cooked-exclude
+  anonymous-name-separator:
+    $ref: separator
+  function-name-placeholder:
+    type: string
+  collapse-package-hierachy:
+    type: boolean
+  recording:
+    anyOf:
+      - const: null
+      - $ref: recording-object
+  serialization:
+    allOf:
+      - $ref: serialization
+      - type: object
+        required:
+          - maximum-print-length
+          - maximum-properties-length
+          - impure-printing
+          - impure-constructor-naming
+          - impure-array-inspection
+          - impure-error-inspection
+          - impure-hash-inspection
+  pruning:
+    type: boolean
+  appmap_dir:
+    $ref: url
+  appmap_file:
+    anyOf:
+      - $ref: basename
+      - const: null
+  name:
+    type: string
+    nullable: true
+  map-name:
+    type: string
+    nullable: true
+  feature:
+    type: string
+    nullable: true
+  feature-group:
+    type: string
+    nullable: true
+  labels:
+    type: array
+    items:
+      type: string
+  frameworks:
+    type: array
+    items:
+      $ref: name-version

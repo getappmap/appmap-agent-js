@@ -1,0 +1,16 @@
+type: object
+additionalProperties: false
+required:
+  - type
+  - print
+properties:
+  type:
+    enum:
+      - "null"
+      - undefined
+      - boolean
+      - number
+      - string
+      - bigint
+  print:
+    type: string

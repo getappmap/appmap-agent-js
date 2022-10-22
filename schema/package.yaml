@@ -1,0 +1,14 @@
+type: object
+additionalProperties: false
+required:
+  - name
+  - version
+  - homepage
+properties:
+  name:
+    type: string
+  version:
+    type: string
+  homepage:
+    type: string
+    nullable: true

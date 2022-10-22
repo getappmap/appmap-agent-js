@@ -4,19 +4,22 @@ const {
 } = globalThis;
 const { search: __search } = new URL(import.meta.url);
 
-import { createRequire } from "module";
-import { readFileSync } from "fs";
-import { pathToFileURL } from "url";
+import { createRequire } from "node:module";
+import { readFileSync } from "node:fs";
+
+const { convertPathToFileUrl } = await import(
+  `../../path/index.mjs${__search}`
+);
+const { toAbsoluteUrl } = await import(`../../url/index.mjs${__search}`);
 const { extractGitInformation } = await import(`./git.mjs${__search}`);
 const { expectSuccess, expect } = await import(
   `../../expect/index.mjs${__search}`
 );
-const { appendURLSegment } = await import(`../../url/index.mjs${__search}`);
 const { logWarning } = await import(`../../log/index.mjs${__search}`);
 
 const hasPackageJSON = (url) => {
   try {
-    readFileSync(new URL(appendURLSegment(url, "package.json")), "utf8");
+    readFileSync(new URL("package.json", url), "utf8");
     return true;
   } catch (error) {
     const { code } = { code: null, ...error };
@@ -32,10 +35,7 @@ const hasPackageJSON = (url) => {
 const createPackage = (url) => {
   let content;
   try {
-    content = readFileSync(
-      new URL(appendURLSegment(url, "package.json")),
-      "utf8",
-    );
+    content = readFileSync(new URL("package.json", url), "utf8");
   } catch (error) {
     logWarning("Cannot read package.json file at %j >> %O", url, error);
     return null;
@@ -72,28 +72,29 @@ export const extractRepositoryHistory = extractGitInformation;
 
 export const extractRepositoryPackage = createPackage;
 
-export const extractRepositoryDependency = (home, segments) => {
-  const { resolve } = createRequire(
-    new URL(appendURLSegment(home, "dummy.js")),
-  );
-  let url = pathToFileURL(
-    expectSuccess(
-      () => resolve(segments.join("/")),
-      "could not resolve %j from %j >> %O",
-      segments,
-      home,
+// TODO cleanup deadcode when we are sure we won't use it anymore
+export const extractRepositoryDependency = (home, request) => {
+  const { resolve } = createRequire(new URL(home));
+  let url = toAbsoluteUrl(
+    ".",
+    convertPathToFileUrl(
+      expectSuccess(
+        () => resolve(request),
+        "could not resolve %j from %j >> %O",
+        request,
+        home,
+      ),
     ),
   );
-  url = appendURLSegment(url, "..");
   while (!hasPackageJSON(url)) {
-    const parent_url = appendURLSegment(url, "..");
+    const next_url = toAbsoluteUrl("..", url);
     expect(
-      parent_url !== url,
+      next_url !== url,
       "failed to find package.json file from module %j in repository %j",
-      segments,
+      request,
       home,
     );
-    url = parent_url;
+    url = next_url;
   }
   return {
     directory: url,

@@ -13,4 +13,4 @@ await mkdirAsync(new URL("../dist", url));
 
 import("./component/index.mjs");
 
-import("./schema/index.mjs");
+import("./schema.mjs");

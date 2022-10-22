@@ -1,0 +1,21 @@
+type: object
+additionalProperties: false
+properties:
+  maximum-print-length:
+    type: number
+    nullable: true
+    minimum: 0
+  maximum-properties-length:
+    type: number
+    nullable: true
+    minimum: 0
+  impure-printing:
+    type: boolean
+  impure-constructor-naming:
+    type: boolean
+  impure-array-inspection:
+    type: boolean
+  impure-error-inspection:
+    type: boolean
+  impure-hash-inspection:
+    type: boolean

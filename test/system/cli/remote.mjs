@@ -1,4 +1,5 @@
 import { join as joinPath } from "path";
+import { pathToFileURL, fileURLToPath } from "url";
 import { writeFile } from "fs/promises";
 import { tmpdir } from "os";
 import { request as createRequest } from "http";
@@ -7,6 +8,7 @@ import { runAsync } from "./__fixture__.mjs";
 import { Buffer } from "buffer";
 
 const {
+  URL,
   JSON,
   setTimeout,
   undefined,
@@ -27,7 +29,7 @@ const requestAsync = (_host, port, method, path, body) =>
       body === null ? "" : Buffer.from(JSON.stringify(body), "utf8");
     const request = createRequest({
       host: "localhost",
-      socketPath: port,
+      socketPath: fileURLToPath(port),
       method,
       path,
       headers:
@@ -129,7 +131,10 @@ if (Reflect.getOwnPropertyDescriptor(env, "TRAVIS") === undefined) {
   stdout.write("\ntrack-port\n");
   await testAsync(
     "track-port",
-    joinPath(tmpdir(), Math.random().toString(36).substring(2)),
+    new URL(
+      Math.random().toString(36).substring(2),
+      `${pathToFileURL(tmpdir())}/`,
+    ).href,
     `
       const interval = setInterval(function heartbeat () {
         console.log("beat");
@@ -142,7 +147,10 @@ if (Reflect.getOwnPropertyDescriptor(env, "TRAVIS") === undefined) {
   );
   stdout.write("\nintercept-track-port\n");
   {
-    const port = joinPath(tmpdir(), Math.random().toString(36).substring(2));
+    const port = new URL(
+      Math.random().toString(36).substring(2),
+      `${pathToFileURL(tmpdir())}/`,
+    ).href;
     await testAsync(
       "intercept-track-port",
       port,
@@ -150,7 +158,7 @@ if (Reflect.getOwnPropertyDescriptor(env, "TRAVIS") === undefined) {
         import Http from "http";
         const server = Http.createServer();
         server.unref();
-        server.listen(${JSON.stringify(port)});
+        server.listen(${JSON.stringify(fileURLToPath(port))});
         const interval = setInterval(function heartbeat () {
           console.log("beat");
         }, 1000);

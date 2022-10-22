@@ -13,15 +13,15 @@ const test = (conf, url, errors = [], status = 0) => {
     {
       recorder: "process",
       agent: {
-        directory: "file:///agent",
+        directory: "agent",
         package: {
           name: "appmap-agent-js",
           version: "1.2.3",
-          homepage: "http://homepage",
+          homepage: "http://host/homepage",
         },
       },
     },
-    null,
+    "protocol://host/base/",
   );
   return compileMetadata(configuration, errors, status);
 };
@@ -35,7 +35,7 @@ const default_meta_data = {
   client: {
     name: "appmap-agent-js",
     version: "1.2.3",
-    url: "http://homepage",
+    url: "http://host/homepage",
   },
   recorder: { name: "process" },
   recording: null,
@@ -44,7 +44,7 @@ const default_meta_data = {
   exception: null,
 };
 
-assertDeepEqual(test({}, "file:///cwd"), default_meta_data);
+assertDeepEqual(test({}, "protocol://host/base/"), default_meta_data);
 
 // history //
 assertEqual(
@@ -57,13 +57,13 @@ assertEqual(
         package: null,
       },
     },
-    "file:///cwd",
+    "protocol://host/base/",
   ).git.repository,
   "string",
 );
 
 // recorder //
-assertDeepEqual(test({ recorder: "process" }, "file:///cwd"), {
+assertDeepEqual(test({ recorder: "process" }, "protocol://host/base/"), {
   ...default_meta_data,
   recorder: { name: "process" },
 });
@@ -73,7 +73,7 @@ assertDeepEqual(test({ recorder: "process" }, "file:///cwd"), {
 assertDeepEqual(
   test(
     {},
-    "file:///cwd",
+    "protocol://host/base/",
     [
       {
         name: "error-name",
@@ -91,27 +91,30 @@ assertDeepEqual(
 
 // app //
 
-assertDeepEqual(test({ name: "app-name" }, "file:///cwd"), {
+assertDeepEqual(test({ name: "app-name" }, "protocol://host/base/"), {
   ...default_meta_data,
   app: "app-name",
 });
 
 // name //
 
-assertDeepEqual(test({ "map-name": "map-name" }, "file:///cwd"), {
+assertDeepEqual(test({ "map-name": "map-name" }, "protocol://host/base/"), {
   ...default_meta_data,
   name: "map-name",
 });
 
-assertDeepEqual(test({ appmap_file: "basename" }, "file:///cwd"), {
+assertDeepEqual(test({ appmap_file: "basename" }, "protocol://host/base/"), {
   ...default_meta_data,
   name: "basename",
 });
 
-assertDeepEqual(test({ main: "/directory/filename.js" }, "file:///cwd"), {
-  ...default_meta_data,
-  name: "filename",
-});
+assertDeepEqual(
+  test({ main: "/directory/filename.js" }, "protocol://host/base/"),
+  {
+    ...default_meta_data,
+    name: "filename",
+  },
+);
 
 // recording //
 
@@ -123,7 +126,7 @@ assertDeepEqual(
         "method-id": "method-id",
       },
     },
-    "file:///cwd",
+    "protocol://host/base/",
   ),
   {
     ...default_meta_data,

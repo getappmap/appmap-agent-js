@@ -1,13 +1,21 @@
 const { URL } = globalThis;
-const { search: __search } = new URL(import.meta.url);
+const { url: __url } = import.meta;
+const { search: __search } = new URL(__url);
+
+const {
+  JSON: { parse: parseJSON, stringify: stringifyJSON },
+  Promise,
+  process,
+} = globalThis;
 
 import { execSync } from "child_process";
 import os from "os";
+import { readFile as readFileAsync } from "fs/promises";
 import { createRequire } from "module";
 import semver from "semver";
-const { schema } = await import(`../../../dist/schema.mjs${__search}`);
-
-const { Promise, process, JSON } = globalThis;
+const schema = parseJSON(
+  await readFileAsync(new URL("../../../dist/schema.json", __url), "utf8"),
+);
 
 /* c8 ignore start */
 export const externals = {
@@ -61,7 +69,7 @@ export const run = (root) => {
   }
 
   const mocha_info = externals.lsPackage(root, "mocha");
-  const package_json = JSON.parse(mocha_info);
+  const package_json = parseJSON(mocha_info);
   // It's possible we'll be run in a pre-14 Node VM, so don't use the
   // optional-chaining operator here.
   const deps = package_json.dependencies;
@@ -81,7 +89,7 @@ export const run = (root) => {
     schema,
   };
 
-  return JSON.stringify(result, null, 2);
+  return stringifyJSON(result, null, 2);
 };
 
 export const main = async (root) => {

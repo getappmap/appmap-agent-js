@@ -1,7 +1,7 @@
 plugins:
   "@bercow/link-adjacent": {}
   "@bercow/prettier":
-    prettier-options: ./prettierrc.yml
+    prettier-options: "."
   "@bercow/eslint": {}
   "@bercow/spawn":
     command: npx

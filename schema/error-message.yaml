@@ -1,0 +1,19 @@
+type: object
+additionalProperties: false
+required:
+  - type
+  - name
+  - message
+  - stack
+properties:
+  type:
+    const: error
+  name:
+    type: string
+    nullable: true
+  message:
+    type: string
+    nullable: true
+  stack:
+    type: string
+    nullable: true

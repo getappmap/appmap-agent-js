@@ -1,0 +1,17 @@
+anyOf:
+  - $ref: bundle-payload
+  - $ref: jump-payload
+  - $ref: apply-payload
+  - $ref: return-payload
+  - $ref: throw-payload
+  - $ref: await-payload
+  - $ref: resolve-payload
+  - $ref: reject-payload
+  - $ref: yield-payload
+  - $ref: resume-payload
+  - $ref: query-payload
+  - $ref: answer-payload
+  - $ref: request-payload
+  - $ref: response-payload
+  - $ref: group-payload
+  - $ref: ungroup-payload

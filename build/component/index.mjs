@@ -6,8 +6,6 @@ import {
   unlink as unlinkAsync,
 } from "node:fs/promises";
 
-import { EOL } from "node:os";
-
 import {
   filterAsync,
   isNotEmptyString,
@@ -33,7 +31,8 @@ const {
 const isDirectoryAsync = async (base, url) =>
   (await statAsync(new URL(url, base))).isDirectory();
 
-const parseEnv = (content) => content.split(EOL).filter(isNotEmptyString);
+const parseEnv = (content) =>
+  content.replace(/\r/gu, "").split("\n").filter(isNotEmptyString);
 
 const loadEnvironmentsAsync = async (home, component, instance) => {
   const envs = parseEnv(

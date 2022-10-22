@@ -1,0 +1,17 @@
+type: object
+additionalProperties: false
+required:
+  - type
+  - length
+  - properties
+properties:
+  type:
+    const: hash
+  length:
+    $ref: natural
+  properties:
+    type: object
+    additionalProperties: false
+    patternProperties:
+      ^:
+        type: string

@@ -1,0 +1,10 @@
+type: object
+additionalProperties: false
+required:
+  - type
+  - length
+properties:
+  type:
+    const: array
+  length:
+    $ref: natural

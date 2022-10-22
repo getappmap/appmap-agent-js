@@ -1,0 +1,74 @@
+anyOf:
+  - type: string
+  - type: object
+    additionalProperties: false
+    required:
+      - regexp
+    properties:
+      regexp:
+        $ref: regexp
+      flags:
+        type: string
+      enabled:
+        type: boolean
+      shallow:
+        type: boolean
+      exclude:
+        $ref: exclude
+      inline-source:
+        type: boolean
+        nullable: true
+  - type: object
+    additionalProperties: false
+    required:
+      - glob
+    properties:
+      glob:
+        type: string
+      enabled:
+        type: boolean
+      shallow:
+        type: boolean
+      exclude:
+        $ref: exclude
+      inline-source:
+        type: boolean
+        nullable: true
+  - type: object
+    additionalProperties: false
+    required:
+      - path
+    properties:
+      path:
+        type: string
+      recursive:
+        type: boolean
+      enabled:
+        type: boolean
+      shallow:
+        type: boolean
+      exclude:
+        $ref: exclude
+      inline-source:
+        type: boolean
+        nullable: true
+  - type: object
+    additionalProperties: false
+    required:
+      - dist
+    properties:
+      dist:
+        type: string
+      recursive:
+        type: boolean
+      external:
+        type: boolean
+      enabled:
+        type: boolean
+      shallow:
+        type: boolean
+      exclude:
+        $ref: exclude
+      inline-source:
+        type: boolean
+        nullable: true

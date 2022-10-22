@@ -1,0 +1,11 @@
+allOf:
+  - $ref: command-options
+  - type: object
+    required:
+      - shell
+      - cwd
+      - encoding
+      - env
+      - stdio
+      - timeout
+      - killSignal

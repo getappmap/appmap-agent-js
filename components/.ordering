@@ -1,17 +1,17 @@
 util
+url
+path
+uuid
 violation
 expect-inner
 expect
 log-inner
 log
-path
-url
 validate
 validate-message
 validate-appmap
 validate-mocha
 patch
-uuid
 file
 time
 group
@@ -59,6 +59,5 @@ receptor
 batch
 questionnaire
 setup
-abomination
 init
 status

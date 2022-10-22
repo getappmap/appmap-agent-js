@@ -1,0 +1,5 @@
+enum:
+  - buffer
+  - utf8
+  - utf16le
+  - latin1

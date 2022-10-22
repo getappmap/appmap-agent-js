@@ -2,7 +2,7 @@ import { encode as encodeVLQ } from "vlq";
 import SourceMap from "source-map";
 import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
 import {
-  extractSourceMapURL,
+  extractSourceMapUrl,
   createMirrorSourceMap,
   createSourceMap,
   mapSource,
@@ -16,11 +16,11 @@ const {
 const { SourceMapGenerator } = SourceMap;
 
 /////////////////////////
-// extractSourceMapURL //
+// extractSourceMapUrl //
 /////////////////////////
 
 assertEqual(
-  extractSourceMapURL({
+  extractSourceMapUrl({
     url: "data:,foo",
     content: "//# sourceMappingURL=http://host/source.map",
   }),
@@ -28,7 +28,7 @@ assertEqual(
 );
 
 assertEqual(
-  extractSourceMapURL({
+  extractSourceMapUrl({
     url: "http://host/directory/filename",
     content: `//@ sourceMappingURL=source.map\r\n`,
   }),
@@ -36,7 +36,7 @@ assertEqual(
 );
 
 assertEqual(
-  extractSourceMapURL({
+  extractSourceMapUrl({
     url: "http:///host/directory/filename",
     content: "123;",
   }),

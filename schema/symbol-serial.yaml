@@ -1,0 +1,13 @@
+type: object
+additionalProperties: false
+required:
+  - type
+  - print
+  - index
+properties:
+  type:
+    const: symbol
+  print:
+    type: string
+  index:
+    $ref: natural

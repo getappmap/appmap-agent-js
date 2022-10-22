@@ -1,0 +1,5 @@
+anyOf:
+  - const: null
+  - $ref: primitive-serial
+  - $ref: symbol-serial
+  - $ref: reference-serial

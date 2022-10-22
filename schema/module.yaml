@@ -1,0 +1,14 @@
+anyOf:
+  - type: boolean
+  - type: object
+    additionalProperties: false
+    properties:
+      enabled:
+        type: boolean
+      shallow:
+        type: boolean
+      inline-source:
+        type: boolean
+        nullable: true
+      exclude:
+        $ref: exclude

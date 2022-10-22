@@ -1,0 +1,13 @@
+type: object
+additionalProperties: false
+required:
+  - type
+  - function
+  - result
+properties:
+  type:
+    const: return
+  function:
+    type: string
+  result:
+    $ref: serial

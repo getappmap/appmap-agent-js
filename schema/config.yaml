@@ -1,0 +1,4 @@
+# Alias for the installer
+# https://github.com/getappmap/appmap-js/blob/f917b055dca17065b307620c67c8917457826fd9/packages/cli/src/service/config/validator.ts#L26
+
+$ref: external-configuration

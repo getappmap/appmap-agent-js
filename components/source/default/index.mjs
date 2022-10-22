@@ -8,24 +8,19 @@ const { search: __search } = new URL(import.meta.url);
 
 import { decode as decodeVLQ } from "vlq";
 const { expectSuccess } = await import(`../../expect/index.mjs${__search}`);
-const { urlifyPath, removeLastURLSegment } = await import(
-  `../../url/index.mjs${__search}`
-);
+const { toAbsoluteUrl } = await import(`../../url/index.mjs${__search}`);
 const { logInfo } = await import(`../../log/index.mjs${__search}`);
 const { identity } = await import(`../../util/index.mjs${__search}`);
 const { validateSourceMap } = await import(
   `../../validate/index.mjs${__search}`
 );
 
-const normalizeEitherPathURL = (either, base) =>
-  /^[a-z]{2,}:/u.test(either) ? either : urlifyPath(either, base);
-
-export const extractSourceMapURL = ({ url, content }) => {
+export const extractSourceMapUrl = ({ url: base, content }) => {
   const parts = /\/\/[#@] sourceMappingURL=(.*)[\r\n]*$/u.exec(content);
   if (parts === null) {
     return null;
   } else {
-    return normalizeEitherPathURL(parts[1], removeLastURLSegment(url));
+    return toAbsoluteUrl(parts[1], base);
   }
 };
 
@@ -34,14 +29,13 @@ export const createMirrorSourceMap = (file) => ({
   source: file,
 });
 
-export const createSourceMap = ({ url, content }) => {
+export const createSourceMap = ({ url: base, content }) => {
   const payload = expectSuccess(
     () => parseJSON(content),
     "Invalid JSON format for source map at %j >> %O",
-    url,
+    base,
   );
   validateSourceMap(payload);
-  const base = removeLastURLSegment(url);
   const {
     sourceRoot: head,
     sources: urls,
@@ -57,7 +51,7 @@ export const createSourceMap = ({ url, content }) => {
     base,
     sources: urls
       .map(head === null ? identity : (body) => `${head}${body}`)
-      .map((either) => normalizeEitherPathURL(either, base))
+      .map((relative) => toAbsoluteUrl(relative, base))
       .map(
         contents === null
           ? (url) => ({ url, content: null })

@@ -11,7 +11,7 @@ export const stringifyLocation = stringifyJSON;
 
 export const parseLocation = parseJSON;
 
-export const getLocationFileURL = ({ url }) => url;
+export const getLocationFileUrl = ({ url }) => url;
 
 export const incrementLocationColumn = ({ url, line, column }) => ({
   url,

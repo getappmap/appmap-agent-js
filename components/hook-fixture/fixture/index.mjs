@@ -3,7 +3,6 @@ const { URL } = globalThis;
 const { search: __search } = new URL(import.meta.url);
 
 const { assert } = await import(`../../util/index.mjs${__search}`);
-const { appendURLSegment } = await import(`../../url/index.mjs${__search}`);
 const { createConfiguration, extendConfiguration } = await import(
   `../../configuration/index.mjs${__search}`
 );
@@ -26,7 +25,7 @@ export const testHookAsync = async (
     ...options,
   };
   const configuration = extendConfiguration(
-    createConfiguration(appendURLSegment(import.meta.url, "..")),
+    createConfiguration(import.meta.url),
     options.configuration,
     options.url,
   );

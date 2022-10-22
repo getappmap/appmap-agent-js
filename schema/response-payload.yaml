@@ -1,0 +1,22 @@
+type: object
+additionalProperties: false
+required:
+  - type
+  - side
+  - status
+  - message
+  - headers
+  - body
+properties:
+  type:
+    const: response
+  side:
+    $ref: side
+  status:
+    type: integer
+  message:
+    type: string
+  headers:
+    $ref: headers
+  body:
+    $ref: serial

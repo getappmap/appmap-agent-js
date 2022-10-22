@@ -9,7 +9,7 @@ const { generateDeadcode, assert, createBox, setBox, getBox } = await import(
   `../../util/index.mjs${__search}`
 );
 const { logWarning } = await import(`../../log/index.mjs${__search}`);
-const { getUUID } = await import(`../../uuid/index.mjs${__search}`);
+const { getUuid } = await import(`../../uuid/index.mjs${__search}`);
 const { requestAsync } = await import(`../../http/index.mjs${__search}`);
 const { openSocket, closeSocket, sendSocket } = await import(
   `../../socket/index.mjs${__search}`
@@ -23,7 +23,7 @@ export const openEmitter = (configuration) => {
     session,
   } = configuration;
   if (session === null) {
-    session = getUUID();
+    session = getUuid();
   }
   if (host === "localhost") {
     host = "127.0.0.1";

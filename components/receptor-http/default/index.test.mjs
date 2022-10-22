@@ -1,7 +1,10 @@
-import { getFreshTemporaryURL, assertDeepEqual } from "../../__fixture__.mjs";
 import { Socket } from "net";
 import { writeFileSync as writeFile } from "fs";
 import NetSocketMessaging from "net-socket-messaging";
+import { assertDeepEqual } from "../../__fixture__.mjs";
+import { getUuid } from "../../uuid/random/index.mjs?env=test";
+import { getTmpUrl } from "../../path/index.mjs?env=test";
+import { toAbsoluteUrl } from "../../url/index.mjs?env=test";
 import {
   createConfiguration,
   extendConfiguration,
@@ -24,11 +27,11 @@ const {
 const { createMessage } = NetSocketMessaging;
 
 const configuration = extendConfiguration(
-  createConfiguration("file:///home"),
+  createConfiguration("protocol://host/home/"),
   {
     recorder: "remote",
   },
-  "file:///base",
+  "protocol://host/base/",
 );
 const receptor = await openReceptorAsync(
   minifyReceptorConfiguration(configuration),
@@ -161,7 +164,7 @@ await assertRequestAsync("GET", "/_appmap/track", null, {
       }),
     ),
   );
-  const url = getFreshTemporaryURL();
+  const url = toAbsoluteUrl(getUuid(), getTmpUrl());
   writeFile(new URL(url), "content", "utf8");
   socket.write(
     createMessage(

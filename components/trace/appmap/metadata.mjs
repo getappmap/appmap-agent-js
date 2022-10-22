@@ -5,7 +5,7 @@ const { search: __search } = new URL(import.meta.url);
 const { assert, mapMaybe, recoverMaybe } = await import(
   `../../util/index.mjs${__search}`
 );
-const { getLastURLSegment } = await import(`../../url/index.mjs${__search}`);
+const { getUrlBasename } = await import(`../../url/index.mjs${__search}`);
 
 /* c8 ignore start */
 const getName = ({ name }) => name;
@@ -66,7 +66,7 @@ const makeMapName = (map_name, file_name, main) => {
     return file_name;
   }
   if (main !== null) {
-    return getLastURLSegment(main).split(".")[0];
+    return getUrlBasename(main);
   }
   return null;
 };

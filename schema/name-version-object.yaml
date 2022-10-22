@@ -1,0 +1,11 @@
+type: object
+additionalProperties: false
+required:
+  - name
+  - version
+properties:
+  name:
+    type: string
+  version:
+    type: string
+    nullable: true

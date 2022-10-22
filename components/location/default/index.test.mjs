@@ -4,16 +4,16 @@ import {
   stringifyLocation,
   parseLocation,
   incrementLocationColumn,
-  getLocationFileURL,
+  getLocationFileUrl,
 } from "./index.mjs?env=test";
 
-const location = { url: "file:///main.js", line: 123, column: 456 };
+const location = { url: "protocol://host/main.js", line: 123, column: 456 };
 
 assertDeepEqual(parseLocation(stringifyLocation(location)), location);
 
 assertDeepEqual(
   incrementLocationColumn(location),
-  makeLocation("file:///main.js", 123, 457),
+  makeLocation("protocol://host/main.js", 123, 457),
 );
 
-assertEqual(getLocationFileURL(location), "file:///main.js");
+assertEqual(getLocationFileUrl(location), "protocol://host/main.js");

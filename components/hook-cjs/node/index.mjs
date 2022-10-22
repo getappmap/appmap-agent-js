@@ -6,7 +6,10 @@ const {
 const { search: __search } = new URL(import.meta.url);
 
 import Module from "module";
-import { pathToFileURL } from "url";
+
+const { convertPathToFileUrl } = await import(
+  `../../path/index.mjs${__search}`
+);
 const { assignProperty } = await import(`../../util/index.mjs${__search}`);
 const { instrument } = await import(`../../agent/index.mjs${__search}`);
 
@@ -24,7 +27,7 @@ export const hook = (agent, { hooks: { cjs } }) => {
   prototype._compile = function _compile(content1, path) {
     return apply(original, this, [
       instrument(agent, {
-        url: pathToFileURL(path).toString(),
+        url: convertPathToFileUrl(path),
         content: content1,
         type: "script",
       }),

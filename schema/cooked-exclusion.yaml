@@ -1,0 +1,24 @@
+type: object
+required:
+  - combinator
+  - qualified-name
+  - name
+  - every-label
+  - some-label
+  - excluded
+  - recursive
+properties:
+  combinator:
+    $ref: combinator
+  qualified-name:
+    $ref: criteria
+  name:
+    $ref: criteria
+  every-label:
+    $ref: criteria
+  some-label:
+    $ref: criteria
+  excluded:
+    type: boolean
+  recursive:
+    type: boolean

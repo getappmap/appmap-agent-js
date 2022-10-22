@@ -1,0 +1,16 @@
+type: object
+additionalProperties: false
+required:
+  - type
+  - site
+  - tab
+  - payload
+properties:
+  type:
+    const: amend
+  site:
+    $ref: site
+  tab:
+    $ref: tab
+  payload:
+    $ref: payload

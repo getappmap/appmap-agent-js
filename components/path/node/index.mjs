@@ -1,88 +1,64 @@
-const { URL, encodeURIComponent, decodeURIComponent } = globalThis;
+const { URL } = globalThis;
 
 const { search: __search } = new URL(import.meta.url);
 
-// The following is cleaner:
-// import {platform as getPlatform} from "os"
-// But it prevents tests from overwriting os.platform
-import { platform as getPlatform } from "os";
-const { assert, constant, coalesce } = await import(
-  `../../util/index.mjs${__search}`
-);
+import { platform as getPlatform, tmpdir as getTmp } from "node:os";
 
-const makeComponent = ({
-  getShell,
-  ipc,
-  separator,
-  splitter,
-  root,
-  forbidden,
-}) => {
-  const assertSegmentValidity = (segment) => {
-    forbidden.lastIndex = 0;
-    assert(!forbidden.test(segment), "invalid file name");
-  };
-  return {
-    // TODO maybe we should rename path to platform to more accurate
-    getShell,
-    toIPCPath: (path) => `${ipc}${path}`,
-    fromIPCPath: (path) => {
-      assert(path.startsWith(ipc), "invalid ipc path");
-      return path.substring(ipc.length);
-    },
-    makeSegment: (string, replace) => {
-      forbidden.lastIndex = 0;
-      return string.replace(forbidden, replace);
-    },
-    encodeSegment: (segment) => {
-      assertSegmentValidity(segment);
-      return encodeURIComponent(segment);
-    },
-    decodeSegment: (encoded_segment) => {
-      const segment = decodeURIComponent(encoded_segment);
-      assertSegmentValidity(segment);
-      return segment;
-    },
-    joinPath: (segments) => segments.join(separator),
-    splitPath: (path) => path.split(splitter),
-    isAbsolutePath: (path) => root.test(path),
-  };
-};
+export { fileURLToPath as convertFileUrlToPath } from "node:url";
+
+import { pathToFileURL as convertPathToFileUrlObject } from "node:url";
+
+export const convertPathToFileUrl = (path) =>
+  convertPathToFileUrlObject(path).href;
 
 /* c8 ignore start */
 export const {
+  getPathFilename,
+  // This function convert an arbitrary string to a valid platform-specific filename.
+  // For instance, it replaces path separator.
+  sanitizePathFilename,
   getShell,
-  toIPCPath,
-  fromIPCPath,
-  makeSegment,
-  encodeSegment,
-  decodeSegment,
-  joinPath,
-  splitPath,
-  isAbsolutePath,
-} = makeComponent(
+  toIpcPath,
+  fromIpcPath,
+  toDirectoryPath,
+  toAbsolutePath,
+  toRelativePath,
+} = await import(
   getPlatform() === "win32"
-    ? {
-        getShell: (env) => {
-          const exec = coalesce(env, "comspec", "cmd.exe");
-          return [
-            exec,
-            exec.endsWith("cmd") || exec.endsWith("cmd.exe") ? "/c" : "-c",
-          ];
-        },
-        ipc: "\\\\.\\pipe\\",
-        separator: "\\",
-        splitter: /[\\/]/gu,
-        root: /^([a-zA-Z]:[\\/]|[\\/][\\/])/u,
-        forbidden: /[\u0000-\u001F\\/<>:"|?*]/gu,
-      }
-    : {
-        getShell: constant(["/bin/sh", "-c"]),
-        ipc: "",
-        separator: "/",
-        splitter: "/",
-        root: /^\//u,
-        forbidden: /[\u0000/]/gu,
-      },
+    ? `./win32.mjs${__search}`
+    : `./posix.mjs${__search}`
 );
 /* c8 ignore stop */
+
+export const getTmpPath = () => toDirectoryPath(getTmp());
+
+export const getTmpUrl = () => convertPathToFileUrl(toDirectoryPath(getTmp()));
+
+export const getCwdPath = ({ cwd: getCwd }) => toDirectoryPath(getCwd());
+
+export const getCwdUrl = ({ cwd: getCwd }) =>
+  convertPathToFileUrl(toDirectoryPath(getCwd()));
+
+export const getPathBasename = (path) => {
+  const filename = getPathFilename(path);
+  if (filename === null) {
+    return null;
+  } else if (filename.includes(".")) {
+    return filename.split(".")[0];
+  } else {
+    return filename;
+  }
+};
+
+export const getPathExtension = (path) => {
+  const filename = getPathFilename(path);
+  if (filename === null) {
+    return null;
+  } else if (filename.includes(".")) {
+    const segments = filename.split(".");
+    segments[0] = "";
+    return segments.join(".");
+  } else {
+    return null;
+  }
+};

@@ -4,8 +4,9 @@ const { search: __search } = new URL(import.meta.url);
 
 import Minimatch from "minimatch";
 const { logDebug } = await import(`../../log/index.mjs${__search}`);
+const { expect } = await import(`../../expect/index.mjs${__search}`);
 const { assert } = await import(`../../util/index.mjs${__search}`);
-const { pathifyURL } = await import(`../../url/index.mjs${__search}`);
+const { toRelativeUrl } = await import(`../../url/index.mjs${__search}`);
 const { expectSuccess } = await import(`../../expect/index.mjs${__search}`);
 
 const { Minimatch: MinimatchClass } = Minimatch;
@@ -93,28 +94,31 @@ export const createSpecifier = (options, base) => {
   throw new Error("invalid specifier options");
 };
 
+// We escape as few character as possible to hide the fact that configuration fields are urls rather than paths.
+const escaping = {
+  __proto__: null,
+  "/": "%2F",
+  "?": "%3F",
+  "#": "%23",
+};
+
+const escapeCharacter = (match) => escaping[match];
+
+const escapeSegment = (segment) => segment.replace(/[/#?]/gu, escapeCharacter);
+
 export const matchSpecifier = (specifier, url) => {
-  if (typeof specifier === "boolean") {
-    logDebug(
-      "url %j %s constant specifier",
-      url,
-      specifier ? "matched" : "did not match",
-    );
-    return specifier;
-  } else {
-    const { base, source, flags } = specifier;
-    const maybe_path = pathifyURL(url, base);
-    const matched =
-      maybe_path === null ? false : makeRegExp(source, flags).test(maybe_path);
-    logDebug(
-      "url %j which resolves to %j relatively to %j %s regexp specifier %j with flags %j",
-      url,
-      maybe_path,
-      base,
-      matched ? "matched" : "did not match",
-      source,
-      flags,
-    );
-    return matched;
-  }
+  const { base, source, flags } = specifier;
+  const relative = toRelativeUrl(url, base, escapeSegment);
+  expect(relative !== null, "could not express %j relatively to %j", url, base);
+  const matched = makeRegExp(source, flags).test(relative);
+  logDebug(
+    "url %j which resolves to %j relatively to %j %s regexp specifier %j with flags %j",
+    url,
+    relative,
+    base,
+    matched ? "matched" : "did not match",
+    source,
+    flags,
+  );
+  return matched;
 };

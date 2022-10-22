@@ -1,0 +1,5 @@
+enum:
+  - begin
+  - end
+  - before
+  - after

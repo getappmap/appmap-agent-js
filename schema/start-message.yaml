@@ -1,0 +1,18 @@
+type: object
+additionalProperties: false
+required:
+  - type
+  - track
+  - configuration
+  - url
+properties:
+  type:
+    const: start
+  track:
+    type: string
+  configuration:
+    $ref: external-configuration
+  url:
+    anyOf:
+      - const: null
+      - $ref: url

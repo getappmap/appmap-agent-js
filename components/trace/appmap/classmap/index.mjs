@@ -11,7 +11,7 @@ const { search: __search } = new URL(import.meta.url);
 const { assert, createCounter } = await import(
   `../../../util/index.mjs${__search}`
 );
-const { pathifyURL } = await import(`../../../url/index.mjs${__search}`);
+const { toRelativeUrl } = await import(`../../../url/index.mjs${__search}`);
 const { logWarning, logDebug } = await import(
   `../../../log/index.mjs${__search}`
 );
@@ -77,7 +77,7 @@ const excludeEntity = (entity, parent, exclusions, excluded_entities) => {
 
 const registerEntityArray = (
   entities,
-  { content, shallow, placeholder, path, url },
+  { content, shallow, placeholder, relative, url },
   closures,
 ) => {
   const cutContent = generateCutContent(content);
@@ -90,7 +90,7 @@ const registerEntityArray = (
         shallow,
         link: {
           method_id: placeholder,
-          path,
+          path: relative,
           lineno: line,
           defined_class: name,
           static: _static,
@@ -136,7 +136,7 @@ const cleanupEntity = (entity) => {
 
 const compileEntityArray = (
   entities,
-  { placeholder, path, inline, content },
+  { placeholder, relative, inline, content },
 ) => {
   const cutContent = generateCutContent(content);
   const compileEntity = (entity) =>
@@ -148,7 +148,7 @@ const compileEntityArray = (
             {
               type: "function",
               name: placeholder,
-              location: `${path}:${entity.line}`,
+              location: `${relative}:${entity.line}`,
               static: entity.static,
               source: inline ? cutContent(entity.range) : null,
               comment: printCommentArray(entity.comments),
@@ -191,11 +191,12 @@ export const addClassmapSource = (
 ) => {
   assert(!urls.has(url), "duplicate source url");
   urls.add(url);
-  const path = pathifyURL(url, directory);
-  const context = { url, path, shallow, inline, content, placeholder };
+  const relative = toRelativeUrl(url, directory);
+  assert(relative !== null, "could not extract relative url");
+  const context = { url, relative, shallow, inline, content, placeholder };
   const exclusions = compileExclusionList(exclude);
   const excluded_entities = [];
-  let entities = extractEstreeEntityArray(path, content, naming).flatMap(
+  let entities = extractEstreeEntityArray(relative, content, naming).flatMap(
     (entity) => excludeEntity(entity, null, exclusions, excluded_entities),
   );
   for (const entity of excluded_entities) {
@@ -266,7 +267,7 @@ export const compileClassmap = (
       ) {
         root.push({
           type: "package",
-          name: context.path,
+          name: context.relative,
           children: compileEntityArray(entities, context),
         });
       }
@@ -277,7 +278,7 @@ export const compileClassmap = (
         /* c8 ignore start */ !pruning ||
         entities.length > 0 /* c8 ignore stop */
       ) {
-        const dirnames = context.path.split("/");
+        const dirnames = context.relative.split("/");
         const filename = dirnames.pop();
         let children = root;
         for (const dirname of dirnames) {

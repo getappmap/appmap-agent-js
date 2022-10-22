@@ -51,10 +51,19 @@ const extractStatementAsync = (statement) => {
   }
 };
 
+const parseAcornLog = (content, options) => {
+  try {
+    return parseAcorn(content, options);
+  } catch (error) {
+    error.message += ` at ${options.directSourceFile}`;
+    throw error;
+  }
+};
+
 export const extractExportAsync = async (url) =>
   (
     await Promise.all(
-      parseAcorn(await readFileAsync(url, "utf8"), {
+      parseAcornLog(await readFileAsync(url, "utf8"), {
         directSourceFile: url,
         locations: true,
         sourceType: "module",

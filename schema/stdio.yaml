@@ -1,0 +1,9 @@
+anyOf:
+  - $ref: stdio-stream
+  - type: array
+    minItems: 3
+    maxItems: 3
+    items:
+      - $ref: stdio-stream
+      - $ref: stdio-stream
+      - $ref: stdio-stream

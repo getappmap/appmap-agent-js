@@ -1,31 +1,20 @@
 import { spawn } from "child_process";
+import { platform as getPlatform } from "node:os";
 import { rm as rmAsync } from "fs/promises";
 import Pg from "pg";
-import { fileURLToPath } from "url";
 import {
-  getFreshTemporaryURL,
   assertEqual,
   assertDeepEqual,
   assertFail,
   assertMatch,
 } from "../../__fixture__.mjs";
+import { getUuid } from "../../uuid/random/index.mjs?env=test";
+import { toAbsoluteUrl } from "../../url/index.mjs?env=test";
+import { getTmpUrl, convertFileUrlToPath } from "../../path/index.mjs?env=test";
 import { testHookAsync } from "../../hook-fixture/index.mjs?env=test";
 import * as HookPg from "./pg.mjs?env=test";
 
-const {
-  Reflect: { getOwnPropertyDescriptor },
-  process,
-  Promise,
-  undefined,
-  String,
-  setTimeout,
-  URL,
-} = globalThis;
-
-// TODO investigate why this fails on travis.
-if (getOwnPropertyDescriptor(process.env, "TRAVIS") !== undefined) {
-  process.exit(0);
-}
+const { Promise, String, setTimeout, URL } = globalThis;
 
 const { Client, Query } = Pg;
 
@@ -35,9 +24,13 @@ const promiseTermination = (child) =>
     child.on("error", reject);
   });
 
-const port = 5432;
-const user = "postgres";
-const url = getFreshTemporaryURL();
+const auth = {
+  host: "localhost",
+  password: "",
+  port: 5432,
+  user: "postgres",
+  database: "postgres",
+};
 
 const proceedAsync = async () => {
   const testCaseAsync = (enabled, runAsync) =>
@@ -45,12 +38,7 @@ const proceedAsync = async () => {
       HookPg,
       { configuration: { hooks: { pg: enabled } } },
       async () => {
-        const client = new Client({
-          host: "localhost",
-          port,
-          user,
-          database: "postgres",
-        });
+        const client = new Client(auth);
         try {
           client.connect();
           await runAsync(client);
@@ -215,58 +203,90 @@ const proceedAsync = async () => {
   );
 };
 
-if (getOwnPropertyDescriptor(process.env, "TRAVIS")) {
-  proceedAsync();
-} else {
+// It would be nicer to use travis service:
+//
+// os: linux
+// dist: focal
+// service:
+//   - postgresql
+//
+// Unfortunatelly (wtf travis), it doesn't work:
+//
+// $ travis_setup_postgresql
+// Starting PostgreSQL v12
+// Assertion failed on job for postgresql@12-main.service.
+// sudo systemctl start postgresql@12-main
+//
+// Downgrading dist to bionic or xenial makes it work.
+// But then node 18 cannot be installed (wtf travis 2x).
+// The solution seems to restart the service with other conf.
+// At this point, it is not any better than to launch the service here.
+if (getPlatform() !== "win32") {
+  const { initdb, pg_isready, postgres } =
+    getPlatform() === "darwin"
+      ? { initdb: "initdb", pg_isready: "pg_isready", postgres: "postgres" }
+      : {
+          initdb: "/usr/lib/postgresql/13/bin/initdb",
+          pg_isready: "/usr/lib/postgresql/13/bin/pg_isready",
+          postgres: "/usr/lib/postgresql/13/bin/postgres",
+        };
+  const url = toAbsoluteUrl(getUuid(), getTmpUrl());
   assertDeepEqual(
     await promiseTermination(
       spawn(
-        "initdb",
+        initdb,
         [
+          "--pgdata",
+          convertFileUrlToPath(url),
           "--no-locale",
           "--encoding",
           "UTF-8",
-          "--pgdata",
-          fileURLToPath(url),
           "--username",
-          user,
+          auth.user,
         ],
         { stdio: "inherit" },
       ),
     ),
-    { signal: null, status: 0 },
+    { status: 0, signal: null },
   );
+  if (getPlatform() !== "darwin") {
+    assertDeepEqual(
+      await promiseTermination(
+        spawn("sudo", ["chmod", "777", "/var/run/postgresql/"], {
+          stdio: "inherit",
+        }),
+      ),
+      { status: 0, signal: null },
+    );
+  }
   const child = spawn(
-    "postgres",
-    ["-D", fileURLToPath(url), "-p", String(port)],
+    postgres,
+    ["-D", convertFileUrlToPath(url), "-p", String(auth.port)],
     {
       stdio: "inherit",
     },
   );
   const termination = promiseTermination(child);
-  while (
-    /* eslint-disable no-constant-condition */ true /* eslint-enable no-constant-condition */
-  ) {
+  let ready = false;
+  while (!ready) {
     await new Promise((resolve) => {
       setTimeout(resolve, 1000);
     });
     const { status, signal } = await promiseTermination(
       spawn(
-        "pg_isready",
-        ["-U", user, "-p", String(port), "-d", "postgres", "-t", "0"],
+        pg_isready,
+        ["-U", auth.user, "-p", String(auth.port), "-d", "postgres", "-t", "0"],
         { stdio: "inherit" },
       ),
     );
     assertEqual(signal, null);
-    if (status === 0) {
-      break;
-    }
+    ready = status === 0;
   }
   try {
     await proceedAsync();
   } finally {
     child.kill("SIGTERM");
-    await termination;
+    assertDeepEqual(await termination, { status: 0, signal: null });
     await rmAsync(new URL(url), { recursive: true });
   }
 }

@@ -1,0 +1,77 @@
+arch: amd64
+os: linux
+dist: focal
+language: node_js
+cache: npm
+node_js: 18
+
+services:
+  - mysql
+
+install:
+  - npm ci
+  - npm run build
+
+stages:
+  - lint
+  - coverage
+  - test
+  - deploy
+
+jobs:
+  include:
+    # lint
+    - stage: lint
+      script:
+        - npm run lint
+    # coverage
+    - stage: coverage
+      os: linux
+      node_js: 18
+      script:
+        - npm run test-unit-cov
+    # test-node14
+    - stage: test
+      os: linux
+      node_js: 14
+      script:
+        - npm run test-unit
+        - npm run test-system
+    - stage: test
+      os: windows
+      node_js: 14
+      script:
+        - npm run test-unit
+        - npm run test-system
+    # test-node16
+    - stage: test
+      os: linux
+      node_js: 16
+      script:
+        - npm run test-unit
+        - npm run test-system
+    - stage: test
+      os: windows
+      node_js: 16
+      script:
+        - npm run test-unit
+        - npm run test-system
+    # test-node18
+    - stage: test
+      os: linux
+      node_js: 18
+      script:
+        - npm run test-unit
+        - npm run test-system
+    - stage: test
+      os: windows
+      node_js: 18
+      script:
+        - npm run test-unit
+        - npm run test-system
+    # deploy
+    - stage: deploy
+      if: branch = main
+      script:
+        - npm run format
+        - npm run deploy

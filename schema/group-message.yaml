@@ -1,0 +1,19 @@
+# Shorthand for group event pair to improve performance.
+# Group-related messages are a large part of the trace.
+
+type: object
+additionalProperties: false
+required:
+  - type
+  - group
+  - child
+  - description
+properties:
+  type:
+    const: group
+  group:
+    $ref: group
+  child:
+    $ref: group
+  description:
+    type: string

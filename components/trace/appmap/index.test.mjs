@@ -10,12 +10,12 @@ import {
 import { compileTrace } from "./index.mjs?env=test";
 
 const configuration = extendConfiguration(
-  createConfiguration("file:///home"),
+  createConfiguration("protocol://host/home/"),
   {
     name: "name",
     recorder: "process",
     agent: {
-      directory: "file:///agent",
+      directory: "protocol://host/agent/",
       package: {
         name: "agent",
         version: "1.2.3",
@@ -25,7 +25,7 @@ const configuration = extendConfiguration(
     pruning: true,
     "function-name-placeholder": "$",
   },
-  "file:///base",
+  "protocol://host/base/",
 );
 
 const tabs = {
@@ -36,7 +36,7 @@ const tabs = {
 };
 
 const location = stringifyLocation(
-  makeLocation("file:///home/filename.js", 1, 0),
+  makeLocation("protocol://host/home/filename.js", 1, 0),
 );
 
 assertDeepEqual(
@@ -50,7 +50,7 @@ assertDeepEqual(
     },
     {
       type: "source",
-      url: "file:///home/filename.js",
+      url: "protocol://host/home/filename.js",
       content: "function f (x) {}",
       shallow: false,
       exclude: [
@@ -75,8 +75,21 @@ assertDeepEqual(
       payload: {
         type: "apply",
         function: location,
-        this: { type: "string", print: "THIS-PRINT" },
-        arguments: [{ type: "string", print: "ARG-PRINT" }],
+        this: { type: "string", print: "THIS-PRINT-1" },
+        arguments: [{ type: "string", print: "ARG-PRINT-1" }],
+      },
+    },
+    {
+      type: "event",
+      site: "begin",
+      tab: tabs.event2,
+      group: 0,
+      time: 0,
+      payload: {
+        type: "apply",
+        function: location,
+        this: { type: "string", print: "this-print-2" },
+        arguments: [{ type: "string", print: "arg-print-2" }],
       },
     },
     {
@@ -84,6 +97,21 @@ assertDeepEqual(
       group: 0,
       child: 1,
       description: "description",
+    },
+    {
+      type: "event",
+      site: "end",
+      tab: tabs.event2,
+      time: 0,
+      group: 0,
+      payload: {
+        type: "return",
+        function: location,
+        result: {
+          type: "string",
+          print: "result-print-2",
+        },
+      },
     },
     {
       type: "event",
@@ -96,7 +124,7 @@ assertDeepEqual(
         function: location,
         result: {
           type: "string",
-          print: "result-print",
+          print: "result-print-1",
         },
       },
     },
@@ -107,8 +135,8 @@ assertDeepEqual(
       payload: {
         type: "apply",
         function: location,
-        this: { type: "string", print: "this-print" },
-        arguments: [{ type: "string", print: "arg-print" }],
+        this: { type: "string", print: "this-print-1" },
+        arguments: [{ type: "string", print: "arg-print-1" }],
       },
     },
     {
@@ -188,19 +216,57 @@ assertDeepEqual(
             name: "this",
             class: "string",
             object_id: null,
-            value: "this-print",
+            value: "this-print-1",
           },
           parameters: [
             {
               name: "x",
               class: "string",
               object_id: null,
-              value: "arg-print",
+              value: "arg-print-1",
             },
           ],
         },
         {
           id: 2,
+          event: "call",
+          thread_id: 0,
+          defined_class: "f",
+          method_id: "$",
+          path: "filename.js",
+          lineno: 1,
+          static: false,
+          receiver: {
+            name: "this",
+            class: "string",
+            object_id: null,
+            value: "this-print-2",
+          },
+          parameters: [
+            {
+              name: "x",
+              class: "string",
+              object_id: null,
+              value: "arg-print-2",
+            },
+          ],
+        },
+        {
+          id: 3,
+          event: "return",
+          thread_id: 0,
+          parent_id: 2,
+          elapsed: 0,
+          return_value: {
+            name: "return",
+            class: "string",
+            object_id: null,
+            value: "result-print-2",
+          },
+          exceptions: null,
+        },
+        {
+          id: 4,
           event: "return",
           thread_id: 0,
           parent_id: 1,
@@ -209,7 +275,7 @@ assertDeepEqual(
             name: "return",
             class: "string",
             object_id: null,
-            value: "result-print",
+            value: "result-print-1",
           },
           exceptions: null,
         },

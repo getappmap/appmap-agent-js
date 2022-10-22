@@ -1,20 +1,27 @@
+const { Promise } = globalThis;
+
 import { createServer, request as createRequest } from "http";
 import {
   assert,
   assertReject,
   assertDeepEqual,
   assertEqual,
-  getFreshTemporaryURL,
-  convertPort,
 } from "../../__fixture__.mjs";
+import {
+  getTmpUrl,
+  toIpcPath,
+  convertFileUrlToPath,
+} from "../../path/index.mjs?env=test";
+import { toAbsoluteUrl } from "../../url/index.mjs?env=test";
+import { getUuid } from "../../uuid/random/index.mjs?env=test";
 import { generateRespond, requestAsync } from "./index.mjs?env=test";
-
-const { Promise } = globalThis;
 
 const listenServerAsync = (server, port) =>
   new Promise((resolve) => {
     server.on("listening", resolve);
-    server.listen(convertPort(port));
+    server.listen(
+      typeof port === "number" ? port : toIpcPath(convertFileUrlToPath(port)),
+    );
   });
 
 const closeServerAsync = (server) =>
@@ -63,7 +70,7 @@ const closeServerAsync = (server) =>
       body: null,
     })),
   );
-  const port = getFreshTemporaryURL();
+  const port = toAbsoluteUrl(getUuid(), getTmpUrl());
   await listenServerAsync(server, port);
   assertDeepEqual(await requestAsync("localhost", port, "GET", "/path", null), {
     code: 200,

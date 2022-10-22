@@ -1,0 +1,13 @@
+type: object
+additionalProperties: false
+required:
+  - type
+  - function
+  - error
+properties:
+  type:
+    const: throw
+  function:
+    type: string
+  error:
+    $ref: serial

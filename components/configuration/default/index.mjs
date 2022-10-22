@@ -11,7 +11,9 @@ const { logGuardInfo } = await import(`../../log/index.mjs${__search}`);
 const { hasOwnProperty, coalesce, identity } = await import(
   `../../util/index.mjs${__search}`
 );
-const { urlifyPath } = await import(`../../url/index.mjs${__search}`);
+const { toAbsoluteUrl, toDirectoryUrl } = await import(
+  `../../url/index.mjs${__search}`
+);
 const { validateExternalConfiguration } = await import(
   `../../validate/index.mjs${__search}`
 );
@@ -28,6 +30,8 @@ const HOOK_EVAL_GLOBAL = "APPMAP_HOOK_EVAL";
 const ANONYMOUS_NAME_SEPARATOR = "-";
 
 const EXPECTED_EXTRA_PROPERTIES = ["test_recording"];
+
+const resolveUrl = (url, base) => new URL(url, base).href;
 
 ////////////
 // Extend //
@@ -74,6 +78,19 @@ const normalizeExclusion = (exclusion, _base) => {
   };
 };
 
+const normalizeCommandOptions = (options, base) => ({
+  shell: true,
+  encoding: "utf8",
+  env: {},
+  stdio: "inherit",
+  timeout: 0,
+  killSignal: "SIGTERM",
+  ...options,
+  cwd: hasOwnProperty(options, "cwd")
+    ? toDirectoryUrl(toAbsoluteUrl(options.cwd, base))
+    : toAbsoluteUrl(".", base),
+});
+
 const normalizeHooks = (hooks, _base) => {
   if (hasOwnProperty(hooks, "eval")) {
     hooks.eval =
@@ -103,12 +120,32 @@ const normalizeHooks = (hooks, _base) => {
   return hooks;
 };
 
+const normalizeDefaultPackage = (package_, _base) => {
+  if (typeof package_ === "boolean") {
+    package_ = { enabled: package_ };
+  }
+  return {
+    enabled: true,
+    shallow: false,
+    exclude: [],
+    "inline-source": null,
+    ...package_,
+  };
+};
+
+const normalizeAgent = ({ directory, package: _package }, base) => ({
+  directory: toDirectoryUrl(toAbsoluteUrl(directory, base)),
+  package: _package,
+});
+
+const normalizeDirectoryUrl = (url, base) =>
+  toDirectoryUrl(toAbsoluteUrl(url, base));
+
 const normalizeExclude = (exclusions, _base) =>
   exclusions.map(normalizeExclusion);
 
-const normalizeCommand = (command, base) => ({
-  base,
-  script: typeof command === "string" ? command : null,
+const normalizeCommand = (command, _base) => ({
+  source: typeof command === "string" ? command : null,
   tokens: typeof command === "string" ? null : command,
 });
 
@@ -124,14 +161,14 @@ const normalizeLog = (log, base) => {
     log = { level: log };
   }
   if (hasOwnProperty(log, "file") && typeof log.file !== "number") {
-    log.file = urlifyPath(log.file, base);
+    log.file = resolveUrl(log.file, base);
   }
   return log;
 };
 
 const normalizePort = (port, base) => {
   if (typeof port === "string" && port !== "") {
-    port = urlifyPath(port, base);
+    port = resolveUrl(port, base);
   }
   return port;
 };
@@ -198,8 +235,6 @@ const normalizePackages = (specifiers, base) => {
 const normalizeProcessSpecifier = (specifier, base) => {
   if (typeof specifier === "string") {
     specifier = { glob: specifier };
-  } else if (typeof specifier === "boolean") {
-    specifier = { regexp: "^", flags: "u", enabled: specifier };
   }
   const { enabled, ...rest } = {
     enabled: true,
@@ -236,7 +271,7 @@ const fields = {
   },
   agent: {
     extend: overwrite,
-    normalize: identity,
+    normalize: normalizeAgent,
   },
   repository: {
     extend: overwrite,
@@ -260,7 +295,7 @@ const fields = {
   },
   "command-options": {
     extend: extendCommandOptions,
-    normalize: identity,
+    normalize: normalizeCommandOptions,
   },
   validate: {
     extend: assign,
@@ -306,6 +341,10 @@ const fields = {
     extend: overwrite,
     normalize: identity,
   },
+  "default-process": {
+    extend: overwrite,
+    normalize: identity,
+  },
   processes: {
     extend: prepend,
     normalize: normalizeProcesses,
@@ -340,13 +379,21 @@ const fields = {
   },
   main: {
     extend: overwrite,
-    normalize: urlifyPath,
+    normalize: toAbsoluteUrl,
   },
   language: {
     extend: overwrite,
     normalize: identity,
   },
   engine: {
+    extend: overwrite,
+    normalize: identity,
+  },
+  "default-package": {
+    extend: overwrite,
+    normalize: normalizeDefaultPackage,
+  },
+  "anonymous-name-separator": {
     extend: overwrite,
     normalize: identity,
   },
@@ -364,7 +411,7 @@ const fields = {
   },
   appmap_dir: {
     extend: overwrite,
-    normalize: urlifyPath,
+    normalize: normalizeDirectoryUrl,
   },
   appmap_file: {
     extend: overwrite,
@@ -411,7 +458,8 @@ export const createConfiguration = (home) => ({
   "recursive-process-recording": true,
   command: null,
   "command-options": {
-    shell: null,
+    cwd: toAbsoluteUrl(".", home),
+    shell: true,
     encoding: "utf8",
     env: {},
     stdio: "inherit",
@@ -421,7 +469,7 @@ export const createConfiguration = (home) => ({
   // overwritten by the agent
   agent: null,
   repository: {
-    directory: home,
+    directory: toAbsoluteUrl(".", home),
     history: null,
     package: null,
   },
@@ -452,9 +500,10 @@ export const createConfiguration = (home) => ({
     level: "error",
     file: 2,
   },
-  appmap_dir: urlifyPath("tmp/appmap", home),
+  appmap_dir: toAbsoluteUrl("tmp/appmap/", home),
   appmap_file: null,
-  processes: [[true, true]],
+  "default-process": true,
+  processes: [],
   recorder: null,
   "inline-source": false,
   hooks: {
@@ -483,35 +532,22 @@ export const createConfiguration = (home) => ({
     "impure-hash-inspection": true,
   },
   language: "javascript",
-  packages: [
-    [
-      true,
-      {
-        enabled: false,
-        shallow: false,
-        exclude: [],
-        "inline-source": null,
-      },
-    ],
-  ],
+  "default-package": {
+    enabled: false,
+    shallow: false,
+    exclude: [],
+    "inline-source": null,
+  },
+  packages: [],
   "anonymous-name-separator": ANONYMOUS_NAME_SEPARATOR,
   exclude: [
-    {
-      combinator: "or",
-      name: `^[^${ANONYMOUS_NAME_SEPARATOR}]*$`,
-      "qualified-name": false,
-      "every-label": false,
-      "some-label": "^",
-      excluded: false,
-      recursive: false,
-    },
     {
       combinator: "or",
       name: true,
       "qualified-name": true,
       "every-label": true,
       "some-label": true,
-      excluded: true,
+      excluded: false,
       recursive: false,
     },
   ],

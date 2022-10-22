@@ -6,7 +6,7 @@ const { assert } = await import(`../../util/index.mjs${__search}`);
 const { expect, expectSuccess } = await import(
   `../../expect/index.mjs${__search}`
 );
-const { getUUID } = await import(`../../uuid/index.mjs${__search}`);
+const { getUuid } = await import(`../../uuid/index.mjs${__search}`);
 const { runScript } = await import(`../../interpretation/index.mjs${__search}`);
 const { resolveConfigurationManualRecorder } = await import(
   `../../configuration-accessor/index.mjs${__search}`
@@ -24,7 +24,7 @@ const {
 
 let global_running = false;
 
-const makeFile = (type, content, url = "file:///") => {
+const makeFile = (type, content, url = "file:///w:/missing-file-url.mjs") => {
   content = String(content);
   url = String(url);
   expectSuccess(
@@ -69,7 +69,7 @@ export class Appmap {
   startRecording(track, conf = {}, base = null) {
     expectRunning(this.hooking);
     if (track === null) {
-      track = getUUID();
+      track = getUuid();
     }
     expect(
       !this.tracks.has(track),

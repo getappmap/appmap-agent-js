@@ -1,0 +1,10 @@
+type: object
+additionalProperties: false
+required:
+  - type
+  - result
+properties:
+  type:
+    const: resolve
+  result:
+    $ref: serial

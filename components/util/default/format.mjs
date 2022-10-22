@@ -23,6 +23,11 @@ export const format = (template, values) => {
         assert(typeof value === "string", "expected a string for format");
         return value;
       }
+      if (marker === "f") {
+        const print = value();
+        assert(typeof print === "string", "expected a string as result");
+        return print;
+      }
       if (marker === "j") {
         return stringifyJSON(value);
       }

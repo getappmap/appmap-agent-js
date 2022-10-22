@@ -23,11 +23,11 @@ const { eval: evalGlobal } = globalThis;
 
 const agent = openAgent(
   extendConfiguration(
-    createConfiguration("file:///home"),
+    createConfiguration("protocol://host/home/"),
     {
       packages: ["*"],
     },
-    "file:///base",
+    "protocol://host/base/",
   ),
 );
 
@@ -37,7 +37,7 @@ recordStartTrack(agent, "record", {}, null);
 recordGroup(agent, 123, "description");
 assertEqual(
   evalGlobal(
-    instrument(agent, { url: "file:///base/main.js", content: "123;" }),
+    instrument(agent, { url: "protocol://host/base/main.js", content: "123;" }),
   ),
   123,
 );
@@ -66,9 +66,9 @@ assertDeepEqual(takeLocalAgentTrace(agent, "record"), [
   },
   {
     type: "source",
-    url: "file:///base/main.js",
+    url: "protocol://host/base/main.js",
     content: "123;",
-    exclude: createConfiguration("file:///home").exclude,
+    exclude: createConfiguration("protocol://host/home").exclude,
     shallow: false,
     inline: false,
   },

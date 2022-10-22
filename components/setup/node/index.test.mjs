@@ -1,107 +1,100 @@
-import { fileURLToPath } from "url";
-import { platform as getPlatform } from "os";
-import { join as joinPath, relative as getRelativePath } from "path";
 import {
-  symlink as symlinkAsync,
+  realpath as realpathAsync,
   mkdir as mkdirAsync,
-  rm as rmAsync,
+  readFile as readFileAsync,
   writeFile as writeFileAsync,
-} from "fs/promises";
-import { assertEqual, getFreshTemporaryURL } from "../../__fixture__.mjs";
+} from "node:fs/promises";
+import { getUuid } from "../../uuid/random/index.mjs?env=test";
+import {
+  toDirectoryPath,
+  getTmpUrl,
+  convertFileUrlToPath,
+  convertPathToFileUrl,
+} from "../../path/index.mjs?env=test";
+import { toAbsoluteUrl } from "../../url/index.mjs?env=test";
+import { assertEqual } from "../../__fixture__.mjs";
+
 import { mainAsync } from "./index.mjs?env=test";
 
-const {
-  URL,
-  process,
-  JSON: { stringify: stringifyJSON },
-} = globalThis;
+const { URL, process } = globalThis;
 
-const directory = getFreshTemporaryURL();
-const cwd = () => fileURLToPath(directory);
-await mkdirAsync(new URL(directory));
+globalThis.GLOBAL_PROMPTS = () => ({ value: false });
+
+const base = toAbsoluteUrl(`${getUuid()}/`, getTmpUrl());
+
+const cwd = () => convertFileUrlToPath(base);
+
+await mkdirAsync(new URL(base));
 
 assertEqual(await mainAsync({ ...process, version: "v12.34.56" }), false);
 process.stdout.write("\n");
 
-globalThis.GLOBAL_PROMPTS = () => ({ value: false });
-
 assertEqual(
   await mainAsync({
     ...process,
+    cwd,
     env: {
-      APPMAP_CONFIGURATION_PATH: fileURLToPath(`${directory}/appmap.yml`),
-      APPMAP_REPOSITORY_DIRECTORY: fileURLToPath(directory),
+      APPMAP_CONFIGURATION_PATH: "appmap.yml",
+      APPMAP_REPOSITORY_DIRECTORY: ".",
     },
   }),
   false,
 );
 process.stdout.write("\n");
 
-await writeFileAsync(
-  new URL(`${directory}/appmap.yml`),
-  "{invalid ,, yaml}",
-  "utf8",
-);
+await writeFileAsync(new URL("appmap.yml", base), "{invalid ,, yaml}", "utf8");
 assertEqual(await mainAsync({ ...process, cwd }), false);
 process.stdout.write("\n");
 
 await writeFileAsync(
-  new URL(`${directory}/appmap.yml`),
+  new URL("appmap.yml", base),
   "invalid configuration type",
   "utf8",
 );
 assertEqual(await mainAsync({ ...process, cwd }), false);
 process.stdout.write("\n");
 
-await writeFileAsync(
-  new URL(`${directory}/appmap.yml`),
-  "name: my-name",
-  "utf8",
-);
+await writeFileAsync(new URL("appmap.yml", base), "name: my-name", "utf8");
 assertEqual(await mainAsync({ ...process, cwd }), false);
 process.stdout.write("\n");
 
-await mkdirAsync(new URL(`${directory}/node_modules`));
-await mkdirAsync(new URL(`${directory}/node_modules/@appland`));
-
-await mkdirAsync(new URL(`${directory}/node_modules/@appland/appmap-agent-js`));
+await mkdirAsync(new URL("node_modules/", base));
+await mkdirAsync(new URL("node_modules/@appland/", base));
+await mkdirAsync(new URL("node_modules/@appland/appmap-agent-js/", base));
+await mkdirAsync(new URL("node_modules/@appland/appmap-agent-js/lib/", base));
+await mkdirAsync(
+  new URL("node_modules/@appland/appmap-agent-js/lib/node", base),
+);
 await writeFileAsync(
-  new URL(`${directory}/node_modules/@appland/appmap-agent-js/package.json`),
-  stringifyJSON({
-    name: "@appland/appmap-agent-js",
-    version: "1.2.3",
-  }),
+  new URL("node_modules/@appland/appmap-agent-js/package.json", base),
+  await readFileAsync(
+    new URL("../../../package.json", import.meta.url),
+    "utf8",
+  ),
   "utf8",
 );
 await writeFileAsync(
-  new URL(`${directory}/node_modules/@appland/appmap-agent-js/index.js`),
+  new URL(
+    "node_modules/@appland/appmap-agent-js/lib/node/recorder-api.mjs",
+    base,
+  ),
   "123;",
   "utf8",
 );
-// TODO investigate how to clear resolve cache which cause next test to fail.
-// assertEqual(await mainAsync({ ...process, cwd }), false);
+
+assertEqual(await mainAsync({ ...process, cwd }), false);
 process.stdout.write("\n");
 
-const url = new URL(`${directory}/node_modules/@appland/appmap-agent-js`);
-await rmAsync(url, { recursive: true });
-await symlinkAsync(
-  getRelativePath(
-    fileURLToPath(url),
-    joinPath(fileURLToPath(import.meta.url), "..", "..", "..", ".."),
-  ),
-  url,
-  "dir",
+const fake = toAbsoluteUrl(
+  "node_modules/@appland/appmap-agent-js/components/setup/node/index.test.mjs",
+  convertPathToFileUrl(toDirectoryPath(await realpathAsync(new URL(base)))),
 );
-// TODO: investigate why symlink resolution in windows does not work
-if (getPlatform() !== "win32") {
-  assertEqual(await mainAsync({ ...process, cwd }), true);
-}
+
+assertEqual(await mainAsync({ ...process, cwd }, fake), true);
 process.stdout.write("\n");
 
-await mkdirAsync(new URL(`${directory}/.git`));
-await writeFileAsync(new URL(`${directory}/package.json`), "{}", "utf8");
-// TODO: investigate why symlink resolution in windows does not work
-if (getPlatform() !== "win32") {
-  assertEqual(await mainAsync({ ...process, cwd }), true);
-}
+await mkdirAsync(new URL(".git", base));
+await writeFileAsync(new URL("package.json", base), "{}", "utf8");
+
+assertEqual(await mainAsync({ ...process, cwd }, fake), true);
 process.stdout.write("\n");

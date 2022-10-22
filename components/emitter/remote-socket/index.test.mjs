@@ -10,7 +10,7 @@ const {
 } = globalThis;
 
 const configuration = extendConfiguration(
-  createConfiguration("file:///home"),
+  createConfiguration("protocol://host/home"),
   {
     host: "localhost",
   },
