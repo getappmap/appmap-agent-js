@@ -1,3 +1,28 @@
+# [11.6.0](https://github.com/getappmap/appmap-agent-js/compare/v11.5.3...v11.6.0) (2022-10-22)
+
+
+### Bug Fixes
+
+* add missing configuration property ([ee267c3](https://github.com/getappmap/appmap-agent-js/commit/ee267c37d9997eff89ee336572a71e01acbb35c9))
+* handle absolute windows path when resolving url ([b673238](https://github.com/getappmap/appmap-agent-js/commit/b673238ad89d9f1b88265890366042ca69c8f458))
+* more portable line splitting for .env files ([7f8d0d8](https://github.com/getappmap/appmap-agent-js/commit/7f8d0d882929a17f104515def01cc60b2242abbd))
+* normalize windows filename case ([df29f33](https://github.com/getappmap/appmap-agent-js/commit/df29f33260dcc4f0b3264722e45d9406ac050f69))
+* use all cap env variable name ([b7f834f](https://github.com/getappmap/appmap-agent-js/commit/b7f834f0e273767844d83048623f6ace5bf90426))
+* use file urls in NODE_OPTIONS ([f0959d8](https://github.com/getappmap/appmap-agent-js/commit/f0959d82b4179016a90669462d63bae524be9245))
+* use import.meta.url instead of require self package ([3257c25](https://github.com/getappmap/appmap-agent-js/commit/3257c2587e66fb118053eb11a2e11f161003ee7e))
+* use pure serialization for hash values ([c652bd4](https://github.com/getappmap/appmap-agent-js/commit/c652bd4343016b5d5612cc3b7d9e43b37620cc05))
+
+
+### Features
+
+* add configuration file when missing ([1214979](https://github.com/getappmap/appmap-agent-js/commit/1214979cc2f978abe2ad067fef2a27e349aba8a4))
+* change default package exclusion ([0a0bfa1](https://github.com/getappmap/appmap-agent-js/commit/0a0bfa124523ef0dbf86aee1200dff69b8d2bdf8))
+* consider SHELL env variable to define posix shell ([32fd562](https://github.com/getappmap/appmap-agent-js/commit/32fd5623d7d1dfac45b354b49ab93894f4957693))
+* default recorder is process instead of remote ([341a1fa](https://github.com/getappmap/appmap-agent-js/commit/341a1fae7fd501acf4410e1250e4b023218c2956))
+* preserve parsed command in configuration-accessor ([505c27b](https://github.com/getappmap/appmap-agent-js/commit/505c27b15f78782b78124df057219fba1646eed0))
+* provide feedback if the stack overflows ([7a4e2b6](https://github.com/getappmap/appmap-agent-js/commit/7a4e2b6d67683fc7d6c1e167d4535da3d3edac65))
+* support node-fashion shell command option ([48a0946](https://github.com/getappmap/appmap-agent-js/commit/48a094673323aa4de0416b5f78f693ad78ccce65))
+
 ## [11.5.3](https://github.com/getappmap/appmap-agent-js/compare/v11.5.2...v11.5.3) (2022-10-07)
 
 
