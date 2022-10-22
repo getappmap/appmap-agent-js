@@ -29,10 +29,18 @@ const { orderEventArray } = await import(`./ordering/index.mjs${__search}`);
 
 const VERSION = "1.8.0";
 
-const summary_template =
-  "Received %j raw events.\n\nEvent Repartition:\n%f\n\nApply Repartition:\n%f\n";
+const summary_template = `\
+Received %j raw events.
 
-const stackoverflow_template = `We cannot process your appmap because it has too many (nested) events.
+Event Distribution:
+%f
+
+Most frequently applied functions:
+%f
+`;
+
+const stackoverflow_template = `\
+We cannot process your appmap because it has too many (nested) events.\
 There is three ways to solve this issue:
 
   * You could tweak the \`appmap.yml\` configuration file to record fewer events:
@@ -48,9 +56,9 @@ There is three ways to solve this issue:
       - glob: 'node_modules/**/*'
         enabled: false
     \`\`\`
-  * You could reduce the scope of the recording.
+  * You could reduce the scope of the recording.\
     For instance, by splitting test files or reducing the time span of remote recording.
-  * You could increase the callstack size of this node process.
+  * You could increase the callstack size of this node process.\
     This can be done via the node \`--stack-size\` cli option.
     \`\`\`
     > node --stack-size=5000 node_modules/bin/appmap-agent-js -- npm run test
@@ -133,7 +141,7 @@ export const compileTrace = (configuration, messages) => {
       routes.add(event.payload.function);
     }
   }
-  const printEventRepartition = () => {
+  const printEventDistribution = () => {
     const counters = new Map();
     for (const { payload } of events) {
       const { type } = payload;
@@ -149,7 +157,7 @@ export const compileTrace = (configuration, messages) => {
       )
       .join("\n");
   };
-  const printApplyRepartition = () => {
+  const printApplyDistribution = () => {
     const counters = new Map();
     let total = 0;
     for (const { payload } of events) {
@@ -182,8 +190,8 @@ export const compileTrace = (configuration, messages) => {
       !(error instanceof RangeError),
       stackoverflow_template,
       events.length,
-      printEventRepartition,
-      printApplyRepartition,
+      printEventDistribution,
+      printApplyDistribution,
     );
     throw error;
   }
@@ -198,8 +206,8 @@ export const compileTrace = (configuration, messages) => {
   logInfo(
     summary_template,
     events.length,
-    printEventRepartition,
-    printApplyRepartition,
+    printEventDistribution,
+    printApplyDistribution,
   );
   return {
     head: configuration,
