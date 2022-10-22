@@ -15,6 +15,8 @@ import {
 
 assertDeepEqual(getShell({}), "/bin/sh");
 
+assertDeepEqual(getShell({ SHELL: "/bin/bash" }), "/bin/bash");
+
 // fromIpcPath && toIpcPath //
 
 assertEqual(
