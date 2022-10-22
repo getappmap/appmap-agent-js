@@ -14,6 +14,8 @@ export const convertPathToFileUrl = (path) =>
 /* c8 ignore start */
 export const {
   getPathFilename,
+  // This function convert an arbitrary string to a valid platform-specific filename.
+  // For instance, it replaces path separator.
   sanitizePathFilename,
   getShell,
   toIpcPath,
