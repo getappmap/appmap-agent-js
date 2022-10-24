@@ -13,6 +13,9 @@ const { search: __search } = new URL(import.meta.url);
 // After this pass, each begin event will be matched to their end event.
 // Also, begin/end event pair can have children but not before/after event pair.
 
+const { InternalAppmapError } = await import(
+  `../../../error/index.mjs${__search}`
+);
 const { assert } = await import(`../../../util/index.mjs${__search}`);
 const { manufactureMatchingEvent, isMatchingEvent } = await import(
   `./matching.mjs${__search}`
@@ -30,7 +33,11 @@ const manufactureBundleEvent = (site, tab) => ({
 });
 
 const makeBundleNode = (begin, children, end) => {
-  assert(isMatchingEvent(begin, end), "begin/end event mismatch");
+  assert(
+    isMatchingEvent(begin, end),
+    "begin/end event mismatch",
+    InternalAppmapError,
+  );
   return {
     type: "bundle",
     begin,
@@ -40,7 +47,11 @@ const makeBundleNode = (begin, children, end) => {
 };
 
 const makeJumpNode = (before, after) => {
-  assert(isMatchingEvent(before, after), "before/after event mismatch");
+  assert(
+    isMatchingEvent(before, after),
+    "before/after event mismatch",
+    InternalAppmapError,
+  );
   return {
     type: "jump",
     before,
@@ -95,7 +106,11 @@ const manufactureBundleNode = (orphan) => {
 const splitJump = (frames, jumps) => {
   const filtering = (frame) => {
     if (frame.enter.site === "after") {
-      assert(!jumps.has(frame.enter.tab), "duplicate jump");
+      assert(
+        !jumps.has(frame.enter.tab),
+        "duplicate jump",
+        InternalAppmapError,
+      );
       jumps.set(frame.enter.tab, frame);
       return false;
     } else {

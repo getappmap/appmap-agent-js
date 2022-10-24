@@ -12,6 +12,9 @@ import {
   validateMessage as validateAjvMessage,
   validateSourceMap as validateAjvSourceMap,
 } from "../../../dist/schema.mjs";
+const { InternalAppmapError } = await import(
+  `../../error/index.mjs${__search}`
+);
 const { assert, coalesce } = await import(`../../util/index.mjs${__search}`);
 const { expect } = await import(`../../expect/index.mjs${__search}`);
 
@@ -21,7 +24,7 @@ const generateValidate = (validateAjv, name) => (json) => {
   if (!validateAjv(json)) {
     const { errors } = validateAjv;
     const { length } = errors;
-    assert(length > 0, "unexpected empty error array");
+    assert(length > 0, "unexpected empty error array", InternalAppmapError);
     const tree1 = AjvErrorTree.structureAJVErrorArray(errors);
     const tree2 = AjvErrorTree.summarizeAJVErrorTree(tree1);
     expect(

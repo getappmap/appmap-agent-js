@@ -19,6 +19,9 @@ const { extendConfigurationPort } = await import(
 const { sanitizePathFilename } = await import(
   `../../path/index.mjs${__search}`
 );
+const { InternalAppmapError } = await import(
+  `../../error/index.mjs${__search}`
+);
 const { assert } = await import(`../../util/index.mjs${__search}`);
 const { logDebug, logInfo, logError } = await import(
   `../../log/index.mjs${__search}`
@@ -82,6 +85,7 @@ export const openReceptorAsync = async ({
   assert(
     recorder === "mocha" || recorder === "process",
     "invalid recorder for receptor-file",
+    InternalAppmapError,
   );
   const base = toAbsoluteUrl(`${recorder}/`, directory);
   await mkdirAsync(new URL(base), { recursive: true });

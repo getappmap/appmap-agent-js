@@ -8,6 +8,9 @@ const {
 
 const { search: __search } = new URL(import.meta.url);
 
+const { InternalAppmapError } = await import(
+  `../../error/index.mjs${__search}`
+);
 const { expect } = await import(`../../expect/index.mjs${__search}`);
 const {
   mapMaybe,
@@ -776,7 +779,11 @@ const initial_parent = { type: "File" };
 const initial_grand_parent = { type: "Root" };
 
 export const visit = (node, context) => {
-  assert(node.type === "Program", "expected program as top level estree node");
+  assert(
+    node.type === "Program",
+    "expected program as top level estree node",
+    InternalAppmapError,
+  );
   // Top level async jump only present in module.
   // Avoid poluting global scope in script.
   return visitNode(

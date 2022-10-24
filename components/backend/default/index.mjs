@@ -2,6 +2,9 @@ const { Map, URL } = globalThis;
 
 const { search: __search } = new URL(import.meta.url);
 
+const { InternalAppmapError } = await import(
+  `../../error/index.mjs${__search}`
+);
 const { assert } = await import(`../../util/index.mjs${__search}`);
 const { logDebug } = await import(`../../log/index.mjs${__search}`);
 const { validateMessage } = await import(
@@ -25,7 +28,7 @@ export const hasBackendTrack = ({ tracks }, key) => tracks.has(key);
 export const hasBackendTrace = ({ traces }, key) => traces.has(key);
 
 export const takeBackendTrace = ({ traces }, key) => {
-  assert(traces.has(key), "missing trace");
+  assert(traces.has(key), "missing trace", InternalAppmapError);
   const trace = traces.get(key);
   traces.delete(key);
   return trace;
@@ -40,12 +43,12 @@ export const sendBackend = (
   const { type } = message;
   if (type === "start") {
     const { track: key } = message;
-    assert(!tracks.has(key), "duplicate track");
+    assert(!tracks.has(key), "duplicate track", InternalAppmapError);
     tracks.set(key, [...sources, message]);
   } else if (type === "stop") {
     const { track: key } = message;
-    assert(tracks.has(key), "missing track");
-    assert(!traces.has(key), "duplicate trace");
+    assert(tracks.has(key), "missing track", InternalAppmapError);
+    assert(!traces.has(key), "duplicate trace", InternalAppmapError);
     const messages = tracks.get(key);
     messages.push(message);
     tracks.delete(key);

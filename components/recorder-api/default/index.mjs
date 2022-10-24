@@ -2,6 +2,9 @@ const { Set, String, URL } = globalThis;
 
 const { search: __search } = new URL(import.meta.url);
 
+const { InternalAppmapError } = await import(
+  `../../error/index.mjs${__search}`
+);
 const { assert } = await import(`../../util/index.mjs${__search}`);
 const { expect, expectSuccess } = await import(
   `../../expect/index.mjs${__search}`
@@ -93,7 +96,11 @@ export class Appmap {
   }
   terminate() {
     expectRunning(this.hooking);
-    assert(global_running, "globally unregistered appmap instance");
+    assert(
+      global_running,
+      "globally unregistered appmap instance",
+      InternalAppmapError,
+    );
     global_running = false;
     unhook(this.hooking);
     this.hooking = null;

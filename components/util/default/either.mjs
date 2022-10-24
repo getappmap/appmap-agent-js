@@ -1,4 +1,4 @@
-import { assert } from "./assert.mjs";
+import { assert, AssertionError } from "./assert.mjs";
 
 const { Error } = globalThis;
 
@@ -19,7 +19,7 @@ export const isRight = generateIs(RIGHT_TAG);
 const generateFrom =
   (tag) =>
   ({ either, value }) => {
-    assert(either === tag, "unexpected either tag");
+    assert(either === tag, "unexpected either tag", AssertionError);
     return value;
   };
 export const fromLeft = generateFrom(LEFT_TAG);

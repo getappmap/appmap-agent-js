@@ -2,6 +2,9 @@ const { URL } = globalThis;
 const { search: __search } = new URL(import.meta.url);
 
 const { logWarning } = await import(`../../log/index.mjs${__search}`);
+const { InternalAppmapError } = await import(
+  `../../error/index.mjs${__search}`
+);
 const { assert, generateDeadcode, createBox, getBox, setBox } = await import(
   `../../util/index.mjs${__search}`
 );
@@ -18,7 +21,11 @@ export const openEmitter = (configuration) => ({
 });
 
 export const closeEmitter = ({ closed, backend }) => {
-  assert(!getBox(closed), "closeClient called on already closed client");
+  assert(
+    !getBox(closed),
+    "closeClient called on already closed client",
+    InternalAppmapError,
+  );
   setBox(closed, true);
   for (const key of getBackendTrackIterator(backend)) {
     sendBackend(backend, {
@@ -48,4 +55,5 @@ export const takeLocalEmitterTrace = ({ backend }, key) =>
 
 export const requestRemoteEmitterAsync = generateDeadcode(
   "requestRemoteEmitterAsync should not be called on emitter/local",
+  InternalAppmapError,
 );

@@ -16,6 +16,9 @@ const {
   getShell,
   toAbsolutePath,
 } = await import(`../../path/index.mjs${__search}`);
+const { InternalAppmapError } = await import(
+  `../../error/index.mjs${__search}`
+);
 const { assert, coalesce, generateDeadcode } = await import(
   `../../util/index.mjs${__search}`
 );
@@ -45,7 +48,10 @@ const escapePosix = (token) => token.replace(/[^a-zA-Z0-9\-_./:]/gu, "\\$&");
 // https://ss64.com/nt/syntax-esc.html
 const escapeWin32 = (token) => token.replace(/[^a-zA-Z0-9\-_./:\\]/gu, "^$&");
 
-const escapeDead = generateDeadcode("escape without shell");
+const escapeDead = generateDeadcode(
+  "escape without shell",
+  InternalAppmapError,
+);
 
 const generateEscape = (shell, env) => {
   if (shell === false) {
@@ -130,7 +136,11 @@ const splitNodeCommand = (tokens) => {
 };
 
 export const resolveConfigurationRepository = (configuration) => {
-  assert(configuration.agent === null, "duplicate respository resolution");
+  assert(
+    configuration.agent === null,
+    "duplicate respository resolution",
+    InternalAppmapError,
+  );
   const { directory } = configuration.repository;
   const agent_directory = toAbsoluteUrl("../../../", import.meta.url);
   const { name, version, homepage } = parseJSON(
@@ -158,6 +168,7 @@ export const resolveConfigurationAutomatedRecorder = (configuration) => {
     assert(
       configuration.command !== null,
       "cannot resolve recorder because command is missing",
+      InternalAppmapError,
     );
     configuration = extendConfiguration(
       configuration,
@@ -211,9 +222,13 @@ export const extendConfigurationNode = (
   configuration,
   { version, argv, cwd },
 ) => {
-  assert(argv.length >= 2, "expected at least two argv");
+  assert(argv.length >= 2, "expected at least two argv", InternalAppmapError);
   const [, main] = argv;
-  assert(version.startsWith("v"), "expected version to start with v");
+  assert(
+    version.startsWith("v"),
+    "expected version to start with v",
+    InternalAppmapError,
+  );
   return {
     ...configuration,
     engine: `node@${version.substring(1)}`,
@@ -225,14 +240,18 @@ export const extendConfigurationPort = (configuration, ports) => {
   for (const [key, new_port] of toEntries(ports)) {
     const { [key]: old_port } = configuration;
     if (old_port === 0 || old_port === "") {
-      assert(typeof new_port === typeof old_port, "port type mismatch");
+      assert(
+        typeof new_port === typeof old_port,
+        "port type mismatch",
+        InternalAppmapError,
+      );
       configuration = extendConfiguration(
         configuration,
         { [key]: new_port },
         configuration.repository.directory,
       );
     } else {
-      assert(old_port === new_port);
+      assert(old_port === new_port, "port mismatch", InternalAppmapError);
     }
   }
   return configuration;
@@ -270,7 +289,11 @@ export const getConfigurationScenarios = (configuration) => {
 // - https://nodejs.org/api/cli.html#node_optionsoptions
 // - https://github.com/nodejs/node/blob/80270994d6ba6019a6a74adc1b97a0cc1bd343ed/src/node_options.cc
 const escapeNodeOption = (token) => {
-  assert(!token.includes(" "), "spaces should have been percent-encoded");
+  assert(
+    !token.includes(" "),
+    "spaces should have been percent-encoded",
+    InternalAppmapError,
+  );
   return token;
 };
 
@@ -357,8 +380,16 @@ const hookers = {
 };
 
 export const compileConfigurationCommand = (configuration, env) => {
-  assert(configuration.agent !== null, "missing agent in configuration");
-  assert(configuration.command !== null, "missing command in configuration");
+  assert(
+    configuration.agent !== null,
+    "missing agent in configuration",
+    InternalAppmapError,
+  );
+  assert(
+    configuration.command !== null,
+    "missing command in configuration",
+    InternalAppmapError,
+  );
   const {
     agent: { directory },
     recorder,

@@ -11,6 +11,9 @@ import { createServer as createTCPServer } from "net";
 import { readFileSync as readFile } from "fs";
 import { createServer as createHTTPServer } from "http";
 import NetSocketMessaging from "net-socket-messaging";
+const { InternalAppmapError } = await import(
+  `../../error/index.mjs${__search}`
+);
 const { assert, coalesce } = await import(`../../util/index.mjs${__search}`);
 const { generateRespond } = await import(`../../http/index.mjs${__search}`);
 const { logDebug, logError } = await import(`../../log/index.mjs${__search}`);
@@ -46,7 +49,11 @@ export const openReceptorAsync = async ({
   "track-port": track_port,
   "trace-port": trace_port,
 }) => {
-  assert(recorder === "remote", "invalid recorder for receptor-http");
+  assert(
+    recorder === "remote",
+    "invalid recorder for receptor-http",
+    InternalAppmapError,
+  );
   const trace_server = createTCPServer();
   const track_server = createHTTPServer();
   const backends = new Map();

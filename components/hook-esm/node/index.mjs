@@ -17,6 +17,9 @@ const {
 
 const { search: __search } = new URL(import.meta.url);
 
+const { InternalAppmapError } = await import(
+  `../../error/index.mjs${__search}`
+);
 const { assert, hasOwnProperty } = await import(
   `../../util/index.mjs${__search}`
 );
@@ -28,6 +31,7 @@ export const unhook = (esm_hook_variable) => {
     assert(
       hasOwnProperty(globalThis, esm_hook_variable),
       "global esm hook variable not defined",
+      InternalAppmapError,
     );
     delete globalThis[esm_hook_variable];
   }
@@ -38,6 +42,7 @@ export const hook = (agent, { hooks: { esm: esm_hook_variable } }) => {
     assert(
       !hasOwnProperty(globalThis, esm_hook_variable),
       "global esm hook variable already defined",
+      InternalAppmapError,
     );
     const transformModule = (url, format, content) =>
       format === "module"

@@ -1,12 +1,12 @@
 import { assertEqual, assertThrow } from "../../__fixture__.mjs";
 import { assert, generateDeadcode } from "./assert.mjs";
 
-const { undefined } = globalThis;
+const { undefined, Error } = globalThis;
 
-assertEqual(assert(true, "foo"), undefined);
+assertEqual(assert(true, "foo", Error), undefined);
 
 assertThrow(() => {
-  assert(false, "foo");
-}, /^AssertionError: foo/u);
+  assert(false, "foo", Error);
+}, /^Error: foo/u);
 
-assertThrow(() => generateDeadcode("foo")("bar"), /^AssertionError: foo/u);
+assertThrow(() => generateDeadcode("foo", Error)("bar"), /^Error: foo/u);

@@ -5,6 +5,9 @@ const { search: __search } = new URL(import.meta.url);
 const { logInfo } = await import(`../../log/index.mjs${__search}`);
 const { expect } = await import(`../../expect/index.mjs${__search}`);
 const { hook, unhook } = await import(`../../hook/index.mjs${__search}`);
+const { InternalAppmapError } = await import(
+  `../../error/index.mjs${__search}`
+);
 const { assert } = await import(`../../util/index.mjs${__search}`);
 const { isConfigurationEnabled, extendConfigurationNode } = await import(
   `../../configuration-accessor/index.mjs${__search}`
@@ -82,13 +85,13 @@ export const recordStartTrack = (
   configuration,
   url,
 ) => {
-  assert(!tracks.has(track), "duplicate track");
+  assert(!tracks.has(track), "duplicate track", InternalAppmapError);
   tracks.add(track);
   recordAgentStartTrack(agent, track, configuration, url);
 };
 
 export const recordStopTrack = ({ agent, tracks }, track, status) => {
-  assert(tracks.has(track), "missing track");
+  assert(tracks.has(track), "missing track", InternalAppmapError);
   tracks.delete(track);
   recordAgentStopTrack(agent, track, status);
 };

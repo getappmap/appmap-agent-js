@@ -5,6 +5,9 @@ const { search: __search } = new URL(import.meta.url);
 import Minimatch from "minimatch";
 const { logDebug } = await import(`../../log/index.mjs${__search}`);
 const { expect } = await import(`../../expect/index.mjs${__search}`);
+const { InternalAppmapError } = await import(
+  `../../error/index.mjs${__search}`
+);
 const { assert } = await import(`../../util/index.mjs${__search}`);
 const { toRelativeUrl } = await import(`../../url/index.mjs${__search}`);
 const { expectSuccess } = await import(`../../expect/index.mjs${__search}`);
@@ -66,6 +69,7 @@ export const createSpecifier = (options, base) => {
     assert(
       path[path.length - 1] !== "/",
       "directory path should not end with a path separator",
+      InternalAppmapError,
     );
     return {
       base,
@@ -77,6 +81,7 @@ export const createSpecifier = (options, base) => {
     assert(
       dist[dist.length - 1] !== "/",
       "package path should not end with a path separator",
+      InternalAppmapError,
     );
     let source = `node_modules/${sanitizeForRegExp(dist)}/`;
     if (!external) {

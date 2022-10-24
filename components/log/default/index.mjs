@@ -2,6 +2,9 @@ const { URL } = globalThis;
 
 const { search: __search, searchParams: __params } = new URL(import.meta.url);
 
+const { InternalAppmapError } = await import(
+  `../../error/index.mjs${__search}`
+);
 const { hasOwnProperty, noop, assert } = await import(
   `../../util/index.mjs${__search}`
 );
@@ -25,7 +28,11 @@ const max_level = __params.has("log-level")
   ? __params.get("log-level")
   : "info";
 
-assert(hasOwnProperty(levels, max_level), "invalid log level");
+assert(
+  hasOwnProperty(levels, max_level),
+  "invalid log level",
+  InternalAppmapError,
+);
 
 const generateLog = (level, log) => {
   if (levels[level] < levels[max_level]) {

@@ -1,4 +1,4 @@
-import { assert } from "./assert.mjs";
+import { assert, AssertionError } from "./assert.mjs";
 
 const {
   Error,
@@ -29,7 +29,7 @@ export const memoize = (closure, argument) => {
 export const compose = (f, g) => {
   const { length: l } = f;
   const { length: m } = g;
-  assert(m > 0, "cannot compose a 0-arity function");
+  assert(m > 0, "cannot compose a 0-arity function", AssertionError);
   if (l === 0) {
     if (m === 1) {
       return () => g(f());
@@ -91,7 +91,7 @@ export const compose = (f, g) => {
 
 export const bind = (f, x1) => {
   const { length: l } = f;
-  assert(l > 0, "cannot bind a 0-arity function");
+  assert(l > 0, "cannot bind a 0-arity function", AssertionError);
   if (l === 1) {
     return () => f(x1);
   }

@@ -2,10 +2,17 @@ const { URL, String, WebSocket } = globalThis;
 
 const { search: __search } = new URL(import.meta.url);
 
+const { InternalAppmapError } = await import(
+  `../../error/index.mjs${__search}`
+);
 const { assert } = await import(`../../util/index.mjs${__search}`);
 
 export const openSocket = (host, port) => {
-  assert(typeof port === "number", "cannot use IPC communicate on browser");
+  assert(
+    typeof port === "number",
+    "cannot use IPC communicate on browser",
+    InternalAppmapError,
+  );
   return new WebSocket(`wss://${host}:${String(port)}`);
 };
 

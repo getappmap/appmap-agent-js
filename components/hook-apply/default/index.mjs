@@ -5,6 +5,9 @@ const {
 
 const { search: __search } = new URL(import.meta.url);
 
+const { InternalAppmapError } = await import(
+  `../../error/index.mjs${__search}`
+);
 const { assert, noop, assignProperty, hasOwnProperty } = await import(
   `../../util/index.mjs${__search}`
 );
@@ -36,6 +39,7 @@ export const hook = (agent, { hooks: { apply: apply_hook_variable } }) => {
     assert(
       !hasOwnProperty(globalThis, apply_hook_variable),
       "global apply hook variable already defined",
+      InternalAppmapError,
     );
     const resume_payload = getResumePayload(agent);
     const runtime = {

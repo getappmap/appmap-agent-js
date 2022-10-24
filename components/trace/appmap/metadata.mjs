@@ -2,6 +2,9 @@ const { URL } = globalThis;
 
 const { search: __search } = new URL(import.meta.url);
 
+const { InternalAppmapError } = await import(
+  `../../error/index.mjs${__search}`
+);
 const { assert, mapMaybe, recoverMaybe } = await import(
   `../../util/index.mjs${__search}`
 );
@@ -77,7 +80,11 @@ const makeTestStatus = (errors, status) => {
 };
 
 const makeRecorder = (recorder) => {
-  assert(recorder !== null, "recorder should have been resolved earlier");
+  assert(
+    recorder !== null,
+    "recorder should have been resolved earlier",
+    InternalAppmapError,
+  );
   return { name: recorder };
 };
 
