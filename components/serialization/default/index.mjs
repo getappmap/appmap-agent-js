@@ -24,7 +24,7 @@ const { search: __search } = new URL(import.meta.url);
 
 const { identity, hasOwnProperty, incrementCounter, createCounter } =
   await import(`../../util/index.mjs${__search}`);
-const { logDebug, logGuardDebug } = await import(
+const { logDebug, logDebugWhen } = await import(
   `../../log/index.mjs${__search}`
 );
 
@@ -139,7 +139,7 @@ const getConstructorName = ({ impure_constructor_naming }, object) => {
     const _constructor = getDataPropertyImpure(object, "constructor");
     if (typeof _constructor === "function") {
       const name = getDataPropertyImpure(_constructor, "name");
-      logGuardDebug(
+      logDebugWhen(
         typeof name !== "string",
         "Constructor name of %o is not a string: %o",
         object,
@@ -200,7 +200,7 @@ const generatePrint =
     } else {
       if (impure_printing) {
         const representation = toStringImpure(any);
-        logGuardDebug(
+        logDebugWhen(
           typeof representation !== "string",
           "%o.toString() did not return a string, got: %o",
           any,

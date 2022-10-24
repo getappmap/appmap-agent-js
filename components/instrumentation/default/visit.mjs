@@ -24,7 +24,7 @@ const { toAbsoluteUrl, toDirectoryUrl } = await import(
   `../../url/index.mjs${__search}`
 );
 const { mapSource } = await import(`../../source/index.mjs${__search}`);
-const { logGuardDebug } = await import(`../../log/index.mjs${__search}`);
+const { logDebugWhen } = await import(`../../log/index.mjs${__search}`);
 const { stringifyLocation, getLocationFileUrl } = await import(
   `../../location/index.mjs${__search}`
 );
@@ -303,7 +303,7 @@ const instrumentClosure = (node, parent, grand_parent, closure, context) => {
     node.loc.start.line,
     node.loc.start.column,
   );
-  logGuardDebug(
+  logDebugWhen(
     location === null,
     "Missing source map at file %j at line %j at column %j",
     context.url,
@@ -629,7 +629,7 @@ const instrumenters = {
         node.loc.start.line,
         node.loc.start.column,
       );
-      logGuardDebug(
+      logDebugWhen(
         location === null,
         "Missing source map at file %j at line %j at column %j",
         context.url,

@@ -25,7 +25,7 @@ const { assert, coalesce, generateDeadcode } = await import(
 const { expect, expectSuccess } = await import(
   `../../expect/index.mjs${__search}`
 );
-const { logGuardWarning } = await import(`../../log/index.mjs${__search}`);
+const { logWarningWhen } = await import(`../../log/index.mjs${__search}`);
 const { extractRepositoryHistory, extractRepositoryPackage } = await import(
   `../../repository/index.mjs${__search}`
 );
@@ -196,13 +196,13 @@ export const resolveConfigurationManualRecorder = (configuration) => {
     recorder,
     hooks: { esm },
   } = configuration;
-  logGuardWarning(
+  logWarningWhen(
     recorder !== "manual",
     "Manual recorder expected configuration field 'recorder' to be %s and got %j.",
     "manual",
     recorder,
   );
-  logGuardWarning(
+  logWarningWhen(
     esm,
     "Manual recorder does not support native module recording and configuration field 'hooks.esm' is enabled.",
   );

@@ -4,7 +4,7 @@ const { search: __search } = new URL(import.meta.url);
 
 import * as Astring from "astring";
 import * as Acorn from "acorn";
-const { logDebug, logGuardDebug } = await import(
+const { logDebug, logDebugWhen } = await import(
   `../../log/index.mjs${__search}`
 );
 const { generateGet, createCounter, recoverMaybe } = await import(
@@ -72,12 +72,12 @@ export const instrument = (
     (configuration.hooks.eval.aliases.length === 0 &&
       configuration.hooks.apply === null)
   ) {
-    logGuardDebug(
+    logDebugWhen(
       excluded,
       "Not instrumenting file %j because it has no allowed sources",
       url,
     );
-    logGuardDebug(
+    logDebugWhen(
       !excluded,
       "Not instrumenting file %j because instrumentation hooks (apply and eval) are disabled",
       url,

@@ -38,12 +38,12 @@ const generateLog = (level, log) => {
   if (levels[level] < levels[max_level]) {
     return {
       log: noop,
-      logGuard: noop,
+      logWhen: noop,
     };
   } else {
     return {
       log,
-      logGuard: (guard, ...args) => {
+      logWhen: (guard, ...args) => {
         if (guard) {
           log(...args);
         }
@@ -52,22 +52,22 @@ const generateLog = (level, log) => {
   }
 };
 
-export const { log: logDebug, logGuard: logGuardDebug } = generateLog(
+export const { log: logDebug, logWhen: logDebugWhen } = generateLog(
   "debug",
   logDebugInner,
 );
 
-export const { log: logInfo, logGuard: logGuardInfo } = generateLog(
+export const { log: logInfo, logWhen: logInfoWhen } = generateLog(
   "info",
   logInfoInner,
 );
 
-export const { log: logWarning, logGuard: logGuardWarning } = generateLog(
+export const { log: logWarning, logWhen: logWarningWhen } = generateLog(
   "warning",
   logWarningInner,
 );
 
-export const { log: logError, logGuard: logGuardError } = generateLog(
+export const { log: logError, logWhen: logErrorWhen } = generateLog(
   "error",
   logErrorInner,
 );

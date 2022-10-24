@@ -7,7 +7,7 @@ const {
 
 const { search: __search } = new URL(import.meta.url);
 
-const { logGuardInfo } = await import(`../../log/index.mjs${__search}`);
+const { logInfoWhen } = await import(`../../log/index.mjs${__search}`);
 const { hasOwnProperty, coalesce, identity } = await import(
   `../../util/index.mjs${__search}`
 );
@@ -571,7 +571,7 @@ export const extendConfiguration = (
         normalize(external_configuration[key], base),
       );
     } else {
-      logGuardInfo(
+      logInfoWhen(
         !EXPECTED_EXTRA_PROPERTIES.includes(key),
         "Configuration property not recognized by the agent: %j",
         key,
