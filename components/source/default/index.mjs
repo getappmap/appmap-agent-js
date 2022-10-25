@@ -7,9 +7,11 @@ const {
 const { search: __search } = new URL(import.meta.url);
 
 import { decode as decodeVLQ } from "vlq";
-const { expectSuccess } = await import(`../../expect/index.mjs${__search}`);
+const { ExternalAppmapError } = await import(
+  `../../error/index.mjs${__search}`
+);
 const { toAbsoluteUrl } = await import(`../../url/index.mjs${__search}`);
-const { logInfo } = await import(`../../log/index.mjs${__search}`);
+const { logInfo, logError } = await import(`../../log/index.mjs${__search}`);
 const { identity } = await import(`../../util/index.mjs${__search}`);
 const { validateSourceMap } = await import(
   `../../validate/index.mjs${__search}`
@@ -29,12 +31,17 @@ export const createMirrorSourceMap = (file) => ({
   source: file,
 });
 
+const parseSourceMap = (content, url) => {
+  try {
+    return parseJSON(content);
+  } catch (error) {
+    logError("Invalid JSON from source map at %j >> %O", url, error);
+    throw new ExternalAppmapError("Source map is not valid JSON");
+  }
+};
+
 export const createSourceMap = ({ url: base, content }) => {
-  const payload = expectSuccess(
-    () => parseJSON(content),
-    "Invalid JSON format for source map at %j >> %O",
-    base,
-  );
+  const payload = parseSourceMap(content, base);
   validateSourceMap(payload);
   const {
     sourceRoot: head,

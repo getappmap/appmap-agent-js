@@ -2,13 +2,13 @@ const { Set, String, URL } = globalThis;
 
 const { search: __search } = new URL(import.meta.url);
 
-const { InternalAppmapError } = await import(
+const { InternalAppmapError, ExternalAppmapError } = await import(
   `../../error/index.mjs${__search}`
 );
-const { assert } = await import(`../../util/index.mjs${__search}`);
-const { expect, expectSuccess } = await import(
-  `../../expect/index.mjs${__search}`
+const { logError, logErrorWhen } = await import(
+  `../../log/index.mjs${__search}`
 );
+const { assert } = await import(`../../util/index.mjs${__search}`);
 const { getUuid } = await import(`../../uuid/index.mjs${__search}`);
 const { runScript } = await import(`../../interpretation/index.mjs${__search}`);
 const { resolveConfigurationManualRecorder } = await import(
@@ -30,23 +30,39 @@ let global_running = false;
 const makeFile = (type, content, url = "file:///w:/missing-file-url.mjs") => {
   content = String(content);
   url = String(url);
-  expectSuccess(
-    () => new URL(url),
-    "the second argument of appmap.recordScript should be a valid url, got: %j >> %O",
-    url,
-  );
+  try {
+    new URL(url);
+  } catch (error) {
+    logError(
+      "The second argument of appmap.recordScript is not a valid url, got: %j >> %O",
+      url,
+      error,
+    );
+    throw new ExternalAppmapError("Invalid url argument");
+  }
   return { type, url, content };
 };
 
 const expectRunning = (hooking) => {
-  expect(hooking !== null, "This appmap instance has been terminated.");
+  assert(
+    !logErrorWhen(
+      hooking === null,
+      "This appmap instance has been terminated.",
+    ),
+    "Terminated appmap instance",
+    ExternalAppmapError,
+  );
 };
 
 export class Appmap {
   constructor(configuration) {
-    expect(
-      !global_running,
-      "Two appmap instances cannot be active concurrently.",
+    assert(
+      !logErrorWhen(
+        global_running,
+        "Two appmap instances cannot be active concurrently.",
+      ),
+      "Concurrent appmap instances",
+      ExternalAppmapError,
     );
     configuration = resolveConfigurationManualRecorder(configuration);
     this.agent = openAgent(configuration);
@@ -74,10 +90,14 @@ export class Appmap {
     if (track === null) {
       track = getUuid();
     }
-    expect(
-      !this.tracks.has(track),
-      "Cannot start track %j because it already exists.",
-      track,
+    assert(
+      !logErrorWhen(
+        this.tracks.has(track),
+        "Cannot start track %j because it already exists.",
+        track,
+      ),
+      "Duplicate track name",
+      ExternalAppmapError,
     );
     this.tracks.add(track);
     recordStartTrack(this.agent, track, conf, base);
@@ -85,10 +105,14 @@ export class Appmap {
   }
   stopRecording(track, status = 0) {
     expectRunning(this.hooking);
-    expect(
-      this.tracks.has(track),
-      "Cannot stop track %j because it is missing.",
-      track,
+    assert(
+      !logErrorWhen(
+        !this.tracks.has(track),
+        "Cannot stop track %j because it is missing.",
+        track,
+      ),
+      "Missing track name",
+      ExternalAppmapError,
     );
     this.tracks.delete(track);
     recordStopTrack(this.agent, track, status);

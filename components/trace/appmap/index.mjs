@@ -11,9 +11,13 @@ const {
 
 const { search: __search } = new URL(import.meta.url);
 
+const { ExternalAppmapError } = await import(
+  `../../error/index.mjs${__search}`
+);
 const { hasOwnProperty } = await import(`../../util/index.mjs${__search}`);
-const { logDebug, logInfo } = await import(`../../log/index.mjs${__search}`);
-const { expect } = await import(`../../expect/index.mjs${__search}`);
+const { logError, logDebug, logInfo } = await import(
+  `../../log/index.mjs${__search}`
+);
 const { validateAppmap } = await import(
   `../../validate-appmap/index.mjs${__search}`
 );
@@ -186,14 +190,19 @@ export const compileTrace = (configuration, messages) => {
   try {
     digested_events = digestEventTrace(orderEventArray(events), classmap);
   } catch (error) {
-    expect(
-      !(error instanceof RangeError),
-      stackoverflow_template,
-      events.length,
-      printEventDistribution,
-      printApplyDistribution,
-    );
-    throw error;
+    if (error instanceof RangeError) {
+      logError(
+        stackoverflow_template,
+        events.length,
+        printEventDistribution,
+        printApplyDistribution,
+      );
+      throw new ExternalAppmapError(
+        "Cannot create appmap because it contains too deeply nested events",
+      );
+    } else {
+      throw error;
+    }
   }
   /* c8 ignore stop */
   const appmap = {

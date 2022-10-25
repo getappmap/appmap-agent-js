@@ -5,9 +5,6 @@ uuid
 error
 log-inner
 log
-violation
-expect-inner
-expect
 validate
 validate-message
 validate-appmap

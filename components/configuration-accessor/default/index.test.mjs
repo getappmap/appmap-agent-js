@@ -64,6 +64,21 @@ assertDeepEqual(
   ],
 );
 
+assertThrow(
+  () =>
+    getConfigurationScenarios(
+      extendConfiguration(
+        createConfiguration("protocol://host/home/"),
+        {
+          scenario: ")(",
+          scenarios: {},
+        },
+        "protocol://host/base/",
+      ),
+    ),
+  /^ExternalAppmapError: Scenario is not a regexp$/u,
+);
+
 ////////////////////////////////////
 // resolveConfigurationRepository //
 ////////////////////////////////////
@@ -459,11 +474,11 @@ assertThrow(() => {
     command: "foo bar",
     shell: true,
   });
-}, /^AppmapError: Could not parse /u);
+}, /^ExternalAppmapError: Not a mocha command$/u);
 
 assertThrow(() => {
   testCompileCommand({
     recorder: "mocha",
     command: ["foo", "bar"],
   });
-}, /^AppmapError: Could not recognize /u);
+}, /^ExternalAppmapError: Not a parsed mocha command$/u);

@@ -5,24 +5,24 @@ const {
 
 const { search: __search } = new URL(import.meta.url);
 
-const { hasOwnProperty } = await import(`../../util/index.mjs${__search}`);
+const { InternalAppmapError } = await import(
+  `../../error/index.mjs${__search}`
+);
+const { assert, hasOwnProperty } = await import(
+  `../../util/index.mjs${__search}`
+);
 const { validateInternalConfiguration } = await import(
   `../../validate/index.mjs${__search}`
 );
-const { expect, expectSuccess } = await import(
-  `../../expect/index.mjs${__search}`
-);
 
 export const loadEnvironmentConfiguration = (env) => {
-  expect(
+  assert(
     hasOwnProperty(env, "APPMAP_CONFIGURATION"),
-    "Missing 'APPMAP_CONFIGURATION' environment variable.",
+    "Missing 'APPMAP_CONFIGURATION' environment variable",
+    InternalAppmapError,
   );
   const { APPMAP_CONFIGURATION: content } = env;
-  const configuration = expectSuccess(
-    () => parseJSON(content),
-    "failed to parse 'APPMAP_CONFIGURATION' environment variable >> %O",
-  );
+  const configuration = parseJSON(content);
   validateInternalConfiguration(configuration);
   return configuration;
 };

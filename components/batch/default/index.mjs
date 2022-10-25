@@ -9,11 +9,11 @@ const {
 
 const { search: __search } = new URL(import.meta.url);
 
-const { assert } = await import(`../../util/index.mjs${__search}`);
-const { expectSuccessAsync } = await import(
-  `../../expect/index.mjs${__search}`
+const { InternalAppmapError, ExternalAppmapError } = await import(
+  `../../error/index.mjs${__search}`
 );
-const { logDebug, logInfo, logWarning } = await import(
+const { assert } = await import(`../../util/index.mjs${__search}`);
+const { logError, logDebug, logInfo, logWarning } = await import(
   `../../log/index.mjs${__search}`
 );
 const { spawn } = await import(`../../spawn/index.mjs${__search}`);
@@ -46,6 +46,7 @@ export const mainAsync = async (process, configuration) => {
         assert(
           subprocess !== null,
           "the timer should have been cleared if the process closed itself",
+          InternalAppmapError,
         );
         subprocess.kill("SIGKILL");
         /* c8 ignore stop */
@@ -73,16 +74,15 @@ export const mainAsync = async (process, configuration) => {
     const command = compileConfigurationCommand(configuration, env);
     logDebug("spawn child command = %j", command);
     subprocess = spawn(command.exec, command.argv, command.options);
-    const { signal, status } = await expectSuccessAsync(
-      new Promise((resolve, reject) => {
-        subprocess.on("error", reject);
-        subprocess.on("close", (status, signal) => {
-          resolve({ signal, status });
-        });
-      }),
-      "Child error %j >> %O",
-      description,
-    );
+    const { signal, status } = await new Promise((resolve, reject) => {
+      subprocess.on("error", (error) => {
+        logError("Child error %j >> %O", description, error);
+        reject(new ExternalAppmapError("Failed to spawn batch child process"));
+      });
+      subprocess.on("close", (status, signal) => {
+        resolve({ signal, status });
+      });
+    });
     subprocess = null;
     if (signal !== null) {
       logInfo("> Killed with: %s", signal);

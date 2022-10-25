@@ -16,16 +16,15 @@ const {
   getShell,
   toAbsolutePath,
 } = await import(`../../path/index.mjs${__search}`);
-const { InternalAppmapError } = await import(
+const { InternalAppmapError, ExternalAppmapError } = await import(
   `../../error/index.mjs${__search}`
 );
 const { assert, coalesce, generateDeadcode } = await import(
   `../../util/index.mjs${__search}`
 );
-const { expect, expectSuccess } = await import(
-  `../../expect/index.mjs${__search}`
+const { logWarningWhen, logErrorWhen, logError } = await import(
+  `../../log/index.mjs${__search}`
 );
-const { logWarningWhen } = await import(`../../log/index.mjs${__search}`);
 const { extractRepositoryHistory, extractRepositoryPackage } = await import(
   `../../repository/index.mjs${__search}`
 );
@@ -79,7 +78,8 @@ const parseMochaCommand = (source) => {
       return result.groups;
     }
   }
-  return expect(false, "Could not parse %j as a mocha command", source);
+  logError("Could not parse %j as a mocha command", source);
+  throw new ExternalAppmapError("Not a mocha command");
 };
 
 const mocha_prefix_array = [
@@ -111,7 +111,8 @@ const splitMochaCommand = (tokens) => {
       };
     }
   }
-  return expect(false, "Could not recognize %j as a mocha command", tokens);
+  logError("Could not recognize %j as a mocha command", tokens);
+  throw new ExternalAppmapError("Not a parsed mocha command");
 };
 
 const parseNodeCommand = (source) => {
@@ -119,15 +120,27 @@ const parseNodeCommand = (source) => {
     /^(?<before>\s*\S*node(.[a-zA-Z]+)?)(?<after>($|\s[\s\S]*$))$/u.exec(
       source,
     );
-  expect(result !== null, "Could not parse %j as a node command", source);
+  assert(
+    !logErrorWhen(
+      result === null,
+      "Could not parse %j as a node command",
+      source,
+    ),
+    "Not a node command",
+    ExternalAppmapError,
+  );
   return result.groups;
 };
 
 const splitNodeCommand = (tokens) => {
-  expect(
-    tokens.length > 0 && tokens[0].startsWith("node"),
-    "Could not recognize %j as a node command",
-    tokens,
+  assert(
+    !logErrorWhen(
+      tokens.length === 0 || !tokens[0].startsWith("node"),
+      "Could not recognize %j as a node command",
+      tokens,
+    ),
+    "Not a parsed node command",
+    ExternalAppmapError,
   );
   return {
     before: tokens.slice(0, 1),
@@ -268,13 +281,22 @@ export const getConfigurationPackage = (
   url,
 ) => getSpecifierValue(packages, url, default_package);
 
+const compileScenario = (scenario) => {
+  try {
+    return new RegExp(scenario, "u");
+  } catch (error) {
+    logError(
+      "Scenario configuration field is not a valid regexp: %j >> %O",
+      scenario,
+      error,
+    );
+    throw new ExternalAppmapError("Scenario is not a regexp");
+  }
+};
+
 export const getConfigurationScenarios = (configuration) => {
   const { scenarios, scenario } = configuration;
-  const regexp = expectSuccess(
-    () => new RegExp(scenario, "u"),
-    "Scenario configuration field is not a valid regexp: %j >> %O",
-    scenario,
-  );
+  const regexp = compileScenario(scenario);
   return scenarios
     .filter(({ key }) => regexp.test(key))
     .map(({ base, value }) =>
@@ -397,9 +419,13 @@ export const compileConfigurationCommand = (configuration, env) => {
     command: { source, tokens },
     "command-options": options,
   } = configuration;
-  expect(
-    tokens !== null || options.shell !== false,
-    "A shell must be provided in order to hook unparsed command, please set `command-options.shell` to `true` or provide a parsed command as an array of tokens",
+  assert(
+    !logErrorWhen(
+      tokens === null && options.shell === false,
+      "A shell must be provided in order to hook unparsed command, please set `command-options.shell` to `true` or provide a parsed command as an array of tokens",
+    ),
+    "Cannot parse command becuase there is no shell",
+    ExternalAppmapError,
   );
   env = {
     ...env,

@@ -1,4 +1,8 @@
-import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
+import {
+  assertEqual,
+  assertDeepEqual,
+  assertThrow,
+} from "../../__fixture__.mjs";
 import {
   createConfiguration,
   extendConfiguration,
@@ -25,6 +29,10 @@ assertEqual(
 );
 
 const track = appmap.startRecording(null, { name: "name2" }, null);
+assertThrow(
+  () => appmap.recordScript("123;", "INVALID URL"),
+  /^ExternalAppmapError: Invalid url argument$/u,
+);
 assertEqual(appmap.recordScript("123;", "protocol://host/base/main.js"), 123);
 assertEqual(appmap.recordError("name", "message", "stack"), undefined);
 assertDeepEqual(appmap.stopRecording(track, 123), [

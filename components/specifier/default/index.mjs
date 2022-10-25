@@ -3,30 +3,42 @@ const { URL, Error, Map, RegExp } = globalThis;
 const { search: __search } = new URL(import.meta.url);
 
 import Minimatch from "minimatch";
-const { logDebug } = await import(`../../log/index.mjs${__search}`);
-const { expect } = await import(`../../expect/index.mjs${__search}`);
+const { ExternalAppmapError } = await import(
+  `../../error/index.mjs${__search}`
+);
+const { logError, logDebug, logErrorWhen } = await import(
+  `../../log/index.mjs${__search}`
+);
 const { InternalAppmapError } = await import(
   `../../error/index.mjs${__search}`
 );
 const { assert } = await import(`../../util/index.mjs${__search}`);
 const { toRelativeUrl } = await import(`../../url/index.mjs${__search}`);
-const { expectSuccess } = await import(`../../expect/index.mjs${__search}`);
 
 const { Minimatch: MinimatchClass } = Minimatch;
 
 const regexps = new Map();
 
 const makeRegExp = (source, flags) => {
+  try {
+    return new RegExp(source, flags);
+  } catch (error) {
+    logError(
+      "Failed to compile regexp source %j with flags %j >> %O",
+      source,
+      flags,
+      error,
+    );
+    throw new ExternalAppmapError("Failed to compile specifier regexp");
+  }
+};
+
+const makeRegExpCache = (source, flags) => {
   const key = `/${source}/${flags}`;
   if (regexps.has(key)) {
     return regexps.get(key);
   } else {
-    const regexp = expectSuccess(
-      () => new RegExp(source, flags),
-      "failed to compile regexp source = %j flags = %j >> %O",
-      source,
-      flags,
-    );
+    const regexp = makeRegExp(source, flags);
     regexps.set(key, regexp);
     return regexp;
   }
@@ -114,8 +126,17 @@ const escapeSegment = (segment) => segment.replace(/[/#?]/gu, escapeCharacter);
 export const matchSpecifier = (specifier, url) => {
   const { base, source, flags } = specifier;
   const relative = toRelativeUrl(url, base, escapeSegment);
-  expect(relative !== null, "could not express %j relatively to %j", url, base);
-  const matched = makeRegExp(source, flags).test(relative);
+  assert(
+    !logErrorWhen(
+      relative === null,
+      "Could not express %j relatively to %j",
+      url,
+      base,
+    ),
+    "Incompatible specifier with url",
+    ExternalAppmapError,
+  );
+  const matched = makeRegExpCache(source, flags).test(relative);
   logDebug(
     "url %j which resolves to %j relatively to %j %s regexp specifier %j with flags %j",
     url,
