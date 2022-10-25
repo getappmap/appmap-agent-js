@@ -5,7 +5,7 @@ const { search: __search, searchParams: __params } = new URL(import.meta.url);
 const { InternalAppmapError } = await import(
   `../../error/index.mjs${__search}`
 );
-const { hasOwnProperty, noop, assert } = await import(
+const { hasOwnProperty, noop, assert, format } = await import(
   `../../util/index.mjs${__search}`
 );
 
@@ -39,13 +39,16 @@ const generateLog = (level, log) => {
     return {
       log: noop,
       logWhen: noop,
+      logAssert: assert,
     };
   } else {
     return {
-      log,
-      logWhen: (guard, ...args) => {
+      log: (template, ...rest) => {
+        log(format(template, rest));
+      },
+      logWhen: (guard, template, ...rest) => {
         if (guard) {
-          log(...args);
+          log(format(template, rest));
         }
       },
     };

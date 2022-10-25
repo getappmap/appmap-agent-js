@@ -10,7 +10,7 @@ import { toAbsoluteUrl } from "../../url/index.mjs?env=test";
 
 const testAsync = async (url) => {
   const { logInfo } = await import(url);
-  logInfo("foo %s", "bar");
+  logInfo("message");
 };
 
 await testAsync("./index.mjs?env=test");

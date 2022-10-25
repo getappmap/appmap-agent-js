@@ -1,13 +1,13 @@
 util
-error
 url
 path
 uuid
+error
+log-inner
+log
 violation
 expect-inner
 expect
-log-inner
-log
 validate
 validate-message
 validate-appmap

@@ -1,4 +1,7 @@
 import "../../__fixture__.mjs";
-import { logInfo } from "./index.mjs?env=test";
+import { logDebug, logInfo, logWarning, logError } from "./index.mjs?env=test";
 
-logInfo("foo %s", "bar");
+logDebug("debug");
+logInfo("info");
+logWarning("warning");
+logError("error");
