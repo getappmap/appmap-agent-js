@@ -50,6 +50,7 @@ const generateLog = (level, log) => {
         if (guard) {
           log(format(template, rest));
         }
+        return guard;
       },
     };
   }

@@ -1,4 +1,4 @@
-import "../../__fixture__.mjs";
+import { assertEqual } from "../../__fixture__.mjs";
 
 import {
   logWarning,
@@ -8,5 +8,5 @@ import {
 
 logInfo("foo");
 logWarning("bar");
-logWarningWhen(true, "qux");
-logWarningWhen(false, "qux");
+assertEqual(logWarningWhen(true, "qux"), true);
+assertEqual(logWarningWhen(false, "qux"), false);

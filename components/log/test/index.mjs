@@ -8,8 +8,9 @@ const log = (template, ...rest) => {
   format(template, rest);
 };
 
-const logWhen = (_guard, template, ...rest) => {
+const logWhen = (guard, template, ...rest) => {
   format(template, rest);
+  return guard;
 };
 
 export const logDebug = log;
