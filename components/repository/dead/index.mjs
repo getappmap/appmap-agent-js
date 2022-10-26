@@ -16,8 +16,3 @@ export const extractRepositoryPackage = generateDeadcode(
   "cannot extract repository package (disabled functionality)",
   InternalAppmapError,
 );
-
-export const extractRepositoryDependency = generateDeadcode(
-  "cannot extract repository dependency package (disabled functionality)",
-  InternalAppmapError,
-);

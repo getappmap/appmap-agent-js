@@ -4,7 +4,7 @@ import { assertEqual, assertThrow } from "../../__fixture__.mjs";
 import { getUuid } from "../../uuid/random/index.mjs?env=test";
 import { getTmpUrl } from "../../path/index.mjs?env=test";
 import { toAbsoluteUrl } from "../../url/index.mjs?env=test";
-import { extractGitInformation } from "./git.mjs?env=test";
+import { extractRepositoryHistory } from "./history.mjs?env=test";
 
 const {
   URL,
@@ -12,21 +12,21 @@ const {
 } = globalThis;
 
 const origin_url = "https://github.com/lachrist/sample.git";
-const url = toAbsoluteUrl(getUuid(), getTmpUrl());
+const url = toAbsoluteUrl(`${getUuid()}/`, getTmpUrl());
 
 assertThrow(
-  () => extractGitInformation(url),
+  () => extractRepositoryHistory(url),
   /^ExternalAppmapError: Could not read repository directory$/u,
 );
 await mkdirAsync(new URL(url));
-assertEqual(extractGitInformation(url), null);
+assertEqual(extractRepositoryHistory(url), null);
 execSync(`git clone ${origin_url} .`, {
   cwd: new URL(url),
   stdio: "ignore",
 });
 
 {
-  const infos = extractGitInformation(url);
+  const infos = extractRepositoryHistory(url);
   assertEqual(infos.repository, origin_url);
   assertEqual(infos.branch, "main");
   assertEqual(typeof infos.commit, "string");
