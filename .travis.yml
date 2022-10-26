@@ -69,6 +69,19 @@ jobs:
       script:
         - npm run test-unit
         - npm run test-system
+    # test-node19
+    - stage: test
+      os: linux
+      node_js: 19
+      script:
+        - npm run test-unit
+        - npm run test-system
+    - stage: test
+      os: windows
+      node_js: 19
+      script:
+        - npm run test-unit
+        - npm run test-system
     # deploy
     - stage: deploy
       if: branch = main

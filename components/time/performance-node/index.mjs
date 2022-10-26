@@ -8,6 +8,4 @@ const {
   Math: { round },
 } = globalThis;
 
-const { now: nowPrecise } = performance;
-
-export const now = () => round(1000 * nowPrecise()) / 1000;
+export const now = () => round(1000 * performance.now()) / 1000;
