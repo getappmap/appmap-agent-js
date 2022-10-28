@@ -12,8 +12,8 @@ export const unhook = noop;
 
 export const hook = (_agent, { hooks: { esm } }) => {
   assert(
-    !logErrorWhen(esm, "No support for recordering native modules"),
-    "No support for recordering native modules",
+    !logErrorWhen(esm, "No support for recording native modules"),
+    "No support for recording native modules",
     ExternalAppmapError,
   );
 };

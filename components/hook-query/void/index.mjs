@@ -14,9 +14,9 @@ export const hook = (_agent, { hooks: { mysql, pg, sqlite3 } }) => {
   assert(
     !logErrorWhen(
       mysql || pg || sqlite3,
-      "No support for recordering sql queries",
+      "No support for recording sql queries",
     ),
-    "No support for recordering sql queries",
+    "No support for recording sql queries",
     ExternalAppmapError,
   );
 };

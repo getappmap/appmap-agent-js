@@ -12,8 +12,8 @@ export const unhook = noop;
 
 export const hook = (_agent, { hooks: { cjs } }) => {
   assert(
-    !logErrorWhen(cjs, "No support for recordering common-js modules"),
-    "No support for recordering common-js modules",
+    !logErrorWhen(cjs, "No support for recording common-js modules"),
+    "No support for recording common-js modules",
     ExternalAppmapError,
   );
 };
