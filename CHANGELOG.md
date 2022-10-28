@@ -1,3 +1,16 @@
+# [11.7.0](https://github.com/getappmap/appmap-agent-js/compare/v11.6.0...v11.7.0) (2022-10-28)
+
+
+### Bug Fixes
+
+* better feedback on incompatible mocha version ([1c2e718](https://github.com/getappmap/appmap-agent-js/commit/1c2e718c724d1000752a9c390b2c83474682de45))
+
+
+### Features
+
+* add user feedback on uncaught error ([6dd3d2e](https://github.com/getappmap/appmap-agent-js/commit/6dd3d2ea2af665aebb845815d1a1bc0f631c9b74))
+* support node 19 ([d102720](https://github.com/getappmap/appmap-agent-js/commit/d102720e4c3f041c0ccdc9e11fe609043baccb83))
+
 # [11.6.0](https://github.com/getappmap/appmap-agent-js/compare/v11.5.3...v11.6.0) (2022-10-22)
 
 
