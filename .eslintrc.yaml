@@ -184,7 +184,7 @@ rules:
   # no-new-object >> No Object global
   # no-new-symbol >> No Symbol global
   # no-new-wrappers >> No globals
-  no-new: [error]
+  # no-new: [error]
   # no-nonoctal-decimal-escape >> Octal disabled in strict mode
   # no-octal >> Octal disabled in strict mode
   # no-obj-calls >> globals disabled

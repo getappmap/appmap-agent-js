@@ -1,4 +1,4 @@
-import { assert } from "./assert.mjs";
+import { assert, AssertionError } from "./assert.mjs";
 
 const {
   Number: { isNaN, parseInt },
@@ -19,9 +19,9 @@ export const matchVersion = (actual, target) => {
       return true;
     }
     const segment1 = parseInt(segments1[index], 10);
-    assert(!isNaN(segment1), "could not parse version: %o", actual);
+    assert(!isNaN(segment1), "could not parse version", AssertionError);
     const segment2 = parseInt(segments2[index], 10);
-    assert(!isNaN(segment2), "could not parse version: %o", target);
+    assert(!isNaN(segment2), "could not parse version", AssertionError);
     if (segment1 > segment2) {
       return true;
     }

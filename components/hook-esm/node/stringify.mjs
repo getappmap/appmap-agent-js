@@ -9,7 +9,10 @@ const {
 
 const { search: __search } = new URL(import.meta.url);
 
-const { expect } = await import(`../../expect/index.mjs${__search}`);
+const { ExternalAppmapError } = await import(
+  `../../error/index.mjs${__search}`
+);
+const { logError } = await import(`../../log/index.mjs${__search}`);
 
 export const stringifyContent = (content) => {
   if (typeof content === "string") {
@@ -37,10 +40,10 @@ export const stringifyContent = (content) => {
     //   }
     return content.toString("utf8");
   } else {
-    throw expect(
-      false,
+    logError(
       "Expected module content to be either: a string, a UintArray, a ArrayBuffer, a SharedArrayBuffer, or a Buffer. Got: %o",
       content,
     );
+    throw new ExternalAppmapError("Invalid module content");
   }
 };

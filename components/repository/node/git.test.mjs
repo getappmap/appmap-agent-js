@@ -14,7 +14,10 @@ const {
 const origin_url = "https://github.com/lachrist/sample.git";
 const url = toAbsoluteUrl(getUuid(), getTmpUrl());
 
-assertThrow(() => extractGitInformation(url), /^AppmapError:.*ENOENT/u);
+assertThrow(
+  () => extractGitInformation(url),
+  /^ExternalAppmapError: Could not read repository directory$/u,
+);
 await mkdirAsync(new URL(url));
 assertEqual(extractGitInformation(url), null);
 execSync(`git clone ${origin_url} .`, {

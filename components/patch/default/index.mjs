@@ -6,23 +6,36 @@ const {
 
 const { search: __search } = new URL(import.meta.url);
 
-const { expect } = await import(`../../expect/index.mjs${__search}`);
-const { hasOwnProperty } = await import(`../../util/index.mjs${__search}`);
+const { ExternalAppmapError } = await import(
+  `../../error/index.mjs${__search}`
+);
+const { logErrorWhen } = await import(`../../log/index.mjs${__search}`);
+const { assert, hasOwnProperty } = await import(
+  `../../util/index.mjs${__search}`
+);
 
 export const patch = (object, key, makePatch) => {
   if (hasOwnProperty(object, key)) {
     const descriptor = getOwnPropertyDescriptor(object, key);
-    expect(
-      hasOwnProperty(descriptor, "value"),
-      "cannot monkey-patch accessor property %j of object %o",
-      key,
-      object,
+    assert(
+      !logErrorWhen(
+        !hasOwnProperty(descriptor, "value"),
+        "Cannot monkey-patch accessor property %j of object %o",
+        key,
+        object,
+      ),
+      "Cannot monkey-patch accessor property",
+      ExternalAppmapError,
     );
-    expect(
-      descriptor.configurable || descriptor.writable,
-      "cannot monkey-patch constant data property %j of object %o",
-      key,
-      object,
+    assert(
+      !logErrorWhen(
+        !descriptor.configurable && !descriptor.writable,
+        "Cannot monkey-patch constant data property %j of object %o",
+        key,
+        object,
+      ),
+      "Cannot monkey-patch constant data property",
+      ExternalAppmapError,
     );
     defineProperty(object, key, {
       __proto__: descriptor,
@@ -34,11 +47,15 @@ export const patch = (object, key, makePatch) => {
     while (prototype !== null) {
       if (hasOwnProperty(prototype, key)) {
         const descriptor = getOwnPropertyDescriptor(prototype, key);
-        expect(
-          hasOwnProperty(descriptor, "value"),
-          "cannot monkey-patch accessor property %j of prototype %o",
-          key,
-          prototype,
+        assert(
+          !logErrorWhen(
+            !hasOwnProperty(descriptor, "value"),
+            "Cannot monkey-patch accessor property %j of prototype %o",
+            key,
+            prototype,
+          ),
+          "Cannot monkey-patch accessor property on prototype",
+          ExternalAppmapError,
         );
         existing_value = descriptor.value;
         prototype = null;

@@ -1,4 +1,4 @@
-import { assertDeepEqual } from "../../__fixture__.mjs";
+import { assertThrow, assertDeepEqual } from "../../__fixture__.mjs";
 import { createMirrorSourceMap } from "../../source/index.mjs?env=test";
 import {
   createConfiguration,
@@ -28,6 +28,41 @@ const normalizeContent = ({ content, ...rest }, source) => ({
   content: normalize(content, source),
   ...rest,
 });
+
+{
+  const file = {
+    url: "protocol://host/base/invalid.js",
+    content: "INVALID JAVASCRIPT",
+    type: "script",
+  };
+  assertThrow(
+    () =>
+      instrument(
+        createInstrumentation(
+          extendConfiguration(
+            createConfiguration("protocol://host/home/"),
+            {
+              "inline-source": false,
+              hooks: { apply: "$", eval: false },
+              packages: [
+                {
+                  path: "invalid.js",
+                  enabled: true,
+                  exclude: ["foo"],
+                  shallow: true,
+                  "inline-source": true,
+                },
+              ],
+            },
+            "protocol://host/base/",
+          ),
+        ),
+        file,
+        createMirrorSourceMap(file),
+      ),
+    /^ExternalAppmapError: Failed to parse js file$/u,
+  );
+}
 
 const instrumentation = createInstrumentation(
   extendConfiguration(

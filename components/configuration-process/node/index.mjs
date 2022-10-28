@@ -13,15 +13,18 @@ import { readFileSync, writeFileSync } from "node:fs";
 import minimist from "minimist";
 import YAML from "yaml";
 
-const { hasOwnProperty, coalesce } = await import(
+const { ExternalAppmapError } = await import(
+  `../../error/index.mjs${__search}`
+);
+const { assert, hasOwnProperty, coalesce } = await import(
   `../../util/index.mjs${__search}`
 );
 const { getCwdUrl } = await import(`../../path/index.mjs${__search}`);
 const { toAbsoluteUrl, getUrlExtension, toDirectoryUrl } = await import(
   `../../url/index.mjs${__search}`
 );
-const { expect, expectSuccess } = await import(
-  `../../expect/index.mjs${__search}`
+const { logError, logErrorWhen } = await import(
+  `../../log/index.mjs${__search}`
 );
 const { createConfiguration, extendConfiguration } = await import(
   `../../configuration/index.mjs${__search}`
@@ -67,12 +70,26 @@ const default_external_configuration = {
   ],
 };
 
+const parseConfigurationFile = (parse, content, url) => {
+  try {
+    return parse(content);
+  } catch (error) {
+    logError("Failed to parse configuration file at %j >> %O", url, error);
+    throw new ExternalAppmapError("Failed to parse configuration file");
+  }
+};
+
 const loadConfigFile = (url) => {
   const extension = getUrlExtension(url);
-  expect(
-    parsers.has(extension),
-    "Unsupported configuration file extension: %j.",
-    extension,
+  assert(
+    !logErrorWhen(
+      !parsers.has(extension),
+      "Unsupported configuration file extension %j from %j.",
+      extension,
+      url,
+    ),
+    "Unsupported configuration file extension",
+    ExternalAppmapError,
   );
   const parse = parsers.get(extension);
   let content = null;
@@ -80,11 +97,15 @@ const loadConfigFile = (url) => {
     content = readFileSync(new URL(url), "utf8");
   } catch (error) {
     const { code } = error;
-    expect(
-      code === "ENOENT",
-      "Cannot read configuration file at %j >> %O",
-      url,
-      error,
+    assert(
+      !logErrorWhen(
+        code !== "ENOENT",
+        "Cannot read configuration file at %j >> %O",
+        url,
+        error,
+      ),
+      "Cannot read configuration file",
+      ExternalAppmapError,
     );
     const stringify = stringifiers.get(extension);
     writeFileSync(
@@ -94,11 +115,7 @@ const loadConfigFile = (url) => {
     );
     return default_external_configuration;
   }
-  return expectSuccess(
-    () => parse(content),
-    "Failed to parse configuration file at %j >> %O",
-    url,
-  );
+  return parseConfigurationFile(parse, content, url);
 };
 
 const aliases = new Map([
@@ -133,17 +150,24 @@ const addOption = (options, key, value) => {
 
 const extractConfig = (argv) => {
   const { _: positional, ...config } = minimist(argv.slice(2));
-
   if (positional.length > 0) {
-    expect(
-      !hasOwnProperty(config, "command"),
-      "The command should not be specified both as positional arguments and in --command",
+    assert(
+      !logErrorWhen(
+        hasOwnProperty(config, "command"),
+        "The command should not be specified both as positional arguments and in --command",
+      ),
+      "Conflicting command arguments",
+      ExternalAppmapError,
     );
     addOption(config, "command", positional);
   } else {
-    expect(
-      !hasOwnProperty(config, "command") || typeof config.command === "string",
-      "There should only be one --command argument",
+    assert(
+      !logErrorWhen(
+        hasOwnProperty(config, "command") && typeof config.command !== "string",
+        "There should be only one --command argument",
+      ),
+      "Too many command arguments",
+      ExternalAppmapError,
     );
   }
   for (const key of ownKeys(config)) {

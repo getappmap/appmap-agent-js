@@ -2,7 +2,10 @@ const { URL } = globalThis;
 
 const { search: __search, searchParams: __params } = new URL(import.meta.url);
 
-const { hasOwnProperty, noop, assert } = await import(
+const { InternalAppmapError } = await import(
+  `../../error/index.mjs${__search}`
+);
+const { hasOwnProperty, noop, assert, format } = await import(
   `../../util/index.mjs${__search}`
 );
 
@@ -25,42 +28,50 @@ const max_level = __params.has("log-level")
   ? __params.get("log-level")
   : "info";
 
-assert(hasOwnProperty(levels, max_level), "invalid log level");
+assert(
+  hasOwnProperty(levels, max_level),
+  "invalid log level",
+  InternalAppmapError,
+);
 
 const generateLog = (level, log) => {
   if (levels[level] < levels[max_level]) {
     return {
       log: noop,
-      logGuard: noop,
+      logWhen: noop,
+      logAssert: assert,
     };
   } else {
     return {
-      log,
-      logGuard: (guard, ...args) => {
+      log: (template, ...rest) => {
+        log(format(template, rest));
+      },
+      logWhen: (guard, template, ...rest) => {
         if (guard) {
-          log(...args);
+          log(format(template, rest));
         }
+        return guard;
       },
     };
   }
 };
 
-export const { log: logDebug, logGuard: logGuardDebug } = generateLog(
+export const { log: logDebug, logWhen: logDebugWhen } = generateLog(
   "debug",
   logDebugInner,
 );
 
-export const { log: logInfo, logGuard: logGuardInfo } = generateLog(
+export const { log: logInfo, logWhen: logInfoWhen } = generateLog(
   "info",
   logInfoInner,
 );
 
-export const { log: logWarning, logGuard: logGuardWarning } = generateLog(
+export const { log: logWarning, logWhen: logWarningWhen } = generateLog(
   "warning",
   logWarningInner,
 );
 
-export const { log: logError, logGuard: logGuardError } = generateLog(
+export const { log: logError, logWhen: logErrorWhen } = generateLog(
   "error",
   logErrorInner,
 );

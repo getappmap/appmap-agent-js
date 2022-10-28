@@ -9,7 +9,7 @@ const { toIpcPath, convertFileUrlToPath } = await import(
   `../../path/index.mjs${__search}`
 );
 const { mapMaybe } = await import(`../../util/index.mjs${__search}`);
-const { logGuardWarning, logWarning } = await import(
+const { logWarningWhen, logWarning } = await import(
   `../../log/index.mjs${__search}`
 );
 
@@ -45,7 +45,7 @@ export const openSocket = (host, port, { heartbeat, threshold }) => {
     });
     socket.on("close", () => {
       process.off("beforeExit", flushBind);
-      logGuardWarning(messages.length > 0, "Lost messages >> %j", messages);
+      logWarningWhen(messages.length > 0, "Lost messages >> %j", messages);
       messages.length = 0;
       clearInterval(timer);
     });

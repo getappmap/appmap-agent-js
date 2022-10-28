@@ -12,7 +12,14 @@ const { search: __search } = new URL(import.meta.url);
 
 import Http from "http";
 import Https from "https";
+const { ExternalAppmapError } = await import(
+  `../../error/index.mjs${__search}`
+);
+const { logError, logErrorWhen } = await import(
+  `../../log/index.mjs${__search}`
+);
 const {
+  assert,
   toString,
   fromMaybe,
   spyOnce,
@@ -32,9 +39,6 @@ const {
   formatHeaders,
   formatStatus,
 } = await import(`../../hook-http/index.mjs${__search}`);
-const { expect, expectSuccess } = await import(
-  `../../expect/index.mjs${__search}`
-);
 const { patch } = await import(`../../patch/index.mjs${__search}`);
 const {
   getFreshTab,
@@ -248,9 +252,13 @@ const spyServer = (state, server, handleTraffic) => {
         if (name !== "request") {
           return apply(original_server_emit, this, [name, ...args]);
         } else {
-          expect(
-            args.length === 2,
-            "expected exactly two arguments for request event on server",
+          assert(
+            !logErrorWhen(
+              args.length !== 2,
+              "Expected exactly two arguments for `request` event listener on `node:http.Server`",
+            ),
+            "Unexpected argument number on 'request' event listener",
+            ExternalAppmapError,
           );
           const [request, response] = args;
           if (!interceptTraffic(state, this, request, response)) {
@@ -264,6 +272,19 @@ const spyServer = (state, server, handleTraffic) => {
 
 export const unhook = (backup) => {
   backup.forEach(assignProperty);
+};
+
+const compileInterceptTrackPort = (source) => {
+  try {
+    return new RegExp(source, "u");
+  } catch (error) {
+    logError(
+      "Failed to compile the 'intercept-track-port' configuration field %j as regexp >> %O",
+      source,
+      error,
+    );
+    throw new ExternalAppmapError("intercept-track-port is not a regexp");
+  }
 };
 
 export const hook = (
@@ -286,11 +307,7 @@ export const hook = (
       recorder,
       jump_payload: getJumpPayload(agent),
       empty: getSerializationEmptyValue(agent),
-      regexp: expectSuccess(
-        () => new RegExp(intercept_track_port, "u"),
-        "Failed to compile the 'intercept-track-port' configuration field %j as regexp >> %O",
-        intercept_track_port,
-      ),
+      regexp: compileInterceptTrackPort(intercept_track_port),
     };
     const traps = {
       __proto__: null,

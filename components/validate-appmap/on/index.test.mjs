@@ -8,4 +8,4 @@ assertThrow(() => {
     classMap: [],
     events: [],
   });
-}, /^AppmapError: failed to validate appmap/u);
+}, "InternalAppmapError: Invalid appmap");

@@ -8,6 +8,9 @@ const {
 
 const { search: __search } = new URL(import.meta.url);
 
+const { InternalAppmapError } = await import(
+  `../../../error/index.mjs${__search}`
+);
 const { assert, createCounter } = await import(
   `../../../util/index.mjs${__search}`
 );
@@ -189,10 +192,14 @@ export const addClassmapSource = (
   },
   { url, content, inline, exclude, shallow },
 ) => {
-  assert(!urls.has(url), "duplicate source url");
+  assert(!urls.has(url), "duplicate source url", InternalAppmapError);
   urls.add(url);
   const relative = toRelativeUrl(url, directory);
-  assert(relative !== null, "could not extract relative url");
+  assert(
+    relative !== null,
+    "could not extract relative url",
+    InternalAppmapError,
+  );
   const context = { url, relative, shallow, inline, content, placeholder };
   const exclusions = compileExclusionList(exclude);
   const excluded_entities = [];

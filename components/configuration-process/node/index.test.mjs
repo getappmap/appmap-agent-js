@@ -23,7 +23,7 @@ assertThrow(
       argv: ["node", "main.mjs"],
       cwd: getTmpPath,
     }),
-  /^AppmapError: Unsupported configuration file extension/u,
+  /^ExternalAppmapError: Unsupported configuration file extension$/u,
 );
 
 // present configuration file //
@@ -79,6 +79,26 @@ assertThrow(
         tokens: ["exec", "arg1", "arg2"],
       },
     },
+  );
+}
+
+// invalid configuration file //
+{
+  const filename = `${getUuid()}.json`;
+  loadProcessConfiguration({
+    env: { APPMAP_CONFIGURATION_PATH: filename },
+    argv: ["node", "main.mjs"],
+    cwd: getTmpPath,
+  });
+  await writeFileAsync(new URL(filename, getTmpUrl()), "INVALID JSON", "utf8");
+  assertThrow(
+    () =>
+      loadProcessConfiguration({
+        env: { APPMAP_CONFIGURATION_PATH: filename },
+        argv: [],
+        cwd: getTmpPath,
+      }),
+    /^ExternalAppmapError: Failed to parse configuration file$/u,
   );
 }
 

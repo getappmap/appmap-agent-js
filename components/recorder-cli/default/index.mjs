@@ -2,9 +2,13 @@ const { Set, Error, URL } = globalThis;
 
 const { search: __search } = new URL(import.meta.url);
 
-const { logInfo } = await import(`../../log/index.mjs${__search}`);
-const { expect } = await import(`../../expect/index.mjs${__search}`);
+const { logInfo, logErrorWhen } = await import(
+  `../../log/index.mjs${__search}`
+);
 const { hook, unhook } = await import(`../../hook/index.mjs${__search}`);
+const { InternalAppmapError, ExternalAppmapError } = await import(
+  `../../error/index.mjs${__search}`
+);
 const { assert } = await import(`../../util/index.mjs${__search}`);
 const { isConfigurationEnabled, extendConfigurationNode } = await import(
   `../../configuration-accessor/index.mjs${__search}`
@@ -32,28 +36,44 @@ export const createRecorder = (process, configuration) => {
     const hooking = hook(agent, configuration);
     const tracks = new Set();
     process.on("uncaughtExceptionMonitor", (error) => {
-      expect(
-        error instanceof Error,
-        "expected uncaught error to be an instance of Error, got: %o",
-        error,
+      assert(
+        !logErrorWhen(
+          !(error instanceof Error),
+          "Expected uncaught error to be an instance of Error, got: %o",
+          error,
+        ),
+        "Uncaught error is not an actual error",
+        ExternalAppmapError,
       );
       const { name, message, stack } = error;
-      expect(
-        typeof name === "string",
-        "expected uncaught error's name to be a string, got: %o",
-        name,
+      assert(
+        !logErrorWhen(
+          typeof name !== "string",
+          "Expected uncaught error's name to be a string, got: %o",
+          name,
+        ),
+        "Uncaught error name is not a string",
+        ExternalAppmapError,
       );
-      expect(
-        typeof message === "string",
-        "expected uncaught error's message to be a string, got: %o",
-        message,
+      assert(
+        !logErrorWhen(
+          typeof message !== "string",
+          "Expected uncaught error's message to be a string, got: %o",
+          message,
+        ),
+        "Uncaught error message is not a string",
+        ExternalAppmapError,
       );
-      expect(
-        typeof stack === "string",
-        "expected uncaught error's stack to be a string, got: %o",
-        stack,
-      );
-      recordAgentError(agent, name, message, stack);
+      assert(
+        !logErrorWhen(
+          typeof stack !== "string",
+          "Expected uncaught error's stack to be a string, got: %o",
+          stack,
+        ),
+        "Uncaught error stack is not a string",
+        ExternalAppmapError,
+      ),
+        recordAgentError(agent, name, message, stack);
     });
     process.on("exit", (status, _signal) => {
       for (const track of tracks) {
@@ -82,13 +102,13 @@ export const recordStartTrack = (
   configuration,
   url,
 ) => {
-  assert(!tracks.has(track), "duplicate track");
+  assert(!tracks.has(track), "duplicate track", InternalAppmapError);
   tracks.add(track);
   recordAgentStartTrack(agent, track, configuration, url);
 };
 
 export const recordStopTrack = ({ agent, tracks }, track, status) => {
-  assert(tracks.has(track), "missing track");
+  assert(tracks.has(track), "missing track", InternalAppmapError);
   tracks.delete(track);
   recordAgentStopTrack(agent, track, status);
 };

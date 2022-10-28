@@ -5,6 +5,9 @@ const {
 
 const { search: __search } = new URL(import.meta.url);
 
+const { InternalAppmapError } = await import(
+  `../../error/index.mjs${__search}`
+);
 const { generateDeadcode, assert, createBox, setBox, getBox } = await import(
   `../../util/index.mjs${__search}`
 );
@@ -35,7 +38,11 @@ export const openEmitter = (configuration) => {
 };
 
 export const closeEmitter = ({ socket, closed }) => {
-  assert(!getBox(closed), "emitter has already been closed");
+  assert(
+    !getBox(closed),
+    "emitter has already been closed",
+    InternalAppmapError,
+  );
   setBox(closed, true);
   closeSocket(socket);
 };
@@ -50,6 +57,7 @@ export const sendEmitter = ({ socket, closed }, message) => {
 
 export const takeLocalEmitterTrace = generateDeadcode(
   "takeLocalEmitterTrace should not be called on emitter/remote-node-posix",
+  InternalAppmapError,
 );
 
 /* c8 ignore start */

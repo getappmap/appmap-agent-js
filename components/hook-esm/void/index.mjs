@@ -1,9 +1,19 @@
 const { URL } = globalThis;
+
 const { search: __search } = new URL(import.meta.url);
 
-const { expect } = await import(`../../expect/index.mjs${__search}`);
-export const { noop: unhook } = await import(`../../util/index.mjs${__search}`);
+const { ExternalAppmapError } = await import(
+  `../../error/index.mjs${__search}`
+);
+const { logErrorWhen } = await import(`../../log/index.mjs${__search}`);
+const { assert, noop } = await import(`../../util/index.mjs${__search}`);
+
+export const unhook = noop;
 
 export const hook = (_agent, { hooks: { esm } }) => {
-  expect(!esm, "expected configuration to disable esm module hook");
+  assert(
+    !logErrorWhen(esm, "No support for recording native modules"),
+    "No support for recording native modules",
+    ExternalAppmapError,
+  );
 };

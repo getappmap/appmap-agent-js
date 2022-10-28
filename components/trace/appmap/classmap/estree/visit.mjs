@@ -6,6 +6,9 @@ const {
 
 const { search: __search } = new URL(import.meta.url);
 
+const { InternalAppmapError } = await import(
+  `../../../../error/index.mjs${__search}`
+);
 const { assert, hasOwnProperty } = await import(
   `../../../../util/index.mjs${__search}`
 );
@@ -14,7 +17,7 @@ const { getName } = await import(`./naming.mjs${__search}`);
 const trimStartString = (string) => string.trimStart();
 
 const extractLineLabel = (line) => {
-  assert(line.startsWith("@label "), "invalid label line");
+  assert(line.startsWith("@label "), "invalid label line", InternalAppmapError);
   const maybe_tokens = line.substring("@label".length).match(/\s+\S+/gu);
   return maybe_tokens === null ? [] : maybe_tokens.map(trimStartString);
 };

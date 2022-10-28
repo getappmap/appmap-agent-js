@@ -1,16 +1,12 @@
 const { URL } = globalThis;
 const { search: __search } = new URL(import.meta.url);
 
-const { format } = await import(`../../util/index.mjs${__search}`);
+const { noop } = await import(`../../util/index.mjs${__search}`);
 
-const checkFormat = (template, ...values) => {
-  format(template, values);
-};
+export const logDebug = noop;
 
-export const logDebug = checkFormat;
+export const logInfo = noop;
 
-export const logInfo = checkFormat;
+export const logWarning = noop;
 
-export const logWarning = checkFormat;
-
-export const logError = checkFormat;
+export const logError = noop;

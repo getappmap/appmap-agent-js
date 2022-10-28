@@ -8,7 +8,9 @@ const {
 
 const { search: __search } = new URL(import.meta.url);
 
-const { expect } = await import(`../../expect/index.mjs${__search}`);
+const { InternalAppmapError, ExternalAppmapError } = await import(
+  `../../error/index.mjs${__search}`
+);
 const {
   mapMaybe,
   fromMaybe,
@@ -21,7 +23,9 @@ const { toAbsoluteUrl, toDirectoryUrl } = await import(
   `../../url/index.mjs${__search}`
 );
 const { mapSource } = await import(`../../source/index.mjs${__search}`);
-const { logGuardDebug } = await import(`../../log/index.mjs${__search}`);
+const { logDebugWhen, logErrorWhen } = await import(
+  `../../log/index.mjs${__search}`
+);
 const { stringifyLocation, getLocationFileUrl } = await import(
   `../../location/index.mjs${__search}`
 );
@@ -300,7 +304,7 @@ const instrumentClosure = (node, parent, grand_parent, closure, context) => {
     node.loc.start.line,
     node.loc.start.column,
   );
-  logGuardDebug(
+  logDebugWhen(
     location === null,
     "Missing source map at file %j at line %j at column %j",
     context.url,
@@ -626,7 +630,7 @@ const instrumenters = {
         node.loc.start.line,
         node.loc.start.column,
       );
-      logGuardDebug(
+      logDebugWhen(
         location === null,
         "Missing source map at file %j at line %j at column %j",
         context.url,
@@ -730,14 +734,18 @@ const instrumenters = {
     }
   },
   Identifier: (node, _parent, _grand_parent, _closure, context) => {
-    expect(
-      !node.name.startsWith(context.apply),
-      "Identifier collision detected at %j line %j column %j >> identifier should not start with %j, got: %j",
-      context.url,
-      node.loc.start.line,
-      node.loc.start.column,
-      context.apply,
-      node.name,
+    assert(
+      !logErrorWhen(
+        node.name.startsWith(context.apply),
+        "Identifier collision detected at %j line %j column %j >> identifier should not start with %j, got: %j",
+        context.url,
+        node.loc.start.line,
+        node.loc.start.column,
+        context.apply,
+        node.name,
+      ),
+      "Identifier collision",
+      ExternalAppmapError,
     );
     return null;
   },
@@ -776,7 +784,11 @@ const initial_parent = { type: "File" };
 const initial_grand_parent = { type: "Root" };
 
 export const visit = (node, context) => {
-  assert(node.type === "Program", "expected program as top level estree node");
+  assert(
+    node.type === "Program",
+    "expected program as top level estree node",
+    InternalAppmapError,
+  );
   // Top level async jump only present in module.
   // Avoid poluting global scope in script.
   return visitNode(

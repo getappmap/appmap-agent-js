@@ -4,21 +4,24 @@ const { search: __search } = new URL(import.meta.url);
 
 import * as Astring from "astring";
 import * as Acorn from "acorn";
-const { logDebug, logGuardDebug } = await import(
+const { logDebug, logDebugWhen } = await import(
   `../../log/index.mjs${__search}`
 );
 const { generateGet, createCounter, recoverMaybe } = await import(
   `../../util/index.mjs${__search}`
 );
+const { logError } = await import(`../../log/index.mjs${__search}`);
 const { getConfigurationPackage } = await import(
   `../../configuration-accessor/index.mjs${__search}`
 );
-const { expectSuccess } = await import(`../../expect/index.mjs${__search}`);
+const { ExternalAppmapError } = await import(
+  `../../error/index.mjs${__search}`
+);
 const { getSources } = await import(`../../source/index.mjs${__search}`);
 const { visit } = await import(`./visit.mjs${__search}`);
 
 const { generate: generateEstree } = Astring;
-const { parse: parseEstree } = Acorn;
+const { parse: parseAcorn } = Acorn;
 
 const getHead = generateGet("head");
 const getBody = generateGet("body");
@@ -29,6 +32,21 @@ export const createInstrumentation = (configuration) => ({
   done: new Set(),
   counter: createCounter(0),
 });
+
+const parseEstree = (type, content, url) => {
+  try {
+    return parseAcorn(content, {
+      allowHashBang: true,
+      sourceType: type,
+      allowAwaitOutsideFunction: type === "module",
+      ecmaVersion: "latest",
+      locations: true,
+    });
+  } catch (error) {
+    logError("Failed to parse file %j as %s >> %O", url, type, error);
+    throw new ExternalAppmapError("Failed to parse js file");
+  }
+};
 
 export const instrument = (
   { configuration, done, counter },
@@ -72,12 +90,12 @@ export const instrument = (
     (configuration.hooks.eval.aliases.length === 0 &&
       configuration.hooks.apply === null)
   ) {
-    logGuardDebug(
+    logDebugWhen(
       excluded,
       "Not instrumenting file %j because it has no allowed sources",
       url,
     );
-    logGuardDebug(
+    logDebugWhen(
       !excluded,
       "Not instrumenting file %j because instrumentation hooks (apply and eval) are disabled",
       url,
@@ -88,28 +106,14 @@ export const instrument = (
     return {
       url,
       content: generateEstree(
-        visit(
-          expectSuccess(
-            () =>
-              parseEstree(content, {
-                allowHashBang: true,
-                sourceType: type,
-                allowAwaitOutsideFunction: type === "module",
-                ecmaVersion: "latest",
-                locations: true,
-              }),
-            "failed to parse file %j >> %O",
-            url,
-          ),
-          {
-            url,
-            whitelist: new Set(sources.map(getURL)),
-            eval: configuration.hooks.eval,
-            apply: configuration.hooks.apply,
-            mapping,
-            counter,
-          },
-        ),
+        visit(parseEstree(type, content, url), {
+          url,
+          whitelist: new Set(sources.map(getURL)),
+          eval: configuration.hooks.eval,
+          apply: configuration.hooks.apply,
+          mapping,
+          counter,
+        }),
       ),
       sources,
     };

@@ -10,6 +10,9 @@ const {
 
 const { search: __search } = new URL(import.meta.url);
 
+const { InternalAppmapError } = await import(
+  `../../../error/index.mjs${__search}`
+);
 const {
   assert,
   coalesceCaseInsensitive,
@@ -202,6 +205,10 @@ const digesters = {
 
 export const digestPayload = (payload, options) => {
   const { type } = payload;
-  assert(hasOwnProperty(digesters, type), "cannot digest payload");
+  assert(
+    hasOwnProperty(digesters, type),
+    "cannot digest payload",
+    InternalAppmapError,
+  );
   return digesters[type](payload, options);
 };

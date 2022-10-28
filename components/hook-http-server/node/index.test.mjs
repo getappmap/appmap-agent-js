@@ -1,6 +1,6 @@
 import Http from "http";
 import createApp from "express";
-import { assertDeepEqual } from "../../__fixture__.mjs";
+import { assertDeepEqual, assertReject } from "../../__fixture__.mjs";
 import {
   toIpcPath,
   getTmpUrl,
@@ -74,6 +74,22 @@ const requestAsync = (request) =>
       }, reject);
     });
   });
+
+// Invalid Track Port //
+assertReject(
+  testHookAsync(
+    HookHttpServer,
+    {
+      configuration: {
+        "intercept-track-port": ")(",
+        recorder: "process",
+        hooks: { http: true },
+      },
+    },
+    async () => {},
+  ),
+  /^ExternalAppmapError: intercept-track-port is not a regexp$/u,
+);
 
 // Empty //
 assertDeepEqual(

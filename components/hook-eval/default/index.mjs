@@ -13,6 +13,9 @@ const {
 
 const { search: __search } = new URL(import.meta.url);
 
+const { InternalAppmapError } = await import(
+  `../../error/index.mjs${__search}`
+);
 const { assert, hasOwnProperty } = await import(
   `../../util/index.mjs${__search}`
 );
@@ -25,6 +28,7 @@ export const unhook = (maybe_hidden) => {
     assert(
       hasOwnProperty(globalThis, maybe_hidden),
       "global eval hook variable not defined",
+      InternalAppmapError,
     );
     defineProperty(globalThis, maybe_hidden, {
       __proto__: null,
@@ -49,6 +53,7 @@ export const hook = (
     assert(
       !hasOwnProperty(globalThis, hidden),
       "global eval hook variable already defined",
+      InternalAppmapError,
     );
     defineProperty(globalThis, hidden, {
       __proto__: null,

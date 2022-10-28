@@ -11,6 +11,7 @@ const server = createServer();
 server.on("request", (request, response) => {
   request.on("data", () => {});
   request.on("end", () => {});
+  response.setHeader("connection", "close");
   response.removeHeader("date");
   response.setHeader("content-type", "application/json; charset=utf-8");
   response.writeHead(200, "OK");

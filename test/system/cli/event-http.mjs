@@ -41,7 +41,9 @@ await runAsync(
         });
         server.on("listening", function onServerListening () {
           const {port} = server.address();
-          const request = Http.get("http://localhost:" + String(port));
+          const request = Http.request("http://localhost:" + String(port));
+          request.setHeader("connection", "close");
+          request.end();
           request.on("response", function onClientResponse (response) {
             response.on("data", function onClientResponseData () {});
             response.on("end", function onClientResponseEnd () {

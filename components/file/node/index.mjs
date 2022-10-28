@@ -5,7 +5,7 @@ const { search: __search } = new URL(import.meta.url);
 import { readFileSync as readFileInner } from "fs";
 import { readFile as readFileInnerAsync } from "fs/promises";
 import { Buffer } from "node:buffer";
-const { logGuardWarning } = await import(`../../log/index.mjs${__search}`);
+const { logWarningWhen } = await import(`../../log/index.mjs${__search}`);
 
 const { from: toBuffer } = Buffer;
 
@@ -24,7 +24,7 @@ const generateReadFile = (readFile) => (url) => {
   } else if (url_obj.protocol === "data:") {
     const { head, body } = splitDataPath(url_obj.pathname);
     if (head.endsWith(";base64")) {
-      logGuardWarning(
+      logWarningWhen(
         !head.toLowerCase().includes(";charset=utf-8;") &&
           !head.toLowerCase().includes(";charset=utf8;"),
         "Data url is encoded as base64 and does not declare UTF-8 as its character encoding, will try to use UTF-8 anyway >> %s",

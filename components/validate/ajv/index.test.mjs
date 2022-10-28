@@ -10,8 +10,8 @@ assertEqual(
 
 assertThrow(() => {
   validateExternalConfiguration("invalid-configuration-type");
-}, /^AppmapError: invalid user-defined configuration\n/u);
+}, /^ExternalAppmapError: Failed to validate data against JSON schema$/u);
 
 assertThrow(() => {
   validateExternalConfiguration({ frameworks: ["invalid@framework@format"] });
-}, /^AppmapError: invalid user-defined configuration\n/u);
+}, /^ExternalAppmapError: Failed to validate data against JSON schema$/u);

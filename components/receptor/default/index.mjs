@@ -2,6 +2,9 @@ const { Map, URL } = globalThis;
 
 const { search: __search } = new URL(import.meta.url);
 
+const { InternalAppmapError } = await import(
+  `../../error/index.mjs${__search}`
+);
 const { assert } = await import(`../../util/index.mjs${__search}`);
 const ReceptorFile = await import(`../../receptor-file/index.mjs${__search}`);
 const ReceptorHttp = await import(`../../receptor-http/index.mjs${__search}`);
@@ -16,6 +19,7 @@ export const minifyReceptorConfiguration = (configuration) => {
   assert(
     configuration.recorder !== null,
     "undefined recorder in configuration",
+    InternalAppmapError,
   );
   return Recepters.get(configuration.recorder).minifyReceptorConfiguration(
     configuration,

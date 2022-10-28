@@ -1,4 +1,8 @@
-import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
+import {
+  assertEqual,
+  assertDeepEqual,
+  assertReject,
+} from "../../__fixture__.mjs";
 import { EventEmitter } from "events";
 import {
   createConfiguration,
@@ -6,7 +10,7 @@ import {
 } from "../../configuration/index.mjs?env=test";
 import { mainAsync } from "./index.mjs?env=test";
 
-const { setTimeout } = globalThis;
+const { setTimeout, Error } = globalThis;
 
 globalThis.GLOBAL_SPY_SPAWN = (exec, argv, _options) => {
   const emitter = new EventEmitter();
@@ -14,7 +18,11 @@ globalThis.GLOBAL_SPY_SPAWN = (exec, argv, _options) => {
     emitter.emit("close", null, signal);
   };
   assertDeepEqual(argv, []);
-  if (exec === "success") {
+  if (exec === "throw") {
+    setTimeout(() => {
+      emitter.emit("error", new Error("BOUM"));
+    }, 0);
+  } else if (exec === "success") {
     setTimeout(() => {
       emitter.emit("close", 0, null);
     }, 0);
@@ -35,6 +43,25 @@ const configuration = createConfiguration("protocol://host/home");
   const emitter = new EventEmitter();
   emitter.env = {};
   await mainAsync(emitter, configuration);
+}
+
+// throw
+{
+  const emitter = new EventEmitter();
+  emitter.env = {};
+  assertReject(
+    mainAsync(
+      emitter,
+      extendConfiguration(
+        configuration,
+        {
+          command: "throw",
+        },
+        "protocol://host/base",
+      ),
+    ),
+    /^ExternalAppmapError: Failed to spawn batch child process$/u,
+  );
 }
 
 // single killed child

@@ -1,4 +1,4 @@
-import { assert } from "./assert.mjs";
+import { assert, AssertionError } from "./assert.mjs";
 import { print } from "./convert.mjs";
 
 const {
@@ -16,16 +16,24 @@ export const format = (template, values) => {
       if (escape.length >= 2) {
         return `${escape.substring(1)}${marker}`;
       }
-      assert(index < length, "missing format value");
+      assert(index < length, "missing format value", AssertionError);
       const value = values[index];
       index += 1;
       if (marker === "s") {
-        assert(typeof value === "string", "expected a string for format");
+        assert(
+          typeof value === "string",
+          "expected a string for format",
+          AssertionError,
+        );
         return value;
       }
       if (marker === "f") {
         const print = value();
-        assert(typeof print === "string", "expected a string as result");
+        assert(
+          typeof print === "string",
+          "expected a string as result",
+          AssertionError,
+        );
         return print;
       }
       if (marker === "j") {
@@ -44,6 +52,6 @@ export const format = (template, values) => {
       throw new Error("invalid format marker");
     },
   );
-  assert(index === length, "missing format marker");
+  assert(index === length, "missing format marker", AssertionError);
   return message;
 };

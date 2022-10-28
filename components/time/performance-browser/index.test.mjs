@@ -1,3 +1,7 @@
+import { assertEqual } from "../../__fixture__.mjs";
+
 globalThis.performance = { now: () => 0 };
 
-await import("./index.mjs?env=test");
+const { now } = await import("./index.mjs?env=test");
+
+assertEqual(typeof now(), "number");

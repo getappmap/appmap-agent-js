@@ -1,6 +1,10 @@
 import { encode as encodeVLQ } from "vlq";
 import SourceMap from "source-map";
-import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
+import {
+  assertEqual,
+  assertDeepEqual,
+  assertThrow,
+} from "../../__fixture__.mjs";
 import {
   extractSourceMapUrl,
   createMirrorSourceMap,
@@ -14,6 +18,15 @@ const {
 } = globalThis;
 
 const { SourceMapGenerator } = SourceMap;
+
+assertThrow(
+  () =>
+    createSourceMap({
+      url: "http://host/source-map.json",
+      content: "INVALID JSON",
+    }),
+  /^ExternalAppmapError: Source map is not valid JSON$/u,
+);
 
 /////////////////////////
 // extractSourceMapUrl //

@@ -1,18 +1,20 @@
+/* c8 ignore start */
+
 const { Error } = globalThis;
 
-class AssertionError extends Error {
+export class AssertionError extends Error {
   constructor(message) {
     super(message);
     this.name = "AssertionError";
   }
 }
 
-export const assert = (boolean, message) => {
+export const assert = (boolean, message, Constructor) => {
   if (!boolean) {
-    throw new AssertionError(message);
+    throw new Constructor(message);
   }
 };
 
-export const generateDeadcode = (message) => () => {
-  throw new AssertionError(message);
+export const generateDeadcode = (message, Constructor) => () => {
+  throw new Constructor(message);
 };
