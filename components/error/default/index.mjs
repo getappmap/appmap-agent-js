@@ -2,6 +2,8 @@ const { URL, Error } = globalThis;
 
 const { search: __search } = new URL(import.meta.url);
 
+const { version } = await import(`../../version/index.mjs${__search}`);
+
 const issues = "https://github.com/getappmap/appmap-agent-js/issues";
 const slack = "https://appmap.io/slack";
 const documentation =
@@ -9,7 +11,7 @@ const documentation =
 const instruction = "https://appmap.io/docs/appmap-overview.html";
 
 const internal_message = `
-Detected an internal appmap error.\
+[appmap@${version}] Detected an internal appmap error.\
  This is probably an issue with how the AppMap agent is being used.\
  Please consider submitting a bug report at:
   ${issues}
@@ -17,7 +19,7 @@ Detected an internal appmap error.\
 `;
 
 const external_message = `
-Detected an external appmap error.\
+[appmap@${version}] Detected an external appmap error.\
  This is probably an issue with how the AppMap agent is being used.
 - You can look for answers in our installation instructions:
     ${instruction}
@@ -29,7 +31,7 @@ Detected an external appmap error.\
 `;
 
 const unknown_message = `
-Detected an unknown error.\
+[appmap@${version}] Detected an unknown error.\
  Does this error disappear when not recording your application?\
  If yes, this is probably an issue within the appmap framework.\
  Please consider submitting a bug report at:
@@ -54,9 +56,9 @@ export class ExternalAppmapError extends AppmapError {
 }
 
 export const reportError = (error) => {
-  if (error instanceof InternalAppmapError) {
+  if (error.name === "InternalAppmapError") {
     return internal_message;
-  } else if (error instanceof ExternalAppmapError) {
+  } else if (error.name === "ExternalAppmapError") {
     return external_message;
   } else {
     return unknown_message;

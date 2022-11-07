@@ -12,9 +12,13 @@ const { logWarning, logErrorWhen } = await import(
 );
 const { coalesce, assert } = await import(`../../util/index.mjs${__search}`);
 
+const { convertFileUrlToPath } = await import(
+  `../../path/index.mjs${__search}`
+);
+
 export const spawn = (exec, argv, url) => {
   const result = spawnChildProcess(exec, argv, {
-    cwd: new URL(".", url),
+    cwd: convertFileUrlToPath(new URL(".", url)),
     encoding: "utf8",
     timeout: 1000,
     stdio: ["ignore", "pipe", "pipe"],
