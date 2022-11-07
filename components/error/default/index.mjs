@@ -56,9 +56,9 @@ export class ExternalAppmapError extends AppmapError {
 }
 
 export const reportError = (error) => {
-  if (error instanceof InternalAppmapError) {
+  if (error.name === "InternalAppmapError") {
     return internal_message;
-  } else if (error instanceof ExternalAppmapError) {
+  } else if (error.name === "ExternalAppmapError") {
     return external_message;
   } else {
     return unknown_message;
