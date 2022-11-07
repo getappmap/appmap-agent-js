@@ -1,3 +1,16 @@
+## [11.7.1](https://github.com/getappmap/appmap-agent-js/compare/v11.7.0...v11.7.1) (2022-11-07)
+
+
+### Bug Fixes
+
+* provide path instead of url to spawn ([5ad873e](https://github.com/getappmap/appmap-agent-js/commit/5ad873e1c13e167ece1e0016b3a39f38ada2dc05))
+* use error.name instead of constructor identity ([d217b59](https://github.com/getappmap/appmap-agent-js/commit/d217b59ae24e5506bb7d0f448e83b0a2ea1415a2))
+
+
+### Performance Improvements
+
+* remove outdated violation search param ([324aaeb](https://github.com/getappmap/appmap-agent-js/commit/324aaeba5e69162ffee9d335a3ea445b2c092387))
+
 # [11.7.0](https://github.com/getappmap/appmap-agent-js/compare/v11.6.0...v11.7.0) (2022-10-28)
 
 
