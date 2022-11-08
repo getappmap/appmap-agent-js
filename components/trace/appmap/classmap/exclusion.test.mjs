@@ -1,5 +1,12 @@
-import { assertEqual, assertThrow } from "../../../__fixture__.mjs";
-import { isExclusionMatched } from "./exclusion.mjs?env=test";
+import {
+  assertEqual,
+  assertThrow,
+  assertDeepEqual,
+} from "../../../__fixture__.mjs";
+import {
+  isExclusionMatched,
+  matchExclusionList,
+} from "./exclusion.mjs?env=test";
 
 const or_exclusion = {
   combinator: "or",
@@ -199,4 +206,32 @@ assertEqual(
     { type: "class", name: "qux" },
   ),
   false,
+);
+
+// matchExclusionList //
+
+assertThrow(() => {
+  matchExclusionList([], { type: "function" }, null);
+});
+
+assertDeepEqual(
+  matchExclusionList(
+    [
+      {
+        combinator: "or",
+        "every-label": true,
+        "some-label": true,
+        name: true,
+        "qualified-name": true,
+        excluded: true,
+        recursive: false,
+      },
+    ],
+    { type: "function", name: "foo" },
+    null,
+  ),
+  {
+    excluded: true,
+    recursive: false,
+  },
 );

@@ -7,7 +7,6 @@ const {
 
 const { search: __search } = new URL(import.meta.url);
 
-const { generateGet } = await import(`../../../util/index.mjs${__search}`);
 const { makeRegExpCache, compileTestRegExpCache } = await import(
   `./regexp.mjs${__search}`
 );
@@ -73,6 +72,14 @@ export const isExclusionMatched = (exclusion, entity, parent) => {
   }
 };
 
-export const isExcluded = generateGet("excluded");
-
-export const isRecursivelyExcluded = generateGet("recursive");
+export const matchExclusionList = (exclusions, entity, parent) => {
+  for (const exclusion of exclusions) {
+    if (isExclusionMatched(exclusion, entity, parent)) {
+      return {
+        excluded: exclusion.excluded,
+        recursive: exclusion.recursive,
+      };
+    }
+  }
+  throw new Error("missing matched exclusion");
+};

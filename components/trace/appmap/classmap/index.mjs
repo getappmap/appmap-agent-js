@@ -27,7 +27,7 @@ const {
 const { extractEstreeEntityArray } = await import(
   `./estree/index.mjs${__search}`
 );
-const { matchExclusionList } = await import(`./exclusion-list.mjs${__search}`);
+const { matchExclusionList } = await import(`./exclusion.mjs${__search}`);
 
 const printCommentArray = (comments) => {
   /* c8 ignore start */
