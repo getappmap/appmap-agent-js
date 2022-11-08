@@ -27,9 +27,7 @@ const {
 const { extractEstreeEntityArray } = await import(
   `./estree/index.mjs${__search}`
 );
-const { compileExclusionList, matchExclusionList } = await import(
-  `./exclusion-list.mjs${__search}`
-);
+const { matchExclusionList } = await import(`./exclusion-list.mjs${__search}`);
 
 const printCommentArray = (comments) => {
   /* c8 ignore start */
@@ -190,7 +188,7 @@ export const addClassmapSource = (
     },
     sources,
   },
-  { url, content, inline, exclude, shallow },
+  { url, content, inline, exclude: exclusions, shallow },
 ) => {
   assert(!urls.has(url), "duplicate source url", InternalAppmapError);
   urls.add(url);
@@ -201,7 +199,6 @@ export const addClassmapSource = (
     InternalAppmapError,
   );
   const context = { url, relative, shallow, inline, content, placeholder };
-  const exclusions = compileExclusionList(exclude);
   const excluded_entities = [];
   let entities = extractEstreeEntityArray(relative, content, naming).flatMap(
     (entity) => excludeEntity(entity, null, exclusions, excluded_entities),

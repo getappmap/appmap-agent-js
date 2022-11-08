@@ -1,16 +1,13 @@
 import { assertDeepEqual, assertThrow } from "../../../__fixture__.mjs";
-import {
-  compileExclusionList,
-  matchExclusionList,
-} from "./exclusion-list.mjs?env=test";
+import { matchExclusionList } from "./exclusion-list.mjs?env=test";
 
 assertThrow(() => {
-  matchExclusionList(compileExclusionList([]), { type: "function" }, null);
+  matchExclusionList([], { type: "function" }, null);
 });
 
 assertDeepEqual(
   matchExclusionList(
-    compileExclusionList([
+    [
       {
         combinator: "or",
         "every-label": true,
@@ -20,7 +17,7 @@ assertDeepEqual(
         excluded: true,
         recursive: false,
       },
-    ]),
+    ],
     { type: "function", name: "foo" },
     null,
   ),

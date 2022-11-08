@@ -1,8 +1,5 @@
 import { assertEqual, assertThrow } from "../../../__fixture__.mjs";
-import { compileExclusion, isExclusionMatched } from "./exclusion.mjs?env=test";
-
-const testExclusion = (exclusion, entity, parent) =>
-  isExclusionMatched(compileExclusion(exclusion), entity, parent);
+import { isExclusionMatched } from "./exclusion.mjs?env=test";
 
 const or_exclusion = {
   combinator: "or",
@@ -27,7 +24,7 @@ const and_exclusion = {
 // Invalid //
 
 assertThrow(() => {
-  testExclusion(
+  isExclusionMatched(
     {
       ...and_exclusion,
       "qualified-name": 123,
@@ -38,7 +35,7 @@ assertThrow(() => {
 });
 
 assertThrow(() => {
-  testExclusion(
+  isExclusionMatched(
     {
       ...and_exclusion,
       combinator: "invalid-combinator",
@@ -49,7 +46,7 @@ assertThrow(() => {
 });
 
 assertThrow(() => {
-  testExclusion(
+  isExclusionMatched(
     {
       ...and_exclusion,
       "qualified-name": "foo",
@@ -60,7 +57,7 @@ assertThrow(() => {
 });
 
 assertThrow(() => {
-  testExclusion(
+  isExclusionMatched(
     {
       ...and_exclusion,
       "qualified-name": "foo",
@@ -73,7 +70,7 @@ assertThrow(() => {
 // Class (Qualified) Name //
 
 assertEqual(
-  testExclusion(
+  isExclusionMatched(
     {
       ...and_exclusion,
       "qualified-name": "foo",
@@ -86,7 +83,7 @@ assertEqual(
 );
 
 assertEqual(
-  testExclusion(
+  isExclusionMatched(
     {
       ...and_exclusion,
       "qualified-name": "foo",
@@ -99,7 +96,7 @@ assertEqual(
 );
 
 assertEqual(
-  testExclusion(
+  isExclusionMatched(
     {
       ...or_exclusion,
       "qualified-name": "foo",
@@ -114,7 +111,7 @@ assertEqual(
 // Function (Qualified) Name //
 
 assertEqual(
-  testExclusion(
+  isExclusionMatched(
     {
       ...and_exclusion,
       "qualified-name": "foo",
@@ -127,7 +124,7 @@ assertEqual(
 );
 
 assertEqual(
-  testExclusion(
+  isExclusionMatched(
     {
       ...and_exclusion,
       "qualified-name": "foo#bar",
@@ -140,7 +137,7 @@ assertEqual(
 );
 
 assertEqual(
-  testExclusion(
+  isExclusionMatched(
     {
       ...and_exclusion,
       "qualified-name": "foo\\.bar",
@@ -155,7 +152,7 @@ assertEqual(
 // Function Every Labels //
 
 assertEqual(
-  testExclusion(
+  isExclusionMatched(
     {
       ...and_exclusion,
       "every-label": "^foo",
@@ -167,7 +164,7 @@ assertEqual(
 );
 
 assertEqual(
-  testExclusion(
+  isExclusionMatched(
     {
       ...and_exclusion,
       "every-label": "^foo",
@@ -181,7 +178,7 @@ assertEqual(
 // Function Some Labels //
 
 assertEqual(
-  testExclusion(
+  isExclusionMatched(
     {
       ...and_exclusion,
       "some-label": "^foo",
@@ -193,7 +190,7 @@ assertEqual(
 );
 
 assertEqual(
-  testExclusion(
+  isExclusionMatched(
     {
       ...and_exclusion,
       "some-label": "^foo",

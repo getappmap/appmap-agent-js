@@ -1,4 +1,5 @@
 estree
+regexp.mjs
 exclusion.mjs
 exclusion-list.mjs
 index.mjs

@@ -1,7 +1,6 @@
 const {
   Error,
   Map,
-  RegExp,
   Array: { from: toArray },
   URL,
 } = globalThis;
@@ -9,8 +8,9 @@ const {
 const { search: __search } = new URL(import.meta.url);
 
 const { generateGet } = await import(`../../../util/index.mjs${__search}`);
-
-const cache = new Map();
+const { makeRegExpCache, compileTestRegExpCache } = await import(
+  `./regexp.mjs${__search}`
+);
 
 const getQualifiedName = (entity, parent) => {
   if (entity.type === "class") {
@@ -31,38 +31,27 @@ const getQualifiedName = (entity, parent) => {
 };
 
 const criteria = new Map([
-  ["name", (pattern, { name }, _parent) => cache.get(pattern)(name)],
+  ["name", (pattern, { name }, _parent) => makeRegExpCache(pattern).test(name)],
   [
     "qualified-name",
     (pattern, entity, parent) =>
-      cache.get(pattern)(getQualifiedName(entity, parent)),
+      makeRegExpCache(pattern).test(getQualifiedName(entity, parent)),
   ],
   [
     "some-label",
     (pattern, { type, labels }, _parent) =>
-      type !== "function" || labels.some(cache.get(pattern)),
+      type !== "function" ||
+      labels.some(compileTestRegExpCache(makeRegExpCache(pattern))),
   ],
   [
     "every-label",
     (pattern, { type, labels }, _parent) =>
-      type !== "function" || labels.every(cache.get(pattern)),
+      type !== "function" ||
+      labels.every(compileTestRegExpCache(makeRegExpCache(pattern))),
   ],
 ]);
 
 const criteria_name_array = toArray(criteria.keys());
-
-export const compileExclusion = (exclusion) => {
-  for (const name of criteria_name_array) {
-    const pattern = exclusion[name];
-    if (typeof pattern === "string") {
-      if (!cache.has(pattern)) {
-        const regexp = new RegExp(pattern, "u");
-        cache.set(pattern, (target) => regexp.test(target));
-      }
-    }
-  }
-  return exclusion;
-};
 
 export const isExclusionMatched = (exclusion, entity, parent) => {
   const isCriterionSatisfied = (name) => {
