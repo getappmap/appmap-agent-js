@@ -15,17 +15,19 @@ const cache = new Map();
 const getQualifiedName = (entity, parent) => {
   if (entity.type === "class") {
     return entity.name;
-  }
-  if (entity.type === "function") {
-    if (parent === null || parent.type === "function") {
-      return entity.name;
+  } else {
+    if (entity.type === "function") {
+      if (parent === null || parent.type === "function") {
+        return entity.name;
+      } else if (parent.type === "class") {
+        return `${parent.name}${entity.static ? "#" : "."}${entity.name}`;
+      } else {
+        throw new Error("getName called on invalid parent entity");
+      }
+    } else {
+      throw new Error("getName called on invalid entity");
     }
-    if (parent.type === "class") {
-      return `${parent.name}${entity.static ? "#" : "."}${entity.name}`;
-    }
-    throw new Error("getName called on invalid parent entity");
   }
-  throw new Error("getName called on invalid entity");
 };
 
 const criteria = new Map([
@@ -67,19 +69,19 @@ export const isExclusionMatched = (exclusion, entity, parent) => {
     const pattern = exclusion[name];
     if (typeof pattern === "boolean") {
       return pattern;
-    }
-    if (typeof pattern === "string") {
+    } else if (typeof pattern === "string") {
       return criteria.get(name)(pattern, entity, parent);
+    } else {
+      throw new Error("invalid pattern type");
     }
-    throw new Error("invalid pattern type");
   };
   if (exclusion.combinator === "and") {
     return criteria_name_array.every(isCriterionSatisfied);
-  }
-  if (exclusion.combinator === "or") {
+  } else if (exclusion.combinator === "or") {
     return criteria_name_array.some(isCriterionSatisfied);
+  } else {
+    throw new Error("invalid exclusion combinator");
   }
-  throw new Error("invalid exclusion combinator");
 };
 
 export const isExcluded = generateGet("excluded");
