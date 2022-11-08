@@ -30,13 +30,11 @@ const { parse: parseBabel } = BabelParser;
 const printComment = ({ type, value }) => {
   if (type === "CommentBlock") {
     return `/*${value}*/`;
-  }
-  if (type === "CommentLine") {
+  } else if (type === "CommentLine") {
     return `//${value}`;
-  }
-  /* c8 ignore start */
-  throw new Error("invalid comment type");
-  /* c8 ignore stop */
+  } /* c8 ignore start */ else {
+    throw new Error("invalid comment type");
+  } /* c8 ignore stop */
 };
 
 export const getLeadingCommentArray = (node) =>
