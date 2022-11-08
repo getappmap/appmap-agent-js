@@ -2,7 +2,7 @@ const { Error, URL } = globalThis;
 
 const { search: __search } = new URL(import.meta.url);
 
-const { isExclusionMatched, isExcluded, isRecursivelyExclued } = await import(
+const { isExclusionMatched, isExcluded, isRecursivelyExcluded } = await import(
   `./exclusion.mjs${__search}`
 );
 
@@ -11,7 +11,7 @@ export const matchExclusionList = (exclusions, entity, parent) => {
     if (isExclusionMatched(exclusion, entity, parent)) {
       return {
         excluded: isExcluded(exclusion),
-        recursive: isRecursivelyExclued(exclusion),
+        recursive: isRecursivelyExcluded(exclusion),
       };
     }
   }

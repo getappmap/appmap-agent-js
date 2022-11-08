@@ -75,4 +75,4 @@ export const isExclusionMatched = (exclusion, entity, parent) => {
 
 export const isExcluded = generateGet("excluded");
 
-export const isRecursivelyExclued = generateGet("recursive");
+export const isRecursivelyExcluded = generateGet("recursive");
