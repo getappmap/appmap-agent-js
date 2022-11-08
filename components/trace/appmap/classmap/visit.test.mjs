@@ -1,6 +1,6 @@
-import { assertDeepEqual } from "../../../../__fixture__.mjs";
+import { assertDeepEqual } from "../../../__fixture__.mjs";
 import * as Acorn from "acorn";
-import { createCounter } from "../../../../util/index.mjs?env=test";
+import { createCounter } from "../../../util/index.mjs?env=test";
 import { visit } from "./visit.mjs?env=test";
 
 const { parse: parseAcorn } = Acorn;

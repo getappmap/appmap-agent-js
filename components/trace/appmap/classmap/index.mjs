@@ -24,9 +24,7 @@ const {
   stringifyLocation,
   incrementLocationColumn,
 } = await import(`../../../location/index.mjs${__search}`);
-const { extractEstreeEntityArray } = await import(
-  `./estree/index.mjs${__search}`
-);
+const { extractEstreeEntityArray } = await import(`./estree.mjs${__search}`);
 const { matchExclusionList } = await import(`./exclusion.mjs${__search}`);
 
 const printCommentArray = (comments) => {

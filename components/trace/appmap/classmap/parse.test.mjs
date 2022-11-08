@@ -1,4 +1,4 @@
-import { assertDeepEqual } from "../../../../__fixture__.mjs";
+import { assertDeepEqual } from "../../../__fixture__.mjs";
 import { parse, getLeadingCommentArray } from "./parse.mjs?env=test";
 
 parse("script.mjs", "export const x = 123;");

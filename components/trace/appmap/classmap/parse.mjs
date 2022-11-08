@@ -3,9 +3,9 @@ const { Error, URL } = globalThis;
 const { search: __search } = new URL(import.meta.url);
 
 import BabelParser from "@babel/parser";
-const { coalesce } = await import(`../../../../util/index.mjs${__search}`);
+const { coalesce } = await import(`../../../util/index.mjs${__search}`);
 const { logWarning, logError } = await import(
-  `../../../../log/index.mjs${__search}`
+  `../../../log/index.mjs${__search}`
 );
 
 const { parse: parseBabel } = BabelParser;

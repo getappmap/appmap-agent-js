@@ -2,9 +2,7 @@ const { URL, Map, String } = globalThis;
 
 const { search: __search } = new URL(import.meta.url);
 
-const { incrementCounter } = await import(
-  `../../../../util/index.mjs${__search}`
-);
+const { incrementCounter } = await import(`../../../util/index.mjs${__search}`);
 
 const tags = new Map([
   ["ArrowFunctionExpression", "arrow"],

@@ -7,10 +7,10 @@ const {
 const { search: __search } = new URL(import.meta.url);
 
 const { InternalAppmapError } = await import(
-  `../../../../error/index.mjs${__search}`
+  `../../../error/index.mjs${__search}`
 );
 const { assert, hasOwnProperty } = await import(
-  `../../../../util/index.mjs${__search}`
+  `../../../util/index.mjs${__search}`
 );
 const { getName } = await import(`./naming.mjs${__search}`);
 

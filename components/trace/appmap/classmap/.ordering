@@ -1,4 +1,7 @@
-estree
+parse.mjs
+naming.mjs
+visit.mjs
+estree.mjs
 regexp.mjs
 exclusion.mjs
 index.mjs

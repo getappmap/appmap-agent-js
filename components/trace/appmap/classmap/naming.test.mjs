@@ -1,6 +1,6 @@
 import * as Acorn from "acorn";
-import { assertEqual } from "../../../../__fixture__.mjs";
-import { createCounter } from "../../../../util/index.mjs?env=test";
+import { assertEqual } from "../../../__fixture__.mjs";
+import { createCounter } from "../../../util/index.mjs?env=test";
 import { getName } from "./naming.mjs?env=test";
 
 const {
