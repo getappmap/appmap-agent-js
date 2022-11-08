@@ -24,8 +24,9 @@ const {
   stringifyLocation,
   incrementLocationColumn,
 } = await import(`../../../location/index.mjs${__search}`);
-const { extractEstreeEntityArray } = await import(`./estree.mjs${__search}`);
 const { matchExclusionList } = await import(`./exclusion.mjs${__search}`);
+const { parse } = await import(`./parse.mjs${__search}`);
+const { visit } = await import(`./visit.mjs${__search}`);
 
 const printCommentArray = (comments) => {
   /* c8 ignore start */
@@ -198,8 +199,8 @@ export const addClassmapSource = (
   );
   const context = { url, relative, shallow, inline, content, placeholder };
   const excluded_entities = [];
-  let entities = extractEstreeEntityArray(relative, content, naming).flatMap(
-    (entity) => excludeEntity(entity, null, exclusions, excluded_entities),
+  let entities = visit(parse(relative, content), naming).flatMap((entity) =>
+    excludeEntity(entity, null, exclusions, excluded_entities),
   );
   for (const entity of excluded_entities) {
     const { type } = entity;
