@@ -3,6 +3,9 @@ const { Error, URL } = globalThis;
 const { search: __search } = new URL(import.meta.url);
 
 import BabelParser from "@babel/parser";
+const { toAbsoluteUrl, getUrlExtension } = await import(
+  `../../../url/index.mjs${__search}`
+);
 const { coalesce } = await import(`../../../util/index.mjs${__search}`);
 const { logWarning, logError } = await import(
   `../../../log/index.mjs${__search}`
@@ -39,15 +42,16 @@ const printComment = ({ type, value }) => {
 export const getLeadingCommentArray = (node) =>
   coalesce(node, "leadingComments", []).map(printComment);
 
-export const parse = (path, content) => {
+export const parse = (relative, content) => {
+  const extension = getUrlExtension(toAbsoluteUrl(relative, "protocol://host"));
   let source_type = "unambiguous";
-  if (path.endsWith(".cjs") || path.endsWith(".node")) {
+  if (extension === ".cjs" || extension === ".node") {
     source_type = "script";
-  } else if (path.endsWith(".mjs")) {
+  } else if (extension === ".mjs") {
     source_type = "module";
   }
   let plugins = [];
-  if (path.endsWith(".ts") || path.endsWith(".tsx")) {
+  if (extension === ".ts" || extension === ".tsx") {
     plugins = ["typescript"];
   } else if (/^[ \t\n]*\/(\/[ \t]*|\*[ \t\n]*)@flow/u.test(content)) {
     plugins = ["flow"];
@@ -62,12 +66,12 @@ export const parse = (path, content) => {
       attachComment: true,
     });
   } catch (error) {
-    logError("Unrecoverable parsing error at file %j >> %O", path, error);
+    logError("Unrecoverable parsing error at file %j >> %O", relative, error);
     return { type: "Program", body: [], sourceType: "script" };
   }
   const { errors, program: node } = result;
   for (const error of errors) {
-    logWarning("Recoverable parsing error at file %j >> %O", path, error);
+    logWarning("Recoverable parsing error at file %j >> %O", relative, error);
   }
   return node;
 };

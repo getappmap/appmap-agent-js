@@ -6,8 +6,8 @@ const { parse, getLeadingCommentArray } = await import(
 );
 const { visit } = await import(`./visit.mjs${__search}`);
 
-export const extractEstreeEntityArray = (path, content, naming) =>
-  visit(parse(path, content), {
+export const extractEstreeEntityArray = (relative, content, naming) =>
+  visit(parse(relative, content), {
     naming,
     getLeadingCommentArray,
   });

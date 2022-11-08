@@ -3,7 +3,7 @@ import { createCounter } from "../../../util/index.mjs?env=test";
 import { extractEstreeEntityArray } from "./estree.mjs?env=test";
 
 assertDeepEqual(
-  extractEstreeEntityArray("path", "123;", {
+  extractEstreeEntityArray("script.js", "123;", {
     separator: "@",
     counter: createCounter(0),
   }),
