@@ -13,6 +13,7 @@ const { assert, hasOwnProperty } = await import(
   `../../../util/index.mjs${__search}`
 );
 const { getName } = await import(`./naming.mjs${__search}`);
+const { getLeadingCommentArray } = await import(`./parse.mjs${__search}`);
 
 const trimStartString = (string) => string.trimStart();
 
@@ -58,12 +59,12 @@ const visitBody = (nodes, parent, grand_parent, name, context) => {
 const initial_parent = { type: "File" };
 const initial_grand_parent = { type: "Root" };
 
-const visitNode = (node, parent, grand_parent, context) => {
+const visitNode = (node, parent, grand_parent, naming) => {
   if (isArray(node)) {
     return {
       head: null,
       body: node.flatMap((child) =>
-        concatResult(visitNode(child, parent, grand_parent, context)),
+        concatResult(visitNode(child, parent, grand_parent, naming)),
       ),
     };
   }
@@ -85,15 +86,14 @@ const visitNode = (node, parent, grand_parent, context) => {
           start: { line, column },
         },
       } = node;
-      const { naming, getLeadingCommentArray } = context;
       const comments = getLeadingCommentArray(node);
       return {
         head: {
           type: "function",
           name: getName(naming, node, parent),
           children: [
-            ...concatResult(visitNode(node.params, node, parent, context)),
-            ...concatResult(visitNode(node.body, node, parent, context)),
+            ...concatResult(visitNode(node.params, node, parent, naming)),
+            ...concatResult(visitNode(node.body, node, parent, naming)),
           ],
           parameters: node.params.map(({ start, end }) => [start, end]),
           static: parent.type === "MethodDefinition" && parent.static,
@@ -110,33 +110,31 @@ const visitNode = (node, parent, grand_parent, context) => {
       type === "MethodDefinition" ||
       (type === "Property" && parent.type === "ObjectExpression")
     ) {
-      const { head, body } = visitNode(node.value, node, parent, context);
+      const { head, body } = visitNode(node.value, node, parent, naming);
       return {
         head,
         body: [
-          ...concatResult(visitNode(node.key, node, parent, context)),
+          ...concatResult(visitNode(node.key, node, parent, naming)),
           ...body,
         ],
       };
     }
     if (type === "ObjectExpression") {
-      const { naming } = context;
       return visitBody(
         node.properties,
         node,
         parent,
         getName(naming, node, parent),
-        context,
+        naming,
       );
     }
     if (type === "ClassBody") {
-      const { naming } = context;
       return visitBody(
         node.body,
         node,
         parent,
         getName(naming, parent, grand_parent),
-        context,
+        naming,
       );
     }
     return {
@@ -144,12 +142,12 @@ const visitNode = (node, parent, grand_parent, context) => {
       body: ownKeys(node)
         .filter(isMaybeNodeKey)
         .flatMap((key) =>
-          concatResult(visitNode(node[key], node, parent, context)),
+          concatResult(visitNode(node[key], node, parent, naming)),
         ),
     };
   }
   return { head: null, body: [] };
 };
 
-export const visit = (node, context) =>
-  concatResult(visitNode(node, initial_parent, initial_grand_parent, context));
+export const visit = (node, naming) =>
+  concatResult(visitNode(node, initial_parent, initial_grand_parent, naming));

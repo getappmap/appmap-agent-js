@@ -1,27 +1,15 @@
 import { assertDeepEqual } from "../../../__fixture__.mjs";
-import * as Acorn from "acorn";
 import { createCounter } from "../../../util/index.mjs?env=test";
+import { parse } from "./parse.mjs?env=test";
 import { visit } from "./visit.mjs?env=test";
 
-const { parse: parseAcorn } = Acorn;
+const test = (content, separator) =>
+  visit(parse("script.mjs", content), {
+    separator,
+    counter: createCounter(0),
+  });
 
-const test = (content, separator, comments) =>
-  visit(
-    parseAcorn(content, {
-      ecmaVersion: 2021,
-      sourceType: "module",
-      locations: true,
-    }),
-    {
-      naming: {
-        separator,
-        counter: createCounter(0),
-      },
-      getLeadingCommentArray: () => comments,
-    },
-  );
-
-assertDeepEqual(test("({k:{}});", "@", ["comment"]), [
+assertDeepEqual(test("({k:{}});", "@"), [
   {
     type: "class",
     name: "object@1",
@@ -35,46 +23,60 @@ assertDeepEqual(test("({k:{}});", "@", ["comment"]), [
   },
 ]);
 
-assertDeepEqual(test("function f () {}", "@", []), [
+assertDeepEqual(
+  test(
+    `
+      /*
+        @label label-1 label-2
+        foo
+      */
+      /* bar */
+      // @label label-3
+      // qux
+      // @label${" "}
+      function f () {}
+    `,
+    "@",
+  ),
+  [
+    {
+      type: "function",
+      name: "f",
+      children: [],
+      parameters: [],
+      static: false,
+      range: [138, 154],
+      line: 10,
+      column: 6,
+      comments: [
+        "/*\n        @label label-1 label-2\n        foo\n      */",
+        "/* bar */",
+        "// @label label-3",
+        "// qux",
+        "// @label ",
+      ],
+      labels: ["label-1", "label-2", "label-3"],
+    },
+  ],
+);
+
+assertDeepEqual(test("class c { static m (x) { } }", "@"), [
   {
-    type: "function",
-    name: "f",
-    line: 1,
-    column: 0,
-    static: false,
-    comments: [],
-    range: [0, 16],
-    parameters: [],
-    labels: [],
-    children: [],
+    type: "class",
+    name: "c",
+    children: [
+      {
+        type: "function",
+        name: "m",
+        line: 1,
+        column: 19,
+        static: true,
+        comments: [],
+        range: [19, 26],
+        parameters: [[20, 21]],
+        labels: [],
+        children: [],
+      },
+    ],
   },
 ]);
-
-{
-  const comments = [
-    "  @label  label-1  label-2  \n  foo  ",
-    "  bar  ",
-    "  @label  label-3  ",
-    "  @label  \n  qux  ",
-  ];
-  assertDeepEqual(test("class c { static m (x) { } }", "@", comments), [
-    {
-      type: "class",
-      name: "c",
-      children: [
-        {
-          type: "function",
-          name: "m",
-          line: 1,
-          column: 19,
-          static: true,
-          comments,
-          range: [19, 26],
-          parameters: [[20, 21]],
-          labels: ["label-1", "label-2", "label-3"],
-          children: [],
-        },
-      ],
-    },
-  ]);
-}
