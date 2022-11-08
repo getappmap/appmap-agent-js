@@ -1,5 +1,4 @@
 const {
-  Error,
   Map,
   Array: { from: toArray },
   URL,
@@ -7,6 +6,9 @@ const {
 
 const { search: __search } = new URL(import.meta.url);
 
+const { InternalAppmapError } = await import(
+  `../../../error/index.mjs${__search}`
+);
 const { makeRegExpCache, compileTestRegExpCache } = await import(
   `./regexp.mjs${__search}`
 );
@@ -21,10 +23,12 @@ const getQualifiedName = (entity, parent) => {
       } else if (parent.type === "class") {
         return `${parent.name}${entity.static ? "#" : "."}${entity.name}`;
       } else {
-        throw new Error("getName called on invalid parent entity");
+        throw new InternalAppmapError(
+          "getName called on invalid parent entity",
+        );
       }
     } else {
-      throw new Error("getName called on invalid entity");
+      throw new InternalAppmapError("getName called on invalid entity");
     }
   }
 };
@@ -60,7 +64,7 @@ export const isExclusionMatched = (exclusion, entity, parent) => {
     } else if (typeof pattern === "string") {
       return criteria.get(name)(pattern, entity, parent);
     } else {
-      throw new Error("invalid pattern type");
+      throw new InternalAppmapError("invalid pattern type");
     }
   };
   if (exclusion.combinator === "and") {
@@ -68,7 +72,7 @@ export const isExclusionMatched = (exclusion, entity, parent) => {
   } else if (exclusion.combinator === "or") {
     return criteria_name_array.some(isCriterionSatisfied);
   } else {
-    throw new Error("invalid exclusion combinator");
+    throw new InternalAppmapError("invalid exclusion combinator");
   }
 };
 
@@ -81,5 +85,5 @@ export const matchExclusionList = (exclusions, entity, parent) => {
       };
     }
   }
-  throw new Error("missing matched exclusion");
+  throw new InternalAppmapError("missing matched exclusion");
 };

@@ -1,13 +1,12 @@
 const {
   URL,
-  Error,
   JSON: { parse: parseJSON },
 } = globalThis;
 
 const { search: __search } = new URL(import.meta.url);
 
 import { decode as decodeVLQ } from "vlq";
-const { ExternalAppmapError } = await import(
+const { InternalAppmapError, ExternalAppmapError } = await import(
   `../../error/index.mjs${__search}`
 );
 const { toAbsoluteUrl } = await import(`../../url/index.mjs${__search}`);
@@ -134,7 +133,7 @@ export const mapSource = (mapping, line, column) => {
       return null;
     }
   } /* c8 ignore start */ else {
-    throw new Error("invalid mapping type");
+    throw new InternalAppmapError("invalid mapping type");
   } /* c8 ignore stop */
 };
 
@@ -144,6 +143,6 @@ export const getSources = (mapping) => {
   } else if (mapping.type === "normal") {
     return mapping.sources;
   } /* c8 ignore start */ else {
-    throw new Error("invalid mapping type");
+    throw new InternalAppmapError("invalid mapping type");
   } /* c8 ignore stop */
 };

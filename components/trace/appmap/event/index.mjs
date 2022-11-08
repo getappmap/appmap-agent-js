@@ -1,7 +1,10 @@
-const { Error, URL } = globalThis;
+const { URL } = globalThis;
 
 const { search: __search } = new URL(import.meta.url);
 
+const { InternalAppmapError } = await import(
+  `../../../error/index.mjs${__search}`
+);
 const { mapMaybe, createCounter, incrementCounter } = await import(
   `../../../util/index.mjs${__search}`
 );
@@ -89,7 +92,7 @@ export const digestEventTrace = (root, classmap) => {
         );
       }
     } /* c8 ignore start */ else {
-      throw new Error("invalid node type");
+      throw new InternalAppmapError("invalid node type");
     } /* c8 ignore stop */
   };
   return root.flatMap(loop);

@@ -1,5 +1,4 @@
 const {
-  Error,
   URL,
   URLSearchParams,
   String,
@@ -180,7 +179,7 @@ const digesters = {
         message: digestSearchMessage(search).map(digestParameterPrimitiveTuple),
       };
     } /* c8 ignore start */ else {
-      throw new Error("invalid request side");
+      throw new InternalAppmapError("invalid request side");
     } /* c8 ignore stop */
   },
   response: ({ side, status, headers, body }, _options) => ({

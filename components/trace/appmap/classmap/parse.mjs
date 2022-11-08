@@ -1,8 +1,11 @@
-const { Error, URL } = globalThis;
+const { URL } = globalThis;
 
 const { search: __search } = new URL(import.meta.url);
 
 import BabelParser from "@babel/parser";
+const { InternalAppmapError } = await import(
+  `../../../error/index.mjs${__search}`
+);
 const { toAbsoluteUrl, getUrlExtension } = await import(
   `../../../url/index.mjs${__search}`
 );
@@ -33,7 +36,7 @@ const printComment = ({ type, value }) => {
   } else if (type === "CommentLine") {
     return `//${value}`;
   } /* c8 ignore start */ else {
-    throw new Error("invalid comment type");
+    throw new InternalAppmapError("invalid comment type");
   } /* c8 ignore stop */
 };
 

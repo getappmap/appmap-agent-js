@@ -1,4 +1,4 @@
-const { URL, Error, Map, RegExp } = globalThis;
+const { URL, Map, RegExp } = globalThis;
 
 const { search: __search } = new URL(import.meta.url);
 
@@ -108,7 +108,7 @@ export const createSpecifier = (options, base) => {
       flags: "",
     };
   }
-  throw new Error("invalid specifier options");
+  throw new InternalAppmapError("invalid specifier options");
 };
 
 // We escape as few character as possible to hide the fact that configuration fields are urls rather than paths.

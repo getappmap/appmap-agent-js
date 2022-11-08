@@ -3,7 +3,7 @@
 // Since 15.x we can use module.preloading
 // const preloaded = Path.join(__dirname, "esm.js") in require.cache;
 // preloaded ? : {hookESM: (instrumentAsync) => {
-//   throw new Error("lib/emitter/hook/esm.js must be preloaded with --experimental loader");
+//   throw new ExternalAppmapError("lib/emitter/hook/esm.js must be preloaded with --experimental loader");
 // }};
 
 // NB: We could avoid using globals by making recorder components export `transformSource` and `load`.
