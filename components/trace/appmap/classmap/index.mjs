@@ -155,8 +155,7 @@ const compileEntityArray = (
 
 export const createClassmap = (configuration) => ({
   closures: new Map(),
-  sources: [],
-  urls: new Set(),
+  sources: new Map(),
   naming: {
     counter: createCounter(0),
     separator: "-",
@@ -167,7 +166,6 @@ export const createClassmap = (configuration) => ({
 export const addClassmapSource = (
   {
     closures,
-    urls,
     naming,
     configuration: {
       pruning,
@@ -178,8 +176,6 @@ export const addClassmapSource = (
   },
   { url, content, inline, exclude: exclusions, shallow },
 ) => {
-  assert(!urls.has(url), "duplicate source url", InternalAppmapError);
-  urls.add(url);
   const relative = toRelativeUrl(url, directory);
   assert(
     relative !== null,
@@ -194,7 +190,8 @@ export const addClassmapSource = (
   if (pruning) {
     entities = entities.flatMap(cleanupEntity);
   }
-  sources.push({ context, entities });
+  assert(!sources.has(url), "duplicate source url", InternalAppmapError);
+  sources.set(url, { context, entities });
 };
 
 export const getClassmapClosure = ({ closures }, location) => {
@@ -239,12 +236,13 @@ export const compileClassmap = (
         }
       }),
     );
-    sources = sources.map(({ context, entities }) => ({
-      context,
-      entities: filterCalledEntityArray(entities, context, locations).flatMap(
-        cleanupEntity,
-      ),
-    }));
+    for (const source of sources.values()) {
+      source.entities = filterCalledEntityArray(
+        source.entities,
+        source.context,
+        locations,
+      ).flatMap(cleanupEntity);
+    }
   }
   const directories = new Set();
   const root = [];
