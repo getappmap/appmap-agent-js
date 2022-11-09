@@ -82,7 +82,7 @@ const registerEntityArray = (
   entities.forEach(registerEntity);
 };
 
-const filterCalledEntityArray = (entities, { url }, callees) => {
+const filterCalledEntityArray = (entities, url, callees) => {
   const filterCalledEntity = (entity) => {
     const children = entity.children.flatMap(filterCalledEntity);
     return entity.type === "function" &&
@@ -182,16 +182,25 @@ export const addClassmapSource = (
     "could not extract relative url",
     InternalAppmapError,
   );
-  const context = { url, relative, shallow, inline, content, placeholder };
   let entities = visit(parse(relative, content), naming).map((entity) =>
     excludeEntity(entity, null, exclusions),
   );
-  registerEntityArray(entities, context, closures);
+  registerEntityArray(
+    entities,
+    { url, relative, shallow, content, placeholder },
+    closures,
+  );
   if (pruning) {
     entities = entities.flatMap(cleanupEntity);
   }
   assert(!sources.has(url), "duplicate source url", InternalAppmapError);
-  sources.set(url, { context, entities });
+  sources.set(url, {
+    entities,
+    shallow,
+    inline,
+    content,
+    placeholder,
+  });
 };
 
 export const getClassmapClosure = ({ closures }, location) => {
@@ -220,7 +229,11 @@ export const getClassmapClosure = ({ closures }, location) => {
 export const compileClassmap = (
   {
     sources,
-    configuration: { pruning, "collapse-package-hierachy": collapse },
+    configuration: {
+      pruning,
+      "collapse-package-hierachy": collapse,
+      repository: { directory },
+    },
     closures,
   },
   locations,
@@ -236,10 +249,10 @@ export const compileClassmap = (
         }
       }),
     );
-    for (const source of sources.values()) {
+    for (const [url, source] of sources) {
       source.entities = filterCalledEntityArray(
         source.entities,
-        source.context,
+        url,
         locations,
       ).flatMap(cleanupEntity);
     }
@@ -247,25 +260,32 @@ export const compileClassmap = (
   const directories = new Set();
   const root = [];
   if (collapse) {
-    for (const { context, entities } of sources.values()) {
+    for (const [url, { entities, inline, content, placeholder }] of sources) {
       if (
         /* c8 ignore start */ !pruning ||
         entities.length > 0 /* c8 ignore stop */
       ) {
+        const relative = toRelativeUrl(url, directory);
         root.push({
           type: "package",
-          name: context.relative,
-          children: compileEntityArray(entities, context),
+          name: relative,
+          children: compileEntityArray(entities, {
+            relative,
+            placeholder,
+            inline,
+            content,
+          }),
         });
       }
     }
   } else {
-    for (const { context, entities } of sources.values()) {
+    for (const [url, { entities, inline, content, placeholder }] of sources) {
       if (
         /* c8 ignore start */ !pruning ||
         entities.length > 0 /* c8 ignore stop */
       ) {
-        const dirnames = context.relative.split("/");
+        const relative = toRelativeUrl(url, directory);
+        const dirnames = relative.split("/");
         const filename = dirnames.pop();
         let children = root;
         for (const dirname of dirnames) {
@@ -286,7 +306,12 @@ export const compileClassmap = (
         children.push({
           type: "package",
           name: filename,
-          children: compileEntityArray(entities, context),
+          children: compileEntityArray(entities, {
+            relative,
+            placeholder,
+            inline,
+            content,
+          }),
         });
       }
     }
