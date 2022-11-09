@@ -53,8 +53,17 @@ const and_exclude = {
 
   addClassmapSource(classmap, {
     url: "protocol://host/home/directory/function.js",
-    content:
-      "const o = { f: \n function (x) {} , g: \n function (y) {} , h: \n function (z) {} , i : \n function (t) { function j () {} } }; const p = {};",
+    content: `
+      const o = {
+        f: function (x) {},
+        g: function (y) {},
+        h: function (z) {},
+        i: function (t) {
+          function j () {}
+        }
+      };
+      const p = {};
+    `,
     inline: false,
     exclude: [
       {
@@ -74,21 +83,23 @@ const and_exclude = {
     shallow: true,
   });
 
+  // missing location
   assertEqual(
     getClassmapClosure(
       classmap,
       stringifyLocation(
-        makeLocation("protocol://host/home/directory/function.js", 1, 1),
+        makeLocation("protocol://host/home/directory/function.js", 0, 0),
       ),
     ),
     null,
   );
 
+  // function included
   assertDeepEqual(
     getClassmapClosure(
       classmap,
       stringifyLocation(
-        makeLocation("protocol://host/home/directory/function.js", 2, 1),
+        makeLocation("protocol://host/home/directory/function.js", 3, 11),
       ),
     ),
     {
@@ -98,33 +109,35 @@ const and_exclude = {
         defined_class: "f",
         method_id: placeholder,
         path: "directory/function.js",
-        lineno: 2,
+        lineno: 3,
         static: false,
       },
     },
   );
 
+  // function excluded
   assertDeepEqual(
     getClassmapClosure(
       classmap,
       stringifyLocation(
-        makeLocation("protocol://host/home/directory/function.js", 3, 1),
+        makeLocation("protocol://host/home/directory/function.js", 4, 11),
       ),
     ),
     null,
   );
 
+  // increment column to find location
   assertDeepEqual(
     getClassmapClosure(
       classmap,
       stringifyLocation(
-        makeLocation("protocol://host/home/directory/function.js", 2, 0),
+        makeLocation("protocol://host/home/directory/function.js", 3, 10),
       ),
     ),
     getClassmapClosure(
       classmap,
       stringifyLocation(
-        makeLocation("protocol://host/home/directory/function.js", 2, 1),
+        makeLocation("protocol://host/home/directory/function.js", 3, 11),
       ),
     ),
   );
@@ -134,10 +147,13 @@ const and_exclude = {
       classmap,
       new Set([
         stringifyLocation(
-          makeLocation("protocol://host/home/directory/function.js", 2, 0),
+          makeLocation("protocol://host/home/directory/function.js", 3, 10),
         ),
         stringifyLocation(
-          makeLocation("protocol://host/home/directory/function.js", 2, 1),
+          makeLocation("protocol://host/home/directory/function.js", 3, 11),
+        ),
+        stringifyLocation(
+          makeLocation("protocol://host/home/directory/function.js", 4, 11),
         ),
       ]),
     ),
@@ -161,7 +177,7 @@ const and_exclude = {
                     labels: [],
                     source: null,
                     static: false,
-                    location: "directory/function.js:2",
+                    location: "directory/function.js:3",
                   },
                 ],
               },

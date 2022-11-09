@@ -1,4 +1,5 @@
 const {
+  undefined,
   Map,
   Array: { from: toArray },
   URL,
@@ -6,6 +7,7 @@ const {
 
 const { search: __search } = new URL(import.meta.url);
 
+const { assert } = await import(`../../../util/index.mjs${__search}`);
 const { InternalAppmapError } = await import(
   `../../../error/index.mjs${__search}`
 );
@@ -56,6 +58,8 @@ const criteria = new Map([
 
 const criteria_name_array = toArray(criteria.keys());
 
+// Exported for testing only.
+// It may be worthwhile to update tests so we no longer have to export this.
 export const isExclusionMatched = (exclusion, entity, parent) => {
   const isCriterionSatisfied = (name) => {
     const pattern = exclusion[name];
@@ -76,14 +80,31 @@ export const isExclusionMatched = (exclusion, entity, parent) => {
   }
 };
 
-export const matchExclusionList = (exclusions, entity, parent) => {
-  for (const exclusion of exclusions) {
-    if (isExclusionMatched(exclusion, entity, parent)) {
-      return {
-        excluded: exclusion.excluded,
-        recursive: exclusion.recursive,
-      };
-    }
+const excludeEntityRecursively = (entity) => ({
+  ...entity,
+  excluded: true,
+  children: entity.children.map(excludeEntityRecursively),
+});
+
+export const excludeEntity = (entity, parent, exclusions) => {
+  const maybe_exclusion = exclusions.find((exclusion) =>
+    isExclusionMatched(exclusion, entity, parent),
+  );
+  assert(
+    maybe_exclusion !== undefined,
+    "missing matching exclusion",
+    InternalAppmapError,
+  );
+  const { excluded, recursive } = maybe_exclusion;
+  if (recursive) {
+    return excluded ? excludeEntityRecursively(entity) : entity;
+  } else {
+    return {
+      ...entity,
+      excluded,
+      children: entity.children.map((child) =>
+        excludeEntity(child, entity, exclusions),
+      ),
+    };
   }
-  throw new InternalAppmapError("missing matched exclusion");
 };

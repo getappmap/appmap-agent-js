@@ -24,7 +24,7 @@ const {
   stringifyLocation,
   incrementLocationColumn,
 } = await import(`../../../location/index.mjs${__search}`);
-const { matchExclusionList } = await import(`./exclusion.mjs${__search}`);
+const { excludeEntity } = await import(`./exclusion.mjs${__search}`);
 const { parse } = await import(`./parse.mjs${__search}`);
 const { visit } = await import(`./visit.mjs${__search}`);
 
@@ -46,35 +46,6 @@ const generateCutContent =
   ([start, end]) =>
     content.substring(start, end);
 
-const excludeEntity = (entity, parent, exclusions, excluded_entities) => {
-  const { excluded, recursive } = matchExclusionList(
-    exclusions,
-    entity,
-    parent,
-  );
-  if (excluded && recursive) {
-    const exclude = (entity) => {
-      excluded_entities.push(entity);
-      entity.children.forEach(exclude);
-    };
-    exclude(entity);
-    return [];
-  }
-  const children = entity.children.flatMap((child) =>
-    excludeEntity(child, entity, exclusions, excluded_entities),
-  );
-  if (excluded && children.length === 0) {
-    excluded_entities.push(entity);
-    return [];
-  }
-  return [
-    {
-      ...entity,
-      children,
-    },
-  ];
-};
-
 const registerEntityArray = (
   entities,
   { content, shallow, placeholder, relative, url },
@@ -84,18 +55,30 @@ const registerEntityArray = (
   const registerEntity = (entity) => {
     const { type, children } = entity;
     if (type === "function") {
-      const { line, column, parameters, name, static: _static } = entity;
-      closures.set(stringifyLocation(makeLocation(url, line, column)), {
-        parameters: parameters.map(cutContent),
-        shallow,
-        link: {
-          method_id: placeholder,
-          path: relative,
-          lineno: line,
-          defined_class: name,
-          static: _static,
-        },
-      });
+      const {
+        excluded,
+        line,
+        column,
+        parameters,
+        name,
+        static: _static,
+      } = entity;
+      closures.set(
+        stringifyLocation(makeLocation(url, line, column)),
+        excluded
+          ? null
+          : {
+              parameters: parameters.map(cutContent),
+              shallow,
+              link: {
+                method_id: placeholder,
+                path: relative,
+                lineno: line,
+                defined_class: name,
+                static: _static,
+              },
+            },
+      );
     }
     children.forEach(registerEntity);
   };
@@ -139,29 +122,38 @@ const compileEntityArray = (
   { placeholder, relative, inline, content },
 ) => {
   const cutContent = generateCutContent(content);
-  const compileEntity = (entity) =>
-    entity.type === "function"
-      ? {
-          type: "class",
-          name: entity.name,
-          children: [
-            {
-              type: "function",
-              name: placeholder,
-              location: `${relative}:${entity.line}`,
-              static: entity.static,
-              source: inline ? cutContent(entity.range) : null,
-              comment: printCommentArray(entity.comments),
-              labels: entity.labels,
-            },
-            ...entity.children.map(compileEntity),
-          ],
-        }
-      : {
-          ...entity,
-          children: entity.children.map(compileEntity),
-        };
-  return entities.map(compileEntity);
+  const compileEntity = (entity) => {
+    const children = entity.children.flatMap(compileEntity);
+    if (entity.excluded) {
+      return children;
+    } else if (entity.type === "function") {
+      return {
+        type: "class",
+        name: entity.name,
+        children: [
+          {
+            type: "function",
+            name: placeholder,
+            location: `${relative}:${entity.line}`,
+            static: entity.static,
+            source: inline ? cutContent(entity.range) : null,
+            comment: printCommentArray(entity.comments),
+            labels: entity.labels,
+          },
+          ...children,
+        ],
+      };
+    } else if (entity.type === "class") {
+      return {
+        type: "class",
+        name: entity.name,
+        children,
+      };
+    } /* c8 ignore start */ else {
+      throw new InternalAppmapError("invalid entity type");
+    } /* c8 ignore stop */
+  };
+  return entities.flatMap(compileEntity);
 };
 
 export const createClassmap = (configuration) => ({
@@ -198,17 +190,9 @@ export const addClassmapSource = (
     InternalAppmapError,
   );
   const context = { url, relative, shallow, inline, content, placeholder };
-  const excluded_entities = [];
-  let entities = visit(parse(relative, content), naming).flatMap((entity) =>
-    excludeEntity(entity, null, exclusions, excluded_entities),
+  let entities = visit(parse(relative, content), naming).map((entity) =>
+    excludeEntity(entity, null, exclusions),
   );
-  for (const entity of excluded_entities) {
-    const { type } = entity;
-    if (type === "function") {
-      const { line, column } = entity;
-      closures.set(stringifyLocation(makeLocation(url, line, column)), null);
-    }
-  }
   registerEntityArray(entities, context, closures);
   if (pruning) {
     entities = entities.flatMap(cleanupEntity);

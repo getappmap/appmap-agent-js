@@ -49,6 +49,7 @@ const visitBody = (nodes, parent, grand_parent, name, context) => {
   return {
     head: {
       type: "class",
+      excluded: false,
       name,
       children: head_children,
     },
@@ -90,6 +91,7 @@ const visitNode = (node, parent, grand_parent, naming) => {
       return {
         head: {
           type: "function",
+          excluded: false,
           name: getName(naming, node, parent),
           children: [
             ...concatResult(visitNode(node.params, node, parent, naming)),

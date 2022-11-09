@@ -3,10 +3,7 @@ import {
   assertThrow,
   assertDeepEqual,
 } from "../../../__fixture__.mjs";
-import {
-  isExclusionMatched,
-  matchExclusionList,
-} from "./exclusion.mjs?env=test";
+import { isExclusionMatched, excludeEntity } from "./exclusion.mjs?env=test";
 
 const or_exclusion = {
   combinator: "or",
@@ -208,30 +205,75 @@ assertEqual(
   false,
 );
 
-// matchExclusionList //
-
-assertThrow(() => {
-  matchExclusionList([], { type: "function" }, null);
-});
-
-assertDeepEqual(
-  matchExclusionList(
-    [
+// excludeEntity >> recursive //
+for (const excluded of [true, false]) {
+  assertDeepEqual(
+    excludeEntity(
       {
-        combinator: "or",
-        "every-label": true,
-        "some-label": true,
-        name: true,
-        "qualified-name": true,
-        excluded: true,
-        recursive: false,
+        type: "class",
+        name: "foo",
+        excluded: false,
+        children: [
+          {
+            type: "class",
+            name: "bar",
+            excluded: false,
+            children: [],
+          },
+        ],
       },
-    ],
-    { type: "function", name: "foo" },
+      null,
+      [{ ...and_exclusion, excluded, recursive: true, name: "foo" }],
+    ),
+    {
+      type: "class",
+      name: "foo",
+      excluded,
+      children: [
+        {
+          type: "class",
+          name: "bar",
+          excluded,
+          children: [],
+        },
+      ],
+    },
+  );
+}
+
+// excludeEntity >> not recursive //
+assertDeepEqual(
+  excludeEntity(
+    {
+      type: "class",
+      name: "foo",
+      excluded: false,
+      children: [
+        {
+          type: "class",
+          name: "bar",
+          excluded: false,
+          children: [],
+        },
+      ],
+    },
     null,
+    [
+      { ...and_exclusion, excluded: false, recursive: false, name: "foo" },
+      { ...and_exclusion, excluded: true, recursive: false, name: "bar" },
+    ],
   ),
   {
-    excluded: true,
-    recursive: false,
+    type: "class",
+    name: "foo",
+    excluded: false,
+    children: [
+      {
+        type: "class",
+        name: "bar",
+        excluded: true,
+        children: [],
+      },
+    ],
   },
 );

@@ -12,10 +12,12 @@ const test = (content, separator) =>
 assertDeepEqual(test("({k:{}});", "@"), [
   {
     type: "class",
+    excluded: false,
     name: "object@1",
     children: [
       {
         type: "class",
+        excluded: false,
         name: "k",
         children: [],
       },
@@ -41,6 +43,7 @@ assertDeepEqual(
   [
     {
       type: "function",
+      excluded: false,
       name: "f",
       children: [],
       parameters: [],
@@ -63,10 +66,12 @@ assertDeepEqual(
 assertDeepEqual(test("class c { static m (x) { } }", "@"), [
   {
     type: "class",
+    excluded: false,
     name: "c",
     children: [
       {
         type: "function",
+        excluded: false,
         name: "m",
         line: 1,
         column: 19,
