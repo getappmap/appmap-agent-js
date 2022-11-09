@@ -18,12 +18,9 @@ const { toRelativeUrl } = await import(`../../../url/index.mjs${__search}`);
 const { logWarning, logDebug } = await import(
   `../../../log/index.mjs${__search}`
 );
-const {
-  makeLocation,
-  parseLocation,
-  stringifyLocation,
-  incrementLocationColumn,
-} = await import(`../../../location/index.mjs${__search}`);
+const { makeLocation, getLocationPosition } = await import(
+  `../../../location/index.mjs${__search}`
+);
 const { excludeEntity } = await import(`./exclusion.mjs${__search}`);
 const { parse } = await import(`./parse.mjs${__search}`);
 const { visit } = await import(`./visit.mjs${__search}`);
@@ -64,7 +61,7 @@ const registerEntityArray = (
         static: _static,
       } = entity;
       closures.set(
-        stringifyLocation(makeLocation(url, line, column)),
+        makeLocation(url, { line, column }),
         excluded
           ? null
           : {
@@ -91,13 +88,13 @@ const filterCalledEntityArray = (entities, { url }, callees) => {
     return entity.type === "function" &&
       children.length === 0 &&
       !callees.has(
-        stringifyLocation(makeLocation(url, entity.line, entity.column)),
+        makeLocation(url, { line: entity.line, column: entity.column }),
       ) &&
       !callees.has(
-        stringifyLocation(makeLocation(url, entity.line, entity.column + 1)),
+        makeLocation(url, { line: entity.line, column: entity.column + 1 }),
       ) &&
       !callees.has(
-        stringifyLocation(makeLocation(url, entity.line, entity.column - 1)),
+        makeLocation(url, { line: entity.line, column: entity.column - 1 }),
       )
       ? []
       : [
@@ -204,9 +201,11 @@ export const getClassmapClosure = ({ closures }, location) => {
   if (closures.has(location)) {
     return closures.get(location);
   }
-  const next_location = stringifyLocation(
-    incrementLocationColumn(parseLocation(location)),
-  );
+  const { line, column } = getLocationPosition(location);
+  const next_location = makeLocation(location, {
+    line,
+    column: column + 1,
+  });
   if (closures.has(next_location)) {
     logDebug(
       "Had to increase column by one to fetch closure information at %j",
@@ -231,11 +230,14 @@ export const compileClassmap = (
 ) => {
   if (pruning) {
     locations = new Set(
-      toArray(locations).map((location) =>
-        closures.has(location)
-          ? location
-          : stringifyLocation(incrementLocationColumn(parseLocation(location))),
-      ),
+      toArray(locations).map((location) => {
+        if (closures.has(location)) {
+          return location;
+        } else {
+          const { line, column } = getLocationPosition(location);
+          return makeLocation(location, { line, column: column + 1 });
+        }
+      }),
     );
     sources = sources.map(({ context, entities }) => ({
       context,

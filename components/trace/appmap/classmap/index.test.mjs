@@ -1,8 +1,5 @@
 import { assertDeepEqual, assertEqual } from "../../../__fixture__.mjs";
-import {
-  stringifyLocation,
-  makeLocation,
-} from "../../../location/index.mjs?env=test";
+import { makeLocation } from "../../../location/index.mjs?env=test";
 import {
   createConfiguration,
   extendConfiguration,
@@ -87,9 +84,10 @@ const and_exclude = {
   assertEqual(
     getClassmapClosure(
       classmap,
-      stringifyLocation(
-        makeLocation("protocol://host/home/directory/function.js", 0, 0),
-      ),
+      makeLocation("protocol://host/home/directory/function.js", {
+        line: 0,
+        column: 0,
+      }),
     ),
     null,
   );
@@ -98,9 +96,10 @@ const and_exclude = {
   assertDeepEqual(
     getClassmapClosure(
       classmap,
-      stringifyLocation(
-        makeLocation("protocol://host/home/directory/function.js", 3, 11),
-      ),
+      makeLocation("protocol://host/home/directory/function.js", {
+        line: 3,
+        column: 11,
+      }),
     ),
     {
       parameters: ["x"],
@@ -119,9 +118,10 @@ const and_exclude = {
   assertDeepEqual(
     getClassmapClosure(
       classmap,
-      stringifyLocation(
-        makeLocation("protocol://host/home/directory/function.js", 4, 11),
-      ),
+      makeLocation("protocol://host/home/directory/function.js", {
+        line: 4,
+        column: 11,
+      }),
     ),
     null,
   );
@@ -130,15 +130,17 @@ const and_exclude = {
   assertDeepEqual(
     getClassmapClosure(
       classmap,
-      stringifyLocation(
-        makeLocation("protocol://host/home/directory/function.js", 3, 10),
-      ),
+      makeLocation("protocol://host/home/directory/function.js", {
+        line: 3,
+        column: 10,
+      }),
     ),
     getClassmapClosure(
       classmap,
-      stringifyLocation(
-        makeLocation("protocol://host/home/directory/function.js", 3, 11),
-      ),
+      makeLocation("protocol://host/home/directory/function.js", {
+        line: 3,
+        column: 11,
+      }),
     ),
   );
 
@@ -146,15 +148,18 @@ const and_exclude = {
     compileClassmap(
       classmap,
       new Set([
-        stringifyLocation(
-          makeLocation("protocol://host/home/directory/function.js", 3, 10),
-        ),
-        stringifyLocation(
-          makeLocation("protocol://host/home/directory/function.js", 3, 11),
-        ),
-        stringifyLocation(
-          makeLocation("protocol://host/home/directory/function.js", 4, 11),
-        ),
+        makeLocation("protocol://host/home/directory/function.js", {
+          line: 3,
+          column: 10,
+        }),
+        makeLocation("protocol://host/home/directory/function.js", {
+          line: 3,
+          column: 11,
+        }),
+        makeLocation("protocol://host/home/directory/function.js", {
+          line: 4,
+          column: 11,
+        }),
       ]),
     ),
     [

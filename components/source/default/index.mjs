@@ -12,6 +12,7 @@ const { InternalAppmapError, ExternalAppmapError } = await import(
 const { toAbsoluteUrl } = await import(`../../url/index.mjs${__search}`);
 const { logInfo, logError } = await import(`../../log/index.mjs${__search}`);
 const { identity } = await import(`../../util/index.mjs${__search}`);
+const { makeLocation } = await import(`../../location/index.mjs${__search}`);
 const { validateSourceMap } = await import(
   `../../validate/index.mjs${__search}`
 );
@@ -72,7 +73,7 @@ export const createSourceMap = ({ url: base, content }) => {
 
 export const mapSource = (mapping, line, column) => {
   if (mapping.type === "mirror") {
-    return { url: mapping.source.url, line, column };
+    return makeLocation(mapping.source.url, { line, column });
   } else if (mapping.type === "normal") {
     if (line <= mapping.groups.length) {
       let group = mapping.groups[line - 1];
@@ -100,11 +101,10 @@ export const mapSource = (mapping, line, column) => {
       }
       if (gen_column === column) {
         if (source_index >= 0 && source_index < mapping.sources.length) {
-          return {
-            url: mapping.sources[source_index].url,
+          return makeLocation(mapping.sources[source_index].url, {
             line: src_line + 1,
             column: src_column,
-          };
+          });
         } else {
           logInfo(
             "Source map out of range %j at file %j, line %j, and column %j",

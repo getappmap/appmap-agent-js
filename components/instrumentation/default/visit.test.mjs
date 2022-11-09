@@ -1,8 +1,5 @@
 import { assertEqual } from "../../__fixture__.mjs";
-import {
-  makeLocation,
-  stringifyLocation,
-} from "../../location/index.mjs?env=test";
+import { makeLocation } from "../../location/index.mjs?env=test";
 import { createCounter } from "../../util/index.mjs?env=test";
 import { createMirrorSourceMap } from "../../source/index.mjs?env=test";
 import { normalize, parse, generate } from "./__fixture__.mjs";
@@ -34,7 +31,7 @@ const instrument = (file, whitelist) =>
   );
 
 const makeCodeLocation = (url, line, column) =>
-  stringifyJSON(stringifyLocation(makeLocation(url, line, column)));
+  stringifyJSON(makeLocation(url, { line, column }));
 
 // expression body //
 assertEqual(
