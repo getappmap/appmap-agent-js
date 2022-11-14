@@ -3,8 +3,9 @@ const {
   Set,
   Map,
   undefined,
-  Array: { from: toArray },
   URL,
+  Array: { from: toArray },
+  Math: { abs },
 } = globalThis;
 
 const { search: __search } = new URL(import.meta.url);
@@ -19,7 +20,7 @@ const { toRelativeUrl } = await import(`../../../url/index.mjs${__search}`);
 const { logWarning, logDebug } = await import(
   `../../../log/index.mjs${__search}`
 );
-const { makeLocation, getLocationPosition, getLocationBase } = await import(
+const { getLocationPosition, getLocationBase } = await import(
   `../../../location/index.mjs${__search}`
 );
 const { excludeEntity } = await import(`./exclusion.mjs${__search}`);
@@ -85,19 +86,15 @@ const registerEntityArray = (
   entities.forEach(registerEntity);
 };
 
-const filterCalledEntityArray = (entities, url, callees) => {
+const filterCalledEntityArray = (entities, called_positions) => {
   const filterCalledEntity = (entity) => {
     const children = entity.children.flatMap(filterCalledEntity);
     return entity.type === "function" &&
       children.length === 0 &&
-      !callees.has(
-        makeLocation(url, { line: entity.line, column: entity.column }),
-      ) &&
-      !callees.has(
-        makeLocation(url, { line: entity.line, column: entity.column + 1 }),
-      ) &&
-      !callees.has(
-        makeLocation(url, { line: entity.line, column: entity.column - 1 }),
+      !called_positions.some(
+        (called_position) =>
+          called_position.line === entity.line &&
+          abs(called_position.column - entity.column) < 2,
       )
       ? []
       : [
@@ -165,11 +162,35 @@ export const createClassmap = (configuration) => ({
   configuration,
 });
 
+export const createSource = (
+  naming,
+  relative,
+  content,
+  { placeholder, inline, exclusions, shallow },
+) => {
+  const entities = visit(parse(relative, content), naming).map((entity) =>
+    excludeEntity(entity, null, exclusions),
+  );
+  const closures = new Map();
+  registerEntityArray(
+    entities,
+    { relative, shallow, content, placeholder },
+    closures,
+  );
+  return {
+    closures,
+    entities,
+    shallow,
+    inline,
+    content,
+    placeholder,
+  };
+};
+
 export const addClassmapSource = (
   {
     naming,
     configuration: {
-      pruning,
       "function-name-placeholder": placeholder,
       repository: { directory },
     },
@@ -183,57 +204,48 @@ export const addClassmapSource = (
     "could not extract relative url",
     InternalAppmapError,
   );
-  let entities = visit(parse(relative, content), naming).map((entity) =>
-    excludeEntity(entity, null, exclusions),
-  );
-  const closures = new Map();
-  registerEntityArray(
-    entities,
-    { relative, shallow, content, placeholder },
-    closures,
-  );
-  if (pruning) {
-    entities = entities.flatMap(cleanupEntity);
-  }
   assert(!sources.has(url), "duplicate source url", InternalAppmapError);
-  sources.set(url, {
-    closures,
-    entities,
-    shallow,
-    inline,
-    content,
-    placeholder,
-  });
+  sources.set(
+    url,
+    createSource(naming, relative, content, {
+      placeholder,
+      inline,
+      exclusions,
+      shallow,
+    }),
+  );
+};
+
+export const getSourceClosure = (source, position) => {
+  const hashed_postion = hashPosition(position);
+  if (source.closures.has(hashed_postion)) {
+    return source.closures.get(hashed_postion);
+  } else {
+    const next_position = {
+      line: position.line,
+      column: position.column + 1,
+    };
+    const hashed_next_position = hashPosition(next_position);
+    if (source.closures.has(hashed_next_position)) {
+      logDebug(
+        "Had to increase column by one to fetch closure information at %j",
+        position,
+      );
+      return source.closures.get(hashed_next_position);
+    } else {
+      logWarning(
+        "Missing source estree node for closure at %j, threating it as excluded.",
+        position,
+      );
+      return null;
+    }
+  }
 };
 
 export const getClassmapClosure = ({ sources }, location) => {
   const base = getLocationBase(location);
   if (sources.has(base)) {
-    const source = sources.get(base);
-    const position = getLocationPosition(location);
-    const hashed_postion = hashPosition(position);
-    if (source.closures.has(hashed_postion)) {
-      return source.closures.get(hashed_postion);
-    } else {
-      const next_position = {
-        line: position.line,
-        column: position.column + 1,
-      };
-      const hashed_next_position = hashPosition(next_position);
-      if (source.closures.has(hashed_next_position)) {
-        logDebug(
-          "Had to increase column by one to fetch closure information at %j",
-          location,
-        );
-        return source.closures.get(hashed_next_position);
-      } else {
-        logWarning(
-          "Missing source estree node for closure at %s, threating it as excluded.",
-          location,
-        );
-        return null;
-      }
-    }
+    return getSourceClosure(sources.get(base), getLocationPosition(location));
   } else {
     logWarning(
       "Missing source file for closure at %s, threating it as excluded.",
@@ -242,6 +254,21 @@ export const getClassmapClosure = ({ sources }, location) => {
     return null;
   }
 };
+
+const compileSource = (source, relative, positions, pruning) =>
+  compileEntityArray(
+    pruning
+      ? filterCalledEntityArray(source.entities, positions).flatMap(
+          cleanupEntity,
+        )
+      : source.entities,
+    {
+      relative,
+      placeholder: source.placeholder,
+      inline: source.inline,
+      content: source.content,
+    },
+  );
 
 export const compileClassmap = (
   {
@@ -254,58 +281,45 @@ export const compileClassmap = (
   },
   locations,
 ) => {
-  if (pruning) {
-    locations = new Set(
-      toArray(locations).map((location) => {
-        const base = getLocationBase(location);
-        if (sources.has(base)) {
-          const source = sources.get(base);
-          if (
-            !source.closures.has(hashPosition(getLocationPosition(location)))
-          ) {
-            const { line, column } = getLocationPosition(location);
-            location = makeLocation(location, { line, column: column + 1 });
-          }
-        }
-        return location;
-      }),
-    );
-    for (const [url, source] of sources) {
-      source.entities = filterCalledEntityArray(
-        source.entities,
-        url,
-        locations,
-      ).flatMap(cleanupEntity);
-    }
-  }
   const directories = new Set();
   const root = [];
   if (collapse) {
-    for (const [url, { entities, inline, content, placeholder }] of sources) {
+    for (const [url, source] of sources) {
+      const relative = toRelativeUrl(url, directory);
+      const entities = compileSource(
+        source,
+        relative,
+        toArray(locations)
+          .filter((location) => getLocationBase(location) === url)
+          .map(getLocationPosition),
+        pruning,
+      );
       if (
         /* c8 ignore start */ !pruning ||
         entities.length > 0 /* c8 ignore stop */
       ) {
-        const relative = toRelativeUrl(url, directory);
         root.push({
           type: "package",
           name: relative,
-          children: compileEntityArray(entities, {
-            relative,
-            placeholder,
-            inline,
-            content,
-          }),
+          children: entities,
         });
       }
     }
   } else {
-    for (const [url, { entities, inline, content, placeholder }] of sources) {
+    for (const [url, source] of sources) {
+      const relative = toRelativeUrl(url, directory);
+      const entities = compileSource(
+        source,
+        relative,
+        toArray(locations)
+          .filter((location) => getLocationBase(location) === url)
+          .map(getLocationPosition),
+        pruning,
+      );
       if (
         /* c8 ignore start */ !pruning ||
         entities.length > 0 /* c8 ignore stop */
       ) {
-        const relative = toRelativeUrl(url, directory);
         const dirnames = relative.split("/");
         const filename = dirnames.pop();
         let children = root;
@@ -327,12 +341,7 @@ export const compileClassmap = (
         children.push({
           type: "package",
           name: filename,
-          children: compileEntityArray(entities, {
-            relative,
-            placeholder,
-            inline,
-            content,
-          }),
+          children: entities,
         });
       }
     }
