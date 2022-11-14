@@ -1,4 +1,5 @@
 const {
+  String,
   Set,
   Map,
   undefined,
@@ -18,7 +19,7 @@ const { toRelativeUrl } = await import(`../../../url/index.mjs${__search}`);
 const { logWarning, logDebug } = await import(
   `../../../log/index.mjs${__search}`
 );
-const { makeLocation, getLocationPosition } = await import(
+const { makeLocation, getLocationPosition, getLocationBase } = await import(
   `../../../location/index.mjs${__search}`
 );
 const { excludeEntity } = await import(`./exclusion.mjs${__search}`);
@@ -43,9 +44,11 @@ const generateCutContent =
   ([start, end]) =>
     content.substring(start, end);
 
+const hashPosition = ({ line, column }) => `${String(line)}:${String(column)}`;
+
 const registerEntityArray = (
   entities,
-  { content, shallow, placeholder, relative, url },
+  { content, shallow, placeholder, relative },
   closures,
 ) => {
   const cutContent = generateCutContent(content);
@@ -61,7 +64,7 @@ const registerEntityArray = (
         static: _static,
       } = entity;
       closures.set(
-        makeLocation(url, { line, column }),
+        hashPosition({ line, column }),
         excluded
           ? null
           : {
@@ -154,7 +157,6 @@ const compileEntityArray = (
 };
 
 export const createClassmap = (configuration) => ({
-  closures: new Map(),
   sources: new Map(),
   naming: {
     counter: createCounter(0),
@@ -165,7 +167,6 @@ export const createClassmap = (configuration) => ({
 
 export const addClassmapSource = (
   {
-    closures,
     naming,
     configuration: {
       pruning,
@@ -185,9 +186,10 @@ export const addClassmapSource = (
   let entities = visit(parse(relative, content), naming).map((entity) =>
     excludeEntity(entity, null, exclusions),
   );
+  const closures = new Map();
   registerEntityArray(
     entities,
-    { url, relative, shallow, content, placeholder },
+    { relative, shallow, content, placeholder },
     closures,
   );
   if (pruning) {
@@ -195,6 +197,7 @@ export const addClassmapSource = (
   }
   assert(!sources.has(url), "duplicate source url", InternalAppmapError);
   sources.set(url, {
+    closures,
     entities,
     shallow,
     inline,
@@ -203,27 +206,41 @@ export const addClassmapSource = (
   });
 };
 
-export const getClassmapClosure = ({ closures }, location) => {
-  if (closures.has(location)) {
-    return closures.get(location);
-  }
-  const { line, column } = getLocationPosition(location);
-  const next_location = makeLocation(location, {
-    line,
-    column: column + 1,
-  });
-  if (closures.has(next_location)) {
-    logDebug(
-      "Had to increase column by one to fetch closure information at %j",
+export const getClassmapClosure = ({ sources }, location) => {
+  const base = getLocationBase(location);
+  if (sources.has(base)) {
+    const source = sources.get(base);
+    const position = getLocationPosition(location);
+    const hashed_postion = hashPosition(position);
+    if (source.closures.has(hashed_postion)) {
+      return source.closures.get(hashed_postion);
+    } else {
+      const next_position = {
+        line: position.line,
+        column: position.column + 1,
+      };
+      const hashed_next_position = hashPosition(next_position);
+      if (source.closures.has(hashed_next_position)) {
+        logDebug(
+          "Had to increase column by one to fetch closure information at %j",
+          location,
+        );
+        return source.closures.get(hashed_next_position);
+      } else {
+        logWarning(
+          "Missing source estree node for closure at %s, threating it as excluded.",
+          location,
+        );
+        return null;
+      }
+    }
+  } else {
+    logWarning(
+      "Missing source file for closure at %s, threating it as excluded.",
       location,
     );
-    return closures.get(next_location);
+    return null;
   }
-  logWarning(
-    "Missing file information for closure at %s, threating it as excluded.",
-    location,
-  );
-  return null;
 };
 
 export const compileClassmap = (
@@ -234,19 +251,23 @@ export const compileClassmap = (
       "collapse-package-hierachy": collapse,
       repository: { directory },
     },
-    closures,
   },
   locations,
 ) => {
   if (pruning) {
     locations = new Set(
       toArray(locations).map((location) => {
-        if (closures.has(location)) {
-          return location;
-        } else {
-          const { line, column } = getLocationPosition(location);
-          return makeLocation(location, { line, column: column + 1 });
+        const base = getLocationBase(location);
+        if (sources.has(base)) {
+          const source = sources.get(base);
+          if (
+            !source.closures.has(hashPosition(getLocationPosition(location)))
+          ) {
+            const { line, column } = getLocationPosition(location);
+            location = makeLocation(location, { line, column: column + 1 });
+          }
         }
+        return location;
       }),
     );
     for (const [url, source] of sources) {

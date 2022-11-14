@@ -80,11 +80,23 @@ const and_exclude = {
     shallow: true,
   });
 
-  // missing location
+  // missing estree location
   assertEqual(
     getClassmapClosure(
       classmap,
       makeLocation("protocol://host/home/directory/function.js", {
+        line: 0,
+        column: 0,
+      }),
+    ),
+    null,
+  );
+
+  // missing file location
+  assertEqual(
+    getClassmapClosure(
+      classmap,
+      makeLocation("protocol://host/home/directory/missing.js", {
         line: 0,
         column: 0,
       }),
