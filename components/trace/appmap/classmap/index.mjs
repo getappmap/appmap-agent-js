@@ -1,41 +1,29 @@
-const {
-  Set,
-  Map,
-  undefined,
-  URL,
-  Array: { from: toArray },
-} = globalThis;
+const { Set, Map, undefined, URL } = globalThis;
 
 const { search: __search } = new URL(import.meta.url);
 
 const { InternalAppmapError } = await import(
   `../../../error/index.mjs${__search}`
 );
-const { assert, createCounter } = await import(
-  `../../../util/index.mjs${__search}`
-);
+const { assert } = await import(`../../../util/index.mjs${__search}`);
 const { toRelativeUrl } = await import(`../../../url/index.mjs${__search}`);
 const { logWarning } = await import(`../../../log/index.mjs${__search}`);
 const { getLocationPosition, getLocationBase } = await import(
   `../../../location/index.mjs${__search}`
 );
-const { createSource, compileSource, getSourceClosure } = await import(
+const { createSource, toSourceClassmap, lookupSourceClosure } = await import(
   `./source.mjs${__search}`
 );
 
 export const createClassmap = (configuration) => ({
   sources: new Map(),
-  naming: {
-    counter: createCounter(0),
-    separator: "-",
-  },
   configuration,
 });
 
 export const addClassmapSource = (
   {
-    naming,
     configuration: {
+      pruning,
       "function-name-placeholder": placeholder,
       repository: { directory },
     },
@@ -52,8 +40,10 @@ export const addClassmapSource = (
   assert(!sources.has(url), "duplicate source url", InternalAppmapError);
   sources.set(
     url,
-    createSource(naming, relative, content, {
+    createSource(content, {
+      relative,
       placeholder,
+      pruning,
       inline,
       exclusions,
       shallow,
@@ -61,10 +51,13 @@ export const addClassmapSource = (
   );
 };
 
-export const getClassmapClosure = ({ sources }, location) => {
+export const lookupClassmapClosure = ({ sources }, location) => {
   const base = getLocationBase(location);
   if (sources.has(base)) {
-    return getSourceClosure(sources.get(base), getLocationPosition(location));
+    return lookupSourceClosure(
+      sources.get(base),
+      getLocationPosition(location),
+    );
   } else {
     logWarning(
       "Missing source file for closure at %s, threating it as excluded.",
@@ -74,30 +67,20 @@ export const getClassmapClosure = ({ sources }, location) => {
   }
 };
 
-export const compileClassmap = (
-  {
-    sources,
-    configuration: {
-      pruning,
-      "collapse-package-hierachy": collapse,
-      repository: { directory },
-    },
+export const compileClassmap = ({
+  sources,
+  configuration: {
+    pruning,
+    "collapse-package-hierachy": collapse,
+    repository: { directory },
   },
-  locations,
-) => {
+}) => {
   const directories = new Set();
   const root = [];
   if (collapse) {
     for (const [url, source] of sources) {
       const relative = toRelativeUrl(url, directory);
-      const entities = compileSource(
-        source,
-        relative,
-        toArray(locations)
-          .filter((location) => getLocationBase(location) === url)
-          .map(getLocationPosition),
-        pruning,
-      );
+      const entities = toSourceClassmap(source);
       if (
         /* c8 ignore start */ !pruning ||
         entities.length > 0 /* c8 ignore stop */
@@ -112,20 +95,13 @@ export const compileClassmap = (
   } else {
     for (const [url, source] of sources) {
       const relative = toRelativeUrl(url, directory);
-      const entities = compileSource(
-        source,
-        relative,
-        toArray(locations)
-          .filter((location) => getLocationBase(location) === url)
-          .map(getLocationPosition),
-        pruning,
-      );
+      const entities = toSourceClassmap(source);
       if (
         /* c8 ignore start */ !pruning ||
         entities.length > 0 /* c8 ignore stop */
       ) {
         const dirnames = relative.split("/");
-        const filename = dirnames.pop();
+        dirnames.pop();
         let children = root;
         for (const dirname of dirnames) {
           let child = children.find(
@@ -142,11 +118,7 @@ export const compileClassmap = (
           }
           ({ children } = child);
         }
-        children.push({
-          type: "package",
-          name: filename,
-          children: entities,
-        });
+        children.push(...entities);
       }
     }
   }

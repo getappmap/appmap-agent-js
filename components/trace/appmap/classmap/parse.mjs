@@ -9,7 +9,7 @@ const { InternalAppmapError } = await import(
 const { toAbsoluteUrl, getUrlExtension } = await import(
   `../../../url/index.mjs${__search}`
 );
-const { coalesce } = await import(`../../../util/index.mjs${__search}`);
+const { assert, coalesce } = await import(`../../../util/index.mjs${__search}`);
 const { logWarning, logError } = await import(
   `../../../log/index.mjs${__search}`
 );
@@ -30,7 +30,7 @@ const { parse: parseBabel } = BabelParser;
 //   return null;
 // };
 
-const printComment = ({ type, value }) => {
+export const printComment = ({ type, value }) => {
   if (type === "CommentBlock") {
     return `/*${value}*/`;
   } else if (type === "CommentLine") {
@@ -41,7 +41,20 @@ const printComment = ({ type, value }) => {
 };
 
 export const getLeadingCommentArray = (node) =>
-  coalesce(node, "leadingComments", []).map(printComment);
+  coalesce(node, "leadingComments", []);
+
+const trimStartString = (string) => string.trimStart();
+
+const extractLineLabel = (line) => {
+  assert(line.startsWith("@label "), "invalid label line", InternalAppmapError);
+  const maybe_tokens = line.substring("@label".length).match(/\s+\S+/gu);
+  return maybe_tokens === null ? [] : maybe_tokens.map(trimStartString);
+};
+
+export const extractCommentLabelArray = ({ value: text }) => {
+  const maybe_lines = text.match(/@label .*/gu);
+  return maybe_lines === null ? [] : maybe_lines.flatMap(extractLineLabel);
+};
 
 export const parse = (relative, content) => {
   const extension = getUrlExtension(toAbsoluteUrl(relative, "protocol://host"));

@@ -1,7 +1,7 @@
 parse.mjs
-naming.mjs
-visit.mjs
-regexp.mjs
+lookup.mjs
+entity.mjs
+digest.mjs
 exclusion.mjs
 source.mjs
 index.mjs

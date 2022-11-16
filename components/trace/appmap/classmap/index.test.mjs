@@ -8,12 +8,8 @@ import {
   createClassmap,
   addClassmapSource,
   compileClassmap,
-  getClassmapClosure,
+  lookupClassmapClosure,
 } from "./index.mjs?env=test";
-
-const { Set } = globalThis;
-
-const placeholder = "$";
 
 const and_exclude = {
   combinator: "and",
@@ -41,7 +37,6 @@ const and_exclude = {
       createConfiguration("protocol://host/home/"),
       {
         pruning: true,
-        "function-name-placeholder": placeholder,
         "collapse-package-hierachy": true,
       },
       "protocol://host/base/",
@@ -82,7 +77,7 @@ const and_exclude = {
 
   // missing estree location
   assertEqual(
-    getClassmapClosure(
+    lookupClassmapClosure(
       classmap,
       makeLocation("protocol://host/home/directory/function.js", {
         line: 0,
@@ -94,7 +89,7 @@ const and_exclude = {
 
   // missing file location
   assertEqual(
-    getClassmapClosure(
+    lookupClassmapClosure(
       classmap,
       makeLocation("protocol://host/home/directory/missing.js", {
         line: 0,
@@ -106,7 +101,7 @@ const and_exclude = {
 
   // function included
   assertDeepEqual(
-    getClassmapClosure(
+    lookupClassmapClosure(
       classmap,
       makeLocation("protocol://host/home/directory/function.js", {
         line: 3,
@@ -117,8 +112,8 @@ const and_exclude = {
       parameters: ["x"],
       shallow: true,
       link: {
-        defined_class: "f",
-        method_id: placeholder,
+        defined_class: "o",
+        method_id: "f",
         path: "directory/function.js",
         lineno: 3,
         static: false,
@@ -128,7 +123,7 @@ const and_exclude = {
 
   // function excluded
   assertDeepEqual(
-    getClassmapClosure(
+    lookupClassmapClosure(
       classmap,
       makeLocation("protocol://host/home/directory/function.js", {
         line: 4,
@@ -138,72 +133,29 @@ const and_exclude = {
     null,
   );
 
-  // increment column to find location
-  assertDeepEqual(
-    getClassmapClosure(
-      classmap,
-      makeLocation("protocol://host/home/directory/function.js", {
-        line: 3,
-        column: 10,
-      }),
-    ),
-    getClassmapClosure(
-      classmap,
-      makeLocation("protocol://host/home/directory/function.js", {
-        line: 3,
-        column: 11,
-      }),
-    ),
-  );
-
-  assertDeepEqual(
-    compileClassmap(
-      classmap,
-      new Set([
-        makeLocation("protocol://host/home/directory/function.js", {
-          line: 3,
-          column: 10,
-        }),
-        makeLocation("protocol://host/home/directory/function.js", {
-          line: 3,
-          column: 11,
-        }),
-        makeLocation("protocol://host/home/directory/function.js", {
-          line: 4,
-          column: 11,
-        }),
-      ]),
-    ),
-    [
-      {
-        type: "package",
-        name: "directory/function.js",
-        children: [
-          {
-            type: "class",
-            name: "o",
-            children: [
-              {
-                type: "class",
-                name: "f",
-                children: [
-                  {
-                    type: "function",
-                    name: placeholder,
-                    comment: null,
-                    labels: [],
-                    source: null,
-                    static: false,
-                    location: "directory/function.js:3",
-                  },
-                ],
-              },
-            ],
-          },
-        ],
-      },
-    ],
-  );
+  assertDeepEqual(compileClassmap(classmap), [
+    {
+      type: "package",
+      name: "directory/function.js",
+      children: [
+        {
+          type: "class",
+          name: "o",
+          children: [
+            {
+              type: "function",
+              name: "f",
+              comment: null,
+              labels: [],
+              source: null,
+              static: false,
+              location: "directory/function.js:3",
+            },
+          ],
+        },
+      ],
+    },
+  ]);
 }
 
 {
@@ -212,7 +164,6 @@ const and_exclude = {
       createConfiguration("protocol://host/home/"),
       {
         pruning: false,
-        "function-name-placeholder": placeholder,
         "collapse-package-hierachy": false,
       },
       "protocol://host/base/",
@@ -228,59 +179,41 @@ const and_exclude = {
     shallow: false,
   });
 
-  assertDeepEqual(compileClassmap(classmap, new Set([])), [
+  assertDeepEqual(compileClassmap(classmap), [
     {
       type: "package",
       name: "directory",
       children: [
         {
-          type: "package",
-          name: "function.js",
+          type: "class",
+          name: "function",
           children: [
             {
-              type: "class",
+              type: "function",
               name: "f",
-              children: [
-                {
-                  type: "function",
-                  name: placeholder,
-                  comment: null,
-                  labels: [],
-                  source: "function f () {}",
-                  static: false,
-                  location: "directory/function.js:1",
-                },
-              ],
+              comment: null,
+              labels: [],
+              source: "function f () {}",
+              static: false,
+              location: "directory/function.js:1",
             },
             {
-              type: "class",
+              type: "function",
               name: "g",
-              children: [
-                {
-                  type: "function",
-                  name: placeholder,
-                  comment: "/* comment1 */",
-                  labels: [],
-                  source: "function g () {}",
-                  static: false,
-                  location: "directory/function.js:2",
-                },
-              ],
+              comment: "/* comment1 */",
+              labels: [],
+              source: "function g () {}",
+              static: false,
+              location: "directory/function.js:2",
             },
             {
-              type: "class",
+              type: "function",
               name: "h",
-              children: [
-                {
-                  type: "function",
-                  name: placeholder,
-                  comment: "/* comment2 */\n/* comment3 */",
-                  labels: [],
-                  source: "function h () {}",
-                  static: false,
-                  location: "directory/function.js:3",
-                },
-              ],
+              comment: "/* comment2 */\n/* comment3 */",
+              labels: [],
+              source: "function h () {}",
+              static: false,
+              location: "directory/function.js:3",
             },
           ],
         },
