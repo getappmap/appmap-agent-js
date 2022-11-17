@@ -13,6 +13,7 @@ const { ExternalAppmapError } = await import(
 const { toAbsoluteUrl } = await import(`../../url/index.mjs${__search}`);
 const { logInfo, logError } = await import(`../../log/index.mjs${__search}`);
 const { identity } = await import(`../../util/index.mjs${__search}`);
+const { makeLocation } = await import(`../../location/index.mjs${__search}`);
 const { validateSourceMap } = await import(
   `../../validate/index.mjs${__search}`
 );
@@ -73,7 +74,7 @@ export const createSourceMap = ({ url: base, content }) => {
 
 export const mapSource = (mapping, line, column) => {
   if (mapping.type === "mirror") {
-    return { url: mapping.source.url, line, column };
+    return makeLocation(mapping.source.url, { line, column });
   } else if (mapping.type === "normal") {
     if (line <= mapping.groups.length) {
       let group = mapping.groups[line - 1];

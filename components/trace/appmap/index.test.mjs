@@ -3,10 +3,7 @@ import {
   createConfiguration,
   extendConfiguration,
 } from "../../configuration/index.mjs?env=test";
-import {
-  makeLocation,
-  stringifyLocation,
-} from "../../location/index.mjs?env=test";
+import { makeLocation } from "../../location/index.mjs?env=test";
 import { compileTrace } from "./index.mjs?env=test";
 
 const configuration = extendConfiguration(
@@ -35,9 +32,10 @@ const tabs = {
   event2: 6,
 };
 
-const location = stringifyLocation(
-  makeLocation("protocol://host/home/filename.js", 1, 0),
-);
+const location = makeLocation("protocol://host/home/dirname/filename.js", {
+  line: 1,
+  column: 0,
+});
 
 assertDeepEqual(
   compileTrace(configuration, [

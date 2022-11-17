@@ -1,8 +1,5 @@
 import { assertDeepEqual } from "../../../__fixture__.mjs";
-import {
-  makeLocation,
-  stringifyLocation,
-} from "../../../location/index.mjs?env=test";
+import { makeLocation } from "../../../location/index.mjs?env=test";
 import { createConfiguration } from "../../../configuration/index.mjs?env=test";
 import {
   createClassmap,
@@ -21,7 +18,7 @@ const makeEvent = (site, tab, payload) => ({
 
 const makeApplyPayload = (location) => ({
   type: "apply",
-  function: stringifyLocation(location),
+  function: location,
   this: null,
   arguments: [
     {
@@ -33,7 +30,7 @@ const makeApplyPayload = (location) => ({
 
 const makeReturnPayload = (location) => ({
   type: "return",
-  function: stringifyLocation(location),
+  function: location,
   result: {
     type: "number",
     print: 123,
@@ -120,7 +117,10 @@ for (const shallow of [true, false]) {
     ],
     shallow,
   });
-  const location = makeLocation("protocol://host/home/filename.js", 1, 0);
+  const location = makeLocation("protocol://host/home/filename.js", {
+    line: 1,
+    column: 0,
+  });
   assertDeepEqual(
     digestEventTrace(
       [
@@ -145,7 +145,10 @@ for (const shallow of [true, false]) {
 
 // missing apply >> transparent //
 {
-  const location = makeLocation("protocol://host/home/filename.js", 1, 0);
+  const location = makeLocation("protocol://host/home/filename.js", {
+    line: 1,
+    column: 0,
+  });
   assertDeepEqual(
     digestEventTrace(
       [

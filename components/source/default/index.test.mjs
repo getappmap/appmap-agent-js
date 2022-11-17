@@ -5,6 +5,7 @@ import {
   assertDeepEqual,
   assertThrow,
 } from "../../__fixture__.mjs";
+import { makeLocation } from "../../location/index.mjs?env=test";
 import {
   extractSourceMapUrl,
   createMirrorSourceMap,
@@ -65,11 +66,7 @@ assertEqual(
     url: "http://host/out.js",
     content: "123;",
   });
-  assertDeepEqual(mapSource(mapping, 123, 456), {
-    url: "http://host/out.js",
-    line: 123,
-    column: 456,
-  });
+  assertEqual(mapSource(mapping, 123, 456), "http://host/out.js#123-456");
   assertDeepEqual(getSources(mapping), [
     { url: "http://host/out.js", content: "123;" },
   ]);
@@ -95,11 +92,10 @@ assertEqual(
     url: "http://host/directory/map.json",
     content: generator.toString(),
   });
-  assertDeepEqual(mapSource(mapping, 3, 13), {
-    url: "http://host/directory/source.js",
-    line: 17,
-    column: 19,
-  });
+  assertEqual(
+    mapSource(mapping, 3, 13),
+    makeLocation("http://host/directory/source.js", { line: 17, column: 19 }),
+  );
   assertEqual(mapSource(mapping, 3, 23), null);
   assertEqual(mapSource(mapping, 29, 0), null);
   assertDeepEqual(getSources(mapping), [
