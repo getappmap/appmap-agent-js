@@ -43,7 +43,7 @@ export const createSource = (
   const estree = parseEstree(url, content);
   const getExclusion = compileExclusionArray(exclusions);
   const context = {
-    anonymous: "anonymous",
+    anonymous: "[anonymous]",
     relative,
     inline,
     shallow,

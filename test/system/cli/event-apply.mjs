@@ -121,7 +121,7 @@ await runAsync(
         {
           event: "call",
           id: 11,
-          method_id: "anonymous",
+          method_id: "[anonymous]",
         },
         {
           event: "return",

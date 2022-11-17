@@ -1,4 +1,4 @@
-const { undefined, String, parseInt, URL } = globalThis;
+const { String, parseInt, URL } = globalThis;
 
 const { search: __search } = new URL(import.meta.url);
 
@@ -13,11 +13,7 @@ export const makeLocation = (url, { line, column }) =>
 export const getLocationPosition = (url) => {
   const { hash } = new URL(url);
   const parts = /^#([0-9]+)-([0-9]+)$/u.exec(hash);
-  assert(
-    parts !== undefined,
-    "expected a url code location",
-    InternalAppmapError,
-  );
+  assert(parts !== null, "expected a url code location", InternalAppmapError);
   return {
     line: parseInt(parts[1]),
     column: parseInt(parts[2]),

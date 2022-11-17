@@ -58,11 +58,10 @@ const default_external_configuration = {
   "default-package": {
     enabled: true,
   },
-  "anonymous-name-separator": "-",
   exclude: [
     {
       combinator: "and",
-      name: "-",
+      name: "^\\[anonymous\\]$",
       "every-label": "^\\b$",
       excluded: true,
       recursive: false,
