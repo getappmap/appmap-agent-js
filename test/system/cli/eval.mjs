@@ -28,7 +28,7 @@ await runAsync(
   async (repository) => {
     await writeFileAsync(
       `${repository}/main.mjs`,
-      "eval('function f () {}');",
+      "function f () {}\neval('function g () {}');",
       "utf8",
     );
   },
@@ -43,35 +43,39 @@ await runAsync(
     assertDeepEqual(classmap, [
       {
         type: "package",
-        name: "main.mjs",
-        children: [],
+        name: ".",
+        children: [
+          {
+            type: "class",
+            name: "main",
+            children: [{
+              type: "function",
+              name: "f",
+              location: "main.mjs:1",
+              static: false,
+              source: null,
+              comment: null,
+              labels: [],
+            }],
+          },
+        ],
       },
       {
         type: "package",
         name: "main.mjs",
-        children: [
-          {
-            type: "package",
-            name: "eval-1",
-            children: [
-              {
-                type: "class",
-                name: "f",
-                children: [
-                  {
-                    type: "function",
-                    name: "()",
-                    location: "main.mjs/eval-1:1",
-                    static: false,
-                    source: null,
-                    comment: null,
-                    labels: [],
-                  },
-                ],
-              },
-            ],
-          },
-        ],
+        children: [{
+          type: "class",
+          name: "eval-1",
+          children: [{
+            type: "function",
+            name: "g",
+            location: "main.mjs/eval-1:1",
+            static: false,
+            source: null,
+            comment: null,
+            labels: [],
+          }]
+        }]
       },
     ]);
   },

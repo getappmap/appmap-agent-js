@@ -1,4 +1,4 @@
-const { Set, Map, undefined, URL } = globalThis;
+const { Map, URL } = globalThis;
 
 const { search: __search } = new URL(import.meta.url);
 
@@ -31,17 +31,12 @@ export const addClassmapSource = (
   },
   { url, content, inline, exclude: exclusions, shallow },
 ) => {
-  const relative = toRelativeUrl(url, directory);
-  assert(
-    relative !== null,
-    "could not extract relative url",
-    InternalAppmapError,
-  );
   assert(!sources.has(url), "duplicate source url", InternalAppmapError);
   sources.set(
     url,
     createSource(content, {
-      relative,
+      url,
+      directory,
       placeholder,
       pruning,
       inline,
@@ -67,6 +62,15 @@ export const lookupClassmapClosure = ({ sources }, location) => {
   }
 };
 
+const registerPackageEntity = (entities, dirname) => {
+  const predicate = (entity) =>
+    entity.type === "package" && entity.name === dirname;
+  if (!entities.some(predicate)) {
+    entities.push({ type: "package", name: dirname, children: [] });
+  }
+  return entities.find(predicate).children;
+};
+
 export const compileClassmap = ({
   sources,
   configuration: {
@@ -75,50 +79,27 @@ export const compileClassmap = ({
     repository: { directory },
   },
 }) => {
-  const directories = new Set();
   const root = [];
-  if (collapse) {
-    for (const [url, source] of sources) {
-      const relative = toRelativeUrl(url, directory);
-      const entities = toSourceClassmap(source);
-      if (
-        /* c8 ignore start */ !pruning ||
-        entities.length > 0 /* c8 ignore stop */
-      ) {
+  for (const [url, source] of sources) {
+    const relative = toRelativeUrl(url, directory);
+    const entities = toSourceClassmap(source);
+    if (
+      /* c8 ignore start */ !pruning ||
+      entities.length > 0 /* c8 ignore stop */
+    ) {
+      if (collapse) {
         root.push({
           type: "package",
           name: relative,
           children: entities,
         });
-      }
-    }
-  } else {
-    for (const [url, source] of sources) {
-      const relative = toRelativeUrl(url, directory);
-      const entities = toSourceClassmap(source);
-      if (
-        /* c8 ignore start */ !pruning ||
-        entities.length > 0 /* c8 ignore stop */
-      ) {
+      } else {
         const dirnames = relative.split("/");
         dirnames.pop();
-        let children = root;
-        for (const dirname of dirnames) {
-          let child = children.find(
-            (child) => child.name === dirname && directories.has(child),
-          );
-          if (child === undefined) {
-            child = {
-              type: "package",
-              name: dirname,
-              children: [],
-            };
-            directories.add(child);
-            children.push(child);
-          }
-          ({ children } = child);
+        if (dirnames.length === 0) {
+          dirnames.push(".");
         }
-        children.push(...entities);
+        dirnames.reduce(registerPackageEntity, root).push(...entities);
       }
     }
   }

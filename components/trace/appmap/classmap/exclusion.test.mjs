@@ -3,7 +3,7 @@ import {
   assertThrow,
   assertDeepEqual,
 } from "../../../__fixture__.mjs";
-import { parse } from "./parse.mjs?env=test";
+import { parseEstree } from "./parse.mjs?env=test";
 import { digestEstreeRoot } from "./digest.mjs?env=test";
 import {
   makeClassEntity,
@@ -64,7 +64,10 @@ assertDeepEqual(
 
 assertDeepEqual(
   digestEstreeRoot(
-    parse("sript.js", "var o = {k: /* @label l1 l2 */ () => {}};"),
+    parseEstree(
+      "protocol://host/path.js",
+      "var o = {k: /* @label l1 l2 */ () => {}};",
+    ),
     default_context,
   )
     .flatMap((entity) =>

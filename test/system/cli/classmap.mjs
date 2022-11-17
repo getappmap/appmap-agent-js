@@ -24,7 +24,6 @@ await runAsync(
       http: false,
     },
     appmap_file: "basename",
-    "function-name-placeholder": "placeholder",
   },
   async (repository) => {
     await writeFileAsync(
@@ -58,7 +57,7 @@ await runAsync(
     assertDeepEqual(classmap, [
       {
         type: "package",
-        name: "main.mjs",
+        name: ".",
         children: [
           {
             type: "class",
@@ -66,7 +65,7 @@ await runAsync(
             children: [
               {
                 type: "function",
-                name: "placeholder",
+                name: "main",
                 location: "main.mjs:4",
                 static: false,
                 source: null,
@@ -75,19 +74,13 @@ await runAsync(
               },
             ],
           },
-        ],
-      },
-      {
-        type: "package",
-        name: "common.js",
-        children: [
           {
             type: "class",
             name: "common",
             children: [
               {
                 type: "function",
-                name: "placeholder",
+                name: "common",
                 location: "common.js:1",
                 static: false,
                 source: null,
@@ -96,19 +89,13 @@ await runAsync(
               },
             ],
           },
-        ],
-      },
-      {
-        type: "package",
-        name: "native.mjs",
-        children: [
           {
             type: "class",
             name: "native",
             children: [
               {
                 type: "function",
-                name: "placeholder",
+                name: "native",
                 location: "native.mjs:1",
                 static: false,
                 source: null,
@@ -116,7 +103,7 @@ await runAsync(
                 labels: [],
               },
             ],
-          },
+          }
         ],
       },
     ]);

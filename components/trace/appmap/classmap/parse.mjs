@@ -6,9 +6,7 @@ import BabelParser from "@babel/parser";
 const { InternalAppmapError } = await import(
   `../../../error/index.mjs${__search}`
 );
-const { toAbsoluteUrl, getUrlExtension } = await import(
-  `../../../url/index.mjs${__search}`
-);
+const { getUrlExtension } = await import(`../../../url/index.mjs${__search}`);
 const { assert, coalesce } = await import(`../../../util/index.mjs${__search}`);
 const { logWarning, logError } = await import(
   `../../../log/index.mjs${__search}`
@@ -56,8 +54,8 @@ export const extractCommentLabelArray = ({ value: text }) => {
   return maybe_lines === null ? [] : maybe_lines.flatMap(extractLineLabel);
 };
 
-export const parse = (relative, content) => {
-  const extension = getUrlExtension(toAbsoluteUrl(relative, "protocol://host"));
+export const parseEstree = (url, content) => {
+  const extension = getUrlExtension(url);
   let source_type = "unambiguous";
   if (extension === ".cjs" || extension === ".node") {
     source_type = "script";
@@ -75,17 +73,18 @@ export const parse = (relative, content) => {
   try {
     result = parseBabel(content, {
       plugins,
+      sourceFilename: url,
       sourceType: source_type,
       errorRecovery: true,
       attachComment: true,
     });
   } catch (error) {
-    logError("Unrecoverable parsing error at file %j >> %O", relative, error);
+    logError("Unrecoverable parsing error at file %j >> %O", url, error);
     return { type: "Program", body: [], sourceType: "script" };
   }
   const { errors, program: node } = result;
   for (const error of errors) {
-    logWarning("Recoverable parsing error at file %j >> %O", relative, error);
+    logWarning("Recoverable parsing error at file %j >> %O", url, error);
   }
   return node;
 };

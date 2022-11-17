@@ -11,7 +11,7 @@ import {
   lookupClassmapClosure,
 } from "./index.mjs?env=test";
 
-const and_exclude = {
+const default_exclusion = {
   combinator: "and",
   "qualified-name": true,
   name: true,
@@ -21,16 +21,7 @@ const and_exclude = {
   recursive: false,
 };
 
-// const or_exclude = {
-//   combinator: "or",
-//   "qualified-name": false,
-//   name: false,
-//   "every-label": false,
-//   "some-label": false,
-//   excluded: false,
-//   recursive: false,
-// };
-
+// pruning && collapse //
 {
   const classmap = createClassmap(
     extendConfiguration(
@@ -39,55 +30,18 @@ const and_exclude = {
         pruning: true,
         "collapse-package-hierachy": true,
       },
-      "protocol://host/base/",
+      "protocol://host/dummy/",
     ),
   );
 
   addClassmapSource(classmap, {
-    url: "protocol://host/home/directory/function.js",
-    content: `
-      const o = {
-        f: function (x) {},
-        g: function (y) {},
-        h: function (z) {},
-        i: function (t) {
-          function j () {}
-        }
-      };
-      const p = {};
-    `,
-    inline: false,
-    exclude: [
-      {
-        ...and_exclude,
-        "qualified-name": "^o\\.g$",
-        excluded: true,
-        recursive: false,
-      },
-      {
-        ...and_exclude,
-        "qualified-name": "^o\\.i$",
-        excluded: true,
-        recursive: true,
-      },
-      and_exclude,
-    ],
+    url: "protocol://host/home/directory/file.js",
+    content: "function f (x) {}\nfunction g (y) {}",
+    inline: true,
     shallow: true,
+    exclude: [default_exclusion],
   });
 
-  // missing estree location
-  assertEqual(
-    lookupClassmapClosure(
-      classmap,
-      makeLocation("protocol://host/home/directory/function.js", {
-        line: 0,
-        column: 0,
-      }),
-    ),
-    null,
-  );
-
-  // missing file location
   assertEqual(
     lookupClassmapClosure(
       classmap,
@@ -99,57 +53,44 @@ const and_exclude = {
     null,
   );
 
-  // function included
   assertDeepEqual(
     lookupClassmapClosure(
       classmap,
-      makeLocation("protocol://host/home/directory/function.js", {
-        line: 3,
-        column: 11,
+      makeLocation("protocol://host/home/directory/file.js", {
+        line: 1,
+        column: 0,
       }),
     ),
     {
       parameters: ["x"],
       shallow: true,
       link: {
-        defined_class: "o",
+        defined_class: "file",
         method_id: "f",
-        path: "directory/function.js",
-        lineno: 3,
+        path: "directory/file.js",
+        lineno: 1,
         static: false,
       },
     },
   );
 
-  // function excluded
-  assertDeepEqual(
-    lookupClassmapClosure(
-      classmap,
-      makeLocation("protocol://host/home/directory/function.js", {
-        line: 4,
-        column: 11,
-      }),
-    ),
-    null,
-  );
-
   assertDeepEqual(compileClassmap(classmap), [
     {
       type: "package",
-      name: "directory/function.js",
+      name: "directory/file.js",
       children: [
         {
           type: "class",
-          name: "o",
+          name: "file",
           children: [
             {
               type: "function",
               name: "f",
               comment: null,
               labels: [],
-              source: null,
+              source: "function f (x) {}",
               static: false,
-              location: "directory/function.js:3",
+              location: "directory/file.js:1",
             },
           ],
         },
@@ -158,6 +99,7 @@ const and_exclude = {
   ]);
 }
 
+// no-pruning && no-collapse && top-level file //
 {
   const classmap = createClassmap(
     extendConfiguration(
@@ -171,49 +113,53 @@ const and_exclude = {
   );
 
   addClassmapSource(classmap, {
-    url: "protocol://host/home/directory/function.js",
-    content:
-      "function f () {} /* comment1 */ \n function g () {} /* comment2 */ /* comment3 */ \n function h () {}",
-    inline: true,
-    exclude: [and_exclude],
+    url: "protocol://host/home/file1.js",
+    content: "function f (x) {}",
+    inline: false,
+    exclude: [default_exclusion],
+    shallow: false,
+  });
+
+  addClassmapSource(classmap, {
+    url: "protocol://host/home/file2.js",
+    content: "function g (x) {}",
+    inline: false,
+    exclude: [default_exclusion],
     shallow: false,
   });
 
   assertDeepEqual(compileClassmap(classmap), [
     {
       type: "package",
-      name: "directory",
+      name: ".",
       children: [
         {
           type: "class",
-          name: "function",
+          name: "file1",
           children: [
             {
               type: "function",
               name: "f",
               comment: null,
               labels: [],
-              source: "function f () {}",
+              source: null,
               static: false,
-              location: "directory/function.js:1",
+              location: "file1.js:1",
             },
+          ],
+        },
+        {
+          type: "class",
+          name: "file2",
+          children: [
             {
               type: "function",
               name: "g",
-              comment: "/* comment1 */",
+              comment: null,
               labels: [],
-              source: "function g () {}",
+              source: null,
               static: false,
-              location: "directory/function.js:2",
-            },
-            {
-              type: "function",
-              name: "h",
-              comment: "/* comment2 */\n/* comment3 */",
-              labels: [],
-              source: "function h () {}",
-              static: false,
-              location: "directory/function.js:3",
+              location: "file2.js:1",
             },
           ],
         },

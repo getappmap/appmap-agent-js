@@ -2,7 +2,15 @@ const { URL, Map, Set, String } = globalThis;
 
 const { search: __search } = new URL(import.meta.url);
 
-const { parse } = await import(`./parse.mjs${__search}`);
+const { assert } = await import(`../../../util/index.mjs${__search}`);
+const { toRelativeUrl } = await import(`../../../url/index.mjs${__search}`);
+const { ExternalAppmapError } = await import(
+  `../../../error/index.mjs${__search}`
+);
+const { logInfoWhen, logErrorWhen } = await import(
+  `../../../log/index.mjs${__search}`
+);
+const { parseEstree } = await import(`./parse.mjs${__search}`);
 const { lookupEstreePath } = await import(`./lookup.mjs${__search}`);
 const {
   wrapRootEntityArray,
@@ -19,11 +27,28 @@ const hashPosition = ({ line, column }) => `${String(line)}:${String(column)}`;
 
 export const createSource = (
   content,
-  { relative, inline, exclusions, shallow, pruning },
+  { url, directory, inline, exclusions, shallow, pruning },
 ) => {
-  const estree = parse(relative, content);
+  const relative = toRelativeUrl(url, directory);
+  assert(
+    !logErrorWhen(
+      relative === null,
+      "Could not express %j relatively to %j",
+      url,
+      directory,
+    ),
+    "Incompatible source url with cwd",
+    ExternalAppmapError,
+  );
+  const estree = parseEstree(url, content);
   const getExclusion = compileExclusionArray(exclusions);
-  const context = { relative, inline, shallow, content };
+  const context = {
+    anonymous: "anonymous",
+    relative,
+    inline,
+    shallow,
+    content,
+  };
   const entities = wrapRootEntityArray(
     digestEstreeRoot(estree, context).flatMap((entity) =>
       excludeEntity(entity, null, getExclusion),
@@ -48,6 +73,12 @@ const lookupCache = (position, estree, paths) => {
     return paths.get(hashed_position);
   } else {
     const maybe_path = lookupEstreePath(estree, isFunctionEstree, position);
+    logInfoWhen(
+      maybe_path === null,
+      "Could not find a function in %j at %j, will treat it as excluded.",
+      estree.loc.filename,
+      position,
+    );
     paths.set(hashed_position, maybe_path);
     return maybe_path;
   }

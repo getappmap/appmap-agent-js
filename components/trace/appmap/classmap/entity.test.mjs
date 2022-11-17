@@ -2,7 +2,7 @@ const { Map, Set } = globalThis;
 
 import { assertEqual, assertDeepEqual } from "../../../__fixture__.mjs";
 
-import { parse } from "./parse.mjs?env=test";
+import { parseEstree } from "./parse.mjs?env=test";
 
 import {
   wrapRootEntityArray,
@@ -38,7 +38,7 @@ const default_context = {
     wrapRootEntityArray(
       [
         makeFunctionEntity(
-          parse("filename.js", content).body[0],
+          parseEstree("protocol://host/path.js", content).body[0],
           "reference",
           "f",
           [],
@@ -98,7 +98,7 @@ assertEqual(
   assertDeepEqual(
     getEntityLabelArray(
       makeFunctionEntity(
-        parse("filename.js", content).body[0],
+        parseEstree("protocol://host/path.js", content).body[0],
         "reference",
         null,
         [],
@@ -126,7 +126,7 @@ assertEqual(
 {
   const content = "function f () {}";
   const entity = makeFunctionEntity(
-    parse("filename.js", content).body[0],
+    parseEstree("protocol://host/path.js", content).body[0],
     "reference",
     "f",
     [],
@@ -138,7 +138,7 @@ assertEqual(
 {
   const content = "function f () {}";
   const entity = makeFunctionEntity(
-    parse("filename.js", content).body[0],
+    parseEstree("protocol://host/path.js", content).body[0],
     "reference",
     "f",
     [],
@@ -213,7 +213,7 @@ assertEqual(
     "c",
     [
       makeFunctionEntity(
-        parse("filename.js", content).body[0],
+        parseEstree("protocol://host/path.js", content).body[0],
         "reference",
         "f",
         [],
@@ -249,7 +249,7 @@ assertEqual(
 {
   const content = "function f () {}";
   const entity = makeFunctionEntity(
-    parse("filename.js", content).body[0],
+    parseEstree("protocol://host/path.js", content).body[0],
     "reference",
     "f",
     [],
@@ -283,7 +283,7 @@ assertEqual(
     "c",
     [
       makeFunctionEntity(
-        parse("filename.js", content).body[0],
+        parseEstree("protocol://host/path.js", content).body[0],
         "reference",
         "f",
         [],
@@ -327,7 +327,7 @@ assertDeepEqual(
   assertDeepEqual(
     toClassmapEntity(
       makeFunctionEntity(
-        parse("filename.js", content).body[0],
+        parseEstree("protocol://host/path.js", content).body[0],
         "reference",
         "f",
         [makeClassEntity("c", [], default_context)],
@@ -358,7 +358,7 @@ assertDeepEqual(
   assertDeepEqual(
     toClassmapEntity(
       makeFunctionEntity(
-        parse("filename.js", content).body[0],
+        parseEstree("protocol://host/path.js", content).body[0],
         "reference",
         "f",
         [],

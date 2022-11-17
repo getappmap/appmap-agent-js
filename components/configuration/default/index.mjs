@@ -27,8 +27,6 @@ const HOOK_APPLY_GLOBAL = "APPMAP_HOOK_APPLY";
 
 const HOOK_EVAL_GLOBAL = "APPMAP_HOOK_EVAL";
 
-const ANONYMOUS_NAME_SEPARATOR = "-";
-
 const EXPECTED_EXTRA_PROPERTIES = ["test_recording"];
 
 const resolveUrl = (url, base) => new URL(url, base).href;
@@ -365,10 +363,6 @@ const fields = {
     extend: overwrite,
     normalize: identity,
   },
-  "function-name-placeholder": {
-    extend: overwrite,
-    normalize: identity,
-  },
   "collapse-package-hierachy": {
     extend: overwrite,
     normalize: identity,
@@ -520,7 +514,6 @@ export const createConfiguration = (home) => ({
     pg: true,
   },
   ordering: "causal",
-  "function-name-placeholder": "()",
   "collapse-package-hierachy": false,
   serialization: {
     "maximum-print-length": 100,
@@ -539,7 +532,6 @@ export const createConfiguration = (home) => ({
     "inline-source": null,
   },
   packages: [],
-  "anonymous-name-separator": ANONYMOUS_NAME_SEPARATOR,
   exclude: [
     {
       combinator: "or",

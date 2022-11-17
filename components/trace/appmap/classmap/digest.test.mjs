@@ -1,10 +1,10 @@
 import { assertDeepEqual } from "../../../__fixture__.mjs";
-import { parse } from "./parse.mjs?env=test";
+import { parseEstree } from "./parse.mjs?env=test";
 import { getEntitySummary } from "./entity.mjs?env=test";
 import { digestEstreeRoot } from "./digest.mjs?env=test";
 
 const digest = (content, anonymous = "dummy") =>
-  digestEstreeRoot(parse("filename.mjs", content), {
+  digestEstreeRoot(parseEstree("protocol://host/path.mjs", content), {
     inline: false,
     shallow: false,
     content: "",

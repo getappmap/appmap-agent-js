@@ -16,7 +16,8 @@ const source = createSource(
     pruning: true,
     inline: true,
     shallow: true,
-    relative: "dirname/basename.extname",
+    directory: "protocol://host/home/",
+    url: "protocol://host/home/dirname/basename.js",
     exclusions: [
       {
         combinator: "or",
@@ -48,7 +49,7 @@ const source = createSource(
     link: {
       defined_class: "basename",
       method_id: "f",
-      path: "dirname/basename.extname",
+      path: "dirname/basename.js",
       lineno: 2,
       static: false,
     },
@@ -81,7 +82,7 @@ assertDeepEqual(toSourceClassmap(source), [
       {
         type: "function",
         name: "f",
-        location: "dirname/basename.extname:2",
+        location: "dirname/basename.js:2",
         static: false,
         source: "function f (x) {}",
         comment: null,
