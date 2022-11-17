@@ -1,87 +1,71 @@
 const {
-  Error,
-  Map,
-  RegExp,
-  Array: { from: toArray },
   URL,
+  RegExp,
+  Object: { entries: toEntries },
 } = globalThis;
 
 const { search: __search } = new URL(import.meta.url);
 
-const { generateGet } = await import(`../../../util/index.mjs${__search}`);
+const { InternalAppmapError } = await import(
+  `../../../error/index.mjs${__search}`
+);
+const { getEntityName, getEntityQualifiedName, getEntityLabelArray } =
+  await import(`./entity.mjs${__search}`);
 
-const cache = new Map();
-
-const getQualifiedName = (entity, parent) => {
-  if (entity.type === "class") {
-    return entity.name;
-  }
-  if (entity.type === "function") {
-    if (parent === null || parent.type === "function") {
-      return entity.name;
-    }
-    if (parent.type === "class") {
-      return `${parent.name}${entity.static ? "#" : "."}${entity.name}`;
-    }
-    throw new Error("getName called on invalid parent entity");
-  }
-  throw new Error("getName called on invalid entity");
+const compileCriterion = ([name, pattern]) => {
+  if (typeof pattern === "boolean") {
+    return (_entity, _parent) => pattern;
+  } else if (typeof pattern === "string") {
+    const regexp = new RegExp(pattern, "u");
+    const predicate = (string) => regexp.test(string);
+    if (name === "name") {
+      return (entity, _maybe_parent_entity) => predicate(getEntityName(entity));
+    } else if (name === "qualified-name") {
+      return (entity, maybe_parent_entity) =>
+        predicate(getEntityQualifiedName(entity, maybe_parent_entity));
+    } else if (name === "some-label") {
+      return (entity, _maybe_parent_entity) =>
+        getEntityLabelArray(entity).some(predicate);
+    } else if (name === "every-label") {
+      return (entity, _maybe_parent_entity) =>
+        getEntityLabelArray(entity).every(predicate);
+    } /* c8 ignore start */ else {
+      throw new InternalAppmapError("invalid criterion name");
+    } /* c8 ignore stop */
+  } /* c8 ignore start */ else {
+    throw new InternalAppmapError("invalid criterion pattern type");
+  } /* c8 ignore stop */
 };
 
-const criteria = new Map([
-  ["name", (pattern, { name }, _parent) => cache.get(pattern)(name)],
-  [
-    "qualified-name",
-    (pattern, entity, parent) =>
-      cache.get(pattern)(getQualifiedName(entity, parent)),
-  ],
-  [
-    "some-label",
-    (pattern, { type, labels }, _parent) =>
-      type !== "function" || labels.some(cache.get(pattern)),
-  ],
-  [
-    "every-label",
-    (pattern, { type, labels }, _parent) =>
-      type !== "function" || labels.every(cache.get(pattern)),
-  ],
-]);
+const compileCriteria = (combinator, criteria) => {
+  const predicates = toEntries(criteria).map(compileCriterion);
+  if (combinator === "and") {
+    return (entity, maybe_parent_entity) =>
+      predicates.every((predicate) => predicate(entity, maybe_parent_entity));
+  } else if (combinator === "or") {
+    return (entity, maybe_parent_entity) =>
+      predicates.some((predicate) => predicate(entity, maybe_parent_entity));
+  } /* c8 ignore start */ else {
+    throw new InternalAppmapError("invalid exclusion combinator");
+  } /* c8 ignore stop */
+};
 
-const criteria_name_array = toArray(criteria.keys());
+const compileExclusion = ({ combinator, excluded, recursive, ...criteria }) => {
+  const predicate = compileCriteria(combinator, criteria);
+  const exclusion = { excluded, recursive };
+  return (entity, maybe_parent_entity) =>
+    predicate(entity, maybe_parent_entity) ? exclusion : null;
+};
 
-export const compileExclusion = (exclusion) => {
-  for (const name of criteria_name_array) {
-    const pattern = exclusion[name];
-    if (typeof pattern === "string") {
-      if (!cache.has(pattern)) {
-        const regexp = new RegExp(pattern, "u");
-        cache.set(pattern, (target) => regexp.test(target));
+export const compileExclusionArray = (exclusions) => {
+  const closures = exclusions.map(compileExclusion);
+  return (entity, maybe_parent_entity) => {
+    for (const closure of closures) {
+      const maybe_exclusion = closure(entity, maybe_parent_entity);
+      if (maybe_exclusion !== null) {
+        return maybe_exclusion;
       }
     }
-  }
-  return exclusion;
-};
-
-export const isExclusionMatched = (exclusion, entity, parent) => {
-  const isCriterionSatisfied = (name) => {
-    const pattern = exclusion[name];
-    if (typeof pattern === "boolean") {
-      return pattern;
-    }
-    if (typeof pattern === "string") {
-      return criteria.get(name)(pattern, entity, parent);
-    }
-    throw new Error("invalid pattern type");
+    throw new InternalAppmapError("missing matching exclusion");
   };
-  if (exclusion.combinator === "and") {
-    return criteria_name_array.every(isCriterionSatisfied);
-  }
-  if (exclusion.combinator === "or") {
-    return criteria_name_array.some(isCriterionSatisfied);
-  }
-  throw new Error("invalid exclusion combinator");
 };
-
-export const isExcluded = generateGet("excluded");
-
-export const isRecursivelyExclued = generateGet("recursive");

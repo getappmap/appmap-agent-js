@@ -62,7 +62,7 @@ const default_external_configuration = {
   exclude: [
     {
       combinator: "and",
-      name: "-",
+      name: "^\\[anonymous\\]$",
       "every-label": "^\\b$",
       excluded: true,
       recursive: false,

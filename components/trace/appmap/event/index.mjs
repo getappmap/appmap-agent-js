@@ -8,7 +8,9 @@ const { InternalAppmapError } = await import(
 const { mapMaybe, createCounter, incrementCounter } = await import(
   `../../../util/index.mjs${__search}`
 );
-const { getClassmapClosure } = await import(`../classmap/index.mjs${__search}`);
+const { lookupClassmapClosure } = await import(
+  `../classmap/index.mjs${__search}`
+);
 const { digestPayload } = await import(`./payload.mjs${__search}`);
 
 const digestEventPair = (event1, event2, id1, id2, info) => [
@@ -30,7 +32,8 @@ const digestEventPair = (event1, event2, id1, id2, info) => [
 
 export const digestEventTrace = (root, classmap) => {
   const counter = createCounter(0);
-  const getClosureInfo = (location) => getClassmapClosure(classmap, location);
+  const getClosureInfo = (location) =>
+    lookupClassmapClosure(classmap, location);
   /* eslint-disable no-use-before-define */
   const digestTransparentBundle = ({ children }, _info) =>
     children.flatMap(loop);

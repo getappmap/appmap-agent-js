@@ -1,8 +1,16 @@
-import { assertEqual, assertThrow } from "../../../__fixture__.mjs";
-import { compileExclusion, isExclusionMatched } from "./exclusion.mjs?env=test";
-
-const testExclusion = (exclusion, entity, parent) =>
-  isExclusionMatched(compileExclusion(exclusion), entity, parent);
+import {
+  // assertEqual,
+  assertThrow,
+  assertDeepEqual,
+} from "../../../__fixture__.mjs";
+import { parseEstree } from "./parse.mjs?env=test";
+import { digestEstreeRoot } from "./digest.mjs?env=test";
+import {
+  makeClassEntity,
+  excludeEntity,
+  getEntitySummary,
+} from "./entity.mjs?env=test";
+import { compileExclusionArray } from "./exclusion.mjs?env=test";
 
 const or_exclusion = {
   combinator: "or",
@@ -24,182 +32,66 @@ const and_exclusion = {
   recursive: true,
 };
 
-// Invalid //
+const default_context = {
+  relative: "script.js",
+  content: "",
+  anonymous: "anonymous",
+  inline: false,
+  shallow: false,
+};
 
-assertThrow(() => {
-  testExclusion(
-    {
-      ...and_exclusion,
-      "qualified-name": 123,
-    },
-    { type: "function" },
-    null,
-  );
-});
-
-assertThrow(() => {
-  testExclusion(
-    {
-      ...and_exclusion,
-      combinator: "invalid-combinator",
-    },
-    { type: "function" },
-    null,
-  );
-});
-
-assertThrow(() => {
-  testExclusion(
-    {
-      ...and_exclusion,
-      "qualified-name": "foo",
-    },
-    { type: "invalid-entity-type" },
-    null,
-  );
-});
-
-assertThrow(() => {
-  testExclusion(
-    {
-      ...and_exclusion,
-      "qualified-name": "foo",
-    },
-    { type: "function" },
-    { type: "invalid-entity-type" },
-  );
-});
-
-// Class (Qualified) Name //
-
-assertEqual(
-  testExclusion(
-    {
-      ...and_exclusion,
-      "qualified-name": "foo",
-      name: "foo",
-    },
-    { type: "class", name: "foo" },
-    null,
-  ),
-  true,
+assertThrow(
+  () => compileExclusionArray([])(makeClassEntity("c", [], default_context)),
+  "InternalAppmapError: missing matching exclusion",
 );
 
-assertEqual(
-  testExclusion(
-    {
-      ...and_exclusion,
-      "qualified-name": "foo",
-      name: "foo",
-    },
-    { type: "class", name: "foo" },
-    null,
-  ),
-  true,
-);
-
-assertEqual(
-  testExclusion(
+assertDeepEqual(
+  compileExclusionArray([
     {
       ...or_exclusion,
-      "qualified-name": "foo",
-      name: "foo",
+      name: true,
+      excluded: true,
+      recursive: true,
     },
-    { type: "class", name: "bar" },
-    null,
-  ),
-  false,
-);
-
-// Function (Qualified) Name //
-
-assertEqual(
-  testExclusion(
     {
       ...and_exclusion,
-      "qualified-name": "foo",
-      name: "foo",
+      excluded: false,
+      recursive: false,
     },
-    { type: "function", static: true, name: "foo" },
-    null,
-  ),
-  true,
+  ])(makeClassEntity("c", [], default_context), null),
+  { excluded: true, recursive: true },
 );
 
-assertEqual(
-  testExclusion(
-    {
-      ...and_exclusion,
-      "qualified-name": "foo#bar",
-      name: "bar",
-    },
-    { type: "function", static: true, name: "bar" },
-    { type: "class", name: "foo" },
-  ),
-  true,
-);
-
-assertEqual(
-  testExclusion(
-    {
-      ...and_exclusion,
-      "qualified-name": "foo\\.bar",
-      name: "bar",
-    },
-    { type: "function", static: false, name: "bar" },
-    { type: "class", name: "foo" },
-  ),
-  true,
-);
-
-// Function Every Labels //
-
-assertEqual(
-  testExclusion(
-    {
-      ...and_exclusion,
-      "every-label": "^foo",
-    },
-    { type: "function", static: false, name: "bar", labels: ["foo", "foobar"] },
-    { type: "class", name: "qux" },
-  ),
-  true,
-);
-
-assertEqual(
-  testExclusion(
-    {
-      ...and_exclusion,
-      "every-label": "^foo",
-    },
-    { type: "function", static: false, name: "bar", labels: ["foo", "barfoo"] },
-    { type: "class", name: "qux" },
-  ),
-  false,
-);
-
-// Function Some Labels //
-
-assertEqual(
-  testExclusion(
-    {
-      ...and_exclusion,
-      "some-label": "^foo",
-    },
-    { type: "function", static: false, name: "bar", labels: ["foo", "barfoo"] },
-    { type: "class", name: "qux" },
-  ),
-  true,
-);
-
-assertEqual(
-  testExclusion(
-    {
-      ...and_exclusion,
-      "some-label": "^foo",
-    },
-    { type: "function", static: false, name: "bar", labels: ["bar", "barfoo"] },
-    { type: "class", name: "qux" },
-  ),
-  false,
+assertDeepEqual(
+  digestEstreeRoot(
+    parseEstree(
+      "protocol://host/path.js",
+      "var o = {k: /* @label l1 l2 */ () => {}};",
+    ),
+    default_context,
+  )
+    .flatMap((entity) =>
+      excludeEntity(
+        entity,
+        null,
+        compileExclusionArray([
+          {
+            ...and_exclusion,
+            excluded: true,
+            recursive: true,
+            name: "^k$",
+            "some-label": "^l1$",
+            "every-label": "^l",
+            "qualified-name": "^o.k$",
+          },
+          {
+            ...and_exclusion,
+            excluded: false,
+            recursive: false,
+          },
+        ]),
+      ),
+    )
+    .map(getEntitySummary),
+  [{ type: "class", name: "o", children: [] }],
 );

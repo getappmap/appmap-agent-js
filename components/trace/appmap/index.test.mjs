@@ -48,7 +48,7 @@ assertDeepEqual(
     },
     {
       type: "source",
-      url: "protocol://host/home/filename.js",
+      url: "protocol://host/home/dirname/filename.js",
       content: "function f (x) {}",
       shallow: false,
       exclude: [
@@ -180,16 +180,16 @@ assertDeepEqual(
       classMap: [
         {
           type: "package",
-          name: "filename.js",
+          name: "dirname",
           children: [
             {
               type: "class",
-              name: "f",
+              name: "filename",
               children: [
                 {
                   type: "function",
-                  name: "$",
-                  location: "filename.js:1",
+                  name: "f",
+                  location: "dirname/filename.js:1",
                   static: false,
                   labels: [],
                   comment: null,
@@ -205,9 +205,9 @@ assertDeepEqual(
           id: 1,
           event: "call",
           thread_id: 0,
-          defined_class: "f",
-          method_id: "$",
-          path: "filename.js",
+          defined_class: "filename",
+          method_id: "f",
+          path: "dirname/filename.js",
           lineno: 1,
           static: false,
           receiver: {
@@ -229,9 +229,9 @@ assertDeepEqual(
           id: 2,
           event: "call",
           thread_id: 0,
-          defined_class: "f",
-          method_id: "$",
-          path: "filename.js",
+          defined_class: "filename",
+          method_id: "f",
+          path: "dirname/filename.js",
           lineno: 1,
           static: false,
           receiver: {
