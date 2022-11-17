@@ -119,10 +119,6 @@ properties:
           $ref: module-specifier
   exclude:
     $ref: exclude
-  anonymous-name-separator:
-    $ref: separator
-  function-name-placeholder:
-    type: string
   collapse-package-hierachy:
     type: boolean
   recording:

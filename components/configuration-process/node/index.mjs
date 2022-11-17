@@ -58,7 +58,6 @@ const default_external_configuration = {
   "default-package": {
     enabled: true,
   },
-  "anonymous-name-separator": "-",
   exclude: [
     {
       combinator: "and",

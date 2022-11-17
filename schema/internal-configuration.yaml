@@ -1,6 +1,6 @@
 type: object
 additionalProperties: false
-minProperties: 42
+minProperties: 40
 properties:
   socket:
     $ref: socket
