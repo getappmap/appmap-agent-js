@@ -48,34 +48,40 @@ await runAsync(
           {
             type: "class",
             name: "main",
-            children: [{
-              type: "function",
-              name: "f",
-              location: "main.mjs:1",
-              static: false,
-              source: null,
-              comment: null,
-              labels: [],
-            }],
+            children: [
+              {
+                type: "function",
+                name: "f",
+                location: "main.mjs:1",
+                static: false,
+                source: null,
+                comment: null,
+                labels: [],
+              },
+            ],
           },
         ],
       },
       {
         type: "package",
         name: "main.mjs",
-        children: [{
-          type: "class",
-          name: "eval-1",
-          children: [{
-            type: "function",
-            name: "g",
-            location: "main.mjs/eval-1:1",
-            static: false,
-            source: null,
-            comment: null,
-            labels: [],
-          }]
-        }]
+        children: [
+          {
+            type: "class",
+            name: "eval-1",
+            children: [
+              {
+                type: "function",
+                name: "g",
+                location: "main.mjs/eval-1:1",
+                static: false,
+                source: null,
+                comment: null,
+                labels: [],
+              },
+            ],
+          },
+        ],
       },
     ]);
   },

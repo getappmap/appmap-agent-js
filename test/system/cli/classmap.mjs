@@ -103,7 +103,7 @@ await runAsync(
                 labels: [],
               },
             ],
-          }
+          },
         ],
       },
     ]);
