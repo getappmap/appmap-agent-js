@@ -35,6 +35,10 @@ const generateReadFile = (readFile) => (url) => {
       return decodeURIComponent(body);
     }
   } else {
+    // This file is meant to be used at the same
+    //   abstraction level as a node library.
+    // Hence, this is delibearately left as an unknown error.
+    // ie: not an External/Internal AppmapError.
     throw new Error("unsupported protocol");
   }
 };

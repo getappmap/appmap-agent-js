@@ -1,13 +1,16 @@
-const { URL, Error } = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
-
 // Rearrenge the event trace into an array of trees.
 // These trees are made by bookkeeping a stack:
 //   - begin/after events trigger a push
 //   - end/before events trigger a pop
 // Missing events at the beginning or at the end of the trace are manufactured to complete the first and last tree.
 
+const { URL } = globalThis;
+
+const { search: __search } = new URL(import.meta.url);
+
+const { InternalAppmapError } = await import(
+  `../../../error/index.mjs${__search}`
+);
 const { createCounter, incrementCounter } = await import(
   `../../../util/index.mjs${__search}`
 );
@@ -61,7 +64,7 @@ export const stackify = (events) => {
         ];
       }
     } /* c8 ignore start */ else {
-      throw new Error("invalid event site");
+      throw new InternalAppmapError("invalid event site");
     } /* c8 ignore stop */
   }
   while (stack.length > 0) {

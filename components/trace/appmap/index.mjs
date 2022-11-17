@@ -1,6 +1,5 @@
 const {
   URL,
-  Error,
   Set,
   Map,
   Array: { from: toArray },
@@ -11,7 +10,7 @@ const {
 
 const { search: __search } = new URL(import.meta.url);
 
-const { ExternalAppmapError } = await import(
+const { InternalAppmapError, ExternalAppmapError } = await import(
   `../../error/index.mjs${__search}`
 );
 const { hasOwnProperty } = await import(`../../util/index.mjs${__search}`);
@@ -132,7 +131,7 @@ export const compileTrace = (configuration, messages) => {
         }
       }
     } /* c8 ignore start */ else {
-      throw new Error("invalid message type");
+      throw new InternalAppmapError("invalid message type");
     } /* c8 ignore stop */
   }
   const classmap = createClassmap(configuration);

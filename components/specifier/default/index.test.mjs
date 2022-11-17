@@ -5,7 +5,7 @@ import { createSpecifier, matchSpecifier } from "./index.mjs?env=test";
 
 assertThrow(
   () => createSpecifier({}, "protocol://host/base/"),
-  /^Error: invalid specifier options/u,
+  /^InternalAppmapError: invalid specifier options/u,
 );
 
 ////////////
