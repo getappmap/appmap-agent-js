@@ -51,7 +51,7 @@ const default_external_configuration = {
       enabled: false,
     },
     {
-      glob: "../**/*",
+      regexp: "^../",
       enabled: false,
     },
   ],
