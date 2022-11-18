@@ -9,9 +9,10 @@ import { decode as decodeVlq } from "vlq";
 const { InternalAppmapError, ExternalAppmapError } = await import(
   `../../error/index.mjs${__search}`
 );
-const { toAbsoluteUrl } = await import(`../../url/index.mjs${__search}`);
+const { toDirectoryUrl, toAbsoluteUrl } = await import(
+  `../../url/index.mjs${__search}`
+);
 const { logInfo, logError } = await import(`../../log/index.mjs${__search}`);
-const { identity } = await import(`../../util/index.mjs${__search}`);
 const { makeLocation } = await import(`../../location/index.mjs${__search}`);
 const { validateSourceMap } = await import(
   `../../validate/index.mjs${__search}`
@@ -70,8 +71,8 @@ export const createSourceMap = ({ url: base, content }) => {
   const payload = parseSourceMap(content, base);
   validateSourceMap(payload);
   const {
-    sourceRoot: head,
-    sources: urls,
+    sourceRoot: root,
+    sources: relatives,
     contents,
     mappings,
   } = {
@@ -79,12 +80,15 @@ export const createSourceMap = ({ url: base, content }) => {
     contents: null,
     ...payload,
   };
+  const root_base =
+    root === null || root === ""
+      ? base
+      : toDirectoryUrl(toAbsoluteUrl(root, base));
   return {
     type: "normal",
     base,
-    sources: urls
-      .map(head === null ? identity : (body) => `${head}${body}`)
-      .map((relative) => toAbsoluteUrl(relative, base))
+    sources: relatives
+      .map((relative) => toAbsoluteUrl(relative, root_base))
       .map(
         contents === null
           ? (url) => ({ url, content: null })

@@ -126,7 +126,7 @@ assertDeepEqual(
       url: "http://host/directory/map.json",
       content: stringifyJSON({
         version: 3,
-        sourceRoot: "root/",
+        sourceRoot: "root",
         sources: ["source1.js", "source2.js"],
         contents: ["123;"],
         names: [],
