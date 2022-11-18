@@ -93,6 +93,14 @@ await testAsync(
       },
       {
         type: "source",
+        url: "protocol://host/",
+        content: null,
+        shallow: false,
+        inline: false,
+        exclude: [],
+      },
+      {
+        type: "source",
         url: new URL(filename, base).href,
         content: null,
         shallow: false,

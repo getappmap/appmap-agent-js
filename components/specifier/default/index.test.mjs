@@ -56,13 +56,12 @@ assertThrow(
   /^ExternalAppmapError: Failed to compile specifier regexp$/u,
 );
 
-assertThrow(
-  () =>
-    matchSpecifier(
-      createSpecifier({ regexp: "^" }, "protocol://host1/base/"),
-      "protocol://host2/base/file.ext",
-    ),
-  /^ExternalAppmapError: Incompatible specifier with url$/u,
+assertEqual(
+  matchSpecifier(
+    createSpecifier({ regexp: "^" }, "protocol://host1/base/"),
+    "protocol://host2/base/file.ext",
+  ),
+  false,
 );
 
 //////////

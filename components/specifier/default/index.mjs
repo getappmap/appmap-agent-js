@@ -6,9 +6,7 @@ import Minimatch from "minimatch";
 const { ExternalAppmapError } = await import(
   `../../error/index.mjs${__search}`
 );
-const { logError, logDebug, logErrorWhen } = await import(
-  `../../log/index.mjs${__search}`
-);
+const { logError, logDebug } = await import(`../../log/index.mjs${__search}`);
 const { InternalAppmapError } = await import(
   `../../error/index.mjs${__search}`
 );
@@ -126,25 +124,25 @@ const escapeSegment = (segment) => segment.replace(/[/#?]/gu, escapeCharacter);
 export const matchSpecifier = (specifier, url) => {
   const { base, source, flags } = specifier;
   const relative = toRelativeUrl(url, base, escapeSegment);
-  assert(
-    !logErrorWhen(
-      relative === null,
-      "Could not express %j relatively to %j",
+  if (relative === null) {
+    logDebug(
+      "could not apply specifier %j because %j cannot be expressed relatively to %j, will treat it as unmatched",
+      source,
       url,
       base,
-    ),
-    "Incompatible specifier with url",
-    ExternalAppmapError,
-  );
-  const matched = makeRegExpCache(source, flags).test(relative);
-  logDebug(
-    "url %j which resolves to %j relatively to %j %s regexp specifier %j with flags %j",
-    url,
-    relative,
-    base,
-    matched ? "matched" : "did not match",
-    source,
-    flags,
-  );
-  return matched;
+    );
+    return false;
+  } else {
+    const matched = makeRegExpCache(source, flags).test(relative);
+    logDebug(
+      "url %j which resolves to %j relatively to %j %s regexp specifier %j with flags %j",
+      url,
+      relative,
+      base,
+      matched ? "matched" : "did not match",
+      source,
+      flags,
+    );
+    return matched;
+  }
 };

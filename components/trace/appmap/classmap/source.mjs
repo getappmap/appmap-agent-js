@@ -2,12 +2,8 @@ const { URL, Map, Set, String } = globalThis;
 
 const { search: __search } = new URL(import.meta.url);
 
-const { assert } = await import(`../../../util/index.mjs${__search}`);
 const { toRelativeUrl } = await import(`../../../url/index.mjs${__search}`);
-const { ExternalAppmapError } = await import(
-  `../../../error/index.mjs${__search}`
-);
-const { logInfoWhen, logErrorWhen } = await import(
+const { logInfoWhen, logWarning } = await import(
   `../../../log/index.mjs${__search}`
 );
 const { parseEstree } = await import(`./parse.mjs${__search}`);
@@ -29,17 +25,20 @@ export const createSource = (
   content,
   { url, directory, inline, exclusions, shallow, pruning },
 ) => {
-  const relative = toRelativeUrl(url, directory);
-  assert(
-    !logErrorWhen(
-      relative === null,
-      "Could not express %j relatively to %j",
+  if (content === null) {
+    logWarning("Will treat %j as empty because it could not be loaded", url);
+    content = "";
+  }
+  let relative = toRelativeUrl(url, directory);
+  if (relative === null) {
+    logWarning(
+      "Will treat %j as empty because it could not be expressed relatively to %j",
       url,
       directory,
-    ),
-    "Incompatible source url with cwd",
-    ExternalAppmapError,
-  );
+    );
+    content = "";
+    relative = "dummy/relative/path";
+  }
   const estree = parseEstree(url, content);
   const getExclusion = compileExclusionArray(exclusions);
   const context = {
