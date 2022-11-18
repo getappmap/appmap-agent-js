@@ -1,4 +1,4 @@
-const { URL } = globalThis;
+const { undefined, URL } = globalThis;
 
 const { search: __search } = new URL(import.meta.url);
 
@@ -20,7 +20,7 @@ const makeClient = (agent) => {
       package: {
         name: "@appland/appmap-agent-js",
         version: "???",
-        homepage: null,
+        url: undefined,
       },
     };
   }
@@ -101,6 +101,7 @@ const makeException = (errors) => {
   }
 };
 
+/* c8 ignore start */
 export const compileMetadata = (
   {
     name: app_name,
@@ -119,19 +120,20 @@ export const compileMetadata = (
   errors,
   status,
 ) => ({
-  name: makeMapName(map_name, file_name, main),
-  app: makeAppName(app_name, repository),
-  labels,
+  name: makeMapName(map_name, file_name, main) ?? undefined,
+  app: makeAppName(app_name, repository) ?? undefined,
+  labels: labels ?? undefined,
   language: {
     name: language,
     version: "ES.Next",
-    engine,
+    engine: engine ?? undefined,
   },
-  frameworks,
+  frameworks: frameworks ?? undefined,
   client: makeClient(agent),
   recorder: makeRecorder(recorder),
-  recording: makeRecording(recording),
-  git: makeGit(repository),
-  test_status: makeTestStatus(errors, status),
-  exception: makeException(errors),
+  recording: makeRecording(recording) ?? undefined,
+  git: makeGit(repository) ?? undefined,
+  test_status: makeTestStatus(errors, status) ?? undefined,
+  exception: makeException(errors) ?? undefined,
 });
+/* c8 ignore stop */

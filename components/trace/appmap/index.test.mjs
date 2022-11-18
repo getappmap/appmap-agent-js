@@ -1,3 +1,5 @@
+const { undefined } = globalThis;
+
 import { assertDeepEqual } from "../../__fixture__.mjs";
 import {
   createConfiguration,
@@ -154,13 +156,13 @@ assertDeepEqual(
     body: {
       version: "1.8.0",
       metadata: {
-        name: null,
+        name: undefined,
         app: "NAME",
         labels: [],
         language: {
           name: "javascript",
           version: "ES.Next",
-          engine: null,
+          engine: undefined,
         },
         frameworks: [],
         client: {
@@ -169,8 +171,8 @@ assertDeepEqual(
           version: "1.2.3",
         },
         recorder: { name: "process" },
-        recording: null,
-        git: null,
+        recording: undefined,
+        git: undefined,
         test_status: "failed",
         exception: {
           class: "name",
@@ -213,14 +215,14 @@ assertDeepEqual(
           receiver: {
             name: "this",
             class: "string",
-            object_id: null,
+            object_id: undefined,
             value: "this-print-1",
           },
           parameters: [
             {
               name: "x",
               class: "string",
-              object_id: null,
+              object_id: undefined,
               value: "arg-print-1",
             },
           ],
@@ -237,14 +239,14 @@ assertDeepEqual(
           receiver: {
             name: "this",
             class: "string",
-            object_id: null,
+            object_id: undefined,
             value: "this-print-2",
           },
           parameters: [
             {
               name: "x",
               class: "string",
-              object_id: null,
+              object_id: undefined,
               value: "arg-print-2",
             },
           ],
@@ -258,10 +260,10 @@ assertDeepEqual(
           return_value: {
             name: "return",
             class: "string",
-            object_id: null,
+            object_id: undefined,
             value: "result-print-2",
           },
-          exceptions: null,
+          exceptions: undefined,
         },
         {
           id: 4,
@@ -272,10 +274,10 @@ assertDeepEqual(
           return_value: {
             name: "return",
             class: "string",
-            object_id: null,
+            object_id: undefined,
             value: "result-print-1",
           },
-          exceptions: null,
+          exceptions: undefined,
         },
       ],
     },

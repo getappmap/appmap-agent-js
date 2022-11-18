@@ -1,3 +1,5 @@
+const { undefined } = globalThis;
+
 import { assertDeepEqual } from "../../../__fixture__.mjs";
 import {
   digestParameterPrimitive,
@@ -110,7 +112,7 @@ assertDeepEqual(
 
 assertDeepEqual(digestParameterPrimitive("name", "primitive"), {
   name: "name",
-  object_id: null,
+  object_id: undefined,
   class: "string",
   value: "primitive",
 });
@@ -132,7 +134,7 @@ assertDeepEqual(
     class: "constructor",
     message: "message",
     path: "stack",
-    lineno: null,
+    lineno: undefined,
   },
 );
 
@@ -148,8 +150,8 @@ assertDeepEqual(
     object_id: 123,
     class: "constructor",
     message: "print",
-    path: null,
-    lineno: null,
+    path: undefined,
+    lineno: undefined,
   },
 );
 
@@ -163,8 +165,8 @@ assertDeepEqual(
     object_id: 123,
     class: "symbol",
     message: "print",
-    path: null,
-    lineno: null,
+    path: undefined,
+    lineno: undefined,
   },
 );
 
@@ -177,8 +179,8 @@ assertDeepEqual(
     object_id: 0,
     class: "string",
     message: "print",
-    path: null,
-    lineno: null,
+    path: undefined,
+    lineno: undefined,
   },
 );
 
@@ -205,14 +207,14 @@ assertDeepEqual(
       {
         class: "string",
         name: "x",
-        object_id: null,
+        object_id: undefined,
         value: "print-arg",
       },
     ],
     receiver: {
       class: "string",
       name: "this",
-      object_id: null,
+      object_id: undefined,
       value: "print-this",
     },
   },
@@ -237,7 +239,7 @@ assertDeepEqual(
     receiver: {
       class: "undefined",
       name: "this",
-      object_id: null,
+      object_id: undefined,
       value: "undefined",
     },
   },
@@ -253,11 +255,11 @@ assertDeepEqual(
     null,
   ),
   {
-    exceptions: null,
+    exceptions: undefined,
     return_value: {
       class: "string",
       name: "return",
-      object_id: null,
+      object_id: undefined,
       value: "print",
     },
   },
@@ -285,10 +287,10 @@ assertDeepEqual(
         class: "constructor",
         message: "message",
         path: "stack",
-        lineno: null,
+        lineno: undefined,
       },
     ],
-    return_value: null,
+    return_value: undefined,
   },
 );
 
@@ -312,7 +314,7 @@ assertDeepEqual(
     message: [
       {
         name: "search",
-        object_id: null,
+        object_id: undefined,
         class: "string",
         value: "param",
       },
@@ -363,13 +365,13 @@ assertDeepEqual(
     message: [
       {
         name: ":info",
-        object_id: null,
+        object_id: undefined,
         class: "string",
         value: "info",
       },
       {
         name: "search",
-        object_id: null,
+        object_id: undefined,
         class: "string",
         value: "param",
       },
@@ -422,7 +424,7 @@ assertDeepEqual(
       return_value: {
         class: "string",
         name: "return",
-        object_id: null,
+        object_id: undefined,
         value: "print",
       },
     },
@@ -443,12 +445,12 @@ assertDeepEqual(
       database_type: "database",
       server_version: "version",
       sql: "sql",
-      explain_sql: null,
+      explain_sql: undefined,
     },
     message: [
       {
         name: "0",
-        object_id: null,
+        object_id: undefined,
         class: "string",
         value: "print",
       },

@@ -65,19 +65,19 @@ await runAsync(
             database_type: "sqlite3",
             server_version: null,
             sql: "SELECT ? * ? as SOLUTION",
-            explain_sql: null,
+            // explain_sql: null,
           },
           message: [
             {
               name: "0",
               class: "number",
-              object_id: null,
+              // object_id: null,
               value: "2",
             },
             {
               name: "1",
               class: "number",
-              object_id: null,
+              // object_id: null,
               value: "3",
             },
           ],
