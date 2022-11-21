@@ -1,19 +1,14 @@
-import { assertDeepEqual, assertEqual } from "../../__fixture__.mjs";
+import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
 import {
   makeLocation,
-  stringifyLocation,
-  parseLocation,
-  incrementLocationColumn,
-  getLocationFileUrl,
+  getLocationPosition,
+  getLocationBase,
 } from "./index.mjs?env=test";
 
-const location = { url: "protocol://host/main.js", line: 123, column: 456 };
+const base = "protocol://host/path";
+const position = { line: 123, column: 456 };
+const location = makeLocation(base, position);
 
-assertDeepEqual(parseLocation(stringifyLocation(location)), location);
+assertDeepEqual(getLocationPosition(location), position);
 
-assertDeepEqual(
-  incrementLocationColumn(location),
-  makeLocation("protocol://host/main.js", 123, 457),
-);
-
-assertEqual(getLocationFileUrl(location), "protocol://host/main.js");
+assertEqual(getLocationBase(location), base);

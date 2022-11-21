@@ -23,7 +23,7 @@ const { InternalAppmapError } = await import(
   `../../error/index.mjs${__search}`
 );
 const { assert } = await import(`../../util/index.mjs${__search}`);
-const { logDebug, logInfo, logError } = await import(
+const { logDebug, logWarning, logInfo, logError } = await import(
   `../../log/index.mjs${__search}`
 );
 const { openServiceAsync, closeServiceAsync, getServicePort } = await import(
@@ -128,7 +128,15 @@ export const openReceptorAsync = async ({
           socket.on("message", (content) => {
             const message = parseJSON(content);
             if (message.type === "source" && message.content === null) {
-              message.content = readFile(new URL(message.url), "utf8");
+              try {
+                message.content = readFile(new URL(message.url), "utf8");
+              } catch (error) {
+                logWarning(
+                  "Could not load source file %j >> %O",
+                  message.url,
+                  error,
+                );
+              }
             }
             sendBackend(backend, message);
             if (message.type === "stop") {

@@ -6,7 +6,7 @@ import { strict as Assert } from "assert";
 import { join as joinPath } from "path";
 import { runAsync } from "./__fixture__.mjs";
 
-const { JSON } = globalThis;
+const { undefined, JSON } = globalThis;
 
 const { equal: assertEqual, deepEqual: assertDeepEqual } = Assert;
 
@@ -48,7 +48,7 @@ await runAsync(
         app: "app-name",
         recorder: { name: "process" },
         test_status: "succeeded",
-        exception: null,
+        exception: undefined,
       },
     );
   },

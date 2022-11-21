@@ -1,6 +1,10 @@
-const { Error, URL } = globalThis;
+const { URL } = globalThis;
 
 const { search: __search } = new URL(import.meta.url);
+
+const { InternalAppmapError } = await import(
+  `../../../error/index.mjs${__search}`
+);
 
 const payloads = {
   jump: {
@@ -139,7 +143,9 @@ const matchFirst = (event) => {
       return makeMatch(match[0], match[2]);
     }
   }
-  throw new Error("invalid combination of event site and event payload type");
+  throw new InternalAppmapError(
+    "invalid combination of event site and event payload type",
+  );
 };
 
 export const manufactureMatchingEvent = (event) => {

@@ -1,5 +1,4 @@
 const {
-  Error,
   URL,
   URLSearchParams,
   String,
@@ -49,7 +48,7 @@ const digestSearchMessage = (search) =>
 export const digestParameterPrimitive = (name, primitive) => ({
   name,
   class: typeof primitive,
-  object_id: null,
+  object_id: undefined,
   value: String(primitive),
 });
 
@@ -90,7 +89,7 @@ export const digestParameterSerial = (name, serial) => {
     return {
       name,
       class: serial.type,
-      object_id: serial.type === "symbol" ? serial.index : null,
+      object_id: serial.type === "symbol" ? serial.index : undefined,
       value: serial.print,
     };
   }
@@ -116,17 +115,17 @@ export const digestExceptionSerial = (serial) => {
       message: recoverMaybe(message, serial.print),
       object_id: serial.index,
       // TODO: extract path from stack
-      path: stack,
+      path: stack ?? undefined,
       // TODO: extract line number from stack
-      lineno: null,
+      lineno: undefined,
     };
   } else {
     return {
       class: serial.type,
       message: serial.print,
       object_id: serial.type === "symbol" ? serial.index : 0,
-      path: null,
-      lineno: null,
+      path: undefined,
+      lineno: undefined,
     };
   }
 };
@@ -145,10 +144,10 @@ const digesters = {
   }),
   return: ({ result }, _options) => ({
     return_value: digestParameterSerial("return", result),
-    exceptions: null,
+    exceptions: undefined,
   }),
   throw: ({ error }, _options) => ({
-    return_value: null,
+    return_value: undefined,
     exceptions: [digestExceptionSerial(error)],
   }),
   // http //
@@ -180,7 +179,7 @@ const digesters = {
         message: digestSearchMessage(search).map(digestParameterPrimitiveTuple),
       };
     } /* c8 ignore start */ else {
-      throw new Error("invalid request side");
+      throw new InternalAppmapError("invalid request side");
     } /* c8 ignore stop */
   },
   response: ({ side, status, headers, body }, _options) => ({
@@ -196,7 +195,7 @@ const digesters = {
       database_type: database,
       server_version: version,
       sql,
-      explain_sql: null,
+      explain_sql: undefined,
     },
     message: toEntries(parameters).map(digestParameterSerialTuple),
   }),

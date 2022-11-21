@@ -5,7 +5,7 @@ import { createSpecifier, matchSpecifier } from "./index.mjs?env=test";
 
 assertThrow(
   () => createSpecifier({}, "protocol://host/base/"),
-  /^Error: invalid specifier options/u,
+  /^InternalAppmapError: invalid specifier options/u,
 );
 
 ////////////
@@ -56,13 +56,12 @@ assertThrow(
   /^ExternalAppmapError: Failed to compile specifier regexp$/u,
 );
 
-assertThrow(
-  () =>
-    matchSpecifier(
-      createSpecifier({ regexp: "^" }, "protocol://host1/base/"),
-      "protocol://host2/base/file.ext",
-    ),
-  /^ExternalAppmapError: Incompatible specifier with url$/u,
+assertEqual(
+  matchSpecifier(
+    createSpecifier({ regexp: "^" }, "protocol://host1/base/"),
+    "protocol://host2/base/file.ext",
+  ),
+  false,
 );
 
 //////////

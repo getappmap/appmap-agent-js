@@ -47,22 +47,25 @@ const stringifiers = new Map([
 const default_external_configuration = {
   packages: [
     {
-      glob: "**/node_modules/**/*",
+      regexp: "^../",
       enabled: false,
     },
     {
-      glob: "../**/*",
+      regexp: "(^|/)node_modules/",
       enabled: false,
+    },
+    {
+      regexp: "",
+      enabled: true,
     },
   ],
   "default-package": {
-    enabled: true,
+    enabled: false,
   },
-  "anonymous-name-separator": "-",
   exclude: [
     {
       combinator: "and",
-      name: "-",
+      name: "^\\[anonymous\\]$",
       "every-label": "^\\b$",
       excluded: true,
       recursive: false,

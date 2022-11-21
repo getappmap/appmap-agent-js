@@ -12,7 +12,7 @@ for (const name of [
   "event-query",
   "npx",
   "mocha",
-  "remote",
+  // "remote",
 ]) {
   stdout.write(`${"\n"}${name}${"\n"}`);
   await import(`./${name}.mjs`);

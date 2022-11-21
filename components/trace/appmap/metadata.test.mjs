@@ -1,3 +1,5 @@
+const { undefined } = globalThis;
+
 import { assertDeepEqual, assertEqual } from "../../__fixture__.mjs";
 import {
   createConfiguration,
@@ -27,10 +29,10 @@ const test = (conf, url, errors = [], status = 0) => {
 };
 
 const default_meta_data = {
-  app: null,
-  name: null,
+  app: undefined,
+  name: undefined,
   labels: [],
-  language: { name: "javascript", version: "ES.Next", engine: null },
+  language: { name: "javascript", version: "ES.Next", engine: undefined },
   frameworks: [],
   client: {
     name: "appmap-agent-js",
@@ -38,10 +40,10 @@ const default_meta_data = {
     url: "http://host/homepage",
   },
   recorder: { name: "process" },
-  recording: null,
-  git: null,
+  recording: undefined,
+  git: undefined,
   test_status: "succeeded",
-  exception: null,
+  exception: undefined,
 };
 
 assertDeepEqual(test({}, "protocol://host/base/"), default_meta_data);

@@ -26,9 +26,7 @@ const { mapSource } = await import(`../../source/index.mjs${__search}`);
 const { logDebugWhen, logErrorWhen } = await import(
   `../../log/index.mjs${__search}`
 );
-const { stringifyLocation, getLocationFileUrl } = await import(
-  `../../location/index.mjs${__search}`
-);
+const { getLocationBase } = await import(`../../location/index.mjs${__search}`);
 
 //////////////////////////////
 // Difficulties with groups //
@@ -316,7 +314,7 @@ const instrumentClosure = (node, parent, grand_parent, closure, context) => {
     instrumented:
       context.apply !== null &&
       location !== null &&
-      context.whitelist.has(getLocationFileUrl(location)),
+      context.whitelist.has(getLocationBase(location)),
   };
   if (closure.instrumented) {
     return makeClosure(
@@ -382,7 +380,7 @@ const instrumentClosure = (node, parent, grand_parent, closure, context) => {
             makeRegularMemberExpression(context.apply, "recordApply"),
             [
               makeIdentifier(`${context.apply}_BUNDLE_TAB`),
-              makeLiteral(stringifyLocation(location)),
+              makeLiteral(location),
               node.type === "ArrowFunctionExpression" ||
               isSubclassConstructor(node, parent, grand_parent)
                 ? makeRegularMemberExpression(context.apply, "empty")
@@ -491,7 +489,7 @@ const instrumentClosure = (node, parent, grand_parent, closure, context) => {
                   makeRegularMemberExpression(context.apply, "recordThrow"),
                   [
                     makeIdentifier(`${context.apply}_BUNDLE_TAB`),
-                    makeLiteral(stringifyLocation(location)),
+                    makeLiteral(location),
                     makeIdentifier(`${context.apply}_ERROR`),
                   ],
                 ),
@@ -508,7 +506,7 @@ const instrumentClosure = (node, parent, grand_parent, closure, context) => {
                     makeRegularMemberExpression(context.apply, "recordReturn"),
                     [
                       makeIdentifier(`${context.apply}_BUNDLE_TAB`),
-                      makeLiteral(stringifyLocation(location)),
+                      makeLiteral(location),
                       makeIdentifier(`${context.apply}_RETURN`),
                     ],
                   ),
@@ -642,9 +640,7 @@ const instrumenters = {
           makeLiteral(
             toAbsoluteUrl(
               `eval-${String(incrementCounter(context.counter))}`,
-              toDirectoryUrl(
-                fromMaybe(location, context.url, getLocationFileUrl),
-              ),
+              toDirectoryUrl(fromMaybe(location, context.url, getLocationBase)),
             ),
           ),
           visitNode(node.arguments[0], node, parent, closure, context),

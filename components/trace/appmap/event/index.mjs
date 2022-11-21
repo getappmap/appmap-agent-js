@@ -1,11 +1,16 @@
-const { Error, URL } = globalThis;
+const { URL } = globalThis;
 
 const { search: __search } = new URL(import.meta.url);
 
+const { InternalAppmapError } = await import(
+  `../../../error/index.mjs${__search}`
+);
 const { mapMaybe, createCounter, incrementCounter } = await import(
   `../../../util/index.mjs${__search}`
 );
-const { getClassmapClosure } = await import(`../classmap/index.mjs${__search}`);
+const { lookupClassmapClosure } = await import(
+  `../classmap/index.mjs${__search}`
+);
 const { digestPayload } = await import(`./payload.mjs${__search}`);
 
 const digestEventPair = (event1, event2, id1, id2, info) => [
@@ -27,7 +32,8 @@ const digestEventPair = (event1, event2, id1, id2, info) => [
 
 export const digestEventTrace = (root, classmap) => {
   const counter = createCounter(0);
-  const getClosureInfo = (location) => getClassmapClosure(classmap, location);
+  const getClosureInfo = (location) =>
+    lookupClassmapClosure(classmap, location);
   /* eslint-disable no-use-before-define */
   const digestTransparentBundle = ({ children }, _info) =>
     children.flatMap(loop);
@@ -89,7 +95,7 @@ export const digestEventTrace = (root, classmap) => {
         );
       }
     } /* c8 ignore start */ else {
-      throw new Error("invalid node type");
+      throw new InternalAppmapError("invalid node type");
     } /* c8 ignore stop */
   };
   return root.flatMap(loop);

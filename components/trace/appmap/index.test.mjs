@@ -1,12 +1,11 @@
+const { undefined } = globalThis;
+
 import { assertDeepEqual } from "../../__fixture__.mjs";
 import {
   createConfiguration,
   extendConfiguration,
 } from "../../configuration/index.mjs?env=test";
-import {
-  makeLocation,
-  stringifyLocation,
-} from "../../location/index.mjs?env=test";
+import { makeLocation } from "../../location/index.mjs?env=test";
 import { compileTrace } from "./index.mjs?env=test";
 
 const configuration = extendConfiguration(
@@ -35,9 +34,10 @@ const tabs = {
   event2: 6,
 };
 
-const location = stringifyLocation(
-  makeLocation("protocol://host/home/filename.js", 1, 0),
-);
+const location = makeLocation("protocol://host/home/dirname/filename.js", {
+  line: 1,
+  column: 0,
+});
 
 assertDeepEqual(
   compileTrace(configuration, [
@@ -50,7 +50,7 @@ assertDeepEqual(
     },
     {
       type: "source",
-      url: "protocol://host/home/filename.js",
+      url: "protocol://host/home/dirname/filename.js",
       content: "function f (x) {}",
       shallow: false,
       exclude: [
@@ -156,13 +156,13 @@ assertDeepEqual(
     body: {
       version: "1.8.0",
       metadata: {
-        name: null,
+        name: undefined,
         app: "NAME",
         labels: [],
         language: {
           name: "javascript",
           version: "ES.Next",
-          engine: null,
+          engine: undefined,
         },
         frameworks: [],
         client: {
@@ -171,8 +171,8 @@ assertDeepEqual(
           version: "1.2.3",
         },
         recorder: { name: "process" },
-        recording: null,
-        git: null,
+        recording: undefined,
+        git: undefined,
         test_status: "failed",
         exception: {
           class: "name",
@@ -182,16 +182,16 @@ assertDeepEqual(
       classMap: [
         {
           type: "package",
-          name: "filename.js",
+          name: "dirname",
           children: [
             {
               type: "class",
-              name: "f",
+              name: "filename",
               children: [
                 {
                   type: "function",
-                  name: "$",
-                  location: "filename.js:1",
+                  name: "f",
+                  location: "dirname/filename.js:1",
                   static: false,
                   labels: [],
                   comment: null,
@@ -207,22 +207,22 @@ assertDeepEqual(
           id: 1,
           event: "call",
           thread_id: 0,
-          defined_class: "f",
-          method_id: "$",
-          path: "filename.js",
+          defined_class: "filename",
+          method_id: "f",
+          path: "dirname/filename.js",
           lineno: 1,
           static: false,
           receiver: {
             name: "this",
             class: "string",
-            object_id: null,
+            object_id: undefined,
             value: "this-print-1",
           },
           parameters: [
             {
               name: "x",
               class: "string",
-              object_id: null,
+              object_id: undefined,
               value: "arg-print-1",
             },
           ],
@@ -231,22 +231,22 @@ assertDeepEqual(
           id: 2,
           event: "call",
           thread_id: 0,
-          defined_class: "f",
-          method_id: "$",
-          path: "filename.js",
+          defined_class: "filename",
+          method_id: "f",
+          path: "dirname/filename.js",
           lineno: 1,
           static: false,
           receiver: {
             name: "this",
             class: "string",
-            object_id: null,
+            object_id: undefined,
             value: "this-print-2",
           },
           parameters: [
             {
               name: "x",
               class: "string",
-              object_id: null,
+              object_id: undefined,
               value: "arg-print-2",
             },
           ],
@@ -260,10 +260,10 @@ assertDeepEqual(
           return_value: {
             name: "return",
             class: "string",
-            object_id: null,
+            object_id: undefined,
             value: "result-print-2",
           },
-          exceptions: null,
+          exceptions: undefined,
         },
         {
           id: 4,
@@ -274,10 +274,10 @@ assertDeepEqual(
           return_value: {
             name: "return",
             class: "string",
-            object_id: null,
+            object_id: undefined,
             value: "result-print-1",
           },
-          exceptions: null,
+          exceptions: undefined,
         },
       ],
     },

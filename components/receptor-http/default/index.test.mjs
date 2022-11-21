@@ -170,6 +170,18 @@ await assertRequestAsync("GET", "/_appmap/track", null, {
     createMessage(
       stringifyJSON({
         type: "source",
+        url: "protocol://host/",
+        content: null,
+        shallow: false,
+        inline: false,
+        exclude: [],
+      }),
+    ),
+  );
+  socket.write(
+    createMessage(
+      stringifyJSON({
+        type: "source",
         url,
         content: null,
         shallow: false,
@@ -193,6 +205,14 @@ await assertRequestAsync("GET", "/_appmap/track", null, {
           track: "track2",
           configuration: {},
           url: null,
+        },
+        {
+          type: "source",
+          url: "protocol://host/",
+          content: null,
+          shallow: false,
+          inline: false,
+          exclude: [],
         },
         {
           type: "source",

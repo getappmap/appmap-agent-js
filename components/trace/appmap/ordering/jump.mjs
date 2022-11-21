@@ -1,7 +1,6 @@
 const {
   URL,
   Array: { from: toArray },
-  Error,
   Map,
 } = globalThis;
 
@@ -99,7 +98,7 @@ const manufactureBundleNode = (orphan) => {
       manufactureMatchingEvent(orphan.open),
     );
   } /* c8 ignore start */ else {
-    throw new Error("invalid enter/leave event site");
+    throw new InternalAppmapError("invalid enter/leave event site");
   } /* c8 ignore stop */
 };
 

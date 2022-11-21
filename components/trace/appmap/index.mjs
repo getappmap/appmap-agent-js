@@ -1,7 +1,5 @@
 const {
   URL,
-  Error,
-  Set,
   Map,
   Array: { from: toArray },
   String,
@@ -11,10 +9,9 @@ const {
 
 const { search: __search } = new URL(import.meta.url);
 
-const { ExternalAppmapError } = await import(
+const { InternalAppmapError, ExternalAppmapError } = await import(
   `../../error/index.mjs${__search}`
 );
-const { hasOwnProperty } = await import(`../../util/index.mjs${__search}`);
 const { logError, logDebug, logInfo } = await import(
   `../../log/index.mjs${__search}`
 );
@@ -132,18 +129,12 @@ export const compileTrace = (configuration, messages) => {
         }
       }
     } /* c8 ignore start */ else {
-      throw new Error("invalid message type");
+      throw new InternalAppmapError("invalid message type");
     } /* c8 ignore stop */
   }
   const classmap = createClassmap(configuration);
   for (const source of sources) {
     addClassmapSource(classmap, source);
-  }
-  const routes = new Set();
-  for (const event of events) {
-    if (hasOwnProperty(event.payload, "function")) {
-      routes.add(event.payload.function);
-    }
   }
   const printEventDistribution = () => {
     const counters = new Map();
@@ -208,7 +199,7 @@ export const compileTrace = (configuration, messages) => {
   const appmap = {
     version: VERSION,
     metadata: compileMetadata(configuration, errors, status),
-    classMap: compileClassmap(classmap, routes),
+    classMap: compileClassmap(classmap),
     events: digested_events,
   };
   validateAppmap(appmap);

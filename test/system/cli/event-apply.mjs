@@ -62,26 +62,26 @@ await runAsync(
     );
     const { events } = appmap;
     assertDeepEqual(
-      events.map(({ event, defined_class, id, parent_id }) => ({
+      events.map(({ event, method_id, id, parent_id }) => ({
         event,
         id,
-        ...(event === "call" ? { defined_class } : { parent_id }),
+        ...(event === "call" ? { method_id } : { parent_id }),
       })),
       [
         {
           event: "call",
           id: 1,
-          defined_class: "mainAsync",
+          method_id: "mainAsync",
         },
         {
           event: "call",
           id: 2,
-          defined_class: "generateAsync",
+          method_id: "generateAsync",
         },
         {
           event: "call",
           id: 3,
-          defined_class: "beforeAwait",
+          method_id: "beforeAwait",
         },
         {
           event: "return",
@@ -91,7 +91,7 @@ await runAsync(
         {
           event: "call",
           id: 5,
-          defined_class: "promiseCallback",
+          method_id: "promiseCallback",
         },
         {
           event: "return",
@@ -101,7 +101,7 @@ await runAsync(
         {
           event: "call",
           id: 7,
-          defined_class: "afterAwait",
+          method_id: "afterAwait",
         },
         {
           event: "return",
@@ -121,7 +121,7 @@ await runAsync(
         {
           event: "call",
           id: 11,
-          defined_class: "arrow-1",
+          method_id: "[anonymous]",
         },
         {
           event: "return",
@@ -131,7 +131,7 @@ await runAsync(
         {
           event: "call",
           id: 13,
-          defined_class: "timeoutCallback",
+          method_id: "timeoutCallback",
         },
         {
           event: "return",
