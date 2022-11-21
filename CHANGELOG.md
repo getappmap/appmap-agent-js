@@ -1,3 +1,34 @@
+# [12.0.0](https://github.com/getappmap/appmap-agent-js/compare/v11.7.1...v12.0.0) (2022-11-21)
+
+
+### Bug Fixes
+
+* add separator for source root concatenation ([3b9da2b](https://github.com/getappmap/appmap-agent-js/commit/3b9da2b00da1f6fbf4b7b21286f6fd50a5318daa))
+* no longer reset source column between source map groups ([66e2dc6](https://github.com/getappmap/appmap-agent-js/commit/66e2dc61102240a1e4ef386f873283216216645f))
+* support incompatible source urls ([8fe9a5c](https://github.com/getappmap/appmap-agent-js/commit/8fe9a5cbabd9a0609d473ca223a75be0c3665160))
+* use regexp instead of glob to exclude external files ([085848d](https://github.com/getappmap/appmap-agent-js/commit/085848df58f1e10ef4f4858a15729cd6336c5cc7))
+
+
+### Code Refactoring
+
+* remove outdated configuration fields ([5e44ad4](https://github.com/getappmap/appmap-agent-js/commit/5e44ad4cb75f60ac9b1a3d4df45f810d6fdff9bb))
+
+
+### Features
+
+* rewrite classmap processing ([a72a4f2](https://github.com/getappmap/appmap-agent-js/commit/a72a4f210adcf915bbefb27f938e45beb49969ef))
+
+
+### Performance Improvements
+
+* remove null fields from appmap ([5537f07](https://github.com/getappmap/appmap-agent-js/commit/5537f07bd91f20e8a51a37aa460cc21ced4f3916))
+
+
+### BREAKING CHANGES
+
+* `function-name-placeholder` and 
+`anonymous-name-separator` are ignored.
+
 ## [11.7.1](https://github.com/getappmap/appmap-agent-js/compare/v11.7.0...v11.7.1) (2022-11-07)
 
 
