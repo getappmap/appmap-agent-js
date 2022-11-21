@@ -26,8 +26,12 @@
 
 ### BREAKING CHANGES
 
-* `function-name-placeholder` and 
-`anonymous-name-separator` are ignored.
+* `function-name-placeholder` and `anonymous-name-separator` are ignored.
+* Nested functions are now represented alongside their class container. Function class container are necessary to represent nested functions because the classmap format does not allow for functions to have children. For instance, `function f () {}` was represented before as `{type:"class", name:"f", children:[{type:"function", name:"<placeholder>"}]}`. Now it is represented as: `[{type:"class", name:"f", children:[]}, {type:"function", name:"f"}]`. The class container is removed if it has no children.
+* Files are represented as classes rather than packages. Plus their name no longer contain the file extension. Also, they are removed if the file does not contain top-level functions. Files as classes are necessary to provide a `defined_class` value to functions.
+* Top level files are nested within a package named: `.`. That is because classes are not allowed at the root level of classmap.
+* More aggressive naming. Before the agent would name code objects accordingly to the rule of dynamic function naming. For instance, `var f = (x) => {}` would cause the arrow to be named `x`. However, `var f = test ? (x) => {} || (y) => {}` would cause both arrows to have no name. The new naming algorithm is more aggressive to help reduce the number of anonymous code objects.
+* Anonymous code object are always named `[anonymous]`. This is likely to change in the future.
 
 ## [11.7.1](https://github.com/getappmap/appmap-agent-js/compare/v11.7.0...v11.7.1) (2022-11-07)
 
