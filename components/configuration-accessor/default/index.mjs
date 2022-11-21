@@ -387,7 +387,7 @@ const mocha_hooker = {
       "NODE_OPTIONS",
       "",
     )} --experimental-loader=${escapeNodeOption(
-      toAbsoluteUrl("lib/node/mocha-loader.mjs", base),
+      toAbsoluteUrl("lib/node/loader-standalone.mjs", base),
     )}`,
   }),
 };

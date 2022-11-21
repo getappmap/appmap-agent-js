@@ -446,7 +446,7 @@ testCompileCommand({
   ],
   base: "file:///w:/base/",
   options:
-    "--experimental-loader=file:///w:/base/agent/lib/node/mocha-loader.mjs",
+    "--experimental-loader=file:///w:/base/agent/lib/node/loader-standalone.mjs",
 });
 
 // mocha >> source && resolve shell //
@@ -465,7 +465,7 @@ testCompileCommand({
   argv: [],
   base: "file:///w:/ base /",
   options:
-    "--experimental-loader=file:///w:/%20base%20/agent/lib/node/mocha-loader.mjs",
+    "--experimental-loader=file:///w:/%20base%20/agent/lib/node/loader-standalone.mjs",
 });
 
 assertThrow(() => {
