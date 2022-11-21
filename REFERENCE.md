@@ -352,7 +352,6 @@ The agent filter code objects (functions or objects/classes) based on a format c
     * `impure-error-inspection <boolean>` indicates whether the message and stack of an error should be retrieved which is an impure operation. *Default* `true`.
     * `impure-hash-inspection <boolean>` indicates whether the properties of an hash object should be inspected which is an impure operation. *Default* `true`.
 * `hidden-identifier <string>` The prefix of hidden variables used by the agent. The instrumentation will fail if variables from the program under recording starts with this prefix. *Default*: `"APPMAP"`.
-* `function-name-placeholder <string>` The placeholder name for classmap function elements. *Default* `"()"`.
 * `collapse-package-hiearchy <boolean>` Indicates whether packages should organized as a tree which mirrors the structure of the file system or if they should be flatten into a list. *Default*: `true`.
 * `validate <boolean> | <object>` Validation options which are useful to debug the agent.
     * `<boolean>` Shorthand, `true` is the same as `{message: true, appmap:true}` and `false` is the same as `{message:true, appmap:true}`.
