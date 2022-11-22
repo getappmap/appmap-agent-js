@@ -77,7 +77,7 @@ export const compileTrace = (configuration, messages) => {
   const sources = [];
   const errors = [];
   const events = [];
-  let status = 1;
+  let termination = { type: "unknown" };
   for (const message of messages) {
     const { type } = message;
     if (type === "start") {
@@ -87,7 +87,7 @@ export const compileTrace = (configuration, messages) => {
         message.url,
       );
     } else if (type === "stop") {
-      status = message.status;
+      termination = message.termination;
     } else if (type === "error") {
       errors.push(message.error);
     } else if (type === "event") {
@@ -198,7 +198,7 @@ export const compileTrace = (configuration, messages) => {
   /* c8 ignore stop */
   const appmap = {
     version: VERSION,
-    metadata: compileMetadata(configuration, errors, status),
+    metadata: compileMetadata(configuration, errors, termination),
     classMap: compileClassmap(classmap),
     events: digested_events,
   };

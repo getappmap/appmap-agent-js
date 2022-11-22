@@ -97,10 +97,10 @@ export const formatStartTrack = ({}, track, configuration, url) => ({
   url,
 });
 
-export const formatStopTrack = ({}, track, status) => ({
+export const formatStopTrack = ({}, track, termination) => ({
   type: "stop",
   track,
-  status,
+  termination,
 });
 
 export const formatGroup = ({}, group, child, description) => ({

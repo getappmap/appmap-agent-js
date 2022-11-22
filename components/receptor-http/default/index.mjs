@@ -27,7 +27,6 @@ const {
   sendBackend,
   hasBackendTrace,
   hasBackendTrack,
-  getBackendTrackIterator,
   takeBackendTrace,
 } = await import(`../../backend/index.mjs${__search}`);
 const { extendConfigurationPort } = await import(
@@ -128,7 +127,7 @@ export const openReceptorAsync = async ({
           sendBackend(backend, {
             type: "stop",
             track: record,
-            status: coalesce(body, "status", 0),
+            termination: { type: "manual" },
           });
         } else if (!hasBackendTrace(backend, record)) {
           return {
@@ -168,19 +167,12 @@ export const openReceptorAsync = async ({
           backends.set(session, backend);
           socket.on("close", () => {
             sendBackend(backend, {
-              type: "error",
-              error: {
-                type: "string",
-                print: "disconnection",
+              type: "stop",
+              track: null,
+              termination: {
+                type: "disconnect",
               },
             });
-            for (const key of getBackendTrackIterator(backend)) {
-              sendBackend(backend, {
-                type: "stop",
-                track: key,
-                status: 1,
-              });
-            }
           });
           socket.on("message", (content) => {
             const message = parseJSON(content);

@@ -23,7 +23,10 @@ export const createMochaHooks = (process, configuration) => {
         );
       },
       afterEach() {
-        recordStopTrack(recorder, "mocha", 0);
+        recordStopTrack(recorder, "mocha", {
+          type: "test",
+          passed: this.currentTest.state === "passed",
+        });
       },
     };
   }

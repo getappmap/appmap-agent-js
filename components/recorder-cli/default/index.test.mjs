@@ -67,7 +67,7 @@ assertThrow(() => {
   requestAsync("GET", "/", {});
 });
 
-recordStopTrack(recorder, "track1", 123);
+recordStopTrack(recorder, "track1", { type: "manual" });
 
 mock_process.emit("uncaughtExceptionMonitor", new Error("BOUM"));
 

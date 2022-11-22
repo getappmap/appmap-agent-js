@@ -34,10 +34,17 @@ export const takeBackendTrace = ({ traces }, key) => {
   return trace;
 };
 
-export const sendBackend = (
-  { configuration, sources, tracks, traces },
-  message,
-) => {
+const stopTrack = ({ configuration, tracks, traces }, key, message) => {
+  assert(tracks.has(key), "missing track", InternalAppmapError);
+  const track = tracks.get(key);
+  tracks.delete(key);
+  track.push(message);
+  assert(!traces.has(key), "duplicate trace", InternalAppmapError);
+  traces.set(key, compileTrace(configuration, track));
+};
+
+export const sendBackend = (backend, message) => {
+  const { sources, tracks } = backend;
   validateMessage(message);
   logDebug("message >> %j", message);
   const { type } = message;
@@ -47,12 +54,13 @@ export const sendBackend = (
     tracks.set(key, [...sources, message]);
   } else if (type === "stop") {
     const { track: key } = message;
-    assert(tracks.has(key), "missing track", InternalAppmapError);
-    assert(!traces.has(key), "duplicate trace", InternalAppmapError);
-    const messages = tracks.get(key);
-    messages.push(message);
-    tracks.delete(key);
-    traces.set(key, compileTrace(configuration, messages));
+    if (key === null) {
+      for (const key of tracks.keys()) {
+        stopTrack(backend, key, message);
+      }
+    } else {
+      stopTrack(backend, key, message);
+    }
   } else {
     if (type === "source") {
       sources.push(message);

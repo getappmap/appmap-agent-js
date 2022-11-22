@@ -20,28 +20,18 @@ const {
 
 const configuration = extendConfiguration(
   createConfiguration("protocol://host/home"),
-  { name: "name1" },
+  { name: "name" },
   null,
 );
 
 {
   const backend = createBackend(configuration);
-  assertEqual(
-    sendBackend(backend, {
-      type: "source",
-      url: "protocol://host/cwd/main.js",
-      content: "function main () {}",
-      shallow: false,
-      inline: false,
-      exclude: [],
-    }),
-    undefined,
-  );
+  // record1 >> stop one && standard message //
   assertEqual(
     sendBackend(backend, {
       type: "start",
-      track: "record",
-      configuration: { name: "name2" },
+      track: "record1",
+      configuration: { name: "name1" },
       url: null,
     }),
     undefined,
@@ -56,19 +46,77 @@ const configuration = extendConfiguration(
     }),
     undefined,
   );
-  assertEqual(hasBackendTrace(backend, "record"), false);
-  assertDeepEqual(toArray(getBackendTrackIterator(backend)), ["record"]);
+  assertEqual(hasBackendTrace(backend, "record1"), false);
+  assertDeepEqual(toArray(getBackendTrackIterator(backend)), ["record1"]);
   assertEqual(
     sendBackend(backend, {
       type: "stop",
-      track: "record",
-      status: 0,
+      track: "record1",
+      termination: {
+        type: "manual",
+      },
     }),
     undefined,
   );
-  assertDeepEqual(toArray(getBackendTraceIterator(backend)), ["record"]);
-  assertEqual(hasBackendTrack(backend, "record"), false);
-  assertDeepEqual(takeBackendTrace(backend, "record"), {
+  assertDeepEqual(toArray(getBackendTraceIterator(backend)), ["record1"]);
+  assertEqual(hasBackendTrack(backend, "record1"), false);
+  assertDeepEqual(takeBackendTrace(backend, "record1"), {
+    head: configuration,
+    body: [
+      {
+        type: "start",
+        track: "record1",
+        configuration: { name: "name1" },
+        url: null,
+      },
+      {
+        type: "error",
+        error: {
+          type: "number",
+          print: "123",
+        },
+      },
+      {
+        type: "stop",
+        track: "record1",
+        termination: {
+          type: "manual",
+        },
+      },
+    ],
+  });
+  // record2 >> stop all && source message //
+  assertEqual(
+    sendBackend(backend, {
+      type: "source",
+      url: "protocol://host/cwd/main.js",
+      content: "function main () {}",
+      shallow: false,
+      inline: false,
+      exclude: [],
+    }),
+    undefined,
+  );
+  assertEqual(
+    sendBackend(backend, {
+      type: "start",
+      track: "record2",
+      configuration: { name: "name2" },
+      url: null,
+    }),
+    undefined,
+  );
+  assertEqual(
+    sendBackend(backend, {
+      type: "stop",
+      track: null,
+      termination: {
+        type: "manual",
+      },
+    }),
+    undefined,
+  );
+  assertDeepEqual(takeBackendTrace(backend, "record2"), {
     head: configuration,
     body: [
       {
@@ -81,21 +129,16 @@ const configuration = extendConfiguration(
       },
       {
         type: "start",
-        track: "record",
+        track: "record2",
         configuration: { name: "name2" },
         url: null,
       },
       {
-        type: "error",
-        error: {
-          type: "number",
-          print: "123",
-        },
-      },
-      {
         type: "stop",
-        track: "record",
-        status: 0,
+        track: null,
+        termination: {
+          type: "manual",
+        },
       },
     ],
   });

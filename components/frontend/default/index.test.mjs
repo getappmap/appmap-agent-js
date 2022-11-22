@@ -43,10 +43,9 @@ validateMessage(formatGroup(frontend, 123, 456, "description"));
 
 validateMessage(formatStartTrack(frontend, "track", {}, null));
 
-validateMessage(formatStopTrack(frontend, "track", 0));
+validateMessage(formatStopTrack(frontend, "track", { type: "manual" }));
 
 validateMessage(formatError(frontend, new Error("BOUM")));
-
 
 validateMessage(
   formatBeginEvent(frontend, 123, 456, 789, getBundlePayload(frontend)),

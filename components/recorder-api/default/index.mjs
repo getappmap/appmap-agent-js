@@ -99,7 +99,7 @@ export class Appmap {
     recordStartTrack(this.agent, track, conf, base);
     return track;
   }
-  stopRecording(track, status = 0) {
+  stopRecording(track, termination = { type: "manual" }) {
     expectRunning(this.hooking);
     assert(
       !logErrorWhen(
@@ -111,7 +111,7 @@ export class Appmap {
       ExternalAppmapError,
     );
     this.tracks.delete(track);
-    recordStopTrack(this.agent, track, status);
+    recordStopTrack(this.agent, track, termination);
     return takeLocalAgentTrace(this.agent, track);
   }
   terminate() {

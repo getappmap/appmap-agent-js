@@ -1,0 +1,6 @@
+type: object
+required: [type]
+additionalProperties: false
+properties:
+  type:
+    const: disconnect

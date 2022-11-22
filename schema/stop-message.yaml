@@ -3,13 +3,12 @@ additionalProperties: false
 required:
   - type
   - track
-  - status
+  - termination
 properties:
   type:
     const: stop
   track:
     type: string
-  status:
-    type: integer
-    minimum: 0
-    maximum: 255
+    nullable: true
+  termination:
+    $ref: termination

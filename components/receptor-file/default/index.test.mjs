@@ -110,7 +110,7 @@ await testAsync(
       {
         type: "stop",
         track: "track",
-        status: 0,
+        termination: { type: "manual" },
       },
     ],
   );
