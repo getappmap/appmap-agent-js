@@ -77,7 +77,7 @@ export const compileTrace = (configuration, messages) => {
   const sources = [];
   const errors = [];
   const events = [];
-  let status = 0;
+  let status = 1;
   for (const message of messages) {
     const { type } = message;
     if (type === "start") {

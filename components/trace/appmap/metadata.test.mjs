@@ -82,7 +82,7 @@ assertDeepEqual(
         message: "error-message",
       },
     ],
-    0,
+    1,
   ),
   {
     ...default_meta_data,

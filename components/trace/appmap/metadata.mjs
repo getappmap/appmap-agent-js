@@ -74,10 +74,7 @@ const makeMapName = (map_name, file_name, main) => {
   return null;
 };
 
-const makeTestStatus = (errors, status) => {
-  const { length } = errors;
-  return length === 0 && status === 0 ? "succeeded" : "failed";
-};
+const makeTestStatus = (status) => (status === 0 ? "succeeded" : "failed");
 
 const makeRecorder = (recorder) => {
   assert(
@@ -133,7 +130,7 @@ export const compileMetadata = (
   recorder: makeRecorder(recorder),
   recording: makeRecording(recording) ?? undefined,
   git: makeGit(repository) ?? undefined,
-  test_status: makeTestStatus(errors, status) ?? undefined,
+  test_status: makeTestStatus(status) ?? undefined,
   exception: makeException(errors) ?? undefined,
 });
 /* c8 ignore stop */

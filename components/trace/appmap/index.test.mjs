@@ -173,7 +173,7 @@ assertDeepEqual(
         recorder: { name: "process" },
         recording: undefined,
         git: undefined,
-        test_status: "failed",
+        test_status: "succeeded",
         exception: {
           class: "name",
           message: "message",
