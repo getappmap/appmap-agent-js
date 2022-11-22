@@ -9,8 +9,6 @@ import {
 } from "../../configuration/index.mjs?env=test";
 import { Appmap } from "./index.mjs?env=test";
 
-const { undefined } = globalThis;
-
 const configuration = extendConfiguration(
   createConfiguration("protocol://host/home/"),
   {
@@ -34,7 +32,6 @@ assertThrow(
   /^ExternalAppmapError: Invalid url argument$/u,
 );
 assertEqual(appmap.recordScript("123;", "protocol://host/base/main.js"), 123);
-assertEqual(appmap.recordError(123), undefined);
 assertDeepEqual(appmap.stopRecording(track, 123), [
   {
     type: "source",
@@ -49,13 +46,6 @@ assertDeepEqual(appmap.stopRecording(track, 123), [
     track: "uuid",
     configuration: { name: "name2" },
     url: null,
-  },
-  {
-    type: "error",
-    error: {
-      type: "number",
-      print: "123",
-    },
   },
   {
     type: "stop",

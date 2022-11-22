@@ -37,6 +37,7 @@ socket
 emitter
 agent
 hook-fixture
+hook-error
 hook-apply
 hook-group
 hook-cjs

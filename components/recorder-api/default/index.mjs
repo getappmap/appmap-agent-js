@@ -19,7 +19,6 @@ const {
   openAgent,
   closeAgent,
   instrument,
-  recordError,
   recordStartTrack,
   recordStopTrack,
   takeLocalAgentTrace,
@@ -81,9 +80,6 @@ export class Appmap {
   recordScript(content, url) {
     expectRunning(this.hooking);
     return runScript(this.instrumentScript(content, url));
-  }
-  recordError(error) {
-    recordError(this.agent, error);
   }
   startRecording(track, conf = {}, base = null) {
     expectRunning(this.hooking);

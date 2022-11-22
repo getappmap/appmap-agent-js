@@ -14,7 +14,6 @@ const { isConfigurationEnabled, extendConfigurationNode } = await import(
 const {
   openAgent,
   closeAgent,
-  recordError: recordAgentError,
   recordStartTrack: recordAgentStartTrack,
   recordStopTrack: recordAgentStopTrack,
   requestRemoteAgentAsync,
@@ -33,9 +32,6 @@ export const createRecorder = (process, configuration) => {
     const agent = openAgent(configuration);
     const hooking = hook(agent, configuration);
     const tracks = new Set();
-    process.on("uncaughtExceptionMonitor", (error) => {
-      recordAgentError(agent, error);
-    });
     process.on("exit", (status, _signal) => {
       for (const track of tracks) {
         recordAgentStopTrack(agent, track, status);
