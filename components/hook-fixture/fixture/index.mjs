@@ -37,7 +37,11 @@ export const testHookAsync = async (
   try {
     recordStartTrack(agent, "record", {}, null);
     await callbackAsync();
-    recordStopTrack(agent, "record", { type: "manual" });
+    // TODO this completely breaks encapsulation
+    //      but hook-fixture is only used for testing...
+    if (agent.emitter.backend.tracks.has("record")) {
+      recordStopTrack(agent, "record", { type: "manual" });
+    }
     const trace = takeLocalAgentTrace(agent, "record");
     assert(
       trace[0].type === "start",

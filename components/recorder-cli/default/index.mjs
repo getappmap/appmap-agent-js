@@ -32,11 +32,7 @@ export const createRecorder = (process, configuration) => {
     const agent = openAgent(configuration);
     const hooking = hook(agent, configuration);
     const tracks = new Set();
-    process.on("exit", (status) => {
-      recordAgentStopTrack(agent, null, {
-        type: "exit",
-        status,
-      });
+    process.on("exit", (_status) => {
       unhook(hooking);
       closeAgent(agent);
     });

@@ -38,6 +38,7 @@ emitter
 agent
 hook-fixture
 hook-error
+hook-exit
 hook-apply
 hook-group
 hook-cjs
