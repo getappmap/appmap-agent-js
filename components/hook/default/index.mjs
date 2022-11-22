@@ -7,6 +7,7 @@ const HookEsm = await import(`../../hook-esm/index.mjs${__search}`);
 const HookCjs = await import(`../../hook-cjs/index.mjs${__search}`);
 const HookEval = await import(`../../hook-eval/index.mjs${__search}`);
 const HookError = await import(`../../hook-error/index.mjs${__search}`);
+const HookExit = await import(`../../hook-exit/index.mjs${__search}`);
 const HookQuery = await import(`../../hook-query/index.mjs${__search}`);
 const HookHttpClient = await import(
   `../../hook-http-client/index.mjs${__search}`
@@ -22,6 +23,7 @@ const Hooks = [
   HookCjs,
   HookEval,
   HookError,
+  HookExit,
   HookQuery,
   HookHttpClient,
   HookHttpServer,
