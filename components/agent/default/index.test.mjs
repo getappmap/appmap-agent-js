@@ -49,7 +49,7 @@ recordBeforeEvent(
   formatQueryPayload(agent, "mysql", null, "SELECT 123;", []),
 );
 recordAfterEvent(agent, tab, getAnswerPayload(agent));
-recordStopTrack(agent, "record", 0);
+recordStopTrack(agent, "record", { type: "manual" });
 closeAgent(agent);
 assertDeepEqual(takeLocalAgentTrace(agent, "record"), [
   {
@@ -97,6 +97,6 @@ assertDeepEqual(takeLocalAgentTrace(agent, "record"), [
   {
     type: "stop",
     track: "record",
-    status: 0,
+    termination: { type: "manual" },
   },
 ]);

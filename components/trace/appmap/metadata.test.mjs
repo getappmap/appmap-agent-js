@@ -7,7 +7,7 @@ import {
 } from "../../configuration/index.mjs?env=test";
 import { compileMetadata } from "./metadata.mjs?env=test";
 
-const test = (conf, url, errors = [], status = 0) => {
+const test = (conf, url, errors = [], termination = { type: "manual" }) => {
   let configuration = createConfiguration(url);
   configuration = extendConfiguration(configuration, conf, url);
   configuration = extendConfiguration(
@@ -25,7 +25,7 @@ const test = (conf, url, errors = [], status = 0) => {
     },
     "protocol://host/base/",
   );
-  return compileMetadata(configuration, errors, status);
+  return compileMetadata(configuration, errors, termination);
 };
 
 const default_meta_data = {
@@ -42,7 +42,7 @@ const default_meta_data = {
   recorder: { name: "process" },
   recording: undefined,
   git: undefined,
-  test_status: "succeeded",
+  test_status: undefined,
   exception: undefined,
 };
 
@@ -124,10 +124,21 @@ assertDeepEqual(
 
 // status //
 
-assertDeepEqual(test({}, "protocol://host/base/", [], 1), {
-  ...default_meta_data,
-  test_status: "failed",
-});
+assertDeepEqual(
+  test({}, "protocol://host/base/", [], { type: "test", passed: true }),
+  {
+    ...default_meta_data,
+    test_status: "succeeded",
+  },
+);
+
+assertDeepEqual(
+  test({}, "protocol://host/base/", [], { type: "test", passed: false }),
+  {
+    ...default_meta_data,
+    test_status: "failed",
+  },
+);
 
 // app //
 

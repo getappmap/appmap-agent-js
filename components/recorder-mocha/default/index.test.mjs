@@ -53,7 +53,11 @@ const mock = {
       },
     },
   });
-  afterEach();
+  afterEach.call({
+    currentTest: {
+      state: "passed",
+    },
+  });
   emitter.emit("uncaughtExceptionMonitor", new Error("BOUM"));
   emitter.emit("exit", 123, "SIGINT");
 }

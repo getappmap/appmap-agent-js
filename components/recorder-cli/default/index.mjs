@@ -32,10 +32,11 @@ export const createRecorder = (process, configuration) => {
     const agent = openAgent(configuration);
     const hooking = hook(agent, configuration);
     const tracks = new Set();
-    process.on("exit", (status, _signal) => {
-      for (const track of tracks) {
-        recordAgentStopTrack(agent, track, status);
-      }
+    process.on("exit", (status) => {
+      recordAgentStopTrack(agent, null, {
+        type: "exit",
+        status,
+      });
       unhook(hooking);
       closeAgent(agent);
     });
@@ -64,8 +65,8 @@ export const recordStartTrack = (
   recordAgentStartTrack(agent, track, configuration, url);
 };
 
-export const recordStopTrack = ({ agent, tracks }, track, status) => {
+export const recordStopTrack = ({ agent, tracks }, track, termination) => {
   assert(tracks.has(track), "missing track", InternalAppmapError);
   tracks.delete(track);
-  recordAgentStopTrack(agent, track, status);
+  recordAgentStopTrack(agent, track, termination);
 };

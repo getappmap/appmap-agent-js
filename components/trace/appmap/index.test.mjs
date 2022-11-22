@@ -149,7 +149,7 @@ assertDeepEqual(
     {
       type: "stop",
       track: "track",
-      status: 0,
+      termination: { type: "manual" },
     },
   ]),
   {
@@ -174,7 +174,7 @@ assertDeepEqual(
         recorder: { name: "process" },
         recording: undefined,
         git: undefined,
-        test_status: "succeeded",
+        test_status: undefined,
         exception: {
           class: "number",
           message: "123",

@@ -21,7 +21,7 @@ sendEmitter(emitter, {
 sendEmitter(emitter, {
   type: "stop",
   track: "record1",
-  status: 0,
+  termination: { type: "manual" },
 });
 
 assertDeepEqual(takeLocalEmitterTrace(emitter, "record1"), [
@@ -34,7 +34,7 @@ assertDeepEqual(takeLocalEmitterTrace(emitter, "record1"), [
   {
     type: "stop",
     track: "record1",
-    status: 0,
+    termination: { type: "manual" },
   },
 ]);
 
@@ -50,5 +50,5 @@ closeEmitter(emitter);
 sendEmitter(emitter, {
   type: "stop",
   track: "record2",
-  status: 0,
+  termination: { type: "manual" },
 });

@@ -8,12 +8,9 @@ const { InternalAppmapError } = await import(
 const { assert, generateDeadcode, createBox, getBox, setBox } = await import(
   `../../util/index.mjs${__search}`
 );
-const {
-  createBackend,
-  sendBackend,
-  getBackendTrackIterator,
-  takeBackendTrace,
-} = await import(`../../backend/index.mjs${__search}`);
+const { createBackend, sendBackend, takeBackendTrace } = await import(
+  `../../backend/index.mjs${__search}`
+);
 
 export const openEmitter = (configuration) => ({
   closed: createBox(false),
@@ -28,19 +25,12 @@ export const closeEmitter = ({ closed, backend }) => {
   );
   setBox(closed, true);
   sendBackend(backend, {
-    type: "error",
-    error: {
-      type: "string",
-      print: "disconnection",
+    type: "stop",
+    track: null,
+    termination: {
+      type: "disconnect",
     },
   });
-  for (const key of getBackendTrackIterator(backend)) {
-    sendBackend(backend, {
-      type: "stop",
-      track: key,
-      status: 1,
-    });
-  }
 };
 
 export const sendEmitter = ({ backend, closed }, message) => {

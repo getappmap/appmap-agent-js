@@ -37,7 +37,7 @@ export const testHookAsync = async (
   try {
     recordStartTrack(agent, "record", {}, null);
     await callbackAsync();
-    recordStopTrack(agent, "record", 0);
+    recordStopTrack(agent, "record", { type: "manual" });
     const trace = takeLocalAgentTrace(agent, "record");
     assert(
       trace[0].type === "start",

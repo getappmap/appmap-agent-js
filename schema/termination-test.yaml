@@ -1,0 +1,8 @@
+type: object
+required: [type, passed]
+additionalProperties: false
+properties:
+  type:
+    const: test
+  passed:
+    type: boolean 

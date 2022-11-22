@@ -1,0 +1,6 @@
+anyOf:
+  - $ref: termination-exit
+  - $ref: termination-disconnect
+  - $ref: termination-test
+  - $ref: termination-manual
+  - $ref: termination-unknown

@@ -47,7 +47,7 @@ await runAsync(
         name: "map-name",
         app: "app-name",
         recorder: { name: "process" },
-        test_status: "succeeded",
+        test_status: undefined,
         exception: undefined,
       },
     );

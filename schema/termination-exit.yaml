@@ -1,0 +1,10 @@
+type: object
+required: [type, status]
+additionalProperties: false
+properties:
+  type:
+    const: exit
+  status:
+    type: integer
+    minimum: 0
+    maximum: 255

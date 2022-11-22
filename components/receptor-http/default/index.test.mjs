@@ -123,37 +123,32 @@ await assertRequestAsync("GET", "/_appmap/track", null, {
   await assertRequestAsync("GET", "/_appmap/track1", null, {
     body: { enabled: true },
   });
-  await assertRequestAsync(
-    "DELETE",
-    "/session/track1",
-    { status: 123 },
-    {
-      body: [
-        {
-          type: "start",
-          track: "track1",
-          configuration: {
-            name: "name",
-          },
-          url: null,
+  await assertRequestAsync("DELETE", "/session/track1", null, {
+    body: [
+      {
+        type: "start",
+        track: "track1",
+        configuration: {
+          name: "name",
         },
-        {
-          type: "stop",
-          track: "track1",
-          status: 123,
+        url: null,
+      },
+      {
+        type: "stop",
+        track: "track1",
+        termination: {
+          type: "manual",
         },
-      ],
-    },
-  );
+      },
+    ],
+  });
   await assertRequestAsync("GET", "/_appmap/track1", null, {
     body: { enabled: false },
   });
-  await assertRequestAsync(
-    "DELETE",
-    "/session/track1",
-    { status: 123 },
-    { code: 404, message: "Missing Track" },
-  );
+  await assertRequestAsync("DELETE", "/session/track1", null, {
+    code: 404,
+    message: "Missing Track",
+  });
   socket.write(
     createMessage(
       stringifyJSON({
@@ -194,48 +189,38 @@ await assertRequestAsync("GET", "/_appmap/track", null, {
     socket.on("close", resolve);
     socket.end();
   });
-  await assertRequestAsync(
-    "DELETE",
-    "/session/track2",
-    { status: 123 },
-    {
-      body: [
-        {
-          type: "start",
-          track: "track2",
-          configuration: {},
-          url: null,
+  await assertRequestAsync("DELETE", "/session/track2", null, {
+    body: [
+      {
+        type: "start",
+        track: "track2",
+        configuration: {},
+        url: null,
+      },
+      {
+        type: "source",
+        url: "protocol://host/",
+        content: null,
+        shallow: false,
+        inline: false,
+        exclude: [],
+      },
+      {
+        type: "source",
+        url,
+        content: "content",
+        shallow: false,
+        inline: false,
+        exclude: [],
+      },
+      {
+        type: "stop",
+        track: null,
+        termination: {
+          type: "disconnect",
         },
-        {
-          type: "source",
-          url: "protocol://host/",
-          content: null,
-          shallow: false,
-          inline: false,
-          exclude: [],
-        },
-        {
-          type: "source",
-          url,
-          content: "content",
-          shallow: false,
-          inline: false,
-          exclude: [],
-        },
-        {
-          type: "error",
-          error: {
-            type: "string",
-            print: "disconnection",
-          },
-        },
-        {
-          type: "stop",
-          track: "track2",
-          status: 1,
-        },
-      ],
-    },
-  );
+      },
+    ],
+  });
   await closeReceptorAsync(receptor);
 }

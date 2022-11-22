@@ -32,7 +32,6 @@ const { openServiceAsync, closeServiceAsync, getServicePort } = await import(
 const {
   createBackend,
   sendBackend,
-  getBackendTrackIterator,
   getBackendTraceIterator,
   takeBackendTrace,
 } = await import(`../../backend/index.mjs${__search}`);
@@ -109,19 +108,12 @@ export const openReceptorAsync = async ({
           const backend = createBackend(configuration);
           socket.on("close", () => {
             sendBackend(backend, {
-              type: "error",
-              error: {
-                type: "string",
-                print: "disconnection",
+              type: "stop",
+              track: null,
+              termination: {
+                type: "disconnect",
               },
             });
-            for (const key of getBackendTrackIterator(backend)) {
-              sendBackend(backend, {
-                type: "stop",
-                track: key,
-                status: 1,
-              });
-            }
             for (const key of getBackendTraceIterator(backend)) {
               store(urls, base, takeBackendTrace(backend, key));
             }
