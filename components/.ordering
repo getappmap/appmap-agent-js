@@ -50,7 +50,6 @@ hook-http-client
 hook-http-server
 hook
 recorder-api
-recorder-cli
 recorder-process
 recorder-mocha
 recorder-remote
