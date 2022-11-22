@@ -85,16 +85,29 @@ const makeRecorder = (recorder) => {
   return { name: recorder };
 };
 
-const makeException = (errors) => {
-  const { length } = errors;
-  if (length === 0) {
+const makeException = (serials) => {
+  if (serials.length === 0) {
     return null;
   } else {
-    const [{ name, message }] = errors;
-    return {
-      class: recoverMaybe(name, "APPMAP-MISSING-ERROR-NAME"),
-      message,
-    };
+    const serial = serials[0];
+    if (serial.type === "object" || serial.type === "function") {
+      if (serial.specific !== null && serial.specific.type === "error") {
+        return {
+          class: serial.specific.name,
+          message: serial.specific.message,
+        };
+      } else {
+        return {
+          class: serial.constructor,
+          message: serial.print,
+        };
+      }
+    } else {
+      return {
+        class: serial.type,
+        message: serial.print,
+      };
+    }
   }
 };
 

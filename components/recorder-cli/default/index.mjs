@@ -1,12 +1,10 @@
-const { Set, Error, URL } = globalThis;
+const { Set, URL } = globalThis;
 
 const { search: __search } = new URL(import.meta.url);
 
-const { logInfo, logErrorWhen } = await import(
-  `../../log/index.mjs${__search}`
-);
+const { logInfo } = await import(`../../log/index.mjs${__search}`);
 const { hook, unhook } = await import(`../../hook/index.mjs${__search}`);
-const { InternalAppmapError, ExternalAppmapError } = await import(
+const { InternalAppmapError } = await import(
   `../../error/index.mjs${__search}`
 );
 const { assert } = await import(`../../util/index.mjs${__search}`);
@@ -36,44 +34,7 @@ export const createRecorder = (process, configuration) => {
     const hooking = hook(agent, configuration);
     const tracks = new Set();
     process.on("uncaughtExceptionMonitor", (error) => {
-      assert(
-        !logErrorWhen(
-          !(error instanceof Error),
-          "Expected uncaught error to be an instance of Error, got: %o",
-          error,
-        ),
-        "Uncaught error is not an actual error",
-        ExternalAppmapError,
-      );
-      const { name, message, stack } = error;
-      assert(
-        !logErrorWhen(
-          typeof name !== "string",
-          "Expected uncaught error's name to be a string, got: %o",
-          name,
-        ),
-        "Uncaught error name is not a string",
-        ExternalAppmapError,
-      );
-      assert(
-        !logErrorWhen(
-          typeof message !== "string",
-          "Expected uncaught error's message to be a string, got: %o",
-          message,
-        ),
-        "Uncaught error message is not a string",
-        ExternalAppmapError,
-      );
-      assert(
-        !logErrorWhen(
-          typeof stack !== "string",
-          "Expected uncaught error's stack to be a string, got: %o",
-          stack,
-        ),
-        "Uncaught error stack is not a string",
-        ExternalAppmapError,
-      ),
-        recordAgentError(agent, name, message, stack);
+      recordAgentError(agent, error);
     });
     process.on("exit", (status, _signal) => {
       for (const track of tracks) {

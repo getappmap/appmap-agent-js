@@ -70,26 +70,64 @@ assertDeepEqual(test({ recorder: "process" }, "protocol://host/base/"), {
   recorder: { name: "process" },
 });
 
-// termination //
+// exception //
 
 assertDeepEqual(
-  test(
-    {},
-    "protocol://host/base/",
-    [
-      {
-        name: "error-name",
-        message: "error-message",
-      },
-    ],
-    1,
-  ),
+  test({}, "protocol://host/base/", [
+    {
+      type: "number",
+      print: "123",
+    },
+  ]),
   {
     ...default_meta_data,
-    test_status: "failed",
-    exception: { class: "error-name", message: "error-message" },
+    exception: { class: "number", message: "123" },
   },
 );
+
+assertDeepEqual(
+  test({}, "protocol://host/base/", [
+    {
+      type: "object",
+      print: "print",
+      index: 123,
+      constructor: "constructor",
+      specific: null,
+    },
+  ]),
+  {
+    ...default_meta_data,
+    exception: { class: "constructor", message: "print" },
+  },
+);
+
+assertDeepEqual(
+  test({}, "protocol://host/base/", [
+    {
+      type: "object",
+      print: "print",
+      index: 123,
+      constructor: "constructor",
+      specific: {
+        type: "error",
+        name: "name",
+        message: "message",
+        stack: "stack",
+      },
+    },
+  ]),
+  {
+    ...default_meta_data,
+    exception: { class: "name", message: "message" },
+  },
+);
+
+// status //
+
+assertDeepEqual(test({}, "protocol://host/base/", [], 1), {
+  ...default_meta_data,
+  test_status: "failed",
+});
 
 // app //
 

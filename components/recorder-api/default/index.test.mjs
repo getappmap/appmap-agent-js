@@ -34,7 +34,7 @@ assertThrow(
   /^ExternalAppmapError: Invalid url argument$/u,
 );
 assertEqual(appmap.recordScript("123;", "protocol://host/base/main.js"), 123);
-assertEqual(appmap.recordError("name", "message", "stack"), undefined);
+assertEqual(appmap.recordError(123), undefined);
 assertDeepEqual(appmap.stopRecording(track, 123), [
   {
     type: "source",
@@ -52,9 +52,10 @@ assertDeepEqual(appmap.stopRecording(track, 123), [
   },
   {
     type: "error",
-    name: "name",
-    message: "message",
-    stack: "stack",
+    error: {
+      type: "number",
+      print: "123",
+    },
   },
   {
     type: "stop",

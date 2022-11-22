@@ -141,9 +141,10 @@ assertDeepEqual(
     },
     {
       type: "error",
-      name: "name",
-      message: "message",
-      stack: "stack",
+      error: {
+        type: "number",
+        print: "123",
+      },
     },
     {
       type: "stop",
@@ -175,8 +176,8 @@ assertDeepEqual(
         git: undefined,
         test_status: "succeeded",
         exception: {
-          class: "name",
-          message: "message",
+          class: "number",
+          message: "123",
         },
       },
       classMap: [

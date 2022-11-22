@@ -9,6 +9,7 @@ const { createInstrumentation, instrument: instrumentInner } = await import(
 );
 const {
   createSerialization,
+  serialize,
   getSerializationEmptyValue: getSerializationEmptyValueInner,
 } = await import(`../../serialization/index.mjs${__search}`);
 
@@ -84,6 +85,11 @@ export const instrument = (
   };
 };
 
+export const formatError = ({ serialization }, value) => ({
+  type: "error",
+  error: serialize(serialization, value),
+});
+
 export const formatStartTrack = ({}, track, configuration, url) => ({
   type: "start",
   track,
@@ -95,13 +101,6 @@ export const formatStopTrack = ({}, track, status) => ({
   type: "stop",
   track,
   status,
-});
-
-export const formatError = ({}, name, message, stack) => ({
-  type: "error",
-  name,
-  message,
-  stack,
 });
 
 export const formatGroup = ({}, group, child, description) => ({

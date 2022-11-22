@@ -49,9 +49,10 @@ const configuration = extendConfiguration(
   assertEqual(
     sendBackend(backend, {
       type: "error",
-      name: "name",
-      message: "message",
-      stack: "stack",
+      error: {
+        type: "number",
+        print: "123",
+      },
     }),
     undefined,
   );
@@ -86,9 +87,10 @@ const configuration = extendConfiguration(
       },
       {
         type: "error",
-        name: "name",
-        message: "message",
-        stack: "stack",
+        error: {
+          type: "number",
+          print: "123",
+        },
       },
       {
         type: "stop",

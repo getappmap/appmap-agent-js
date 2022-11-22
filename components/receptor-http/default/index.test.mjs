@@ -224,9 +224,10 @@ await assertRequestAsync("GET", "/_appmap/track", null, {
         },
         {
           type: "error",
-          name: "AppmapError",
-          message: "disconnection",
-          stack: "",
+          error: {
+            type: "string",
+            print: "disconnection",
+          },
         },
         {
           type: "stop",

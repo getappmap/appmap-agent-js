@@ -110,9 +110,10 @@ export const openReceptorAsync = async ({
           socket.on("close", () => {
             sendBackend(backend, {
               type: "error",
-              name: "AppmapError",
-              message: "disconnection",
-              stack: "",
+              error: {
+                type: "string",
+                print: "disconnection",
+              },
             });
             for (const key of getBackendTrackIterator(backend)) {
               sendBackend(backend, {

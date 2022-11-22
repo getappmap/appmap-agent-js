@@ -89,7 +89,7 @@ export const compileTrace = (configuration, messages) => {
     } else if (type === "stop") {
       status = message.status;
     } else if (type === "error") {
-      errors.push(message);
+      errors.push(message.error);
     } else if (type === "event") {
       events.push(message);
     } else if (type === "group") {

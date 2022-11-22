@@ -27,13 +27,14 @@ export const closeEmitter = ({ closed, backend }) => {
     InternalAppmapError,
   );
   setBox(closed, true);
+  sendBackend(backend, {
+    type: "error",
+    error: {
+      type: "string",
+      print: "disconnection",
+    },
+  });
   for (const key of getBackendTrackIterator(backend)) {
-    sendBackend(backend, {
-      type: "error",
-      name: "AppmapError",
-      message: "disconnection",
-      stack: "",
-    });
     sendBackend(backend, {
       type: "stop",
       track: key,

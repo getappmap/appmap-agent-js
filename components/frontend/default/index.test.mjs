@@ -1,3 +1,5 @@
+const { Error } = globalThis;
+
 import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
 import { createMirrorSourceMap } from "../../source/index.mjs?env=test";
 import { validateMessage } from "../../validate/index.mjs?env=test";
@@ -43,7 +45,8 @@ validateMessage(formatStartTrack(frontend, "track", {}, null));
 
 validateMessage(formatStopTrack(frontend, "track", 0));
 
-validateMessage(formatError(frontend, "name", "message", "stack"));
+validateMessage(formatError(frontend, new Error("BOUM")));
+
 
 validateMessage(
   formatBeginEvent(frontend, 123, 456, 789, getBundlePayload(frontend)),

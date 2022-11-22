@@ -82,8 +82,8 @@ export class Appmap {
     expectRunning(this.hooking);
     return runScript(this.instrumentScript(content, url));
   }
-  recordError(name = "", message = "", stack = "") {
-    recordError(this.agent, name, message, stack);
+  recordError(error) {
+    recordError(this.agent, error);
   }
   startRecording(track, conf = {}, base = null) {
     expectRunning(this.hooking);
