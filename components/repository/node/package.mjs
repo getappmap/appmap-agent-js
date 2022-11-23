@@ -2,7 +2,6 @@ const {
   URL,
   JSON: { parse: parseJSON },
 } = globalThis;
-const { search: __search } = new URL(import.meta.url);
 
 import { readFileSync as readFile } from "node:fs";
 

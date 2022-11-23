@@ -5,8 +5,6 @@ const {
   JSON: { stringify: stringifyJSON, parse: parseJSON },
 } = globalThis;
 
-const { search: __search } = new URL(import.meta.url);
-
 import { readFileSync } from "node:fs";
 import { toAbsoluteUrl } from "../../url/index.mjs";
 import {

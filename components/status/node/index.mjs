@@ -1,6 +1,5 @@
 const { URL } = globalThis;
 const { url: __url } = import.meta;
-const { search: __search } = new URL(__url);
 
 const {
   JSON: { parse: parseJSON, stringify: stringifyJSON },

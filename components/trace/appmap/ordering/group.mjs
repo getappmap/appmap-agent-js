@@ -6,10 +6,7 @@
 const {
   Array: { from: toArray },
   Map,
-  URL,
 } = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
 
 const makeFrame = (enter, children, leave) => ({ enter, children, leave });
 

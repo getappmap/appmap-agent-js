@@ -1,12 +1,9 @@
 const {
-  URL,
   String,
   Array: { isArray },
   Object: { fromEntries },
   Reflect: { ownKeys },
 } = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
 
 import {
   InternalAppmapError,

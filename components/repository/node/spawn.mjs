@@ -1,7 +1,5 @@
 const { URL } = globalThis;
 
-const { search: __search } = new URL(import.meta.url);
-
 import { spawnSync as spawnChildProcess } from "child_process";
 import { ExternalAppmapError } from "../../error/index.mjs";
 

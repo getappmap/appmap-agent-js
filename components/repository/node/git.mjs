@@ -1,7 +1,5 @@
 const { URL, parseInt } = globalThis;
 
-const { search: __search } = new URL(import.meta.url);
-
 import { spawnSync } from "child_process";
 import { readdirSync as readdir } from "fs";
 import { convertFileUrlToPath } from "../../path/index.mjs";

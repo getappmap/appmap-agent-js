@@ -1,6 +1,3 @@
-const { URL } = globalThis;
-const { search: __search } = new URL(import.meta.url);
-
 import { hook as hookMysql, unhook as unhookMysql } from "./mysql.mjs";
 import { hook as hookPg, unhook as unhookPg } from "./pg.mjs";
 import { hook as hookSqlite3, unhook as unhookSqlite3 } from "./sqlite3.mjs";

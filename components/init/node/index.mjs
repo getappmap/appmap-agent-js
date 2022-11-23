@@ -1,6 +1,4 @@
-const { URL, Promise, process, Set, Array, JSON } = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
+const { Promise, process, Set, Array, JSON } = globalThis;
 
 import fs from "fs";
 import glob from "glob";

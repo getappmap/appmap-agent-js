@@ -5,8 +5,6 @@ const {
   Object: { entries: toEntries },
 } = globalThis;
 
-const { search: __search } = new URL(import.meta.url);
-
 import { logInfoWhen } from "../../log/index.mjs";
 import { hasOwnProperty, coalesce, identity } from "../../util/index.mjs";
 import { toAbsoluteUrl, toDirectoryUrl } from "../../url/index.mjs";

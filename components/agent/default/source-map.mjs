@@ -1,6 +1,3 @@
-const { URL } = globalThis;
-const { search: __search } = new URL(import.meta.url);
-
 import {
   extractSourceMapUrl,
   createMirrorSourceMap,

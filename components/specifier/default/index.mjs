@@ -1,6 +1,4 @@
-const { URL, Map, RegExp } = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
+const { Map, RegExp } = globalThis;
 
 import Minimatch from "minimatch";
 import {

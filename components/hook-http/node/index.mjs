@@ -6,10 +6,7 @@ const {
   JSON: { parse: parseJSON },
   Math: { round },
   undefined,
-  URL,
 } = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
 
 import { toNumber, jsonifyNumber, toString } from "../../util/index.mjs";
 import { logWarning } from "../../log/index.mjs";

@@ -1,12 +1,9 @@
 const {
-  URL,
   Buffer: { from: toBuffer, concat: concatBuffer },
   Promise,
   Error,
   JSON: { parse: parseJSON, stringify: stringifyJSON },
 } = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
 
 import Http from "node:http";
 

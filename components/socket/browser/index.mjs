@@ -1,6 +1,4 @@
-const { URL, String, WebSocket } = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
+const { String, WebSocket } = globalThis;
 
 import { InternalAppmapError } from "../../error/index.mjs";
 import { assert } from "../../util/index.mjs";

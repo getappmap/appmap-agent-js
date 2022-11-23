@@ -1,11 +1,8 @@
 const {
-  URL,
   String,
   Reflect: { ownKeys },
   Array: { isArray },
 } = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
 
 import { logInfoWhen } from "../../../log/index.mjs";
 import { hasOwnProperty } from "../../../util/index.mjs";

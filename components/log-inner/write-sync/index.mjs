@@ -1,6 +1,4 @@
-const { URL, parseInt } = globalThis;
-
-const { search: __search, searchParams: __params } = new URL(import.meta.url);
+const { URL, parseInt, __params } = globalThis;
 
 // NB: Synchronous loggin is important to avoid infinite loop when async hooks are enabled.
 import { openSync, writeSync } from "fs";

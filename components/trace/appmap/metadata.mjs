@@ -1,6 +1,4 @@
-const { undefined, URL } = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
+const { undefined } = globalThis;
 
 import { InternalAppmapError } from "../../error/index.mjs";
 import { assert, mapMaybe, recoverMaybe } from "../../util/index.mjs";

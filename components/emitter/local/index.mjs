@@ -1,6 +1,3 @@
-const { URL } = globalThis;
-const { search: __search } = new URL(import.meta.url);
-
 import { logWarning } from "../../log/index.mjs";
 import { InternalAppmapError } from "../../error/index.mjs";
 import {

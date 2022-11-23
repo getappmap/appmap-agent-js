@@ -1,10 +1,7 @@
 const {
-  URL,
   Array: { from: toArray },
   Map,
 } = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
 
 // Resolve jumps.
 // Insert trees starting by an after event next to their corresponding before event.

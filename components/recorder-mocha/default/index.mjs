@@ -1,7 +1,3 @@
-const { URL } = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
-
 import { ExternalAppmapError } from "../../error/index.mjs";
 import { logInfo, logErrorWhen } from "../../log/index.mjs";
 import { hook } from "../../hook/index.mjs";

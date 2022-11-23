@@ -1,7 +1,3 @@
-const { URL } = globalThis;
-
-const { search: __search, searchParams: __params } = new URL(import.meta.url);
-
 import { format } from "../../util/index.mjs";
 
 const log = (template, ...rest) => {

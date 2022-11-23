@@ -1,6 +1,4 @@
-const { Set, String, URL } = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
+const { URL, Set, String } = globalThis;
 
 import {
   InternalAppmapError,

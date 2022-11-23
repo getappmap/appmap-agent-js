@@ -1,7 +1,3 @@
-const { URL } = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
-
 import { InternalAppmapError } from "../../../error/index.mjs";
 import {
   mapMaybe,

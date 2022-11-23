@@ -1,7 +1,3 @@
-const { URL } = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
-
 import Treeify from "treeify";
 import AjvErrorTree from "ajv-error-tree";
 import {

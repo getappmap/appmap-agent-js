@@ -1,6 +1,4 @@
-const { URL, Map, Set, String } = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
+const { Map, Set, String } = globalThis;
 
 import { toRelativeUrl } from "../../../url/index.mjs";
 import { logInfoWhen, logWarning } from "../../../log/index.mjs";

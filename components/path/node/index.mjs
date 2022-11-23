@@ -1,7 +1,3 @@
-const { URL } = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
-
 import { platform as getPlatform, tmpdir as getTmp } from "node:os";
 
 export { fileURLToPath as convertFileUrlToPath } from "node:url";
