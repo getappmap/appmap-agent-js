@@ -2,10 +2,8 @@ const { URL } = globalThis;
 
 const { search: __search } = new URL(import.meta.url);
 
-const { InternalAppmapError } = await import(
-  `../../error/index.mjs${__search}`
-);
-const { logError } = await import(`../../log/index.mjs${__search}`);
+import { InternalAppmapError } from "../../error/index.mjs";
+import { logError } from "../../log/index.mjs";
 
 import AppmapValidate from "@appland/appmap-validate";
 

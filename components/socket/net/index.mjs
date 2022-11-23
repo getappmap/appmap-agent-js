@@ -5,13 +5,9 @@ const { search: __search } = new URL(import.meta.url);
 import { connect } from "net";
 import { Buffer } from "buffer";
 import NetSocketMessaging from "net-socket-messaging";
-const { toIpcPath, convertFileUrlToPath } = await import(
-  `../../path/index.mjs${__search}`
-);
-const { mapMaybe } = await import(`../../util/index.mjs${__search}`);
-const { logWarningWhen, logWarning } = await import(
-  `../../log/index.mjs${__search}`
-);
+import { toIpcPath, convertFileUrlToPath } from "../../path/index.mjs";
+import { mapMaybe } from "../../util/index.mjs";
+import { logWarningWhen, logWarning } from "../../log/index.mjs";
 
 const { concat: concatBuffer } = Buffer;
 const { createMessage } = NetSocketMessaging;

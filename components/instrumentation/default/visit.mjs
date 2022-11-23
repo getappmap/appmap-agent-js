@@ -8,25 +8,22 @@ const {
 
 const { search: __search } = new URL(import.meta.url);
 
-const { InternalAppmapError, ExternalAppmapError } = await import(
-  `../../error/index.mjs${__search}`
-);
-const {
+import {
+  InternalAppmapError,
+  ExternalAppmapError,
+} from "../../error/index.mjs";
+import {
   mapMaybe,
   fromMaybe,
   assert,
   hasOwnProperty,
   coalesce,
   incrementCounter,
-} = await import(`../../util/index.mjs${__search}`);
-const { toAbsoluteUrl, toDirectoryUrl } = await import(
-  `../../url/index.mjs${__search}`
-);
-const { mapSource } = await import(`../../source/index.mjs${__search}`);
-const { logDebugWhen, logErrorWhen } = await import(
-  `../../log/index.mjs${__search}`
-);
-const { getLocationBase } = await import(`../../location/index.mjs${__search}`);
+} from "../../util/index.mjs";
+import { toAbsoluteUrl, toDirectoryUrl } from "../../url/index.mjs";
+import { mapSource } from "../../source/index.mjs";
+import { logDebugWhen, logErrorWhen } from "../../log/index.mjs";
+import { getLocationBase } from "../../location/index.mjs";
 
 //////////////////////////////
 // Difficulties with groups //

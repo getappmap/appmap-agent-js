@@ -7,9 +7,9 @@
 const { URL } = globalThis;
 const { search: __search } = new URL(import.meta.url);
 
-const { groupStack } = await import(`./group.mjs${__search}`);
-const { stackify } = await import(`./stack.mjs${__search}`);
-const { jumpify } = await import(`./jump.mjs${__search}`);
+import { groupStack } from "./group.mjs";
+import { stackify } from "./stack.mjs";
+import { jumpify } from "./jump.mjs";
 
 export const orderEventArray = (events) =>
   jumpify(groupStack(stackify(events)));

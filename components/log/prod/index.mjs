@@ -2,19 +2,15 @@ const { URL } = globalThis;
 
 const { search: __search, searchParams: __params } = new URL(import.meta.url);
 
-const { InternalAppmapError } = await import(
-  `../../error/index.mjs${__search}`
-);
-const { hasOwnProperty, noop, assert, format } = await import(
-  `../../util/index.mjs${__search}`
-);
+import { InternalAppmapError } from "../../error/index.mjs";
+import { hasOwnProperty, noop, assert, format } from "../../util/index.mjs";
 
-const {
-  logDebug: logDebugInner,
-  logInfo: logInfoInner,
-  logWarning: logWarningInner,
-  logError: logErrorInner,
-} = await import(`../../log-inner/index.mjs${__search}`);
+import {
+  logDebug as logDebugInner,
+  logInfo as logInfoInner,
+  logWarning as logWarningInner,
+  logError as logErrorInner,
+} from "../../log-inner/index.mjs";
 
 const levels = {
   debug: 1,

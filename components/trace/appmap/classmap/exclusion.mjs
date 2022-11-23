@@ -6,11 +6,12 @@ const {
 
 const { search: __search } = new URL(import.meta.url);
 
-const { InternalAppmapError } = await import(
-  `../../../error/index.mjs${__search}`
-);
-const { getEntityName, getEntityQualifiedName, getEntityLabelArray } =
-  await import(`./entity.mjs${__search}`);
+import { InternalAppmapError } from "../../../error/index.mjs";
+import {
+  getEntityName,
+  getEntityQualifiedName,
+  getEntityLabelArray,
+} from "./entity.mjs";
 
 const compileCriterion = ([name, pattern]) => {
   if (typeof pattern === "boolean") {

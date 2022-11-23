@@ -1,20 +1,16 @@
 const { URL } = globalThis;
 const { search: __search } = new URL(import.meta.url);
 
-const HookApply = await import(`../../hook-apply/index.mjs${__search}`);
-const HookGroup = await import(`../../hook-group/index.mjs${__search}`);
-const HookEsm = await import(`../../hook-esm/index.mjs${__search}`);
-const HookCjs = await import(`../../hook-cjs/index.mjs${__search}`);
-const HookEval = await import(`../../hook-eval/index.mjs${__search}`);
-const HookError = await import(`../../hook-error/index.mjs${__search}`);
-const HookExit = await import(`../../hook-exit/index.mjs${__search}`);
-const HookQuery = await import(`../../hook-query/index.mjs${__search}`);
-const HookHttpClient = await import(
-  `../../hook-http-client/index.mjs${__search}`
-);
-const HookHttpServer = await import(
-  `../../hook-http-server/index.mjs${__search}`
-);
+import * as HookApply from "../../hook-apply/index.mjs";
+import * as HookGroup from "../../hook-group/index.mjs";
+import * as HookEsm from "../../hook-esm/index.mjs";
+import * as HookCjs from "../../hook-cjs/index.mjs";
+import * as HookEval from "../../hook-eval/index.mjs";
+import * as HookError from "../../hook-error/index.mjs";
+import * as HookExit from "../../hook-exit/index.mjs";
+import * as HookQuery from "../../hook-query/index.mjs";
+import * as HookHttpClient from "../../hook-http-client/index.mjs";
+import * as HookHttpServer from "../../hook-http-server/index.mjs";
 
 const Hooks = [
   HookApply,

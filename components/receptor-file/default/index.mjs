@@ -12,29 +12,23 @@ import { mkdir as mkdirAsync } from "fs/promises";
 import { writeFileSync as writeFile, readFileSync as readFile } from "fs";
 import { createServer } from "net";
 import NetSocketMessaging from "net-socket-messaging";
-const { toAbsoluteUrl } = await import(`../../url/index.mjs${__search}`);
-const { extendConfigurationPort } = await import(
-  `../../configuration-accessor/index.mjs${__search}`
-);
-const { sanitizePathFilename } = await import(
-  `../../path/index.mjs${__search}`
-);
-const { InternalAppmapError } = await import(
-  `../../error/index.mjs${__search}`
-);
-const { assert } = await import(`../../util/index.mjs${__search}`);
-const { logDebug, logWarning, logInfo, logError } = await import(
-  `../../log/index.mjs${__search}`
-);
-const { openServiceAsync, closeServiceAsync, getServicePort } = await import(
-  `../../service/index.mjs${__search}`
-);
-const {
+import { toAbsoluteUrl } from "../../url/index.mjs";
+import { extendConfigurationPort } from "../../configuration-accessor/index.mjs";
+import { sanitizePathFilename } from "../../path/index.mjs";
+import { InternalAppmapError } from "../../error/index.mjs";
+import { assert } from "../../util/index.mjs";
+import { logDebug, logWarning, logInfo, logError } from "../../log/index.mjs";
+import {
+  openServiceAsync,
+  closeServiceAsync,
+  getServicePort,
+} from "../../service/index.mjs";
+import {
   createBackend,
   sendBackend,
   getBackendTraceIterator,
   takeBackendTrace,
-} = await import(`../../backend/index.mjs${__search}`);
+} from "../../backend/index.mjs";
 
 const { patch: patchSocket } = NetSocketMessaging;
 

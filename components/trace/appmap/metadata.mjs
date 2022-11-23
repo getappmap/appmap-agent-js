@@ -2,13 +2,9 @@ const { undefined, URL } = globalThis;
 
 const { search: __search } = new URL(import.meta.url);
 
-const { InternalAppmapError } = await import(
-  `../../error/index.mjs${__search}`
-);
-const { assert, mapMaybe, recoverMaybe } = await import(
-  `../../util/index.mjs${__search}`
-);
-const { getUrlBasename } = await import(`../../url/index.mjs${__search}`);
+import { InternalAppmapError } from "../../error/index.mjs";
+import { assert, mapMaybe, recoverMaybe } from "../../util/index.mjs";
+import { getUrlBasename } from "../../url/index.mjs";
 
 /* c8 ignore start */
 const getName = ({ name }) => name;

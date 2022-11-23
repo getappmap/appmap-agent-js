@@ -7,12 +7,13 @@ const {
 
 const { search: __search } = new URL(import.meta.url);
 
-const { hasOwnProperty, mapMaybe } = await import(
-  `../../../util/index.mjs${__search}`
-);
+import { hasOwnProperty, mapMaybe } from "../../../util/index.mjs";
 
-const { toStaticFunctionEntity, makeFunctionEntity, makeClassEntity } =
-  await import(`./entity.mjs${__search}`);
+import {
+  toStaticFunctionEntity,
+  makeFunctionEntity,
+  makeClassEntity,
+} from "./entity.mjs";
 
 const isKeyRelevant = (key) =>
   key !== "start" && key !== "end" && key !== "type" && key !== "loc";

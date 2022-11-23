@@ -6,13 +6,9 @@ const {
 
 const { search: __search } = new URL(import.meta.url);
 
-const { ExternalAppmapError } = await import(
-  `../../error/index.mjs${__search}`
-);
-const { logErrorWhen } = await import(`../../log/index.mjs${__search}`);
-const { assert, hasOwnProperty } = await import(
-  `../../util/index.mjs${__search}`
-);
+import { ExternalAppmapError } from "../../error/index.mjs";
+import { logErrorWhen } from "../../log/index.mjs";
+import { assert, hasOwnProperty } from "../../util/index.mjs";
 
 export const patch = (object, key, makePatch) => {
   if (hasOwnProperty(object, key)) {

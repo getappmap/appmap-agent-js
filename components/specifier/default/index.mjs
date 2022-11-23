@@ -3,15 +3,13 @@ const { URL, Map, RegExp } = globalThis;
 const { search: __search } = new URL(import.meta.url);
 
 import Minimatch from "minimatch";
-const { ExternalAppmapError } = await import(
-  `../../error/index.mjs${__search}`
-);
-const { logError, logDebug } = await import(`../../log/index.mjs${__search}`);
-const { InternalAppmapError } = await import(
-  `../../error/index.mjs${__search}`
-);
-const { assert } = await import(`../../util/index.mjs${__search}`);
-const { toRelativeUrl } = await import(`../../url/index.mjs${__search}`);
+import {
+  InternalAppmapError,
+  ExternalAppmapError,
+} from "../../error/index.mjs";
+import { logError, logDebug } from "../../log/index.mjs";
+import { assert } from "../../util/index.mjs";
+import { toRelativeUrl } from "../../url/index.mjs";
 
 const { Minimatch: MinimatchClass } = Minimatch;
 

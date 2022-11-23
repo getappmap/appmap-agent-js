@@ -22,11 +22,13 @@ const {
 
 const { search: __search } = new URL(import.meta.url);
 
-const { identity, hasOwnProperty, incrementCounter, createCounter } =
-  await import(`../../util/index.mjs${__search}`);
-const { logDebug, logDebugWhen } = await import(
-  `../../log/index.mjs${__search}`
-);
+import {
+  identity,
+  hasOwnProperty,
+  incrementCounter,
+  createCounter,
+} from "../../util/index.mjs";
+import { logDebug, logDebugWhen } from "../../log/index.mjs";
 
 const noargs = [];
 

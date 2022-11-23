@@ -11,27 +11,23 @@ import { createServer as createTCPServer } from "net";
 import { readFileSync as readFile } from "fs";
 import { createServer as createHTTPServer } from "http";
 import NetSocketMessaging from "net-socket-messaging";
-const { InternalAppmapError } = await import(
-  `../../error/index.mjs${__search}`
-);
-const { assert, coalesce } = await import(`../../util/index.mjs${__search}`);
-const { generateRespond } = await import(`../../http/index.mjs${__search}`);
-const { logDebug, logError, logWarning } = await import(
-  `../../log/index.mjs${__search}`
-);
-const { openServiceAsync, closeServiceAsync, getServicePort } = await import(
-  `../../service/index.mjs${__search}`
-);
-const {
+import { InternalAppmapError } from "../../error/index.mjs";
+import { assert, coalesce } from "../../util/index.mjs";
+import { generateRespond } from "../../http/index.mjs";
+import { logDebug, logError, logWarning } from "../../log/index.mjs";
+import {
+  openServiceAsync,
+  closeServiceAsync,
+  getServicePort,
+} from "../../service/index.mjs";
+import {
   createBackend,
   sendBackend,
   hasBackendTrace,
   hasBackendTrack,
   takeBackendTrace,
-} = await import(`../../backend/index.mjs${__search}`);
-const { extendConfigurationPort } = await import(
-  `../../configuration-accessor/index.mjs${__search}`
-);
+} from "../../backend/index.mjs";
+import { extendConfigurationPort } from "../../configuration-accessor/index.mjs";
 
 const { patch: patchSocket } = NetSocketMessaging;
 

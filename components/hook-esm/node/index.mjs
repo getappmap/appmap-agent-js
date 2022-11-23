@@ -17,14 +17,10 @@ const {
 
 const { search: __search } = new URL(import.meta.url);
 
-const { InternalAppmapError } = await import(
-  `../../error/index.mjs${__search}`
-);
-const { assert, hasOwnProperty } = await import(
-  `../../util/index.mjs${__search}`
-);
-const { instrument } = await import(`../../agent/index.mjs${__search}`);
-const { stringifyContent } = await import(`./stringify.mjs${__search}`);
+import { InternalAppmapError } from "../../error/index.mjs";
+import { assert, hasOwnProperty } from "../../util/index.mjs";
+import { instrument } from "../../agent/index.mjs";
+import { stringifyContent } from "./stringify.mjs";
 
 export const unhook = (esm_hook_variable) => {
   if (esm_hook_variable !== null) {

@@ -3,11 +3,9 @@ const { Set, URL } = globalThis;
 const { search: __search } = new URL(import.meta.url);
 
 import { createHook } from "async_hooks";
-const { InternalAppmapError } = await import(
-  `../../error/index.mjs${__search}`
-);
-const { assert } = await import(`../../util/index.mjs${__search}`);
-const { recordGroup } = await import(`../../agent/index.mjs${__search}`);
+import { InternalAppmapError } from "../../error/index.mjs";
+import { assert } from "../../util/index.mjs";
+import { recordGroup } from "../../agent/index.mjs";
 
 export const hook = (agent, { ordering }) => {
   if (ordering !== "causal") {

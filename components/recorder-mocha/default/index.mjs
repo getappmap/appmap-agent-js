@@ -2,20 +2,19 @@ const { URL } = globalThis;
 
 const { search: __search } = new URL(import.meta.url);
 
-const { ExternalAppmapError } = await import(
-  `../../error/index.mjs${__search}`
-);
-const { logInfo, logErrorWhen } = await import(
-  `../../log/index.mjs${__search}`
-);
-const { hook } = await import(`../../hook/index.mjs${__search}`);
-const { assert } = await import(`../../util/index.mjs${__search}`);
-const { isConfigurationEnabled, extendConfigurationNode } = await import(
-  `../../configuration-accessor/index.mjs${__search}`
-);
-const { openAgent, recordStartTrack, recordStopTrack } = await import(
-  `../../agent/index.mjs${__search}`
-);
+import { ExternalAppmapError } from "../../error/index.mjs";
+import { logInfo, logErrorWhen } from "../../log/index.mjs";
+import { hook } from "../../hook/index.mjs";
+import { assert } from "../../util/index.mjs";
+import {
+  isConfigurationEnabled,
+  extendConfigurationNode,
+} from "../../configuration-accessor/index.mjs";
+import {
+  openAgent,
+  recordStartTrack,
+  recordStopTrack,
+} from "../../agent/index.mjs";
 
 export const createMochaHooks = (process, configuration) => {
   configuration = extendConfigurationNode(configuration, process);

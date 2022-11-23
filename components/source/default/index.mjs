@@ -6,17 +6,14 @@ const {
 const { search: __search } = new URL(import.meta.url);
 
 import { decode as decodeVlq } from "vlq";
-const { InternalAppmapError, ExternalAppmapError } = await import(
-  `../../error/index.mjs${__search}`
-);
-const { toDirectoryUrl, toAbsoluteUrl } = await import(
-  `../../url/index.mjs${__search}`
-);
-const { logInfo, logError } = await import(`../../log/index.mjs${__search}`);
-const { makeLocation } = await import(`../../location/index.mjs${__search}`);
-const { validateSourceMap } = await import(
-  `../../validate/index.mjs${__search}`
-);
+import {
+  InternalAppmapError,
+  ExternalAppmapError,
+} from "../../error/index.mjs";
+import { toDirectoryUrl, toAbsoluteUrl } from "../../url/index.mjs";
+import { logInfo, logError } from "../../log/index.mjs";
+import { makeLocation } from "../../location/index.mjs";
+import { validateSourceMap } from "../../validate/index.mjs";
 
 export const extractSourceMapUrl = ({ url: base, content }) => {
   const parts = /\/\/[#@] sourceMappingURL=(.*)[\r\n]*$/u.exec(content);

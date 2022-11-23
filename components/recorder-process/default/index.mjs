@@ -2,14 +2,13 @@ const { URL } = globalThis;
 
 const { search: __search } = new URL(import.meta.url);
 
-const { logInfo } = await import(`../../log/index.mjs${__search}`);
-const { hook } = await import(`../../hook/index.mjs${__search}`);
-const { isConfigurationEnabled, extendConfigurationNode } = await import(
-  `../../configuration-accessor/index.mjs${__search}`
-);
-const { openAgent, recordStartTrack } = await import(
-  `../../agent/index.mjs${__search}`
-);
+import { logInfo } from "../../log/index.mjs";
+import { hook } from "../../hook/index.mjs";
+import {
+  isConfigurationEnabled,
+  extendConfigurationNode,
+} from "../../configuration-accessor/index.mjs";
+import { openAgent, recordStartTrack } from "../../agent/index.mjs";
 
 export const main = (process, configuration) => {
   configuration = extendConfigurationNode(configuration, process);

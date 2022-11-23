@@ -2,9 +2,7 @@ const { URL } = globalThis;
 
 const { search: __search } = new URL(import.meta.url);
 
-const { InternalAppmapError } = await import(
-  `../../../error/index.mjs${__search}`
-);
+import { InternalAppmapError } from "../../../error/index.mjs";
 
 const payloads = {
   jump: {

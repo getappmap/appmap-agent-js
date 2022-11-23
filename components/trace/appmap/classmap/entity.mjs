@@ -2,15 +2,14 @@ const { URL, String, parseInt } = globalThis;
 
 const { search: __search } = new URL(import.meta.url);
 
-const { assert } = await import(`../../../util/index.mjs${__search}`);
-const { getUrlBasename, toAbsoluteUrl } = await import(
-  `../../../url/index.mjs${__search}`
-);
-const { InternalAppmapError } = await import(
-  `../../../error/index.mjs${__search}`
-);
-const { getLeadingCommentArray, printComment, extractCommentLabelArray } =
-  await import(`./parse.mjs${__search}`);
+import { assert } from "../../../util/index.mjs";
+import { getUrlBasename, toAbsoluteUrl } from "../../../url/index.mjs";
+import { InternalAppmapError } from "../../../error/index.mjs";
+import {
+  getLeadingCommentArray,
+  printComment,
+  extractCommentLabelArray,
+} from "./parse.mjs";
 
 const isFunctionEntity = ({ type }) => type === "function";
 

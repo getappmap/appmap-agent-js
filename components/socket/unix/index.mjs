@@ -5,9 +5,7 @@ const { search: __search } = new URL(import.meta.url);
 // Dynamically import optional dependencies
 import { createRequire } from "module";
 
-const { toIpcPath, convertFileUrlToPath } = await import(
-  `../../path/index.mjs${__search}`
-);
+import { toIpcPath, convertFileUrlToPath } from "../../path/index.mjs";
 
 const require = createRequire(import.meta.url);
 

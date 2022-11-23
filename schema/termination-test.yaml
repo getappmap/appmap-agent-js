@@ -5,4 +5,4 @@ properties:
   type:
     const: test
   passed:
-    type: boolean 
+    type: boolean

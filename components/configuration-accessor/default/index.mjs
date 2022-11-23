@@ -8,30 +8,26 @@ const {
 const { search: __search } = new URL(import.meta.url);
 
 import { readFileSync } from "node:fs";
-const { toAbsoluteUrl } = await import(`../../url/index.mjs${__search}`);
-const {
+import { toAbsoluteUrl } from "../../url/index.mjs";
+import {
   toDirectoryPath,
   convertFileUrlToPath,
   convertPathToFileUrl,
   getShell,
   toAbsolutePath,
-} = await import(`../../path/index.mjs${__search}`);
-const { InternalAppmapError, ExternalAppmapError } = await import(
-  `../../error/index.mjs${__search}`
-);
-const { assert, coalesce, generateDeadcode } = await import(
-  `../../util/index.mjs${__search}`
-);
-const { logWarningWhen, logErrorWhen, logError } = await import(
-  `../../log/index.mjs${__search}`
-);
-const { extractRepositoryHistory, extractRepositoryPackage } = await import(
-  `../../repository/index.mjs${__search}`
-);
-const { matchSpecifier } = await import(`../../specifier/index.mjs${__search}`);
-const { extendConfiguration } = await import(
-  `../../configuration/index.mjs${__search}`
-);
+} from "../../path/index.mjs";
+import {
+  InternalAppmapError,
+  ExternalAppmapError,
+} from "../../error/index.mjs";
+import { assert, coalesce, generateDeadcode } from "../../util/index.mjs";
+import { logWarningWhen, logErrorWhen, logError } from "../../log/index.mjs";
+import {
+  extractRepositoryHistory,
+  extractRepositoryPackage,
+} from "../../repository/index.mjs";
+import { matchSpecifier } from "../../specifier/index.mjs";
+import { extendConfiguration } from "../../configuration/index.mjs";
 
 const getSpecifierValue = (pairs, key, def) => {
   for (const [specifier, value] of pairs) {

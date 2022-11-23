@@ -1,19 +1,18 @@
 const { URL } = globalThis;
 const { search: __search } = new URL(import.meta.url);
 
-const { createCounter, incrementCounter } = await import(
-  `../../util/index.mjs${__search}`
-);
-const { createInstrumentation, instrument: instrumentInner } = await import(
-  `../../instrumentation/index.mjs${__search}`
-);
-const {
+import { createCounter, incrementCounter } from "../../util/index.mjs";
+import {
+  createInstrumentation,
+  instrument as instrumentInner,
+} from "../../instrumentation/index.mjs";
+import {
   createSerialization,
   serialize,
-  getSerializationEmptyValue: getSerializationEmptyValueInner,
-} = await import(`../../serialization/index.mjs${__search}`);
+  getSerializationEmptyValue as getSerializationEmptyValueInner,
+} from "../../serialization/index.mjs";
 
-export const {
+export {
   getJumpPayload,
   getBundlePayload,
   formatApplyPayload,
@@ -30,7 +29,7 @@ export const {
   getAnswerPayload,
   formatGroupPayload,
   formatUngroupPayload,
-} = await import(`./payload.mjs${__search}`);
+} from "./payload.mjs";
 
 const toSourceMessage = (source) => ({
   type: "source",
