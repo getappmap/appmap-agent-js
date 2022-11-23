@@ -1,15 +1,15 @@
 import { assertDeepEqual, assertEqual } from "../../../__fixture__.mjs";
-import { makeLocation } from "../../../location/index.mjs?env=test";
+import { makeLocation } from "../../../location/index.mjs";
 import {
   createConfiguration,
   extendConfiguration,
-} from "../../../configuration/index.mjs?env=test";
+} from "../../../configuration/index.mjs";
 import {
   createClassmap,
   addClassmapSource,
   compileClassmap,
   lookupClassmapClosure,
-} from "./index.mjs?env=test";
+} from "./index.mjs";
 
 const default_exclusion = {
   combinator: "and",

@@ -1,7 +1,7 @@
 import { assertDeepEqual, assertEqual } from "../../__fixture__.mjs";
-import { validateInternalConfiguration } from "../../validate/index.mjs?env=test";
-import { matchSpecifier } from "../../specifier/index.mjs?env=test";
-import { createConfiguration, extendConfiguration } from "./index.mjs?env=test";
+import { validateInternalConfiguration } from "../../validate/index.mjs";
+import { matchSpecifier } from "../../specifier/index.mjs";
+import { createConfiguration, extendConfiguration } from "./index.mjs";
 
 const { undefined } = globalThis;
 

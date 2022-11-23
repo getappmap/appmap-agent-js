@@ -1,5 +1,5 @@
 import { assertThrow, assertEqual } from "../../__fixture__.mjs";
-import { validateMocha } from "./index.mjs?env=test";
+import { validateMocha } from "./index.mjs";
 
 const { undefined } = globalThis;
 

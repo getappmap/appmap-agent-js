@@ -1,5 +1,5 @@
 import { assertDeepEqual } from "../../../__fixture__.mjs";
-import { jumpify } from "./jump.mjs?env=test";
+import { jumpify } from "./jump.mjs";
 
 export const generateMakeEvent = (site, type) => (tab) => ({
   type: "event",

@@ -1,5 +1,5 @@
 import { assertDeepEqual } from "../../../__fixture__.mjs";
-import { stackify } from "./stack.mjs?env=test";
+import { stackify } from "./stack.mjs";
 
 export const generateMakeEvent = (site, type) => (tab) => ({
   type: "event",

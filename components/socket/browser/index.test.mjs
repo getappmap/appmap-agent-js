@@ -16,9 +16,7 @@ globalThis.WebSocket = function (url) {
   };
 };
 
-const { openSocket, sendSocket, closeSocket } = await import(
-  "./index.mjs?env=test"
-);
+const { openSocket, sendSocket, closeSocket } = await import("./index.mjs");
 
 const socket = openSocket("host", 8080);
 sendSocket(socket, "message");

@@ -4,7 +4,7 @@ import {
   logWarning,
   logWarningWhen,
   logInfo,
-} from "./index.mjs?env=test&log-level=warning";
+} from "./index.mjs&log-level=warning";
 
 logInfo("foo");
 logWarning("bar");

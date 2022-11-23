@@ -3,10 +3,7 @@ import {
   assertEqual,
   assertThrow,
 } from "../../../__fixture__.mjs";
-import {
-  isMatchingEvent,
-  manufactureMatchingEvent,
-} from "./matching.mjs?env=test";
+import { isMatchingEvent, manufactureMatchingEvent } from "./matching.mjs";
 
 const event1 = {
   type: "event",

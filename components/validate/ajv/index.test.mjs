@@ -1,5 +1,5 @@
 import { assertEqual, assertThrow } from "../../__fixture__.mjs";
-import { validateExternalConfiguration } from "./index.mjs?env=test";
+import { validateExternalConfiguration } from "./index.mjs";
 
 const { undefined } = globalThis;
 

@@ -1,5 +1,5 @@
 import { assertDeepEqual } from "../../../__fixture__.mjs";
-import { groupStack } from "./group.mjs?env=test";
+import { groupStack } from "./group.mjs";
 
 const makeEvent = (site, group, payload) => ({
   type: "event",

@@ -1,5 +1,5 @@
 import { assertThrow } from "../../__fixture__.mjs";
-import { validateAppmap } from "./index.mjs?env=test";
+import { validateAppmap } from "./index.mjs";
 
 assertThrow(() => {
   validateAppmap({

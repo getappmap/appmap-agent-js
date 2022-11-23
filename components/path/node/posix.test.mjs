@@ -9,7 +9,7 @@ import {
   toAbsolutePath,
   toRelativePath,
   getPathFilename,
-} from "./posix.mjs?env=test";
+} from "./posix.mjs";
 
 // getShell //
 

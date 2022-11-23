@@ -2,8 +2,8 @@ const { Error } = globalThis;
 
 import process from "node:process";
 import { assertEqual } from "../../__fixture__.mjs";
-import { testHookAsync } from "../../hook-fixture/index.mjs?env=test";
-import * as HookError from "./index.mjs?env=test";
+import { testHookAsync } from "../../hook-fixture/index.mjs";
+import * as HookError from "./index.mjs";
 
 assertEqual(
   (

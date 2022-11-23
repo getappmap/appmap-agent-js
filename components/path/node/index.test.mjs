@@ -12,7 +12,7 @@ import {
   convertFileUrlToPath,
   getPathBasename,
   getPathExtension,
-} from "./index.mjs?env=test";
+} from "./index.mjs";
 
 const base = getCwdPath(process);
 

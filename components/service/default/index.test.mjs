@@ -1,11 +1,11 @@
 import { createServer, Socket } from "net";
 import "../../__fixture__.mjs";
-import { toIpcPath, convertFileUrlToPath } from "../../path/index.mjs?env=test";
+import { toIpcPath, convertFileUrlToPath } from "../../path/index.mjs";
 import {
   openServiceAsync,
   closeServiceAsync,
   getServicePort,
-} from "./index.mjs?env=test";
+} from "./index.mjs";
 
 const { Promise, setTimeout } = globalThis;
 

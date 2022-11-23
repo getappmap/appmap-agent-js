@@ -1,18 +1,18 @@
 import { mkdir as mkdirAsync } from "fs/promises";
 import "../../__fixture__.mjs";
-import { getUuid } from "../../uuid/random/index.mjs?env=test";
-import { getTmpUrl } from "../../path/index.mjs?env=test";
-import { toAbsoluteUrl } from "../../url/index.mjs?env=test";
+import { getUuid } from "../../uuid/random/index.mjs";
+import { getTmpUrl } from "../../path/index.mjs";
+import { toAbsoluteUrl } from "../../url/index.mjs";
 import {
   createConfiguration,
   extendConfiguration,
-} from "../../configuration/index.mjs?env=test";
+} from "../../configuration/index.mjs";
 import {
   openReceptorAsync,
   minifyReceptorConfiguration,
   closeReceptorAsync,
   adaptReceptorConfiguration,
-} from "./index.mjs?env=test";
+} from "./index.mjs";
 
 const { URL } = globalThis;
 

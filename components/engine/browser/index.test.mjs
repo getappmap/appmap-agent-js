@@ -4,6 +4,6 @@ globalThis.navigator = {
   userAgent: "name/version rest",
 };
 
-const { getEngine } = await import("./index.mjs?env=test");
+const { getEngine } = await import("./index.mjs");
 
 assertDeepEqual(getEngine(), "name@version");

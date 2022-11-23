@@ -1,7 +1,7 @@
 const { encodeURIComponent } = globalThis;
 
 import { assertEqual, assertThrow } from "../../__fixture__.mjs";
-import { createSpecifier, matchSpecifier } from "./index.mjs?env=test";
+import { createSpecifier, matchSpecifier } from "./index.mjs";
 
 assertThrow(
   () => createSpecifier({}, "protocol://host/base/"),

@@ -5,11 +5,11 @@ import {
   assertDeepEqual,
   assertEqual,
 } from "../../__fixture__.mjs";
-import { toAbsoluteUrl } from "../../url/index.mjs?env=test";
-import { getUuid } from "../../uuid/random/index.mjs?env=test";
-import { getTmpPath, getTmpUrl } from "../../path/index.mjs?env=test";
-import { getConfigurationPackage } from "../../configuration-accessor/index.mjs?env=test";
-import { loadProcessConfiguration } from "./index.mjs?env=test";
+import { toAbsoluteUrl } from "../../url/index.mjs";
+import { getUuid } from "../../uuid/random/index.mjs";
+import { getTmpPath, getTmpUrl } from "../../path/index.mjs";
+import { getConfigurationPackage } from "../../configuration-accessor/index.mjs";
+import { loadProcessConfiguration } from "./index.mjs";
 
 const {
   URL,

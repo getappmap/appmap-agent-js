@@ -1,10 +1,10 @@
 import { mkdir as mkdirAsync, writeFile as writeFileAsync } from "fs/promises";
 import { assertEqual } from "../../__fixture__.mjs";
 
-import { getTmpUrl } from "../../path/index.mjs?env=test";
-import { getUuid } from "../../uuid/random/index.mjs?env=test";
-import { toAbsoluteUrl } from "../../url/index.mjs?env=test";
-import { requireMaybe } from "./require.mjs?env=test";
+import { getTmpUrl } from "../../path/index.mjs";
+import { getUuid } from "../../uuid/random/index.mjs";
+import { toAbsoluteUrl } from "../../url/index.mjs";
+import { requireMaybe } from "./require.mjs";
 
 const {
   URL,

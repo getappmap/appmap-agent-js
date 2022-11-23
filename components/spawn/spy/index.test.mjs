@@ -1,5 +1,5 @@
 import { assertDeepEqual } from "../../__fixture__.mjs";
-import { spawn } from "./index.mjs?env=test";
+import { spawn } from "./index.mjs";
 
 globalThis.GLOBAL_SPY_SPAWN = (exec, argv, options) => ({
   exec,

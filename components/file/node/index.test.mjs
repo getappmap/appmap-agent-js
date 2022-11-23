@@ -2,10 +2,10 @@ const { URL } = globalThis;
 
 import { assertEqual, assertThrow } from "../../__fixture__.mjs";
 import { writeFile as writeFileAsync } from "fs/promises";
-import { readFile } from "./index.mjs?env=test";
-import { toAbsoluteUrl } from "../../url/index.mjs?env=test";
-import { getUuid } from "../../uuid/random/index.mjs?env=test";
-import { getTmpUrl } from "../../path/index.mjs?env=test";
+import { readFile } from "./index.mjs";
+import { toAbsoluteUrl } from "../../url/index.mjs";
+import { getUuid } from "../../uuid/random/index.mjs";
+import { getTmpUrl } from "../../path/index.mjs";
 
 {
   const url = toAbsoluteUrl(getUuid(), getTmpUrl());

@@ -6,8 +6,8 @@ import {
   assertThrow,
 } from "../../__fixture__.mjs";
 import Sqlite3 from "sqlite3";
-import { testHookAsync } from "../../hook-fixture/index.mjs?env=test";
-import * as HookSqlite3 from "./sqlite3.mjs?env=test";
+import { testHookAsync } from "../../hook-fixture/index.mjs";
+import * as HookSqlite3 from "./sqlite3.mjs";
 
 const { Promise, undefined, Error, setTimeout } = globalThis;
 

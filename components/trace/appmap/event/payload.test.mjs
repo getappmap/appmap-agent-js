@@ -6,7 +6,7 @@ import {
   digestExceptionSerial,
   digestParameterSerial,
   digestPayload,
-} from "./payload.mjs?env=test";
+} from "./payload.mjs";
 
 ///////////////////////////
 // digestParameterSerial //

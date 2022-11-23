@@ -1,10 +1,10 @@
 import "../../__fixture__.mjs";
-import { convertFileUrlToPath } from "../../path/index.mjs?env=test";
+import { convertFileUrlToPath } from "../../path/index.mjs";
 import {
   createConfiguration,
   extendConfiguration,
-} from "../../configuration/index.mjs?env=test";
-import { main } from "./index.mjs?env=test";
+} from "../../configuration/index.mjs";
+import { main } from "./index.mjs";
 
 const {
   process: { version },

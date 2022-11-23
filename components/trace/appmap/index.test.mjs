@@ -4,9 +4,9 @@ import { assertDeepEqual } from "../../__fixture__.mjs";
 import {
   createConfiguration,
   extendConfiguration,
-} from "../../configuration/index.mjs?env=test";
-import { makeLocation } from "../../location/index.mjs?env=test";
-import { compileTrace } from "./index.mjs?env=test";
+} from "../../configuration/index.mjs";
+import { makeLocation } from "../../location/index.mjs";
+import { compileTrace } from "./index.mjs";
 
 const configuration = extendConfiguration(
   createConfiguration("protocol://host/home/"),

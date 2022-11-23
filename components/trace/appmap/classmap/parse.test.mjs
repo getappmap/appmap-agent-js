@@ -4,7 +4,7 @@ import {
   printComment,
   getLeadingCommentArray,
   extractCommentLabelArray,
-} from "./parse.mjs?env=test";
+} from "./parse.mjs";
 
 parseEstree(
   "protocol://host/dirname/filename.mjs?search#hash",
