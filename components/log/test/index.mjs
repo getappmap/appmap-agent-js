@@ -2,7 +2,7 @@ const { URL } = globalThis;
 
 const { search: __search, searchParams: __params } = new URL(import.meta.url);
 
-const { format } = await import(`../../util/index.mjs${__search}`);
+import { format } from "../../util/index.mjs";
 
 const log = (template, ...rest) => {
   format(template, rest);

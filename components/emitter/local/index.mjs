@@ -1,16 +1,20 @@
 const { URL } = globalThis;
 const { search: __search } = new URL(import.meta.url);
 
-const { logWarning } = await import(`../../log/index.mjs${__search}`);
-const { InternalAppmapError } = await import(
-  `../../error/index.mjs${__search}`
-);
-const { assert, generateDeadcode, createBox, getBox, setBox } = await import(
-  `../../util/index.mjs${__search}`
-);
-const { createBackend, sendBackend, takeBackendTrace } = await import(
-  `../../backend/index.mjs${__search}`
-);
+import { logWarning } from "../../log/index.mjs";
+import { InternalAppmapError } from "../../error/index.mjs";
+import {
+  assert,
+  generateDeadcode,
+  createBox,
+  getBox,
+  setBox,
+} from "../../util/index.mjs";
+import {
+  createBackend,
+  sendBackend,
+  takeBackendTrace,
+} from "../../backend/index.mjs";
 
 export const openEmitter = (configuration) => ({
   closed: createBox(false),

@@ -9,17 +9,15 @@ const {
 
 const { search: __search } = new URL(import.meta.url);
 
-const { InternalAppmapError } = await import(
-  `../../../error/index.mjs${__search}`
-);
-const {
+import { InternalAppmapError } from "../../../error/index.mjs";
+import {
   assert,
   coalesceCaseInsensitive,
   zip,
   hasOwnProperty,
   mapMaybe,
   recoverMaybe,
-} = await import(`../../../util/index.mjs${__search}`);
+} from "../../../util/index.mjs";
 
 const parseURL = (url, headers) =>
   new URL(

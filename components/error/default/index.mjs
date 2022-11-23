@@ -2,7 +2,7 @@ const { URL, Error } = globalThis;
 
 const { search: __search } = new URL(import.meta.url);
 
-const { version } = await import(`../../version/index.mjs${__search}`);
+import { version } from "../../version/index.mjs";
 
 const issues = "https://github.com/getappmap/appmap-agent-js/issues";
 const slack = "https://appmap.io/slack";

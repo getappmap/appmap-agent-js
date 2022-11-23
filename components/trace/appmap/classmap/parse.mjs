@@ -3,14 +3,10 @@ const { URL } = globalThis;
 const { search: __search } = new URL(import.meta.url);
 
 import BabelParser from "@babel/parser";
-const { InternalAppmapError } = await import(
-  `../../../error/index.mjs${__search}`
-);
-const { getUrlExtension } = await import(`../../../url/index.mjs${__search}`);
-const { assert, coalesce } = await import(`../../../util/index.mjs${__search}`);
-const { logWarning, logError } = await import(
-  `../../../log/index.mjs${__search}`
-);
+import { InternalAppmapError } from "../../../error/index.mjs";
+import { getUrlExtension } from "../../../url/index.mjs";
+import { assert, coalesce } from "../../../util/index.mjs";
+import { logWarning, logError } from "../../../log/index.mjs";
 
 const { parse: parseBabel } = BabelParser;
 

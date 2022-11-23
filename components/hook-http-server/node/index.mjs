@@ -12,13 +12,9 @@ const { search: __search } = new URL(import.meta.url);
 
 import Http from "http";
 import Https from "https";
-const { ExternalAppmapError } = await import(
-  `../../error/index.mjs${__search}`
-);
-const { logError, logErrorWhen } = await import(
-  `../../log/index.mjs${__search}`
-);
-const {
+import { ExternalAppmapError } from "../../error/index.mjs";
+import { logError, logErrorWhen } from "../../log/index.mjs";
+import {
   assert,
   toString,
   fromMaybe,
@@ -30,17 +26,17 @@ const {
   coalesce,
   assignProperty,
   getOwnProperty,
-} = await import(`../../util/index.mjs${__search}`);
-const {
+} from "../../util/index.mjs";
+import {
   parseContentType,
   decodeSafe,
   parseJSONSafe,
   spyWritable,
   formatHeaders,
   formatStatus,
-} = await import(`../../hook-http/index.mjs${__search}`);
-const { patch } = await import(`../../patch/index.mjs${__search}`);
-const {
+} from "../../hook-http/index.mjs";
+import { patch } from "../../patch/index.mjs";
+import {
   getFreshTab,
   getSerializationEmptyValue,
   requestRemoteAgentAsync,
@@ -52,8 +48,8 @@ const {
   formatRequestPayload,
   formatResponsePayload,
   getJumpPayload,
-} = await import(`../../agent/index.mjs${__search}`);
-const { generateRespond } = await import(`../../http/index.mjs${__search}`);
+} from "../../agent/index.mjs";
+import { generateRespond } from "../../http/index.mjs";
 
 // TODO: improve test coverage
 

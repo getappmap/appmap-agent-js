@@ -10,12 +10,8 @@ const { search: __search } = new URL(import.meta.url);
 
 import Http from "node:http";
 
-const { noop, hasOwnProperty } = await import(
-  `../../util/index.mjs${__search}`
-);
-const { toIpcPath, convertFileUrlToPath } = await import(
-  `../../path/index.mjs${__search}`
-);
+import { noop, hasOwnProperty } from "../../util/index.mjs";
+import { toIpcPath, convertFileUrlToPath } from "../../path/index.mjs";
 
 const { request: createRequest } = Http;
 

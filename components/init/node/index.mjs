@@ -7,7 +7,7 @@ import glob from "glob";
 import klaw from "klaw-sync";
 import { basename as getBasename, join as joinPath } from "path";
 import YAML from "yaml";
-const { hasOwnProperty } = await import(`../../util/index.mjs${__search}`);
+import { hasOwnProperty } from "../../util/index.mjs";
 
 // Glob to match/exclude all the directories we should scan for source files:
 const GLOB = "!(node_modules)/";

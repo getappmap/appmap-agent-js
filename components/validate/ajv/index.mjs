@@ -12,11 +12,12 @@ import {
   validateMessage as validateAjvMessage,
   validateSourceMap as validateAjvSourceMap,
 } from "../../../dist/schema.mjs";
-const { InternalAppmapError, ExternalAppmapError } = await import(
-  `../../error/index.mjs${__search}`
-);
-const { logError } = await import(`../../log/index.mjs${__search}`);
-const { assert, coalesce } = await import(`../../util/index.mjs${__search}`);
+import {
+  InternalAppmapError,
+  ExternalAppmapError,
+} from "../../error/index.mjs";
+import { logError } from "../../log/index.mjs";
+import { assert, coalesce } from "../../util/index.mjs";
 
 const { asTree } = Treeify;
 

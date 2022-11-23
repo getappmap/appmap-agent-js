@@ -3,12 +3,10 @@ const { search: __search } = new URL(import.meta.url);
 
 import { readdirSync as readdir } from "node:fs";
 
-const { ExternalAppmapError } = await import(
-  `../../error/index.mjs${__search}`
-);
-const { mapMaybe } = await import(`../../util/index.mjs${__search}`);
-const { logError, logWarning } = await import(`../../log/index.mjs${__search}`);
-const { spawn } = await import(`./spawn.mjs${__search}`);
+import { ExternalAppmapError } from "../../error/index.mjs";
+import { mapMaybe } from "../../util/index.mjs";
+import { logError, logWarning } from "../../log/index.mjs";
+import { spawn } from "./spawn.mjs";
 
 const trim = (string) => string.trim();
 

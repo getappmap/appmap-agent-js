@@ -2,20 +2,19 @@ const { URL } = globalThis;
 
 const { search: __search } = new URL(import.meta.url);
 
-const { InternalAppmapError } = await import(
-  `../../error/index.mjs${__search}`
-);
-const { assert } = await import(`../../util/index.mjs${__search}`);
-const { createConfiguration, extendConfiguration } = await import(
-  `../../configuration/index.mjs${__search}`
-);
-const {
+import { InternalAppmapError } from "../../error/index.mjs";
+import { assert } from "../../util/index.mjs";
+import {
+  createConfiguration,
+  extendConfiguration,
+} from "../../configuration/index.mjs";
+import {
   recordStopTrack,
   recordStartTrack,
   openAgent,
   takeLocalAgentTrace,
   closeAgent,
-} = await import(`../../agent/index.mjs${__search}`);
+} from "../../agent/index.mjs";
 
 export const testHookAsync = async (
   { hook, unhook },

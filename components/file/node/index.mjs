@@ -5,7 +5,7 @@ const { search: __search } = new URL(import.meta.url);
 import { readFileSync as readFileInner } from "fs";
 import { readFile as readFileInnerAsync } from "fs/promises";
 import { Buffer } from "node:buffer";
-const { logWarningWhen } = await import(`../../log/index.mjs${__search}`);
+import { logWarningWhen } from "../../log/index.mjs";
 
 const { from: toBuffer } = Buffer;
 

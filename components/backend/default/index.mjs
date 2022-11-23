@@ -2,15 +2,11 @@ const { Map, URL } = globalThis;
 
 const { search: __search } = new URL(import.meta.url);
 
-const { InternalAppmapError } = await import(
-  `../../error/index.mjs${__search}`
-);
-const { assert } = await import(`../../util/index.mjs${__search}`);
-const { logDebug } = await import(`../../log/index.mjs${__search}`);
-const { validateMessage } = await import(
-  `../../validate-message/index.mjs${__search}`
-);
-const { compileTrace } = await import(`../../trace/index.mjs${__search}`);
+import { InternalAppmapError } from "../../error/index.mjs";
+import { assert } from "../../util/index.mjs";
+import { logDebug } from "../../log/index.mjs";
+import { validateMessage } from "../../validate-message/index.mjs";
+import { compileTrace } from "../../trace/index.mjs";
 
 export const createBackend = (configuration) => ({
   configuration,

@@ -14,20 +14,16 @@ import { createRequire } from "module";
 import YAML from "yaml";
 import Semver from "semver";
 import Chalk from "chalk";
-const { validateExternalConfiguration } = await import(
-  `../../validate/index.mjs${__search}`
-);
-const { questionConfigAsync } = await import(
-  `../../questionnaire/index.mjs${__search}`
-);
-const { hasOwnProperty } = await import(`../../util/index.mjs${__search}`);
-const { convertPathToFileUrl, toAbsolutePath, getCwdPath } = await import(
-  `../../path/index.mjs${__search}`
-);
-const { toDirectoryUrl, toAbsoluteUrl } = await import(
-  `../../url/index.mjs${__search}`
-);
-const { prompts } = await import(`../../prompts/index.mjs${__search}`);
+import { validateExternalConfiguration } from "../../validate/index.mjs";
+import { questionConfigAsync } from "../../questionnaire/index.mjs";
+import { hasOwnProperty } from "../../util/index.mjs";
+import {
+  convertPathToFileUrl,
+  toAbsolutePath,
+  getCwdPath,
+} from "../../path/index.mjs";
+import { toDirectoryUrl, toAbsoluteUrl } from "../../url/index.mjs";
+import { prompts } from "../../prompts/index.mjs";
 
 const { satisfies: satisfiesSemver } = Semver;
 const { green: chalkGreen, yellow: chalkYellow, red: chalkRed } = Chalk;

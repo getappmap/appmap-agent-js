@@ -2,18 +2,19 @@ const { Map, URL } = globalThis;
 
 const { search: __search } = new URL(import.meta.url);
 
-const { InternalAppmapError } = await import(
-  `../../../error/index.mjs${__search}`
-);
-const { assert } = await import(`../../../util/index.mjs${__search}`);
-const { toRelativeUrl } = await import(`../../../url/index.mjs${__search}`);
-const { logWarning } = await import(`../../../log/index.mjs${__search}`);
-const { getLocationPosition, getLocationBase } = await import(
-  `../../../location/index.mjs${__search}`
-);
-const { createSource, toSourceClassmap, lookupSourceClosure } = await import(
-  `./source.mjs${__search}`
-);
+import { InternalAppmapError } from "../../../error/index.mjs";
+import { assert } from "../../../util/index.mjs";
+import { toRelativeUrl } from "../../../url/index.mjs";
+import { logWarning } from "../../../log/index.mjs";
+import {
+  getLocationPosition,
+  getLocationBase,
+} from "../../../location/index.mjs";
+import {
+  createSource,
+  toSourceClassmap,
+  lookupSourceClosure,
+} from "./source.mjs";
 
 export const createClassmap = (configuration) => ({
   sources: new Map(),

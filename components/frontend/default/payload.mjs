@@ -6,8 +6,8 @@ const {
 
 const { search: __search } = new URL(import.meta.url);
 
-const { constant } = await import(`../../util/index.mjs${__search}`);
-const { serialize } = await import(`../../serialization/index.mjs${__search}`);
+import { constant } from "../../util/index.mjs";
+import { serialize } from "../../serialization/index.mjs";
 
 export const getJumpPayload = constant({ type: "jump" });
 
