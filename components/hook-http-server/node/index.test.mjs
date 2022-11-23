@@ -5,11 +5,11 @@ import {
   toIpcPath,
   getTmpUrl,
   convertFileUrlToPath,
-} from "../../path/index.mjs?env=test";
-import { getUuid } from "../../uuid/random/index.mjs?env=test";
-import { toAbsoluteUrl } from "../../url/index.mjs?env=test";
-import { testHookAsync } from "../../hook-fixture/index.mjs?env=test";
-import * as HookHttpServer from "./index.mjs?env=test";
+} from "../../path/index.mjs";
+import { getUuid } from "../../uuid/random/index.mjs";
+import { toAbsoluteUrl } from "../../url/index.mjs";
+import { testHookAsync } from "../../hook-fixture/index.mjs";
+import * as HookHttpServer from "./index.mjs";
 
 const {
   Promise,

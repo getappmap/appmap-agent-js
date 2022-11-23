@@ -1,5 +1,5 @@
 import { assertDeepEqual } from "../../__fixture__.mjs";
-import { openSocket, closeSocket, sendSocket } from "./index.mjs?env=test";
+import { openSocket, closeSocket, sendSocket } from "./index.mjs";
 
 const socket = openSocket("host", "port", {});
 

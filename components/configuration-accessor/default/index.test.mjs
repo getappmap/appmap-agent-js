@@ -4,11 +4,11 @@ import {
   assertEqual,
   assertThrow,
 } from "../../__fixture__.mjs";
-import { convertFileUrlToPath } from "../../path/index.mjs?env=test";
+import { convertFileUrlToPath } from "../../path/index.mjs";
 import {
   createConfiguration,
   extendConfiguration,
-} from "../../configuration/index.mjs?env=test";
+} from "../../configuration/index.mjs";
 import {
   resolveConfigurationRepository,
   resolveConfigurationAutomatedRecorder,
@@ -19,7 +19,7 @@ import {
   getConfigurationPackage,
   getConfigurationScenarios,
   compileConfigurationCommand,
-} from "./index.mjs?env=test";
+} from "./index.mjs";
 
 const {
   URL,

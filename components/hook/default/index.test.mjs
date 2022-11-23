@@ -1,6 +1,6 @@
 import { assertDeepEqual } from "../../__fixture__.mjs";
-import { testHookAsync } from "../../hook-fixture/index.mjs?env=test";
-import * as Hook from "./index.mjs?env=test";
+import { testHookAsync } from "../../hook-fixture/index.mjs";
+import * as Hook from "./index.mjs";
 
 assertDeepEqual(
   await testHookAsync(

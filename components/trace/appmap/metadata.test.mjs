@@ -4,8 +4,8 @@ import { assertDeepEqual, assertEqual } from "../../__fixture__.mjs";
 import {
   createConfiguration,
   extendConfiguration,
-} from "../../configuration/index.mjs?env=test";
-import { compileMetadata } from "./metadata.mjs?env=test";
+} from "../../configuration/index.mjs";
+import { compileMetadata } from "./metadata.mjs";
 
 const test = (conf, url, errors = [], termination = { type: "manual" }) => {
   let configuration = createConfiguration(url);

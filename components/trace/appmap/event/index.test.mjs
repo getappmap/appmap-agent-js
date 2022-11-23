@@ -1,11 +1,8 @@
 import { assertDeepEqual } from "../../../__fixture__.mjs";
-import { makeLocation } from "../../../location/index.mjs?env=test";
-import { createConfiguration } from "../../../configuration/index.mjs?env=test";
-import {
-  createClassmap,
-  addClassmapSource,
-} from "../classmap/index.mjs?env=test";
-import { digestEventTrace } from "./index.mjs?env=test";
+import { makeLocation } from "../../../location/index.mjs";
+import { createConfiguration } from "../../../configuration/index.mjs";
+import { createClassmap, addClassmapSource } from "../classmap/index.mjs";
+import { digestEventTrace } from "./index.mjs";
 
 const makeEvent = (site, tab, payload) => ({
   type: "event",

@@ -1,1 +1,1 @@
-import "./index.mjs?env=test";
+import "./index.mjs";

@@ -2,13 +2,13 @@ import { assertDeepEqual } from "../../__fixture__.mjs";
 import {
   createConfiguration,
   extendConfiguration,
-} from "../../configuration/index.mjs?env=test";
-import { validateSerial } from "../../validate/index.mjs?env=test";
+} from "../../configuration/index.mjs";
+import { validateSerial } from "../../validate/index.mjs";
 import {
   createSerialization,
   getSerializationEmptyValue,
   serialize,
-} from "./index.mjs?env=test";
+} from "./index.mjs";
 
 const {
   Proxy,

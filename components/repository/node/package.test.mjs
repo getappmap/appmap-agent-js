@@ -1,12 +1,12 @@
 import { mkdir as mkdirAsync, writeFile as writeFileAsync } from "fs/promises";
 import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
-import { getUuid } from "../../uuid/random/index.mjs?env=test";
-import { toAbsoluteUrl } from "../../url/index.mjs?env=test";
-import { getTmpUrl } from "../../path/index.mjs?env=test";
+import { getUuid } from "../../uuid/random/index.mjs";
+import { toAbsoluteUrl } from "../../url/index.mjs";
+import { getTmpUrl } from "../../path/index.mjs";
 import {
   // extractRepositoryHistory,
   extractRepositoryPackage,
-} from "./index.mjs?env=test";
+} from "./index.mjs";
 
 const { URL } = globalThis;
 

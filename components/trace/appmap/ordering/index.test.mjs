@@ -1,5 +1,5 @@
 import { assertDeepEqual } from "../../../__fixture__.mjs";
-import { orderEventArray } from "./index.mjs?env=test";
+import { orderEventArray } from "./index.mjs";
 
 export const generateMakeEvent = (site, type) => (tab) => ({
   type: "event",

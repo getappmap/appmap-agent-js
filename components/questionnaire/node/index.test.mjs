@@ -1,6 +1,6 @@
 import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
-import { validateExternalConfiguration } from "../../validate/index.mjs?env=test";
-import { questionConfigAsync } from "./index.mjs?env=test";
+import { validateExternalConfiguration } from "../../validate/index.mjs";
+import { questionConfigAsync } from "./index.mjs";
 
 const { Symbol } = globalThis;
 

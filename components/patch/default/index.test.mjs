@@ -1,5 +1,5 @@
 import { assertEqual } from "../../__fixture__.mjs";
-import { patch } from "./index.mjs?env=test";
+import { patch } from "./index.mjs";
 
 const {
   Reflect: { defineProperty },

@@ -1,8 +1,8 @@
 import { assertDeepEqual } from "../../__fixture__.mjs";
-import { getUuid } from "../../uuid/random/index.mjs?env=test";
-import { getTmpUrl } from "../../path/index.mjs?env=test";
-import { toAbsoluteUrl } from "../../url/index.mjs?env=test";
-import { openSocket, closeSocket, sendSocket } from "./index.mjs?env=test";
+import { getUuid } from "../../uuid/random/index.mjs";
+import { getTmpUrl } from "../../path/index.mjs";
+import { toAbsoluteUrl } from "../../url/index.mjs";
+import { openSocket, closeSocket, sendSocket } from "./index.mjs";
 import { testAsync } from "../__fixture__.mjs";
 
 const { Promise, setTimeout } = globalThis;

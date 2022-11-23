@@ -1,6 +1,6 @@
 import { assertDeepEqual } from "../../__fixture__.mjs";
-import { testHookAsync } from "../../hook-fixture/index.mjs?env=test";
-import * as HookGroup from "./index.mjs?env=test";
+import { testHookAsync } from "../../hook-fixture/index.mjs";
+import * as HookGroup from "./index.mjs";
 
 const { Promise, setTimeout } = globalThis;
 

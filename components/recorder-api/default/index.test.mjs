@@ -6,8 +6,8 @@ import {
 import {
   createConfiguration,
   extendConfiguration,
-} from "../../configuration/index.mjs?env=test";
-import { Appmap } from "./index.mjs?env=test";
+} from "../../configuration/index.mjs";
+import { Appmap } from "./index.mjs";
 
 const configuration = extendConfiguration(
   createConfiguration("protocol://host/home/"),

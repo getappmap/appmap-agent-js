@@ -8,11 +8,11 @@ import {
   assertFail,
   assertMatch,
 } from "../../__fixture__.mjs";
-import { getUuid } from "../../uuid/random/index.mjs?env=test";
-import { toAbsoluteUrl } from "../../url/index.mjs?env=test";
-import { getTmpUrl, convertFileUrlToPath } from "../../path/index.mjs?env=test";
-import { testHookAsync } from "../../hook-fixture/index.mjs?env=test";
-import * as HookPg from "./pg.mjs?env=test";
+import { getUuid } from "../../uuid/random/index.mjs";
+import { toAbsoluteUrl } from "../../url/index.mjs";
+import { getTmpUrl, convertFileUrlToPath } from "../../path/index.mjs";
+import { testHookAsync } from "../../hook-fixture/index.mjs";
+import * as HookPg from "./pg.mjs";
 
 const { Promise, String, setTimeout, URL } = globalThis;
 

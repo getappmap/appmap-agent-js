@@ -1,10 +1,10 @@
 import { mkdir as mkdirAsync } from "fs/promises";
 import { execSync } from "child_process";
 import { assertEqual, assertThrow } from "../../__fixture__.mjs";
-import { getUuid } from "../../uuid/random/index.mjs?env=test";
-import { getTmpUrl } from "../../path/index.mjs?env=test";
-import { toAbsoluteUrl } from "../../url/index.mjs?env=test";
-import { extractGitInformation } from "./git.mjs?env=test";
+import { getUuid } from "../../uuid/random/index.mjs";
+import { getTmpUrl } from "../../path/index.mjs";
+import { toAbsoluteUrl } from "../../url/index.mjs";
+import { extractGitInformation } from "./git.mjs";
 
 const {
   URL,

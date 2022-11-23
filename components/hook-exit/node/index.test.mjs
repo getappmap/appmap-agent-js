@@ -1,7 +1,7 @@
 import process from "node:process";
 import { assertDeepEqual } from "../../__fixture__.mjs";
-import { testHookAsync } from "../../hook-fixture/index.mjs?env=test";
-import * as HookExit from "./index.mjs?env=test";
+import { testHookAsync } from "../../hook-fixture/index.mjs";
+import * as HookExit from "./index.mjs";
 
 assertDeepEqual(
   await testHookAsync(HookExit, {}, () => {

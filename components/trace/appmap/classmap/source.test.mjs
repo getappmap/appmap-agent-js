@@ -4,7 +4,7 @@ import {
   createSource,
   lookupSourceClosure,
   toSourceClassmap,
-} from "./source.mjs?env=test";
+} from "./source.mjs";
 
 assertDeepEqual(
   toSourceClassmap(

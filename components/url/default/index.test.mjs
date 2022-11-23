@@ -7,7 +7,7 @@ import {
   getUrlFilename,
   getUrlBasename,
   getUrlExtension,
-} from "./index.mjs?env=test.mjs";
+} from "./index.mjs";
 
 ////////////////////
 // getUrlFilename //

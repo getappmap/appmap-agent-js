@@ -5,14 +5,14 @@ import {
   assertDeepEqual,
   assertThrow,
 } from "../../__fixture__.mjs";
-import { makeLocation } from "../../location/index.mjs?env=test";
+import { makeLocation } from "../../location/index.mjs";
 import {
   extractSourceMapUrl,
   createMirrorSourceMap,
   createSourceMap,
   mapSource,
   getSources,
-} from "./index.mjs?env=test";
+} from "./index.mjs";
 
 const {
   JSON: { stringify: stringifyJSON },
