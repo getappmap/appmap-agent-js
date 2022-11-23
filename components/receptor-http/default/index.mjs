@@ -5,8 +5,6 @@ const {
   JSON: { parse: parseJSON },
 } = globalThis;
 
-const { search: __search } = new URL(import.meta.url);
-
 import { createServer as createTCPServer } from "net";
 import { readFileSync as readFile } from "fs";
 import { createServer as createHTTPServer } from "http";

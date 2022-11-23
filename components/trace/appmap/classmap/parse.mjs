@@ -1,7 +1,3 @@
-const { URL } = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
-
 import BabelParser from "@babel/parser";
 import { InternalAppmapError } from "../../../error/index.mjs";
 import { getUrlExtension } from "../../../url/index.mjs";

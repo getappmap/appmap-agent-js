@@ -4,10 +4,7 @@ const {
   ArrayBuffer,
   SharedArrayBuffer,
   Uint8Array,
-  URL,
 } = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
 
 import { ExternalAppmapError } from "../../error/index.mjs";
 import { logError } from "../../log/index.mjs";

@@ -1,5 +1,4 @@
 const {
-  URL,
   RegExp,
   String,
   process: { nextTick },
@@ -7,8 +6,6 @@ const {
   Proxy,
   undefined,
 } = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
 
 import Http from "http";
 import Https from "https";

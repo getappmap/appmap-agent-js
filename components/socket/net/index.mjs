@@ -1,6 +1,4 @@
-const { URL, process, setInterval, clearInterval } = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
+const { process, setInterval, clearInterval } = globalThis;
 
 import { connect } from "net";
 import { Buffer } from "buffer";

@@ -1,6 +1,4 @@
-const { URL, Error } = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
+const { Error } = globalThis;
 
 import { version } from "../../version/index.mjs";
 

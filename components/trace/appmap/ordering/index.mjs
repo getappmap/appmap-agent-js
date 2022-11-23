@@ -4,9 +4,6 @@
 // 2) Resolve groups by inserting top-level trees where the asynchronous resource was registered.
 // 3) Resolve jumps by moving the tree framed by after events next to their corresponding before event.
 
-const { URL } = globalThis;
-const { search: __search } = new URL(import.meta.url);
-
 import { groupStack } from "./group.mjs";
 import { stackify } from "./stack.mjs";
 import { jumpify } from "./jump.mjs";

@@ -1,7 +1,3 @@
-const { URL } = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
-
 import process from "node:process";
 
 import { recordStopTrack } from "../../agent/index.mjs";

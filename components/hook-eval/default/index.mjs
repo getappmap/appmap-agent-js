@@ -7,11 +7,8 @@
 
 const {
   String,
-  URL,
   Reflect: { defineProperty },
 } = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
 
 import { InternalAppmapError } from "../../error/index.mjs";
 import { assert, hasOwnProperty } from "../../util/index.mjs";

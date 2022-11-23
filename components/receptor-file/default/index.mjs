@@ -1,12 +1,10 @@
 const {
-  JSON: { parse: parseJSON, stringify: stringifyJSON },
   URL,
+  JSON: { parse: parseJSON, stringify: stringifyJSON },
   encodeURIComponent,
   String,
   Set,
 } = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
 
 import { mkdir as mkdirAsync } from "fs/promises";
 import { writeFileSync as writeFile, readFileSync as readFile } from "fs";

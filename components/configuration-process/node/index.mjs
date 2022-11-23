@@ -6,8 +6,6 @@ const {
   Array: { isArray },
 } = globalThis;
 
-const { search: __search } = new URL(import.meta.url);
-
 import { readFileSync, writeFileSync } from "node:fs";
 
 import minimist from "minimist";

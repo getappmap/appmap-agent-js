@@ -1,5 +1,4 @@
 const {
-  URL,
   Reflect: { getOwnPropertyDescriptor, getPrototypeOf, apply, ownKeys },
   Error: { prototype: error_prototype },
   Infinity,
@@ -19,8 +18,6 @@ const {
   Array: { isArray },
   JSON: { stringify: stringifyJSON },
 } = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
 
 import {
   identity,

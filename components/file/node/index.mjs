@@ -1,7 +1,5 @@
 const { Error, decodeURIComponent, URL } = globalThis;
 
-const { search: __search } = new URL(import.meta.url);
-
 import { readFileSync as readFileInner } from "fs";
 import { readFile as readFileInnerAsync } from "fs/promises";
 import { Buffer } from "node:buffer";

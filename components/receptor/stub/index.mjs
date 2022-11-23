@@ -1,6 +1,4 @@
-const { Promise, undefined, URL } = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
+const { Promise, undefined } = globalThis;
 
 import { constant, returnSecond } from "../../util/index.mjs";
 

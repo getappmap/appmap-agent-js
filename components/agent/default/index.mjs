@@ -1,7 +1,3 @@
-const { URL } = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
-
 import { now } from "../../time/index.mjs";
 import { getCurrentGroup } from "../../group/index.mjs";
 import {

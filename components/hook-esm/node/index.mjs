@@ -11,11 +11,8 @@
 // Plus, all the other hooks have global side effects which cannot be avoided.
 
 const {
-  URL,
   Reflect: { defineProperty },
 } = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
 
 import { InternalAppmapError } from "../../error/index.mjs";
 import { assert, hasOwnProperty } from "../../util/index.mjs";

@@ -1,6 +1,4 @@
-const { URL, String, parseInt } = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
+const { String, parseInt } = globalThis;
 
 import { assert } from "../../../util/index.mjs";
 import { getUrlBasename, toAbsoluteUrl } from "../../../url/index.mjs";

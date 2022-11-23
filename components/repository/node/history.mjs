@@ -1,5 +1,4 @@
-const { parseInt, URL } = globalThis;
-const { search: __search } = new URL(import.meta.url);
+const { URL, parseInt } = globalThis;
 
 import { readdirSync as readdir } from "node:fs";
 

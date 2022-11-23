@@ -2,10 +2,7 @@ const {
   JSON: { parse: parseJSON },
   Number: { parseInt },
   Object: { assign, fromEntries },
-  URL,
 } = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
 
 import { constant, hasOwnProperty } from "../../util/index.mjs";
 import { prompts } from "../../prompts/index.mjs";

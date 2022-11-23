@@ -1,6 +1,4 @@
-const { Set, URL } = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
+const { Set } = globalThis;
 
 import * as Astring from "astring";
 import * as Acorn from "acorn";

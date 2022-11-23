@@ -1,6 +1,4 @@
-const { document, URL } = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
+const { document } = globalThis;
 
 export const runScript = (script, _url) => {
   const element = document.createElement("script");

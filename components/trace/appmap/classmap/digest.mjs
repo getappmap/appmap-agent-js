@@ -1,11 +1,8 @@
 const {
-  URL,
   Array: { isArray },
   String,
   Reflect: { ownKeys },
 } = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
 
 import { hasOwnProperty, mapMaybe } from "../../../util/index.mjs";
 

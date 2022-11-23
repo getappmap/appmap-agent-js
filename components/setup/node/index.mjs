@@ -3,8 +3,6 @@ const {
   JSON: { parse: parseJSON },
 } = globalThis;
 
-const { search: __search } = new URL(import.meta.url);
-
 import {
   readFile as readFileAsync,
   writeFile as writeFileAsync,

@@ -1,7 +1,3 @@
-const { URL } = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
-
 // Dynamically import optional dependencies
 import { createRequire } from "module";
 

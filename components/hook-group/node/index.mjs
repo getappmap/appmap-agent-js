@@ -1,6 +1,4 @@
-const { Set, URL } = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
+const { Set } = globalThis;
 
 import { createHook } from "async_hooks";
 import { InternalAppmapError } from "../../error/index.mjs";

@@ -1,13 +1,10 @@
 const {
-  URL,
   Map,
   Array: { from: toArray },
   String,
   Math: { round },
   RangeError,
 } = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
 
 import {
   InternalAppmapError,

@@ -1,6 +1,3 @@
-const { URL } = globalThis;
-const { search: __search } = new URL(import.meta.url);
-
 import * as HookApply from "../../hook-apply/index.mjs";
 import * as HookGroup from "../../hook-group/index.mjs";
 import * as HookEsm from "../../hook-esm/index.mjs";

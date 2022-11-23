@@ -1,10 +1,7 @@
 const {
-  URL,
   Object,
   Reflect: { apply },
 } = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
 
 import { toString, spyOnce, assignProperty } from "../../util/index.mjs";
 import {

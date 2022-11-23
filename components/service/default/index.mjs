@@ -1,6 +1,4 @@
-const { URL, Promise, Set, setTimeout } = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
+const { Promise, Set, setTimeout } = globalThis;
 
 import { tmpdir as getTemporaryDirectory } from "node:os";
 

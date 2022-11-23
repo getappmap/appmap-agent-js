@@ -1,10 +1,7 @@
 const {
   Array: { isArray, from: toArray },
   Object: { fromEntries, entries: toEntries },
-  URL,
 } = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
 
 import { constant } from "../../util/index.mjs";
 import { serialize } from "../../serialization/index.mjs";

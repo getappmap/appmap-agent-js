@@ -1,6 +1,4 @@
-const { process, URL } = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
+const { process } = globalThis;
 
 import { spawn as spawnChildProcess } from "child_process";
 

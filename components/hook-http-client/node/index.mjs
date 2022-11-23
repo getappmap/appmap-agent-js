@@ -1,10 +1,7 @@
 const {
   Reflect: { apply, construct },
   Proxy,
-  URL,
 } = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
 
 import Http from "http";
 import Https from "https";
