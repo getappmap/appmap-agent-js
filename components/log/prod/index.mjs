@@ -1,8 +1,6 @@
-const { __params } = globalThis;
-
+import { env } from "node:process";
 import { InternalAppmapError } from "../../error/index.mjs";
 import { hasOwnProperty, noop, assert, format } from "../../util/index.mjs";
-
 import {
   logDebug as logDebugInner,
   logInfo as logInfoInner,
@@ -18,9 +16,11 @@ const levels = {
   off: 5,
 };
 
-const max_level = __params.has("log-level")
-  ? __params.get("log-level")
+/* c8 ignore start */
+const max_level = hasOwnProperty(env, "APPMAP_LOG_LEVEL")
+  ? env.APPMAP_LOG_LEVEL
   : "info";
+/* c8 ignore stop */
 
 assert(
   hasOwnProperty(levels, max_level),
