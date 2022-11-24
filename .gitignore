@@ -1,4 +1,5 @@
 /coverage
+/components/params.mjs
 /components/*/index.mjs
 /components/*/*/.eslintrc.json
 /dist
