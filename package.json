@@ -26,14 +26,14 @@
     "url": "https://github.com/getappmap/appmap-agent-js.git"
   },
   "scripts": {
-    "prepare": "npm run build",
-    "build": "node build/index.mjs",
-    "format": "npx prettier -w '**/*.@(mjs|js|cjs|json|yaml|yml)'",
-    "lint": "npx eslint '**/*.@(mjs|js|cjs)'",
-    "test": "npx bercow",
-    "test-unit": "npx bercow .bercowrc-test-only.yaml",
-    "test-unit-cov": "npx bercow .bercowrc-test-only-cov.yaml",
-    "test-system": "node --unhandled-rejections=strict test/system/index.mjs",
+    "prepare": "npm run build-schema",
+    "build-schema": "node schema/build.mjs",
+    "build-test": "node component/build.mjs --params '{\"env\":\"test\"}' --route",
+    "build-lint": "node component/build.mjs --signature --eslintrc",
+    "lint": "npm run build-test && npm run build-lint && npx eslint '**/*.@(mjs|cjs)' && npx prettier --check .",
+    "format": "npx prettier --write .",
+    "test": "npm run build-test && npx bercow .bercowrc-test-only.yaml && node --unhandled-rejections=strict test/system/index.mjs",
+    "coverage": "npm run build-test && npx bercow .bercowrc-test-only-cov.yaml",
     "deploy": "npx semantic-release"
   },
   "optionalDependencies": {
