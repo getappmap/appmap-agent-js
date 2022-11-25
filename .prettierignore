@@ -1,4 +1,13 @@
+/.github
+/components/params.mjs
+/components/*/index.mjs
+/components/*/*/.eslintrc.json
 /coverage
+/dist
+/doc
 /node_modules
 /tmp
+/package.json
 /package-lock.json
+
+*.md

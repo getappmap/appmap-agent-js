@@ -1,10 +1,19 @@
-/build
+/.github
+/components/params.mjs
+/components/test-helper.mjs
+/components/__fixture__.mjs
+/components/*/index.mjs
+/components/**/*.test.mjs
 /coverage
+/dist/bundles
 /doc
 /node_modules
+/schema
 /test
 /tmp
 /babel.config.json
+/CONTRIBUTING.md
+/REFERENCE.md
 
 .*
-*.test.mjs
+!/components/*/*/.env
