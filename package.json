@@ -54,6 +54,7 @@
     "minimist": "^1.2.5",
     "net-socket-messaging": "^0.1.6",
     "prompts": "^2.4.2",
+    "rollup": "^3.4.0",
     "semver": "^7.3.5",
     "treeify": "^1.1.0",
     "vlq": "^2.0.4",

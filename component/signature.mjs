@@ -1,11 +1,37 @@
 import { readFile as readFileAsync } from "fs/promises";
 import { parse as parseAcorn } from "acorn";
+import {
+  readInstanceArrayAsync,
+  readComponentArrayAsync,
+  getInstanceMainUrl,
+} from "./layout.mjs";
 
-const { Promise, URL, Error } = globalThis;
+const {
+  JSON: { stringify: stringifyJSON },
+  Math: { max },
+  Promise,
+  URL,
+  Error,
+} = globalThis;
 
 const isNotNull = (any) => any !== null;
 
 const getExportedName = ({ exported: { name } }) => name;
+
+export const isArrayShallowEqual = (array1, array2) => {
+  const { length: length1 } = array1;
+  const { length: length2 } = array2;
+  if (length1 !== length2) {
+    return false;
+  } else {
+    for (let index = 0; index < length1; index += 1) {
+      if (array1[index] !== array2[index]) {
+        return false;
+      }
+    }
+    return true;
+  }
+};
 
 const extractPattern = (pattern) => {
   if (pattern.type === "Identifier") {
@@ -60,7 +86,7 @@ const parseAcornLog = (content, options) => {
   }
 };
 
-export const extractExportAsync = async (url) =>
+const extractExportAsync = async (url) =>
   (
     await Promise.all(
       parseAcornLog(await readFileAsync(url, "utf8"), {
@@ -71,3 +97,45 @@ export const extractExportAsync = async (url) =>
       }).body.map(extractStatementAsync),
     )
   ).flat();
+
+const loadSignatureAsync = async (home, component, instance) => {
+  const exports = await extractExportAsync(
+    getInstanceMainUrl(home, component, instance),
+  );
+  exports.sort();
+  return exports;
+};
+
+export const checkComponentSignatureAsync = async (home, component) => {
+  let first = null;
+  for (const instance of await readInstanceArrayAsync(home, component)) {
+    if (first === null) {
+      first = {
+        instance,
+        signature: await loadSignatureAsync(home, component, instance),
+      };
+    } else {
+      const signature = await loadSignatureAsync(home, component, instance);
+      if (!isArrayShallowEqual(first.signature, signature)) {
+        const padding = max(first.instance.length, instance.length);
+        throw new Error(
+          [
+            `Signature mismatch on component ${component} between:`,
+            ` - ${first.instance.padEnd(padding)} >> ${stringifyJSON(
+              first.signature,
+            )}`,
+            ` - ${instance.padEnd(padding)} >> ${stringifyJSON(signature)}`,
+          ].join("\n"),
+        );
+      }
+    }
+  }
+};
+
+export const checkSignatureAsync = async (home) => {
+  await Promise.all(
+    (
+      await readComponentArrayAsync(home)
+    ).map((component) => checkComponentSignatureAsync(home, component)),
+  );
+};
