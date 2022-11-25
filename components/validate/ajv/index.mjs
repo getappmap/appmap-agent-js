@@ -1,19 +1,23 @@
+const { URL } = globalThis;
+
 import Treeify from "treeify";
 import AjvErrorTree from "ajv-error-tree";
-import {
-  validateSerial as validateAjvSerial,
-  validatePayload as validateAjvPayload,
-  validateExternalConfiguration as validateAjvExternalConfiguration,
-  validateInternalConfiguration as validateAjvInternalConfiguration,
-  validateMessage as validateAjvMessage,
-  validateSourceMap as validateAjvSourceMap,
-} from "../../../dist/schema.mjs";
+import { home } from "../../home/index.mjs";
 import {
   InternalAppmapError,
   ExternalAppmapError,
 } from "../../error/index.mjs";
 import { logError } from "../../log/index.mjs";
 import { assert, coalesce } from "../../util/index.mjs";
+
+const {
+  validateSerial: validateAjvSerial,
+  validatePayload: validateAjvPayload,
+  validateExternalConfiguration: validateAjvExternalConfiguration,
+  validateInternalConfiguration: validateAjvInternalConfiguration,
+  validateMessage: validateAjvMessage,
+  validateSourceMap: validateAjvSourceMap,
+} = await import(new URL("dist/schema.mjs", home));
 
 const { asTree } = Treeify;
 
