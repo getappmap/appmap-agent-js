@@ -12,6 +12,8 @@ import {
   recordStopTrack,
 } from "../../agent/index.mjs";
 
+const { String } = globalThis;
+
 export const createMochaHooks = (process, configuration) => {
   configuration = extendConfigurationNode(configuration, process);
   const enabled = isConfigurationEnabled(configuration);

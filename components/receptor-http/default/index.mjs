@@ -1,10 +1,3 @@
-const {
-  URL,
-  Error,
-  Map,
-  JSON: { parse: parseJSON },
-} = globalThis;
-
 import { createServer as createTCPServer } from "net";
 import { readFileSync as readFile } from "fs";
 import { createServer as createHTTPServer } from "http";
@@ -26,6 +19,13 @@ import {
   takeBackendTrace,
 } from "../../backend/index.mjs";
 import { extendConfigurationPort } from "../../configuration-accessor/index.mjs";
+
+const {
+  URL,
+  Error,
+  Map,
+  JSON: { parse: parseJSON },
+} = globalThis;
 
 const { patch: patchSocket } = NetSocketMessaging;
 

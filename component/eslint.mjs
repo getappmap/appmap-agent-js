@@ -1,12 +1,3 @@
-const {
-  Promise,
-  Map,
-  undefined,
-  Error,
-  Object: { fromEntries },
-  JSON: { stringify: stringifyJSON },
-} = globalThis;
-
 import {
   writeFile as writeFileAsync,
   unlink as unlinkAsync,
@@ -18,6 +9,15 @@ import {
   readComponentArrayAsync,
 } from "./layout.mjs";
 import { readInstanceSupportAsync } from "./support.mjs";
+
+const {
+  Promise,
+  Map,
+  undefined,
+  Error,
+  Object: { fromEntries },
+  JSON: { stringify: stringifyJSON },
+} = globalThis;
 
 export const doesNotInclude = (array, element) => !array.includes(element);
 

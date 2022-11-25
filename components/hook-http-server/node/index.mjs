@@ -1,12 +1,3 @@
-const {
-  RegExp,
-  String,
-  process: { nextTick },
-  Reflect: { apply, construct },
-  Proxy,
-  undefined,
-} = globalThis;
-
 import Http from "http";
 import Https from "https";
 import { ExternalAppmapError } from "../../error/index.mjs";
@@ -47,6 +38,15 @@ import {
   getJumpPayload,
 } from "../../agent/index.mjs";
 import { generateRespond } from "../../http/index.mjs";
+
+const {
+  RegExp,
+  String,
+  process: { nextTick },
+  Reflect: { apply, construct },
+  Proxy,
+  undefined,
+} = globalThis;
 
 // TODO: improve test coverage
 

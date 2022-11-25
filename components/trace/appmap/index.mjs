@@ -1,11 +1,3 @@
-const {
-  Map,
-  Array: { from: toArray },
-  String,
-  Math: { round },
-  RangeError,
-} = globalThis;
-
 import {
   InternalAppmapError,
   ExternalAppmapError,
@@ -21,6 +13,14 @@ import {
 } from "./classmap/index.mjs";
 import { digestEventTrace } from "./event/index.mjs";
 import { orderEventArray } from "./ordering/index.mjs";
+
+const {
+  Map,
+  Array: { from: toArray },
+  String,
+  Math: { round },
+  RangeError,
+} = globalThis;
 
 const VERSION = "1.8.0";
 

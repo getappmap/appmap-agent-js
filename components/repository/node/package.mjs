@@ -1,12 +1,12 @@
-const {
-  URL,
-  JSON: { parse: parseJSON },
-} = globalThis;
-
 import { readFileSync as readFile } from "node:fs";
 
 import { mapMaybe } from "../../util/index.mjs";
 import { logWarning } from "../../log/index.mjs";
+
+const {
+  URL,
+  JSON: { parse: parseJSON },
+} = globalThis;
 
 //////////////////////////////
 // extractRepositoryPackage //

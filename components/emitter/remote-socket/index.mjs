@@ -1,7 +1,3 @@
-const {
-  JSON: { stringify: stringifyJSON },
-} = globalThis;
-
 import { InternalAppmapError } from "../../error/index.mjs";
 import {
   generateDeadcode,
@@ -14,6 +10,10 @@ import { logWarning } from "../../log/index.mjs";
 import { getUuid } from "../../uuid/index.mjs";
 import { requestAsync } from "../../http/index.mjs";
 import { openSocket, closeSocket, sendSocket } from "../../socket/index.mjs";
+
+const {
+  JSON: { stringify: stringifyJSON },
+} = globalThis;
 
 export const openEmitter = (configuration) => {
   let {

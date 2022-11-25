@@ -1,6 +1,6 @@
-const { Promise, undefined } = globalThis;
-
 import { constant, returnSecond } from "../../util/index.mjs";
+
+const { Promise, undefined } = globalThis;
 
 export const minifyReceptorConfiguration = constant({});
 

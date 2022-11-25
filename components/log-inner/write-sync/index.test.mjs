@@ -1,9 +1,3 @@
-const {
-  String,
-  URL,
-  JSON: { stringify: stringifyJSON },
-} = globalThis;
-
 import { writeFile as writeFileAsync } from "node:fs/promises";
 import "../../__fixture__.mjs";
 import { getUuid } from "../../uuid/random/index.mjs";
@@ -11,6 +5,12 @@ import { getTmpUrl } from "../../path/index.mjs";
 import { toAbsoluteUrl } from "../../url/index.mjs";
 
 import { logInfo } from "./index.mjs";
+
+const {
+  String,
+  URL,
+  JSON: { stringify: stringifyJSON },
+} = globalThis;
 logInfo("message");
 
 let counter = 0;

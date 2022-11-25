@@ -1,11 +1,11 @@
-const { process, setInterval, clearInterval } = globalThis;
-
 import { connect } from "net";
 import { Buffer } from "buffer";
 import NetSocketMessaging from "net-socket-messaging";
 import { toIpcPath, convertFileUrlToPath } from "../../path/index.mjs";
 import { mapMaybe } from "../../util/index.mjs";
 import { logWarningWhen, logWarning } from "../../log/index.mjs";
+
+const { process, setInterval, clearInterval } = globalThis;
 
 const { concat: concatBuffer } = Buffer;
 const { createMessage } = NetSocketMessaging;

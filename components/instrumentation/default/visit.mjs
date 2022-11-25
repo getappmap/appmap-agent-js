@@ -1,10 +1,3 @@
-const {
-  String,
-  Array: { isArray },
-  Object: { fromEntries },
-  Reflect: { ownKeys },
-} = globalThis;
-
 import {
   InternalAppmapError,
   ExternalAppmapError,
@@ -21,6 +14,13 @@ import { toAbsoluteUrl, toDirectoryUrl } from "../../url/index.mjs";
 import { mapSource } from "../../source/index.mjs";
 import { logDebugWhen, logErrorWhen } from "../../log/index.mjs";
 import { getLocationBase } from "../../location/index.mjs";
+
+const {
+  String,
+  Array: { isArray },
+  Object: { fromEntries },
+  Reflect: { ownKeys },
+} = globalThis;
 
 //////////////////////////////
 // Difficulties with groups //

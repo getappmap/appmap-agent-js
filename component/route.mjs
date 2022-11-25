@@ -1,12 +1,3 @@
-const {
-  Promise,
-  undefined,
-  Error,
-  JSON: { stringify: stringifyJSON },
-  Reflect: { getOwnPropertyDescriptor },
-  Object: { hasOwn = (object, key) => getOwnPropertyDescriptor(object, key) },
-} = globalThis;
-
 import { writeFile as writeFileAsync } from "node:fs/promises";
 import {
   readInstanceArrayAsync,
@@ -16,6 +7,15 @@ import {
 } from "./layout.mjs";
 import { readParamsAsync } from "./params.mjs";
 import { readInstanceSupportAsync } from "./support.mjs";
+
+const {
+  Promise,
+  undefined,
+  Error,
+  JSON: { stringify: stringifyJSON },
+  Reflect: { getOwnPropertyDescriptor },
+  Object: { hasOwn = (object, key) => getOwnPropertyDescriptor(object, key) },
+} = globalThis;
 
 const lookupInstanceAsync = async (home, component, params) => {
   const env = hasOwn(params, "env") ? params.env : "test";

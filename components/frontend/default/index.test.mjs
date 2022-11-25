@@ -1,5 +1,3 @@
-const { Error } = globalThis;
-
 import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
 import { createMirrorSourceMap } from "../../source/index.mjs";
 import { validateMessage } from "../../validate/index.mjs";
@@ -20,6 +18,8 @@ import {
   formatBeginEvent,
   formatBeginAmend,
 } from "./index.mjs";
+
+const { Error } = globalThis;
 
 const configuration = extendConfiguration(
   createConfiguration("protocol://host/home"),

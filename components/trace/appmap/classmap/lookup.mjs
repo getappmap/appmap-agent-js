@@ -1,11 +1,11 @@
+import { logInfoWhen } from "../../../log/index.mjs";
+import { hasOwnProperty } from "../../../util/index.mjs";
+
 const {
   String,
   Reflect: { ownKeys },
   Array: { isArray },
 } = globalThis;
-
-import { logInfoWhen } from "../../../log/index.mjs";
-import { hasOwnProperty } from "../../../util/index.mjs";
 
 const isPositionIncluded = (position, start_position, end_position) =>
   (position.line > start_position.line ||

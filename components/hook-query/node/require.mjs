@@ -1,7 +1,7 @@
-const { URL } = globalThis;
-
 import { createRequire } from "module";
 import { logWarning } from "../../log/index.mjs";
+
+const { URL } = globalThis;
 
 export const requireMaybe = (enabled, directory, name) => {
   if (!enabled) {

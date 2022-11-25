@@ -1,11 +1,3 @@
-const {
-  Object,
-  Array: { isArray },
-  Object: { assign },
-  Reflect: { apply },
-  TypeError,
-} = globalThis;
-
 import { toString, spyOnce, assignProperty } from "../../util/index.mjs";
 import {
   getFreshTab,
@@ -18,6 +10,14 @@ import {
   getBundlePayload,
 } from "../../agent/index.mjs";
 import { requireMaybe } from "./require.mjs";
+
+const {
+  Object,
+  Array: { isArray },
+  Object: { assign },
+  Reflect: { apply },
+  TypeError,
+} = globalThis;
 
 const throwIfNotNull = (error) => {
   /* c8 ignore start */

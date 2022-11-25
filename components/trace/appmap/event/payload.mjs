@@ -1,12 +1,3 @@
-const {
-  URL,
-  URLSearchParams,
-  String,
-  undefined,
-  Object: { entries: toEntries },
-  Array: { from: arrayFrom },
-} = globalThis;
-
 import { InternalAppmapError } from "../../../error/index.mjs";
 import {
   assert,
@@ -16,6 +7,15 @@ import {
   mapMaybe,
   recoverMaybe,
 } from "../../../util/index.mjs";
+
+const {
+  URL,
+  URLSearchParams,
+  String,
+  undefined,
+  Object: { entries: toEntries },
+  Array: { from: arrayFrom },
+} = globalThis;
 
 const parseURL = (url, headers) =>
   new URL(

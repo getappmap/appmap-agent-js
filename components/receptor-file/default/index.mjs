@@ -1,11 +1,3 @@
-const {
-  URL,
-  JSON: { parse: parseJSON, stringify: stringifyJSON },
-  encodeURIComponent,
-  String,
-  Set,
-} = globalThis;
-
 import { mkdir as mkdirAsync } from "fs/promises";
 import { writeFileSync as writeFile, readFileSync as readFile } from "fs";
 import { createServer } from "net";
@@ -27,6 +19,14 @@ import {
   getBackendTraceIterator,
   takeBackendTrace,
 } from "../../backend/index.mjs";
+
+const {
+  URL,
+  JSON: { parse: parseJSON, stringify: stringifyJSON },
+  encodeURIComponent,
+  String,
+  Set,
+} = globalThis;
 
 const { patch: patchSocket } = NetSocketMessaging;
 

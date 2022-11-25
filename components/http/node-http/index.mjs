@@ -1,14 +1,14 @@
+import Http from "node:http";
+
+import { noop, hasOwnProperty } from "../../util/index.mjs";
+import { toIpcPath, convertFileUrlToPath } from "../../path/index.mjs";
+
 const {
   Buffer: { from: toBuffer, concat: concatBuffer },
   Promise,
   Error,
   JSON: { parse: parseJSON, stringify: stringifyJSON },
 } = globalThis;
-
-import Http from "node:http";
-
-import { noop, hasOwnProperty } from "../../util/index.mjs";
-import { toIpcPath, convertFileUrlToPath } from "../../path/index.mjs";
 
 const { request: createRequest } = Http;
 

@@ -1,7 +1,3 @@
-const {
-  JSON: { parse: parseJSON },
-} = globalThis;
-
 import { decode as decodeVlq } from "vlq";
 import {
   InternalAppmapError,
@@ -11,6 +7,10 @@ import { toDirectoryUrl, toAbsoluteUrl } from "../../url/index.mjs";
 import { logInfo, logError } from "../../log/index.mjs";
 import { makeLocation } from "../../location/index.mjs";
 import { validateSourceMap } from "../../validate/index.mjs";
+
+const {
+  JSON: { parse: parseJSON },
+} = globalThis;
 
 export const extractSourceMapUrl = ({ url: base, content }) => {
   const parts = /\/\/[#@] sourceMappingURL=(.*)[\r\n]*$/u.exec(content);

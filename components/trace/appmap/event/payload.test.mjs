@@ -1,5 +1,3 @@
-const { undefined } = globalThis;
-
 import { assertDeepEqual } from "../../../__fixture__.mjs";
 import {
   digestParameterPrimitive,
@@ -7,6 +5,8 @@ import {
   digestParameterSerial,
   digestPayload,
 } from "./payload.mjs";
+
+const { undefined } = globalThis;
 
 ///////////////////////////
 // digestParameterSerial //

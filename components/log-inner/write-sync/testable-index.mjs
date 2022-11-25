@@ -1,8 +1,8 @@
-const { URL, parseInt } = globalThis;
-
 // NB: Synchronous loggin is important to avoid infinite loop when async hooks are enabled.
 import { openSync, writeSync } from "fs";
 import { hasOwnProperty } from "../../util/index.mjs";
+
+const { URL, parseInt } = globalThis;
 
 export default (params) => {
   const openLogFile = (name) =>

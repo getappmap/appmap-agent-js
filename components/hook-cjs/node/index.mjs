@@ -1,12 +1,12 @@
-const {
-  Reflect: { apply },
-} = globalThis;
-
 import Module from "module";
 
 import { convertPathToFileUrl } from "../../path/index.mjs";
 import { assignProperty } from "../../util/index.mjs";
 import { instrument } from "../../agent/index.mjs";
+
+const {
+  Reflect: { apply },
+} = globalThis;
 
 const { prototype } = Module;
 

@@ -1,5 +1,3 @@
-const { Set } = globalThis;
-
 import * as Astring from "astring";
 import * as Acorn from "acorn";
 import { logError, logDebug, logDebugWhen } from "../../log/index.mjs";
@@ -8,6 +6,8 @@ import { getConfigurationPackage } from "../../configuration-accessor/index.mjs"
 import { ExternalAppmapError } from "../../error/index.mjs";
 import { getSources } from "../../source/index.mjs";
 import { visit } from "./visit.mjs";
+
+const { Set } = globalThis;
 
 const { generate: generateEstree } = Astring;
 const { parse: parseAcorn } = Acorn;

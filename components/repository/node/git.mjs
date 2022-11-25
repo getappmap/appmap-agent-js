@@ -1,5 +1,3 @@
-const { URL, parseInt } = globalThis;
-
 import { spawnSync } from "child_process";
 import { readdirSync as readdir } from "fs";
 import { convertFileUrlToPath } from "../../path/index.mjs";
@@ -7,6 +5,8 @@ import { ExternalAppmapError } from "../../error/index.mjs";
 
 import { logWarning, logError, logErrorWhen } from "../../log/index.mjs";
 import { mapMaybe, coalesce, assert } from "../../util/index.mjs";
+
+const { URL, parseInt } = globalThis;
 
 const trim = (string) => string.trim();
 

@@ -1,14 +1,14 @@
-const {
-  Error,
-  eval: geval,
-  JSON: { stringify: stringifyJSON },
-} = globalThis;
-
 import {
   readFile as readFileAsync,
   writeFile as writeFileAsync,
 } from "node:fs/promises";
 import { getParamsUrl } from "./layout.mjs";
+
+const {
+  Error,
+  eval: geval,
+  JSON: { stringify: stringifyJSON },
+} = globalThis;
 
 // JSON modules would be nice to hold parameters...
 // But they are not yet consistently supported across major node versions.

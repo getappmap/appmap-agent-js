@@ -1,5 +1,3 @@
-const { URL, Set, String } = globalThis;
-
 import {
   InternalAppmapError,
   ExternalAppmapError,
@@ -18,6 +16,8 @@ import {
   recordStopTrack,
   takeLocalAgentTrace,
 } from "../../agent/index.mjs";
+
+const { URL, Set, String } = globalThis;
 
 let global_running = false;
 

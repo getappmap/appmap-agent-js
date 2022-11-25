@@ -1,11 +1,11 @@
+import { ExternalAppmapError } from "../../error/index.mjs";
+import { logErrorWhen } from "../../log/index.mjs";
+import { assert, hasOwnProperty } from "../../util/index.mjs";
+
 const {
   Reflect: { getPrototypeOf, defineProperty, getOwnPropertyDescriptor },
   undefined,
 } = globalThis;
-
-import { ExternalAppmapError } from "../../error/index.mjs";
-import { logErrorWhen } from "../../log/index.mjs";
-import { assert, hasOwnProperty } from "../../util/index.mjs";
 
 export const patch = (object, key, makePatch) => {
   if (hasOwnProperty(object, key)) {

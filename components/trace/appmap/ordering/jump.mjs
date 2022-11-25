@@ -1,8 +1,3 @@
-const {
-  Array: { from: toArray },
-  Map,
-} = globalThis;
-
 // Resolve jumps.
 // Insert trees starting by an after event next to their corresponding before event.
 // Event manufacturing is performed to complete sequences of events.
@@ -12,6 +7,11 @@ const {
 import { InternalAppmapError } from "../../../error/index.mjs";
 import { assert } from "../../../util/index.mjs";
 import { manufactureMatchingEvent, isMatchingEvent } from "./matching.mjs";
+
+const {
+  Array: { from: toArray },
+  Map,
+} = globalThis;
 
 const manufactureBundleEvent = (site, tab) => ({
   type: "event",

@@ -1,5 +1,3 @@
-const { Map } = globalThis;
-
 import { InternalAppmapError } from "../../../error/index.mjs";
 import { assert } from "../../../util/index.mjs";
 import { toRelativeUrl } from "../../../url/index.mjs";
@@ -13,6 +11,8 @@ import {
   toSourceClassmap,
   lookupSourceClosure,
 } from "./source.mjs";
+
+const { Map } = globalThis;
 
 export const createClassmap = (configuration) => ({
   sources: new Map(),

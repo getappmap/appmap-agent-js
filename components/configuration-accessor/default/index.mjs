@@ -1,10 +1,3 @@
-const {
-  URL,
-  RegExp,
-  Object: { entries: toEntries },
-  JSON: { stringify: stringifyJSON, parse: parseJSON },
-} = globalThis;
-
 import { readFileSync } from "node:fs";
 import { toAbsoluteUrl } from "../../url/index.mjs";
 import { home } from "../../home/index.mjs";
@@ -27,6 +20,13 @@ import {
 } from "../../repository/index.mjs";
 import { matchSpecifier } from "../../specifier/index.mjs";
 import { extendConfiguration } from "../../configuration/index.mjs";
+
+const {
+  URL,
+  RegExp,
+  Object: { entries: toEntries },
+  JSON: { stringify: stringifyJSON, parse: parseJSON },
+} = globalThis;
 
 const getSpecifierValue = (pairs, key, def) => {
   for (const [specifier, value] of pairs) {

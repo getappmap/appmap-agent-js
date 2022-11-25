@@ -1,16 +1,16 @@
-const {
-  Promise,
-  URL,
-  Object: { entries: toEntries },
-  JSON: { stringify: stringifyJSON },
-} = globalThis;
-
 import { createHash } from "node:crypto";
 import {
   rm as rmAsync,
   readdir as readdirAsync,
   stat as statAsync,
 } from "node:fs/promises";
+
+const {
+  Promise,
+  URL,
+  Object: { entries: toEntries },
+  JSON: { stringify: stringifyJSON },
+} = globalThis;
 
 const BUNDLE_DIRNAME = "dist/bundles";
 const COMPONENT_DIRNAME = "components";

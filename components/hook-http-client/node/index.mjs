@@ -1,8 +1,3 @@
-const {
-  Reflect: { apply, construct },
-  Proxy,
-} = globalThis;
-
 import Http from "http";
 import Https from "https";
 import {
@@ -31,6 +26,11 @@ import {
   formatRequestPayload,
   formatResponsePayload,
 } from "../../agent/index.mjs";
+
+const {
+  Reflect: { apply, construct },
+  Proxy,
+} = globalThis;
 
 export const unhook = (backup) => backup.forEach(assignProperty);
 

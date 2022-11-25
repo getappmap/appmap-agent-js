@@ -1,10 +1,10 @@
-const {
-  JSON: { parse: parseJSON },
-} = globalThis;
-
 import { InternalAppmapError } from "../../error/index.mjs";
 import { assert, hasOwnProperty } from "../../util/index.mjs";
 import { validateInternalConfiguration } from "../../validate/index.mjs";
+
+const {
+  JSON: { parse: parseJSON },
+} = globalThis;
 
 export const loadEnvironmentConfiguration = (env) => {
   assert(

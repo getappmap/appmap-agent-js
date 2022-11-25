@@ -1,5 +1,3 @@
-const { Promise, Set, setTimeout } = globalThis;
-
 import { tmpdir as getTemporaryDirectory } from "node:os";
 
 import { logWarning } from "../../log/index.mjs";
@@ -12,6 +10,8 @@ import {
   convertFileUrlToPath,
 } from "../../path/index.mjs";
 import { getUuid } from "../../uuid/index.mjs";
+
+const { Promise, Set, setTimeout } = globalThis;
 
 export const openServiceAsync = (server, port) => {
   const sockets = new Set();

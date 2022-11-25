@@ -1,8 +1,8 @@
-const { undefined } = globalThis;
-
 import { InternalAppmapError } from "../../error/index.mjs";
 import { assert, mapMaybe, recoverMaybe } from "../../util/index.mjs";
 import { getUrlBasename } from "../../url/index.mjs";
+
+const { undefined } = globalThis;
 
 /* c8 ignore start */
 const getName = ({ name }) => name;

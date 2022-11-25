@@ -1,5 +1,3 @@
-const { String, parseInt } = globalThis;
-
 import { assert } from "../../../util/index.mjs";
 import { getUrlBasename, toAbsoluteUrl } from "../../../url/index.mjs";
 import { InternalAppmapError } from "../../../error/index.mjs";
@@ -8,6 +6,8 @@ import {
   printComment,
   extractCommentLabelArray,
 } from "./parse.mjs";
+
+const { String, parseInt } = globalThis;
 
 const isFunctionEntity = ({ type }) => type === "function";
 

@@ -1,11 +1,11 @@
+import { constant, hasOwnProperty } from "../../util/index.mjs";
+import { prompts } from "../../prompts/index.mjs";
+
 const {
   JSON: { parse: parseJSON },
   Number: { parseInt },
   Object: { assign, fromEntries },
 } = globalThis;
-
-import { constant, hasOwnProperty } from "../../util/index.mjs";
-import { prompts } from "../../prompts/index.mjs";
 
 // const generateMakeGlobSpecifier = (enabled) => (glob) => ({enabled, glob});
 // const makeEnabledGlobSpecifier = generateMakeGlobSpecifier(true);

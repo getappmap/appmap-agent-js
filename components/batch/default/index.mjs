@@ -1,11 +1,3 @@
-const {
-  Map,
-  JSON: { stringify: stringifyJSON },
-  setTimeout,
-  clearTimeout,
-  Promise,
-} = globalThis;
-
 import {
   InternalAppmapError,
   ExternalAppmapError,
@@ -25,6 +17,14 @@ import {
   adaptReceptorConfiguration,
   minifyReceptorConfiguration,
 } from "../../receptor/index.mjs";
+
+const {
+  Map,
+  JSON: { stringify: stringifyJSON },
+  setTimeout,
+  clearTimeout,
+  Promise,
+} = globalThis;
 
 const getCommandDescription = ({ exec, argv }) => ({ exec, argv });
 const isCommandNonNull = ({ command }) => command !== null;

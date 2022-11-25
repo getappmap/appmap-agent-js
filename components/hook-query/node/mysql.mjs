@@ -1,8 +1,3 @@
-const {
-  Object,
-  Reflect: { apply },
-} = globalThis;
-
 import { toString, spyOnce, assignProperty } from "../../util/index.mjs";
 import {
   getFreshTab,
@@ -15,6 +10,11 @@ import {
   getBundlePayload,
 } from "../../agent/index.mjs";
 import { requireMaybe } from "./require.mjs";
+
+const {
+  Object,
+  Reflect: { apply },
+} = globalThis;
 
 const DATABASE = "mysql";
 const VERSION = null;

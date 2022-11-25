@@ -1,11 +1,11 @@
-const { URL, parseInt } = globalThis;
-
 import { readdirSync as readdir } from "node:fs";
 
 import { ExternalAppmapError } from "../../error/index.mjs";
 import { mapMaybe } from "../../util/index.mjs";
 import { logError, logWarning } from "../../log/index.mjs";
 import { spawn } from "./spawn.mjs";
+
+const { URL, parseInt } = globalThis;
 
 const trim = (string) => string.trim();
 

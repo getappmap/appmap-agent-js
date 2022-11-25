@@ -1,3 +1,10 @@
+import { execSync } from "child_process";
+import os from "os";
+import { readFileSync as readFile } from "fs";
+import { readFile as readFileAsync } from "fs/promises";
+import semver from "semver";
+import { home } from "../../home/index.mjs";
+
 const { URL } = globalThis;
 
 const {
@@ -5,13 +12,6 @@ const {
   Promise,
   process,
 } = globalThis;
-
-import { execSync } from "child_process";
-import os from "os";
-import { readFileSync as readFile } from "fs";
-import { readFile as readFileAsync } from "fs/promises";
-import semver from "semver";
-import { home } from "../../home/index.mjs";
 const schema = parseJSON(
   await readFileAsync(new URL("dist/schema.json", home), "utf8"),
 );

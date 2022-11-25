@@ -1,10 +1,10 @@
-const { Map } = globalThis;
-
 import { InternalAppmapError } from "../../error/index.mjs";
 import { assert } from "../../util/index.mjs";
 import { logDebug } from "../../log/index.mjs";
 import { validateMessage } from "../../validate-message/index.mjs";
 import { compileTrace } from "../../trace/index.mjs";
+
+const { Map } = globalThis;
 
 export const createBackend = (configuration) => ({
   configuration,

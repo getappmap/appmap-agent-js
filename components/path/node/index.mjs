@@ -1,14 +1,14 @@
 import { platform as getPlatform, tmpdir as getTmp } from "node:os";
 
-export { fileURLToPath as convertFileUrlToPath } from "node:url";
-
 import { pathToFileURL as convertPathToFileUrlObject } from "node:url";
-
-export const convertPathToFileUrl = (path) =>
-  convertPathToFileUrlObject(path).href;
 
 import * as Win32 from "./win32.mjs";
 import * as Posix from "./posix.mjs";
+
+export { fileURLToPath as convertFileUrlToPath } from "node:url";
+
+export const convertPathToFileUrl = (path) =>
+  convertPathToFileUrlObject(path).href;
 
 /* c8 ignore start */
 export const {
