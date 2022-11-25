@@ -86,7 +86,7 @@ assertEqual(await mainAsync({ ...process, cwd }), false);
 process.stdout.write("\n");
 
 const fake = toAbsoluteUrl(
-  "node_modules/@appland/appmap-agent-js/components/setup/node/index.test.mjs",
+  "node_modules/@appland/appmap-agent-js/",
   convertPathToFileUrl(toDirectoryPath(await realpathAsync(new URL(base)))),
 );
 

@@ -7,6 +7,7 @@ const {
 
 import { readFileSync } from "node:fs";
 import { toAbsoluteUrl } from "../../url/index.mjs";
+import { home } from "../../home/index.mjs";
 import {
   toDirectoryPath,
   convertFileUrlToPath,
@@ -149,15 +150,14 @@ export const resolveConfigurationRepository = (configuration) => {
     InternalAppmapError,
   );
   const { directory } = configuration.repository;
-  const agent_directory = toAbsoluteUrl("../../../", import.meta.url);
   const { name, version, homepage } = parseJSON(
-    readFileSync(new URL("package.json", agent_directory), "utf8"),
+    readFileSync(new URL("package.json", home), "utf8"),
   );
   return extendConfiguration(
     configuration,
     {
       agent: {
-        directory: agent_directory,
+        directory: home,
         package: { name, version, homepage },
       },
       repository: {

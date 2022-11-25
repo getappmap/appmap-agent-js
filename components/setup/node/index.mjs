@@ -12,6 +12,7 @@ import { createRequire } from "module";
 import YAML from "yaml";
 import Semver from "semver";
 import Chalk from "chalk";
+import { home } from "../../home/index.mjs";
 import { validateExternalConfiguration } from "../../validate/index.mjs";
 import { questionConfigAsync } from "../../questionnaire/index.mjs";
 import { hasOwnProperty } from "../../util/index.mjs";
@@ -33,13 +34,12 @@ const generateLog = (prefix, writable) => (message) => {
 
 export const mainAsync = async (
   { version, cwd, env, stdout, stderr },
-  import_meta_url = import.meta.url,
+  testable_home = home,
 ) => {
   const logSuccess = generateLog(chalkGreen("\u2714"), stdout);
   const logWarning = generateLog(chalkYellow("\u26A0"), stderr);
   const logFailure = generateLog(chalkRed("\u2716"), stderr);
   const cwd_url = toDirectoryUrl(convertPathToFileUrl(cwd()));
-  const agent_url = toAbsoluteUrl("../../../", import_meta_url);
   let conf_url = toAbsoluteUrl("appmap.yml", cwd_url);
   if (hasOwnProperty(env, "APPMAP_CONFIGURATION_PATH")) {
     conf_url = convertPathToFileUrl(
@@ -58,7 +58,7 @@ export const mainAsync = async (
   {
     const _package = parseJSON(
       await readFileAsync(
-        new URL(toAbsoluteUrl("package.json", agent_url)),
+        new URL(toAbsoluteUrl("package.json", testable_home)),
         "utf8",
       ),
     );
@@ -137,9 +137,9 @@ export const mainAsync = async (
     }
     const agent_main_url = convertPathToFileUrl(agent_main_path);
     const resolved_agent_url = toAbsoluteUrl("../../", agent_main_url);
-    if (agent_url !== resolved_agent_url) {
+    if (resolved_agent_url !== testable_home) {
       logFailure(
-        `agent location mismatch, expected agent to resolve to ${agent_url} but got ${resolved_agent_url}`,
+        `agent location mismatch, expected agent to resolve to ${testable_home} but got ${resolved_agent_url}`,
       );
       return false;
     }

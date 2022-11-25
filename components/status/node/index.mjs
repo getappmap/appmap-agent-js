@@ -1,5 +1,4 @@
 const { URL } = globalThis;
-const { url: __url } = import.meta;
 
 const {
   JSON: { parse: parseJSON, stringify: stringifyJSON },
@@ -9,11 +8,12 @@ const {
 
 import { execSync } from "child_process";
 import os from "os";
+import { readFileSync as readFile } from "fs";
 import { readFile as readFileAsync } from "fs/promises";
-import { createRequire } from "module";
 import semver from "semver";
+import { home } from "../../home/index.mjs";
 const schema = parseJSON(
-  await readFileAsync(new URL("../../../dist/schema.json", __url), "utf8"),
+  await readFileAsync(new URL("dist/schema.json", home), "utf8"),
 );
 
 /* c8 ignore start */
@@ -56,10 +56,9 @@ export const externals = {
 
 export const run = (root) => {
   const errors = [];
-
   const node_version = externals.getNodeVersion();
-  const require = createRequire(import.meta.url);
-  const versions = require("../../../package.json").engines.node;
+  const versions = parseJSON(readFile(new URL("package.json", home), "utf8"))
+    .engines.node;
   if (!semver.satisfies(node_version, versions)) {
     errors.push({
       level: "error",

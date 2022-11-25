@@ -2,6 +2,7 @@ util
 url
 path
 uuid
+home
 version
 error
 log-inner

@@ -4,7 +4,8 @@ const {
 } = globalThis;
 
 import { readFile as readFileAsync } from "node:fs/promises";
+import { home } from "../../home/index.mjs";
 
 export const { version } = parseJSON(
-  await readFileAsync(new URL("../../../package.json", import.meta.url)),
+  await readFileAsync(new URL("package.json", home)),
 );
