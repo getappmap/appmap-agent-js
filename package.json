@@ -26,14 +26,11 @@
     "url": "https://github.com/getappmap/appmap-agent-js.git"
   },
   "scripts": {
-    "prepare": "npm run build",
-    "build": "node build/index.mjs",
-    "format": "npx prettier -w '**/*.@(mjs|js|cjs|json|yaml|yml)'",
-    "lint": "npx eslint '**/*.@(mjs|js|cjs)'",
-    "test": "npx bercow",
-    "test-unit": "npx bercow .bercowrc-test-only.yaml",
-    "test-unit-cov": "npx bercow .bercowrc-test-only-cov.yaml",
-    "test-system": "node --unhandled-rejections=strict test/system/index.mjs",
+    "prepare": "node schema/build.mjs && node component/build.mjs",
+    "lint": "node component/lint.mjs && npx eslint '**/*.@(mjs|cjs)' && npx prettier --check .",
+    "format": "npx prettier --write .",
+    "test": "npx bercow .bercowrc-test-only.yaml && node --unhandled-rejections=strict test/system/index.mjs",
+    "coverage": "npx bercow .bercowrc-test-only-cov.yaml",
     "deploy": "npx semantic-release"
   },
   "optionalDependencies": {
