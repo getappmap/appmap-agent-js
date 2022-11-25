@@ -2,7 +2,7 @@
   "name": "@appland/appmap-agent-js",
   "version": "12.0.0",
   "bin": {
-    "appmap-agent-js": "bin/appmap-agent-js"
+    "appmap-agent-js": "bin/appmap-agent-js.cjs"
   },
   "main": "lib/node/recorder-api.mjs",
   "license": "MIT",
@@ -28,8 +28,8 @@
   "scripts": {
     "prepare": "npm run build",
     "build": "node build/index.mjs",
-    "format": "npx prettier -w bin/appmap-agent-js '**/*.@(mjs|js|cjs|json|yaml|yml)'",
-    "lint": "npx eslint bin/appmap-agent-js '**/*.@(mjs|js|cjs)'",
+    "format": "npx prettier -w '**/*.@(mjs|js|cjs|json|yaml|yml)'",
+    "lint": "npx eslint '**/*.@(mjs|js|cjs)'",
     "test": "npx bercow",
     "test-unit": "npx bercow .bercowrc-test-only.yaml",
     "test-unit-cov": "npx bercow .bercowrc-test-only-cov.yaml",

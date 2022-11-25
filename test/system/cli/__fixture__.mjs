@@ -48,10 +48,14 @@ const runAsyncInner = async (_package, config, beforeAsync, afterAsync) => {
       ...config,
     }),
   );
-  await spawnStrictAsync("node", [joinPath(cwd(), "bin", "appmap-agent-js")], {
-    cwd: directory,
-    stdio: "inherit",
-  });
+  await spawnStrictAsync(
+    "node",
+    [joinPath(cwd(), "bin", "appmap-agent-js.cjs")],
+    {
+      cwd: directory,
+      stdio: "inherit",
+    },
+  );
   await afterAsync(directory);
   await rmdirAsync(directory, { recursive: true });
 };
