@@ -1,4 +1,5 @@
 import {
+  mkdir as mkdirAsync,
   readdir as readdirAsync,
   readFile as readFileAsync,
   writeFile as writeFileAsync,
@@ -16,14 +17,16 @@ const { url: __url } = import.meta;
 
 const schemas = [];
 
-for (const filename of await readdirAsync(new URL("../schema", __url))) {
+for (const filename of await readdirAsync(new URL("definitions", __url))) {
   schemas.push({
     $id: filename.split(".")[0],
     ...parseYAML(
-      await readFileAsync(new URL(`../schema/${filename}`, __url), "utf8"),
+      await readFileAsync(new URL(`definitions/${filename}`, __url), "utf8"),
     ),
   });
 }
+
+await mkdirAsync(new URL("../dist", __url), { recursive: true });
 
 const ajv = new Ajv({
   schemas,
