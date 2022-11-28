@@ -1,4 +1,10 @@
-import { generateNodeHook } from "./node-recursive.mjs";
-export { doesSupportSource, doesSupportTokens } from "./node-recursive.mjs";
-export const { hookCommandSource, hookCommandTokens, hookEnvironment } =
-  generateNodeHook("remote");
+import { generateNodeRecorder } from "./node-recursive.mjs";
+export const {
+  name,
+  recursive,
+  doesSupportSource,
+  doesSupportTokens,
+  hookCommandSource,
+  hookCommandTokens,
+  hookEnvironment,
+} = generateNodeRecorder("remote");

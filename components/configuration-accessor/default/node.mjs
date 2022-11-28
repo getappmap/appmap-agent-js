@@ -7,9 +7,9 @@ import { escapeShell } from "./escape.mjs";
 
 const regexp = /^(?<before>\s*\S*node(.[a-zA-Z]+)?)(?<after>($|\s[\s\S]*$))$/u;
 
-export const doesSupportSource = (command) => regexp.test(command);
+const doesSupportSource = (command) => regexp.test(command);
 
-export const doesSupportTokens = (tokens) =>
+const doesSupportTokens = (tokens) =>
   tokens.length > 0 && tokens[0].startsWith("node");
 
 const splitNodeCommand = (tokens) => {
@@ -42,7 +42,11 @@ const parseNodeCommand = (source) => {
   return result.groups;
 };
 
-export const generateNodeHook = (recorder) => ({
+export const generateNodeRecorder = (recorder) => ({
+  doesSupportSource,
+  doesSupportTokens,
+  recursive: false,
+  name: recorder,
   hookCommandSource: (source, shell, base) => {
     const groups = parseNodeCommand(source);
     return [

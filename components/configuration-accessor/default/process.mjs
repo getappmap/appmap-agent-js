@@ -1,4 +1,10 @@
-import { generateNodeHook } from "./node.mjs";
-export { doesSupportSource, doesSupportTokens } from "./node.mjs";
-export const { hookCommandSource, hookCommandTokens, hookEnvironment } =
-  generateNodeHook("process");
+import { generateNodeRecorder } from "./node.mjs";
+export const {
+  name,
+  recursive,
+  doesSupportSource,
+  doesSupportTokens,
+  hookCommandSource,
+  hookCommandTokens,
+  hookEnvironment,
+} = generateNodeRecorder("process");

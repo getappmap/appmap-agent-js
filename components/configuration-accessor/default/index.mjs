@@ -19,16 +19,22 @@ import { matchSpecifier } from "../../specifier/index.mjs";
 import { extendConfiguration } from "../../configuration/index.mjs";
 import { resolveShell } from "./escape.mjs";
 import * as MochaRecorder from "./mocha.mjs";
+import * as JestRecorder from "./jest.mjs";
 import * as ProcessRecorder from "./process.mjs";
 import * as ProcessRecorderRecursive from "./process-recursive.mjs";
 import * as RemoteRecorder from "./remote.mjs";
 import * as RemoteRecorderRecursive from "./remote-recursive.mjs";
 
-const { doesSupportTokens: isMochaTokens, doesSupportSource: isMochaSource } =
-  MochaRecorder;
+export const recorders = [
+  MochaRecorder,
+  JestRecorder,
+  ProcessRecorder,
+  ProcessRecorderRecursive,
+  RemoteRecorder,
+  RemoteRecorderRecursive,
+];
 
 const {
-  String,
   URL,
   RegExp,
   Object: { entries: toEntries },
@@ -78,16 +84,25 @@ export const resolveConfigurationAutomatedRecorder = (configuration) => {
       "cannot resolve recorder because command is missing",
       InternalAppmapError,
     );
+    const method =
+      configuration.command.tokens === null
+        ? "doesSupportSource"
+        : "doesSupportTokens";
+    const input =
+      configuration.command.tokens === null
+        ? configuration.command.source
+        : configuration.command.tokens;
+    const { name } = recorders.find(
+      (recorder) =>
+        (recorder.recursive === null ||
+          recorder.recursive ===
+            configuration["recursive-process-recording"]) &&
+        recorder[method](input),
+    );
     configuration = extendConfiguration(
       configuration,
       {
-        recorder: (
-          configuration.command.tokens === null
-            ? isMochaSource(configuration.command.source)
-            : isMochaTokens(configuration.command.tokens)
-        )
-          ? "mocha"
-          : "process",
+        recorder: name,
       },
       configuration.repository.directory,
     );
@@ -195,21 +210,6 @@ export const getConfigurationScenarios = (configuration) => {
     );
 };
 
-const recorders = {
-  process: {
-    true: ProcessRecorderRecursive,
-    false: ProcessRecorder,
-  },
-  remote: {
-    true: RemoteRecorderRecursive,
-    false: RemoteRecorder,
-  },
-  mocha: {
-    true: MochaRecorder,
-    false: MochaRecorder,
-  },
-};
-
 export const compileConfigurationCommand = (configuration, env) => {
   assert(
     configuration.agent !== null,
@@ -223,8 +223,6 @@ export const compileConfigurationCommand = (configuration, env) => {
   );
   const {
     agent: { directory },
-    recorder,
-    "recursive-process-recording": recursive,
     command: { source, tokens },
     "command-options": options,
   } = configuration;
@@ -234,7 +232,13 @@ export const compileConfigurationCommand = (configuration, env) => {
     APPMAP_CONFIGURATION: stringifyJSON(configuration),
   };
   const { hookCommandSource, hookCommandTokens, hookEnvironment } =
-    recorders[recorder][String(recursive)];
+    recorders.find(
+      (recorder) =>
+        (recorder.recursive === null ||
+          recorder.recursive ===
+            configuration["recursive-process-recording"]) &&
+        recorder.name === configuration.recorder,
+    );
   const [exec, ...argv] =
     tokens === null
       ? hookCommandSource(source, resolveShell(options.shell, env), directory)
