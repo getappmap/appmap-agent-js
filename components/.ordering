@@ -53,6 +53,7 @@ hook
 recorder-api
 recorder-process
 recorder-mocha
+recorder-jest
 recorder-remote
 receptor-file
 receptor-http
