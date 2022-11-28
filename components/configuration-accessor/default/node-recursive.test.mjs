@@ -1,16 +1,23 @@
 import { fileURLToPath } from "node:url";
 import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
-import {
+import { generateNodeRecorder } from "./node-recursive.mjs";
+
+const {
+  name,
+  recursive,
   doesSupportSource,
   doesSupportTokens,
-  generateNodeHook,
-} from "./node-recursive.mjs";
-
-const { hookCommandSource, hookCommandTokens, hookEnvironment } =
-  generateNodeHook("process");
+  hookCommandSource,
+  hookCommandTokens,
+  hookEnvironment,
+} = generateNodeRecorder("process");
 
 const base = "file:///A:/base/";
 const path = fileURLToPath("file:///A:/base/lib/node/recorder-process.mjs");
+
+assertEqual(name, "process");
+
+assertEqual(recursive, true);
 
 assertEqual(doesSupportSource("source"), true);
 

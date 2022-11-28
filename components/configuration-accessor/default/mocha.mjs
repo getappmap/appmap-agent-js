@@ -7,6 +7,9 @@ import { generateParseSource, generateSplitTokens } from "./package.mjs";
 const { canParseSource, parseSource } = generateParseSource("mocha");
 const { canSplitTokens, splitTokens } = generateSplitTokens("mocha");
 
+export const name = "mocha";
+export const recursive = null;
+
 export const doesSupportSource = canParseSource;
 
 export const doesSupportTokens = canSplitTokens;

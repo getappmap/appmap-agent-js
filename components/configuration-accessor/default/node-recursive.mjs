@@ -3,11 +3,15 @@ import { toAbsoluteUrl } from "../../url/index.mjs";
 import { convertFileUrlToPath } from "../../path/index.mjs";
 import { escapeNodeOption } from "./escape.mjs";
 
-export const doesSupportSource = constant(true);
+const doesSupportSource = constant(true);
 
-export const doesSupportTokens = constant(true);
+const doesSupportTokens = constant(true);
 
-export const generateNodeHook = (recorder) => ({
+export const generateNodeRecorder = (recorder) => ({
+  name: recorder,
+  recursive: true,
+  doesSupportSource,
+  doesSupportTokens,
   hookCommandSource: (source, _shell, _base) => [source],
   hookCommandTokens: (tokens, _base) => tokens,
   hookEnvironment: (env, base) => ({
