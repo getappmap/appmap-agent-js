@@ -74,7 +74,7 @@ export const openReceptorAsync = async ({
   appmap_dir: directory,
 }) => {
   assert(
-    recorder === "mocha" || recorder === "process",
+    recorder === "jest" || recorder === "mocha" || recorder === "process",
     "invalid recorder for receptor-file",
     InternalAppmapError,
   );
@@ -90,9 +90,13 @@ export const openReceptorAsync = async ({
         socket.removeAllListeners("message");
         const configuration = parseJSON(content);
         const { recorder } = configuration;
-        if (recorder !== "process" && recorder !== "mocha") {
+        if (
+          recorder !== "jest" &&
+          recorder !== "process" &&
+          recorder !== "mocha"
+        ) {
           logError(
-            "File receptor expected process/mocha recorder but got: %j",
+            "File receptor expected process/mocha/jest recorder but got: %j",
             recorder,
           );
           socket.destroy();

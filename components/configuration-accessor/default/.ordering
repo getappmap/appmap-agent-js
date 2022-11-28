@@ -1,6 +1,7 @@
 escape.mjs
 package.mjs
 mocha.mjs
+jest.mjs
 node.mjs
 process.mjs
 remote.mjs

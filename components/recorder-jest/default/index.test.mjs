@@ -1,10 +1,11 @@
 import process from "node:process";
+import { platform as getPlatform } from "node:os";
 import { spawn } from "child_process";
 
 const { String, Error } = globalThis;
 
 const child = spawn(
-  "npx",
+  getPlatform() === "win32" ? "npx.cmd" : "npx",
   [
     "jest",
     "--runInBand",
