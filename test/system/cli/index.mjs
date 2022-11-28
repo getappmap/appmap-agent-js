@@ -12,6 +12,7 @@ for (const name of [
   "event-query",
   "npx",
   "mocha",
+  "jest",
   // "remote",
 ]) {
   stdout.write(`${"\n"}${name}${"\n"}`);

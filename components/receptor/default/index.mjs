@@ -9,6 +9,7 @@ const Recepters = new Map([
   ["remote", ReceptorHttp],
   ["process", ReceptorFile],
   ["mocha", ReceptorFile],
+  ["jest", ReceptorFile],
 ]);
 
 export const minifyReceptorConfiguration = (configuration) => {
