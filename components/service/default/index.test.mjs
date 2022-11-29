@@ -19,7 +19,7 @@ const { Promise, setTimeout } = globalThis;
   });
   // Wait for server to process connection
   await new Promise((resolve) => {
-    setTimeout(resolve, 100);
+    setTimeout(resolve, 500);
   });
   await closeServiceAsync(service);
 }
