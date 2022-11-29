@@ -7,16 +7,13 @@ import { checkSignatureAsync } from "./signature.mjs";
 import { writeEslintAsync } from "./eslint.mjs";
 import { routeAsync } from "./route.mjs";
 
-const {
-  URL,
-  JSON: { parse: parseJSON },
-} = globalThis;
+const { URL } = globalThis;
 
 const options = {
   home: ".",
   eslintrc: false,
   signature: false,
-  params: null,
+  params: false,
   route: false,
   clear: false,
   bundle: null,
@@ -37,8 +34,8 @@ if (options.signature) {
   await checkSignatureAsync(home);
 }
 
-if (options.params !== null) {
-  await writeParamsAsync(home, parseJSON(options.params));
+if (options.params) {
+  await writeParamsAsync(home, { env: "test" });
 }
 
 if (options.route) {
