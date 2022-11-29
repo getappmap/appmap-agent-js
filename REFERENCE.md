@@ -124,7 +124,7 @@ import {createAppMap} from "@appland/appmap-agent-js";
 const appmap = createAppMap(
   repository_directory,    // default: process.cwd()
   configuration,           // default: {}
-  configuration_directory, // default: null
+  configuration_directory, // default: repository_directory
 );
 // NB: An appmap can create multiple (concurrent) tracks
 const track = "my-identifier";
@@ -141,11 +141,9 @@ appmap.recordScript(
   "(function main () { return 123; } ());",
   "path/to/main.js",
 );
-const trace = appmap.stopRecording(track, {
-  status: 0,
-  errors: []
-});
+const trace = appmap.stopRecording(track);
 console.log(JSON.stringify(trace, null, 2));
+appmap.terminate();
 ```
 
 ### `createAppMap(home, configuration, base)`
@@ -153,11 +151,11 @@ console.log(JSON.stringify(trace, null, 2));
 * `home <string>` The file url of the project. Default: file url of the current working directory.
 * `configuration <object>` Root configuration. Default: `{}`.
 * `base <string>` The file url of the directory to resolve the relative paths of the configuration argument.
-* Returns `<appmap>` an appmap instance and start recording.
+* Returns `<appmap>` an appmap instance and listen to different event emitters.
 
 ### `appmap.terminate()`
 
-Stop recording. Subsequent method invocations will throw exception.
+Stop listening to events. Subsequent method invocations will throw exception.
 
 ### `appmap.startRecording(track, configuration, base)`
 
@@ -166,11 +164,9 @@ Stop recording. Subsequent method invocations will throw exception.
 * `base <string> | null`: The file url of the directory to resolve the relative paths of the configuration argument. Default: `null`, the presence of relative paths will throw an error.
 * Returns `<string>` the identifier for the track. This is useful when providing `null` for the `track` argument.
 
-### `appmap.stopRecording(track, status, errors)`
+### `appmap.stopRecording(track)`
 
-* `track <string>`
-* `status <number>` Exit status code. Default: `[]`.
-* `errors <Errors[]>` List of errors that happened during the track lifetime. Default: `[]`.
+* `track <string>` Identifier of the track.
 * Returns `<object>` the recorded trace in the appmap format -- ie: a JSON object.
 
 ### `appmap.recordScript(content, url)`
@@ -178,18 +174,6 @@ Stop recording. Subsequent method invocations will throw exception.
 * `content <string>` Script content.
 * `url <string>` Script location.
 * Returns `<any>` the completion value of the script.
-
-### `appmap.instrumentScript(content, url)`
-
-* `content <string>` Script content.
-* `url <string>` Script location.
-* Returns `<string>` the instrumented code to run as a module.
-
-### `appmap.instrumentModule(content, url)`
-
-* `content <string>` Script content.
-* `url <string>` Script location.
-* Returns `<string>` the instrumented code to run as a script.
 
 <!-- ### `appmap.recordBeginBundle()`
 
@@ -249,7 +233,7 @@ Same type signature as `appmap.recordServerResponse` but without `route` propert
 
 ## Configuration
 
-The actual format requirements for configuration can be found as a json-schema [here](build/schema/schema.yml).
+The actual format requirements for configuration can be found as a json-schema [here](schema/definitions/external-configuration.yml).
 
 ### Prelude: Specifier Format
 
@@ -295,10 +279,11 @@ The agent filter code objects (functions or objects/classes) based on a format c
     * `encoding "utf8" | "utf16le" | "latin1"` Encoding of all the child's stdio streams.
     * `timeout <number>` The maximum number of millisecond the child process is allowed to run before being killed. *Default*: `0` (no timeout).
     * `killSignal <string>` The signal used to kill the child process when it runs out of time. *Default*: `"SIGTERM"`.
-* `recorder "process" | "remote" | "mocha"` Defines the main algorithm used for recording. *Default* `null`.
-    * `null` Will pick between `"remote"` and `"mocha"` based on the content of the command.
+* `recorder "process" | "remote" | "mocha" | "jest"` Defines the main algorithm used for recording. *Default* `null`.
+    * `null` Will check whether `"jest"` or `"mocha"` is suitable. Else, it will default to `"process"`.
     * `"process"` Generate a single appmap which spans over the entire lifetime of the process.
     * `"mocha"` Generate an appmap for each test case (ie `it` calls) of the entire test suite (ie every `describe` calls on every test file).
+    * `"jest"` Generate an appmap for each test case (ie `test` calls) of the entire test suite.
     * `"remote"` Generate appmap on demand via HTTP requests.
 * `socket "unix" | "net"` Defines the socket implementation to use: [`posix-socket`](https://www.npmjs.com/package/posix-socket) or [`net.Socket`](https://nodejs.org/api/net.html#class-netsocket). The `posix-socket` module provide synchronous methods which avoid creating asynchronous resources that are observed when `ordering` is `"causal"`. To avoid infinite loop, the `"net"` implementation buffers messages. The `"unix"` is probably the better option but it requires node-gyp compilation and is not available on windows. If `"unix"` is chosen but the `posix-socket` could not be installed, the agent will fallback on `"net"`. Default: `"unix"`.
 * `heartbeat <number> | null` Defines the interval in millisecond where the socket should be flushed. This only has effect if `socket` is `"net"`. Default: `1000`.
