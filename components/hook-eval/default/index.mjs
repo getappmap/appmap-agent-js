@@ -5,14 +5,14 @@
 //   throw new ExternalAppmapError("lib/emitter/hook/esm.js must be preloaded with --experimental loader");
 // }};
 
+import { InternalAppmapError } from "../../error/index.mjs";
+import { assert, hasOwnProperty } from "../../util/index.mjs";
+import { instrument } from "../../agent/index.mjs";
+
 const {
   String,
   Reflect: { defineProperty },
 } = globalThis;
-
-import { InternalAppmapError } from "../../error/index.mjs";
-import { assert, hasOwnProperty } from "../../util/index.mjs";
-import { instrument } from "../../agent/index.mjs";
 
 const forward = (_url, content) => content;
 

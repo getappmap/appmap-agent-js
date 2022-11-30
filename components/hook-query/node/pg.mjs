@@ -1,11 +1,3 @@
-const {
-  Object,
-  undefined,
-  Reflect: { apply },
-  Promise,
-  TypeError,
-} = globalThis;
-
 import { toString, spyOnce, assignProperty } from "../../util/index.mjs";
 import {
   getFreshTab,
@@ -18,6 +10,14 @@ import {
   getBundlePayload,
 } from "../../agent/index.mjs";
 import { requireMaybe } from "./require.mjs";
+
+const {
+  Object,
+  undefined,
+  Reflect: { apply },
+  Promise,
+  TypeError,
+} = globalThis;
 
 const VERSION = null;
 const DATABASE = "postgres";

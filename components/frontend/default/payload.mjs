@@ -1,10 +1,10 @@
+import { constant } from "../../util/index.mjs";
+import { serialize } from "../../serialization/index.mjs";
+
 const {
   Array: { isArray, from: toArray },
   Object: { fromEntries, entries: toEntries },
 } = globalThis;
-
-import { constant } from "../../util/index.mjs";
-import { serialize } from "../../serialization/index.mjs";
 
 export const getJumpPayload = constant({ type: "jump" });
 

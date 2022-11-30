@@ -1,3 +1,7 @@
+import { toNumber, jsonifyNumber, toString } from "../../util/index.mjs";
+import { logWarning } from "../../log/index.mjs";
+import { patch } from "../../patch/index.mjs";
+
 const {
   Buffer: { from: toBuffer, concat: concatBuffer },
   Object: { fromEntries, entries: toEntries },
@@ -7,10 +11,6 @@ const {
   Math: { round },
   undefined,
 } = globalThis;
-
-import { toNumber, jsonifyNumber, toString } from "../../util/index.mjs";
-import { logWarning } from "../../log/index.mjs";
-import { patch } from "../../patch/index.mjs";
 
 const normalizeChunk = (chunk, encoding) =>
   typeof chunk === "string" ? toBuffer(chunk, encoding) : chunk;

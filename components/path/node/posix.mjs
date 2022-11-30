@@ -1,3 +1,5 @@
+import { posix as PosixPath } from "node:path";
+
 const {
   undefined,
   Reflect: { getOwnPropertyDescriptor },
@@ -7,8 +9,6 @@ const {
   },
   /* c8 ignore stop */
 } = globalThis;
-
-import { posix as PosixPath } from "node:path";
 
 const { resolve: resolvePath, relative: unresolvePath } = PosixPath;
 

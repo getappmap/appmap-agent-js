@@ -1,7 +1,3 @@
-const {
-  Reflect: { defineProperty },
-} = globalThis;
-
 import { InternalAppmapError } from "../../error/index.mjs";
 import {
   assert,
@@ -25,6 +21,10 @@ import {
   formatYieldPayload,
   getResumePayload,
 } from "../../agent/index.mjs";
+
+const {
+  Reflect: { defineProperty },
+} = globalThis;
 
 export const unhook = (backup) => {
   backup.forEach(assignProperty);

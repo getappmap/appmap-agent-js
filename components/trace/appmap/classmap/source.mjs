@@ -1,5 +1,3 @@
-const { Map, Set, String } = globalThis;
-
 import { toRelativeUrl } from "../../../url/index.mjs";
 import { logInfoWhen, logWarning } from "../../../log/index.mjs";
 import { parseEstree } from "./parse.mjs";
@@ -14,6 +12,8 @@ import {
 } from "./entity.mjs";
 import { digestEstreeRoot } from "./digest.mjs";
 import { compileExclusionArray } from "./exclusion.mjs";
+
+const { Map, Set, String } = globalThis;
 
 const hashPosition = ({ line, column }) => `${String(line)}:${String(column)}`;
 

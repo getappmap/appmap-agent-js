@@ -1,5 +1,3 @@
-const { Map, RegExp } = globalThis;
-
 import Minimatch from "minimatch";
 import {
   InternalAppmapError,
@@ -8,6 +6,8 @@ import {
 import { logError, logDebug } from "../../log/index.mjs";
 import { assert } from "../../util/index.mjs";
 import { toRelativeUrl } from "../../url/index.mjs";
+
+const { Map, RegExp } = globalThis;
 
 const { Minimatch: MinimatchClass } = Minimatch;
 

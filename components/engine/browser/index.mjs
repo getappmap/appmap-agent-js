@@ -1,10 +1,10 @@
-const {
-  navigator: { userAgent: description },
-} = globalThis;
-
 import { ExternalAppmapError } from "../../error/index.mjs";
 import { logErrorWhen } from "../../log/index.mjs";
 import { assert } from "../../util/index.mjs";
+
+const {
+  navigator: { userAgent: description },
+} = globalThis;
 
 const regexp = /^([^ \n\t/]+)\/([^ \n\t/]+) /u;
 

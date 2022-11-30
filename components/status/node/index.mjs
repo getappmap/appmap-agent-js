@@ -1,16 +1,16 @@
-const { URL } = globalThis;
-
-const {
-  JSON: { parse: parseJSON, stringify: stringifyJSON },
-  Promise,
-  process,
-} = globalThis;
-
 import { execSync } from "child_process";
 import os from "os";
 import { readFile as readFileAsync } from "fs/promises";
 import semver from "semver";
 import { self_directory, self_package } from "../../self/index.mjs";
+
+const {
+  URL,
+  JSON: { parse: parseJSON, stringify: stringifyJSON },
+  Promise,
+  process,
+} = globalThis;
+
 const schema = parseJSON(
   await readFileAsync(new URL("dist/schema.json", self_directory), "utf8"),
 );

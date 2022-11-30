@@ -1,15 +1,15 @@
+import { logInfoWhen } from "../../log/index.mjs";
+import { hasOwnProperty, coalesce, identity } from "../../util/index.mjs";
+import { toAbsoluteUrl, toDirectoryUrl } from "../../url/index.mjs";
+import { validateExternalConfiguration } from "../../validate/index.mjs";
+import { createSpecifier } from "../../specifier/index.mjs";
+
 const {
   URL,
   Array: { isArray },
   Reflect: { ownKeys },
   Object: { entries: toEntries },
 } = globalThis;
-
-import { logInfoWhen } from "../../log/index.mjs";
-import { hasOwnProperty, coalesce, identity } from "../../util/index.mjs";
-import { toAbsoluteUrl, toDirectoryUrl } from "../../url/index.mjs";
-import { validateExternalConfiguration } from "../../validate/index.mjs";
-import { createSpecifier } from "../../specifier/index.mjs";
 
 const HOOK_ESM_GLOBAL = "APPMAP_HOOK_ESM";
 

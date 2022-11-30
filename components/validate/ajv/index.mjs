@@ -1,5 +1,3 @@
-const { URL } = globalThis;
-
 import Treeify from "treeify";
 import AjvErrorTree from "ajv-error-tree";
 import { self_directory } from "../../self/index.mjs";
@@ -9,6 +7,8 @@ import {
 } from "../../error/index.mjs";
 import { logError } from "../../log/index.mjs";
 import { assert, coalesce } from "../../util/index.mjs";
+
+const { URL } = globalThis;
 
 const {
   validateSerial: validateAjvSerial,

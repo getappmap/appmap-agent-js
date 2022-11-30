@@ -1,3 +1,11 @@
+import {
+  identity,
+  hasOwnProperty,
+  incrementCounter,
+  createCounter,
+} from "../../util/index.mjs";
+import { logDebug, logDebugWhen } from "../../log/index.mjs";
+
 const {
   Reflect: { getOwnPropertyDescriptor, getPrototypeOf, apply, ownKeys },
   Error: { prototype: error_prototype },
@@ -18,14 +26,6 @@ const {
   Array: { isArray },
   JSON: { stringify: stringifyJSON },
 } = globalThis;
-
-import {
-  identity,
-  hasOwnProperty,
-  incrementCounter,
-  createCounter,
-} from "../../util/index.mjs";
-import { logDebug, logDebugWhen } from "../../log/index.mjs";
 
 const noargs = [];
 

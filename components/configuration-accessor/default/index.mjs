@@ -1,9 +1,3 @@
-const {
-  RegExp,
-  Object: { entries: toEntries },
-  JSON: { stringify: stringifyJSON },
-} = globalThis;
-
 import { toAbsoluteUrl } from "../../url/index.mjs";
 import { self_directory, self_package } from "../../self/index.mjs";
 import {
@@ -25,6 +19,12 @@ import {
 } from "../../repository/index.mjs";
 import { matchSpecifier } from "../../specifier/index.mjs";
 import { extendConfiguration } from "../../configuration/index.mjs";
+
+const {
+  RegExp,
+  Object: { entries: toEntries },
+  JSON: { stringify: stringifyJSON },
+} = globalThis;
 
 const getSpecifierValue = (pairs, key, def) => {
   for (const [specifier, value] of pairs) {

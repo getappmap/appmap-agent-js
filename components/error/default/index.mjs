@@ -1,6 +1,6 @@
-const { Error } = globalThis;
-
 import { version } from "../../version/index.mjs";
+
+const { Error } = globalThis;
 
 const issues = "https://github.com/getappmap/appmap-agent-js/issues";
 const slack = "https://appmap.io/slack";

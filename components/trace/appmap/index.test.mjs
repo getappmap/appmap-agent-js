@@ -1,5 +1,3 @@
-const { undefined } = globalThis;
-
 import { assertDeepEqual } from "../../__fixture__.mjs";
 import {
   createConfiguration,
@@ -7,6 +5,8 @@ import {
 } from "../../configuration/index.mjs";
 import { makeLocation } from "../../location/index.mjs";
 import { compileTrace } from "./index.mjs";
+
+const { undefined } = globalThis;
 
 const configuration = extendConfiguration(
   createConfiguration("protocol://host/home/"),

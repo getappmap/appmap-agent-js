@@ -1,5 +1,3 @@
-const { URL } = globalThis;
-
 import {
   readFile as readFileAsync,
   writeFile as writeFileAsync,
@@ -20,6 +18,8 @@ import {
 } from "../../path/index.mjs";
 import { toDirectoryUrl, toAbsoluteUrl } from "../../url/index.mjs";
 import { prompts } from "../../prompts/index.mjs";
+
+const { URL } = globalThis;
 
 const { satisfies: satisfiesSemver } = Semver;
 const { green: chalkGreen, yellow: chalkYellow, red: chalkRed } = Chalk;

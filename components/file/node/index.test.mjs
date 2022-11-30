@@ -1,11 +1,11 @@
-const { URL } = globalThis;
-
 import { assertEqual, assertThrow } from "../../__fixture__.mjs";
 import { writeFile as writeFileAsync } from "fs/promises";
 import { readFile } from "./index.mjs";
 import { toAbsoluteUrl } from "../../url/index.mjs";
 import { getUuid } from "../../uuid/random/index.mjs";
 import { getTmpUrl } from "../../path/index.mjs";
+
+const { URL } = globalThis;
 
 {
   const url = toAbsoluteUrl(getUuid(), getTmpUrl());

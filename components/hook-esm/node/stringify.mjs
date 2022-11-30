@@ -1,3 +1,6 @@
+import { ExternalAppmapError } from "../../error/index.mjs";
+import { logError } from "../../log/index.mjs";
+
 const {
   Buffer,
   Buffer: { from: toBuffer },
@@ -5,9 +8,6 @@ const {
   SharedArrayBuffer,
   Uint8Array,
 } = globalThis;
-
-import { ExternalAppmapError } from "../../error/index.mjs";
-import { logError } from "../../log/index.mjs";
 
 export const stringifyContent = (content) => {
   if (typeof content === "string") {

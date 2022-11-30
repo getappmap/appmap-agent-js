@@ -1,9 +1,9 @@
-const { Error, decodeURIComponent, URL } = globalThis;
-
 import { readFileSync as readFileInner } from "fs";
 import { readFile as readFileInnerAsync } from "fs/promises";
 import { Buffer } from "node:buffer";
 import { logWarningWhen } from "../../log/index.mjs";
+
+const { Error, decodeURIComponent, URL } = globalThis;
 
 const { from: toBuffer } = Buffer;
 

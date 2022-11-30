@@ -1,9 +1,3 @@
-const {
-  Array: { isArray },
-  String,
-  Reflect: { ownKeys },
-} = globalThis;
-
 import { hasOwnProperty, mapMaybe } from "../../../util/index.mjs";
 
 import {
@@ -11,6 +5,12 @@ import {
   makeFunctionEntity,
   makeClassEntity,
 } from "./entity.mjs";
+
+const {
+  Array: { isArray },
+  String,
+  Reflect: { ownKeys },
+} = globalThis;
 
 const isKeyRelevant = (key) =>
   key !== "start" && key !== "end" && key !== "type" && key !== "loc";

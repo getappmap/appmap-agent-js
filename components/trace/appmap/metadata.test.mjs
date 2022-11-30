@@ -1,11 +1,11 @@
-const { undefined } = globalThis;
-
 import { assertDeepEqual, assertEqual } from "../../__fixture__.mjs";
 import {
   createConfiguration,
   extendConfiguration,
 } from "../../configuration/index.mjs";
 import { compileMetadata } from "./metadata.mjs";
+
+const { undefined } = globalThis;
 
 const test = (conf, url, errors = [], termination = { type: "manual" }) => {
   let configuration = createConfiguration(url);

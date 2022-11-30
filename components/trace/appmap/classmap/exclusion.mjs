@@ -1,14 +1,14 @@
-const {
-  RegExp,
-  Object: { entries: toEntries },
-} = globalThis;
-
 import { InternalAppmapError } from "../../../error/index.mjs";
 import {
   getEntityName,
   getEntityQualifiedName,
   getEntityLabelArray,
 } from "./entity.mjs";
+
+const {
+  RegExp,
+  Object: { entries: toEntries },
+} = globalThis;
 
 const compileCriterion = ([name, pattern]) => {
   if (typeof pattern === "boolean") {

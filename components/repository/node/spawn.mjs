@@ -1,5 +1,3 @@
-const { URL } = globalThis;
-
 import { spawnSync as spawnChildProcess } from "child_process";
 import { ExternalAppmapError } from "../../error/index.mjs";
 
@@ -7,6 +5,8 @@ import { logWarning, logErrorWhen } from "../../log/index.mjs";
 import { coalesce, assert } from "../../util/index.mjs";
 
 import { convertFileUrlToPath } from "../../path/index.mjs";
+
+const { URL } = globalThis;
 
 export const spawn = (exec, argv, url) => {
   const result = spawnChildProcess(exec, argv, {

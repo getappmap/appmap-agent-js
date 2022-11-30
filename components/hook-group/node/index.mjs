@@ -1,9 +1,9 @@
-const { Set } = globalThis;
-
 import { createHook } from "async_hooks";
 import { InternalAppmapError } from "../../error/index.mjs";
 import { assert } from "../../util/index.mjs";
 import { recordGroup } from "../../agent/index.mjs";
+
+const { Set } = globalThis;
 
 export const hook = (agent, { ordering }) => {
   if (ordering !== "causal") {

@@ -1,5 +1,3 @@
-const { Promise } = globalThis;
-
 import { createServer, request as createRequest } from "http";
 import {
   assert,
@@ -15,6 +13,8 @@ import {
 import { toAbsoluteUrl } from "../../url/index.mjs";
 import { getUuid } from "../../uuid/random/index.mjs";
 import { generateRespond, requestAsync } from "./index.mjs";
+
+const { Promise } = globalThis;
 
 const listenServerAsync = (server, port) =>
   new Promise((resolve) => {

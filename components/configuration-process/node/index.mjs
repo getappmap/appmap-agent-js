@@ -1,11 +1,3 @@
-const {
-  URL,
-  Map,
-  JSON: { parse: parseJSON, stringify: stringifyJSON },
-  Reflect: { ownKeys },
-  Array: { isArray },
-} = globalThis;
-
 import { readFileSync, writeFileSync } from "node:fs";
 
 import minimist from "minimist";
@@ -24,6 +16,14 @@ import {
   createConfiguration,
   extendConfiguration,
 } from "../../configuration/index.mjs";
+
+const {
+  URL,
+  Map,
+  JSON: { parse: parseJSON, stringify: stringifyJSON },
+  Reflect: { ownKeys },
+  Array: { isArray },
+} = globalThis;
 
 const { parse: parseYAML, stringify: stringifyYAML } = YAML;
 

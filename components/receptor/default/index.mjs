@@ -1,9 +1,9 @@
-const { Map } = globalThis;
-
 import { InternalAppmapError } from "../../error/index.mjs";
 import { assert } from "../../util/index.mjs";
 import * as ReceptorFile from "../../receptor-file/index.mjs";
 import * as ReceptorHttp from "../../receptor-http/index.mjs";
+
+const { Map } = globalThis;
 
 const Recepters = new Map([
   ["remote", ReceptorHttp],
