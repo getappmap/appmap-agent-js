@@ -12,9 +12,7 @@ const base = "file:///A:/base/";
 const recorder_path = fileURLToPath(
   "file:///A:/base/lib/node/recorder-jest.mjs",
 );
-const loader_path = fileURLToPath(
-  "file:///A:/base/lib/node/loader-standalone.mjs",
-);
+const loader_url = "file:///A:/base/lib/node/loader-standalone.mjs";
 
 //////////////////
 // mocha --argv //
@@ -23,7 +21,10 @@ const loader_path = fileURLToPath(
 // source //
 assertEqual(doesSupportSource("jest --argv"), true);
 assertDeepEqual(hookCommandSource("jest --argv", "/bin/sh", base), [
-  `jest --runInBand --setupFilesAfterEnv ${recorder_path} --argv`,
+  `jest --runInBand --setupFilesAfterEnv ${recorder_path.replace(
+    /\\/gu,
+    "\\\\",
+  )} --argv`,
 ]);
 
 // tokens //
@@ -44,6 +45,6 @@ assertDeepEqual(
   hookEnvironment({ FOO: "bar", NODE_OPTIONS: "options" }, base),
   {
     FOO: "bar",
-    NODE_OPTIONS: `options --experimental-vm-modules --experimental-loader=${loader_path}`,
+    NODE_OPTIONS: `options --experimental-vm-modules --experimental-loader=${loader_url}`,
   },
 );

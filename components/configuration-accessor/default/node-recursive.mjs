@@ -1,6 +1,5 @@
 import { constant, coalesce } from "../../util/index.mjs";
 import { toAbsoluteUrl } from "../../url/index.mjs";
-import { convertFileUrlToPath } from "../../path/index.mjs";
 import { escapeNodeOption } from "./escape.mjs";
 
 const doesSupportSource = constant(true);
@@ -21,9 +20,7 @@ export const generateNodeRecorder = (recorder) => ({
       "NODE_OPTIONS",
       "",
     )} --experimental-loader=${escapeNodeOption(
-      convertFileUrlToPath(
-        toAbsoluteUrl(`lib/node/recorder-${recorder}.mjs`, base),
-      ),
+      toAbsoluteUrl(`lib/node/recorder-${recorder}.mjs`, base),
     )}`,
   }),
 });

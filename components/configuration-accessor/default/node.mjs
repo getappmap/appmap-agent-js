@@ -1,6 +1,5 @@
 import { assert } from "../../util/index.mjs";
 import { logErrorWhen } from "../../log/index.mjs";
-import { convertFileUrlToPath } from "../../path/index.mjs";
 import { toAbsoluteUrl } from "../../url/index.mjs";
 import { ExternalAppmapError } from "../../error/index.mjs";
 import { escapeShell } from "./escape.mjs";
@@ -52,9 +51,7 @@ export const generateNodeRecorder = (recorder) => ({
     return [
       `${groups.before} --experimental-loader ${escapeShell(
         shell,
-        convertFileUrlToPath(
-          toAbsoluteUrl(`lib/node/recorder-${recorder}.mjs`, base),
-        ),
+        toAbsoluteUrl(`lib/node/recorder-${recorder}.mjs`, base),
       )}${groups.after}`,
     ];
   },
@@ -63,9 +60,7 @@ export const generateNodeRecorder = (recorder) => ({
     return [
       ...before,
       "--experimental-loader",
-      convertFileUrlToPath(
-        toAbsoluteUrl(`lib/node/recorder-${recorder}.mjs`, base),
-      ),
+      toAbsoluteUrl(`lib/node/recorder-${recorder}.mjs`, base),
       ...after,
     ];
   },
