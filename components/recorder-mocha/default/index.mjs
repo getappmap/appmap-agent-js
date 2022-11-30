@@ -12,6 +12,8 @@ import {
   recordStopTrack,
 } from "../../agent/index.mjs";
 
+const { String } = globalThis;
+
 export const createMochaHooks = (process, configuration) => {
   configuration = extendConfigurationNode(configuration, process);
   const enabled = isConfigurationEnabled(configuration);
@@ -24,6 +26,7 @@ export const createMochaHooks = (process, configuration) => {
     const agent = openAgent(configuration);
     hook(agent, configuration);
     let running = null;
+    let counter = 0;
     return {
       beforeEach() {
         const name = this.currentTest.parent.fullTitle();
@@ -38,9 +41,10 @@ export const createMochaHooks = (process, configuration) => {
           ExternalAppmapError,
         );
         running = name;
+        counter += 1;
         recordStartTrack(
           agent,
-          "mocha",
+          `mocha-${String(counter)}`,
           {
             "map-name": name,
           },
@@ -48,7 +52,7 @@ export const createMochaHooks = (process, configuration) => {
         );
       },
       afterEach() {
-        recordStopTrack(agent, "mocha", {
+        recordStopTrack(agent, `mocha-${String(counter)}`, {
           type: "test",
           passed: this.currentTest.state === "passed",
         });
