@@ -9,7 +9,7 @@ import {
   convertPathToFileUrl,
   convertFileUrlToPath,
 } from "../../path/index.mjs";
-import { getUuid } from "../../uuid/index.mjs";
+import { getUuid } from "../../uuid/random/index.mjs";
 
 const { Promise, Set, setTimeout } = globalThis;
 
