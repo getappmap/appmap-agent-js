@@ -1,4 +1,3 @@
-import { fileURLToPath } from "node:url";
 import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
 import { generateNodeRecorder } from "./node-recursive.mjs";
 
@@ -13,7 +12,7 @@ const {
 } = generateNodeRecorder("process");
 
 const base = "file:///A:/base/";
-const path = fileURLToPath("file:///A:/base/lib/node/recorder-process.mjs");
+const recorder_url = "file:///A:/base/lib/node/recorder-process.mjs";
 
 assertEqual(name, "process");
 
@@ -31,6 +30,6 @@ assertDeepEqual(
   hookEnvironment({ FOO: "bar", NODE_OPTIONS: "options" }, base),
   {
     FOO: "bar",
-    NODE_OPTIONS: `options --experimental-loader=${path}`,
+    NODE_OPTIONS: `options --experimental-loader=${recorder_url}`,
   },
 );

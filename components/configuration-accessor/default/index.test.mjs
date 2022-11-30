@@ -322,9 +322,7 @@ assertDeepEqual(
   ),
   {
     cwd: "file:///A:/base/",
-    exec: `node --experimental-loader ${convertFileUrlToPath(
-      "file:///A:/home/lib/node/recorder-process.mjs",
-    )} main.mjs`,
+    exec: `node --experimental-loader file:///A:/home/lib/node/recorder-process.mjs main.mjs`,
     argv: [],
     env: {
       VAR1: "VAL1",
@@ -373,9 +371,7 @@ assertDeepEqual(
     env: {
       VAR1: "VAL1",
       VAR2: "VAL2",
-      NODE_OPTIONS: `options --experimental-loader=${convertFileUrlToPath(
-        "file:///A:/home/lib/node/recorder-remote.mjs",
-      )}`,
+      NODE_OPTIONS: `options --experimental-loader=file:///A:/home/lib/node/recorder-remote.mjs`,
     },
   },
 );

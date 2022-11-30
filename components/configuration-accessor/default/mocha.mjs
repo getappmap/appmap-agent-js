@@ -41,6 +41,6 @@ export const hookEnvironment = (env, base) => ({
     "NODE_OPTIONS",
     "",
   )} --experimental-loader=${escapeNodeOption(
-    convertFileUrlToPath(toAbsoluteUrl("lib/node/loader-standalone.mjs", base)),
+    toAbsoluteUrl("lib/node/loader-standalone.mjs", base),
   )}`,
 });

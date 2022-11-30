@@ -12,9 +12,7 @@ const base = "file:///A:/base/";
 const recorder_path = fileURLToPath(
   "file:///A:/base/lib/node/recorder-mocha.mjs",
 );
-const loader_path = fileURLToPath(
-  "file:///A:/base/lib/node/loader-standalone.mjs",
-);
+const loader_url = "file:///A:/base/lib/node/loader-standalone.mjs";
 
 //////////////////
 // mocha --argv //
@@ -23,7 +21,7 @@ const loader_path = fileURLToPath(
 // source //
 assertEqual(doesSupportSource("mocha --argv"), true);
 assertDeepEqual(hookCommandSource("mocha --argv", "/bin/sh", base), [
-  `mocha --require ${recorder_path} --argv`,
+  `mocha --require ${recorder_path.replace(/\\/gu, "\\\\")} --argv`,
 ]);
 
 // tokens //
@@ -43,6 +41,6 @@ assertDeepEqual(
   hookEnvironment({ FOO: "bar", NODE_OPTIONS: "options" }, base),
   {
     FOO: "bar",
-    NODE_OPTIONS: `options --experimental-loader=${loader_path}`,
+    NODE_OPTIONS: `options --experimental-loader=${loader_url}`,
   },
 );
