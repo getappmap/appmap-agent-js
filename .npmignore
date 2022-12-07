@@ -1,10 +1,14 @@
-/build
+/.github
+/component
+/components
 /coverage
 /doc
 /node_modules
+/schema
 /test
 /tmp
 /babel.config.json
+/CONTRIBUTING.md
+/REFERENCE.md
 
 .*
-*.test.mjs
