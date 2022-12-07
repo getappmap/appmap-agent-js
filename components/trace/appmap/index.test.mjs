@@ -21,6 +21,9 @@ const configuration = extendConfiguration(
         homepage: null,
       },
     },
+    validate: {
+      appmap: true,
+    },
     pruning: true,
     "function-name-placeholder": "$",
   },

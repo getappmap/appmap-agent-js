@@ -8,7 +8,6 @@ error
 log-inner
 log
 validate
-validate-message
 validate-appmap
 validate-mocha
 patch

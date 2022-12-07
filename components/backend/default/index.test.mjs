@@ -20,7 +20,7 @@ const {
 
 const configuration = extendConfiguration(
   createConfiguration("protocol://host/home"),
-  { name: "name" },
+  { name: "name", validate: { message: true } },
   null,
 );
 

@@ -196,7 +196,9 @@ export const compileTrace = (configuration, messages) => {
     classMap: compileClassmap(classmap),
     events: digested_events,
   };
-  validateAppmap(appmap);
+  if (configuration.validate.appmap) {
+    validateAppmap(appmap);
+  }
   logInfo(
     summary_template,
     events.length,

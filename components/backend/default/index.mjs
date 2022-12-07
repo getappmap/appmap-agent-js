@@ -3,7 +3,7 @@ const { Map } = globalThis;
 import { InternalAppmapError } from "../../error/index.mjs";
 import { assert } from "../../util/index.mjs";
 import { logDebug } from "../../log/index.mjs";
-import { validateMessage } from "../../validate-message/index.mjs";
+import { validateMessage } from "../../validate/index.mjs";
 import { compileTrace } from "../../trace/index.mjs";
 
 export const createBackend = (configuration) => ({
@@ -38,8 +38,10 @@ const stopTrack = ({ configuration, tracks, traces }, key, message) => {
 };
 
 export const sendBackend = (backend, message) => {
-  const { sources, tracks } = backend;
-  validateMessage(message);
+  const { configuration, sources, tracks } = backend;
+  if (configuration.validate.message) {
+    validateMessage(message);
+  }
   logDebug("message >> %j", message);
   const { type } = message;
   if (type === "start") {
