@@ -14,7 +14,7 @@ const makeClient = (agent) => {
       package: {
         name: "@appland/appmap-agent-js",
         version: "???",
-        url: undefined,
+        homepage: undefined,
       },
     };
   }
@@ -25,7 +25,7 @@ const makeClient = (agent) => {
     name,
     version,
     url:
-      homepage === null
+      homepage === null || homepage === undefined
         ? "https://github.com/applandinc/appmap-agent-js"
         : homepage,
   };
