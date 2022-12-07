@@ -3,7 +3,7 @@ import { getUuid } from "../../uuid/random/index.mjs";
 import { getTmpUrl } from "../../path/index.mjs";
 import { toAbsoluteUrl } from "../../url/index.mjs";
 import { openSocket, closeSocket, sendSocket } from "./index.mjs";
-import { testAsync } from "../__fixture__.mjs";
+import { testAsync } from "./__fixture__.mjs";
 
 const { Promise, setTimeout } = globalThis;
 
