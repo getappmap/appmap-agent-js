@@ -4,17 +4,17 @@ import {
   readFile as readFileAsync,
   writeFile as writeFileAsync,
 } from "node:fs/promises";
-import { getUuid } from "../../uuid/random/index.mjs?env=test";
+import { getUuid } from "../../uuid/random/index.mjs";
 import {
   toDirectoryPath,
   getTmpUrl,
   convertFileUrlToPath,
   convertPathToFileUrl,
-} from "../../path/index.mjs?env=test";
-import { toAbsoluteUrl } from "../../url/index.mjs?env=test";
+} from "../../path/index.mjs";
+import { toAbsoluteUrl } from "../../url/index.mjs";
 import { assertEqual } from "../../__fixture__.mjs";
 
-import { mainAsync } from "./index.mjs?env=test";
+import { mainAsync } from "./index.mjs";
 
 const { URL, process } = globalThis;
 
@@ -86,7 +86,7 @@ assertEqual(await mainAsync({ ...process, cwd }), false);
 process.stdout.write("\n");
 
 const fake = toAbsoluteUrl(
-  "node_modules/@appland/appmap-agent-js/components/setup/node/index.test.mjs",
+  "node_modules/@appland/appmap-agent-js/",
   convertPathToFileUrl(toDirectoryPath(await realpathAsync(new URL(base)))),
 );
 

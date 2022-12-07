@@ -2,7 +2,7 @@ import { assertDeepEqual, assertEqual } from "../../__fixture__.mjs";
 import {
   createConfiguration,
   extendConfiguration,
-} from "../../configuration/index.mjs?env=test";
+} from "../../configuration/index.mjs";
 import {
   openAgent,
   closeAgent,
@@ -17,7 +17,7 @@ import {
   recordAfterEvent,
   formatQueryPayload,
   getAnswerPayload,
-} from "./index.mjs?env=test";
+} from "./index.mjs";
 
 const { eval: evalGlobal } = globalThis;
 

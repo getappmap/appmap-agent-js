@@ -1,7 +1,7 @@
 import { assertDeepEqual } from "../../__fixture__.mjs";
 import Http from "http";
-import { testHookAsync } from "../../hook-fixture/index.mjs?env=test";
-import * as HookHttpClient from "./index.mjs?env=test";
+import { testHookAsync } from "../../hook-fixture/index.mjs";
+import * as HookHttpClient from "./index.mjs";
 
 const { Promise, String } = globalThis;
 

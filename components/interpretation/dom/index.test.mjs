@@ -17,7 +17,7 @@ globalThis.document = {
   },
 };
 
-const { runScript } = await import("./index.mjs?env=test");
+const { runScript } = await import("./index.mjs");
 
 runScript("123;", "protocol://host/path");
 
@@ -36,7 +36,7 @@ runScript("123;", "protocol://host/path");
 //
 // globalThis.document = window.document;
 //
-// const { runScript } = await import("./index.mjs?env=test");
+// const { runScript } = await import("./index.mjs");
 //
 // assertEqual(runScript("var x = 123;", "protocol://host/script.js"), undefined);
 //

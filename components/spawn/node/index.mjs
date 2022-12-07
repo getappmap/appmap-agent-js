@@ -1,14 +1,10 @@
-const { process, URL } = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
-
 import { spawn as spawnChildProcess } from "child_process";
 
-const { toAbsoluteUrl } = await import(`../../url/index.mjs${__search}`);
+import { toAbsoluteUrl } from "../../url/index.mjs";
 
-const { convertFileUrlToPath } = await import(
-  `../../path/index.mjs${__search}`
-);
+import { convertFileUrlToPath } from "../../path/index.mjs";
+
+const { process } = globalThis;
 
 export const spawn = (exec, argv, options) =>
   spawnChildProcess(exec, argv, {

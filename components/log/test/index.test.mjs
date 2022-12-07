@@ -1,10 +1,6 @@
 import { assertEqual } from "../../__fixture__.mjs";
 
-import {
-  logWarning,
-  logWarningWhen,
-  logInfo,
-} from "./index.mjs?env=test&log-level=warning";
+import { logWarning, logWarningWhen, logInfo } from "./index.mjs";
 
 logInfo("foo");
 logWarning("bar");

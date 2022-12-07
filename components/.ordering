@@ -2,12 +2,12 @@ util
 url
 path
 uuid
+self
 version
 error
 log-inner
 log
 validate
-validate-message
 validate-appmap
 validate-mocha
 patch
@@ -52,7 +52,9 @@ hook
 recorder-api
 recorder-process
 recorder-mocha
+recorder-jest
 recorder-remote
+recorder-cli
 receptor-file
 receptor-http
 receptor

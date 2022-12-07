@@ -1,5 +1,5 @@
 import { assertEqual, assertThrow } from "../../__fixture__.mjs";
-import { stringifyContent } from "./stringify.mjs?env=test";
+import { stringifyContent } from "./stringify.mjs";
 
 const { TextEncoder } = globalThis;
 

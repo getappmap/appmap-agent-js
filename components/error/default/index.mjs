@@ -1,8 +1,6 @@
-const { URL, Error } = globalThis;
+import { version } from "../../version/index.mjs";
 
-const { search: __search } = new URL(import.meta.url);
-
-const { version } = await import(`../../version/index.mjs${__search}`);
+const { Error } = globalThis;
 
 const issues = "https://github.com/getappmap/appmap-agent-js/issues";
 const slack = "https://appmap.io/slack";

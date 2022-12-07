@@ -1,21 +1,18 @@
-const { URL } = globalThis;
+import { ExternalAppmapError } from "../../error/index.mjs";
+import { logInfo, logErrorWhen } from "../../log/index.mjs";
+import { hook } from "../../hook/index.mjs";
+import { assert } from "../../util/index.mjs";
+import {
+  isConfigurationEnabled,
+  extendConfigurationNode,
+} from "../../configuration-accessor/index.mjs";
+import {
+  openAgent,
+  recordStartTrack,
+  recordStopTrack,
+} from "../../agent/index.mjs";
 
-const { search: __search } = new URL(import.meta.url);
-
-const { ExternalAppmapError } = await import(
-  `../../error/index.mjs${__search}`
-);
-const { logInfo, logErrorWhen } = await import(
-  `../../log/index.mjs${__search}`
-);
-const { hook } = await import(`../../hook/index.mjs${__search}`);
-const { assert } = await import(`../../util/index.mjs${__search}`);
-const { isConfigurationEnabled, extendConfigurationNode } = await import(
-  `../../configuration-accessor/index.mjs${__search}`
-);
-const { openAgent, recordStartTrack, recordStopTrack } = await import(
-  `../../agent/index.mjs${__search}`
-);
+const { String } = globalThis;
 
 export const createMochaHooks = (process, configuration) => {
   configuration = extendConfigurationNode(configuration, process);
@@ -29,6 +26,7 @@ export const createMochaHooks = (process, configuration) => {
     const agent = openAgent(configuration);
     hook(agent, configuration);
     let running = null;
+    let counter = 0;
     return {
       beforeEach() {
         const name = this.currentTest.parent.fullTitle();
@@ -43,9 +41,10 @@ export const createMochaHooks = (process, configuration) => {
           ExternalAppmapError,
         );
         running = name;
+        counter += 1;
         recordStartTrack(
           agent,
-          "mocha",
+          `mocha-${String(counter)}`,
           {
             "map-name": name,
           },
@@ -53,7 +52,7 @@ export const createMochaHooks = (process, configuration) => {
         );
       },
       afterEach() {
-        recordStopTrack(agent, "mocha", {
+        recordStopTrack(agent, `mocha-${String(counter)}`, {
           type: "test",
           passed: this.currentTest.state === "passed",
         });

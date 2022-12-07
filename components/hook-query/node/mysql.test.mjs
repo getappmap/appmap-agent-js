@@ -3,11 +3,11 @@ import { platform as getPlatform } from "node:os";
 import { rm as rmAsync } from "fs/promises";
 import Mysql from "mysql";
 import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
-import { getUuid } from "../../uuid/random/index.mjs?env=test";
-import { toAbsoluteUrl } from "../../url/index.mjs?env=test";
-import { getTmpUrl, convertFileUrlToPath } from "../../path/index.mjs?env=test";
-import { testHookAsync } from "../../hook-fixture/index.mjs?env=test";
-import * as HookMysql from "./mysql.mjs?env=test";
+import { getUuid } from "../../uuid/random/index.mjs";
+import { toAbsoluteUrl } from "../../url/index.mjs";
+import { getTmpUrl, convertFileUrlToPath } from "../../path/index.mjs";
+import { testHookAsync } from "../../hook-fixture/index.mjs";
+import * as HookMysql from "./mysql.mjs";
 
 const {
   Reflect: { getOwnPropertyDescriptor },

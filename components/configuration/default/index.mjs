@@ -1,25 +1,15 @@
+import { logInfoWhen } from "../../log/index.mjs";
+import { hasOwnProperty, coalesce, identity } from "../../util/index.mjs";
+import { toAbsoluteUrl, toDirectoryUrl } from "../../url/index.mjs";
+import { validateExternalConfiguration } from "../../validate/index.mjs";
+import { createSpecifier } from "../../specifier/index.mjs";
+
 const {
   URL,
   Array: { isArray },
   Reflect: { ownKeys },
   Object: { entries: toEntries },
 } = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
-
-const { logInfoWhen } = await import(`../../log/index.mjs${__search}`);
-const { hasOwnProperty, coalesce, identity } = await import(
-  `../../util/index.mjs${__search}`
-);
-const { toAbsoluteUrl, toDirectoryUrl } = await import(
-  `../../url/index.mjs${__search}`
-);
-const { validateExternalConfiguration } = await import(
-  `../../validate/index.mjs${__search}`
-);
-const { createSpecifier } = await import(
-  `../../specifier/index.mjs${__search}`
-);
 
 const HOOK_ESM_GLOBAL = "APPMAP_HOOK_ESM";
 

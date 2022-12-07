@@ -1,22 +1,12 @@
-const { URL, parseInt } = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
-
 import { spawnSync } from "child_process";
 import { readdirSync as readdir } from "fs";
-const { convertFileUrlToPath } = await import(
-  `../../path/index.mjs${__search}`
-);
-const { ExternalAppmapError } = await import(
-  `../../error/index.mjs${__search}`
-);
+import { convertFileUrlToPath } from "../../path/index.mjs";
+import { ExternalAppmapError } from "../../error/index.mjs";
 
-const { logWarning, logError, logErrorWhen } = await import(
-  `../../log/index.mjs${__search}`
-);
-const { mapMaybe, coalesce, assert } = await import(
-  `../../util/index.mjs${__search}`
-);
+import { logWarning, logError, logErrorWhen } from "../../log/index.mjs";
+import { mapMaybe, coalesce, assert } from "../../util/index.mjs";
+
+const { URL, parseInt } = globalThis;
 
 const trim = (string) => string.trim();
 

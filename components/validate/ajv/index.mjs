@@ -1,22 +1,23 @@
-const { URL } = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
-
 import Treeify from "treeify";
 import AjvErrorTree from "ajv-error-tree";
+import { self_directory } from "../../self/index.mjs";
 import {
-  validateSerial as validateAjvSerial,
-  validatePayload as validateAjvPayload,
-  validateExternalConfiguration as validateAjvExternalConfiguration,
-  validateInternalConfiguration as validateAjvInternalConfiguration,
-  validateMessage as validateAjvMessage,
-  validateSourceMap as validateAjvSourceMap,
-} from "../../../dist/schema.mjs";
-const { InternalAppmapError, ExternalAppmapError } = await import(
-  `../../error/index.mjs${__search}`
-);
-const { logError } = await import(`../../log/index.mjs${__search}`);
-const { assert, coalesce } = await import(`../../util/index.mjs${__search}`);
+  InternalAppmapError,
+  ExternalAppmapError,
+} from "../../error/index.mjs";
+import { logError } from "../../log/index.mjs";
+import { assert, coalesce } from "../../util/index.mjs";
+
+const { URL } = globalThis;
+
+const {
+  validateSerial: validateAjvSerial,
+  validatePayload: validateAjvPayload,
+  validateExternalConfiguration: validateAjvExternalConfiguration,
+  validateInternalConfiguration: validateAjvInternalConfiguration,
+  validateMessage: validateAjvMessage,
+  validateSourceMap: validateAjvSourceMap,
+} = await import(new URL("dist/schema.mjs", self_directory));
 
 const { asTree } = Treeify;
 

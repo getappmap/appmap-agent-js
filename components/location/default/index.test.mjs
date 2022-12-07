@@ -3,7 +3,7 @@ import {
   makeLocation,
   getLocationPosition,
   getLocationBase,
-} from "./index.mjs?env=test";
+} from "./index.mjs";
 
 const base = "protocol://host/path";
 const position = { line: 123, column: 456 };

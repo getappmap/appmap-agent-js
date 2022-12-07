@@ -1,13 +1,11 @@
-const { URL, Promise, process, Set, Array, JSON } = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
-
 import fs from "fs";
 import glob from "glob";
 import klaw from "klaw-sync";
 import { basename as getBasename, join as joinPath } from "path";
 import YAML from "yaml";
-const { hasOwnProperty } = await import(`../../util/index.mjs${__search}`);
+import { hasOwnProperty } from "../../util/index.mjs";
+
+const { Promise, process, Set, Array, JSON } = globalThis;
 
 // Glob to match/exclude all the directories we should scan for source files:
 const GLOB = "!(node_modules)/";

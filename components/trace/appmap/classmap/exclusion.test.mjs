@@ -3,14 +3,10 @@ import {
   assertThrow,
   assertDeepEqual,
 } from "../../../__fixture__.mjs";
-import { parseEstree } from "./parse.mjs?env=test";
-import { digestEstreeRoot } from "./digest.mjs?env=test";
-import {
-  makeClassEntity,
-  excludeEntity,
-  getEntitySummary,
-} from "./entity.mjs?env=test";
-import { compileExclusionArray } from "./exclusion.mjs?env=test";
+import { parseEstree } from "./parse.mjs";
+import { digestEstreeRoot } from "./digest.mjs";
+import { makeClassEntity, excludeEntity, getEntitySummary } from "./entity.mjs";
+import { compileExclusionArray } from "./exclusion.mjs";
 
 const or_exclusion = {
   combinator: "or",

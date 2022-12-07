@@ -1,8 +1,6 @@
-const { Map, Set } = globalThis;
-
 import { assertEqual, assertDeepEqual } from "../../../__fixture__.mjs";
 
-import { parseEstree } from "./parse.mjs?env=test";
+import { parseEstree } from "./parse.mjs";
 
 import {
   wrapRootEntityArray,
@@ -18,7 +16,9 @@ import {
   hideMissingFunctionEntity,
   removeEmptyClassEntity,
   toClassmapEntity,
-} from "./entity.mjs?env=test";
+} from "./entity.mjs";
+
+const { Map, Set } = globalThis;
 
 const default_context = {
   relative: "script.js",

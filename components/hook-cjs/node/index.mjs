@@ -1,17 +1,12 @@
-const {
-  URL,
-  Reflect: { apply },
-} = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
-
 import Module from "module";
 
-const { convertPathToFileUrl } = await import(
-  `../../path/index.mjs${__search}`
-);
-const { assignProperty } = await import(`../../util/index.mjs${__search}`);
-const { instrument } = await import(`../../agent/index.mjs${__search}`);
+import { convertPathToFileUrl } from "../../path/index.mjs";
+import { assignProperty } from "../../util/index.mjs";
+import { instrument } from "../../agent/index.mjs";
+
+const {
+  Reflect: { apply },
+} = globalThis;
 
 const { prototype } = Module;
 

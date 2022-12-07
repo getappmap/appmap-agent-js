@@ -1,17 +1,11 @@
-const {
-  URL,
-  Reflect: { defineProperty },
-} = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
-
-const { InternalAppmapError } = await import(
-  `../../error/index.mjs${__search}`
-);
-const { assert, noop, assignProperty, hasOwnProperty } = await import(
-  `../../util/index.mjs${__search}`
-);
-const {
+import { InternalAppmapError } from "../../error/index.mjs";
+import {
+  assert,
+  noop,
+  assignProperty,
+  hasOwnProperty,
+} from "../../util/index.mjs";
+import {
   getFreshTab,
   getSerializationEmptyValue,
   recordBeginEvent,
@@ -26,7 +20,11 @@ const {
   formatRejectPayload,
   formatYieldPayload,
   getResumePayload,
-} = await import(`../../agent/index.mjs${__search}`);
+} from "../../agent/index.mjs";
+
+const {
+  Reflect: { defineProperty },
+} = globalThis;
 
 export const unhook = (backup) => {
   backup.forEach(assignProperty);

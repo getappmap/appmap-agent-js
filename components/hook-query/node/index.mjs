@@ -1,13 +1,6 @@
-const { URL } = globalThis;
-const { search: __search } = new URL(import.meta.url);
-
-const { hook: hookMysql, unhook: unhookMysql } = await import(
-  `./mysql.mjs${__search}`
-);
-const { hook: hookPg, unhook: unhookPg } = await import(`./pg.mjs${__search}`);
-const { hook: hookSqlite3, unhook: unhookSqlite3 } = await import(
-  `./sqlite3.mjs${__search}`
-);
+import { hook as hookMysql, unhook as unhookMysql } from "./mysql.mjs";
+import { hook as hookPg, unhook as unhookPg } from "./pg.mjs";
+import { hook as hookSqlite3, unhook as unhookSqlite3 } from "./sqlite3.mjs";
 
 export const hook = (emitter, frontend, configuration) => ({
   mysql: hookMysql(emitter, frontend, configuration),

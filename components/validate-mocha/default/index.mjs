@@ -1,13 +1,6 @@
-const { URL } = globalThis;
-const { search: __search } = new URL(import.meta.url);
-
-const { ExternalAppmapError } = await import(
-  `../../error/index.mjs${__search}`
-);
-const { logErrorWhen } = await import(`../../log/index.mjs${__search}`);
-const { assert, coalesce, matchVersion } = await import(
-  `../../util/index.mjs${__search}`
-);
+import { ExternalAppmapError } from "../../error/index.mjs";
+import { logErrorWhen } from "../../log/index.mjs";
+import { assert, coalesce, matchVersion } from "../../util/index.mjs";
 
 const { undefined } = globalThis;
 

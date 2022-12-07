@@ -1,17 +1,12 @@
-const { URL } = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
-
 import { createServer } from "http";
-const { logInfo } = await import(`../../log/index.mjs${__search}`);
-const { hook } = await import(`../../hook/index.mjs${__search}`);
-const { isConfigurationEnabled, extendConfigurationNode } = await import(
-  `../../configuration-accessor/index.mjs${__search}`
-);
-const { generateRespond } = await import(`../../http/index.mjs${__search}`);
-const { openAgent, requestRemoteAgentAsync } = await import(
-  `../../agent/index.mjs${__search}`
-);
+import { logInfo } from "../../log/index.mjs";
+import { hook } from "../../hook/index.mjs";
+import {
+  isConfigurationEnabled,
+  extendConfigurationNode,
+} from "../../configuration-accessor/index.mjs";
+import { generateRespond } from "../../http/index.mjs";
+import { openAgent, requestRemoteAgentAsync } from "../../agent/index.mjs";
 
 export const main = (process, configuration) => {
   configuration = extendConfigurationNode(configuration, process);

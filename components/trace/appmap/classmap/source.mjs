@@ -1,23 +1,19 @@
-const { URL, Map, Set, String } = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
-
-const { toRelativeUrl } = await import(`../../../url/index.mjs${__search}`);
-const { logInfoWhen, logWarning } = await import(
-  `../../../log/index.mjs${__search}`
-);
-const { parseEstree } = await import(`./parse.mjs${__search}`);
-const { lookupEstreePath } = await import(`./lookup.mjs${__search}`);
-const {
+import { toRelativeUrl } from "../../../url/index.mjs";
+import { logInfoWhen, logWarning } from "../../../log/index.mjs";
+import { parseEstree } from "./parse.mjs";
+import { lookupEstreePath } from "./lookup.mjs";
+import {
   wrapRootEntityArray,
   excludeEntity,
   registerFunctionEntity,
   hideMissingFunctionEntity,
   removeEmptyClassEntity,
   toClassmapEntity,
-} = await import(`./entity.mjs${__search}`);
-const { digestEstreeRoot } = await import(`./digest.mjs${__search}`);
-const { compileExclusionArray } = await import(`./exclusion.mjs${__search}`);
+} from "./entity.mjs";
+import { digestEstreeRoot } from "./digest.mjs";
+import { compileExclusionArray } from "./exclusion.mjs";
+
+const { Map, Set, String } = globalThis;
 
 const hashPosition = ({ line, column }) => `${String(line)}:${String(column)}`;
 

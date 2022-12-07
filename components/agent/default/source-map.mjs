@@ -1,10 +1,10 @@
-const { URL } = globalThis;
-const { search: __search } = new URL(import.meta.url);
-
-const { extractSourceMapUrl, createMirrorSourceMap, createSourceMap } =
-  await import(`../../source/index.mjs${__search}`);
-const { readFile } = await import(`../../file/index.mjs${__search}`);
-const { logDebug } = await import(`../../log/index.mjs${__search}`);
+import {
+  extractSourceMapUrl,
+  createMirrorSourceMap,
+  createSourceMap,
+} from "../../source/index.mjs";
+import { readFile } from "../../file/index.mjs";
+import { logDebug } from "../../log/index.mjs";
 
 export const loadSourceMap = (file) => {
   const maybe_url = extractSourceMapUrl(file);

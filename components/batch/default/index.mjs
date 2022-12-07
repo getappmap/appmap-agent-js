@@ -1,34 +1,30 @@
+import {
+  InternalAppmapError,
+  ExternalAppmapError,
+} from "../../error/index.mjs";
+import { assert } from "../../util/index.mjs";
+import { logError, logDebug, logInfo, logWarning } from "../../log/index.mjs";
+import { spawn } from "../../spawn/index.mjs";
+import {
+  getConfigurationScenarios,
+  resolveConfigurationRepository,
+  compileConfigurationCommand,
+  resolveConfigurationAutomatedRecorder,
+} from "../../configuration-accessor/index.mjs";
+import {
+  openReceptorAsync,
+  closeReceptorAsync,
+  adaptReceptorConfiguration,
+  minifyReceptorConfiguration,
+} from "../../receptor/index.mjs";
+
 const {
   Map,
   JSON: { stringify: stringifyJSON },
   setTimeout,
   clearTimeout,
   Promise,
-  URL,
 } = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
-
-const { InternalAppmapError, ExternalAppmapError } = await import(
-  `../../error/index.mjs${__search}`
-);
-const { assert } = await import(`../../util/index.mjs${__search}`);
-const { logError, logDebug, logInfo, logWarning } = await import(
-  `../../log/index.mjs${__search}`
-);
-const { spawn } = await import(`../../spawn/index.mjs${__search}`);
-const {
-  getConfigurationScenarios,
-  resolveConfigurationRepository,
-  compileConfigurationCommand,
-  resolveConfigurationAutomatedRecorder,
-} = await import(`../../configuration-accessor/index.mjs${__search}`);
-const {
-  openReceptorAsync,
-  closeReceptorAsync,
-  adaptReceptorConfiguration,
-  minifyReceptorConfiguration,
-} = await import(`../../receptor/index.mjs${__search}`);
 
 const getCommandDescription = ({ exec, argv }) => ({ exec, argv });
 const isCommandNonNull = ({ command }) => command !== null;

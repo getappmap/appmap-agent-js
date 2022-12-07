@@ -1,22 +1,19 @@
+import { InternalAppmapError } from "../../error/index.mjs";
+import {
+  generateDeadcode,
+  assert,
+  createBox,
+  setBox,
+  getBox,
+} from "../../util/index.mjs";
+import { logWarning } from "../../log/index.mjs";
+import { getUuid } from "../../uuid/index.mjs";
+import { requestAsync } from "../../http/index.mjs";
+import { openSocket, closeSocket, sendSocket } from "../../socket/index.mjs";
+
 const {
   JSON: { stringify: stringifyJSON },
-  URL,
 } = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
-
-const { InternalAppmapError } = await import(
-  `../../error/index.mjs${__search}`
-);
-const { generateDeadcode, assert, createBox, setBox, getBox } = await import(
-  `../../util/index.mjs${__search}`
-);
-const { logWarning } = await import(`../../log/index.mjs${__search}`);
-const { getUuid } = await import(`../../uuid/index.mjs${__search}`);
-const { requestAsync } = await import(`../../http/index.mjs${__search}`);
-const { openSocket, closeSocket, sendSocket } = await import(
-  `../../socket/index.mjs${__search}`
-);
 
 export const openEmitter = (configuration) => {
   let {

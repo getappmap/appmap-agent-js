@@ -1,12 +1,10 @@
-const { Error } = globalThis;
-
 import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
-import { createMirrorSourceMap } from "../../source/index.mjs?env=test";
-import { validateMessage } from "../../validate/index.mjs?env=test";
+import { createMirrorSourceMap } from "../../source/index.mjs";
+import { validateMessage } from "../../validate/index.mjs";
 import {
   createConfiguration,
   extendConfiguration,
-} from "../../configuration/index.mjs?env=test";
+} from "../../configuration/index.mjs";
 import {
   createFrontend,
   formatStartTrack,
@@ -19,7 +17,9 @@ import {
   formatGroup,
   formatBeginEvent,
   formatBeginAmend,
-} from "./index.mjs?env=test";
+} from "./index.mjs";
+
+const { Error } = globalThis;
 
 const configuration = extendConfiguration(
   createConfiguration("protocol://host/home"),

@@ -13,7 +13,7 @@ import {
   toDirectoryPath,
   toAbsolutePath,
   toRelativePath,
-} from "./win32.mjs?env=test";
+} from "./win32.mjs";
 
 // getShell //
 

@@ -1,6 +1,6 @@
 import { assertDeepEqual } from "../../__fixture__.mjs";
-import { createConfiguration } from "../../configuration/index.mjs?env=test";
-import { compileTrace } from "./index.mjs?env=test";
+import { createConfiguration } from "../../configuration/index.mjs";
+import { compileTrace } from "./index.mjs";
 
 const configuration = createConfiguration("protocol://host/home");
 

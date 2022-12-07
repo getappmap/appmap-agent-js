@@ -1,4 +1,4 @@
-import { prompts } from "./index.mjs?env=test";
+import { prompts } from "./index.mjs";
 
 globalThis.GLOBAL_PROMPTS = (prompt) => prompt;
 

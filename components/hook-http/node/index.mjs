@@ -1,3 +1,7 @@
+import { toNumber, jsonifyNumber, toString } from "../../util/index.mjs";
+import { logWarning } from "../../log/index.mjs";
+import { patch } from "../../patch/index.mjs";
+
 const {
   Buffer: { from: toBuffer, concat: concatBuffer },
   Object: { fromEntries, entries: toEntries },
@@ -6,16 +10,7 @@ const {
   JSON: { parse: parseJSON },
   Math: { round },
   undefined,
-  URL,
 } = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
-
-const { toNumber, jsonifyNumber, toString } = await import(
-  `../../util/index.mjs${__search}`
-);
-const { logWarning } = await import(`../../log/index.mjs${__search}`);
-const { patch } = await import(`../../patch/index.mjs${__search}`);
 
 const normalizeChunk = (chunk, encoding) =>
   typeof chunk === "string" ? toBuffer(chunk, encoding) : chunk;

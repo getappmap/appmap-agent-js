@@ -4,12 +4,9 @@
 // 2) Resolve groups by inserting top-level trees where the asynchronous resource was registered.
 // 3) Resolve jumps by moving the tree framed by after events next to their corresponding before event.
 
-const { URL } = globalThis;
-const { search: __search } = new URL(import.meta.url);
-
-const { groupStack } = await import(`./group.mjs${__search}`);
-const { stackify } = await import(`./stack.mjs${__search}`);
-const { jumpify } = await import(`./jump.mjs${__search}`);
+import { groupStack } from "./group.mjs";
+import { stackify } from "./stack.mjs";
+import { jumpify } from "./jump.mjs";
 
 export const orderEventArray = (events) =>
   jumpify(groupStack(stackify(events)));

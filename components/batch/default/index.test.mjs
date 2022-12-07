@@ -7,8 +7,8 @@ import { EventEmitter } from "events";
 import {
   createConfiguration,
   extendConfiguration,
-} from "../../configuration/index.mjs?env=test";
-import { mainAsync } from "./index.mjs?env=test";
+} from "../../configuration/index.mjs";
+import { mainAsync } from "./index.mjs";
 
 const { setTimeout, Error } = globalThis;
 

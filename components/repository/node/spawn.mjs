@@ -1,20 +1,12 @@
-const { URL } = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
-
 import { spawnSync as spawnChildProcess } from "child_process";
-const { ExternalAppmapError } = await import(
-  `../../error/index.mjs${__search}`
-);
+import { ExternalAppmapError } from "../../error/index.mjs";
 
-const { logWarning, logErrorWhen } = await import(
-  `../../log/index.mjs${__search}`
-);
-const { coalesce, assert } = await import(`../../util/index.mjs${__search}`);
+import { logWarning, logErrorWhen } from "../../log/index.mjs";
+import { coalesce, assert } from "../../util/index.mjs";
 
-const { convertFileUrlToPath } = await import(
-  `../../path/index.mjs${__search}`
-);
+import { convertFileUrlToPath } from "../../path/index.mjs";
+
+const { URL } = globalThis;
 
 export const spawn = (exec, argv, url) => {
   const result = spawnChildProcess(exec, argv, {

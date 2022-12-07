@@ -2,7 +2,7 @@ import {
   reportError,
   InternalAppmapError,
   ExternalAppmapError,
-} from "./index.mjs?env=test";
+} from "./index.mjs";
 
 reportError(new InternalAppmapError("foo"));
 

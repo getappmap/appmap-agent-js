@@ -1,3 +1,22 @@
+import { readFileSync, writeFileSync } from "node:fs";
+
+import minimist from "minimist";
+import YAML from "yaml";
+
+import { ExternalAppmapError } from "../../error/index.mjs";
+import { assert, hasOwnProperty, coalesce } from "../../util/index.mjs";
+import { getCwdUrl } from "../../path/index.mjs";
+import {
+  toAbsoluteUrl,
+  getUrlExtension,
+  toDirectoryUrl,
+} from "../../url/index.mjs";
+import { logError, logErrorWhen } from "../../log/index.mjs";
+import {
+  createConfiguration,
+  extendConfiguration,
+} from "../../configuration/index.mjs";
+
 const {
   URL,
   Map,
@@ -5,30 +24,6 @@ const {
   Reflect: { ownKeys },
   Array: { isArray },
 } = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
-
-import { readFileSync, writeFileSync } from "node:fs";
-
-import minimist from "minimist";
-import YAML from "yaml";
-
-const { ExternalAppmapError } = await import(
-  `../../error/index.mjs${__search}`
-);
-const { assert, hasOwnProperty, coalesce } = await import(
-  `../../util/index.mjs${__search}`
-);
-const { getCwdUrl } = await import(`../../path/index.mjs${__search}`);
-const { toAbsoluteUrl, getUrlExtension, toDirectoryUrl } = await import(
-  `../../url/index.mjs${__search}`
-);
-const { logError, logErrorWhen } = await import(
-  `../../log/index.mjs${__search}`
-);
-const { createConfiguration, extendConfiguration } = await import(
-  `../../configuration/index.mjs${__search}`
-);
 
 const { parse: parseYAML, stringify: stringifyYAML } = YAML;
 

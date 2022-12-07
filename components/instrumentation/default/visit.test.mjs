@@ -1,9 +1,9 @@
 import { assertEqual } from "../../__fixture__.mjs";
-import { makeLocation } from "../../location/index.mjs?env=test";
-import { createCounter } from "../../util/index.mjs?env=test";
-import { createMirrorSourceMap } from "../../source/index.mjs?env=test";
+import { makeLocation } from "../../location/index.mjs";
+import { createCounter } from "../../util/index.mjs";
+import { createMirrorSourceMap } from "../../source/index.mjs";
 import { normalize, parse, generate } from "./__fixture__.mjs";
-import { visit } from "./visit.mjs?env=test";
+import { visit } from "./visit.mjs";
 
 const {
   JSON: { stringify: stringifyJSON },

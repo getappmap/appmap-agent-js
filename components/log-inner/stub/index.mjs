@@ -1,7 +1,4 @@
-const { URL } = globalThis;
-const { search: __search } = new URL(import.meta.url);
-
-const { noop } = await import(`../../util/index.mjs${__search}`);
+import { noop } from "../../util/index.mjs";
 
 export const logDebug = noop;
 

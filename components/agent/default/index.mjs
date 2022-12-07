@@ -1,14 +1,10 @@
-const { URL } = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
-
-const { now } = await import(`../../time/index.mjs${__search}`);
-const { getCurrentGroup } = await import(`../../group/index.mjs${__search}`);
-const {
+import { now } from "../../time/index.mjs";
+import { getCurrentGroup } from "../../group/index.mjs";
+import {
   createFrontend,
-  getFreshTab: getFrontendFreshTab,
-  instrument: instrumentFrontend,
-  getSerializationEmptyValue: getFrontendSerializationEmptyValue,
+  getFreshTab as getFrontendFreshTab,
+  instrument as instrumentFrontend,
+  getSerializationEmptyValue as getFrontendSerializationEmptyValue,
   formatError,
   formatStartTrack,
   formatStopTrack,
@@ -21,31 +17,31 @@ const {
   formatEndAmend,
   formatBeforeAmend,
   formatAfterAmend,
-  getJumpPayload: getFrontendJumpPayload,
-  getBundlePayload: getFrontendBundlePayload,
-  formatApplyPayload: formatFrontendApplyPayload,
-  formatReturnPayload: formatFrontendReturnPayload,
-  formatThrowPayload: formatFrontendThrowPayload,
-  formatAwaitPayload: formatFrontendAwaitPayload,
-  formatResolvePayload: formatFrontendResolvePayload,
-  formatRejectPayload: formatFrontendRejectPayload,
-  formatYieldPayload: formatFrontendYieldPayload,
-  getResumePayload: getFrontendResumePayload,
-  formatRequestPayload: formatFrontendRequestPayload,
-  formatResponsePayload: formatFrontendResponsePayload,
-  formatQueryPayload: formatFrontendQueryPayload,
-  getAnswerPayload: getFrontendAnswerPayload,
-  formatGroupPayload: formatFrontendGroupPayload,
-  formatUngroupPayload: formatFrontendUngroupPayload,
-} = await import(`../../frontend/index.mjs${__search}`);
-const {
+  getJumpPayload as getFrontendJumpPayload,
+  getBundlePayload as getFrontendBundlePayload,
+  formatApplyPayload as formatFrontendApplyPayload,
+  formatReturnPayload as formatFrontendReturnPayload,
+  formatThrowPayload as formatFrontendThrowPayload,
+  formatAwaitPayload as formatFrontendAwaitPayload,
+  formatResolvePayload as formatFrontendResolvePayload,
+  formatRejectPayload as formatFrontendRejectPayload,
+  formatYieldPayload as formatFrontendYieldPayload,
+  getResumePayload as getFrontendResumePayload,
+  formatRequestPayload as formatFrontendRequestPayload,
+  formatResponsePayload as formatFrontendResponsePayload,
+  formatQueryPayload as formatFrontendQueryPayload,
+  getAnswerPayload as getFrontendAnswerPayload,
+  formatGroupPayload as formatFrontendGroupPayload,
+  formatUngroupPayload as formatFrontendUngroupPayload,
+} from "../../frontend/index.mjs";
+import {
   openEmitter,
   closeEmitter,
   sendEmitter,
   requestRemoteEmitterAsync,
   takeLocalEmitterTrace,
-} = await import(`../../emitter/index.mjs${__search}`);
-const { loadSourceMap } = await import(`./source-map.mjs${__search}`);
+} from "../../emitter/index.mjs";
+import { loadSourceMap } from "./source-map.mjs";
 
 export const openAgent = (configuration) => ({
   emitter: openEmitter(configuration),

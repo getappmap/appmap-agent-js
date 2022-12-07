@@ -1,28 +1,23 @@
-const { Set, String, URL } = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
-
-const { InternalAppmapError, ExternalAppmapError } = await import(
-  `../../error/index.mjs${__search}`
-);
-const { logError, logErrorWhen } = await import(
-  `../../log/index.mjs${__search}`
-);
-const { assert } = await import(`../../util/index.mjs${__search}`);
-const { getUuid } = await import(`../../uuid/index.mjs${__search}`);
-const { runScript } = await import(`../../interpretation/index.mjs${__search}`);
-const { resolveConfigurationManualRecorder } = await import(
-  `../../configuration-accessor/index.mjs${__search}`
-);
-const { hook, unhook } = await import(`../../hook/index.mjs${__search}`);
-const {
+import {
+  InternalAppmapError,
+  ExternalAppmapError,
+} from "../../error/index.mjs";
+import { logError, logErrorWhen } from "../../log/index.mjs";
+import { assert } from "../../util/index.mjs";
+import { getUuid } from "../../uuid/index.mjs";
+import { runScript } from "../../interpretation/index.mjs";
+import { resolveConfigurationManualRecorder } from "../../configuration-accessor/index.mjs";
+import { hook, unhook } from "../../hook/index.mjs";
+import {
   openAgent,
   closeAgent,
   instrument,
   recordStartTrack,
   recordStopTrack,
   takeLocalAgentTrace,
-} = await import(`../../agent/index.mjs${__search}`);
+} from "../../agent/index.mjs";
+
+const { URL, Set, String } = globalThis;
 
 let global_running = false;
 

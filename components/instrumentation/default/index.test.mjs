@@ -1,11 +1,11 @@
 import { assertThrow, assertDeepEqual } from "../../__fixture__.mjs";
-import { createMirrorSourceMap } from "../../source/index.mjs?env=test";
+import { createMirrorSourceMap } from "../../source/index.mjs";
 import {
   createConfiguration,
   extendConfiguration,
-} from "../../configuration/index.mjs?env=test";
+} from "../../configuration/index.mjs";
 import { normalize } from "./__fixture__.mjs";
-import { createInstrumentation, instrument } from "./index.mjs?env=test";
+import { createInstrumentation, instrument } from "./index.mjs";
 
 const and_exclusion = {
   combinator: "and",

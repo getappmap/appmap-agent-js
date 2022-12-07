@@ -1,16 +1,11 @@
+import { constant, hasOwnProperty } from "../../util/index.mjs";
+import { prompts } from "../../prompts/index.mjs";
+
 const {
   JSON: { parse: parseJSON },
   Number: { parseInt },
   Object: { assign, fromEntries },
-  URL,
 } = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
-
-const { constant, hasOwnProperty } = await import(
-  `../../util/index.mjs${__search}`
-);
-const { prompts } = await import(`../../prompts/index.mjs${__search}`);
 
 // const generateMakeGlobSpecifier = (enabled) => (glob) => ({enabled, glob});
 // const makeEnabledGlobSpecifier = generateMakeGlobSpecifier(true);

@@ -1,12 +1,11 @@
-const { URL } = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
-
 import { platform as getPlatform, tmpdir as getTmp } from "node:os";
 
-export { fileURLToPath as convertFileUrlToPath } from "node:url";
-
 import { pathToFileURL as convertPathToFileUrlObject } from "node:url";
+
+import * as Win32 from "./win32.mjs";
+import * as Posix from "./posix.mjs";
+
+export { fileURLToPath as convertFileUrlToPath } from "node:url";
 
 export const convertPathToFileUrl = (path) =>
   convertPathToFileUrlObject(path).href;
@@ -23,11 +22,7 @@ export const {
   toDirectoryPath,
   toAbsolutePath,
   toRelativePath,
-} = await import(
-  getPlatform() === "win32"
-    ? `./win32.mjs${__search}`
-    : `./posix.mjs${__search}`
-);
+} = getPlatform() === "win32" ? Win32 : Posix;
 /* c8 ignore stop */
 
 export const getTmpPath = () => toDirectoryPath(getTmp());

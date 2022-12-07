@@ -1,17 +1,17 @@
-const { URL, Promise, Set, setTimeout } = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
-
 import { tmpdir as getTemporaryDirectory } from "node:os";
 
-const { logWarning } = await import(`../../log/index.mjs${__search}`);
-const { toDirectoryUrl, toAbsoluteUrl } = await import(
-  `../../url/index.mjs${__search}`
-);
+import { logWarning } from "../../log/index.mjs";
+import { toDirectoryUrl, toAbsoluteUrl } from "../../url/index.mjs";
 
-const { toIpcPath, fromIpcPath, convertPathToFileUrl, convertFileUrlToPath } =
-  await import(`../../path/index.mjs${__search}`);
-const { getUuid } = await import(`../../uuid/index.mjs${__search}`);
+import {
+  toIpcPath,
+  fromIpcPath,
+  convertPathToFileUrl,
+  convertFileUrlToPath,
+} from "../../path/index.mjs";
+import { getUuid } from "../../uuid/random/index.mjs";
+
+const { Promise, Set, setTimeout } = globalThis;
 
 export const openServiceAsync = (server, port) => {
   const sockets = new Set();

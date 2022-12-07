@@ -1,13 +1,12 @@
+import { readFileSync as readFile } from "node:fs";
+
+import { mapMaybe } from "../../util/index.mjs";
+import { logWarning } from "../../log/index.mjs";
+
 const {
   URL,
   JSON: { parse: parseJSON },
 } = globalThis;
-const { search: __search } = new URL(import.meta.url);
-
-import { readFileSync as readFile } from "node:fs";
-
-const { mapMaybe } = await import(`../../util/index.mjs${__search}`);
-const { logWarning } = await import(`../../log/index.mjs${__search}`);
 
 //////////////////////////////
 // extractRepositoryPackage //

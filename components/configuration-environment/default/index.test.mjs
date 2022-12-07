@@ -1,6 +1,6 @@
 import "../../__fixture__.mjs";
-import { createConfiguration } from "../../configuration/index.mjs?env=test";
-import { loadEnvironmentConfiguration } from "./index.mjs?env=test";
+import { createConfiguration } from "../../configuration/index.mjs";
+import { loadEnvironmentConfiguration } from "./index.mjs";
 
 const {
   JSON: { stringify: stringifyJSON },

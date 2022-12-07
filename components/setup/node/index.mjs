@@ -1,10 +1,3 @@
-const {
-  URL,
-  JSON: { parse: parseJSON },
-} = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
-
 import {
   readFile as readFileAsync,
   writeFile as writeFileAsync,
@@ -14,20 +7,19 @@ import { createRequire } from "module";
 import YAML from "yaml";
 import Semver from "semver";
 import Chalk from "chalk";
-const { validateExternalConfiguration } = await import(
-  `../../validate/index.mjs${__search}`
-);
-const { questionConfigAsync } = await import(
-  `../../questionnaire/index.mjs${__search}`
-);
-const { hasOwnProperty } = await import(`../../util/index.mjs${__search}`);
-const { convertPathToFileUrl, toAbsolutePath, getCwdPath } = await import(
-  `../../path/index.mjs${__search}`
-);
-const { toDirectoryUrl, toAbsoluteUrl } = await import(
-  `../../url/index.mjs${__search}`
-);
-const { prompts } = await import(`../../prompts/index.mjs${__search}`);
+import { self_directory, self_package } from "../../self/index.mjs";
+import { validateExternalConfiguration } from "../../validate/index.mjs";
+import { questionConfigAsync } from "../../questionnaire/index.mjs";
+import { hasOwnProperty } from "../../util/index.mjs";
+import {
+  convertPathToFileUrl,
+  toAbsolutePath,
+  getCwdPath,
+} from "../../path/index.mjs";
+import { toDirectoryUrl, toAbsoluteUrl } from "../../url/index.mjs";
+import { prompts } from "../../prompts/index.mjs";
+
+const { URL } = globalThis;
 
 const { satisfies: satisfiesSemver } = Semver;
 const { green: chalkGreen, yellow: chalkYellow, red: chalkRed } = Chalk;
@@ -39,13 +31,12 @@ const generateLog = (prefix, writable) => (message) => {
 
 export const mainAsync = async (
   { version, cwd, env, stdout, stderr },
-  import_meta_url = import.meta.url,
+  testable_self_directory = self_directory,
 ) => {
   const logSuccess = generateLog(chalkGreen("\u2714"), stdout);
   const logWarning = generateLog(chalkYellow("\u26A0"), stderr);
   const logFailure = generateLog(chalkRed("\u2716"), stderr);
   const cwd_url = toDirectoryUrl(convertPathToFileUrl(cwd()));
-  const agent_url = toAbsoluteUrl("../../../", import_meta_url);
   let conf_url = toAbsoluteUrl("appmap.yml", cwd_url);
   if (hasOwnProperty(env, "APPMAP_CONFIGURATION_PATH")) {
     conf_url = convertPathToFileUrl(
@@ -61,21 +52,13 @@ export const mainAsync = async (
     );
   }
   // node //
-  {
-    const _package = parseJSON(
-      await readFileAsync(
-        new URL(toAbsoluteUrl("package.json", agent_url)),
-        "utf8",
-      ),
+  if (!satisfiesSemver(version, self_package.engines.node)) {
+    logFailure(
+      `Node version ${version} is not compatible with ${self_package.engines.node}`,
     );
-    if (!satisfiesSemver(version, _package.engines.node)) {
-      logFailure(
-        `Node version ${version} is not compatible with ${_package.engines.node}`,
-      );
-      return false;
-    }
-    logSuccess(`compatible node version: ${version}`);
+    return false;
   }
+  logSuccess(`compatible node version: ${version}`);
   // configuration file //
   {
     let content;
@@ -143,9 +126,9 @@ export const mainAsync = async (
     }
     const agent_main_url = convertPathToFileUrl(agent_main_path);
     const resolved_agent_url = toAbsoluteUrl("../../", agent_main_url);
-    if (agent_url !== resolved_agent_url) {
+    if (resolved_agent_url !== testable_self_directory) {
       logFailure(
-        `agent location mismatch, expected agent to resolve to ${agent_url} but got ${resolved_agent_url}`,
+        `agent location mismatch, expected agent to resolve to ${testable_self_directory} but got ${resolved_agent_url}`,
       );
       return false;
     }

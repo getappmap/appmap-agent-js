@@ -1,10 +1,6 @@
-const { Promise, undefined, URL } = globalThis;
+import { constant, returnSecond } from "../../util/index.mjs";
 
-const { search: __search } = new URL(import.meta.url);
-
-const { constant, returnSecond } = await import(
-  `../../util/index.mjs${__search}`
-);
+const { Promise, undefined } = globalThis;
 
 export const minifyReceptorConfiguration = constant({});
 

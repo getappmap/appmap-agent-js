@@ -1,3 +1,5 @@
+import { win32 as Win32Path } from "node:path";
+
 const {
   undefined,
   Reflect: { getOwnPropertyDescriptor },
@@ -9,8 +11,6 @@ const {
   },
   /* c8 ignore stop */
 } = globalThis;
-
-import { win32 as Win32Path } from "node:path";
 
 const { resolve: resolvePath, relative: unresolvePath } = Win32Path;
 

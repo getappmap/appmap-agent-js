@@ -4,16 +4,8 @@
 //   - end/before events trigger a pop
 // Missing events at the beginning or at the end of the trace are manufactured to complete the first and last tree.
 
-const { URL } = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
-
-const { InternalAppmapError } = await import(
-  `../../../error/index.mjs${__search}`
-);
-const { createCounter, incrementCounter } = await import(
-  `../../../util/index.mjs${__search}`
-);
+import { InternalAppmapError } from "../../../error/index.mjs";
+import { createCounter, incrementCounter } from "../../../util/index.mjs";
 
 const makeFrame = (enter, children, leave) => ({ enter, children, leave });
 

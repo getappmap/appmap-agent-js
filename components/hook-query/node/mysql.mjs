@@ -1,15 +1,5 @@
-const {
-  URL,
-  Object,
-  Reflect: { apply },
-} = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
-
-const { toString, spyOnce, assignProperty } = await import(
-  `../../util/index.mjs${__search}`
-);
-const {
+import { toString, spyOnce, assignProperty } from "../../util/index.mjs";
+import {
   getFreshTab,
   recordBeginEvent,
   recordEndEvent,
@@ -18,8 +8,13 @@ const {
   formatQueryPayload,
   getAnswerPayload,
   getBundlePayload,
-} = await import(`../../agent/index.mjs${__search}`);
-const { requireMaybe } = await import(`./require.mjs${__search}`);
+} from "../../agent/index.mjs";
+import { requireMaybe } from "./require.mjs";
+
+const {
+  Object,
+  Reflect: { apply },
+} = globalThis;
 
 const DATABASE = "mysql";
 const VERSION = null;

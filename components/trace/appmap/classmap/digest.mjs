@@ -1,18 +1,16 @@
+import { hasOwnProperty, mapMaybe } from "../../../util/index.mjs";
+
+import {
+  toStaticFunctionEntity,
+  makeFunctionEntity,
+  makeClassEntity,
+} from "./entity.mjs";
+
 const {
-  URL,
   Array: { isArray },
   String,
   Reflect: { ownKeys },
 } = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
-
-const { hasOwnProperty, mapMaybe } = await import(
-  `../../../util/index.mjs${__search}`
-);
-
-const { toStaticFunctionEntity, makeFunctionEntity, makeClassEntity } =
-  await import(`./entity.mjs${__search}`);
 
 const isKeyRelevant = (key) =>
   key !== "start" && key !== "end" && key !== "type" && key !== "loc";

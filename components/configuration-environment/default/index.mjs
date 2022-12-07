@@ -1,19 +1,10 @@
+import { InternalAppmapError } from "../../error/index.mjs";
+import { assert, hasOwnProperty } from "../../util/index.mjs";
+import { validateInternalConfiguration } from "../../validate/index.mjs";
+
 const {
   JSON: { parse: parseJSON },
-  URL,
 } = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
-
-const { InternalAppmapError } = await import(
-  `../../error/index.mjs${__search}`
-);
-const { assert, hasOwnProperty } = await import(
-  `../../util/index.mjs${__search}`
-);
-const { validateInternalConfiguration } = await import(
-  `../../validate/index.mjs${__search}`
-);
 
 export const loadEnvironmentConfiguration = (env) => {
   assert(

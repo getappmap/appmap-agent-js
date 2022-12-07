@@ -1,3 +1,13 @@
+import { InternalAppmapError } from "../../../error/index.mjs";
+import {
+  assert,
+  coalesceCaseInsensitive,
+  zip,
+  hasOwnProperty,
+  mapMaybe,
+  recoverMaybe,
+} from "../../../util/index.mjs";
+
 const {
   URL,
   URLSearchParams,
@@ -6,20 +16,6 @@ const {
   Object: { entries: toEntries },
   Array: { from: arrayFrom },
 } = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
-
-const { InternalAppmapError } = await import(
-  `../../../error/index.mjs${__search}`
-);
-const {
-  assert,
-  coalesceCaseInsensitive,
-  zip,
-  hasOwnProperty,
-  mapMaybe,
-  recoverMaybe,
-} = await import(`../../../util/index.mjs${__search}`);
 
 const parseURL = (url, headers) =>
   new URL(

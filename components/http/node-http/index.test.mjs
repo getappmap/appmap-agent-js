@@ -1,5 +1,3 @@
-const { Promise } = globalThis;
-
 import { createServer, request as createRequest } from "http";
 import {
   assert,
@@ -11,10 +9,12 @@ import {
   getTmpUrl,
   toIpcPath,
   convertFileUrlToPath,
-} from "../../path/index.mjs?env=test";
-import { toAbsoluteUrl } from "../../url/index.mjs?env=test";
-import { getUuid } from "../../uuid/random/index.mjs?env=test";
-import { generateRespond, requestAsync } from "./index.mjs?env=test";
+} from "../../path/index.mjs";
+import { toAbsoluteUrl } from "../../url/index.mjs";
+import { getUuid } from "../../uuid/random/index.mjs";
+import { generateRespond, requestAsync } from "./index.mjs";
+
+const { Promise } = globalThis;
 
 const listenServerAsync = (server, port) =>
   new Promise((resolve) => {

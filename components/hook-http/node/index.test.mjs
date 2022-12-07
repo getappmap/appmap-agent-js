@@ -9,7 +9,7 @@ import {
   decodeSafe,
   spyReadable,
   spyWritable,
-} from "./index.mjs?env=test";
+} from "./index.mjs";
 
 const { Symbol } = globalThis;
 

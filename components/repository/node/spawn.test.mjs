@@ -1,6 +1,6 @@
 import { platform as getPlatform } from "node:os";
 import { assertEqual, assertThrow } from "../../__fixture__.mjs";
-import { spawn } from "./spawn.mjs?env=test";
+import { spawn } from "./spawn.mjs";
 
 assertThrow(
   () => spawn("MISSING EXECUTABLE", [], import.meta.url),

@@ -2,19 +2,19 @@ import { readFileSync as readFile, writeFileSync as writeFile } from "fs";
 import { Socket } from "net";
 import NetSocketMessaging from "net-socket-messaging";
 import "../../__fixture__.mjs";
-import { getUuid } from "../../uuid/random/index.mjs?env=test";
-import { getTmpUrl } from "../../path/index.mjs?env=test";
-import { toAbsoluteUrl } from "../../url/index.mjs?env=test";
+import { getUuid } from "../../uuid/random/index.mjs";
+import { getTmpUrl } from "../../path/index.mjs";
+import { toAbsoluteUrl } from "../../url/index.mjs";
 import {
   createConfiguration,
   extendConfiguration,
-} from "../../configuration/index.mjs?env=test";
+} from "../../configuration/index.mjs";
 import {
   openReceptorAsync,
   adaptReceptorConfiguration,
   minifyReceptorConfiguration,
   closeReceptorAsync,
-} from "./index.mjs?env=test";
+} from "./index.mjs";
 
 const {
   Promise,

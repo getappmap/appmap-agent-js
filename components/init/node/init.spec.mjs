@@ -7,7 +7,7 @@ import YAML from "yaml";
 import Mocha from "mocha";
 import * as sinon from "sinon";
 import "../../__fixture__.mjs";
-import { externals, main, run } from "./index.mjs?env=test";
+import { externals, main, run } from "./index.mjs";
 
 const { Math, process, JSON, undefined } = globalThis;
 

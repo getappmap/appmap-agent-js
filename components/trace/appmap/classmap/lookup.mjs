@@ -1,14 +1,11 @@
+import { logInfoWhen } from "../../../log/index.mjs";
+import { hasOwnProperty } from "../../../util/index.mjs";
+
 const {
-  URL,
   String,
   Reflect: { ownKeys },
   Array: { isArray },
 } = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
-
-const { logInfoWhen } = await import(`../../../log/index.mjs${__search}`);
-const { hasOwnProperty } = await import(`../../../util/index.mjs${__search}`);
 
 const isPositionIncluded = (position, start_position, end_position) =>
   (position.line > start_position.line ||

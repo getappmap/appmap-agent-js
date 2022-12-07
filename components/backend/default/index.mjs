@@ -1,16 +1,10 @@
-const { Map, URL } = globalThis;
+import { InternalAppmapError } from "../../error/index.mjs";
+import { assert } from "../../util/index.mjs";
+import { logDebug } from "../../log/index.mjs";
+import { validateMessage } from "../../validate/index.mjs";
+import { compileTrace } from "../../trace/index.mjs";
 
-const { search: __search } = new URL(import.meta.url);
-
-const { InternalAppmapError } = await import(
-  `../../error/index.mjs${__search}`
-);
-const { assert } = await import(`../../util/index.mjs${__search}`);
-const { logDebug } = await import(`../../log/index.mjs${__search}`);
-const { validateMessage } = await import(
-  `../../validate-message/index.mjs${__search}`
-);
-const { compileTrace } = await import(`../../trace/index.mjs${__search}`);
+const { Map } = globalThis;
 
 export const createBackend = (configuration) => ({
   configuration,
@@ -44,8 +38,10 @@ const stopTrack = ({ configuration, tracks, traces }, key, message) => {
 };
 
 export const sendBackend = (backend, message) => {
-  const { sources, tracks } = backend;
-  validateMessage(message);
+  const { configuration, sources, tracks } = backend;
+  if (configuration.validate.message) {
+    validateMessage(message);
+  }
   logDebug("message >> %j", message);
   const { type } = message;
   if (type === "start") {

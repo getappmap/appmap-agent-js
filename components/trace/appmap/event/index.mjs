@@ -1,17 +1,11 @@
-const { URL } = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
-
-const { InternalAppmapError } = await import(
-  `../../../error/index.mjs${__search}`
-);
-const { mapMaybe, createCounter, incrementCounter } = await import(
-  `../../../util/index.mjs${__search}`
-);
-const { lookupClassmapClosure } = await import(
-  `../classmap/index.mjs${__search}`
-);
-const { digestPayload } = await import(`./payload.mjs${__search}`);
+import { InternalAppmapError } from "../../../error/index.mjs";
+import {
+  mapMaybe,
+  createCounter,
+  incrementCounter,
+} from "../../../util/index.mjs";
+import { lookupClassmapClosure } from "../classmap/index.mjs";
+import { digestPayload } from "./payload.mjs";
 
 const digestEventPair = (event1, event2, id1, id2, info) => [
   {

@@ -1,10 +1,6 @@
-const { URL } = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
-
 import process from "node:process";
 
-const { recordStopTrack } = await import(`../../agent/index.mjs${__search}`);
+import { recordStopTrack } from "../../agent/index.mjs";
 
 export const hook = (agent, _configuration) => {
   const listener = (status) => {

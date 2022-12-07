@@ -2,7 +2,7 @@ import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
 import {
   createConfiguration,
   extendConfiguration,
-} from "../../configuration/index.mjs?env=test";
+} from "../../configuration/index.mjs";
 import {
   createBackend,
   sendBackend,
@@ -11,7 +11,7 @@ import {
   hasBackendTrace,
   hasBackendTrack,
   takeBackendTrace,
-} from "./index.mjs?env=test";
+} from "./index.mjs";
 
 const {
   undefined,
@@ -20,7 +20,7 @@ const {
 
 const configuration = extendConfiguration(
   createConfiguration("protocol://host/home"),
-  { name: "name" },
+  { name: "name", validate: { message: true } },
   null,
 );
 

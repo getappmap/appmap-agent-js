@@ -1,24 +1,13 @@
-const { Set, URL } = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
-
 import * as Astring from "astring";
 import * as Acorn from "acorn";
-const { logDebug, logDebugWhen } = await import(
-  `../../log/index.mjs${__search}`
-);
-const { generateGet, createCounter, recoverMaybe } = await import(
-  `../../util/index.mjs${__search}`
-);
-const { logError } = await import(`../../log/index.mjs${__search}`);
-const { getConfigurationPackage } = await import(
-  `../../configuration-accessor/index.mjs${__search}`
-);
-const { ExternalAppmapError } = await import(
-  `../../error/index.mjs${__search}`
-);
-const { getSources } = await import(`../../source/index.mjs${__search}`);
-const { visit } = await import(`./visit.mjs${__search}`);
+import { logError, logDebug, logDebugWhen } from "../../log/index.mjs";
+import { generateGet, createCounter, recoverMaybe } from "../../util/index.mjs";
+import { getConfigurationPackage } from "../../configuration-accessor/index.mjs";
+import { ExternalAppmapError } from "../../error/index.mjs";
+import { getSources } from "../../source/index.mjs";
+import { visit } from "./visit.mjs";
+
+const { Set } = globalThis;
 
 const { generate: generateEstree } = Astring;
 const { parse: parseAcorn } = Acorn;

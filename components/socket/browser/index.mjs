@@ -1,11 +1,7 @@
-const { URL, String, WebSocket } = globalThis;
+import { InternalAppmapError } from "../../error/index.mjs";
+import { assert } from "../../util/index.mjs";
 
-const { search: __search } = new URL(import.meta.url);
-
-const { InternalAppmapError } = await import(
-  `../../error/index.mjs${__search}`
-);
-const { assert } = await import(`../../util/index.mjs${__search}`);
+const { String, WebSocket } = globalThis;
 
 export const openSocket = (host, port) => {
   assert(

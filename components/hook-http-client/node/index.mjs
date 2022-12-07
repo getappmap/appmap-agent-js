@@ -1,24 +1,21 @@
-const {
-  Reflect: { apply, construct },
-  Proxy,
-  URL,
-} = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
-
 import Http from "http";
 import Https from "https";
-const { toString, identity, assignProperty, getOwnProperty, spyOnce } =
-  await import(`../../util/index.mjs${__search}`);
-const {
+import {
+  toString,
+  identity,
+  assignProperty,
+  getOwnProperty,
+  spyOnce,
+} from "../../util/index.mjs";
+import {
   parseContentType,
   decodeSafe,
   parseJSONSafe,
   spyReadable,
   formatHeaders,
   formatStatus,
-} = await import(`../../hook-http/index.mjs${__search}`);
-const {
+} from "../../hook-http/index.mjs";
+import {
   getSerializationEmptyValue,
   getFreshTab,
   recordBeginEvent,
@@ -28,7 +25,12 @@ const {
   getBundlePayload,
   formatRequestPayload,
   formatResponsePayload,
-} = await import(`../../agent/index.mjs${__search}`);
+} from "../../agent/index.mjs";
+
+const {
+  Reflect: { apply, construct },
+  Proxy,
+} = globalThis;
 
 export const unhook = (backup) => backup.forEach(assignProperty);
 

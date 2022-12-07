@@ -1,0 +1,6 @@
+enum:
+  - process
+  - mocha
+  - jest
+  - manual
+  - remote

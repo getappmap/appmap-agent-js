@@ -1,11 +1,11 @@
 import { assertDeepEqual } from "../../__fixture__.mjs";
-import { createConfiguration } from "../../configuration/index.mjs?env=test";
+import { createConfiguration } from "../../configuration/index.mjs";
 import {
   openEmitter,
   closeEmitter,
   sendEmitter,
   takeLocalEmitterTrace,
-} from "./index.mjs?env=test";
+} from "./index.mjs";
 
 const configuration = createConfiguration("protocol://host/home");
 

@@ -1,5 +1,12 @@
+import {
+  identity,
+  hasOwnProperty,
+  incrementCounter,
+  createCounter,
+} from "../../util/index.mjs";
+import { logDebug, logDebugWhen } from "../../log/index.mjs";
+
 const {
-  URL,
   Reflect: { getOwnPropertyDescriptor, getPrototypeOf, apply, ownKeys },
   Error: { prototype: error_prototype },
   Infinity,
@@ -19,14 +26,6 @@ const {
   Array: { isArray },
   JSON: { stringify: stringifyJSON },
 } = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
-
-const { identity, hasOwnProperty, incrementCounter, createCounter } =
-  await import(`../../util/index.mjs${__search}`);
-const { logDebug, logDebugWhen } = await import(
-  `../../log/index.mjs${__search}`
-);
 
 const noargs = [];
 

@@ -1,14 +1,8 @@
-const { undefined, URL } = globalThis;
+import { InternalAppmapError } from "../../error/index.mjs";
+import { assert, mapMaybe, recoverMaybe } from "../../util/index.mjs";
+import { getUrlBasename } from "../../url/index.mjs";
 
-const { search: __search } = new URL(import.meta.url);
-
-const { InternalAppmapError } = await import(
-  `../../error/index.mjs${__search}`
-);
-const { assert, mapMaybe, recoverMaybe } = await import(
-  `../../util/index.mjs${__search}`
-);
-const { getUrlBasename } = await import(`../../url/index.mjs${__search}`);
+const { undefined } = globalThis;
 
 /* c8 ignore start */
 const getName = ({ name }) => name;
@@ -20,7 +14,7 @@ const makeClient = (agent) => {
       package: {
         name: "@appland/appmap-agent-js",
         version: "???",
-        url: undefined,
+        homepage: undefined,
       },
     };
   }
@@ -31,7 +25,7 @@ const makeClient = (agent) => {
     name,
     version,
     url:
-      homepage === null
+      homepage === null || homepage === undefined
         ? "https://github.com/applandinc/appmap-agent-js"
         : homepage,
   };

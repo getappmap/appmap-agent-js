@@ -1,11 +1,7 @@
-const { String, parseInt, URL } = globalThis;
+import { InternalAppmapError } from "../../error/index.mjs";
+import { assert } from "../../util/index.mjs";
 
-const { search: __search } = new URL(import.meta.url);
-
-const { InternalAppmapError } = await import(
-  `../../error/index.mjs${__search}`
-);
-const { assert } = await import(`../../util/index.mjs${__search}`);
+const { URL, String, parseInt } = globalThis;
 
 export const makeLocation = (url, { line, column }) =>
   new URL(`#${String(line)}-${String(column)}`, url).toString();

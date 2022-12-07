@@ -1,32 +1,26 @@
+import {
+  InternalAppmapError,
+  ExternalAppmapError,
+} from "../../error/index.mjs";
+import { logError, logDebug, logInfo } from "../../log/index.mjs";
+import { validateAppmap } from "../../validate-appmap/index.mjs";
+import { extendConfiguration } from "../../configuration/index.mjs";
+import { compileMetadata } from "./metadata.mjs";
+import {
+  createClassmap,
+  addClassmapSource,
+  compileClassmap,
+} from "./classmap/index.mjs";
+import { digestEventTrace } from "./event/index.mjs";
+import { orderEventArray } from "./ordering/index.mjs";
+
 const {
-  URL,
   Map,
   Array: { from: toArray },
   String,
   Math: { round },
   RangeError,
 } = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
-
-const { InternalAppmapError, ExternalAppmapError } = await import(
-  `../../error/index.mjs${__search}`
-);
-const { logError, logDebug, logInfo } = await import(
-  `../../log/index.mjs${__search}`
-);
-const { validateAppmap } = await import(
-  `../../validate-appmap/index.mjs${__search}`
-);
-const { extendConfiguration } = await import(
-  `../../configuration/index.mjs${__search}`
-);
-const { compileMetadata } = await import(`./metadata.mjs${__search}`);
-const { createClassmap, addClassmapSource, compileClassmap } = await import(
-  `./classmap/index.mjs${__search}`
-);
-const { digestEventTrace } = await import(`./event/index.mjs${__search}`);
-const { orderEventArray } = await import(`./ordering/index.mjs${__search}`);
 
 const VERSION = "1.8.0";
 
@@ -202,7 +196,9 @@ export const compileTrace = (configuration, messages) => {
     classMap: compileClassmap(classmap),
     events: digested_events,
   };
-  validateAppmap(appmap);
+  if (configuration.validate.appmap) {
+    validateAppmap(appmap);
+  }
   logInfo(
     summary_template,
     events.length,

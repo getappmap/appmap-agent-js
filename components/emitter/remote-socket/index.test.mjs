@@ -2,8 +2,8 @@ import { assertDeepEqual } from "../../__fixture__.mjs";
 import {
   createConfiguration,
   extendConfiguration,
-} from "../../configuration/index.mjs?env=test";
-import { openEmitter, closeEmitter, sendEmitter } from "./index.mjs?env=test";
+} from "../../configuration/index.mjs";
+import { openEmitter, closeEmitter, sendEmitter } from "./index.mjs";
 
 const {
   JSON: { stringify: stringifyJSON },

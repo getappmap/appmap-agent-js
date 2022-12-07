@@ -1,12 +1,12 @@
-const { undefined } = globalThis;
-
 import { assertDeepEqual } from "../../__fixture__.mjs";
 import {
   createConfiguration,
   extendConfiguration,
-} from "../../configuration/index.mjs?env=test";
-import { makeLocation } from "../../location/index.mjs?env=test";
-import { compileTrace } from "./index.mjs?env=test";
+} from "../../configuration/index.mjs";
+import { makeLocation } from "../../location/index.mjs";
+import { compileTrace } from "./index.mjs";
+
+const { undefined } = globalThis;
 
 const configuration = extendConfiguration(
   createConfiguration("protocol://host/home/"),
@@ -20,6 +20,9 @@ const configuration = extendConfiguration(
         version: "1.2.3",
         homepage: null,
       },
+    },
+    validate: {
+      appmap: true,
     },
     pruning: true,
     "function-name-placeholder": "$",

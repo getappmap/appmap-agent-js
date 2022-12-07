@@ -1,6 +1,6 @@
 import "../../__fixture__.mjs";
-import { getTmpUrl } from "../../path/index.mjs?env=test";
-import { spawn } from "./index.mjs?env=test";
+import { getTmpUrl } from "../../path/index.mjs";
+import { spawn } from "./index.mjs";
 
 const { Promise, Error, undefined } = globalThis;
 

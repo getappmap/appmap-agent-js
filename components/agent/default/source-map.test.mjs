@@ -1,11 +1,11 @@
 import { writeFile as writeFileAsync } from "node:fs/promises";
 import { assertEqual } from "../../__fixture__.mjs";
-import { getUuid } from "../../uuid/random/index.mjs?env=test";
-import { getTmpUrl } from "../../path/index.mjs?env=test";
-import { toAbsoluteUrl } from "../../url/index.mjs?env=test";
-import { makeLocation } from "../../location/index.mjs?env=test";
-import { mapSource } from "../../source/index.mjs?env=test";
-import { loadSourceMap } from "./source-map.mjs?env=test";
+import { getUuid } from "../../uuid/random/index.mjs";
+import { getTmpUrl } from "../../path/index.mjs";
+import { toAbsoluteUrl } from "../../url/index.mjs";
+import { makeLocation } from "../../location/index.mjs";
+import { mapSource } from "../../source/index.mjs";
+import { loadSourceMap } from "./source-map.mjs";
 
 const {
   encodeURIComponent,

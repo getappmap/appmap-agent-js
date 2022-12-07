@@ -1,11 +1,11 @@
 /* eslint-disable no-undef */
 
-const { Object, JSON, process, RegExp, undefined } = globalThis;
-
 import { strict as assert } from "assert";
 import * as sinon from "sinon";
 import "../../__fixture__.mjs";
-import { main, run, externals } from "./index.mjs?env=test";
+import { main, run, externals } from "./index.mjs";
+
+const { Object, JSON, process, RegExp, undefined } = globalThis;
 
 describe("the status command", () => {
   beforeEach(() => {

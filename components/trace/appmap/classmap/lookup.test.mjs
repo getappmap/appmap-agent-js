@@ -1,6 +1,6 @@
 import { assertEqual } from "../../../__fixture__.mjs";
-import { parseEstree } from "./parse.mjs?env=test";
-import { lookupEstreePath } from "./lookup.mjs?env=test";
+import { parseEstree } from "./parse.mjs";
+import { lookupEstreePath } from "./lookup.mjs";
 
 assertEqual(
   lookupEstreePath(

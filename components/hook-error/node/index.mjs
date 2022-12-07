@@ -1,10 +1,6 @@
-const { URL } = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
-
 import process from "node:process";
 
-const { recordError } = await import(`../../agent/index.mjs${__search}`);
+import { recordError } from "../../agent/index.mjs";
 
 export const hook = (agent, _configuration) => {
   const listener = (error) => {

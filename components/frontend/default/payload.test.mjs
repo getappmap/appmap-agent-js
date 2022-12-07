@@ -1,7 +1,7 @@
 import "../../__fixture__.mjs";
-import { createConfiguration } from "../../configuration/index.mjs?env=test";
-import { createSerialization } from "../../serialization/index.mjs?env=test";
-import { validatePayload } from "../../validate/index.mjs?env=test";
+import { createConfiguration } from "../../configuration/index.mjs";
+import { createSerialization } from "../../serialization/index.mjs";
+import { validatePayload } from "../../validate/index.mjs";
 import {
   getBundlePayload,
   getJumpPayload,
@@ -19,7 +19,7 @@ import {
   formatResponsePayload,
   formatGroupPayload,
   formatUngroupPayload,
-} from "./payload.mjs?env=test";
+} from "./payload.mjs";
 
 const configuration = createConfiguration("protocol://host/home");
 

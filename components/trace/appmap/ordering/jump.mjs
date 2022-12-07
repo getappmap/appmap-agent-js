@@ -1,24 +1,17 @@
-const {
-  URL,
-  Array: { from: toArray },
-  Map,
-} = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
-
 // Resolve jumps.
 // Insert trees starting by an after event next to their corresponding before event.
 // Event manufacturing is performed to complete sequences of events.
 // After this pass, each begin event will be matched to their end event.
 // Also, begin/end event pair can have children but not before/after event pair.
 
-const { InternalAppmapError } = await import(
-  `../../../error/index.mjs${__search}`
-);
-const { assert } = await import(`../../../util/index.mjs${__search}`);
-const { manufactureMatchingEvent, isMatchingEvent } = await import(
-  `./matching.mjs${__search}`
-);
+import { InternalAppmapError } from "../../../error/index.mjs";
+import { assert } from "../../../util/index.mjs";
+import { manufactureMatchingEvent, isMatchingEvent } from "./matching.mjs";
+
+const {
+  Array: { from: toArray },
+  Map,
+} = globalThis;
 
 const manufactureBundleEvent = (site, tab) => ({
   type: "event",

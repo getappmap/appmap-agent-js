@@ -1,8 +1,4 @@
-const { URL } = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
-
-const { hasOwnProperty } = await import(`../../util/index.mjs${__search}`);
+import { hasOwnProperty } from "../../util/index.mjs";
 
 if (!hasOwnProperty(globalThis, "SOCKET_TRACE")) {
   globalThis.SOCKET_TRACE = [];

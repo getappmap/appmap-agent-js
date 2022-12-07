@@ -1,5 +1,3 @@
-const { process } = globalThis;
-
 import { assertEqual } from "../../__fixture__.mjs";
 
 import {
@@ -12,7 +10,9 @@ import {
   convertFileUrlToPath,
   getPathBasename,
   getPathExtension,
-} from "./index.mjs?env=test";
+} from "./index.mjs";
+
+const { process } = globalThis;
 
 const base = getCwdPath(process);
 

@@ -1,9 +1,7 @@
-const { URL } = globalThis;
-
-const { search: __search } = new URL(import.meta.url);
-
 import { createRequire } from "module";
-const { logWarning } = await import(`../../log/index.mjs${__search}`);
+import { logWarning } from "../../log/index.mjs";
+
+const { URL } = globalThis;
 
 export const requireMaybe = (enabled, directory, name) => {
   if (!enabled) {

@@ -1,5 +1,3 @@
-const { URL } = globalThis;
-
 import { createRequire } from "node:module";
 import {
   writeFile as writeFileAsync,
@@ -7,12 +5,14 @@ import {
 } from "node:fs/promises";
 
 import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
-import { getUuid } from "../../uuid/random/index.mjs?env=test";
-import { getTmpUrl, convertPathToFileUrl } from "../../path/index.mjs?env=test";
-import { toAbsoluteUrl } from "../../url/index.mjs?env=test";
-import { createConfiguration } from "../../configuration/index.mjs?env=test";
-import { testHookAsync } from "../../hook-fixture/index.mjs?env=test";
-import * as HookCjs from "./index.mjs?env=test";
+import { getUuid } from "../../uuid/random/index.mjs";
+import { getTmpUrl, convertPathToFileUrl } from "../../path/index.mjs";
+import { toAbsoluteUrl } from "../../url/index.mjs";
+import { createConfiguration } from "../../configuration/index.mjs";
+import { testHookAsync } from "../../hook-fixture/index.mjs";
+import * as HookCjs from "./index.mjs";
+
+const { URL } = globalThis;
 
 const relative = `./${getUuid()}.js`;
 
