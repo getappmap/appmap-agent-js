@@ -1,12 +1,11 @@
 const {
-  URL,
   RegExp,
   Object: { entries: toEntries },
-  JSON: { stringify: stringifyJSON, parse: parseJSON },
+  JSON: { stringify: stringifyJSON },
 } = globalThis;
 
-import { readFileSync } from "node:fs";
 import { toAbsoluteUrl } from "../../url/index.mjs";
+import { self_directory, self_package } from "../../self/index.mjs";
 import {
   toDirectoryPath,
   convertFileUrlToPath,
@@ -149,15 +148,12 @@ export const resolveConfigurationRepository = (configuration) => {
     InternalAppmapError,
   );
   const { directory } = configuration.repository;
-  const agent_directory = toAbsoluteUrl("../../../", import.meta.url);
-  const { name, version, homepage } = parseJSON(
-    readFileSync(new URL("package.json", agent_directory), "utf8"),
-  );
+  const { name, version, homepage } = self_package;
   return extendConfiguration(
     configuration,
     {
       agent: {
-        directory: agent_directory,
+        directory: self_directory,
         package: { name, version, homepage },
       },
       repository: {
