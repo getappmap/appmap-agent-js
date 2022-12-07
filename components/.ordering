@@ -53,6 +53,7 @@ recorder-api
 recorder-process
 recorder-mocha
 recorder-remote
+recorder-cli
 receptor-file
 receptor-http
 receptor
