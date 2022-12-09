@@ -1,4 +1,5 @@
 import { spawn } from "child_process";
+import { env } from "node:process";
 import { platform as getPlatform } from "node:os";
 import { rm as rmAsync } from "fs/promises";
 import Pg from "pg";
@@ -8,6 +9,7 @@ import {
   assertFail,
   assertMatch,
 } from "../../__fixture__.mjs";
+import { hasOwnProperty } from "../../util/index.mjs";
 import { getUuid } from "../../uuid/random/index.mjs";
 import { toAbsoluteUrl } from "../../url/index.mjs";
 import { getTmpUrl, convertFileUrlToPath } from "../../path/index.mjs";

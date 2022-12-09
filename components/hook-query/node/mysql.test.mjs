@@ -3,21 +3,14 @@ import { platform as getPlatform } from "node:os";
 import { rm as rmAsync } from "fs/promises";
 import Mysql from "mysql";
 import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
+import { hasOwnProperty } from "../../util/index.mjs";
 import { getUuid } from "../../uuid/random/index.mjs";
 import { toAbsoluteUrl } from "../../url/index.mjs";
 import { getTmpUrl, convertFileUrlToPath } from "../../path/index.mjs";
 import { testHookAsync } from "../../hook-fixture/index.mjs";
 import * as HookMysql from "./mysql.mjs";
 
-const {
-  Reflect: { getOwnPropertyDescriptor },
-  process,
-  Promise,
-  String,
-  setTimeout,
-  URL,
-  undefined,
-} = globalThis;
+const { process, Promise, String, setTimeout, URL } = globalThis;
 
 const promiseTermination = (child) =>
   new Promise((resolve, reject) => {
