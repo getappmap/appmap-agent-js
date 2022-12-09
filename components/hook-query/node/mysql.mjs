@@ -1,3 +1,4 @@
+/* c8 ignore start */
 import { toString, spyOnce, assignProperty } from "../../util/index.mjs";
 import {
   getFreshTab,
