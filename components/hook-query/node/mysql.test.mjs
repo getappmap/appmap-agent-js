@@ -128,13 +128,7 @@ const proceedAsync = async () => {
   );
 };
 
-if (getOwnPropertyDescriptor(process.env, "TRAVIS") !== undefined) {
-  // TODO: Investigate why it fails on travis/windows
-  // > ECONNREFUSED 127.0.0.1:3306
-  if (getPlatform() !== "win32") {
-    await proceedAsync();
-  }
-} else if (getPlatform() !== "win32") {
+if (!hasOwnProperty(process.env, "CI") && getPlatform() !== "win32") {
   const url = toAbsoluteUrl(getUuid(), getTmpUrl());
   assertDeepEqual(
     await promiseTermination(

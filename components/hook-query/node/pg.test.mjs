@@ -221,7 +221,7 @@ const proceedAsync = async () => {
 // But then node 18 cannot be installed (wtf travis 2x).
 // The solution seems to restart the service with other conf.
 // At this point, it is not any better than to launch the service here.
-if (getPlatform() !== "win32") {
+if (!hasOwnProperty(env, "CI") && getPlatform() !== "win32") {
   const { initdb, pg_isready, postgres } =
     getPlatform() === "darwin"
       ? { initdb: "initdb", pg_isready: "pg_isready", postgres: "postgres" }
