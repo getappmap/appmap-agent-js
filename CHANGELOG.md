@@ -1,3 +1,18 @@
+# [12.1.0](https://github.com/getappmap/appmap-agent-js/compare/v12.0.0...v12.1.0) (2022-12-13)
+
+
+### Bug Fixes
+
+* adequate homepage even if the agent is missing ([606aaf0](https://github.com/getappmap/appmap-agent-js/commit/606aaf00730d097744021547287c54ce3ec0f2cc))
+* use file urls to specify node loader ([6f49b2c](https://github.com/getappmap/appmap-agent-js/commit/6f49b2c1b2ef46cd09ee9f3bb0e082f26976602d))
+
+
+### Features
+
+* make status independent from uncaught error ([9c9a93f](https://github.com/getappmap/appmap-agent-js/commit/9c9a93f866a872853349ad98ef30a87bfe54eb32))
+* more precise track termination ([97a598d](https://github.com/getappmap/appmap-agent-js/commit/97a598d2c646171e2c03532ad155abaff39d4114))
+* support jest ([26ed907](https://github.com/getappmap/appmap-agent-js/commit/26ed907d21614b84d1d028b908a8af9e5edf9a56))
+
 # [12.0.0](https://github.com/getappmap/appmap-agent-js/compare/v11.7.1...v12.0.0) (2022-11-21)
 
 
