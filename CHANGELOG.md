@@ -1,3 +1,10 @@
+## [12.1.1](https://github.com/getappmap/appmap-agent-js/compare/v12.1.0...v12.1.1) (2022-12-14)
+
+
+### Bug Fixes
+
+* add missing bundles ([22ccf0d](https://github.com/getappmap/appmap-agent-js/commit/22ccf0d92c9c66e8fa8188b3df7a1a0db44c3a88))
+
 # [12.1.0](https://github.com/getappmap/appmap-agent-js/compare/v12.0.0...v12.1.0) (2022-12-13)
 
 
