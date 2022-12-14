@@ -65,12 +65,12 @@ jobs:
     # test-node19
     - stage: test
       os: linux
-      node_js: 19
+      node_js: 19.2 # Travis breaks if this resolves to > 19.2
       script:
         - npm run test
     - stage: test
       os: windows
-      node_js: 19
+      node_js: 19.2 # Travis breaks if this resolves to > 19.2
       script:
         - npm run test
     # deploy

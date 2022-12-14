@@ -4,6 +4,9 @@ import { bundleAsync } from "./bundle.mjs";
 for (const [entry, env, resolution] of [
   ["error", "node", {}],
   ["batch", "node", {}],
+  ["init", "node", {}],
+  ["status", "node", {}],
+  ["setup", "node", {}],
   ["validate-mocha", "node", {}],
   ["configuration", "node", {}],
   ["configuration-process", "node", {}],

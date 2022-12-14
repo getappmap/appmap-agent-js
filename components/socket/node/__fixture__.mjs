@@ -1,5 +1,5 @@
 import { createServer as createTCPServer } from "net";
-import { toIpcPath, convertFileUrlToPath } from "../../path/index.mjs?env=test";
+import { toIpcPath, convertFileUrlToPath } from "../../path/index.mjs";
 import NetSocketMessaging from "net-socket-messaging";
 
 const { Promise } = globalThis;
