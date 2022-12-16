@@ -7,6 +7,7 @@ for (const name of [
   "classmap",
   "eval",
   "event-apply",
+  "event-apply-argument",
   "event-apply-source",
   "event-http",
   "event-query",
