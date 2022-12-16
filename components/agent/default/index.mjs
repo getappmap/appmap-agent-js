@@ -26,7 +26,7 @@ import {
   formatResolvePayload as formatFrontendResolvePayload,
   formatRejectPayload as formatFrontendRejectPayload,
   formatYieldPayload as formatFrontendYieldPayload,
-  getResumePayload as getFrontendResumePayload,
+  formatResumePayload as formatFrontendResumePayload,
   formatRequestPayload as formatFrontendRequestPayload,
   formatResponsePayload as formatFrontendResponsePayload,
   formatQueryPayload as formatFrontendQueryPayload,
@@ -154,7 +154,9 @@ export const formatRejectPayload = generateFormatPayload(
 export const formatYieldPayload = generateFormatPayload(
   formatFrontendYieldPayload,
 );
-export const getResumePayload = generateFormatPayload(getFrontendResumePayload);
+export const formatResumePayload = generateFormatPayload(
+  formatFrontendResumePayload,
+);
 export const formatRequestPayload = generateFormatPayload(
   formatFrontendRequestPayload,
 );

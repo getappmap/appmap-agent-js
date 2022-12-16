@@ -591,15 +591,21 @@ const instrumenters = {
               makeIdentifier(`${context.apply}_YIELD`),
             ],
           ),
-          makeYieldExpression(
-            node.delegate,
+          makeAssignmentExpression(
             makeIdentifier(`${context.apply}_YIELD`),
+            makeYieldExpression(
+              node.delegate,
+              makeIdentifier(`${context.apply}_YIELD`),
+            ),
           ),
           makeCallExpression(
             makeRegularMemberExpression(context.apply, "recordResume"),
-            [makeIdentifier(`${context.apply}_YIELD_TAB`)],
+            [
+              makeIdentifier(`${context.apply}_YIELD_TAB`),
+              makeIdentifier(`${context.apply}_YIELD`),
+            ],
           ),
-          makeUnaryExpression("void", makeLiteral(0)),
+          makeIdentifier(`${context.apply}_YIELD`),
         ])
       : null,
   ReturnStatement: (node, parent, _grand_parent, closure, context) =>

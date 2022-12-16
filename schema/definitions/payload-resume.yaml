@@ -5,3 +5,5 @@ required:
 properties:
   type:
     const: resume
+  argument:
+    $ref: serial
