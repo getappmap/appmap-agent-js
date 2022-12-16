@@ -67,11 +67,11 @@ export const createSourceMap = ({ url: base, content }) => {
   const {
     sourceRoot: root,
     sources: relatives,
-    contents,
+    sourcesContent: contents,
     mappings,
   } = {
     sourceRoot: null,
-    contents: null,
+    sourcesContent: null,
     ...payload,
   };
   const root_base =
