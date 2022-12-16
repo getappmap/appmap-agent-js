@@ -44,7 +44,7 @@ assertEqual(
 assertEqual(
   extractSourceMapUrl({
     url: "http://host/directory/filename",
-    content: `//@ sourceMappingURL=source.map\r\n`,
+    content: `//@ sourceMappingURL=source.map\r\n\t`,
   }),
   "http://host/directory/source.map",
 );
