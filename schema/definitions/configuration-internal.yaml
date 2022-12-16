@@ -22,7 +22,7 @@ properties:
         key:
           type: string
         value:
-          $ref: external-configuration
+          $ref: configuration-external
         base:
           $ref: url
   recursive-process-recording:
@@ -40,7 +40,7 @@ properties:
         type: string
         nullable: true
   command-options:
-    $ref: cooked-command-options
+    $ref: command-options-cooked
   validate:
     type: object
     additionalProperties: false
@@ -55,11 +55,11 @@ properties:
   agent:
     anyOf:
       - const: null
-      - $ref: cooked-agent
+      - $ref: agent-cooked
   repository:
     $ref: repository
   log:
-    $ref: cooked-log
+    $ref: log-cooked
   host:
     const: localhost
   session:
@@ -67,11 +67,11 @@ properties:
       - const: null
       - $ref: basename
   trace-port:
-    $ref: cooked-port
+    $ref: port-cooked
   trace-protocol:
     const: TCP
   track-port:
-    $ref: cooked-port
+    $ref: port-cooked
   track-protocol:
     const: HTTP/1.1
   intercept-track-port:
@@ -101,12 +101,12 @@ properties:
       esm:
         anyOf:
           - const: null
-          - $ref: regular-identifier
+          - $ref: identifier-regular
       eval:
         type: object
         properties:
           hidden:
-            $ref: regular-identifier
+            $ref: identifier-regular
           aliases:
             type: array
             items:
@@ -114,7 +114,7 @@ properties:
       apply:
         anyOf:
           - const: null
-          - $ref: regular-identifier
+          - $ref: identifier-regular
       http:
         type: boolean
       mysql:
@@ -134,7 +134,7 @@ properties:
       minItems: 2
       maxItems: 2
       items:
-        - $ref: cooked-specifier
+        - $ref: specifier-cooked
         - type: boolean
   main:
     anyOf:
@@ -146,7 +146,7 @@ properties:
   language:
     $ref: language
   default-package:
-    $ref: cooked-module
+    $ref: module-cooked
   packages:
     type: array
     items:
@@ -154,10 +154,10 @@ properties:
       minItems: 2
       maxItems: 2
       items:
-        - $ref: cooked-specifier
-        - $ref: cooked-module
+        - $ref: specifier-cooked
+        - $ref: module-cooked
   exclude:
-    $ref: cooked-exclude
+    $ref: exclude-cooked
   anonymous-name-separator:
     $ref: separator
   function-name-placeholder:

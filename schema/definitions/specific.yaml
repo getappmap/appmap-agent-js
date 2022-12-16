@@ -1,0 +1,5 @@
+anyOf:
+  - const: null
+  - $ref: specific-array
+  - $ref: specific-error
+  - $ref: specific-hash
