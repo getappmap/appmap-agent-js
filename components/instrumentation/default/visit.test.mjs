@@ -217,9 +217,9 @@ assertEqual(
               APPLY_YIELD = 123,
               APPLY_YIELD_TAB = APPLY.getFreshTab(),
               APPLY.recordYield(APPLY_YIELD_TAB, true, APPLY_YIELD),
-              yield* APPLY_YIELD,
-              APPLY.recordResume(APPLY_YIELD_TAB),
-              void 0
+              APPLY_YIELD = yield* APPLY_YIELD,
+              APPLY.recordResume(APPLY_YIELD_TAB, APPLY_YIELD),
+              APPLY_YIELD
             );
           }
         } catch (APPLY_ERROR) {

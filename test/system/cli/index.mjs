@@ -8,6 +8,7 @@ for (const name of [
   "eval",
   "event-apply",
   "event-apply-argument",
+  "event-apply-generator",
   "event-apply-source",
   "event-http",
   "event-query",

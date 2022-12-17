@@ -9,7 +9,7 @@ properties:
     additionalProperties: false
     patternProperties:
       ^:
-        $ref: external-configuration
+        $ref: configuration-external
   scenario:
     $ref: regexp
   recursive-process-recording:
@@ -68,14 +68,14 @@ properties:
         anyOf:
           - type: boolean
           - const: null
-          - $ref: regular-identifier
+          - $ref: identifier-regular
       eval:
         anyOf:
           - type: boolean
           - type: object
             properties:
               hidden:
-                $ref: regular-identifier
+                $ref: identifier-regular
               aliases:
                 type: array
                 items:
@@ -84,7 +84,7 @@ properties:
         anyOf:
           - type: boolean
           - const: null
-          - $ref: regular-identifier
+          - $ref: identifier-regular
       http:
         type: boolean
       mysql:
@@ -99,10 +99,10 @@ properties:
     type: boolean
   processes:
     anyOf:
-      - $ref: process-specifier
+      - $ref: specifier-process
       - type: array
         items:
-          $ref: process-specifier
+          $ref: specifier-process
   main:
     $ref: path
   engine:
@@ -113,10 +113,10 @@ properties:
     $ref: module
   packages:
     anyOf:
-      - $ref: module-specifier
+      - $ref: specifier-module
       - type: array
         items:
-          $ref: module-specifier
+          $ref: specifier-module
   exclude:
     $ref: exclude
   collapse-package-hierachy:
