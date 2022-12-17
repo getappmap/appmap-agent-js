@@ -19,8 +19,4 @@ properties:
     type: string
     nullable: true
   specific:
-    anyOf:
-      - const: null
-      - $ref: error-specific
-      - $ref: array-specific
-      - $ref: hash-specific
+    $ref: specific

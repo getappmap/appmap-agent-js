@@ -12,7 +12,7 @@ import {
   formatResolvePayload,
   formatRejectPayload,
   formatYieldPayload,
-  getResumePayload,
+  formatResumePayload,
   formatQueryPayload,
   getAnswerPayload,
   formatRequestPayload,
@@ -29,7 +29,7 @@ validatePayload(getBundlePayload({ serialization }));
 
 validatePayload(getJumpPayload({ serialization }));
 
-validatePayload(getResumePayload({ serialization }));
+validatePayload(formatResumePayload({ serialization }), "argument");
 
 validatePayload(getAnswerPayload({ serialization }));
 

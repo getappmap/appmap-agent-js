@@ -19,7 +19,7 @@ import {
   formatResolvePayload,
   formatRejectPayload,
   formatYieldPayload,
-  getResumePayload,
+  formatResumePayload,
 } from "../../agent/index.mjs";
 
 const {
@@ -39,7 +39,6 @@ export const hook = (agent, { hooks: { apply: apply_hook_variable } }) => {
       "global apply hook variable already defined",
       InternalAppmapError,
     );
-    const resume_payload = getResumePayload(agent);
     const runtime = {
       empty: getSerializationEmptyValue(agent),
       getFreshTab: () => getFreshTab(agent),
@@ -72,8 +71,8 @@ export const hook = (agent, { hooks: { apply: apply_hook_variable } }) => {
       recordYield: (tab, iterator) => {
         recordBeforeEvent(agent, tab, formatYieldPayload(agent, iterator));
       },
-      recordResume: (tab) => {
-        recordAfterEvent(agent, tab, resume_payload);
+      recordResume: (tab, argument) => {
+        recordAfterEvent(agent, tab, formatResumePayload(agent, argument));
       },
     };
     defineProperty(globalThis, apply_hook_variable, {

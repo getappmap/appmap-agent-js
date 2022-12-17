@@ -1,8 +1,8 @@
 anyOf:
-  - $ref: start-message
-  - $ref: stop-message
-  - $ref: error-message
-  - $ref: source-message
-  - $ref: group-message
-  - $ref: event-message
-  - $ref: amend-message
+  - $ref: message-amend
+  - $ref: message-error
+  - $ref: message-event
+  - $ref: message-group
+  - $ref: message-source
+  - $ref: message-start
+  - $ref: message-stop

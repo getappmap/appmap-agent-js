@@ -14,4 +14,4 @@ properties:
     type: boolean
     nullable: true
   exclude:
-    $ref: cooked-exclude
+    $ref: exclude-cooked

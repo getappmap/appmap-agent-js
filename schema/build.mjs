@@ -39,8 +39,8 @@ await writeFileAsync(
   generateStandaloneModule(ajv, {
     validateSerial: "serial",
     validatePayload: "payload",
-    validateExternalConfiguration: "external-configuration",
-    validateInternalConfiguration: "internal-configuration",
+    validateExternalConfiguration: "configuration-external",
+    validateInternalConfiguration: "configuration-internal",
     validateMessage: "message",
     validateSourceMap: "source-map",
   }),

@@ -1,5 +1,5 @@
 anyOf:
   - const: null
-  - $ref: primitive-serial
-  - $ref: symbol-serial
-  - $ref: reference-serial
+  - $ref: serial-primitive
+  - $ref: serial-reference
+  - $ref: serial-symbol

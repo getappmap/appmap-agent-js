@@ -22,4 +22,4 @@ properties:
   exclude:
     type: array
     items:
-      $ref: cooked-exclusion
+      $ref: exclusion-cooked

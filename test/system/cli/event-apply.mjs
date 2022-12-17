@@ -29,8 +29,7 @@ await runAsync(
     await writeFileAsync(
       joinPath(repository, "main.mjs"),
       `
-        async function* generateAsync (x) {
-          yield 1 * x;
+        async function f (x) {
           (function beforeAwait () {} ());
           await new Promise(function promiseCallback (resolve, reject) {
             setTimeout(function timeoutCallback () {
@@ -38,14 +37,9 @@ await runAsync(
             }, 0);
           });
           (function afterAwait () {} ());
-          yield* [2 * x, 3  * x];
         }
         const mainAsync = async () => {
-          const iterateAsync = generateAsync(2);
-          console.log(await iterateAsync.next());
-          console.log(await iterateAsync.next());
-          console.log(await iterateAsync.next());
-          console.log(await iterateAsync.next());
+          await f();
         };
         mainAsync();
         ((() => {}) ());
@@ -76,7 +70,7 @@ await runAsync(
         {
           event: "call",
           id: 2,
-          method_id: "generateAsync",
+          method_id: "f",
         },
         {
           event: "call",

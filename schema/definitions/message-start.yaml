@@ -11,7 +11,7 @@ properties:
   track:
     type: string
   configuration:
-    $ref: external-configuration
+    $ref: configuration-external
   url:
     anyOf:
       - const: null
