@@ -1,3 +1,13 @@
+## [12.1.2](https://github.com/getappmap/appmap-agent-js/compare/v12.1.1...v12.1.2) (2022-12-17)
+
+
+### Bug Fixes
+
+* more lenient source map url parsing ([7656c39](https://github.com/getappmap/appmap-agent-js/commit/7656c393ecd221c204631ba9d62fe4a4747b75ac))
+* resilient zipping of arguments and parameters ([4920efc](https://github.com/getappmap/appmap-agent-js/commit/4920efcd56f0fd6b6d177853e34b29ba588db70d))
+* return yield value intead of undefined ([dd93c64](https://github.com/getappmap/appmap-agent-js/commit/dd93c642027b17ba862165f46ea3b220b9622c30))
+* use sourcesContent instead of contents in source map ([f1ae3b4](https://github.com/getappmap/appmap-agent-js/commit/f1ae3b49e2c3849699157f4c6cd788a5f9877bbf))
+
 ## [12.1.1](https://github.com/getappmap/appmap-agent-js/compare/v12.1.0...v12.1.1) (2022-12-14)
 
 
