@@ -13,7 +13,7 @@ const {
 } = globalThis;
 
 export const extractSourceMapUrl = ({ url: base, content }) => {
-  const parts = /\/\/[#@] sourceMappingURL=(.*)[\r\n]*$/u.exec(content);
+  const parts = /\/\/[#@] sourceMappingURL=(.*)[\s]*$/u.exec(content);
   if (parts === null) {
     return null;
   } else {
@@ -67,11 +67,11 @@ export const createSourceMap = ({ url: base, content }) => {
   const {
     sourceRoot: root,
     sources: relatives,
-    contents,
+    sourcesContent: contents,
     mappings,
   } = {
     sourceRoot: null,
-    contents: null,
+    sourcesContent: null,
     ...payload,
   };
   const root_base =

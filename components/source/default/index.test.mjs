@@ -44,7 +44,7 @@ assertEqual(
 assertEqual(
   extractSourceMapUrl({
     url: "http://host/directory/filename",
-    content: `//@ sourceMappingURL=source.map\r\n`,
+    content: `//@ sourceMappingURL=source.map\r\n\t`,
   }),
   "http://host/directory/source.map",
 );
@@ -128,7 +128,7 @@ assertDeepEqual(
         version: 3,
         sourceRoot: "root",
         sources: ["source1.js", "source2.js"],
-        contents: ["123;"],
+        sourcesContent: ["123;"],
         names: [],
         mappings: "",
       }),
