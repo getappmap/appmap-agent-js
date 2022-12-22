@@ -1,7 +1,7 @@
-import { lstat as lstatAsync, readdir as readdirAsync } from "fs/promises";
-import { spawnAsync } from "../spawn.mjs";
+import { lstat as lstatAsync, readdir as readdirAsync } from "node:fs/promises";
+import { fileURLToPath } from "node:url";
 import Chalk from "chalk";
-import { fileURLToPath } from "url";
+import { spawnAsync } from "./spawn.mjs";
 
 const {
   URL,
@@ -44,7 +44,7 @@ const loop = async (url) => {
   }
 };
 
-await loop(new URL("../../components/", import.meta.url));
+await loop(new URL("../components/", import.meta.url));
 
 if (failures.length === 0) {
   stdout.write(chalkGreen("All passed\n"));
