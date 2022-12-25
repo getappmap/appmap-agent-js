@@ -4,6 +4,9 @@
 /coverage
 /dist
 /node_modules
+/test/cases/**/*.output.*
+/test/cases/**/*.appmap.*
+/test/pack
 /tmp
 
 .DS_Store

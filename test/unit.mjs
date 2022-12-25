@@ -1,34 +1,28 @@
 import { lstat as lstatAsync, readdir as readdirAsync } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
-import Chalk from "chalk";
+import { logTitle, logSuccess, logFailure } from "./log.mjs";
 import { spawnAsync } from "./spawn.mjs";
 
-const {
-  URL,
-  process: { stdout },
-  String,
-} = globalThis;
-
-const { green: chalkGreen, blue: chalkBlue, red: chalkRed } = Chalk;
+const { URL, String } = globalThis;
 
 const failures = [];
 
 const loop = async (url) => {
   if (url.href.endsWith(".test.mjs")) {
-    stdout.write(chalkBlue(`${url.href}...\n`));
+    logTitle(`${url.href}...`);
     const { signal, status } = await spawnAsync(
       "node",
       ["--unhandled-rejections=strict", fileURLToPath(url)],
       { stdio: "inherit" },
     );
     if (signal !== null) {
-      stdout.write(chalkRed(`Killed by ${signal}\n`));
+      logFailure(`Killed by ${signal}`);
       failures.push(url.href);
     } else if (status !== 0) {
-      stdout.write(chalkRed(`Exit code ${String(status)}\n`));
+      logFailure(`Exit code ${String(status)}`);
       failures.push(url.href);
     } else {
-      stdout.write(chalkGreen("Success\n"));
+      logSuccess("Success");
     }
   } else if (url.href.endsWith("/")) {
     for (const filename of await readdirAsync(url)) {
@@ -47,7 +41,7 @@ const loop = async (url) => {
 await loop(new URL("../components/", import.meta.url));
 
 if (failures.length === 0) {
-  stdout.write(chalkGreen("All passed\n"));
+  logSuccess("All passed");
 } else {
-  stdout.write(chalkRed(`Failures:\n  - ${failures.join("\n  - ")}\n`));
+  logFailure(`Failures:\n  - ${failures.join("\n  - ")}\n`);
 }
