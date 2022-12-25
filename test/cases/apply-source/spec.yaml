@@ -1,0 +1,3 @@
+commands:
+  - node generate-source-map.mjs
+  - node $1
