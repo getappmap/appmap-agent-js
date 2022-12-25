@@ -1,0 +1,10 @@
+recorder: process
+packages:
+  path: main.mjs
+  enabled: true
+command: node main.mjs
+appmap_dir: .
+appmap_file: main
+hooks:
+  esm: true
+  apply: true
