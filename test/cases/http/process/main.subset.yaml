@@ -1,0 +1,33 @@
+events:
+  - event: call
+    id: 1
+    http_server_request:
+      protocol: HTTP/1.1
+      request_method: GET
+      path_info: /
+      normalized_path_info: null
+      headers:
+        host: "localhost:8888"
+    message: []
+  - event: return
+    id: 2
+    parent_id: 1
+    http_server_response:
+      status_code: 200
+      headers: {}
+      return_value: null
+  - event: call
+    id: 3
+    http_client_request:
+      request_method: GET
+      url: http://localhost:8888/
+      headers:
+        host: localhost:8888
+    message: []
+  - event: return
+    id: 4
+    parent_id: 3
+    http_client_response:
+      status_code: 200
+      headers: {}
+      return_value: null
