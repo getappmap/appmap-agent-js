@@ -1,0 +1,17 @@
+events:
+  - event: call
+    id: 1
+    sql_query:
+      database_type: sqlite3
+      server_version: null
+      sql: SELECT ? * ? as SOLUTION
+    message:
+      - name: "0"
+        class: number
+        value: "2"
+      - name: "1"
+        class: number
+        value: "3"
+  - event: return
+    id: 2
+    parent_id: 1
