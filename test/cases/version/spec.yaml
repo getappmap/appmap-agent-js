@@ -1,0 +1,4 @@
+commands:
+  - node $1 version > version.output.text
+actual: .output.text
+expect: .regexp.text
