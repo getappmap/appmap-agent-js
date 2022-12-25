@@ -1,0 +1,5 @@
+recorder: jest
+command: npx jest
+appmap_dir: .
+hooks:
+  cjs: true
