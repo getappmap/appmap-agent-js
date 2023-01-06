@@ -1,6 +1,4 @@
 import { createHook } from "async_hooks";
-import { InternalAppmapError } from "../../error/index.mjs";
-import { assert } from "../../util/index.mjs";
 import { recordGroup } from "../../agent/index.mjs";
 
 const { Set } = globalThis;
@@ -12,7 +10,14 @@ export const hook = (agent, { ordering }) => {
     const groups = new Set();
     const hook = createHook({
       init: (id, description, _origin) => {
-        assert(!groups.has(id), "duplicate async id", InternalAppmapError);
+        // In the presence of a debugger, the init hook may be called multiple times for the same asyncId.
+        // However, the asyncId is guaranteed to be unique so we should be able to safely ignore it if it's
+        // already been seen.
+        /* c8 ignore next 3 */
+        if (groups.has(id)) {
+          return;
+        }
+
         groups.add(id);
         recordGroup(agent, id, description);
       },
