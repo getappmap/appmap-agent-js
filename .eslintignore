@@ -4,4 +4,5 @@
 /dist
 /doc
 /node_modules
+/test/pack
 /tmp

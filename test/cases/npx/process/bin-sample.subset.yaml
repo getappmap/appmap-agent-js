@@ -1,0 +1,10 @@
+classMap:
+  - type: package
+    name: node_modules
+    children:
+      - type: package
+        name: bin-sample
+        children:
+          - type: package
+            name: bin
+            children: []

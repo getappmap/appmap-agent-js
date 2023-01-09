@@ -4,6 +4,12 @@
 /coverage
 /dist
 /node_modules
+/test/cases/**/*.output.*
+/test/cases/**/*.appmap.*
+/test/cases/npx/package.json
+/test/cases/npx/package-lock.json
+/test/cases/apply-source/source.map
+/test/pack
 /tmp
 
 .DS_Store

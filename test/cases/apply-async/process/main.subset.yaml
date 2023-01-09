@@ -1,0 +1,13 @@
+events:
+  - event: call
+    id: 1
+    method_id: mainAsync
+  - event: call
+    id: 2
+    method_id: promiseCallback
+  - event: return
+    id: 3
+    parent_id: 2
+  - event: return
+    id: 4
+    parent_id: 1

@@ -29,7 +29,7 @@
     "prepare": "node schema/build.mjs && node component/build.mjs",
     "lint": "node component/lint.mjs && npx eslint '**/*.@(mjs|cjs)' && npx prettier --check .",
     "format": "npx prettier --write .",
-    "test": "npx bercow .bercowrc-test-only.yaml && node --unhandled-rejections=strict test/system/index.mjs",
+    "test": "npx bercow .bercowrc-test-only.yaml && node test/system.mjs --pack",
     "coverage": "npx bercow .bercowrc-test-only-cov.yaml",
     "deploy": "npx semantic-release"
   },
@@ -48,7 +48,7 @@
     "glob": "^8.0.3",
     "klaw-sync": "^6.0.0",
     "minimatch": "^5.1.0",
-    "minimist": "^1.2.5",
+    "minimist": "^1.2.7",
     "net-socket-messaging": "^0.1.6",
     "prompts": "^2.4.2",
     "semver": "^7.3.5",

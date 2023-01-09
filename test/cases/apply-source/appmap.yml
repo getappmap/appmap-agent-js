@@ -1,0 +1,9 @@
+recorder: process
+packages:
+  path: source.mjs
+  enabled: true
+command: node script.mjs
+appmap_dir: .
+appmap_file: script
+hooks:
+  esm: true

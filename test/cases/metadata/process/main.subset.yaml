@@ -1,0 +1,5 @@
+metadata:
+  name: map-name
+  app: app-name
+  recorder:
+    name: process

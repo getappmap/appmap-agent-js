@@ -1,0 +1,8 @@
+recorder: mocha
+packages:
+  path: main.mjs
+  enabled: true
+command: npx mocha '*.test.mjs'
+appmap_dir: .
+hooks:
+  esm: true

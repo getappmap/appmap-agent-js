@@ -1,0 +1,16 @@
+command: npx bin-sample
+appmap_dir: .
+appmap_file: bin-sample
+recorder: process
+hooks:
+  cjs: true
+  apply: true
+packages:
+  - dist: bin-sample
+    enabled: true
+processes:
+  - dist: bin-sample
+    enabled: true
+  - regexp: ^../
+    enabled: false
+pruning: false

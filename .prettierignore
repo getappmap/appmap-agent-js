@@ -5,6 +5,8 @@
 /dist
 /doc
 /node_modules
+/test/cases/**/*.appmap.json
+/test/pack
 /tmp
 /package.json
 /package-lock.json

@@ -1,0 +1,34 @@
+classMap:
+  - type: package
+    name: "."
+    children:
+      - type: class
+        name: main
+        children:
+          - type: function
+            name: main
+            location: main.mjs:3
+            static: false
+            source: null
+            comment: null
+            labels: []
+      - type: class
+        name: native
+        children:
+          - type: function
+            name: native
+            location: native.mjs:1
+            static: false
+            source: null
+            comment: null
+            labels: []
+      - type: class
+        name: common
+        children:
+          - type: function
+            name: common
+            location: common.cjs:2
+            static: false
+            source: null
+            comment: null
+            labels: []
