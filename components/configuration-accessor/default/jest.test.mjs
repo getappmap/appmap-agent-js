@@ -19,7 +19,7 @@ const loader_url = "file:///A:/base/lib/node/loader-standalone.mjs";
 //////////////////
 
 // source //
-assertEqual(doesSupportSource("jest --argv"), true);
+assertEqual(doesSupportSource("jest --argv", "/bin/sh"), true);
 assertDeepEqual(hookCommandSource("jest --argv", "/bin/sh", base), [
   `jest --runInBand --setupFilesAfterEnv ${recorder_path.replace(
     /\\/gu,

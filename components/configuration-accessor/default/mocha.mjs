@@ -2,17 +2,20 @@ import { coalesce } from "../../util/index.mjs";
 import { convertFileUrlToPath } from "../../path/index.mjs";
 import { toAbsoluteUrl } from "../../url/index.mjs";
 import { escapeShell, escapeNodeOption } from "./escape.mjs";
-import { generateParseSource, generateSplitTokens } from "./package.mjs";
-
-const { canParseSource, parseSource } = generateParseSource("mocha");
-const { canSplitTokens, splitTokens } = generateSplitTokens("mocha");
+import {
+  sniffSource,
+  sniffTokens,
+  parseSource,
+  splitTokens,
+} from "./package.mjs";
 
 export const name = "mocha";
 export const recursive = null;
 
-export const doesSupportSource = canParseSource;
+export const doesSupportSource = (source, shell) =>
+  sniffSource(source, "mocha", shell);
 
-export const doesSupportTokens = canSplitTokens;
+export const doesSupportTokens = (tokens) => sniffTokens(tokens, "mocha");
 
 export const hookCommandSource = (source, shell, base) => {
   const groups = parseSource(source);
@@ -20,7 +23,7 @@ export const hookCommandSource = (source, shell, base) => {
     `${groups.before} --require ${escapeShell(
       shell,
       convertFileUrlToPath(toAbsoluteUrl("lib/node/recorder-mocha.mjs", base)),
-    )}${groups.after}`,
+    )} ${groups.after}`,
   ];
 };
 

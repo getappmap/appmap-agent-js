@@ -1,88 +1,114 @@
+import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
+
 import {
-  assertThrow,
-  assertEqual,
-  assertDeepEqual,
-} from "../../__fixture__.mjs";
-import { generateParseSource, generateSplitTokens } from "./package.mjs";
-
-const { canParseSource, parseSource } = generateParseSource("mocha");
-
-const { canSplitTokens, splitTokens } = generateSplitTokens("mocha");
+  splitTokens,
+  sniffTokens,
+  parseSource,
+  sniffSource,
+} from "./package.mjs";
 
 /////////////////
 // unsupported //
 /////////////////
 
-// source //
-assertEqual(canParseSource("node main.mjs"), false);
-assertThrow(
-  () => parseSource("node main.mjs"),
-  /^InternalAppmapError: could not parse command source$/u,
+// source >> /bin/sh //
+assertEqual(sniffSource("VAR=VAL exec argv", "pckg", "/bin/sh"), false);
+
+// source >> cmd.exe //
+assertEqual(sniffSource("exec argv", "pckg", "cmd.exe"), false);
+
+// tokens >> regular //
+assertEqual(sniffTokens(["exec", "argv"]), false);
+
+// tokens >> empty //
+assertEqual(sniffTokens([]), false);
+
+//////////////////////////////////////////////
+// node --cpu-prof node_modules/pckg/bin.js //
+//////////////////////////////////////////////
+
+// source >> /bin/sh //
+assertEqual(
+  sniffSource(
+    "VAR=VAL node --cpu-prof node_modules/pckg/bin.js --argv",
+    "pckg",
+    "/bin/sh",
+  ),
+  true,
+);
+assertDeepEqual(
+  parseSource(
+    "VAR=VAL node --cpu-prof node_modules/pckg/bin.js --argv",
+    "/bin/sh",
+  ),
+  {
+    __proto__: null,
+    before: "VAR=VAL node --cpu-prof node_modules/pckg/bin.js",
+    after: "--argv",
+  },
+);
+
+// source >> cmd.exe //
+assertEqual(
+  sniffSource(
+    "node --cpu-prof node_modules/pckg/bin.js --argv",
+    "pckg",
+    "cmd.exe",
+  ),
+  true,
+);
+assertDeepEqual(
+  parseSource("node --cpu-prof node_modules/pckg/bin.js --argv", "cmd.exe"),
+  {
+    __proto__: null,
+    before: "node --cpu-prof node_modules/pckg/bin.js",
+    after: "--argv",
+  },
 );
 
 // tokens //
-assertEqual(canSplitTokens(["node", "main.mjs"]), false);
-assertThrow(
-  () => splitTokens(["node", "main.mjs"]),
-  /^InternalAppmapError: could not split command tokens$/u,
+assertEqual(
+  sniffTokens(
+    ["node", "--cpu-prof", "node_modules/pckg/bin.js", "--argv"],
+    "pckg",
+  ),
+  true,
+);
+assertDeepEqual(
+  splitTokens(["node", "--cpu-prof", "node_modules/pckg/bin.js", "--argv"]),
+  {
+    __proto__: null,
+    before: ["node", "--cpu-prof", "node_modules/pckg/bin.js"],
+    after: ["--argv"],
+  },
 );
 
-//////////////////
-// mocha --argv //
-//////////////////
+////////////////////
+// node -- --pckg //
+////////////////////
 
-// source //
-assertEqual(canParseSource("mocha --argv"), true);
-assertDeepEqual(parseSource("mocha --argv"), {
-  __proto__: null,
-  before: "mocha",
-  after: " --argv",
-});
+assertEqual(sniffTokens(["node", "--", "--pckg", "--argv"], "--pckg"), true);
 
-// tokens //
-assertEqual(canSplitTokens(["mocha", "--argv"]), true);
-assertDeepEqual(splitTokens(["mocha", "--argv"]), {
+assertDeepEqual(splitTokens(["node", "--", "--pckg", "--argv"]), {
   __proto__: null,
-  before: ["mocha"],
+  before: ["node", "--", "--pckg"],
   after: ["--argv"],
 });
 
-//////////////////////
-// npx mocha --argv //
-//////////////////////
+/////////////
+// node -- //
+/////////////
 
-// source //
-assertEqual(canParseSource("npx mocha --argv"), true);
-assertDeepEqual(parseSource("npx mocha --argv"), {
-  __proto__: null,
-  before: "npx mocha",
-  after: " --argv",
-});
+assertEqual(sniffTokens(["node", "--"], "pckg"), false);
 
-// tokens //
-assertEqual(canSplitTokens(["npx", "mocha", "--argv"]), true);
-assertDeepEqual(splitTokens(["npx", "mocha", "--argv"]), {
-  __proto__: null,
-  before: ["npx", "mocha"],
-  after: ["--argv"],
-});
+/////////////////
+// node - pckg //
+/////////////////
 
-///////////////////////////
-// npm exec mocha --argv //
-///////////////////////////
+assertEqual(sniffTokens(["node", "-", "pckg"], "--pckg"), false);
 
-// source //
-assertEqual(canParseSource("npm exec mocha --argv"), true);
-assertDeepEqual(parseSource("npm exec mocha --argv"), {
-  __proto__: null,
-  before: "npm exec mocha",
-  after: " --argv",
-});
+/////////////////////
+// node --cpu-prof //
+/////////////////////
 
-// tokens //
-assertEqual(canSplitTokens(["npm", "exec", "mocha", "--argv"]), true);
-assertDeepEqual(splitTokens(["npm", "exec", "mocha", "--argv"]), {
-  __proto__: null,
-  before: ["npm", "exec", "mocha"],
-  after: ["--argv"],
-});
+assertEqual(sniffTokens(["node", "--cpu-prof"], "--cpu-prof"), false);

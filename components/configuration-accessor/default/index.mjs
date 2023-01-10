@@ -80,21 +80,23 @@ export const resolveConfigurationAutomatedRecorder = (configuration) => {
       "cannot resolve recorder because command is missing",
       InternalAppmapError,
     );
-    const method =
-      configuration.command.tokens === null
-        ? "doesSupportSource"
-        : "doesSupportTokens";
-    const input =
-      configuration.command.tokens === null
-        ? configuration.command.source
-        : configuration.command.tokens;
-    const { name } = recorders.find(
-      (recorder) =>
-        (recorder.recursive === null ||
-          recorder.recursive ===
-            configuration["recursive-process-recording"]) &&
-        recorder[method](input),
-    );
+    const { name } = recorders.find((recorder) => {
+      if (
+        recorder.recursive === null ||
+        recorder.recursive === configuration["recursive-process-recording"]
+      ) {
+        if (configuration.command.tokens === null) {
+          return recorder.doesSupportSource(
+            configuration.command.source,
+            configuration.command.shell,
+          );
+        } else {
+          return recorder.doesSupportTokens(configuration.command.tokens);
+        }
+      } else {
+        return false;
+      }
+    });
     configuration = extendConfiguration(
       configuration,
       {

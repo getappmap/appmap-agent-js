@@ -6,7 +6,7 @@ import { escapeShell } from "./escape.mjs";
 
 const regexp = /^(?<before>\s*\S*node(.[a-zA-Z]+)?)(?<after>($|\s[\s\S]*$))$/u;
 
-const doesSupportSource = (command) => regexp.test(command);
+const doesSupportSource = (source, _shell) => regexp.test(source);
 
 const doesSupportTokens = (tokens) =>
   tokens.length > 0 && tokens[0].startsWith("node");
