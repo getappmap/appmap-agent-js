@@ -1,0 +1,8 @@
+packages:
+  path: main.mjs
+  enabled: true
+command: FOO=BAR npx mocha '*.test.mjs'
+appmap_dir: .
+hooks:
+  esm: true
+  apply: true
