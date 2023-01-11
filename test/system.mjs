@@ -17,6 +17,7 @@ import { hasOwn } from "./util.mjs";
 import { spawnStrictAsync } from "./spawn.mjs";
 
 const {
+  RegExp,
   Error,
   URL,
   Promise,
@@ -73,6 +74,7 @@ const changeUrlExtension = (url, ext1, ext2) => {
 
 const testAsync = async (test_url, bin_url) => {
   const spec = {
+    os: "^",
     commands: ["node $1"],
     actual: ".appmap.json",
     expect: ".subset.yaml",
@@ -80,37 +82,43 @@ const testAsync = async (test_url, bin_url) => {
       (await readFileMaybeAsync(new URL("spec.yaml", test_url))) ?? "{}",
     ),
   };
-  await Promise.all(
-    (
-      await globAsync(`**/*${spec.output}`, test_url)
-    ).map((path) => rmAsync(path)),
-  );
-  for (const command of spec.commands) {
-    await spawnStrictAsync(
-      shell,
-      // Very crude variable substitution.
-      // It is hard to come up with a portable command for both posix and win32.
-      // For intance: `$1` vs `$args[1]`
-      [
-        shell_command_flag,
-        command.replace(/\$1/u, () => fileURLToPath(bin_url)),
-      ],
-      {
-        stdio: "inherit",
-        cwd: test_url,
-      },
+  if (new RegExp(spec.os, "u").test(getPlatform())) {
+    await Promise.all(
+      (
+        await globAsync(`**/*${spec.output}`, test_url)
+      ).map((path) => rmAsync(path)),
     );
-  }
-  for (const expect_url of await globAsync(`**/*${spec.expect}`, test_url)) {
-    const actual_url = changeUrlExtension(expect_url, spec.expect, spec.actual);
-    if (
-      !match(
-        { url: actual_url, content: await readFileAsync(actual_url, "utf8") },
-        { url: expect_url, content: await readFileAsync(expect_url, "utf8") },
-      )
-    ) {
-      logFailure(`output mismatch at ${actual_url}`);
-      throw new Error("Output mismatch");
+    for (const command of spec.commands) {
+      await spawnStrictAsync(
+        shell,
+        // Very crude variable substitution.
+        // It is hard to come up with a portable command for both posix and win32.
+        // For intance: `$1` vs `$args[1]`
+        [
+          shell_command_flag,
+          command.replace(/\$1/u, () => fileURLToPath(bin_url)),
+        ],
+        {
+          stdio: "inherit",
+          cwd: test_url,
+        },
+      );
+    }
+    for (const expect_url of await globAsync(`**/*${spec.expect}`, test_url)) {
+      const actual_url = changeUrlExtension(
+        expect_url,
+        spec.expect,
+        spec.actual,
+      );
+      if (
+        !match(
+          { url: actual_url, content: await readFileAsync(actual_url, "utf8") },
+          { url: expect_url, content: await readFileAsync(expect_url, "utf8") },
+        )
+      ) {
+        logFailure(`output mismatch at ${actual_url}`);
+        throw new Error("Output mismatch");
+      }
     }
   }
 };

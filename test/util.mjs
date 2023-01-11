@@ -11,7 +11,7 @@ export const {
   },
 } = globalThis;
 
-export const isSubsetJSON = (json1, json2, path) => {
+export const matchJSON = (json1, json2, path) => {
   if (isArray(json1)) {
     if (!isArray(json2)) {
       return `not an array at ${path}`;
@@ -20,7 +20,7 @@ export const isSubsetJSON = (json1, json2, path) => {
     } else {
       const { length } = json1;
       for (let index = 0; index < length; index += 1) {
-        const maybe_mismatch = isSubsetJSON(
+        const maybe_mismatch = matchJSON(
           json1[index],
           json2[index],
           `${path}[${String(index)}]`,
@@ -38,7 +38,7 @@ export const isSubsetJSON = (json1, json2, path) => {
       const keys = ownKeys(json1);
       for (const key of keys) {
         if (hasOwn(json2, key)) {
-          const maybe_mismatch = isSubsetJSON(
+          const maybe_mismatch = matchJSON(
             json1[key],
             json2[key],
             /^[a-zA-Z_$][a-zA-Z0-9_$]*$/u.test(key)

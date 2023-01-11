@@ -2,35 +2,39 @@ import { coalesce } from "../../util/index.mjs";
 import { convertFileUrlToPath } from "../../path/index.mjs";
 import { toAbsoluteUrl } from "../../url/index.mjs";
 import { escapeNodeOption, escapeShell } from "./escape.mjs";
-import { generateParseSource, generateSplitTokens } from "./package.mjs";
-
-const { canParseSource, parseSource } = generateParseSource("jest");
-const { canSplitTokens, splitTokens } = generateSplitTokens("jest");
+import {
+  sniffSource,
+  sniffTokens,
+  parseSource,
+  splitTokens,
+} from "./package.mjs";
 
 export const name = "jest";
 export const recursive = null;
 
-export const doesSupportSource = canParseSource;
-export const doesSupportTokens = canSplitTokens;
+export const doesSupportSource = (source, shell) =>
+  sniffSource(source, "jest", shell);
+
+export const doesSupportTokens = (tokens) => sniffTokens(tokens, "jest");
 
 export const hookCommandSource = (source, shell, base) => {
-  const groups = parseSource(source);
+  const groups = parseSource(source, shell);
   return [
-    `${groups.before} --runInBand --setupFilesAfterEnv ${escapeShell(
+    `${groups.exec} --runInBand --setupFilesAfterEnv ${escapeShell(
       shell,
       convertFileUrlToPath(toAbsoluteUrl("lib/node/recorder-jest.mjs", base)),
-    )}${groups.after}`,
+    )} ${groups.argv}`,
   ];
 };
 
 export const hookCommandTokens = (tokens, base) => {
-  const { before, after } = splitTokens(tokens);
+  const { exec, argv } = splitTokens(tokens);
   return [
-    ...before,
+    ...exec,
     "--runInBand",
     "--setupFilesAfterEnv",
     convertFileUrlToPath(toAbsoluteUrl("lib/node/recorder-jest.mjs", base)),
-    ...after,
+    ...argv,
   ];
 };
 

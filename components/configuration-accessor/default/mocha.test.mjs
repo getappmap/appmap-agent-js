@@ -19,7 +19,7 @@ const loader_url = "file:///A:/base/lib/node/loader-standalone.mjs";
 //////////////////
 
 // source //
-assertEqual(doesSupportSource("mocha --argv"), true);
+assertEqual(doesSupportSource("mocha --argv", "/bin/sh"), true);
 assertDeepEqual(hookCommandSource("mocha --argv", "/bin/sh", base), [
   `mocha --require ${recorder_path.replace(/\\/gu, "\\\\")} --argv`,
 ]);

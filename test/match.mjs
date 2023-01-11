@@ -1,7 +1,7 @@
 import Ajv from "ajv";
 import { parse as parseYAML } from "yaml";
 import { logFailure } from "./log.mjs";
-import { hasOwn, isSubsetJSON } from "./util.mjs";
+import { hasOwn, matchJSON } from "./util.mjs";
 
 const {
   URL,
@@ -36,7 +36,7 @@ const matchers = {
     }
   },
   subset: (actual, expect) => {
-    const maybe_mismatch = isSubsetJSON(expect, actual, "");
+    const maybe_mismatch = matchJSON(expect, actual, "");
     if (maybe_mismatch === null) {
       return true;
     } else {

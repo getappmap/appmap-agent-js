@@ -2,35 +2,38 @@ import { coalesce } from "../../util/index.mjs";
 import { convertFileUrlToPath } from "../../path/index.mjs";
 import { toAbsoluteUrl } from "../../url/index.mjs";
 import { escapeShell, escapeNodeOption } from "./escape.mjs";
-import { generateParseSource, generateSplitTokens } from "./package.mjs";
-
-const { canParseSource, parseSource } = generateParseSource("mocha");
-const { canSplitTokens, splitTokens } = generateSplitTokens("mocha");
+import {
+  sniffSource,
+  sniffTokens,
+  parseSource,
+  splitTokens,
+} from "./package.mjs";
 
 export const name = "mocha";
 export const recursive = null;
 
-export const doesSupportSource = canParseSource;
+export const doesSupportSource = (source, shell) =>
+  sniffSource(source, "mocha", shell);
 
-export const doesSupportTokens = canSplitTokens;
+export const doesSupportTokens = (tokens) => sniffTokens(tokens, "mocha");
 
 export const hookCommandSource = (source, shell, base) => {
   const groups = parseSource(source);
   return [
-    `${groups.before} --require ${escapeShell(
+    `${groups.exec} --require ${escapeShell(
       shell,
       convertFileUrlToPath(toAbsoluteUrl("lib/node/recorder-mocha.mjs", base)),
-    )}${groups.after}`,
+    )} ${groups.argv}`,
   ];
 };
 
 export const hookCommandTokens = (tokens, base) => {
-  const { before, after } = splitTokens(tokens);
+  const { exec, argv } = splitTokens(tokens);
   return [
-    ...before,
+    ...exec,
     "--require",
     convertFileUrlToPath(toAbsoluteUrl("lib/node/recorder-mocha.mjs", base)),
-    ...after,
+    ...argv,
   ];
 };
 
