@@ -4,7 +4,7 @@ import { toAbsoluteUrl } from "../../url/index.mjs";
 import { ExternalAppmapError } from "../../error/index.mjs";
 import { escapeShell } from "./escape.mjs";
 
-const regexp = /^(?<before>\s*\S*node(.[a-zA-Z]+)?)(?<after>($|\s[\s\S]*$))$/u;
+const regexp = /^(?<exec>\s*\S*node(.[a-zA-Z]+)?)(?<argv>($|\s[\s\S]*$))$/u;
 
 const doesSupportSource = (source, _shell) => regexp.test(source);
 
@@ -22,8 +22,8 @@ const splitNodeCommand = (tokens) => {
     ExternalAppmapError,
   );
   return {
-    before: tokens.slice(0, 1),
-    after: tokens.slice(1),
+    exec: tokens.slice(0, 1),
+    argv: tokens.slice(1),
   };
 };
 
@@ -49,19 +49,19 @@ export const generateNodeRecorder = (recorder) => ({
   hookCommandSource: (source, shell, base) => {
     const groups = parseNodeCommand(source);
     return [
-      `${groups.before} --experimental-loader ${escapeShell(
+      `${groups.exec} --experimental-loader ${escapeShell(
         shell,
         toAbsoluteUrl(`lib/node/recorder-${recorder}.mjs`, base),
-      )}${groups.after}`,
+      )}${groups.argv}`,
     ];
   },
   hookCommandTokens: (tokens, base) => {
-    const { before, after } = splitNodeCommand(tokens);
+    const { exec, argv } = splitNodeCommand(tokens);
     return [
-      ...before,
+      ...exec,
       "--experimental-loader",
       toAbsoluteUrl(`lib/node/recorder-${recorder}.mjs`, base),
-      ...after,
+      ...argv,
     ];
   },
   hookEnvironment: (env, _base) => env,

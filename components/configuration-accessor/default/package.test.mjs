@@ -43,8 +43,8 @@ assertDeepEqual(
   ),
   {
     __proto__: null,
-    before: "VAR=VAL node --cpu-prof node_modules/pckg/bin.js",
-    after: "--argv",
+    exec: "VAR=VAL node --cpu-prof node_modules/pckg/bin.js",
+    argv: "--argv",
   },
 );
 
@@ -61,8 +61,8 @@ assertDeepEqual(
   parseSource("node --cpu-prof node_modules/pckg/bin.js --argv", "cmd.exe"),
   {
     __proto__: null,
-    before: "node --cpu-prof node_modules/pckg/bin.js",
-    after: "--argv",
+    exec: "node --cpu-prof node_modules/pckg/bin.js",
+    argv: "--argv",
   },
 );
 
@@ -78,8 +78,8 @@ assertDeepEqual(
   splitTokens(["node", "--cpu-prof", "node_modules/pckg/bin.js", "--argv"]),
   {
     __proto__: null,
-    before: ["node", "--cpu-prof", "node_modules/pckg/bin.js"],
-    after: ["--argv"],
+    exec: ["node", "--cpu-prof", "node_modules/pckg/bin.js"],
+    argv: ["--argv"],
   },
 );
 
@@ -91,8 +91,8 @@ assertEqual(sniffTokens(["node", "--", "--pckg", "--argv"], "--pckg"), true);
 
 assertDeepEqual(splitTokens(["node", "--", "--pckg", "--argv"]), {
   __proto__: null,
-  before: ["node", "--", "--pckg"],
-  after: ["--argv"],
+  exec: ["node", "--", "--pckg"],
+  argv: ["--argv"],
 });
 
 /////////////

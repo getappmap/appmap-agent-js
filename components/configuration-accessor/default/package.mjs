@@ -72,8 +72,8 @@ export const splitTokens = (tokens) => {
   );
   return {
     __proto__: null,
-    before: tokens.slice(0, positional + 1),
-    after: tokens.slice(positional + 1),
+    exec: tokens.slice(0, positional + 1),
+    argv: tokens.slice(positional + 1),
   };
 };
 
@@ -124,8 +124,8 @@ export const parseSource = (source, shell) => {
   const { exec, argv } = splitTokens(body);
   return {
     __proto__: null,
-    before: [...head, ...before].join(" "),
-    after: after.join(" "),
+    exec: [...head, ...exec].join(" "),
+    argv: argv.join(" "),
   };
 };
 

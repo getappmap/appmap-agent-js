@@ -20,21 +20,21 @@ export const doesSupportTokens = (tokens) => sniffTokens(tokens, "jest");
 export const hookCommandSource = (source, shell, base) => {
   const groups = parseSource(source, shell);
   return [
-    `${groups.before} --runInBand --setupFilesAfterEnv ${escapeShell(
+    `${groups.exec} --runInBand --setupFilesAfterEnv ${escapeShell(
       shell,
       convertFileUrlToPath(toAbsoluteUrl("lib/node/recorder-jest.mjs", base)),
-    )} ${groups.after}`,
+    )} ${groups.argv}`,
   ];
 };
 
 export const hookCommandTokens = (tokens, base) => {
-  const { before, after } = splitTokens(tokens);
+  const { exec, argv } = splitTokens(tokens);
   return [
-    ...before,
+    ...exec,
     "--runInBand",
     "--setupFilesAfterEnv",
     convertFileUrlToPath(toAbsoluteUrl("lib/node/recorder-jest.mjs", base)),
-    ...after,
+    ...argv,
   ];
 };
 
