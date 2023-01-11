@@ -1,3 +1,10 @@
+# [12.2.0](https://github.com/getappmap/appmap-agent-js/compare/v12.1.2...v12.2.0) (2023-01-11)
+
+
+### Features
+
+* support additional command patterns for mocha and jest ([e9c84b7](https://github.com/getappmap/appmap-agent-js/commit/e9c84b788947cb8587881142efb61843864427cf))
+
 ## [12.1.2](https://github.com/getappmap/appmap-agent-js/compare/v12.1.1...v12.1.2) (2022-12-17)
 
 
