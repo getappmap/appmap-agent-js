@@ -22,7 +22,7 @@ export const hookCommandSource = (source, shell, base) => {
   return [
     `${groups.exec} --require ${escapeShell(
       shell,
-      convertFileUrlToPath(toAbsoluteUrl("lib/node/recorder-mocha.mjs", base)),
+      convertFileUrlToPath(toAbsoluteUrl("lib/node/mocha-hook.mjs", base)),
     )} ${groups.argv}`,
   ];
 };
@@ -32,7 +32,7 @@ export const hookCommandTokens = (tokens, base) => {
   return [
     ...exec,
     "--require",
-    convertFileUrlToPath(toAbsoluteUrl("lib/node/recorder-mocha.mjs", base)),
+    convertFileUrlToPath(toAbsoluteUrl("lib/node/mocha-hook.mjs", base)),
     ...argv,
   ];
 };
@@ -44,6 +44,6 @@ export const hookEnvironment = (env, base) => ({
     "NODE_OPTIONS",
     "",
   )} --experimental-loader=${escapeNodeOption(
-    toAbsoluteUrl("lib/node/loader-standalone.mjs", base),
+    toAbsoluteUrl("lib/node/recorder.mjs", base),
   )}`,
 });

@@ -9,10 +9,8 @@ import {
 } from "./jest.mjs";
 
 const base = "file:///A:/base/";
-const recorder_path = fileURLToPath(
-  "file:///A:/base/lib/node/recorder-jest.mjs",
-);
-const loader_url = "file:///A:/base/lib/node/loader-standalone.mjs";
+const recorder_path = fileURLToPath("file:///A:/base/lib/node/recorder.mjs");
+const loader_url = "file:///A:/base/lib/node/loader-esm.mjs";
 
 //////////////////
 // mocha --argv //

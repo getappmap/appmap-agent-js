@@ -22,7 +22,7 @@ export const hookCommandSource = (source, shell, base) => {
   return [
     `${groups.exec} --runInBand --setupFilesAfterEnv ${escapeShell(
       shell,
-      convertFileUrlToPath(toAbsoluteUrl("lib/node/recorder-jest.mjs", base)),
+      convertFileUrlToPath(toAbsoluteUrl("lib/node/recorder.mjs", base)),
     )} ${groups.argv}`,
   ];
 };
@@ -33,7 +33,7 @@ export const hookCommandTokens = (tokens, base) => {
     ...exec,
     "--runInBand",
     "--setupFilesAfterEnv",
-    convertFileUrlToPath(toAbsoluteUrl("lib/node/recorder-jest.mjs", base)),
+    convertFileUrlToPath(toAbsoluteUrl("lib/node/recorder.mjs", base)),
     ...argv,
   ];
 };
@@ -45,6 +45,6 @@ export const hookEnvironment = (env, base) => ({
     "NODE_OPTIONS",
     "",
   )} --experimental-vm-modules --experimental-loader=${escapeNodeOption(
-    toAbsoluteUrl("lib/node/loader-standalone.mjs", base),
+    toAbsoluteUrl("lib/node/loader-esm.mjs", base),
   )}`,
 });

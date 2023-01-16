@@ -51,7 +51,7 @@ export const generateNodeRecorder = (recorder) => ({
     return [
       `${groups.exec} --experimental-loader ${escapeShell(
         shell,
-        toAbsoluteUrl(`lib/node/recorder-${recorder}.mjs`, base),
+        toAbsoluteUrl(`lib/node/recorder.mjs`, base),
       )}${groups.argv}`,
     ];
   },
@@ -60,7 +60,7 @@ export const generateNodeRecorder = (recorder) => ({
     return [
       ...exec,
       "--experimental-loader",
-      toAbsoluteUrl(`lib/node/recorder-${recorder}.mjs`, base),
+      toAbsoluteUrl(`lib/node/recorder.mjs`, base),
       ...argv,
     ];
   },

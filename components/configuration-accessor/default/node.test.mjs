@@ -12,7 +12,7 @@ const {
 } = generateNodeRecorder("process");
 
 const base = "file:///A:/base/";
-const recorder_url = "file:///A:/base/lib/node/recorder-process.mjs";
+const recorder_url = "file:///A:/base/lib/node/recorder.mjs";
 
 assertEqual(name, "process");
 assertEqual(recursive, false);

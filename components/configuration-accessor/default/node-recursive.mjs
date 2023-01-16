@@ -20,7 +20,7 @@ export const generateNodeRecorder = (recorder) => ({
       "NODE_OPTIONS",
       "",
     )} --experimental-loader=${escapeNodeOption(
-      toAbsoluteUrl(`lib/node/recorder-${recorder}.mjs`, base),
+      toAbsoluteUrl(`lib/node/recorder.mjs`, base),
     )}`,
   }),
 });
