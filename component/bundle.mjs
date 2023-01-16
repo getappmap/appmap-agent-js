@@ -3,12 +3,27 @@ import { rollup } from "rollup";
 import { getComponentMainUrl, getBundleUrl } from "./layout.mjs";
 import { routeAsync } from "./route.mjs";
 
-const isExternal = (specifier, _parent, resolved) => {
+const { URL } = globalThis;
+
+const resolveSpecifier = (specifier, parent, resolved) => {
   if (resolved) {
-    return pathToFileURL(specifier).href.includes("/node_modules/");
+    const { href } = pathToFileURL(specifier);
+    return href;
+  } else if (/^[a-zA-Z]+:\/\//u.test(specifier)) {
+    return specifier;
+  } else if (specifier.startsWith("./") || specifier.startsWith("../")) {
+    const { href } = new URL(specifier, pathToFileURL(parent));
+    return href;
   } else {
-    return !specifier.startsWith("./") && !specifier.startsWith("../");
+    return null;
   }
+};
+
+const isExternal = (specifier, parent, resolved) => {
+  const maybe_url = resolveSpecifier(specifier, parent, resolved);
+  return (
+    maybe_url === null || !maybe_url.includes("/appmap-agent-js/components/")
+  );
 };
 
 export const bundleAsync = async (home, component, env, resolution) => {
