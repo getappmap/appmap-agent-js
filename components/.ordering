@@ -9,7 +9,6 @@ log-inner
 log
 validate
 validate-appmap
-validate-mocha
 patch
 file
 time
