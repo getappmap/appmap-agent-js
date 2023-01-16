@@ -12,7 +12,7 @@ const child = spawn(
     "--testMatch",
     "**/*.mjs",
     "--",
-    "components/recorder-jest/default/__fixture__.mjs",
+    "components/recorder-cli/default/__fixture_jest__.mjs",
   ],
   {
     stdio: "inherit",

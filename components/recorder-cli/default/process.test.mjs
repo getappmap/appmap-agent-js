@@ -5,23 +5,24 @@ import {
   createConfiguration,
   extendConfiguration,
 } from "../../configuration/index.mjs";
-import { record } from "./index.mjs";
+import { extendConfigurationNode } from "../../configuration-accessor/index.mjs";
+import { record } from "./process.mjs";
 
-for (const enabled of [false, true]) {
-  record(
+record(
+  extendConfigurationNode(
+    extendConfiguration(
+      createConfiguration("file:///w:/home/"),
+      {
+        processes: [{ regexp: "", enabled: true }],
+        hooks: { cjs: false, esm: false, apply: false, http: false },
+        recorder: "remote",
+      },
+      "file:///w:/base/",
+    ),
     {
       cwd: () => convertFileUrlToPath("file:///w:/cwd"),
       argv: ["node", "main.mjs"],
       version,
     },
-    extendConfiguration(
-      createConfiguration("file:///w:/home/"),
-      {
-        processes: [{ regexp: "", enabled }],
-        recorder: "process",
-        hooks: { cjs: false, esm: false, apply: false, http: false },
-      },
-      "file:///w:/base/",
-    ),
-  );
-}
+  ),
+);
