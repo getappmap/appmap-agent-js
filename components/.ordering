@@ -10,6 +10,7 @@ log
 validate
 validate-appmap
 patch
+peer
 file
 time
 group

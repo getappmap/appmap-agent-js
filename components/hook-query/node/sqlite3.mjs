@@ -1,4 +1,5 @@
 import { toString, spyOnce, assignProperty } from "../../util/index.mjs";
+import { requirePeerDependency } from "../../peer/index.mjs";
 import {
   getFreshTab,
   recordBeginEvent,
@@ -9,7 +10,6 @@ import {
   getAnswerPayload,
   getBundlePayload,
 } from "../../agent/index.mjs";
-import { requireMaybe } from "./require.mjs";
 
 const {
   Object,
@@ -104,7 +104,12 @@ export const hook = (
   agent,
   { repository: { directory }, hooks: { sqlite3 } },
 ) => {
-  const Sqlite3 = requireMaybe(sqlite3, directory, "sqlite3");
+  const Sqlite3 = sqlite3
+    ? requirePeerDependency("sqlite3", {
+        directory,
+        strict: true,
+      })
+    : null;
   if (Sqlite3 === null) {
     return [];
   }

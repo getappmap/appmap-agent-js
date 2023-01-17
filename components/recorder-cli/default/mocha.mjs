@@ -1,9 +1,9 @@
-import { createRequire } from "node:module";
 import { hooks } from "../../../lib/node/mocha-hook.mjs";
 import { ExternalAppmapError } from "../../error/index.mjs";
-import { logError, logErrorWhen } from "../../log/index.mjs";
+import { logErrorWhen } from "../../log/index.mjs";
 import { hook } from "../../hook/index.mjs";
 import { assert, coalesce, matchVersion } from "../../util/index.mjs";
+import { requirePeerDependency } from "../../peer/index.mjs";
 import {
   openAgent,
   recordStartTrack,
@@ -44,15 +44,12 @@ const validateMocha = (Mocha) => {
 };
 
 export const record = (configuration) => {
-  let Mocha = null;
-  const require = createRequire(import.meta.url);
-  try {
-    Mocha = require("mocha");
-  } /* c8 ignore start */ catch (error) {
-    logError("Failed to load mocha module >> %o", error);
-    throw new ExternalAppmapError("Failed to load mocha module");
-  } /* c8 ignore stop */
-  validateMocha(Mocha);
+  validateMocha(
+    requirePeerDependency("mocha", {
+      directory: configuration.repository.directory,
+      strict: true,
+    }),
+  );
   const agent = openAgent(configuration);
   hook(agent, configuration);
   let running = null;

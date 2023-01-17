@@ -1,7 +1,7 @@
-import { version } from "node:process";
+import { version, cwd } from "node:process";
 import { mochaHooks as hooks } from "../../../lib/node/mocha-hook.mjs";
 import "../../__fixture__.mjs";
-import { convertFileUrlToPath } from "../../path/index.mjs";
+import { convertPathToFileUrl, toDirectoryPath } from "../../path/index.mjs";
 import {
   createConfiguration,
   extendConfiguration,
@@ -12,7 +12,7 @@ import { record } from "./mocha.mjs";
 record(
   extendConfigurationNode(
     extendConfiguration(
-      createConfiguration("file:///w:/home/"),
+      createConfiguration(convertPathToFileUrl(toDirectoryPath(cwd()))),
       {
         recorder: "mocha",
         hooks: { cjs: false, esm: false, apply: false, http: false },
@@ -20,7 +20,7 @@ record(
       "file:///w:/base/",
     ),
     {
-      cwd: () => convertFileUrlToPath("file:///w:/cwd"),
+      cwd,
       argv: ["node", "main.mjs"],
       version,
     },

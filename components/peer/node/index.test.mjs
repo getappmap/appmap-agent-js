@@ -1,10 +1,9 @@
 import { mkdir as mkdirAsync, writeFile as writeFileAsync } from "fs/promises";
-import { assertEqual } from "../../__fixture__.mjs";
-
+import { assertEqual, assertThrow } from "../../__fixture__.mjs";
 import { getTmpUrl } from "../../path/index.mjs";
 import { getUuid } from "../../uuid/random/index.mjs";
 import { toAbsoluteUrl } from "../../url/index.mjs";
-import { requireMaybe } from "./require.mjs";
+import { requirePeerDependency } from "./index.mjs";
 
 const {
   URL,
@@ -33,16 +32,26 @@ await writeFileAsync(
 );
 
 assertEqual(
-  requireMaybe(true, toAbsoluteUrl(`${uuid}/`, getTmpUrl()), "foo"),
+  requirePeerDependency("foo", {
+    directory: toAbsoluteUrl(`${uuid}/`, getTmpUrl()),
+    strict: true,
+  }),
   123,
 );
 
 assertEqual(
-  requireMaybe(false, toAbsoluteUrl(`${uuid}/`, getTmpUrl()), "foo"),
+  requirePeerDependency(getUuid(), {
+    directory: toAbsoluteUrl(`${uuid}/`, getTmpUrl()),
+    strict: false,
+  }),
   null,
 );
 
-assertEqual(
-  requireMaybe(true, toAbsoluteUrl(`${uuid}/`, getTmpUrl()), getUuid()),
-  null,
+assertThrow(
+  () =>
+    requirePeerDependency(getUuid(), {
+      directory: toAbsoluteUrl(`${uuid}/`, getTmpUrl()),
+      strict: true,
+    }),
+  /^ExternalAppmapError: Could not load peer dependency$/u,
 );

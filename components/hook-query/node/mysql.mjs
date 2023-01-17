@@ -1,4 +1,5 @@
 import { toString, spyOnce, assignProperty } from "../../util/index.mjs";
+import { requirePeerDependency } from "../../peer/index.mjs";
 import {
   getFreshTab,
   recordBeginEvent,
@@ -9,7 +10,6 @@ import {
   getAnswerPayload,
   getBundlePayload,
 } from "../../agent/index.mjs";
-import { requireMaybe } from "./require.mjs";
 
 const {
   Object,
@@ -27,7 +27,12 @@ export const hook = (
   agent,
   { repository: { directory }, hooks: { mysql } },
 ) => {
-  const Mysql = requireMaybe(mysql, directory, "mysql");
+  const Mysql = mysql
+    ? requirePeerDependency("sqlite3", {
+        directory,
+        strict: true,
+      })
+    : null;
   if (Mysql === null) {
     return [];
   }
