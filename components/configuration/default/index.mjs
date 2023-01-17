@@ -11,8 +11,6 @@ const {
   Object: { entries: toEntries },
 } = globalThis;
 
-const HOOK_ESM_GLOBAL = "APPMAP_HOOK_ESM";
-
 const HOOK_APPLY_GLOBAL = "APPMAP_HOOK_APPLY";
 
 const HOOK_EVAL_GLOBAL = "APPMAP_HOOK_EVAL";
@@ -88,14 +86,6 @@ const normalizeHooks = (hooks, _base) => {
             aliases: hooks.eval ? ["eval"] : [],
           }
         : hooks.eval;
-  }
-  if (hasOwnProperty(hooks, "esm")) {
-    hooks.esm =
-      typeof hooks.esm === "boolean"
-        ? hooks.esm
-          ? HOOK_ESM_GLOBAL
-          : null
-        : hooks.esm;
   }
   if (hasOwnProperty(hooks, "apply")) {
     hooks.apply =
@@ -496,7 +486,7 @@ export const createConfiguration = (home) => ({
       hidden: HOOK_EVAL_GLOBAL,
       aliases: [],
     },
-    esm: HOOK_ESM_GLOBAL,
+    esm: true,
     cjs: true,
     http: true,
     mysql: true,

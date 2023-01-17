@@ -1,3 +1,4 @@
+import { hooks } from "../../../lib/node/loader-esm.mjs";
 import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
 import { createConfiguration } from "../../configuration/index.mjs";
 import { testHookAsync } from "../../hook-fixture/index.mjs";
@@ -10,7 +11,7 @@ assertDeepEqual(
     HookEsm,
     {
       configuration: {
-        hooks: { apply: false, esm: "GLOBAL" },
+        hooks: { apply: false, esm: true },
         packages: [
           {
             regexp: "^",
@@ -23,7 +24,7 @@ assertDeepEqual(
     async () => {
       // transformSource //
       {
-        const { source } = await globalThis.GLOBAL.transformSource(
+        const { source } = await hooks.transformSource(
           "123;",
           { url: "protocol://host/foo", format: "module" },
           (content, _context, _next) => ({ source: content }),
@@ -32,7 +33,7 @@ assertDeepEqual(
       }
       // load //
       {
-        const { format, source } = await globalThis.GLOBAL.load(
+        const { format, source } = await hooks.load(
           "protocol://host/bar",
           "context",
           (_url, _context, _next) => ({
@@ -45,7 +46,7 @@ assertDeepEqual(
       }
       // bypass //
       {
-        const { format, source } = await globalThis.GLOBAL.load(
+        const { format, source } = await hooks.load(
           "protocol://host/qux",
           "context",
           (_url, _context, _next) => ({

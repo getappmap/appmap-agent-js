@@ -99,9 +99,7 @@ properties:
       cjs:
         type: boolean
       esm:
-        anyOf:
-          - const: null
-          - $ref: identifier-regular
+        type: boolean
       eval:
         type: object
         properties:

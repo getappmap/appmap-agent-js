@@ -65,10 +65,7 @@ properties:
       cjs:
         type: boolean
       esm:
-        anyOf:
-          - type: boolean
-          - const: null
-          - $ref: identifier-regular
+        type: boolean
       eval:
         anyOf:
           - type: boolean
