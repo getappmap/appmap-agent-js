@@ -3,3 +3,10 @@ command: npx jest
 appmap_dir: .
 hooks:
   cjs: true
+  esm: false
+  apply: false
+  eval: false
+  http: false
+  mysql: false
+  pg: false
+  sqlite3: false

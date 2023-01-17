@@ -6,6 +6,11 @@ command: node main.mjs
 appmap_dir: .
 appmap_file: main
 hooks:
+  cjs: false
   esm: true
   apply: false
+  eval: false
   http: true
+  mysql: false
+  pg: false
+  sqlite3: false

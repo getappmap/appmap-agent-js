@@ -19,7 +19,16 @@ for (const enabled of [false, true]) {
       {
         processes: [{ regexp: "", enabled }],
         recorder: "process",
-        hooks: { cjs: false, esm: false, apply: false, http: false },
+        hooks: {
+          cjs: false,
+          esm: false,
+          eval: false,
+          apply: false,
+          http: false,
+          mysql: false,
+          pg: false,
+          sqlite3: false,
+        },
       },
       "file:///w:/base/",
     ),

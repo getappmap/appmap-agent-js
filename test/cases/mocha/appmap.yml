@@ -5,4 +5,11 @@ packages:
 command: npx mocha '*.test.mjs'
 appmap_dir: .
 hooks:
+  cjs: false
   esm: true
+  apply: false
+  eval: false
+  http: false
+  mysql: false
+  pg: false
+  sqlite3: false

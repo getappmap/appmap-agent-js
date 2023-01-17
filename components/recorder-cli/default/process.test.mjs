@@ -14,8 +14,17 @@ record(
       createConfiguration("file:///w:/home/"),
       {
         processes: [{ regexp: "", enabled: true }],
-        hooks: { cjs: false, esm: false, apply: false, http: false },
         recorder: "remote",
+        hooks: {
+          cjs: false,
+          esm: false,
+          eval: false,
+          apply: false,
+          http: false,
+          mysql: false,
+          pg: false,
+          sqlite3: false,
+        },
       },
       "file:///w:/base/",
     ),

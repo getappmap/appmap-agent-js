@@ -15,7 +15,16 @@ const configuration = extendConfiguration(
     name: "name1",
     recorder: "manual",
     packages: ["*"],
-    hooks: { cjs: false, esm: false, apply: false, http: false },
+    hooks: {
+      cjs: false,
+      esm: false,
+      eval: false,
+      apply: false,
+      http: false,
+      mysql: false,
+      pg: false,
+      sqlite3: false,
+    },
   },
   "protocol://host/base/",
 );

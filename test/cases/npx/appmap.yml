@@ -2,9 +2,6 @@ command: npx bin-sample
 appmap_dir: .
 appmap_file: bin-sample
 recorder: process
-hooks:
-  cjs: true
-  apply: true
 packages:
   - dist: bin-sample
     enabled: true
@@ -14,3 +11,12 @@ processes:
   - regexp: ^../
     enabled: false
 pruning: false
+hooks:
+  cjs: true
+  esm: false
+  apply: true
+  eval: false
+  http: false
+  mysql: false
+  pg: false
+  sqlite3: false

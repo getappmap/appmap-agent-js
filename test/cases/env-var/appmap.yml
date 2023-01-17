@@ -4,5 +4,11 @@ packages:
 command: FOO=BAR npx mocha '*.test.mjs'
 appmap_dir: .
 hooks:
+  cjs: false
   esm: true
+  eval: false
   apply: true
+  http: false
+  mysql: false
+  pg: false
+  sqlite3: false

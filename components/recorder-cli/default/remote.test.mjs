@@ -15,7 +15,16 @@ record(
       {
         processes: [{ regexp: "", enabled: true }],
         recorder: "remote",
-        hooks: { cjs: false, esm: false, apply: false, http: false },
+        hooks: {
+          cjs: false,
+          esm: false,
+          eval: false,
+          apply: false,
+          http: false,
+          mysql: false,
+          pg: false,
+          sqlite3: false,
+        },
       },
       "file:///w:/base/",
     ),
