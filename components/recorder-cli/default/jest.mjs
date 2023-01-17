@@ -1,8 +1,7 @@
-import { createRequire } from "node:module";
 import { ExternalAppmapError } from "../../error/index.mjs";
-import { logErrorWhen, logError } from "../../log/index.mjs";
+import { logErrorWhen } from "../../log/index.mjs";
 import { hook } from "../../hook/index.mjs";
-import { assert } from "../../util/index.mjs";
+import { assert, hasOwnProperty } from "../../util/index.mjs";
 import {
   openAgent,
   recordStartTrack,
@@ -12,15 +11,33 @@ import {
 const { String } = globalThis;
 
 export const record = (configuration) => {
-  let Jest = null;
-  const require = createRequire(import.meta.url);
-  try {
-    Jest = require("@jest/globals");
-  } /* c8 ignore start */ catch (error) {
-    logError("Failed to load @jest/globals module >> %o", error);
-    throw new ExternalAppmapError("Failed to load @jest/globals module");
-  } /* c8 ignore stop */
-  const { beforeEach, afterEach, expect } = Jest;
+  // I would prefer to use require rather that global variable:
+  //
+  // const { beforeEach, afterEach, expect } = requirePeerDependency(
+  //   "@jest/globals",
+  //   {
+  //     directory: configuration.repository.directory,
+  //     strict: true,
+  //   },
+  // );
+  //
+  // But this breaks an invariant in Jest:
+  //
+  // Error: There should always be a Jest object already
+  //
+  // Which might be a bug in jest related to `createRequire`.
+  for (const name of ["beforeEach", "afterEach", "expect"]) {
+    assert(
+      !logErrorWhen(
+        !hasOwnProperty(globalThis, "beforeEach"),
+        "Missing jest-related global variable: %s",
+        name,
+      ),
+      "Missing jest-related global variable",
+      ExternalAppmapError,
+    );
+  }
+  const { beforeEach, afterEach, expect } = globalThis;
   const agent = openAgent(configuration);
   hook(agent, configuration);
   let running = null;

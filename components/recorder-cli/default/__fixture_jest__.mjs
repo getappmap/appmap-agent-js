@@ -11,12 +11,10 @@ import { record } from "./jest.mjs";
 
 const { test: testJest } = Jest;
 
-const configuration = createConfiguration("file:///w:/home/");
-
 record(
   extendConfigurationNode(
     extendConfiguration(
-      configuration,
+      createConfiguration("file:///w:/home/"),
       {
         processes: [{ regexp: "", enabled: true }],
         hooks: { cjs: false, esm: false, apply: false, http: false },
