@@ -90,6 +90,7 @@ properties:
     required:
       - cjs
       - esm
+      - eval
       - apply
       - http
       - mysql
@@ -117,10 +118,13 @@ properties:
         type: boolean
       mysql:
         type: boolean
+        nullable: true
       pg:
         type: boolean
+        nullable: true
       sqlite3:
         type: boolean
+        nullable: true
   ordering:
     $ref: ordering
   default-process:

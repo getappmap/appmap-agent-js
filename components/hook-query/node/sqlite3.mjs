@@ -104,145 +104,138 @@ export const hook = (
   agent,
   { repository: { directory }, hooks: { sqlite3 } },
 ) => {
-  const Sqlite3 = sqlite3
-    ? requirePeerDependency("sqlite3", {
-        directory,
-        strict: true,
-      })
-    : null;
-  if (Sqlite3 === null) {
+  if (sqlite3 === false) {
     return [];
+  } else {
+    const Sqlite3 = requirePeerDependency("sqlite3", {
+      directory,
+      strict: sqlite3 === true,
+    });
+    /* c8 ignore start */ if (Sqlite3 === null) {
+      return [];
+    } /* c8 ignore stop */ else {
+      const bundle_payload = getBundlePayload(agent);
+      const answer_payload = getAnswerPayload(agent);
+      const { Database } = Sqlite3;
+      const { prototype: database_prototype } = Database;
+      const backup = ["run", "get", "all", "each", "prepare"].map((key) => ({
+        object: database_prototype,
+        key,
+        value: database_prototype[key],
+      }));
+      const copy = { ...database_prototype };
+      const recordQuery = (sql, parameters, callback) => {
+        const bundle_tab = getFreshTab(agent);
+        const jump_tab = getFreshTab(agent);
+        recordBeginEvent(agent, bundle_tab, bundle_payload);
+        recordBeforeEvent(
+          agent,
+          jump_tab,
+          formatQueryPayload(
+            agent,
+            DATABASE,
+            VERSION,
+            toString(sql),
+            Object(parameters),
+          ),
+        );
+        return spyOnce(() => {
+          recordAfterEvent(agent, jump_tab, answer_payload);
+          recordEndEvent(agent, bundle_tab, bundle_payload);
+        }, callback);
+      };
+      /////////////////////////////////
+      // Direct Database method call //
+      /////////////////////////////////
+      database_prototype.each = function each(...args) {
+        const each = extractEach(args);
+        const { sql, parameters, callback } = normalizeDatabaseArguments(args);
+        return apply(copy.each, this, [
+          sql,
+          parameters,
+          each,
+          recordQuery(sql, parameters, callback),
+        ]);
+      };
+      for (const key of ["run", "all", "get"]) {
+        database_prototype[key] = function (...args) {
+          const { sql, parameters, callback } =
+            normalizeDatabaseArguments(args);
+          return apply(copy[key], this, [
+            sql,
+            parameters,
+            recordQuery(sql, parameters, callback),
+          ]);
+        };
+      }
+      // Database.prototype.exec is immutable :(
+      // database_prototype.exec = function exec (...args) {
+      //   const {sql, callback} = normalizeDatabaseArguments(args);
+      //   return apply(
+      //     save.exec,
+      //     this,
+      //     [sql, recordQuery(sql, null, callback)]
+      //   );
+      // }
+      ////////////////////////
+      // Prepared Statement //
+      ////////////////////////
+      // NB: Statement.prototype is largely immutable, that is why we need
+      // to perform object composition instead of simple prototype assignments.
+      function Statement(database, sql, parameters, callback) {
+        const statement = apply(copy.prepare, database, [sql, callback]);
+        statement._appmap_statement = this;
+        this._appmap_statement = statement;
+        this._appmap_sql = sql;
+        this._appmap_parameters = parameters;
+      }
+      const { prototype: statement_prototype } = Statement;
+      assign(statement_prototype, {
+        run: null,
+        all: null,
+        get: null,
+        each: function each(...args) {
+          const each = extractEach(args);
+          let { parameters, callback } = normalizeStatementArguments(args);
+          parameters = combine(this._appmap_parameters, parameters);
+          this._appmap_statement.each(
+            parameters,
+            each,
+            recordQuery(this._appmap_sql, parameters, callback),
+          );
+          return this;
+        },
+        bind: function bind(...args) {
+          const { parameters, callback } = normalizeStatementArguments(args);
+          this._appmap_parameters = parameters;
+          this._appmap_statement.reset(callback);
+          return this;
+        },
+        reset: function reset(callback) {
+          this._appmap_statement.reset(callback);
+          return this;
+        },
+        finalize: function finalize(callback) {
+          this._appmap_statement.finalize(callback);
+          return this;
+        },
+      });
+      for (const key of ["run", "all", "get"]) {
+        statement_prototype[key] = function (...args) {
+          let { parameters, callback } = normalizeStatementArguments(args);
+          parameters = combine(this._appmap_parameters, parameters);
+          this._appmap_statement[key](
+            parameters,
+            recordQuery(this._appmap_sql, parameters, callback),
+          );
+          return this;
+        };
+      }
+      database_prototype.prepare = function (...args) {
+        const { sql, parameters, callback } = normalizeDatabaseArguments(args);
+        return new Statement(this, sql, parameters, callback);
+      };
+      return backup;
+    }
   }
-  const bundle_payload = getBundlePayload(agent);
-  const answer_payload = getAnswerPayload(agent);
-  const { Database } = Sqlite3;
-  const { prototype: database_prototype } = Database;
-  const backup = ["run", "get", "all", "each", "prepare"].map((key) => ({
-    object: database_prototype,
-    key,
-    value: database_prototype[key],
-  }));
-  const copy = { ...database_prototype };
-
-  const recordQuery = (sql, parameters, callback) => {
-    const bundle_tab = getFreshTab(agent);
-    const jump_tab = getFreshTab(agent);
-    recordBeginEvent(agent, bundle_tab, bundle_payload);
-    recordBeforeEvent(
-      agent,
-      jump_tab,
-      formatQueryPayload(
-        agent,
-        DATABASE,
-        VERSION,
-        toString(sql),
-        Object(parameters),
-      ),
-    );
-    return spyOnce(() => {
-      recordAfterEvent(agent, jump_tab, answer_payload);
-      recordEndEvent(agent, bundle_tab, bundle_payload);
-    }, callback);
-  };
-
-  /////////////////////////////////
-  // Direct Database method call //
-  /////////////////////////////////
-
-  database_prototype.each = function each(...args) {
-    const each = extractEach(args);
-    const { sql, parameters, callback } = normalizeDatabaseArguments(args);
-    return apply(copy.each, this, [
-      sql,
-      parameters,
-      each,
-      recordQuery(sql, parameters, callback),
-    ]);
-  };
-
-  for (const key of ["run", "all", "get"]) {
-    database_prototype[key] = function (...args) {
-      const { sql, parameters, callback } = normalizeDatabaseArguments(args);
-      return apply(copy[key], this, [
-        sql,
-        parameters,
-        recordQuery(sql, parameters, callback),
-      ]);
-    };
-  }
-
-  // Database.prototype.exec is immutable :(
-  // database_prototype.exec = function exec (...args) {
-  //   const {sql, callback} = normalizeDatabaseArguments(args);
-  //   return apply(
-  //     save.exec,
-  //     this,
-  //     [sql, recordQuery(sql, null, callback)]
-  //   );
-  // }
-
-  ////////////////////////
-  // Prepared Statement //
-  ////////////////////////
-
-  // NB: Statement.prototype is largely immutable, that is why we need
-  // to perform object composition instead of simple prototype assignments.
-
-  function Statement(database, sql, parameters, callback) {
-    const statement = apply(copy.prepare, database, [sql, callback]);
-    statement._appmap_statement = this;
-    this._appmap_statement = statement;
-    this._appmap_sql = sql;
-    this._appmap_parameters = parameters;
-  }
-  const { prototype: statement_prototype } = Statement;
-  assign(statement_prototype, {
-    run: null,
-    all: null,
-    get: null,
-    each: function each(...args) {
-      const each = extractEach(args);
-      let { parameters, callback } = normalizeStatementArguments(args);
-      parameters = combine(this._appmap_parameters, parameters);
-      this._appmap_statement.each(
-        parameters,
-        each,
-        recordQuery(this._appmap_sql, parameters, callback),
-      );
-      return this;
-    },
-    bind: function bind(...args) {
-      const { parameters, callback } = normalizeStatementArguments(args);
-      this._appmap_parameters = parameters;
-      this._appmap_statement.reset(callback);
-      return this;
-    },
-    reset: function reset(callback) {
-      this._appmap_statement.reset(callback);
-      return this;
-    },
-    finalize: function finalize(callback) {
-      this._appmap_statement.finalize(callback);
-      return this;
-    },
-  });
-
-  for (const key of ["run", "all", "get"]) {
-    statement_prototype[key] = function (...args) {
-      let { parameters, callback } = normalizeStatementArguments(args);
-      parameters = combine(this._appmap_parameters, parameters);
-      this._appmap_statement[key](
-        parameters,
-        recordQuery(this._appmap_sql, parameters, callback),
-      );
-      return this;
-    };
-  }
-
-  database_prototype.prepare = function (...args) {
-    const { sql, parameters, callback } = normalizeDatabaseArguments(args);
-    return new Statement(this, sql, parameters, callback);
-  };
-
-  return backup;
 };
