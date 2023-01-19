@@ -17,7 +17,7 @@ export const doesSupportSource = (source, shell) =>
 
 export const doesSupportTokens = (tokens) => sniffTokens(tokens, "mocha");
 
-export const hookCommandSource = (source, shell, base) => {
+export const hookCommandSourceAsync = (source, shell, base) => {
   const groups = parseSource(source);
   return [
     `${groups.exec} --require ${escapeShell(
@@ -27,7 +27,7 @@ export const hookCommandSource = (source, shell, base) => {
   ];
 };
 
-export const hookCommandTokens = (tokens, base) => {
+export const hookCommandTokensAsync = (tokens, base) => {
   const { exec, argv } = splitTokens(tokens);
   return [
     ...exec,

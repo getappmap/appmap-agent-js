@@ -4,7 +4,7 @@ export const {
   recursive,
   doesSupportSource,
   doesSupportTokens,
-  hookCommandSource,
-  hookCommandTokens,
+  hookCommandSourceAsync,
+  hookCommandTokensAsync,
   hookEnvironment,
 } = generateNodeRecorder("remote");

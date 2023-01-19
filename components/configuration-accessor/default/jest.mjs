@@ -17,7 +17,7 @@ export const doesSupportSource = (source, shell) =>
 
 export const doesSupportTokens = (tokens) => sniffTokens(tokens, "jest");
 
-export const hookCommandSource = (source, shell, base) => {
+export const hookCommandSourceAsync = async (source, shell, base) => {
   const groups = parseSource(source, shell);
   return [
     `${groups.exec} --runInBand --setupFilesAfterEnv ${escapeShell(
@@ -27,7 +27,7 @@ export const hookCommandSource = (source, shell, base) => {
   ];
 };
 
-export const hookCommandTokens = (tokens, base) => {
+export const hookCommandTokensAsync = async (tokens, base) => {
   const { exec, argv } = splitTokens(tokens);
   return [
     ...exec,

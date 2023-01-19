@@ -8,7 +8,7 @@ import { spawn } from "../../spawn/index.mjs";
 import {
   getConfigurationScenarios,
   resolveConfigurationRepository,
-  compileConfigurationCommand,
+  compileConfigurationCommandAsync,
   resolveConfigurationAutomatedRecorder,
 } from "../../configuration-accessor/index.mjs";
 import {
@@ -67,7 +67,7 @@ export const mainAsync = async (process, configuration) => {
     const receptor = await createReceptorAsync(configuration);
     configuration = adaptReceptorConfiguration(receptor, configuration);
     const description = getCommandDescription(configuration.command);
-    const command = compileConfigurationCommand(configuration, env);
+    const command = await compileConfigurationCommandAsync(configuration, env);
     logDebug("spawn child command = %j", command);
     subprocess = spawn(command.exec, command.argv, command.options);
     const { signal, status } = await new Promise((resolve, reject) => {

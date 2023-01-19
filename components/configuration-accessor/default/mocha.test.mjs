@@ -3,8 +3,8 @@ import { fileURLToPath } from "node:url";
 import {
   doesSupportSource,
   doesSupportTokens,
-  hookCommandSource,
-  hookCommandTokens,
+  hookCommandSourceAsync,
+  hookCommandTokensAsync,
   hookEnvironment,
 } from "./mocha.mjs";
 
@@ -18,13 +18,13 @@ const recorder_url = "file:///A:/base/lib/node/recorder.mjs";
 
 // source //
 assertEqual(doesSupportSource("mocha --argv", "/bin/sh"), true);
-assertDeepEqual(hookCommandSource("mocha --argv", "/bin/sh", base), [
+assertDeepEqual(await hookCommandSourceAsync("mocha --argv", "/bin/sh", base), [
   `mocha --require ${hook_path.replace(/\\/gu, "\\\\")} --argv`,
 ]);
 
 // tokens //
 assertEqual(doesSupportTokens(["mocha", "--argv"]), true);
-assertDeepEqual(hookCommandTokens(["mocha", "--argv"], base), [
+assertDeepEqual(await hookCommandTokensAsync(["mocha", "--argv"], base), [
   "mocha",
   "--require",
   hook_path,

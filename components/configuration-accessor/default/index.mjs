@@ -208,7 +208,7 @@ export const getConfigurationScenarios = (configuration) => {
     );
 };
 
-export const compileConfigurationCommand = (configuration, env) => {
+export const compileConfigurationCommandAsync = async (configuration, env) => {
   assert(
     configuration.agent !== null,
     "missing agent in configuration",
@@ -229,7 +229,7 @@ export const compileConfigurationCommand = (configuration, env) => {
     ...options.env,
     APPMAP_CONFIGURATION: stringifyJSON(configuration),
   };
-  const { hookCommandSource, hookCommandTokens, hookEnvironment } =
+  const { hookCommandSourceAsync, hookCommandTokensAsync, hookEnvironment } =
     recorders.find(
       (recorder) =>
         (recorder.recursive === null ||
@@ -239,8 +239,12 @@ export const compileConfigurationCommand = (configuration, env) => {
     );
   const [exec, ...argv] =
     tokens === null
-      ? hookCommandSource(source, resolveShell(options.shell, env), directory)
-      : hookCommandTokens(tokens, directory);
+      ? await hookCommandSourceAsync(
+          source,
+          resolveShell(options.shell, env),
+          directory,
+        )
+      : await hookCommandTokensAsync(tokens, directory);
   return {
     exec,
     argv,

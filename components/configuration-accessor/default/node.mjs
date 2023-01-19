@@ -46,7 +46,7 @@ export const generateNodeRecorder = (recorder) => ({
   doesSupportTokens,
   recursive: false,
   name: recorder,
-  hookCommandSource: (source, shell, base) => {
+  hookCommandSourceAsync: (source, shell, base) => {
     const groups = parseNodeCommand(source);
     return [
       `${groups.exec} --experimental-loader ${escapeShell(
@@ -55,7 +55,7 @@ export const generateNodeRecorder = (recorder) => ({
       )}${groups.argv}`,
     ];
   },
-  hookCommandTokens: (tokens, base) => {
+  hookCommandTokensAsync: (tokens, base) => {
     const { exec, argv } = splitNodeCommand(tokens);
     return [
       ...exec,

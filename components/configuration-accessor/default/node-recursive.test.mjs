@@ -6,8 +6,8 @@ const {
   recursive,
   doesSupportSource,
   doesSupportTokens,
-  hookCommandSource,
-  hookCommandTokens,
+  hookCommandSourceAsync,
+  hookCommandTokensAsync,
   hookEnvironment,
 } = generateNodeRecorder("process");
 
@@ -20,11 +20,13 @@ assertEqual(recursive, true);
 
 assertEqual(doesSupportSource("source"), true);
 
-assertDeepEqual(hookCommandSource("source", "/bin/sh", base), ["source"]);
+assertDeepEqual(await hookCommandSourceAsync("source", "/bin/sh", base), [
+  "source",
+]);
 
 assertEqual(doesSupportTokens(["token"]), true);
 
-assertDeepEqual(hookCommandTokens(["token"], base), ["token"]);
+assertDeepEqual(await hookCommandTokensAsync(["token"], base), ["token"]);
 
 assertDeepEqual(
   hookEnvironment({ FOO: "bar", NODE_OPTIONS: "options" }, base),

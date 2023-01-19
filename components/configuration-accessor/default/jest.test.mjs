@@ -3,8 +3,8 @@ import { fileURLToPath } from "node:url";
 import {
   doesSupportSource,
   doesSupportTokens,
-  hookCommandSource,
-  hookCommandTokens,
+  hookCommandSourceAsync,
+  hookCommandTokensAsync,
   hookEnvironment,
 } from "./jest.mjs";
 
@@ -18,8 +18,8 @@ const loader_url = "file:///A:/base/lib/node/loader-esm.mjs";
 
 // source //
 assertEqual(doesSupportSource("jest --argv", "/bin/sh"), true);
-assertDeepEqual(hookCommandSource("jest --argv", "/bin/sh", base), [
   `jest --runInBand --setupFilesAfterEnv ${recorder_path.replace(
+assertDeepEqual(await hookCommandSourceAsync("jest --argv", "/bin/sh", base), [
     /\\/gu,
     "\\\\",
   )} --argv`,
@@ -27,7 +27,7 @@ assertDeepEqual(hookCommandSource("jest --argv", "/bin/sh", base), [
 
 // tokens //
 assertEqual(doesSupportTokens(["jest", "--argv"]), true);
-assertDeepEqual(hookCommandTokens(["jest", "--argv"], base), [
+assertDeepEqual(await hookCommandTokensAsync(["jest", "--argv"], base), [
   "jest",
   "--runInBand",
   "--setupFilesAfterEnv",

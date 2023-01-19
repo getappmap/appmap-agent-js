@@ -17,7 +17,7 @@ import {
   isConfigurationEnabled,
   getConfigurationPackage,
   getConfigurationScenarios,
-  compileConfigurationCommand,
+  compileConfigurationCommandAsync,
 } from "./index.mjs";
 
 const {
@@ -268,11 +268,11 @@ assertEqual(
     extendConfigurationNode(createConfiguration("protocol://host/home/"), {
       version: "v1.2.3",
       argv: ["node", "main.js"],
-      cwd: () => convertFileUrlToPath("file:///w:/cwd"),
+      cwd: () => convertFileUrlToPath("file:///A:/cwd"),
     }),
     "main",
   ),
-  "file:///w:/cwd/main.js",
+  "file:///A:/cwd/main.js",
 );
 
 /////////////////////////////////
@@ -291,7 +291,7 @@ const stripEnvironmentConfiguration = ({
 // process >> source >> not-recursive //
 assertDeepEqual(
   stripEnvironmentConfiguration(
-    compileConfigurationCommand(
+    await compileConfigurationCommandAsync(
       extendConfiguration(
         createConfiguration("protocol://host/home/"),
         {
@@ -334,7 +334,7 @@ assertDeepEqual(
 // remote >> tokens >> recursive //
 assertDeepEqual(
   stripEnvironmentConfiguration(
-    compileConfigurationCommand(
+    await compileConfigurationCommandAsync(
       extendConfiguration(
         createConfiguration("protocol://host/home/"),
         {

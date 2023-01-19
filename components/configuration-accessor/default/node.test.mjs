@@ -6,8 +6,8 @@ const {
   recursive,
   doesSupportSource,
   doesSupportTokens,
-  hookCommandSource,
-  hookCommandTokens,
+  hookCommandSourceAsync,
+  hookCommandTokensAsync,
   hookEnvironment,
 } = generateNodeRecorder("process");
 
@@ -18,12 +18,13 @@ assertEqual(name, "process");
 assertEqual(recursive, false);
 
 assertEqual(doesSupportSource("node.ext main.mjs"), true);
-assertDeepEqual(hookCommandSource("node.ext main.mjs", "/bin/sh", base), [
-  `node.ext --experimental-loader ${recorder_url} main.mjs`,
-]);
+assertDeepEqual(
+  await hookCommandSourceAsync("node.ext main.mjs", "/bin/sh", base),
+  [`node.ext --experimental-loader ${recorder_url} main.mjs`],
+);
 
 assertEqual(doesSupportTokens(["node.ext", "main.mjs"]), true);
-assertDeepEqual(hookCommandTokens(["node.ext", "main.mjs"], base), [
+assertDeepEqual(await hookCommandTokensAsync(["node.ext", "main.mjs"], base), [
   "node.ext",
   "--experimental-loader",
   recorder_url,

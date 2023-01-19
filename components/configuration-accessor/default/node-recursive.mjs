@@ -11,8 +11,8 @@ export const generateNodeRecorder = (recorder) => ({
   recursive: true,
   doesSupportSource,
   doesSupportTokens,
-  hookCommandSource: (source, _shell, _base) => [source],
-  hookCommandTokens: (tokens, _base) => tokens,
+  hookCommandSourceAsync: (source, _shell, _base) => [source],
+  hookCommandTokensAsync: (tokens, _base) => tokens,
   hookEnvironment: (env, base) => ({
     ...env,
     NODE_OPTIONS: `${coalesce(
