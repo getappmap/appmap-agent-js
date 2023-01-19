@@ -2,9 +2,7 @@ import { generateNodeRecorder } from "./node.mjs";
 export const {
   name,
   recursive,
-  doesSupportSource,
-  doesSupportTokens,
-  hookCommandSourceAsync,
-  hookCommandTokensAsync,
+  doesSupport,
+  hookCommandAsync,
   hookEnvironment,
 } = generateNodeRecorder("remote");

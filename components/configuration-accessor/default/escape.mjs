@@ -1,8 +1,5 @@
 import { assert } from "../../util/index.mjs";
-import {
-  InternalAppmapError,
-  ExternalAppmapError,
-} from "../../error/index.mjs";
+import { InternalAppmapError } from "../../error/index.mjs";
 import { getShell } from "../../path/index.mjs";
 
 // NODE_OPTIONS format is not platform-specific
@@ -20,11 +17,6 @@ export const escapeNodeOption = (token) => {
   return token;
 };
 
-const escapePosix = (token) => token.replace(/[^a-zA-Z0-9\-_./:]/gu, "\\$&");
-
-// https://ss64.com/nt/syntax-esc.html
-const escapeWin32 = (token) => token.replace(/[^a-zA-Z0-9\-_./:\\]/gu, "^$&");
-
 export const resolveShell = (shell, env) => {
   if (shell === false) {
     return null;
@@ -32,19 +24,5 @@ export const resolveShell = (shell, env) => {
     return getShell(env);
   } else {
     return shell;
-  }
-};
-
-export const escapeShell = (shell, token) => {
-  if (typeof shell === "string") {
-    if (shell.endsWith("cmd") || shell.endsWith("cmd.exe")) {
-      return escapeWin32(token);
-    } else {
-      return escapePosix(token);
-    }
-  } else {
-    throw new ExternalAppmapError(
-      "Could not escape token because no shell was provided",
-    );
   }
 };

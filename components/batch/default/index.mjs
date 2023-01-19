@@ -63,7 +63,7 @@ export const mainAsync = async (process, configuration) => {
     return receptors.get(key);
   };
   const runConfigurationAsync = async (configuration, env) => {
-    configuration = resolveConfigurationAutomatedRecorder(configuration);
+    configuration = resolveConfigurationAutomatedRecorder(configuration, env);
     const receptor = await createReceptorAsync(configuration);
     configuration = adaptReceptorConfiguration(receptor, configuration);
     const description = getCommandDescription(configuration.command);

@@ -1,6 +1,6 @@
 import { assertDeepEqual } from "../../__fixture__.mjs";
 
-import { tokenizeShell, tokenizeCmdShell } from "./tokenize.mjs";
+import { tokenizeShell, tokenize } from "./tokenize.mjs";
 
 ///////////////////
 // tokenizeShell //
@@ -16,14 +16,18 @@ assertDeepEqual(tokenizeShell(` "foo \\" bar" `), [`"foo \\" bar"`]);
 
 assertDeepEqual(tokenizeShell(` '\\foo \\ bar\\' `), [`'\\foo \\ bar\\'`]);
 
-//////////////////////
-// tokenizeCmdShell //
-//////////////////////
+//////////////
+// tokenize //
+//////////////
 
-assertDeepEqual(tokenizeCmdShell("foo"), ["foo"]);
+assertDeepEqual(tokenize("foo bar", null), ["foo", "bar"]);
 
-assertDeepEqual(tokenizeCmdShell(" foo  bar "), ["foo", "bar"]);
+assertDeepEqual(tokenize("foo bar", "/bin/sh"), ["/bin/sh", "-c", "foo bar"]);
 
-assertDeepEqual(tokenizeCmdShell(" foo^ bar "), ["foo^ bar"]);
-
-assertDeepEqual(tokenizeCmdShell(` "^foo ^ bar^" `), [`"^foo ^ bar^"`]);
+assertDeepEqual(tokenize("foo bar", "cmd.exe"), [
+  "cmd.exe",
+  "/d",
+  "/s",
+  "/c",
+  '"foo bar"',
+]);

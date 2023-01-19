@@ -1,12 +1,6 @@
 import { assertDeepEqual, assertEqual } from "../../__fixture__.mjs";
 import { fileURLToPath } from "node:url";
-import {
-  doesSupportSource,
-  doesSupportTokens,
-  hookCommandSourceAsync,
-  hookCommandTokensAsync,
-  hookEnvironment,
-} from "./jest.mjs";
+import { doesSupport, hookCommandAsync, hookEnvironment } from "./jest.mjs";
 
 const base = "file:///A:/base/";
 const recorder_path = fileURLToPath("file:///A:/base/lib/node/recorder.mjs");
@@ -16,18 +10,9 @@ const loader_url = "file:///A:/base/lib/node/loader-esm.mjs";
 // mocha --argv //
 //////////////////
 
-// source //
-assertEqual(doesSupportSource("jest --argv", "/bin/sh"), true);
-  `jest --runInBand --setupFilesAfterEnv ${recorder_path.replace(
-assertDeepEqual(await hookCommandSourceAsync("jest --argv", "/bin/sh", base), [
-    /\\/gu,
-    "\\\\",
-  )} --argv`,
-]);
 
-// tokens //
-assertEqual(doesSupportTokens(["jest", "--argv"]), true);
-assertDeepEqual(await hookCommandTokensAsync(["jest", "--argv"], base), [
+assertEqual(doesSupport(["jest", "--argv"]), true);
+assertDeepEqual(await hookCommandAsync(["jest", "--argv"], base), [
   "jest",
   "--runInBand",
   "--setupFilesAfterEnv",

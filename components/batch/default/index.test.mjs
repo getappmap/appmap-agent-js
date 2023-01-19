@@ -36,7 +36,13 @@ globalThis.GLOBAL_SPY_SPAWN = (exec, argv, _options) => {
   return emitter;
 };
 
-const configuration = createConfiguration("protocol://host/home");
+const configuration = extendConfiguration(
+  createConfiguration("protocol://host/home"),
+  {
+    "command-options": { shell: false },
+  },
+  "file:///A:/base/",
+);
 
 // no child
 {
