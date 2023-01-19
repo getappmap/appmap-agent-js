@@ -21,11 +21,15 @@ export const hook = (agent, { hooks: { cjs } }) => {
   const { _compile: original } = prototype;
   prototype._compile = function _compile(content1, path) {
     return apply(original, this, [
-      instrument(agent, {
-        url: convertPathToFileUrl(path),
-        content: content1,
-        type: "script",
-      }),
+      instrument(
+        agent,
+        {
+          url: convertPathToFileUrl(path),
+          content: content1,
+          type: "script",
+        },
+        null,
+      ),
       path,
     ]);
   };

@@ -57,11 +57,11 @@ export const getFreshTab = ({ frontend }) => getFrontendFreshTab(frontend);
 export const getSerializationEmptyValue = ({ frontend }) =>
   getFrontendSerializationEmptyValue(frontend);
 
-export const instrument = ({ frontend, emitter }, file) => {
+export const instrument = ({ frontend, emitter }, file, map) => {
   const { messages, content } = instrumentFrontend(
     frontend,
     file,
-    loadSourceMap(file),
+    loadSourceMap(file, map),
   );
   for (const message of messages) {
     sendEmitter(emitter, message);

@@ -64,15 +64,11 @@ export const getFreshTab = ({ counter }) => incrementCounter(counter);
 export const getSerializationEmptyValue = ({ serialization }) =>
   getSerializationEmptyValueInner(serialization);
 
-export const instrument = (
-  { instrumentation },
-  script_file,
-  source_map_file,
-) => {
+export const instrument = ({ instrumentation }, file, mapping) => {
   const { url, content, sources } = instrumentInner(
     instrumentation,
-    script_file,
-    source_map_file,
+    file,
+    mapping,
   );
   return {
     url,

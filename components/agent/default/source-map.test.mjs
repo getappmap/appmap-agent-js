@@ -15,10 +15,13 @@ const {
 
 assertEqual(
   mapSource(
-    loadSourceMap({
-      url: "http://host/main.js",
-      content: "123;",
-    }),
+    loadSourceMap(
+      {
+        url: "http://host/main.js",
+        content: "123;",
+      },
+      null,
+    ),
     456,
     789,
   ),
@@ -37,12 +40,33 @@ const mapping = {
 
 assertEqual(
   mapSource(
-    loadSourceMap({
-      url: "http://host/main.js",
-      content: `123; //# sourceMappingURL=data:,${encodeURIComponent(
-        stringifyJSON(mapping),
-      )}`,
-    }),
+    loadSourceMap(
+      {
+        url: "http://host/main.js",
+        content: `123;`,
+      },
+      {
+        url: "http://host/map.json",
+        content: mapping,
+      },
+    ),
+    456,
+    789,
+  ),
+  null,
+);
+
+assertEqual(
+  mapSource(
+    loadSourceMap(
+      {
+        url: "http://host/main.js",
+        content: `123; //# sourceMappingURL=data:,${encodeURIComponent(
+          stringifyJSON(mapping),
+        )}`,
+      },
+      null,
+    ),
     456,
     789,
   ),
@@ -53,10 +77,13 @@ const url = toAbsoluteUrl(getUuid(), getTmpUrl());
 
 assertEqual(
   mapSource(
-    loadSourceMap({
-      url: "http://host/main.js",
-      content: `123; //# sourceMappingURL=${url}`,
-    }),
+    loadSourceMap(
+      {
+        url: "http://host/main.js",
+        content: `123; //# sourceMappingURL=${url}`,
+      },
+      null,
+    ),
     456,
     789,
   ),
@@ -70,10 +97,13 @@ await writeFileAsync(new URL(url), stringifyJSON(mapping), "utf8");
 
 assertEqual(
   mapSource(
-    loadSourceMap({
-      url: "http://host/main.js",
-      content: `123; //# sourceMappingURL=${url}`,
-    }),
+    loadSourceMap(
+      {
+        url: "http://host/main.js",
+        content: `123; //# sourceMappingURL=${url}`,
+      },
+      null,
+    ),
     456,
     789,
   ),

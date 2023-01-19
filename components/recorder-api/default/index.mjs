@@ -66,11 +66,11 @@ export class Appmap {
   }
   instrumentScript(content, url) {
     expectRunning(this.hooking);
-    return instrument(this.agent, makeFile("script", content, url));
+    return instrument(this.agent, makeFile("script", content, url), null);
   }
   instrumentModule(content, url) {
     expectRunning(this.hooking);
-    return instrument(this.agent, makeFile("module", content, url));
+    return instrument(this.agent, makeFile("module", content, url), null);
   }
   recordScript(content, url) {
     expectRunning(this.hooking);

@@ -14,10 +14,6 @@ import {
   getSources,
 } from "./index.mjs";
 
-const {
-  JSON: { stringify: stringifyJSON },
-} = globalThis;
-
 const { SourceMapGenerator } = SourceMap;
 
 assertThrow(
@@ -107,12 +103,12 @@ assertEqual(
   mapSource(
     createSourceMap({
       url: "http://host/directory/map.json",
-      content: stringifyJSON({
+      content: {
         version: 3,
         sources: [],
         names: [],
         mappings: encodeVLQ([0, 0, 0, 0]),
-      }),
+      },
     }),
     1,
     0,
@@ -124,14 +120,14 @@ assertDeepEqual(
   getSources(
     createSourceMap({
       url: "http://host/directory/map.json",
-      content: stringifyJSON({
+      content: {
         version: 3,
         sourceRoot: "root",
         sources: ["source1.js", "source2.js"],
         sourcesContent: ["123;"],
         names: [],
         mappings: "",
-      }),
+      },
     }),
   ),
   [
@@ -144,12 +140,12 @@ assertDeepEqual(
   getSources(
     createSourceMap({
       url: "http://host/directory/map.json",
-      content: stringifyJSON({
+      content: {
         version: 3,
         sources: ["source.js"],
         names: [],
         mappings: "",
-      }),
+      },
     }),
   ),
   [{ url: "http://host/directory/source.js", content: null }],

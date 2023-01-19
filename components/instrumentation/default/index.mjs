@@ -39,7 +39,7 @@ const parseEstree = (type, content, url) => {
 
 export const instrument = (
   { configuration, done, counter },
-  { type, url, content },
+  { url, type, content },
   mapping,
 ) => {
   let sources = getSources(mapping);
