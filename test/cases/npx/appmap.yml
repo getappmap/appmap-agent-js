@@ -1,4 +1,5 @@
 command: npx bin-sample
+command-win32: npx.cmd bin-sample
 appmap_dir: .
 appmap_file: bin-sample
 recorder: process

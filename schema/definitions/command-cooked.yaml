@@ -1,0 +1,11 @@
+type: object
+nullable: true
+properties:
+  tokens:
+    type: array
+    nullable: true
+    items:
+      type: string
+  source:
+    type: string
+    nullable: true

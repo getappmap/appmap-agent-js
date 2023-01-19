@@ -15,11 +15,9 @@ properties:
   recursive-process-recording:
     type: boolean
   command:
-    anyOf:
-      - type: string
-      - type: array
-        items:
-          type: string
+    $ref: command
+  command-win32:
+    $ref: command
   command-options:
     $ref: command-options
   validate:

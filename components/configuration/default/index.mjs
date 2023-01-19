@@ -65,7 +65,7 @@ const normalizeExclusion = (exclusion, _base) => {
 };
 
 const normalizeCommandOptions = (options, base) => ({
-  shell: true,
+  shell: false,
   encoding: "utf8",
   env: {},
   stdio: "inherit",
@@ -271,6 +271,10 @@ const fields = {
     extend: overwrite,
     normalize: normalizeCommand,
   },
+  "command-win32": {
+    extend: overwrite,
+    normalize: normalizeCommand,
+  },
   "command-options": {
     extend: extendCommandOptions,
     normalize: normalizeCommandOptions,
@@ -431,9 +435,10 @@ export const createConfiguration = (home) => ({
   scenario: "^",
   "recursive-process-recording": true,
   command: null,
+  "command-win32": null,
   "command-options": {
     cwd: toAbsoluteUrl(".", home),
-    shell: true,
+    shell: false,
     encoding: "utf8",
     env: {},
     stdio: "inherit",

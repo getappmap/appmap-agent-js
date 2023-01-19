@@ -3,6 +3,7 @@ packages:
   path: main.mjs
   enabled: true
 command: npx mocha '*.test.mjs'
+command-win32: npx.cmd mocha '*.test.mjs'
 appmap_dir: .
 hooks:
   cjs: false

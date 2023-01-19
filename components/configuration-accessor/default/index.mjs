@@ -1,3 +1,4 @@
+import { platform } from "node:process";
 import { self_directory, self_package } from "../../self/index.mjs";
 import {
   toDirectoryPath,
@@ -8,7 +9,7 @@ import {
   InternalAppmapError,
   ExternalAppmapError,
 } from "../../error/index.mjs";
-import { assert } from "../../util/index.mjs";
+import { assert, hasOwnProperty } from "../../util/index.mjs";
 import { logWarningWhen, logError } from "../../log/index.mjs";
 import {
   extractRepositoryHistory,
@@ -72,6 +73,22 @@ export const resolveConfigurationRepository = (configuration) => {
     },
     directory,
   );
+};
+
+const platform_command_key = `command-${platform}`;
+
+export const pickPlatformSpecificCommand = (configuration) => {
+  if (
+    hasOwnProperty(configuration, platform_command_key) &&
+    configuration[platform_command_key] !== null
+  ) {
+    return {
+      ...configuration,
+      command: configuration[platform_command_key],
+    };
+  } else {
+    return configuration;
+  }
 };
 
 export const resolveConfigurationAutomatedRecorder = (configuration, env) => {

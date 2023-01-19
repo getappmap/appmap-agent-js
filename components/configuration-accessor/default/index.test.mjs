@@ -1,3 +1,4 @@
+import { platform } from "node:process";
 import {
   assertDeepEqual,
   assertEqual,
@@ -9,6 +10,7 @@ import {
   extendConfiguration,
 } from "../../configuration/index.mjs";
 import {
+  pickPlatformSpecificCommand,
   resolveConfigurationRepository,
   resolveConfigurationAutomatedRecorder,
   resolveConfigurationManualRecorder,
@@ -23,6 +25,27 @@ import {
 const {
   Reflect: { get },
 } = globalThis;
+
+/////////////////////////////////
+// pickPlatformSpecificCommand //
+/////////////////////////////////
+
+assertEqual(
+  get(
+    pickPlatformSpecificCommand(createConfiguration("protocol://host/home/")),
+    "command",
+  ),
+  null,
+);
+
+get(
+  pickPlatformSpecificCommand({
+    ...createConfiguration("protocol://host/home/"),
+    [`command-${platform}`]: { source: "foo", tokens: [] },
+  }),
+  "command",
+  { source: "foo", tokens: [] },
+);
 
 ////////////////////////////////////////
 // resolveConfigurationManualRecorder //

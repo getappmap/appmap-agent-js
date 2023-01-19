@@ -271,6 +271,7 @@ The agent filter code objects (functions or objects/classes) based on a format c
 ### Automated Recording Configuration Fields
 
 * `command <string> | <string[]>` The command to record. It is either a string or a list of tokens that will be escaped with single quotes. It follows that only simple commands can currently be executed -- eg: piping and chaining is not possible. This limitation might be lifted in the future.
+* `command-win32 <string> | <string[]>` Same as `command` but is preferred on Windows. This enables to configure a Windows-specific command such as `npx.cmd jest`.
 * `command-options <object>` Options to run the command, inspired by node's `child_process` library.
     * `shell null | string[]` An optional prefix for executing the command. If `null`, it will be `["/bin/sh", "-c"]` on unix-like platforms and `["cmd.exe", "/c"]` on windows (with support for the `ComSpec` environment variable).
     * `env <object>` Environment variables. Note that Unlike for the [child_process#spawn](https://nodejs.org/api/child_process.html#child_process_child_process_spawn_command_args_options), the environment variables from the parent process will always be included.

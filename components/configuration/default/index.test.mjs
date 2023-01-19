@@ -139,7 +139,7 @@ assertDeepEqual(
   ),
   {
     cwd: "protocol://host/base/",
-    shell: true,
+    shell: false,
     encoding: "utf8",
     env: { FOO: "BAR" },
     stdio: "inherit",
@@ -152,7 +152,7 @@ assertDeepEqual(
   extend("command-options", { cwd: "cwd" }, "protocol://host/base/"),
   {
     cwd: "protocol://host/base/cwd/",
-    shell: true,
+    shell: false,
     encoding: "utf8",
     env: {},
     stdio: "inherit",

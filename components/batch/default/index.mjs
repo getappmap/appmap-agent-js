@@ -1,11 +1,19 @@
+import { platform } from "node:process";
 import {
   InternalAppmapError,
   ExternalAppmapError,
 } from "../../error/index.mjs";
-import { assert } from "../../util/index.mjs";
-import { logError, logDebug, logInfo, logWarning } from "../../log/index.mjs";
+import { hasOwnProperty, assert } from "../../util/index.mjs";
+import {
+  logErrorWhen,
+  logError,
+  logDebug,
+  logInfo,
+  logWarning,
+} from "../../log/index.mjs";
 import { spawn } from "../../spawn/index.mjs";
 import {
+  pickPlatformSpecificCommand,
   getConfigurationScenarios,
   resolveConfigurationRepository,
   compileConfigurationCommandAsync,
@@ -25,6 +33,9 @@ const {
   clearTimeout,
   Promise,
 } = globalThis;
+
+const win32_enoent_message =
+  "This issue may be caused by a missing file extension which is sometimes required on Windows. For instance: `npx jest` should be `npx.cmd jest`. Note that it is possible to provide a windows-specific command with `command-win32`.";
 
 const getCommandDescription = ({ exec, argv }) => ({ exec, argv });
 const isCommandNonNull = ({ command }) => command !== null;
@@ -73,6 +84,14 @@ export const mainAsync = async (process, configuration) => {
     const { signal, status } = await new Promise((resolve, reject) => {
       subprocess.on("error", (error) => {
         logError("Child error %j >> %O", description, error);
+        logErrorWhen(
+          /* c8 ignore start */
+          hasOwnProperty(error, "code") &&
+            error.code === "ENOENT" &&
+            platform === "win32",
+          /* c8 ignore stop */
+          win32_enoent_message,
+        );
         reject(new ExternalAppmapError("Failed to spawn batch child process"));
       });
       subprocess.on("close", (status, signal) => {
@@ -90,7 +109,9 @@ export const mainAsync = async (process, configuration) => {
   const configurations = [
     configuration,
     ...getConfigurationScenarios(configuration),
-  ].filter(isCommandNonNull);
+  ]
+    .map(pickPlatformSpecificCommand)
+    .filter(isCommandNonNull);
   const { length } = configurations;
   try {
     if (length === 0) {

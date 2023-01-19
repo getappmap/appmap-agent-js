@@ -28,17 +28,9 @@ properties:
   recursive-process-recording:
     type: boolean
   command:
-    type: object
-    nullable: true
-    properties:
-      tokens:
-        type: array
-        nullable: true
-        items:
-          type: string
-      source:
-        type: string
-        nullable: true
+    $ref: command-cooked
+  command-win32:
+    $ref: command-cooked
   command-options:
     $ref: command-options-cooked
   validate:
