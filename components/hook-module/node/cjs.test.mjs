@@ -10,7 +10,7 @@ import { getTmpUrl, convertPathToFileUrl } from "../../path/index.mjs";
 import { toAbsoluteUrl } from "../../url/index.mjs";
 import { createConfiguration } from "../../configuration/index.mjs";
 import { testHookAsync } from "../../hook-fixture/index.mjs";
-import * as HookCjs from "./index.mjs";
+import * as HookCjs from "./cjs.mjs";
 
 const { URL } = globalThis;
 

@@ -2,7 +2,7 @@ import { hooks } from "../../../lib/node/loader-esm.mjs";
 import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
 import { createConfiguration } from "../../configuration/index.mjs";
 import { testHookAsync } from "../../hook-fixture/index.mjs";
-import * as HookEsm from "./index.mjs";
+import * as HookEsm from "./esm.mjs";
 
 const { eval: evalGlobal } = globalThis;
 

@@ -41,8 +41,7 @@ hook-error
 hook-exit
 hook-apply
 hook-group
-hook-cjs
-hook-esm
+hook-module
 hook-eval
 hook-query
 hook-http
