@@ -1,6 +1,6 @@
 import * as Astring from "astring";
 import * as Acorn from "acorn";
-import { logError, logDebug, logDebugWhen } from "../../log/index.mjs";
+import { logError, logDebug } from "../../log/index.mjs";
 import { generateGet, recoverMaybe } from "../../util/index.mjs";
 import { getConfigurationPackage } from "../../configuration-accessor/index.mjs";
 import { ExternalAppmapError } from "../../error/index.mjs";
@@ -41,8 +41,7 @@ export const instrument = (
   { url, type, content },
   mapping,
 ) => {
-  let sources = getSources(mapping);
-  sources = sources
+  const sources = getSources(mapping)
     .map(({ url, content }) => {
       const {
         enabled,
@@ -68,41 +67,41 @@ export const instrument = (
     })
     .filter(getHead)
     .map(getBody);
-  const excluded = sources.length === 0;
-  sources = sources.filter(({ url }) => !done.has(url));
-  for (const { url } of sources) {
-    done.add(url);
-  }
-  if (
-    excluded ||
-    (configuration.hooks.eval.aliases.length === 0 &&
-      configuration.hooks.apply === null)
-  ) {
-    logDebugWhen(
-      excluded,
+  if (sources.length === 0) {
+    logDebug(
       "Not instrumenting file %j because it has no allowed sources",
       url,
     );
-    logDebugWhen(
-      !excluded,
-      "Not instrumenting file %j because instrumentation hooks (apply and eval) are disabled",
-      url,
-    );
-    return { url, content, sources };
+    return { url, content, sources: [] };
   } else {
-    logDebug("Instrumenting file %j", url);
-    return {
-      url,
-      content: generateEstree(
-        visit(parseEstree(type, content, url), {
-          url,
-          whitelist: new Set(sources.map(getURL)),
-          eval: configuration.hooks.eval,
-          apply: configuration.hooks.apply,
-          mapping,
-        }),
-      ),
-      sources,
-    };
+    const new_sources = sources.filter(({ url }) => !done.has(url));
+    for (const { url } of new_sources) {
+      done.add(url);
+    }
+    if (
+      configuration.hooks.eval.aliases.length === 0 &&
+      configuration.hooks.apply === null
+    ) {
+      logDebug(
+        "Not instrumenting file %j because instrumentation hooks (apply and eval) are disabled",
+        url,
+      );
+      return { url, content, sources: new_sources };
+    } else {
+      logDebug("Instrumenting file %j", url);
+      return {
+        url,
+        content: generateEstree(
+          visit(parseEstree(type, content, url), {
+            url,
+            whitelist: new Set(sources.map(getURL)),
+            eval: configuration.hooks.eval,
+            apply: configuration.hooks.apply,
+            mapping,
+          }),
+        ),
+        sources: new_sources,
+      };
+    }
   }
 };
