@@ -1,8 +1,13 @@
+import { cwd } from "node:process";
 import { coalesce } from "../../util/index.mjs";
-import { convertFileUrlToPath } from "../../path/index.mjs";
-import { toAbsoluteUrl } from "../../url/index.mjs";
+import {
+  convertFileUrlToPath,
+  convertPathToFileUrl,
+} from "../../path/index.mjs";
+import { toAbsoluteUrl, toDirectoryUrl } from "../../url/index.mjs";
 import { escapeNodeOption } from "./escape.mjs";
 import { sniffTokens, splitTokens } from "./package.mjs";
+import { hookJestArgvAsync } from "./jest-argv.mjs";
 
 export const name = "jest";
 export const recursive = null;
@@ -14,9 +19,12 @@ export const hookCommandAsync = async (tokens, base) => {
   return [
     ...exec,
     "--runInBand",
+    ...(await hookJestArgvAsync(
+      argv,
+      toDirectoryUrl(convertPathToFileUrl(cwd())),
+    )),
     "--setupFilesAfterEnv",
     convertFileUrlToPath(toAbsoluteUrl("lib/node/recorder.mjs", base)),
-    ...argv,
   ];
 };
 

@@ -1,3 +1,5 @@
 /* eslint local/no-globals: ["error", "exports"] */
-exports.main = () => "main";
-exports.mainAsync = async () => await "main";
+const main = () => "main";
+const mainAsync = async () => await "main";
+exports.main = main;
+exports.mainAsync = mainAsync;

@@ -1,7 +1,7 @@
 events:
   - event: call
     id: 1
-    method_id: mainAsync
+    method_id: MAIN_TRANSFORMED
   - event: return
     id: 2
     parent_id: 1

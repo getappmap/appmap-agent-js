@@ -1,4 +1,5 @@
 stringify.mjs
 cjs.mjs
 esm.mjs
+jest.mjs
 index.mjs
