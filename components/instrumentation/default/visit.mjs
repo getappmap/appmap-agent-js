@@ -8,9 +8,7 @@ import {
   assert,
   hasOwnProperty,
   coalesce,
-  incrementCounter,
 } from "../../util/index.mjs";
-import { toAbsoluteUrl, toDirectoryUrl } from "../../url/index.mjs";
 import { mapSource } from "../../source/index.mjs";
 import { logDebugWhen, logErrorWhen } from "../../log/index.mjs";
 import { getLocationBase } from "../../location/index.mjs";
@@ -637,11 +635,9 @@ const instrumenters = {
       );
       return makeCallExpression(makeIdentifier(node.callee.name), [
         makeCallExpression(makeIdentifier(context.eval.hidden), [
+          makeLiteral(fromMaybe(location, context.url, getLocationBase)),
           makeLiteral(
-            toAbsoluteUrl(
-              `eval-${String(incrementCounter(context.counter))}`,
-              toDirectoryUrl(fromMaybe(location, context.url, getLocationBase)),
-            ),
+            `${String(node.loc.start.line)}-${String(node.loc.start.column)}`,
           ),
           visitNode(node.arguments[0], node, parent, closure, context),
         ]),

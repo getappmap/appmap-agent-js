@@ -1,7 +1,7 @@
 import * as Astring from "astring";
 import * as Acorn from "acorn";
 import { logError, logDebug, logDebugWhen } from "../../log/index.mjs";
-import { generateGet, createCounter, recoverMaybe } from "../../util/index.mjs";
+import { generateGet, recoverMaybe } from "../../util/index.mjs";
 import { getConfigurationPackage } from "../../configuration-accessor/index.mjs";
 import { ExternalAppmapError } from "../../error/index.mjs";
 import { getSources } from "../../source/index.mjs";
@@ -19,7 +19,6 @@ const getURL = generateGet("url");
 export const createInstrumentation = (configuration) => ({
   configuration,
   done: new Set(),
-  counter: createCounter(0),
 });
 
 const parseEstree = (type, content, url) => {
@@ -38,7 +37,7 @@ const parseEstree = (type, content, url) => {
 };
 
 export const instrument = (
-  { configuration, done, counter },
+  { configuration, done },
   { url, type, content },
   mapping,
 ) => {
@@ -101,7 +100,6 @@ export const instrument = (
           eval: configuration.hooks.eval,
           apply: configuration.hooks.apply,
           mapping,
-          counter,
         }),
       ),
       sources,
