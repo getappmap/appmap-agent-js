@@ -1,7 +1,0 @@
-events:
-  - event: call
-    id: 1
-    method_id: main
-  - event: return
-    id: 2
-    parent_id: 1

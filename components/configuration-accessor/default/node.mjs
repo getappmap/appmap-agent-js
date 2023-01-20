@@ -2,19 +2,14 @@ import { assert } from "../../util/index.mjs";
 import { logErrorWhen } from "../../log/index.mjs";
 import { toAbsoluteUrl } from "../../url/index.mjs";
 import { ExternalAppmapError } from "../../error/index.mjs";
-import { escapeShell } from "./escape.mjs";
 
-const regexp = /^(?<exec>\s*\S*node(.[a-zA-Z]+)?)(?<argv>($|\s[\s\S]*$))$/u;
-
-const doesSupportSource = (source, _shell) => regexp.test(source);
-
-const doesSupportTokens = (tokens) =>
+const doesSupport = (tokens) =>
   tokens.length > 0 && tokens[0].startsWith("node");
 
 const splitNodeCommand = (tokens) => {
   assert(
     !logErrorWhen(
-      !doesSupportTokens(tokens),
+      !doesSupport(tokens),
       "Could not recognize %j as a node command",
       tokens,
     ),
@@ -27,40 +22,16 @@ const splitNodeCommand = (tokens) => {
   };
 };
 
-const parseNodeCommand = (source) => {
-  const result = regexp.exec(source);
-  assert(
-    !logErrorWhen(
-      result === null,
-      "Could not parse %j as a node command",
-      source,
-    ),
-    "Not a node command",
-    ExternalAppmapError,
-  );
-  return result.groups;
-};
-
 export const generateNodeRecorder = (recorder) => ({
-  doesSupportSource,
-  doesSupportTokens,
+  doesSupport,
   recursive: false,
   name: recorder,
-  hookCommandSource: (source, shell, base) => {
-    const groups = parseNodeCommand(source);
-    return [
-      `${groups.exec} --experimental-loader ${escapeShell(
-        shell,
-        toAbsoluteUrl(`lib/node/recorder-${recorder}.mjs`, base),
-      )}${groups.argv}`,
-    ];
-  },
-  hookCommandTokens: (tokens, base) => {
+  hookCommandAsync: (tokens, base) => {
     const { exec, argv } = splitNodeCommand(tokens);
     return [
       ...exec,
       "--experimental-loader",
-      toAbsoluteUrl(`lib/node/recorder-${recorder}.mjs`, base),
+      toAbsoluteUrl(`lib/node/recorder.mjs`, base),
       ...argv,
     ];
   },

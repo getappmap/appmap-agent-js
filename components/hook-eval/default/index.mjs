@@ -54,11 +54,15 @@ export const hook = (
       enumerable: false,
       configurable: true,
       value: (url, content) =>
-        instrument(agent, {
-          url,
-          type: "script",
-          content: String(content),
-        }),
+        instrument(
+          agent,
+          {
+            url,
+            type: "script",
+            content: String(content),
+          },
+          null,
+        ),
     });
   }
   return enabled ? hidden : null;

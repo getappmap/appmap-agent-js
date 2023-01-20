@@ -7,7 +7,6 @@ for (const [entry, env, resolution] of [
   ["init", "node", {}],
   ["status", "node", {}],
   ["setup", "node", {}],
-  ["validate-mocha", "node", {}],
   ["configuration", "node", {}],
   ["configuration-process", "node", {}],
   ["configuration-environment", "node", {}],

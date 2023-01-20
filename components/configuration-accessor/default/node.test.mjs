@@ -1,29 +1,17 @@
 import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
 import { generateNodeRecorder } from "./node.mjs";
 
-const {
-  name,
-  recursive,
-  doesSupportSource,
-  doesSupportTokens,
-  hookCommandSource,
-  hookCommandTokens,
-  hookEnvironment,
-} = generateNodeRecorder("process");
+const { name, recursive, doesSupport, hookCommandAsync, hookEnvironment } =
+  generateNodeRecorder("process");
 
 const base = "file:///A:/base/";
-const recorder_url = "file:///A:/base/lib/node/recorder-process.mjs";
+const recorder_url = "file:///A:/base/lib/node/recorder.mjs";
 
 assertEqual(name, "process");
 assertEqual(recursive, false);
 
-assertEqual(doesSupportSource("node.ext main.mjs"), true);
-assertDeepEqual(hookCommandSource("node.ext main.mjs", "/bin/sh", base), [
-  `node.ext --experimental-loader ${recorder_url} main.mjs`,
-]);
-
-assertEqual(doesSupportTokens(["node.ext", "main.mjs"]), true);
-assertDeepEqual(hookCommandTokens(["node.ext", "main.mjs"], base), [
+assertEqual(doesSupport(["node.ext", "main.mjs"]), true);
+assertDeepEqual(await hookCommandAsync(["node.ext", "main.mjs"], base), [
   "node.ext",
   "--experimental-loader",
   recorder_url,

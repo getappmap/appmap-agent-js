@@ -1,73 +1,57 @@
-import {
-  assertEqual,
-  assertDeepEqual,
-  assertReject,
-} from "../../__fixture__.mjs";
+import { cwd, env, platform } from "node:process";
+import { assertReject } from "../../__fixture__.mjs";
 import { EventEmitter } from "events";
 import {
   createConfiguration,
   extendConfiguration,
 } from "../../configuration/index.mjs";
+import { convertPathToFileUrl } from "../../path/index.mjs";
 import { mainAsync } from "./index.mjs";
 
-const { setTimeout, Error } = globalThis;
+const { setTimeout } = globalThis;
 
-globalThis.GLOBAL_SPY_SPAWN = (exec, argv, _options) => {
-  const emitter = new EventEmitter();
-  emitter.kill = (signal) => {
-    emitter.emit("close", null, signal);
-  };
-  assertDeepEqual(argv, []);
-  if (exec === "throw") {
-    setTimeout(() => {
-      emitter.emit("error", new Error("BOUM"));
-    }, 0);
-  } else if (exec === "success") {
-    setTimeout(() => {
-      emitter.emit("close", 0, null);
-    }, 0);
-  } else if (exec === "failure") {
-    setTimeout(() => {
-      emitter.emit("close", 1, null);
-    }, 0);
-  } else {
-    assertEqual(exec, "sleep");
-  }
-  return emitter;
-};
+const cwd_url = convertPathToFileUrl(cwd());
 
-const configuration = createConfiguration("protocol://host/home");
+const configuration = extendConfiguration(
+  createConfiguration("protocol://host/home"),
+  {
+    "command-options": { shell: false },
+  },
+  cwd_url,
+);
 
 // no child
 {
   const emitter = new EventEmitter();
-  emitter.env = {};
+  emitter.env = env;
   await mainAsync(emitter, configuration);
 }
 
 // throw
 {
   const emitter = new EventEmitter();
-  emitter.env = {};
-  assertReject(
+  emitter.env = env;
+  await assertReject(
     mainAsync(
       emitter,
       extendConfiguration(
         configuration,
         {
-          command: "throw",
+          command: ["MISSING-EXECUTABLE"],
         },
-        "protocol://host/base",
+        cwd_url,
       ),
     ),
-    /^ExternalAppmapError: Failed to spawn batch child process$/u,
+    platform === "win32"
+      ? /^ExternalAppmapError: Could not locate executable$/u
+      : /^ExternalAppmapError: Failed to spawn child process$/u,
   );
 }
 
 // single killed child
 {
   const emitter = new EventEmitter();
-  emitter.env = {};
+  emitter.env = env;
   setTimeout(() => {
     emitter.emit("SIGINT");
   }, 0);
@@ -78,11 +62,10 @@ const configuration = createConfiguration("protocol://host/home");
       {
         scenario: "^",
         scenarios: {
-          key1: { command: "sleep" },
-          key2: { command: "sleep" },
+          key: { command: ["node", "--eval", `setTimeout(() => {}, 5000)`] },
         },
       },
-      "protocol://host/base",
+      cwd_url,
     ),
   );
 }
@@ -90,7 +73,7 @@ const configuration = createConfiguration("protocol://host/home");
 // single child
 {
   const emitter = new EventEmitter();
-  emitter.env = {};
+  emitter.env = env;
   await mainAsync(
     emitter,
     extendConfiguration(
@@ -100,11 +83,11 @@ const configuration = createConfiguration("protocol://host/home");
         scenario: "^",
         scenarios: {
           key: {
-            command: "success",
+            command: ["node", "--eval", `"success";`],
           },
         },
       },
-      "protocol://host/base",
+      cwd_url,
     ),
   );
 }
@@ -112,7 +95,7 @@ const configuration = createConfiguration("protocol://host/home");
 // multiple child
 {
   const emitter = new EventEmitter();
-  emitter.env = {};
+  emitter.env = env;
   await mainAsync(
     emitter,
     extendConfiguration(
@@ -122,14 +105,14 @@ const configuration = createConfiguration("protocol://host/home");
         scenario: "^",
         scenarios: {
           key1: {
-            command: "success",
+            command: ["node", "--eval", `"success";`],
           },
           key2: {
-            command: "failure",
+            command: ["node", "--eval", `throw "failure";`],
           },
         },
       },
-      "protocol://host/base",
+      cwd_url,
     ),
   );
 }

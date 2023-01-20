@@ -1,8 +1,18 @@
 packages:
   path: main.mjs
   enabled: true
-command: FOO=BAR npx mocha '*.test.mjs'
+recorder: process
+command: FOO=BAR node main.mjs
+command-options:
+  shell: true
 appmap_dir: .
+appmap_file: main
 hooks:
+  cjs: false
   esm: true
+  eval: false
   apply: true
+  http: false
+  mysql: false
+  pg: false
+  sqlite3: false

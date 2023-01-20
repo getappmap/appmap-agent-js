@@ -6,46 +6,6 @@ import { logErrorWhen } from "../../log/index.mjs";
 
 const space = /^\s$/u;
 
-export const tokenizeCmdShell = (source) => {
-  const tokens = [];
-  let token = "";
-  let escaped = false;
-  let quoted = false;
-  for (const char of source) {
-    token += char;
-    if (quoted) {
-      if (char === '"') {
-        quoted = false;
-      }
-    } else if (escaped) {
-      escaped = false;
-    } else if (char === "^") {
-      escaped = true;
-    } else if (char === '"') {
-      quoted = true;
-    } else if (space.test(char)) {
-      if (token.length > 1) {
-        tokens.push(token.substring(0, token.length - 1));
-      }
-      token = "";
-    }
-  }
-  if (token !== "") {
-    tokens.push(token);
-  }
-  assert(
-    !logErrorWhen(quoted, "unterminated quote on command %s", source),
-    ExternalAppmapError,
-    "unterminated quote on command",
-  );
-  assert(
-    !logErrorWhen(escaped, "missing escaped character on command %s", source),
-    ExternalAppmapError,
-    "missing escaped character",
-  );
-  return tokens;
-};
-
 export const tokenizeShell = (source) => {
   const tokens = [];
   let token = "";
@@ -88,4 +48,15 @@ export const tokenizeShell = (source) => {
     "missing escaped character",
   );
   return tokens;
+};
+
+// https://github.com/nodejs/node/blob/e58ed6d855e1af6579aaa50471426db8881eea99/lib/child_process.js#L628
+export const tokenize = (source, shell) => {
+  if (shell === null) {
+    return tokenizeShell(source);
+  } else if (/^(?:.*\\)?cmd(?:\.exe)?$/iu.test(shell)) {
+    return [shell, "/d", "/s", "/c", `"${source}"`];
+  } else {
+    return [shell, "-c", source];
+  }
 };

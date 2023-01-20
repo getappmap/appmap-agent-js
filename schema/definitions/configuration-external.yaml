@@ -15,11 +15,9 @@ properties:
   recursive-process-recording:
     type: boolean
   command:
-    anyOf:
-      - type: string
-      - type: array
-        items:
-          type: string
+    $ref: command
+  command-win32:
+    $ref: command
   command-options:
     $ref: command-options
   validate:
@@ -65,10 +63,7 @@ properties:
       cjs:
         type: boolean
       esm:
-        anyOf:
-          - type: boolean
-          - const: null
-          - $ref: identifier-regular
+        type: boolean
       eval:
         anyOf:
           - type: boolean
@@ -89,10 +84,13 @@ properties:
         type: boolean
       mysql:
         type: boolean
+        nullable: true
       pg:
         type: boolean
+        nullable: true
       sqlite3:
         type: boolean
+        nullable: true
   ordering:
     $ref: ordering
   default-process:

@@ -28,17 +28,9 @@ properties:
   recursive-process-recording:
     type: boolean
   command:
-    type: object
-    nullable: true
-    properties:
-      tokens:
-        type: array
-        nullable: true
-        items:
-          type: string
-      source:
-        type: string
-        nullable: true
+    $ref: command-cooked
+  command-win32:
+    $ref: command-cooked
   command-options:
     $ref: command-options-cooked
   validate:
@@ -90,6 +82,7 @@ properties:
     required:
       - cjs
       - esm
+      - eval
       - apply
       - http
       - mysql
@@ -99,9 +92,7 @@ properties:
       cjs:
         type: boolean
       esm:
-        anyOf:
-          - const: null
-          - $ref: identifier-regular
+        type: boolean
       eval:
         type: object
         properties:
@@ -119,10 +110,13 @@ properties:
         type: boolean
       mysql:
         type: boolean
+        nullable: true
       pg:
         type: boolean
+        nullable: true
       sqlite3:
         type: boolean
+        nullable: true
   ordering:
     $ref: ordering
   default-process:

@@ -1,0 +1,7 @@
+{
+  "testMatch": ["<rootDir>/*.test.cjs"],
+  "testPathIgnorePatterns": [],
+  "transform": {
+    "main\\.cjs$": ["<rootDir>/transform.cjs", "options"]
+  }
+}

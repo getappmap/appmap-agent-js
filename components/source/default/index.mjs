@@ -27,11 +27,15 @@ export const createMirrorSourceMap = (file) => ({
 });
 
 const parseSourceMap = (content, url) => {
-  try {
-    return parseJSON(content);
-  } catch (error) {
-    logError("Invalid JSON from source map at %j >> %O", url, error);
-    throw new ExternalAppmapError("Source map is not valid JSON");
+  if (typeof content === "string") {
+    try {
+      return parseJSON(content);
+    } catch (error) {
+      logError("Invalid JSON from source map at %j >> %O", url, error);
+      throw new ExternalAppmapError("Source map is not valid JSON");
+    }
+  } else {
+    return content;
   }
 };
 

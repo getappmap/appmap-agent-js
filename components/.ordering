@@ -9,8 +9,8 @@ log-inner
 log
 validate
 validate-appmap
-validate-mocha
 patch
+peer
 file
 time
 group
@@ -41,8 +41,7 @@ hook-error
 hook-exit
 hook-apply
 hook-group
-hook-cjs
-hook-esm
+hook-module
 hook-eval
 hook-query
 hook-http
@@ -50,10 +49,6 @@ hook-http-client
 hook-http-server
 hook
 recorder-api
-recorder-process
-recorder-mocha
-recorder-jest
-recorder-remote
 recorder-cli
 receptor-file
 receptor-http

@@ -1,3 +1,4 @@
+import { platform } from "node:process";
 import {
   assertDeepEqual,
   assertEqual,
@@ -9,6 +10,7 @@ import {
   extendConfiguration,
 } from "../../configuration/index.mjs";
 import {
+  pickPlatformSpecificCommand,
   resolveConfigurationRepository,
   resolveConfigurationAutomatedRecorder,
   resolveConfigurationManualRecorder,
@@ -17,12 +19,33 @@ import {
   isConfigurationEnabled,
   getConfigurationPackage,
   getConfigurationScenarios,
-  compileConfigurationCommand,
+  compileConfigurationCommandAsync,
 } from "./index.mjs";
 
 const {
   Reflect: { get },
 } = globalThis;
+
+/////////////////////////////////
+// pickPlatformSpecificCommand //
+/////////////////////////////////
+
+assertEqual(
+  get(
+    pickPlatformSpecificCommand(createConfiguration("protocol://host/home/")),
+    "command",
+  ),
+  null,
+);
+
+get(
+  pickPlatformSpecificCommand({
+    ...createConfiguration("protocol://host/home/"),
+    [`command-${platform}`]: { source: "foo", tokens: [] },
+  }),
+  "command",
+  { source: "foo", tokens: [] },
+);
 
 ////////////////////////////////////////
 // resolveConfigurationManualRecorder //
@@ -122,6 +145,7 @@ assertEqual(
         },
         "protocol://host/base/",
       ),
+      {},
     ),
     "recorder",
   ),
@@ -138,6 +162,7 @@ assertEqual(
         },
         "protocol://host/base/",
       ),
+      {},
     ),
     "recorder",
   ),
@@ -154,6 +179,7 @@ assertEqual(
         },
         "protocol://host/base/",
       ),
+      {},
     ),
     "recorder",
   ),
@@ -170,6 +196,7 @@ assertEqual(
         },
         "protocol://host/base/",
       ),
+      {},
     ),
     "recorder",
   ),
@@ -268,11 +295,11 @@ assertEqual(
     extendConfigurationNode(createConfiguration("protocol://host/home/"), {
       version: "v1.2.3",
       argv: ["node", "main.js"],
-      cwd: () => convertFileUrlToPath("file:///w:/cwd"),
+      cwd: () => convertFileUrlToPath("file:///A:/cwd"),
     }),
     "main",
   ),
-  "file:///w:/cwd/main.js",
+  "file:///A:/cwd/main.js",
 );
 
 /////////////////////////////////
@@ -291,7 +318,7 @@ const stripEnvironmentConfiguration = ({
 // process >> source >> not-recursive //
 assertDeepEqual(
   stripEnvironmentConfiguration(
-    compileConfigurationCommand(
+    await compileConfigurationCommandAsync(
       extendConfiguration(
         createConfiguration("protocol://host/home/"),
         {
@@ -304,56 +331,12 @@ assertDeepEqual(
             },
           },
           "recursive-process-recording": false,
-          command: "node main.mjs",
+          command: ["node", "main.mjs"],
           recorder: "process",
           "command-options": {
-            shell: "/bin/sh",
+            shell: false,
             env: {
               VAR1: "VAL1",
-            },
-          },
-        },
-        "file:///A:/base/",
-      ),
-      {
-        VAR2: "VAL2",
-      },
-    ),
-  ),
-  {
-    cwd: "file:///A:/base/",
-    exec: `node --experimental-loader file:///A:/home/lib/node/recorder-process.mjs main.mjs`,
-    argv: [],
-    env: {
-      VAR1: "VAL1",
-      VAR2: "VAL2",
-    },
-  },
-);
-
-// remote >> tokens >> recursive //
-assertDeepEqual(
-  stripEnvironmentConfiguration(
-    compileConfigurationCommand(
-      extendConfiguration(
-        createConfiguration("protocol://host/home/"),
-        {
-          agent: {
-            directory: "file:///A:/home/",
-            package: {
-              name: "@appmap-agent-js",
-              version: "1.2.3",
-              homepage: null,
-            },
-          },
-          "recursive-process-recording": true,
-          command: ["node", "main.mjs"],
-          recorder: "remote",
-          "command-options": {
-            shell: "/bin/sh",
-            env: {
-              VAR1: "VAL1",
-              NODE_OPTIONS: "options",
             },
           },
         },
@@ -367,11 +350,59 @@ assertDeepEqual(
   {
     cwd: "file:///A:/base/",
     exec: "node",
-    argv: ["main.mjs"],
+    argv: [
+      "--experimental-loader",
+      "file:///A:/home/lib/node/recorder.mjs",
+      "main.mjs",
+    ],
     env: {
       VAR1: "VAL1",
       VAR2: "VAL2",
-      NODE_OPTIONS: `options --experimental-loader=file:///A:/home/lib/node/recorder-remote.mjs`,
     },
   },
 );
+
+// // remote >> tokens >> recursive //
+// assertDeepEqual(
+//   stripEnvironmentConfiguration(
+//     await compileConfigurationCommandAsync(
+//       extendConfiguration(
+//         createConfiguration("protocol://host/home/"),
+//         {
+//           agent: {
+//             directory: "file:///A:/home/",
+//             package: {
+//               name: "@appmap-agent-js",
+//               version: "1.2.3",
+//               homepage: null,
+//             },
+//           },
+//           "recursive-process-recording": true,
+//           command: ["node", "main.mjs"],
+//           recorder: "remote",
+//           "command-options": {
+//             shell: "/bin/sh",
+//             env: {
+//               VAR1: "VAL1",
+//               NODE_OPTIONS: "options",
+//             },
+//           },
+//         },
+//         "file:///A:/base/",
+//       ),
+//       {
+//         VAR2: "VAL2",
+//       },
+//     ),
+//   ),
+//   {
+//     cwd: "file:///A:/base/",
+//     exec: "node",
+//     argv: ["main.mjs"],
+//     env: {
+//       VAR1: "VAL1",
+//       VAR2: "VAL2",
+//       NODE_OPTIONS: `options --experimental-loader=file:///A:/home/lib/node/recorder.mjs`,
+//     },
+//   },
+// );

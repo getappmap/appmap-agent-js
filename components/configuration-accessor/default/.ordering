@@ -2,6 +2,8 @@ escape.mjs
 tokenize.mjs
 package.mjs
 mocha.mjs
+jest-config.mjs
+jest-argv.mjs
 jest.mjs
 node.mjs
 process.mjs

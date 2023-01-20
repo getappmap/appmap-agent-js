@@ -1,7 +1,6 @@
 import * as HookApply from "../../hook-apply/index.mjs";
 import * as HookGroup from "../../hook-group/index.mjs";
-import * as HookEsm from "../../hook-esm/index.mjs";
-import * as HookCjs from "../../hook-cjs/index.mjs";
+import * as HookModule from "../../hook-module/index.mjs";
 import * as HookEval from "../../hook-eval/index.mjs";
 import * as HookError from "../../hook-error/index.mjs";
 import * as HookExit from "../../hook-exit/index.mjs";
@@ -12,8 +11,7 @@ import * as HookHttpServer from "../../hook-http-server/index.mjs";
 const Hooks = [
   HookApply,
   HookGroup,
-  HookEsm,
-  HookCjs,
+  HookModule,
   HookEval,
   HookError,
   HookExit,

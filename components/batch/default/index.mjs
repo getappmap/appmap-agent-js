@@ -1,14 +1,12 @@
-import {
-  InternalAppmapError,
-  ExternalAppmapError,
-} from "../../error/index.mjs";
-import { assert } from "../../util/index.mjs";
+import { platform } from "node:process";
+import { ExternalAppmapError } from "../../error/index.mjs";
+import { hasOwnProperty } from "../../util/index.mjs";
 import { logError, logDebug, logInfo, logWarning } from "../../log/index.mjs";
-import { spawn } from "../../spawn/index.mjs";
 import {
+  pickPlatformSpecificCommand,
   getConfigurationScenarios,
   resolveConfigurationRepository,
-  compileConfigurationCommand,
+  compileConfigurationCommandAsync,
   resolveConfigurationAutomatedRecorder,
 } from "../../configuration-accessor/index.mjs";
 import {
@@ -17,41 +15,55 @@ import {
   adaptReceptorConfiguration,
   minifyReceptorConfiguration,
 } from "../../receptor/index.mjs";
+import { spawnAsync, killAllAsync } from "./spawn.mjs";
+import { whereAsync } from "./where.mjs";
 
 const {
+  Set,
   Map,
   JSON: { stringify: stringifyJSON },
-  setTimeout,
-  clearTimeout,
-  Promise,
 } = globalThis;
 
-const getCommandDescription = ({ exec, argv }) => ({ exec, argv });
 const isCommandNonNull = ({ command }) => command !== null;
+
+const spawnWithHandlerAsync = async (command, children, tokens, located) => {
+  try {
+    return await spawnAsync(command, children);
+  } catch (error) {
+    /* c8 ignore start */ if (
+      hasOwnProperty(error, "code") &&
+      error.code === "ENOENT" &&
+      platform === "win32" &&
+      !located
+    ) {
+      logWarning(
+        "Could not find executable %j, we will try to locate it using `where.exe`. Often, this is caused by a missing extension on Windows. For instance `npx jest` should be `npx.cmd jest`. Note that it is possible to provide a windows-specific command with `command-win32`.",
+        command.exec,
+      );
+      return await spawnWithHandlerAsync(
+        {
+          ...command,
+          exec: await whereAsync(command.exec, children),
+        },
+        children,
+        tokens,
+        true,
+      );
+    } /* c8 ignore start */ else {
+      logError("Child error %j >> %O", tokens, error);
+      throw new ExternalAppmapError("Failed to spawn child process");
+    }
+  }
+};
 
 export const mainAsync = async (process, configuration) => {
   configuration = resolveConfigurationRepository(configuration);
   const { env } = process;
+  const children = new Set();
   let interrupted = false;
-  let subprocess = null;
   process.on("SIGINT", () => {
+    killAllAsync(children);
     interrupted = true;
-    if (subprocess !== null) {
-      const timeout = setTimeout(() => {
-        /* c8 ignore start */
-        assert(
-          subprocess !== null,
-          "the timer should have been cleared if the process closed itself",
-          InternalAppmapError,
-        );
-        subprocess.kill("SIGKILL");
-        /* c8 ignore stop */
-      }, 1000);
-      subprocess.on("close", () => {
-        clearTimeout(timeout);
-      });
-      subprocess.kill("SIGINT");
-    }
   });
   const receptors = new Map();
   const createReceptorAsync = async (configuration) => {
@@ -63,34 +75,31 @@ export const mainAsync = async (process, configuration) => {
     return receptors.get(key);
   };
   const runConfigurationAsync = async (configuration, env) => {
-    configuration = resolveConfigurationAutomatedRecorder(configuration);
+    configuration = resolveConfigurationAutomatedRecorder(configuration, env);
     const receptor = await createReceptorAsync(configuration);
     configuration = adaptReceptorConfiguration(receptor, configuration);
-    const description = getCommandDescription(configuration.command);
-    const command = compileConfigurationCommand(configuration, env);
+    const { tokens } = configuration.command;
+    const command = await compileConfigurationCommandAsync(configuration, env);
     logDebug("spawn child command = %j", command);
-    subprocess = spawn(command.exec, command.argv, command.options);
-    const { signal, status } = await new Promise((resolve, reject) => {
-      subprocess.on("error", (error) => {
-        logError("Child error %j >> %O", description, error);
-        reject(new ExternalAppmapError("Failed to spawn batch child process"));
-      });
-      subprocess.on("close", (status, signal) => {
-        resolve({ signal, status });
-      });
-    });
-    subprocess = null;
+    const { signal, status } = await spawnWithHandlerAsync(
+      command,
+      children,
+      tokens,
+      false,
+    );
     if (signal !== null) {
       logInfo("> Killed with: %s", signal);
     } else {
       logInfo("> Exited with: %j", status);
     }
-    return { description, signal, status };
+    return { tokens, signal, status };
   };
   const configurations = [
     configuration,
     ...getConfigurationScenarios(configuration),
-  ].filter(isCommandNonNull);
+  ]
+    .map(pickPlatformSpecificCommand)
+    .filter(isCommandNonNull);
   const { length } = configurations;
   try {
     if (length === 0) {
@@ -108,9 +117,9 @@ export const mainAsync = async (process, configuration) => {
         }
       }
       logInfo("Summary:");
-      for (const { description, signal, status } of summary) {
+      for (const { tokens, signal, status } of summary) {
         /* c8 ignore start */
-        logInfo("%j >> %j", description, signal === null ? status : signal);
+        logInfo("%j >> %j", tokens, signal === null ? status : signal);
         /* c8 ignore stop */
       }
     }

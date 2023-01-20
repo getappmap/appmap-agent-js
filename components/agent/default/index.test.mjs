@@ -37,7 +37,11 @@ recordStartTrack(agent, "record", {}, null);
 recordGroup(agent, 123, "description");
 assertEqual(
   evalGlobal(
-    instrument(agent, { url: "protocol://host/base/main.js", content: "123;" }),
+    instrument(
+      agent,
+      { url: "protocol://host/base/main.js", content: "123;" },
+      null,
+    ),
   ),
   123,
 );

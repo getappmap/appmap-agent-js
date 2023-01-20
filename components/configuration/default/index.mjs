@@ -11,8 +11,6 @@ const {
   Object: { entries: toEntries },
 } = globalThis;
 
-const HOOK_ESM_GLOBAL = "APPMAP_HOOK_ESM";
-
 const HOOK_APPLY_GLOBAL = "APPMAP_HOOK_APPLY";
 
 const HOOK_EVAL_GLOBAL = "APPMAP_HOOK_EVAL";
@@ -67,7 +65,7 @@ const normalizeExclusion = (exclusion, _base) => {
 };
 
 const normalizeCommandOptions = (options, base) => ({
-  shell: true,
+  shell: false,
   encoding: "utf8",
   env: {},
   stdio: "inherit",
@@ -88,14 +86,6 @@ const normalizeHooks = (hooks, _base) => {
             aliases: hooks.eval ? ["eval"] : [],
           }
         : hooks.eval;
-  }
-  if (hasOwnProperty(hooks, "esm")) {
-    hooks.esm =
-      typeof hooks.esm === "boolean"
-        ? hooks.esm
-          ? HOOK_ESM_GLOBAL
-          : null
-        : hooks.esm;
   }
   if (hasOwnProperty(hooks, "apply")) {
     hooks.apply =
@@ -281,6 +271,10 @@ const fields = {
     extend: overwrite,
     normalize: normalizeCommand,
   },
+  "command-win32": {
+    extend: overwrite,
+    normalize: normalizeCommand,
+  },
   "command-options": {
     extend: extendCommandOptions,
     normalize: normalizeCommandOptions,
@@ -441,9 +435,10 @@ export const createConfiguration = (home) => ({
   scenario: "^",
   "recursive-process-recording": true,
   command: null,
+  "command-win32": null,
   "command-options": {
     cwd: toAbsoluteUrl(".", home),
-    shell: true,
+    shell: false,
     encoding: "utf8",
     env: {},
     stdio: "inherit",
@@ -496,12 +491,12 @@ export const createConfiguration = (home) => ({
       hidden: HOOK_EVAL_GLOBAL,
       aliases: [],
     },
-    esm: HOOK_ESM_GLOBAL,
+    esm: true,
     cjs: true,
     http: true,
-    mysql: true,
-    sqlite3: true,
-    pg: true,
+    mysql: null,
+    sqlite3: null,
+    pg: null,
   },
   ordering: "causal",
   "collapse-package-hierachy": false,
