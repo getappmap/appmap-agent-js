@@ -1,3 +1,24 @@
+# [13.0.0](https://github.com/getappmap/appmap-agent-js/compare/v12.2.0...v13.0.0) (2023-01-20)
+
+
+### Bug Fixes
+
+* instrument jest tests with transformers ([de5e92f](https://github.com/getappmap/appmap-agent-js/commit/de5e92fc1291e81430b4fc21af91422959d9eeed))
+
+
+### Features
+
+* allow query hook config to be null ([c5eeae7](https://github.com/getappmap/appmap-agent-js/commit/c5eeae759a36cf273f4bba2afa66dadba277972a))
+* programs are directly spawned by default ([0f5bbcf](https://github.com/getappmap/appmap-agent-js/commit/0f5bbcf99ffb61b1c54a964ff16bca0cc5598819))
+* tokenize every commands ([637cbab](https://github.com/getappmap/appmap-agent-js/commit/637cbab20d795df6171a3d3435496d69832f409d)), closes [/github.com/nodejs/node/blob/e58ed6d855e1af6579aaa50471426db8881eea99/lib/child_process.js#L619](https://github.com//github.com/nodejs/node/blob/e58ed6d855e1af6579aaa50471426db8881eea99/lib/child_process.js/issues/L619)
+* use where.exe to locate missing exec on windows ([facd76d](https://github.com/getappmap/appmap-agent-js/commit/facd76db8e2fb54a22de09fd45763b7f81c63b00))
+
+
+### BREAKING CHANGES
+
+* By default, programs are no longer spawned inside a
+shell. Rather, they are directly spawned with a system call.
+
 # [12.2.0](https://github.com/getappmap/appmap-agent-js/compare/v12.1.2...v12.2.0) (2023-01-11)
 
 
