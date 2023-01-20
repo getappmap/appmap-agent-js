@@ -1,14 +1,7 @@
 import { platform } from "node:process";
 import { ExternalAppmapError } from "../../error/index.mjs";
 import { hasOwnProperty } from "../../util/index.mjs";
-import {
-  logErrorWhen,
-  logError,
-  logDebug,
-  logInfo,
-  logWarning,
-} from "../../log/index.mjs";
-import { spawnAsync, killAllAsync } from "./spawn.mjs";
+import { logError, logDebug, logInfo, logWarning } from "../../log/index.mjs";
 import {
   pickPlatformSpecificCommand,
   getConfigurationScenarios,
@@ -22,6 +15,8 @@ import {
   adaptReceptorConfiguration,
   minifyReceptorConfiguration,
 } from "../../receptor/index.mjs";
+import { spawnAsync, killAllAsync } from "./spawn.mjs";
+import { whereAsync } from "./where.mjs";
 
 const {
   Set,
@@ -29,25 +24,35 @@ const {
   JSON: { stringify: stringifyJSON },
 } = globalThis;
 
-const win32_enoent_message =
-  "This issue may be caused by a missing file extension which is sometimes required on Windows. For instance: `npx jest` should be `npx.cmd jest`. Note that it is possible to provide a windows-specific command with `command-win32`.";
-
 const isCommandNonNull = ({ command }) => command !== null;
 
-const spawnWithHandlerAsync = async (command, children, tokens) => {
+const spawnWithHandlerAsync = async (command, children, tokens, located) => {
   try {
     return await spawnAsync(command, children);
   } catch (error) {
-    logError("Child error %j >> %O", tokens, error);
-    logErrorWhen(
-      /* c8 ignore start */
+    /* c8 ignore start */ if (
       hasOwnProperty(error, "code") &&
-        error.code === "ENOENT" &&
-        platform === "win32",
-      /* c8 ignore stop */
-      win32_enoent_message,
-    );
-    throw new ExternalAppmapError("Failed to spawn child process");
+      error.code === "ENOENT" &&
+      platform === "win32" &&
+      !located
+    ) {
+      logWarning(
+        "Could not find executable %j, we will try to locate it using `where.exe`. Often, this is caused by a missing extension on Windows. For instance `npx jest` should be `npx.cmd jest`. Note that it is possible to provide a windows-specific command with `command-win32`.",
+        command.exec,
+      );
+      return await spawnWithHandlerAsync(
+        {
+          ...command,
+          exec: await whereAsync(command.exec, children),
+        },
+        children,
+        tokens,
+        true,
+      );
+    } /* c8 ignore start */ else {
+      logError("Child error %j >> %O", tokens, error);
+      throw new ExternalAppmapError("Failed to spawn child process");
+    }
   }
 };
 
@@ -80,6 +85,7 @@ export const mainAsync = async (process, configuration) => {
       command,
       children,
       tokens,
+      false,
     );
     if (signal !== null) {
       logInfo("> Killed with: %s", signal);

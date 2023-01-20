@@ -11,10 +11,34 @@ const children = new Set();
 
 assertDeepEqual(
   await spawnAsync(
-    { exec: "node", argv: ["--eval", "123;"], options: { stdio: "inherit" } },
+    {
+      exec: "node",
+      argv: [
+        "--eval",
+        `
+          process.stdout.write("foo");
+          process.stderr.write("bar");
+        `,
+      ],
+      options: { stdio: "pipe" },
+    },
     children,
   ),
-  { status: 0, signal: null },
+  { status: 0, signal: null, stdout: "foo", stderr: "bar" },
+);
+
+assertEqual(children.size, 0);
+
+assertDeepEqual(
+  await spawnAsync(
+    {
+      exec: "node",
+      argv: ["--eval", `process.stderr.write("foo");`],
+      options: { stdio: "ignore" },
+    },
+    children,
+  ),
+  { status: 0, signal: null, stdout: null, stderr: null },
 );
 
 assertEqual(children.size, 0);
@@ -44,4 +68,9 @@ const promise = spawnAsync(
 
 await killAllAsync(children);
 
-assertDeepEqual(await promise, { status: null, signal: "SIGINT" });
+assertDeepEqual(await promise, {
+  status: null,
+  signal: "SIGINT",
+  stdout: null,
+  stderr: null,
+});

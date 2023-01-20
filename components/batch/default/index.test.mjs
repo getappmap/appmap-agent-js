@@ -1,4 +1,4 @@
-import { cwd, env } from "node:process";
+import { cwd, env, platform } from "node:process";
 import { assertReject } from "../../__fixture__.mjs";
 import { EventEmitter } from "events";
 import {
@@ -42,7 +42,9 @@ const configuration = extendConfiguration(
         cwd_url,
       ),
     ),
-    /^ExternalAppmapError: Failed to spawn child process$/u,
+    platform === "win32"
+      ? /^ExternalAppmapError: Could not locate executable$/u
+      : /^ExternalAppmapError: Failed to spawn child process$/u,
   );
 }
 
