@@ -1,9 +1,6 @@
 import { platform } from "node:process";
-import {
-  InternalAppmapError,
-  ExternalAppmapError,
-} from "../../error/index.mjs";
-import { hasOwnProperty, assert } from "../../util/index.mjs";
+import { ExternalAppmapError } from "../../error/index.mjs";
+import { hasOwnProperty } from "../../util/index.mjs";
 import {
   logErrorWhen,
   logError,
@@ -11,7 +8,7 @@ import {
   logInfo,
   logWarning,
 } from "../../log/index.mjs";
-import { spawn } from "../../spawn/index.mjs";
+import { spawnAsync, killAllAsync } from "./spawn.mjs";
 import {
   pickPlatformSpecificCommand,
   getConfigurationScenarios,
@@ -27,42 +24,41 @@ import {
 } from "../../receptor/index.mjs";
 
 const {
+  Set,
   Map,
   JSON: { stringify: stringifyJSON },
-  setTimeout,
-  clearTimeout,
-  Promise,
 } = globalThis;
 
 const win32_enoent_message =
   "This issue may be caused by a missing file extension which is sometimes required on Windows. For instance: `npx jest` should be `npx.cmd jest`. Note that it is possible to provide a windows-specific command with `command-win32`.";
 
-const getCommandDescription = ({ exec, argv }) => ({ exec, argv });
 const isCommandNonNull = ({ command }) => command !== null;
+
+const spawnWithHandlerAsync = async (command, children, tokens) => {
+  try {
+    return await spawnAsync(command, children);
+  } catch (error) {
+    logError("Child error %j >> %O", tokens, error);
+    logErrorWhen(
+      /* c8 ignore start */
+      hasOwnProperty(error, "code") &&
+        error.code === "ENOENT" &&
+        platform === "win32",
+      /* c8 ignore stop */
+      win32_enoent_message,
+    );
+    throw new ExternalAppmapError("Failed to spawn child process");
+  }
+};
 
 export const mainAsync = async (process, configuration) => {
   configuration = resolveConfigurationRepository(configuration);
   const { env } = process;
+  const children = new Set();
   let interrupted = false;
-  let subprocess = null;
   process.on("SIGINT", () => {
+    killAllAsync(children);
     interrupted = true;
-    if (subprocess !== null) {
-      const timeout = setTimeout(() => {
-        /* c8 ignore start */
-        assert(
-          subprocess !== null,
-          "the timer should have been cleared if the process closed itself",
-          InternalAppmapError,
-        );
-        subprocess.kill("SIGKILL");
-        /* c8 ignore stop */
-      }, 1000);
-      subprocess.on("close", () => {
-        clearTimeout(timeout);
-      });
-      subprocess.kill("SIGINT");
-    }
   });
   const receptors = new Map();
   const createReceptorAsync = async (configuration) => {
@@ -77,34 +73,20 @@ export const mainAsync = async (process, configuration) => {
     configuration = resolveConfigurationAutomatedRecorder(configuration, env);
     const receptor = await createReceptorAsync(configuration);
     configuration = adaptReceptorConfiguration(receptor, configuration);
-    const description = getCommandDescription(configuration.command);
+    const { tokens } = configuration.command;
     const command = await compileConfigurationCommandAsync(configuration, env);
     logDebug("spawn child command = %j", command);
-    subprocess = spawn(command.exec, command.argv, command.options);
-    const { signal, status } = await new Promise((resolve, reject) => {
-      subprocess.on("error", (error) => {
-        logError("Child error %j >> %O", description, error);
-        logErrorWhen(
-          /* c8 ignore start */
-          hasOwnProperty(error, "code") &&
-            error.code === "ENOENT" &&
-            platform === "win32",
-          /* c8 ignore stop */
-          win32_enoent_message,
-        );
-        reject(new ExternalAppmapError("Failed to spawn batch child process"));
-      });
-      subprocess.on("close", (status, signal) => {
-        resolve({ signal, status });
-      });
-    });
-    subprocess = null;
+    const { signal, status } = await spawnWithHandlerAsync(
+      command,
+      children,
+      tokens,
+    );
     if (signal !== null) {
       logInfo("> Killed with: %s", signal);
     } else {
       logInfo("> Exited with: %j", status);
     }
-    return { description, signal, status };
+    return { tokens, signal, status };
   };
   const configurations = [
     configuration,
@@ -129,9 +111,9 @@ export const mainAsync = async (process, configuration) => {
         }
       }
       logInfo("Summary:");
-      for (const { description, signal, status } of summary) {
+      for (const { tokens, signal, status } of summary) {
         /* c8 ignore start */
-        logInfo("%j >> %j", description, signal === null ? status : signal);
+        logInfo("%j >> %j", tokens, signal === null ? status : signal);
         /* c8 ignore stop */
       }
     }
