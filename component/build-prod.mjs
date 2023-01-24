@@ -12,6 +12,7 @@ for (const [entry, env, resolution] of [
   ["configuration-environment", "node", {}],
   ["recorder-api", "node", { emitter: "local" }],
   ["recorder-cli", "node", { emitter: "remote-socket" }],
+  ["transformer-jest", "node", { emitter: "remote-socket" }],
 ]) {
   await bundleAsync(home, entry, env, resolution);
 }
