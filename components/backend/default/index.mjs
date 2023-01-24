@@ -1,68 +1,98 @@
-import { InternalAppmapError } from "../../error/index.mjs";
-import { assert } from "../../util/index.mjs";
-import { logDebug } from "../../log/index.mjs";
+import {
+  toAbsoluteUrl,
+  getUrlBasename,
+  getUrlExtension,
+} from "../../url/index.mjs";
+import { logDebug, logError } from "../../log/index.mjs";
 import { validateMessage } from "../../validate/index.mjs";
-import { compileTrace } from "../../trace/index.mjs";
+import {
+  createSession,
+  sendSession,
+  hasSessionTrack,
+  compileSessionTrace,
+  compileSessionTraceArray,
+} from "./session.mjs";
 
-const { Map } = globalThis;
+const { String, Set, Map } = globalThis;
 
 export const createBackend = (configuration) => ({
   configuration,
-  sources: [],
-  tracks: new Map(),
-  traces: new Map(),
+  urls: new Set(),
+  sessions: new Map(),
 });
 
-export const getBackendTrackIterator = ({ tracks }) => tracks.keys();
-
-export const getBackendTraceIterator = ({ traces }) => traces.keys();
-
-export const hasBackendTrack = ({ tracks }, key) => tracks.has(key);
-
-export const hasBackendTrace = ({ traces }, key) => traces.has(key);
-
-export const takeBackendTrace = ({ traces }, key) => {
-  assert(traces.has(key), "missing trace", InternalAppmapError);
-  const trace = traces.get(key);
-  traces.delete(key);
-  return trace;
+const refreshUrl = (urls, url) => {
+  const basename = getUrlBasename(url);
+  const extension = getUrlExtension(url);
+  let index = 0;
+  while (urls.has(url)) {
+    index += 1;
+    url = toAbsoluteUrl(`${basename}-${String(index)}${extension}`, url);
+  }
+  urls.add(url);
+  return url;
 };
 
-const stopTrack = ({ configuration, tracks, traces }, key, message) => {
-  assert(tracks.has(key), "missing track", InternalAppmapError);
-  const track = tracks.get(key);
-  tracks.delete(key);
-  track.push(message);
-  assert(!traces.has(key), "duplicate trace", InternalAppmapError);
-  traces.set(key, compileTrace(configuration, track));
+const refreshTrace = (urls, { url, content }) => ({
+  url: refreshUrl(urls, url),
+  content,
+});
+
+export const compileBackendTraceArray = ({ sessions, urls }, key) => {
+  if (sessions.has(key)) {
+    return compileSessionTraceArray(sessions.get(key)).map((trace) =>
+      refreshTrace(urls, trace),
+    );
+  } else {
+    return null;
+  }
 };
 
-export const sendBackend = (backend, message) => {
-  const { configuration, sources, tracks } = backend;
+export const compileBackendTrace = ({ sessions, urls }, key1, key2) => {
+  if (sessions.has(key1)) {
+    const maybe_trace = compileSessionTrace(sessions.get(key1), key2);
+    if (maybe_trace === null) {
+      return null;
+    } else {
+      return refreshTrace(urls, maybe_trace);
+    }
+  } else {
+    return null;
+  }
+};
+
+export const hasBackendTrack = ({ sessions }, key1, key2) => {
+  if (sessions.has(key1)) {
+    return hasSessionTrack(sessions.get(key1), key2);
+  } else {
+    return null;
+  }
+};
+
+export const sendBackend = ({ sessions, configuration }, key, message) => {
+  logDebug("message >> %j", message);
   if (configuration.validate.message) {
     validateMessage(message);
   }
-  logDebug("message >> %j", message);
-  const { type } = message;
-  if (type === "start") {
-    const { track: key } = message;
-    assert(!tracks.has(key), "duplicate track", InternalAppmapError);
-    tracks.set(key, [...sources, message]);
-  } else if (type === "stop") {
-    const { track: key } = message;
-    if (key === null) {
-      for (const key of tracks.keys()) {
-        stopTrack(backend, key, message);
-      }
+  if (message.type === "open") {
+    if (sessions.has(key)) {
+      logError("Existing backend session %j on %j", key, message);
+      return false;
     } else {
-      stopTrack(backend, key, message);
+      sessions.set(key, createSession(configuration));
+      return true;
     }
   } else {
-    if (type === "source") {
-      sources.push(message);
-    }
-    for (const messages of tracks.values()) {
-      messages.push(message);
+    if (sessions.has(key)) {
+      if (message.type === "close") {
+        sessions.delete(key);
+        return true;
+      } else {
+        return sendSession(sessions.get(key), message);
+      }
+    } else {
+      logError("Missing backend session %j on %j", key, message);
+      return false;
     }
   }
 };
