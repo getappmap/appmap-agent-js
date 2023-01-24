@@ -1,5 +1,3 @@
-import { InternalAppmapError } from "../../error/index.mjs";
-import { assert } from "../../util/index.mjs";
 import {
   createConfiguration,
   extendConfiguration,
@@ -11,6 +9,8 @@ import {
   takeLocalAgentTrace,
   closeAgent,
 } from "../../agent/index.mjs";
+
+const isCore = ({ type }) => type !== "start" && type !== "stop";
 
 export const testHookAsync = async (
   { hook, unhook },
@@ -32,23 +32,8 @@ export const testHookAsync = async (
   try {
     recordStartTrack(agent, "record", {}, null);
     await callbackAsync();
-    // TODO this completely breaks encapsulation
-    //      but hook-fixture is only used for testing...
-    if (agent.emitter.backend.tracks.has("record")) {
-      recordStopTrack(agent, "record", { type: "manual" });
-    }
-    const trace = takeLocalAgentTrace(agent, "record");
-    assert(
-      trace[0].type === "start",
-      "expected start as first message",
-      InternalAppmapError,
-    );
-    assert(
-      trace[trace.length - 1].type === "stop",
-      "expected stop as last message",
-      InternalAppmapError,
-    );
-    return trace.slice(1, -1);
+    recordStopTrack(agent, "record", { type: "manual" });
+    return takeLocalAgentTrace(agent, "record").filter(isCore);
   } finally {
     closeAgent(agent);
     unhook(hooking);

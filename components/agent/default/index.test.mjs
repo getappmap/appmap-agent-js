@@ -56,6 +56,14 @@ recordAfterEvent(agent, tab, getAnswerPayload(agent));
 recordStopTrack(agent, "record", { type: "manual" });
 assertDeepEqual(takeLocalAgentTrace(agent, "record"), [
   {
+    type: "source",
+    url: "protocol://host/base/main.js",
+    content: "123;",
+    exclude: createConfiguration("protocol://host/home").exclude,
+    shallow: false,
+    inline: false,
+  },
+  {
     type: "start",
     track: "record",
     configuration: {},
@@ -66,14 +74,6 @@ assertDeepEqual(takeLocalAgentTrace(agent, "record"), [
     group: 0,
     child: 123,
     description: "description",
-  },
-  {
-    type: "source",
-    url: "protocol://host/base/main.js",
-    content: "123;",
-    exclude: createConfiguration("protocol://host/home").exclude,
-    shallow: false,
-    inline: false,
   },
   {
     type: "event",
