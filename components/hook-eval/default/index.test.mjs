@@ -22,16 +22,16 @@ assertDeepEqual(
     },
     () => {
       assertEqual(
-        evalGlobal(globalThis.EVAL("protocol://host/foo", "123;")),
-        123,
+        evalGlobal(globalThis.EVAL("protocol://host/foo", "123-456", "789;")),
+        789,
       );
     },
   ),
   [
     {
       type: "source",
-      url: "protocol://host/foo",
-      content: "123;",
+      url: "protocol://host/foo/eval-123-456-uuid.js",
+      content: "789;",
       shallow: true,
       exclude: createConfiguration("protocol://host/home").exclude,
       inline: false,
@@ -39,7 +39,10 @@ assertDeepEqual(
   ],
 );
 
-assertEqual(evalGlobal(globalThis.EVAL("protocol://host/foo", "123;")), 123);
+assertEqual(
+  evalGlobal(globalThis.EVAL("protocol://host/foo", "123-456", "789;")),
+  789,
+);
 
 assertDeepEqual(
   await testHookAsync(
