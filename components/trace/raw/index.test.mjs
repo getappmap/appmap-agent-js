@@ -1,10 +1,17 @@
 import { assertDeepEqual } from "../../__fixture__.mjs";
-import { createConfiguration } from "../../configuration/index.mjs";
 import { compileTrace } from "./index.mjs";
 
-const configuration = createConfiguration("protocol://host/home");
-
-assertDeepEqual(compileTrace(configuration, []), {
-  head: configuration,
-  body: [],
-});
+assertDeepEqual(
+  compileTrace(
+    {
+      recorder: "process",
+      appmap_dir: "protocol://host/dirname/",
+      appmap_file: "basename",
+    },
+    [],
+  ),
+  {
+    url: "protocol://host/dirname/process/basename.appmap.json",
+    content: [],
+  },
+);

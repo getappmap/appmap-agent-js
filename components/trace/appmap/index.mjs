@@ -13,6 +13,7 @@ import {
 } from "./classmap/index.mjs";
 import { digestEventTrace } from "./event/index.mjs";
 import { orderEventArray } from "./ordering/index.mjs";
+import { getLocationUrl } from "./location.mjs";
 
 const {
   Map,
@@ -206,7 +207,7 @@ export const compileTrace = (configuration, messages) => {
     printApplyDistribution,
   );
   return {
-    head: configuration,
-    body: appmap,
+    url: getLocationUrl(configuration),
+    content: appmap,
   };
 };

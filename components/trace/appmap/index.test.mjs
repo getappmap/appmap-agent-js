@@ -11,7 +11,10 @@ const { undefined } = globalThis;
 const configuration = extendConfiguration(
   createConfiguration("protocol://host/home/"),
   {
-    name: "name",
+    appmap_dir: "appmap_dir",
+    appmap_file: "appmap_file",
+    "map-name": "map-name",
+    name: "app-name",
     recorder: "process",
     agent: {
       directory: "protocol://host/agent/",
@@ -47,7 +50,7 @@ assertDeepEqual(
     {
       type: "start",
       configuration: {
-        name: "NAME",
+        name: "APP-NAME",
       },
       url: null,
     },
@@ -156,12 +159,12 @@ assertDeepEqual(
     },
   ]),
   {
-    head: { ...configuration, name: "NAME" },
-    body: {
+    url: "protocol://host/base/appmap_dir/process/appmap_file.appmap.json",
+    content: {
       version: "1.8.0",
       metadata: {
-        name: undefined,
-        app: "NAME",
+        name: "map-name",
+        app: "APP-NAME",
         labels: [],
         language: {
           name: "javascript",
