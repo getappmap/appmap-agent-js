@@ -85,7 +85,7 @@ const testAsync = async (test_url, bin_url) => {
   if (new RegExp(spec.os, "u").test(getPlatform())) {
     await Promise.all(
       (
-        await globAsync(`**/*${spec.output}`, test_url)
+        await globAsync(`**/*${spec.actual}`, test_url)
       ).map((path) => rmAsync(path)),
     );
     for (const command of spec.commands) {
