@@ -13,6 +13,7 @@ const {
 const { resolve: resolvePath, relative: unresolvePath } = PosixPath;
 
 export const sanitizePathFilename = (filename) =>
+  // Escape `.` and `..`
   /^\.*$/u.test(filename)
     ? `...${filename}`
     : filename.replace(/\\/gu, "\\\\").replace(/\//gu, "\\");
