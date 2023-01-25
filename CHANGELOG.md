@@ -1,3 +1,13 @@
+## [13.0.1](https://github.com/getappmap/appmap-agent-js/compare/v13.0.0...v13.0.1) (2023-01-25)
+
+
+### Bug Fixes
+
+* add undefined check for sourceRoot in source map ([6b1873b](https://github.com/getappmap/appmap-agent-js/commit/6b1873b695eb12b9ff55e7788cc2236fb1ca62dc))
+* allow jest transformer in separate context ([731dcc0](https://github.com/getappmap/appmap-agent-js/commit/731dcc030073833a3c094b7304010eddbc749c3c))
+* support running jest test in separate context ([2160e65](https://github.com/getappmap/appmap-agent-js/commit/2160e652a2043258ced6ba3e9f31889975437613))
+* unique dynamic url for eval source ([9880202](https://github.com/getappmap/appmap-agent-js/commit/9880202572b9598bdade0357dbf0582464cafdcd))
+
 # [13.0.0](https://github.com/getappmap/appmap-agent-js/compare/v12.2.0...v13.0.0) (2023-01-20)
 
 
