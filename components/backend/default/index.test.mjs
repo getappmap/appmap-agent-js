@@ -11,24 +11,23 @@ import {
   sendBackend,
 } from "./index.mjs";
 
-const backend = createBackend(
-  extendConfiguration(
-    createConfiguration("protocol://host/home/"),
-    {
-      recorder: "process",
-      appmap_dir: "dirname",
-      appmap_file: "basename",
-      validate: { message: true },
-    },
-    "protocol://host/base/",
-  ),
+const configuration = extendConfiguration(
+  createConfiguration("protocol://host/home/"),
+  {
+    recorder: "process",
+    appmap_dir: "dirname",
+    appmap_file: "basename",
+    validate: { message: true },
+  },
+  "protocol://host/base/",
 );
+
+const backend = createBackend(configuration);
 
 const message1 = {
   type: "start",
   track: "track",
-  configuration: {},
-  url: null,
+  configuration,
 };
 
 const message2 = {

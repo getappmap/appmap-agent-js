@@ -14,7 +14,7 @@ export const openReceptorAsync = async (configuration, backend) => {
     configuration["trace-port"],
   );
   const track_service = await openServiceAsync(
-    createTrackServer(backend),
+    createTrackServer(configuration, backend),
     configuration["track-port"],
   );
   logDebug("Trace port: %j", getServicePort(trace_service));

@@ -53,8 +53,7 @@ assertDeepEqual(appmap.stopRecording(track), [
   {
     type: "start",
     track: "uuid",
-    configuration: { name: "name2" },
-    url: null,
+    configuration: { ...configuration, name: "name2" },
   },
   {
     type: "stop",

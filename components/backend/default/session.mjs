@@ -38,8 +38,7 @@ const closeTrack = ({ tracks, traces }, key, message) => {
   }
 };
 
-export const createSession = (configuration) => ({
-  configuration,
+export const createSession = () => ({
   sources: [],
   tracks: new Map(),
   traces: new Map(),
@@ -47,14 +46,11 @@ export const createSession = (configuration) => ({
 
 export const hasSessionTrack = ({ tracks }, key) => tracks.has(key);
 
-export const compileSessionTrace = (
-  { traces, sources, configuration },
-  key,
-) => {
+export const compileSessionTrace = ({ traces, sources }, key) => {
   if (traces.has(key)) {
     const messages = traces.get(key);
     traces.delete(key);
-    return compileTrace(configuration, [...sources, ...messages]);
+    return compileTrace([...sources, ...messages]);
   } else {
     return null;
   }

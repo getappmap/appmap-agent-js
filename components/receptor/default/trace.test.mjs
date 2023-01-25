@@ -63,8 +63,7 @@ socket.write(createMessage("session"));
 const message1 = {
   type: "start",
   track: "record",
-  configuration: {},
-  url: null,
+  configuration,
 };
 
 socket.write(createMessage(stringifyJSON(message1)));

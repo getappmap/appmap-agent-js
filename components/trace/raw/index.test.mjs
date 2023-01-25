@@ -1,17 +1,26 @@
-import { assertDeepEqual } from "../../__fixture__.mjs";
+import { assertThrow, assertDeepEqual } from "../../__fixture__.mjs";
+import {
+  createConfiguration,
+  extendConfiguration,
+} from "../../configuration/index.mjs";
 import { compileTrace } from "./index.mjs";
 
-assertDeepEqual(
-  compileTrace(
-    {
-      recorder: "process",
-      appmap_dir: "protocol://host/dirname/",
-      appmap_file: "basename",
-    },
-    [],
-  ),
+const configuration = extendConfiguration(
+  createConfiguration("protocol://host/home/"),
   {
-    url: "protocol://host/dirname/process/basename.appmap.json",
-    content: [],
+    recorder: "process",
+    appmap_dir: "dirname",
+    appmap_file: "basename",
   },
+  "protocol://host/base/",
+);
+
+assertDeepEqual(compileTrace([{ type: "start", configuration }]), {
+  url: "protocol://host/base/dirname/process/basename.appmap.json",
+  content: [{ type: "start", configuration }],
+});
+
+assertThrow(
+  () => compileTrace([]),
+  /^InternalAppmapError: missing start message$/u,
 );

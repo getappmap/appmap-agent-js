@@ -28,8 +28,7 @@ const configuration = extendConfiguration(
   const message1 = {
     type: "start",
     track: "record",
-    configuration: {},
-    url: "protocol://host/path/",
+    configuration,
   };
   assertEqual(sendSession(session, message1), true);
   // duplicate track
@@ -79,8 +78,7 @@ const configuration = extendConfiguration(
   const message2 = {
     type: "start",
     track: "record",
-    configuration: { name: "name2" },
-    url: null,
+    configuration,
   };
   assertEqual(sendSession(session, message2), true);
   const message3 = {

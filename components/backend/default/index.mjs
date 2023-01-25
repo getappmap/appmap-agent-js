@@ -79,7 +79,7 @@ export const sendBackend = ({ sessions, configuration }, key, message) => {
       logError("Existing backend session %j on %j", key, message);
       return false;
     } else {
-      sessions.set(key, createSession(configuration));
+      sessions.set(key, createSession());
       return true;
     }
   } else {

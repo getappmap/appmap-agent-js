@@ -4,5 +4,5 @@ import { openAgent, recordStartTrack } from "../../agent/index.mjs";
 export const record = (configuration) => {
   const agent = openAgent(configuration);
   hook(agent, configuration);
-  recordStartTrack(agent, "process", {}, null);
+  recordStartTrack(agent, "process", configuration);
 };

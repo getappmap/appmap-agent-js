@@ -17,7 +17,7 @@ const configuration = extendConfiguration(
 
 const backend = createBackend(configuration);
 
-const server = createTrackServer(backend);
+const server = createTrackServer(configuration, backend);
 
 server.listen(0);
 
@@ -59,7 +59,11 @@ assertDeepEqual(await requestAsync(...req("GET")), {
 assertDeepEqual(await requestAsync(...req("DELETE")), {
   ...success,
   body: [
-    { type: "start", track: "record", configuration: {}, url: null },
+    {
+      type: "start",
+      track: "record",
+      configuration: { ...configuration, recorder: "remote" },
+    },
     {
       type: "stop",
       track: "record",

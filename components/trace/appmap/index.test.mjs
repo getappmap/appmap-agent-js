@@ -46,13 +46,10 @@ const location = makeLocation("protocol://host/home/dirname/filename.js", {
 });
 
 assertDeepEqual(
-  compileTrace(configuration, [
+  compileTrace([
     {
       type: "start",
-      configuration: {
-        name: "APP-NAME",
-      },
-      url: null,
+      configuration,
     },
     {
       type: "source",
@@ -164,7 +161,7 @@ assertDeepEqual(
       version: "1.8.0",
       metadata: {
         name: "map-name",
-        app: "APP-NAME",
+        app: "app-name",
         labels: [],
         language: {
           name: "javascript",

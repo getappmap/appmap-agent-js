@@ -2,9 +2,9 @@ import {
   InternalAppmapError,
   ExternalAppmapError,
 } from "../../error/index.mjs";
+import { assert } from "../../util/index.mjs";
 import { logError, logDebug, logInfo } from "../../log/index.mjs";
 import { validateAppmap } from "../../validate-appmap/index.mjs";
-import { extendConfiguration } from "../../configuration/index.mjs";
 import { compileMetadata } from "./metadata.mjs";
 import {
   createClassmap,
@@ -63,12 +63,9 @@ There is three ways to solve this issue:
 
 ${summary_template}`;
 
-export const compileTrace = (configuration, messages) => {
-  logDebug(
-    "Trace:\n  configuration = %j\n  messages = %j",
-    configuration,
-    messages,
-  );
+export const compileTrace = (messages) => {
+  logDebug("Trace: %j", messages);
+  let configuration = null;
   const sources = [];
   const errors = [];
   const events = [];
@@ -76,11 +73,12 @@ export const compileTrace = (configuration, messages) => {
   for (const message of messages) {
     const { type } = message;
     if (type === "start") {
-      configuration = extendConfiguration(
-        configuration,
-        message.configuration,
-        message.url,
+      assert(
+        configuration === null,
+        "duplicate start message",
+        InternalAppmapError,
       );
+      ({ configuration } = message);
     } else if (type === "stop") {
       termination = message.termination;
     } else if (type === "error") {
@@ -127,6 +125,7 @@ export const compileTrace = (configuration, messages) => {
       throw new InternalAppmapError("invalid message type");
     } /* c8 ignore stop */
   }
+  assert(configuration !== null, "missing start message", InternalAppmapError);
   const classmap = createClassmap(configuration);
   for (const source of sources) {
     addClassmapSource(classmap, source);

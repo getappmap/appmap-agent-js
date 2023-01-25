@@ -14,8 +14,7 @@ const emitter = openEmitter(configuration);
 const message1 = {
   type: "start",
   track: "record",
-  configuration: {},
-  url: null,
+  configuration,
 };
 
 const message2 = {

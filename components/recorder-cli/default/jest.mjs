@@ -2,6 +2,7 @@ import { ExternalAppmapError } from "../../error/index.mjs";
 import { logErrorWhen } from "../../log/index.mjs";
 import { getUuid } from "../../uuid/index.mjs";
 import { hook } from "../../hook/index.mjs";
+import { extendConfiguration } from "../../configuration/index.mjs";
 import { assert, hasOwnProperty } from "../../util/index.mjs";
 import {
   openAgent,
@@ -56,10 +57,13 @@ export const record = (configuration) => {
     recordStartTrack(
       agent,
       track,
-      {
-        "map-name": expect.getState().currentTestName,
-      },
-      null,
+      extendConfiguration(
+        configuration,
+        {
+          "map-name": expect.getState().currentTestName,
+        },
+        null,
+      ),
     );
   });
   afterEach(() => {

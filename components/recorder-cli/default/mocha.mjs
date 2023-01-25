@@ -2,6 +2,7 @@ import { hooks } from "../../../lib/node/mocha-hook.mjs";
 import { ExternalAppmapError } from "../../error/index.mjs";
 import { logErrorWhen } from "../../log/index.mjs";
 import { hook } from "../../hook/index.mjs";
+import { extendConfiguration } from "../../configuration/index.mjs";
 import { assert, coalesce, matchVersion } from "../../util/index.mjs";
 import { requirePeerDependency } from "../../peer/index.mjs";
 import {
@@ -71,10 +72,13 @@ export const record = (configuration) => {
     recordStartTrack(
       agent,
       `mocha-${String(counter)}`,
-      {
-        "map-name": name,
-      },
-      null,
+      extendConfiguration(
+        configuration,
+        {
+          "map-name": name,
+        },
+        null,
+      ),
     );
   };
   hooks.afterEach = (context) => {

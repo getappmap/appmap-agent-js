@@ -30,7 +30,7 @@ export const testHookAsync = async (
   const agent = openAgent(configuration);
   const hooking = hook(agent, configuration);
   try {
-    recordStartTrack(agent, "record", {}, null);
+    recordStartTrack(agent, "record", configuration);
     await callbackAsync();
     recordStopTrack(agent, "record", { type: "manual" });
     return takeLocalAgentTrace(agent, "record").filter(isCore);
