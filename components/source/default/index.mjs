@@ -9,6 +9,7 @@ import { makeLocation } from "../../location/index.mjs";
 import { validateSourceMap } from "../../validate/index.mjs";
 
 const {
+  undefined,
   JSON: { parse: parseJSON },
 } = globalThis;
 
@@ -79,7 +80,11 @@ export const createSourceMap = ({ url: base, content }) => {
     ...payload,
   };
   const root_base =
-    root === null || root === ""
+    // Ideally, payload is json and `sourceRoot` should never
+    // be `undefined`. But I had the case where the already
+    // parsed content had `undefined` for `sourceRoot`.
+    // This happened when `jest` compiled `jsx` with `babel`.
+    root === null || root === undefined || root === ""
       ? base
       : toDirectoryUrl(toAbsoluteUrl(root, base));
   return {

@@ -41,7 +41,7 @@ assertEqual(typeof getFreshTab(frontend), "number");
 
 validateMessage(formatGroup(frontend, 123, 456, "description"));
 
-validateMessage(formatStartTrack(frontend, "track", {}, null));
+validateMessage(formatStartTrack(frontend, "track", configuration));
 
 validateMessage(formatStopTrack(frontend, "track", { type: "manual" }));
 

@@ -1,4 +1,3 @@
-import { platform as getPlatform } from "node:os";
 import { resolve as resolvePath } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import {
@@ -7,7 +6,7 @@ import {
   mkdir as mkdirAsync,
   readdir as readdirAsync,
 } from "node:fs/promises";
-import { argv, cwd as getCwd } from "node:process";
+import { platform, argv, cwd as getCwd } from "node:process";
 import { parse as parseYAML } from "yaml";
 import glob from "glob";
 import minimist from "minimist";
@@ -55,11 +54,11 @@ const readFileMaybeAsync = async (url) => {
   }
 };
 
-const npm = getPlatform() === "win32" ? "npm.cmd" : "npm";
+const npm = platform === "win32" ? "npm.cmd" : "npm";
 
-const shell = getPlatform() === "win32" ? "cmd.exe" : "/bin/sh";
+const shell = platform === "win32" ? "cmd.exe" : "/bin/sh";
 
-const shell_command_flag = getPlatform() === "win32" ? "/c" : "-c";
+const shell_command_flag = platform === "win32" ? "/c" : "-c";
 
 const changeUrlExtension = (url, ext1, ext2) => {
   if (url.pathname.endsWith(ext1)) {
@@ -82,10 +81,10 @@ const testAsync = async (test_url, bin_url) => {
       (await readFileMaybeAsync(new URL("spec.yaml", test_url))) ?? "{}",
     ),
   };
-  if (new RegExp(spec.os, "u").test(getPlatform())) {
+  if (new RegExp(spec.os, "u").test(platform)) {
     await Promise.all(
       (
-        await globAsync(`**/*${spec.output}`, test_url)
+        await globAsync(`**/*${spec.actual}`, test_url)
       ).map((path) => rmAsync(path)),
     );
     for (const command of spec.commands) {

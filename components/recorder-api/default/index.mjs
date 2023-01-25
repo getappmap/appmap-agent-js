@@ -6,6 +6,7 @@ import { logError, logErrorWhen } from "../../log/index.mjs";
 import { assert } from "../../util/index.mjs";
 import { getUuid } from "../../uuid/index.mjs";
 import { runScript } from "../../interpretation/index.mjs";
+import { extendConfiguration } from "../../configuration/index.mjs";
 import { resolveConfigurationManualRecorder } from "../../configuration-accessor/index.mjs";
 import { hook, unhook } from "../../hook/index.mjs";
 import {
@@ -59,6 +60,7 @@ export class Appmap {
       ExternalAppmapError,
     );
     configuration = resolveConfigurationManualRecorder(configuration);
+    this.configuration = configuration;
     this.agent = openAgent(configuration);
     this.hooking = hook(this.agent, configuration);
     this.tracks = new Set();
@@ -91,7 +93,11 @@ export class Appmap {
       ExternalAppmapError,
     );
     this.tracks.add(track);
-    recordStartTrack(this.agent, track, conf, base);
+    recordStartTrack(
+      this.agent,
+      track,
+      extendConfiguration(this.configuration, conf, base),
+    );
     return track;
   }
   stopRecording(track, termination = { type: "manual" }) {

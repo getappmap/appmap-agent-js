@@ -1,31 +1,31 @@
-import { mkdir as mkdirAsync } from "fs/promises";
-import "../../__fixture__.mjs";
-import { getUuid } from "../../uuid/random/index.mjs";
-import { getTmpUrl } from "../../path/index.mjs";
-import { toAbsoluteUrl } from "../../url/index.mjs";
+import { assertNotEqual } from "../../__fixture__.mjs";
+import { createBackend } from "../../backend/index.mjs";
 import {
   createConfiguration,
   extendConfiguration,
 } from "../../configuration/index.mjs";
 import {
   openReceptorAsync,
-  minifyReceptorConfiguration,
-  closeReceptorAsync,
   adaptReceptorConfiguration,
+  closeReceptorAsync,
 } from "./index.mjs";
 
-const { URL } = globalThis;
-
-const base = toAbsoluteUrl(`${getUuid()}/`, getTmpUrl());
-await mkdirAsync(new URL(base));
 const configuration = extendConfiguration(
-  createConfiguration(base),
-  { recorder: "process", appmap_dir: "directory" },
-  base,
+  createConfiguration("protocol://host/home/"),
+  {
+    "trace-port": 0,
+    "track-port": 0,
+  },
+  "protocol://host/base/",
 );
 
-const receptor = await openReceptorAsync(
-  minifyReceptorConfiguration(configuration),
+const backend = createBackend(configuration);
+
+const receptor = await openReceptorAsync(configuration, backend);
+
+assertNotEqual(
+  adaptReceptorConfiguration(receptor, configuration)["trace-port"],
+  0,
 );
-adaptReceptorConfiguration(receptor, configuration);
+
 await closeReceptorAsync(receptor);

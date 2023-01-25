@@ -15,11 +15,9 @@ classMap:
     name: main.mjs
     children:
       - type: class
-        name: eval-1
         children:
           - type: function
             name: g
-            location: main.mjs/eval-1:1
             static: false
             source: null
             comment: null

@@ -11,44 +11,21 @@ const configuration = createConfiguration("protocol://host/home");
 
 const emitter = openEmitter(configuration);
 
-sendEmitter(emitter, {
+const message1 = {
   type: "start",
-  track: "record1",
-  configuration: {},
-  url: null,
-});
+  track: "record",
+  configuration,
+};
 
-sendEmitter(emitter, {
+const message2 = {
   type: "stop",
-  track: "record1",
+  track: "record",
   termination: { type: "manual" },
-});
+};
 
-assertDeepEqual(takeLocalEmitterTrace(emitter, "record1"), [
-  {
-    type: "start",
-    track: "record1",
-    configuration: {},
-    url: null,
-  },
-  {
-    type: "stop",
-    track: "record1",
-    termination: { type: "manual" },
-  },
-]);
+sendEmitter(emitter, message1);
+sendEmitter(emitter, message2);
 
-sendEmitter(emitter, {
-  type: "start",
-  track: "record2",
-  configuration: {},
-  url: null,
-});
+assertDeepEqual(takeLocalEmitterTrace(emitter, "record"), [message1, message2]);
 
 closeEmitter(emitter);
-
-sendEmitter(emitter, {
-  type: "stop",
-  track: "record2",
-  termination: { type: "manual" },
-});

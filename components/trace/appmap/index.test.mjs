@@ -11,7 +11,10 @@ const { undefined } = globalThis;
 const configuration = extendConfiguration(
   createConfiguration("protocol://host/home/"),
   {
-    name: "name",
+    appmap_dir: "appmap_dir",
+    appmap_file: "appmap_file",
+    "map-name": "map-name",
+    name: "app-name",
     recorder: "process",
     agent: {
       directory: "protocol://host/agent/",
@@ -43,13 +46,10 @@ const location = makeLocation("protocol://host/home/dirname/filename.js", {
 });
 
 assertDeepEqual(
-  compileTrace(configuration, [
+  compileTrace([
     {
       type: "start",
-      configuration: {
-        name: "NAME",
-      },
-      url: null,
+      configuration,
     },
     {
       type: "source",
@@ -156,12 +156,12 @@ assertDeepEqual(
     },
   ]),
   {
-    head: { ...configuration, name: "NAME" },
-    body: {
+    url: "protocol://host/base/appmap_dir/process/appmap_file.appmap.json",
+    content: {
       version: "1.8.0",
       metadata: {
-        name: undefined,
-        app: "NAME",
+        name: "map-name",
+        app: "app-name",
         labels: [],
         language: {
           name: "javascript",

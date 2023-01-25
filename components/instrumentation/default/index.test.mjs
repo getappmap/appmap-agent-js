@@ -24,6 +24,8 @@ const makeExclusion = (name) => ({
   recursive: true,
 });
 
+const default_exclude = createConfiguration("protocol://host/home").exclude;
+
 const normalizeContent = ({ content, ...rest }, source) => ({
   content: normalize(content, source),
   ...rest,
@@ -48,9 +50,6 @@ const normalizeContent = ({ content, ...rest }, source) => ({
                 {
                   path: "invalid.js",
                   enabled: true,
-                  exclude: ["foo"],
-                  shallow: true,
-                  "inline-source": true,
                 },
               ],
             },
@@ -61,6 +60,52 @@ const normalizeContent = ({ content, ...rest }, source) => ({
         createMirrorSourceMap(file),
       ),
     /^ExternalAppmapError: Failed to parse js file$/u,
+  );
+}
+
+{
+  const file = {
+    url: "protocol://host/base/script.js",
+    content: "function main () {}",
+    type: "script",
+  };
+  assertDeepEqual(
+    instrument(
+      createInstrumentation(
+        extendConfiguration(
+          createConfiguration("protocol://host/home/"),
+          {
+            "inline-source": false,
+            hooks: { apply: null, eval: false },
+            packages: [
+              {
+                path: "script.js",
+                enabled: true,
+                exclude: [],
+                shallow: true,
+                "inline-source": true,
+              },
+            ],
+          },
+          "protocol://host/base/",
+        ),
+      ),
+      file,
+      createMirrorSourceMap(file),
+    ),
+    {
+      url: "protocol://host/base/script.js",
+      content: "function main () {}",
+      sources: [
+        {
+          url: "protocol://host/base/script.js",
+          content: "function main () {}",
+          shallow: true,
+          inline: true,
+          exclude: default_exclude,
+        },
+      ],
+    },
   );
 }
 
@@ -114,7 +159,7 @@ const instrumentation = createInstrumentation(
           exclude: [
             makeExclusion("foo"),
             makeExclusion("qux"),
-            ...createConfiguration("protocol://host/home").exclude,
+            ...default_exclude,
           ],
         },
       ],

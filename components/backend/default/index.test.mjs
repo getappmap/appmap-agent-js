@@ -5,141 +5,101 @@ import {
 } from "../../configuration/index.mjs";
 import {
   createBackend,
-  sendBackend,
-  getBackendTrackIterator,
-  getBackendTraceIterator,
-  hasBackendTrace,
+  compileBackendTrace,
+  compileBackendTraceArray,
   hasBackendTrack,
-  takeBackendTrace,
+  sendBackend,
 } from "./index.mjs";
 
-const {
-  undefined,
-  Array: { from: toArray },
-} = globalThis;
-
 const configuration = extendConfiguration(
-  createConfiguration("protocol://host/home"),
-  { name: "name", validate: { message: true } },
-  null,
+  createConfiguration("protocol://host/home/"),
+  {
+    recorder: "process",
+    appmap_dir: "dirname",
+    appmap_file: "basename",
+    validate: { message: true },
+  },
+  "protocol://host/base/",
 );
 
-{
-  const backend = createBackend(configuration);
-  // record1 >> stop one && standard message //
-  assertEqual(
-    sendBackend(backend, {
-      type: "start",
-      track: "record1",
-      configuration: { name: "name1" },
-      url: null,
-    }),
-    undefined,
-  );
-  assertEqual(
-    sendBackend(backend, {
-      type: "error",
-      error: {
-        type: "number",
-        print: "123",
-      },
-    }),
-    undefined,
-  );
-  assertEqual(hasBackendTrace(backend, "record1"), false);
-  assertDeepEqual(toArray(getBackendTrackIterator(backend)), ["record1"]);
-  assertEqual(
-    sendBackend(backend, {
-      type: "stop",
-      track: "record1",
-      termination: {
-        type: "manual",
-      },
-    }),
-    undefined,
-  );
-  assertDeepEqual(toArray(getBackendTraceIterator(backend)), ["record1"]);
-  assertEqual(hasBackendTrack(backend, "record1"), false);
-  assertDeepEqual(takeBackendTrace(backend, "record1"), {
-    head: configuration,
-    body: [
-      {
-        type: "start",
-        track: "record1",
-        configuration: { name: "name1" },
-        url: null,
-      },
-      {
-        type: "error",
-        error: {
-          type: "number",
-          print: "123",
-        },
-      },
-      {
-        type: "stop",
-        track: "record1",
-        termination: {
-          type: "manual",
-        },
-      },
-    ],
-  });
-  // record2 >> stop all && source message //
-  assertEqual(
-    sendBackend(backend, {
-      type: "source",
-      url: "protocol://host/cwd/main.js",
-      content: "function main () {}",
-      shallow: false,
-      inline: false,
-      exclude: [],
-    }),
-    undefined,
-  );
-  assertEqual(
-    sendBackend(backend, {
-      type: "start",
-      track: "record2",
-      configuration: { name: "name2" },
-      url: null,
-    }),
-    undefined,
-  );
-  assertEqual(
-    sendBackend(backend, {
-      type: "stop",
-      track: null,
-      termination: {
-        type: "manual",
-      },
-    }),
-    undefined,
-  );
-  assertDeepEqual(takeBackendTrace(backend, "record2"), {
-    head: configuration,
-    body: [
-      {
-        type: "source",
-        url: "protocol://host/cwd/main.js",
-        content: "function main () {}",
-        shallow: false,
-        inline: false,
-        exclude: [],
-      },
-      {
-        type: "start",
-        track: "record2",
-        configuration: { name: "name2" },
-        url: null,
-      },
-      {
-        type: "stop",
-        track: null,
-        termination: {
-          type: "manual",
-        },
-      },
-    ],
-  });
-}
+const backend = createBackend(configuration);
+
+const message1 = {
+  type: "start",
+  track: "track",
+  configuration,
+};
+
+const message2 = {
+  type: "stop",
+  track: "track",
+  termination: { type: "manual" },
+};
+
+////////////////
+// happy path //
+////////////////
+
+assertEqual(sendBackend(backend, "session", { type: "open" }), true);
+
+assertEqual(hasBackendTrack(backend, "session", "track"), false);
+
+assertEqual(sendBackend(backend, "session", message1), true);
+
+assertEqual(hasBackendTrack(backend, "session", "track"), true);
+
+assertEqual(sendBackend(backend, "session", message2), true);
+
+assertDeepEqual(compileBackendTrace(backend, "session", "track"), {
+  url: "protocol://host/base/dirname/process/basename.appmap.json",
+  content: [message1, message2],
+});
+
+assertEqual(hasBackendTrack(backend, "session", "track"), false);
+
+assertEqual(sendBackend(backend, "session", message1), true);
+
+assertEqual(sendBackend(backend, "session", message2), true);
+
+assertDeepEqual(compileBackendTraceArray(backend, "session"), [
+  {
+    url: "protocol://host/base/dirname/process/basename-1.appmap.json",
+    content: [message1, message2],
+  },
+]);
+
+assertEqual(sendBackend(backend, "session", { type: "close" }), true);
+
+/////////////////////
+// missing session //
+/////////////////////
+
+assertEqual(hasBackendTrack(backend, "session", "track"), null);
+
+assertEqual(compileBackendTraceArray(backend, "session"), null);
+
+assertEqual(compileBackendTrace(backend, "session", "record"), null);
+
+assertEqual(sendBackend(backend, "session", message1), false);
+
+///////////////////////
+// duplicate session //
+///////////////////////
+
+assertEqual(sendBackend(backend, "session", { type: "open" }), true);
+
+assertEqual(sendBackend(backend, "session", { type: "open" }), false);
+
+assertEqual(sendBackend(backend, "session", { type: "close" }), true);
+
+assertEqual(sendBackend(backend, "session", { type: "close" }), false);
+
+///////////////////
+// missing track //
+///////////////////
+
+assertEqual(sendBackend(backend, "session", { type: "open" }), true);
+
+assertEqual(compileBackendTrace(backend, "session", "record"), null);
+
+assertEqual(sendBackend(backend, "session", { type: "close" }), true);

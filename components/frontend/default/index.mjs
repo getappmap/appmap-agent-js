@@ -82,11 +82,10 @@ export const formatError = ({ serialization }, value) => ({
   error: serialize(serialization, value),
 });
 
-export const formatStartTrack = ({}, track, configuration, url) => ({
+export const formatStartTrack = ({}, track, configuration) => ({
   type: "start",
   track,
   configuration,
-  url,
 });
 
 export const formatStopTrack = ({}, track, termination) => ({

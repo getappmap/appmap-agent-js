@@ -7,7 +7,6 @@ import {
   getBox,
 } from "../../util/index.mjs";
 import { logWarning } from "../../log/index.mjs";
-import { getUuid } from "../../uuid/index.mjs";
 import { requestAsync } from "../../http/index.mjs";
 import { openSocket, closeSocket, sendSocket } from "../../socket/index.mjs";
 
@@ -22,15 +21,12 @@ export const openEmitter = (configuration) => {
     "track-port": track_port,
     session,
   } = configuration;
-  if (session === null) {
-    session = getUuid();
-  }
+  assert(session !== null, "session is not resolved", InternalAppmapError);
   if (host === "localhost") {
     host = "127.0.0.1";
   }
   const socket = openSocket(host, trace_port, configuration);
   sendSocket(socket, session);
-  sendSocket(socket, stringifyJSON(configuration));
   return { socket, session, host, track_port, closed: createBox(false) };
 };
 

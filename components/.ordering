@@ -48,10 +48,9 @@ hook-http
 hook-http-client
 hook-http-server
 hook
+transformer-jest
 recorder-api
 recorder-cli
-receptor-file
-receptor-http
 receptor
 batch
 questionnaire

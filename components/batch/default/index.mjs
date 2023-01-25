@@ -1,6 +1,13 @@
 import { platform } from "node:process";
-import { ExternalAppmapError } from "../../error/index.mjs";
-import { hasOwnProperty } from "../../util/index.mjs";
+import {
+  mkdir as mkdirAsync,
+  writeFile as writeFileAsync,
+} from "node:fs/promises";
+import {
+  InternalAppmapError,
+  ExternalAppmapError,
+} from "../../error/index.mjs";
+import { hasOwnProperty, assert } from "../../util/index.mjs";
 import { logError, logDebug, logInfo, logWarning } from "../../log/index.mjs";
 import {
   pickPlatformSpecificCommand,
@@ -13,16 +20,23 @@ import {
   openReceptorAsync,
   closeReceptorAsync,
   adaptReceptorConfiguration,
-  minifyReceptorConfiguration,
 } from "../../receptor/index.mjs";
+import {
+  createBackend,
+  sendBackend,
+  compileBackendTraceArray,
+} from "../../backend/index.mjs";
 import { spawnAsync, killAllAsync } from "./spawn.mjs";
 import { whereAsync } from "./where.mjs";
 
 const {
+  URL,
   Set,
-  Map,
   JSON: { stringify: stringifyJSON },
 } = globalThis;
+
+// Support for remote recording: (GET|POST|DELETE) /_appmap/record
+const DEFAULT_SESSION = "_appmap";
 
 const isCommandNonNull = ({ command }) => command !== null;
 
@@ -56,6 +70,25 @@ const spawnWithHandlerAsync = async (command, children, tokens, located) => {
   }
 };
 
+const sendBatchBackend = (backend, session, message) => {
+  assert(
+    sendBackend(backend, session, message),
+    "invalid batch message",
+    InternalAppmapError,
+  );
+};
+
+const defineConfigurationSession = (configuration) => {
+  if (configuration.session === null) {
+    return {
+      ...configuration,
+      session: DEFAULT_SESSION,
+    };
+  } else {
+    return configuration;
+  }
+};
+
 export const mainAsync = async (process, configuration) => {
   configuration = resolveConfigurationRepository(configuration);
   const { env } = process;
@@ -65,19 +98,14 @@ export const mainAsync = async (process, configuration) => {
     killAllAsync(children);
     interrupted = true;
   });
-  const receptors = new Map();
-  const createReceptorAsync = async (configuration) => {
-    const receptor_configuration = minifyReceptorConfiguration(configuration);
-    const key = stringifyJSON(receptor_configuration);
-    if (!receptors.has(key)) {
-      receptors.set(key, await openReceptorAsync(receptor_configuration));
-    }
-    return receptors.get(key);
-  };
+  const backend = createBackend(configuration);
+  const receptor = await openReceptorAsync(configuration, backend);
   const runConfigurationAsync = async (configuration, env) => {
+    configuration = defineConfigurationSession(configuration);
     configuration = resolveConfigurationAutomatedRecorder(configuration, env);
-    const receptor = await createReceptorAsync(configuration);
     configuration = adaptReceptorConfiguration(receptor, configuration);
+    const { session } = configuration;
+    sendBatchBackend(backend, session, { type: "open" });
     const { tokens } = configuration.command;
     const command = await compileConfigurationCommandAsync(configuration, env);
     logDebug("spawn child command = %j", command);
@@ -92,6 +120,21 @@ export const mainAsync = async (process, configuration) => {
     } else {
       logInfo("> Exited with: %j", status);
     }
+    sendBatchBackend(backend, session, {
+      type: "stop",
+      track: null,
+      termination: { type: "unknown" },
+    });
+    for (const { url, content } of compileBackendTraceArray(backend, session)) {
+      await mkdirAsync(new URL(".", url), { recursive: true });
+      await writeFileAsync(
+        new URL(url),
+        stringifyJSON(content, null, 2),
+        "utf8",
+      );
+      logInfo("Appmap written at %j", url);
+    }
+    sendBatchBackend(backend, session, { type: "close" });
     return { tokens, signal, status };
   };
   const configurations = [
@@ -124,9 +167,7 @@ export const mainAsync = async (process, configuration) => {
       }
     }
   } finally {
-    for (const receptor of receptors.values()) {
-      await closeReceptorAsync(receptor);
-    }
+    await closeReceptorAsync(receptor);
   }
   return 0;
 };

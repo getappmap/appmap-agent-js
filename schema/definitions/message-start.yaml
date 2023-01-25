@@ -4,15 +4,10 @@ required:
   - type
   - track
   - configuration
-  - url
 properties:
   type:
     const: start
   track:
     type: string
   configuration:
-    $ref: configuration-external
-  url:
-    anyOf:
-      - const: null
-      - $ref: url
+    $ref: configuration-internal

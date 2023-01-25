@@ -21,19 +21,19 @@ import {
 
 const { eval: evalGlobal } = globalThis;
 
-const agent = openAgent(
-  extendConfiguration(
-    createConfiguration("protocol://host/home/"),
-    {
-      packages: ["*"],
-    },
-    "protocol://host/base/",
-  ),
+const configuration = extendConfiguration(
+  createConfiguration("protocol://host/home/"),
+  {
+    packages: ["*"],
+  },
+  "protocol://host/base/",
 );
+
+const agent = openAgent(configuration);
 
 getSerializationEmptyValue(agent);
 
-recordStartTrack(agent, "record", {}, null);
+recordStartTrack(agent, "record", configuration);
 recordGroup(agent, 123, "description");
 assertEqual(
   evalGlobal(
@@ -54,20 +54,7 @@ recordBeforeEvent(
 );
 recordAfterEvent(agent, tab, getAnswerPayload(agent));
 recordStopTrack(agent, "record", { type: "manual" });
-closeAgent(agent);
 assertDeepEqual(takeLocalAgentTrace(agent, "record"), [
-  {
-    type: "start",
-    track: "record",
-    configuration: {},
-    url: null,
-  },
-  {
-    type: "group",
-    group: 0,
-    child: 123,
-    description: "description",
-  },
   {
     type: "source",
     url: "protocol://host/base/main.js",
@@ -75,6 +62,17 @@ assertDeepEqual(takeLocalAgentTrace(agent, "record"), [
     exclude: createConfiguration("protocol://host/home").exclude,
     shallow: false,
     inline: false,
+  },
+  {
+    type: "start",
+    track: "record",
+    configuration,
+  },
+  {
+    type: "group",
+    group: 0,
+    child: 123,
+    description: "description",
   },
   {
     type: "event",
@@ -104,3 +102,4 @@ assertDeepEqual(takeLocalAgentTrace(agent, "record"), [
     termination: { type: "manual" },
   },
 ]);
+closeAgent(agent);

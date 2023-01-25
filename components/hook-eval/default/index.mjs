@@ -5,6 +5,8 @@
 //   throw new ExternalAppmapError("lib/emitter/hook/esm.js must be preloaded with --experimental loader");
 // }};
 
+import { toAbsoluteUrl, toDirectoryUrl } from "../../url/index.mjs";
+import { getUuid } from "../../uuid/index.mjs";
 import { InternalAppmapError } from "../../error/index.mjs";
 import { assert, hasOwnProperty } from "../../util/index.mjs";
 import { instrument } from "../../agent/index.mjs";
@@ -14,7 +16,7 @@ const {
   Reflect: { defineProperty },
 } = globalThis;
 
-const forward = (_url, content) => content;
+const forward = (_url, _location, content) => content;
 
 export const unhook = (maybe_hidden) => {
   if (maybe_hidden !== null) {
@@ -53,11 +55,17 @@ export const hook = (
       writable: false,
       enumerable: false,
       configurable: true,
-      value: (url, content) =>
+      value: (url, location, content) =>
         instrument(
           agent,
           {
-            url,
+            // We need to use a unique filename because
+            // a single eval call location may evaluate
+            // multiple different code.
+            url: toAbsoluteUrl(
+              `eval-${location}-${getUuid()}.js`,
+              toDirectoryUrl(url),
+            ),
             type: "script",
             content: String(content),
           },
