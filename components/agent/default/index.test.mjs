@@ -54,7 +54,6 @@ recordBeforeEvent(
 );
 recordAfterEvent(agent, tab, getAnswerPayload(agent));
 recordStopTrack(agent, "record", { type: "manual" });
-closeAgent(agent);
 assertDeepEqual(takeLocalAgentTrace(agent, "record"), [
   {
     type: "start",
@@ -104,3 +103,4 @@ assertDeepEqual(takeLocalAgentTrace(agent, "record"), [
     termination: { type: "manual" },
   },
 ]);
+closeAgent(agent);
