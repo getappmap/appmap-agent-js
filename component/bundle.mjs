@@ -4,6 +4,7 @@ import { getComponentMainUrl, getBundleUrl } from "./layout.mjs";
 import { routeAsync } from "./route.mjs";
 
 const {
+  Error,
   URL,
   JSON: { stringify: stringifyJSON },
 } = globalThis;

@@ -1,5 +1,6 @@
 import { ExternalAppmapError } from "../../error/index.mjs";
 import { logErrorWhen } from "../../log/index.mjs";
+import { getUuid } from "../../uuid/index.mjs";
 import { hook } from "../../hook/index.mjs";
 import { assert, hasOwnProperty } from "../../util/index.mjs";
 import {
@@ -7,8 +8,6 @@ import {
   recordStartTrack,
   recordStopTrack,
 } from "../../agent/index.mjs";
-
-const { String } = globalThis;
 
 export const record = (configuration) => {
   // I would prefer to use require rather that global variable:
@@ -40,37 +39,44 @@ export const record = (configuration) => {
   const { beforeEach, afterEach, expect } = globalThis;
   const agent = openAgent(configuration);
   hook(agent, configuration);
-  let running = null;
-  let counter = 0;
+  let track = null;
   beforeEach(() => {
-    const name = expect.getState().currentTestName;
     assert(
       !logErrorWhen(
-        running !== null,
-        "Detected conccurent jest test cases: %j and %j",
-        running,
-        name,
+        track !== null,
+        "Detected concurrent jest test cases %j",
+        track,
       ),
       "Concurrent jest test cases",
       ExternalAppmapError,
     );
-    running = name;
-    counter += 1;
+    // We cannot use a counter because another jest
+    // agent may be running in a different context.
+    track = `jest-${getUuid()}`;
     recordStartTrack(
       agent,
-      `jest-${String(counter)}`,
+      track,
       {
-        "map-name": name,
+        "map-name": expect.getState().currentTestName,
       },
       null,
     );
   });
   afterEach(() => {
-    recordStopTrack(agent, `jest-${String(counter)}`, {
+    assert(
+      !logErrorWhen(
+        track === null,
+        "Detected concurrent jest test cases %j",
+        track,
+      ),
+      "Concurrent jest test cases",
+      ExternalAppmapError,
+    );
+    recordStopTrack(agent, track, {
       type: "test",
       // TODO: figure out how to fetch the status of the current test case
       passed: true,
     });
-    running = null;
+    track = null;
   });
 };
