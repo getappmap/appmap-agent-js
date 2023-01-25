@@ -1,41 +1,37 @@
-import { InternalAppmapError } from "../../error/index.mjs";
-import { assert } from "../../util/index.mjs";
-import * as ReceptorFile from "../../receptor-file/index.mjs";
-import * as ReceptorHttp from "../../receptor-http/index.mjs";
+import {
+  openServiceAsync,
+  closeServiceAsync,
+  getServicePort,
+} from "../../service/index.mjs";
+import { extendConfigurationPort } from "../../configuration-accessor/index.mjs";
+import { logDebug } from "../../log/index.mjs";
+import { createTraceServer } from "./trace.mjs";
+import { createTrackServer } from "./track.mjs";
 
-const { Map } = globalThis;
-
-const Recepters = new Map([
-  ["remote", ReceptorHttp],
-  ["process", ReceptorFile],
-  ["mocha", ReceptorFile],
-  ["jest", ReceptorFile],
-]);
-
-export const minifyReceptorConfiguration = (configuration) => {
-  assert(
-    configuration.recorder !== null,
-    "undefined recorder in configuration",
-    InternalAppmapError,
+export const openReceptorAsync = async (configuration, backend) => {
+  const trace_service = await openServiceAsync(
+    createTraceServer(backend),
+    configuration["trace-port"],
   );
-  return Recepters.get(configuration.recorder).minifyReceptorConfiguration(
-    configuration,
+  const track_service = await openServiceAsync(
+    createTrackServer(backend),
+    configuration["track-port"],
   );
-};
-
-export const openReceptorAsync = async (configuration) => ({
-  recorder: configuration.recorder,
-  receptor: await Recepters.get(configuration.recorder).openReceptorAsync(
-    configuration,
-  ),
-});
-
-export const closeReceptorAsync = async ({ recorder, receptor }) => {
-  await Recepters.get(recorder).closeReceptorAsync(receptor);
+  logDebug("Trace port: %j", getServicePort(trace_service));
+  logDebug("Track port: %j", getServicePort(track_service));
+  return { trace_service, track_service };
 };
 
 export const adaptReceptorConfiguration = (
-  { recorder, receptor },
+  { trace_service, track_service },
   configuration,
 ) =>
-  Recepters.get(recorder).adaptReceptorConfiguration(receptor, configuration);
+  extendConfigurationPort(configuration, {
+    "trace-port": getServicePort(trace_service),
+    "track-port": getServicePort(track_service),
+  });
+
+export const closeReceptorAsync = async ({ trace_service, track_service }) => {
+  await closeServiceAsync(trace_service);
+  await closeServiceAsync(track_service);
+};

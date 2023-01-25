@@ -50,8 +50,6 @@ hook-http-server
 hook
 recorder-api
 recorder-cli
-receptor-file
-receptor-http
 receptor
 batch
 questionnaire
