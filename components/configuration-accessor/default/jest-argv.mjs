@@ -2,7 +2,7 @@ import * as Minimist from "minimist";
 import { ExternalAppmapError } from "../../error/index.mjs";
 import { logError, logErrorWhen } from "../../log/index.mjs";
 import { hasOwnProperty, assert, constant } from "../../util/index.mjs";
-import { loadJestConfigAsync } from "./jest-config.mjs";
+import { loadJestConfigAsync, resolveJestPresetAsync } from "./jest-config.mjs";
 import { self_directory } from "../../self/index.mjs";
 import { convertFileUrlToPath } from "../../path/index.mjs";
 import { toAbsoluteUrl, toDirectoryUrl } from "../../url/index.mjs";
@@ -101,7 +101,10 @@ export const hookJestArgvAsync = async (argv, base) => {
       ...argv.slice(index + 2, argv.length),
     ];
   } else {
-    const config = await loadJestConfigAsync(options, { root, base });
+    const config = await resolveJestPresetAsync(
+      await loadJestConfigAsync(options, { root, base }),
+      root,
+    );
     const transform = hasOwnProperty(config, "transform")
       ? config.transform
       : // Default jest transformer.
