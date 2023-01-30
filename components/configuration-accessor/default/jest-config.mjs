@@ -59,7 +59,7 @@ const loadConfigFileAsync = async (url, strict) => {
   }
 };
 
-const loadPackageAsync = async (directory) => {
+const loadPackageJsonAsync = async (directory) => {
   try {
     return parseJSON(
       await readFileAsync(
@@ -83,7 +83,7 @@ export const loadJestConfigAsync = async (options, { root, base }) => {
   } else {
     const { jest: maybe_package_config } = {
       jest: null,
-      ...(await loadPackageAsync(root)),
+      ...(await loadPackageJsonAsync(root)),
     };
     if (maybe_package_config !== null) {
       return maybe_package_config;
