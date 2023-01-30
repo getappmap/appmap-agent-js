@@ -45,11 +45,9 @@ export const createSource = (
     content,
   };
   const entities = wrapRootEntityArray(
-    digestEstreeRoot(estree, context).flatMap((entity) =>
-      excludeEntity(entity, null, getExclusion),
-    ),
+    digestEstreeRoot(estree, context),
     context,
-  );
+  ).flatMap((entity) => excludeEntity(entity, null, getExclusion));
   const infos = new Map();
   for (const entity of entities) {
     registerFunctionEntity(entity, null, infos);

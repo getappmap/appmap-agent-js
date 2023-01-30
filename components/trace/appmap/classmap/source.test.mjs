@@ -36,8 +36,8 @@ assertDeepEqual(
       exclusions: [
         {
           combinator: "or",
-          name: "g",
-          "qualified-name": false,
+          name: false,
+          "qualified-name": "^basename\\.g$",
           "some-label": false,
           "every-label": false,
           excluded: true,
