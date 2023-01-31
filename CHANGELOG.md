@@ -1,3 +1,16 @@
+# [13.1.0](https://github.com/getappmap/appmap-agent-js/compare/v13.0.1...v13.1.0) (2023-01-31)
+
+
+### Bug Fixes
+
+* ignore json files in jest transformer ([6dbfc70](https://github.com/getappmap/appmap-agent-js/commit/6dbfc7031eefc881a7569ef76c8a80a88d4cba76))
+* support concurrent jest test case ([75c9696](https://github.com/getappmap/appmap-agent-js/commit/75c9696d882841634722c6eb8561a0834d33958b))
+
+
+### Features
+
+* support jest preset ([15c5e5e](https://github.com/getappmap/appmap-agent-js/commit/15c5e5e9ca8ae1b8dd410a449ecd5817dca6ce87))
+
 ## [13.0.1](https://github.com/getappmap/appmap-agent-js/compare/v13.0.0...v13.0.1) (2023-01-25)
 
 
