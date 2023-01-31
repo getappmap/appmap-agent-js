@@ -1,10 +1,13 @@
 import { readFile as readFileAsync } from "node:fs/promises";
 import { createRequire } from "node:module";
 import { hasOwnProperty } from "../../util/index.mjs";
-import { logError } from "../../log/index.mjs";
+import { logError, logDebug } from "../../log/index.mjs";
 import { ExternalAppmapError } from "../../error/index.mjs";
 import { self_directory } from "../../self/index.mjs";
-import { convertFileUrlToPath } from "../../path/index.mjs";
+import {
+  convertFileUrlToPath,
+  convertPathToFileUrl,
+} from "../../path/index.mjs";
 import { getUrlFilename, toAbsoluteUrl } from "../../url/index.mjs";
 
 const {
@@ -59,7 +62,7 @@ const loadConfigFileAsync = async (url, strict) => {
   }
 };
 
-const loadPackageAsync = async (directory) => {
+const loadPackageJsonAsync = async (directory) => {
   try {
     return parseJSON(
       await readFileAsync(
@@ -83,7 +86,7 @@ export const loadJestConfigAsync = async (options, { root, base }) => {
   } else {
     const { jest: maybe_package_config } = {
       jest: null,
-      ...(await loadPackageAsync(root)),
+      ...(await loadPackageJsonAsync(root)),
     };
     if (maybe_package_config !== null) {
       return maybe_package_config;
@@ -99,5 +102,49 @@ export const loadJestConfigAsync = async (options, { root, base }) => {
       }
       return {};
     }
+  }
+};
+
+const PRESET_FILE_NAME_ARRAY = [
+  "jest-preset.json",
+  "jest-preset.js",
+  "jest-preset.cjs",
+  "jest-preset.mjs",
+];
+
+const resolvePresetSpecifier = (specifier, root) => {
+  if (specifier.startsWith("./") || specifier.startsWith("../")) {
+    return toAbsoluteUrl(specifier, root);
+  } else {
+    const { resolve } = createRequire(new URL(root));
+    for (const filename of PRESET_FILE_NAME_ARRAY) {
+      const sub_specifier = `${specifier}/${filename}`;
+      try {
+        return convertPathToFileUrl(resolve(sub_specifier));
+      } catch (error) {
+        logDebug(
+          "Could not resolve jest preset at %j >> %O",
+          sub_specifier,
+          error,
+        );
+      }
+    }
+    logError("Could not resolve jest preset at %j", specifier);
+    throw new ExternalAppmapError("Could not resolve jest preset");
+  }
+};
+
+export const resolveJestPresetAsync = async (config, root) => {
+  if (hasOwnProperty(config, "preset")) {
+    return {
+      ...(await loadConfigFileAsync(
+        resolvePresetSpecifier(config.preset, root),
+        true,
+      )),
+      ...config,
+      preset: null,
+    };
+  } else {
+    return config;
   }
 };

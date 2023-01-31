@@ -6,7 +6,7 @@ import { assertDeepEqual, assertReject } from "../../__fixture__.mjs";
 import { getTmpUrl } from "../../path/index.mjs";
 import { getUuid } from "../../uuid/random/index.mjs";
 import { toAbsoluteUrl } from "../../url/index.mjs";
-import { loadJestConfigAsync } from "./jest-config.mjs";
+import { loadJestConfigAsync, resolveJestPresetAsync } from "./jest-config.mjs";
 
 const { URL } = globalThis;
 
@@ -274,3 +274,37 @@ assertDeepEqual(
   ),
   { filename: "package.json" },
 );
+
+////////////
+// Preset //
+////////////
+
+await assertReject(
+  resolveJestPresetAsync({ preset: "./missing-jest-preset.json" }, home),
+  /^ExternalAppmapError: Cannot find jest configuration file$/u,
+);
+
+await assertReject(
+  resolveJestPresetAsync({ preset: "missing-jest-preset" }, home),
+  /^ExternalAppmapError: Could not resolve jest preset$/u,
+);
+
+await mkdirAsync(new URL("node_modules/preset", home), { recursive: true });
+
+await writeFileAsync(
+  new URL("node_modules/preset/jest-preset.js", home),
+  `
+    const { basename } = require("node:path");
+    module.exports = { filename: basename(__filename) };
+  `,
+  "utf8",
+);
+
+assertDeepEqual(
+  await resolveJestPresetAsync({ preset: "preset", foo: "bar" }, home),
+  { foo: "bar", filename: "jest-preset.js", preset: null },
+);
+
+assertDeepEqual(await resolveJestPresetAsync({ foo: "bar" }, home), {
+  foo: "bar",
+});
