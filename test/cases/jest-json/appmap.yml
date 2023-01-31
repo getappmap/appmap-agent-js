@@ -1,0 +1,16 @@
+recorder: jest
+command: npx jest --no-cache
+command-win32: npx.cmd jest --no-cache
+appmap_dir: .
+packages:
+  path: main.json
+  enabled: true
+hooks:
+  cjs: true
+  esm: false
+  apply: true
+  eval: false
+  http: false
+  mysql: false
+  pg: false
+  sqlite3: false
