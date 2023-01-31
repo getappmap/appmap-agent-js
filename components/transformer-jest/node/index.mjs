@@ -60,7 +60,13 @@ const transform = (
   { supportsStaticESM: is_module },
   { hooks: { esm, cjs } },
 ) => {
-  if (is_module ? esm : cjs) {
+  // Unfortunately, Jest does not provide definitive information
+  // on the type of script that is being given.
+  // Hence we mirror its strategy which is a simple path extension check.
+  // https://github.com/facebook/jest/blob/836157f4807893bb23a4758a60998fbd61cb184c/packages/jest-runtime/src/index.ts#L1176
+  if (path.endsWith(".json")) {
+    return source;
+  } else if (is_module ? esm : cjs) {
     const url = convertPathToFileUrl(path);
     return {
       code: instrument(

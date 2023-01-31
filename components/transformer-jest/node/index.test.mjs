@@ -1,5 +1,9 @@
 import { writeFile as writeFileAsync } from "node:fs/promises";
-import { assertDeepEqual, assertMatch } from "../../__fixture__.mjs";
+import {
+  assertEqual,
+  assertDeepEqual,
+  assertMatch,
+} from "../../__fixture__.mjs";
 import { getUuid } from "../../uuid/random/index.mjs";
 import { toAbsoluteUrl } from "../../url/index.mjs";
 import { convertFileUrlToPath, getTmpUrl } from "../../path/index.mjs";
@@ -79,6 +83,14 @@ const {
 
   for (const asynchronous of [true, false]) {
     const method = asynchronous ? "processAsync" : "process";
+    {
+      const result = transformer[method](
+        "[123, 456]",
+        convertFileUrlToPath("file:///A:/base/data.json"),
+        { supportsStaticESM: null },
+      );
+      assertEqual((asynchronous ? await result : result).code, "[123, 456]");
+    }
     {
       const result = transformer[method](
         "eval(123);",
