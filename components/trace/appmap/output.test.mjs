@@ -1,9 +1,9 @@
 import { platform } from "node:process";
 import { assertEqual } from "../../__fixture__.mjs";
-import { getLocationUrl } from "./location.mjs";
+import { getOutputUrl } from "./output.mjs";
 
 assertEqual(
-  getLocationUrl({
+  getOutputUrl({
     recorder: "process",
     appmap_dir: "protocol://host/path/",
     appmap_file: "foo/bar",
@@ -15,7 +15,7 @@ assertEqual(
 );
 
 assertEqual(
-  getLocationUrl({
+  getOutputUrl({
     recorder: "process",
     appmap_dir: "protocol://host/dirname/",
     appmap_file: "basename",
@@ -25,7 +25,7 @@ assertEqual(
 );
 
 assertEqual(
-  getLocationUrl({
+  getOutputUrl({
     recorder: "process",
     appmap_dir: "protocol://host/dirname/",
     appmap_file: null,
@@ -35,7 +35,7 @@ assertEqual(
 );
 
 assertEqual(
-  getLocationUrl({
+  getOutputUrl({
     recorder: "process",
     appmap_dir: "protocol://host/dirname/",
     appmap_file: null,
