@@ -18,7 +18,6 @@ const getURL = generateGet("url");
 
 export const createInstrumentation = (configuration) => ({
   configuration,
-  done: new Set(),
 });
 
 const parseEstree = (type, content, url) => {
@@ -37,7 +36,7 @@ const parseEstree = (type, content, url) => {
 };
 
 export const instrument = (
-  { configuration, done },
+  { configuration },
   { url, type, content },
   mapping,
 ) => {
@@ -74,10 +73,6 @@ export const instrument = (
     );
     return { url, content, sources: [] };
   } else {
-    const new_sources = sources.filter(({ url }) => !done.has(url));
-    for (const { url } of new_sources) {
-      done.add(url);
-    }
     if (
       configuration.hooks.eval.aliases.length === 0 &&
       configuration.hooks.apply === null
@@ -86,7 +81,7 @@ export const instrument = (
         "Not instrumenting file %j because instrumentation hooks (apply and eval) are disabled",
         url,
       );
-      return { url, content, sources: new_sources };
+      return { url, content, sources };
     } else {
       logDebug("Instrumenting file %j", url);
       return {
@@ -100,7 +95,7 @@ export const instrument = (
             mapping,
           }),
         ),
-        sources: new_sources,
+        sources,
       };
     }
   }
