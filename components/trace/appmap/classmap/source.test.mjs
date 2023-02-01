@@ -2,23 +2,10 @@ import { assertEqual, assertDeepEqual } from "../../../__fixture__.mjs";
 
 import {
   createSource,
+  getSourceRelativeUrl,
   lookupSourceClosure,
   toSourceClassmap,
 } from "./source.mjs";
-
-assertDeepEqual(
-  toSourceClassmap(
-    createSource(null, {
-      pruning: true,
-      inline: true,
-      shallow: true,
-      directory: "protocol1://host1/home/",
-      url: "protocol2://host2/home/dirname/basename.js",
-      exclusions: [],
-    }),
-  ),
-  [],
-);
 
 {
   const source = createSource(
@@ -31,7 +18,7 @@ assertDeepEqual(
       pruning: true,
       inline: true,
       shallow: true,
-      directory: "protocol://host/home/",
+      relative: "dirname/basename.js",
       url: "protocol://host/home/dirname/basename.js",
       exclusions: [
         {
@@ -55,6 +42,8 @@ assertDeepEqual(
       ],
     },
   );
+
+  assertEqual(getSourceRelativeUrl(source), "dirname/basename.js");
 
   // present function //
   {

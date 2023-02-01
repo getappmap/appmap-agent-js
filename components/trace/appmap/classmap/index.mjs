@@ -41,6 +41,10 @@ export const addClassmapSource = (
   sources.set(
     hash,
     createSource(content, {
+  let relative = toRelativeUrl(url, directory);
+  if (relative === null) {
+    logWarning(
+      "Ignoring %j because it could not be expressed relatively to %j",
       url,
       relative,
       placeholder,
@@ -50,6 +54,8 @@ export const addClassmapSource = (
       shallow,
     }),
   );
+  } else if (content === null) {
+    logWarning("Ignoring %j because its content could not be loaded", url);
 };
 
 export const lookupClassmapClosure = ({ sources }, location) => {
@@ -78,15 +84,11 @@ const registerPackageEntity = (entities, dirname) => {
 
 export const compileClassmap = ({
   sources,
-  configuration: {
-    pruning,
-    "collapse-package-hierachy": collapse,
-    repository: { directory },
-  },
+  configuration: { pruning, "collapse-package-hierachy": collapse },
 }) => {
   const root = [];
-  for (const [url, source] of sources) {
-    const relative = toRelativeUrl(url, directory);
+  for (const source of sources.values()) {
+    const relative = getSourceRelativeUrl(source);
     const entities = toSourceClassmap(source);
     if (
       /* c8 ignore start */ !pruning ||
