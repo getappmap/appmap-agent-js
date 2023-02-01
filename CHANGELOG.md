@@ -1,3 +1,10 @@
+## [13.1.2](https://github.com/getappmap/appmap-agent-js/compare/v13.1.1...v13.1.2) (2023-02-01)
+
+
+### Bug Fixes
+
+* Ignore duplicate async events ([b44937a](https://github.com/getappmap/appmap-agent-js/commit/b44937abc43b63939ea1d587db4fa13ae47c8b82))
+
 ## [13.1.1](https://github.com/getappmap/appmap-agent-js/compare/v13.1.0...v13.1.1) (2023-02-01)
 
 
