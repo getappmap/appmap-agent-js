@@ -2,6 +2,7 @@ import { InternalAppmapError } from "../../../error/index.mjs";
 import { assert } from "../../../util/index.mjs";
 import { toRelativeUrl } from "../../../url/index.mjs";
 import { logWarning } from "../../../log/index.mjs";
+import { lookupSpecifier } from "../../../specifier/index.mjs";
 import {
 import {
   createSource,
@@ -22,21 +23,30 @@ export const addClassmapSource = (
       pruning,
       "function-name-placeholder": placeholder,
       repository: { directory },
+      packages: specifiers,
+      "default-package": default_specifier,
+      exclude: global_exclusion_array,
+      "inline-source": global_inline_source,
     },
     sources,
   },
   { url, content, inline, exclude: exclusions, shallow },
 ) => {
   assert(!sources.has(url), "duplicate source url", InternalAppmapError);
+  const {
+    "inline-source": local_inline_source,
+    exclude: local_exclusion_array,
+    shallow,
+  } = lookupSpecifier(specifiers, url, default_specifier);
   sources.set(
-    url,
+    hash,
     createSource(content, {
       url,
-      directory,
+      relative,
       placeholder,
       pruning,
-      inline,
-      exclusions,
+      inline: local_inline_source ?? global_inline_source,
+      exclusions: [...global_exclusion_array, ...local_exclusion_array],
       shallow,
     }),
   );

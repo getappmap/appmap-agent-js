@@ -36,9 +36,6 @@ const default_exclusion = {
   addClassmapSource(classmap, {
     url: "protocol://host/home/directory/file.js",
     content: "function f (x) {}\nfunction g (y) {}",
-    inline: true,
-    shallow: true,
-    exclude: [default_exclusion],
   });
 
   assertEqual(
@@ -104,6 +101,7 @@ const default_exclusion = {
       {
         pruning: false,
         "collapse-package-hierachy": false,
+        "inline-source": false,
       },
       "protocol://host/base/",
     ),
@@ -112,17 +110,11 @@ const default_exclusion = {
   addClassmapSource(classmap, {
     url: "protocol://host/home/file1.js",
     content: "function f (x) {}",
-    inline: false,
-    exclude: [default_exclusion],
-    shallow: false,
   });
 
   addClassmapSource(classmap, {
     url: "protocol://host/home/file2.js",
     content: "function g (x) {}",
-    inline: false,
-    exclude: [default_exclusion],
-    shallow: false,
   });
 
   assertDeepEqual(compileClassmap(classmap), [

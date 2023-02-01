@@ -67,9 +67,6 @@ validateMessage(formatBeginAmend(frontend, 123, getBundlePayload(frontend)));
         type: "source",
         url: "protocol://host/filename.js",
         content: "123;",
-        exclude: createConfiguration("protocol://host/home").exclude,
-        shallow: false,
-        inline: false,
       },
     ],
   });

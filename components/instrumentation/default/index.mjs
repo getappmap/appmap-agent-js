@@ -42,12 +42,11 @@ export const instrument = (
 ) => {
   const sources = getSources(mapping)
     .map(({ url, content }) => {
-      const {
-        enabled,
-        shallow,
-        exclude,
-        "inline-source": inline,
-      } = lookupSpecifier(configuration, url);
+      const { enabled } = lookupSpecifier(
+        configuration.packages,
+        url,
+        configuration["default-package"],
+      );
       logDebug(
         "%s source file %j",
         enabled ? "Instrumenting" : "Not instrumenting",
@@ -58,9 +57,6 @@ export const instrument = (
         body: {
           url,
           content,
-          shallow,
-          inline: recoverMaybe(inline, configuration["inline-source"]),
-          exclude: [...exclude, ...configuration.exclude],
         },
       };
     })

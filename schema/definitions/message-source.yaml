@@ -2,24 +2,13 @@ type: object
 additionalProperties: false
 required:
   - type
-  - content
   - url
-  - shallow
-  - inline
-  - exclude
+  - content
 properties:
   type:
     const: source
+  url:
+    $ref: url
   content:
     type: string
     nullable: true
-  url:
-    $ref: url
-  shallow:
-    type: boolean
-  inline:
-    type: boolean
-  exclude:
-    type: array
-    items:
-      $ref: exclusion-cooked

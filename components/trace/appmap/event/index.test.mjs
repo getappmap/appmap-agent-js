@@ -1,6 +1,9 @@
 import { assertDeepEqual } from "../../../__fixture__.mjs";
-import { createConfiguration } from "../../../configuration/index.mjs";
 import { stringifyLocation } from "../../../location/index.mjs";
+import {
+  createConfiguration,
+  extendConfiguration,
+} from "../../../configuration/index.mjs";
 import { createClassmap, addClassmapSource } from "../classmap/index.mjs";
 import { digestEventTrace } from "./index.mjs";
 
@@ -96,23 +99,24 @@ assertDeepEqual(
 
 // apply //
 for (const shallow of [true, false]) {
-  const classmap = createClassmap(createConfiguration("protocol://host/home"));
+  const classmap = createClassmap(
+    extendConfiguration(
+      createConfiguration("protocol://host/home"),
+      {
+        packages: [
+          {
+            glob: "*.js",
+            "inline-source": false,
+            shallow,
+          },
+        ],
+      },
+      "protocol://host/home/",
+    ),
+  );
   addClassmapSource(classmap, {
     url: "protocol://host/home/filename.js",
     content: "function f (x) {}",
-    inline: false,
-    exclude: [
-      {
-        combinator: "or",
-        "every-label": true,
-        "some-label": true,
-        "qualified-name": true,
-        name: true,
-        excluded: false,
-        recursive: true,
-      },
-    ],
-    shallow,
   });
   const location = stringifyLocation({
     url: "protocol://host/home/filename.js",
