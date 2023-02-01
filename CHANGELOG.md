@@ -1,3 +1,10 @@
+## [13.1.1](https://github.com/getappmap/appmap-agent-js/compare/v13.1.0...v13.1.1) (2023-02-01)
+
+
+### Bug Fixes
+
+* wrap root function before exclusion ([185e50f](https://github.com/getappmap/appmap-agent-js/commit/185e50f53cd968c747ace6fd32f829b3b6065d16))
+
 # [13.1.0](https://github.com/getappmap/appmap-agent-js/compare/v13.0.1...v13.1.0) (2023-01-31)
 
 
