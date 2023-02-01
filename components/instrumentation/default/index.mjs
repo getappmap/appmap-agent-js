@@ -1,7 +1,7 @@
 import * as Astring from "astring";
 import * as Acorn from "acorn";
 import { logError, logDebug } from "../../log/index.mjs";
-import { generateGet, recoverMaybe } from "../../util/index.mjs";
+import { generateGet } from "../../util/index.mjs";
 import { ExternalAppmapError } from "../../error/index.mjs";
 import { getSources } from "../../source/index.mjs";
 import { lookupSpecifier } from "../../specifier/index.mjs";
@@ -14,7 +14,7 @@ const { parse: parseAcorn } = Acorn;
 
 const getHead = generateGet("head");
 const getBody = generateGet("body");
-const getURL = generateGet("url");
+const getUrl = generateGet("url");
 
 export const createInstrumentation = (configuration) => ({
   configuration,
@@ -89,7 +89,7 @@ export const instrument = (
         content: generateEstree(
           visit(parseEstree(type, content, url), {
             url,
-            whitelist: new Set(sources.map(getURL)),
+            whitelist: new Set(sources.map(getUrl)),
             eval: configuration.hooks.eval,
             apply: configuration.hooks.apply,
             mapping,
