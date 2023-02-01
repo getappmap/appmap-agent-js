@@ -2,9 +2,9 @@ import * as Astring from "astring";
 import * as Acorn from "acorn";
 import { logError, logDebug } from "../../log/index.mjs";
 import { generateGet, recoverMaybe } from "../../util/index.mjs";
-import { getConfigurationPackage } from "../../configuration-accessor/index.mjs";
 import { ExternalAppmapError } from "../../error/index.mjs";
 import { getSources } from "../../source/index.mjs";
+import { lookupSpecifier } from "../../specifier/index.mjs";
 import { visit } from "./visit.mjs";
 
 const { Set } = globalThis;
@@ -48,7 +48,7 @@ export const instrument = (
         shallow,
         exclude,
         "inline-source": inline,
-      } = getConfigurationPackage(configuration, url);
+      } = lookupSpecifier(configuration, url);
       logDebug(
         "%s source file %j",
         enabled ? "Instrumenting" : "Not instrumenting",

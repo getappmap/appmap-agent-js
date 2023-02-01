@@ -1,5 +1,5 @@
 import { assertEqual, assertThrow } from "../../__fixture__.mjs";
-import { createSpecifier, matchSpecifier } from "./index.mjs";
+import { createSpecifier, matchSpecifier, lookupSpecifier } from "./index.mjs";
 
 const { encodeURIComponent } = globalThis;
 
@@ -209,4 +209,27 @@ assertEqual(
     "protocol://host/node_modules/dist/file.ext",
   ),
   true,
+);
+
+/////////////////////
+// lookupSpecifier //
+/////////////////////
+
+assertEqual(
+  lookupSpecifier([], "protocol://host/base/file.ext", "default_value"),
+  "default_value",
+);
+
+assertEqual(
+  lookupSpecifier(
+    [
+      [
+        createSpecifier({ regexp: "^file\\." }, "protocol://host/base/"),
+        "value",
+      ],
+    ],
+    "protocol://host/base/file.ext",
+    "default_value",
+  ),
+  "value",
 );

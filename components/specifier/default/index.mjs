@@ -142,3 +142,12 @@ export const matchSpecifier = (specifier, url) => {
     return matched;
   }
 };
+
+export const lookupSpecifier = (entries, url, default_value) => {
+  for (const [specifier, value] of entries) {
+    if (matchSpecifier(specifier, url)) {
+      return value;
+    }
+  }
+  return default_value;
+};
