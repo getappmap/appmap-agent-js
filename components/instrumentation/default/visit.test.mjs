@@ -2,6 +2,7 @@ import { assertEqual } from "../../__fixture__.mjs";
 import { stringifyLocation } from "../../location/index.mjs";
 import { createCounter } from "../../util/index.mjs";
 import { createMirrorSourceMap } from "../../source/index.mjs";
+import { hashFile } from "../../hash/index.mjs";
 import { normalize, parse, generate } from "./__fixture__.mjs";
 import { visit } from "./visit.mjs";
 
@@ -10,327 +11,342 @@ const {
   Set,
 } = globalThis;
 
-const instrument = (file, whitelist) =>
+const instrument = (options) =>
   generate(
     visit(
-      parse(file.content, {
+      parse(options.file.content, {
         ecmaVersion: 2021,
-        sourceType: file.type,
+        sourceType: options.type,
         locations: true,
-        allowAwaitOutsideFunction: file.type === "module",
+        allowAwaitOutsideFunction: options.type === "module",
       }),
       {
-        url: file.url,
+        url: options.file.url,
         apply: "APPLY",
         eval: { hidden: "EVAL", aliases: ["eval"] },
-        mapping: createMirrorSourceMap(file),
-        whitelist: new Set(whitelist),
+        mapping: createMirrorSourceMap(options.file),
+        whitelist: new Set(options.instrumented ? [options.file.url] : []),
         counter: createCounter(0),
       },
     ),
   );
 
-const makeCodeLocation = (url, line, column) =>
+const makeCodeLocation = ({ url, content }, line, column) =>
   stringifyJSON(
-    stringifyLocation({ url, line, column }),
+    stringifyLocation({ url, hash: hashFile({ url, content }), line, column }),
   );
 
 // expression body //
-assertEqual(
-  instrument(
-    {
-      url: "protocol://host/script.js",
-      content: "(() => 123);",
+{
+  const file = {
+    url: "protocol://host/script.js",
+    content: "(() => 123);",
+  };
+  assertEqual(
+    instrument({
+      file,
       type: "script",
-    },
-    ["protocol://host/script.js"],
-  ),
-  normalize(
-    `
-      (() => {
-        var
-          APPLY_BUNDLE_TAB = APPLY.getFreshTab(),
-          APPLY_RETURN,
-          APPLY_RETURNED = true;
-        APPLY.recordApply(
-          APPLY_BUNDLE_TAB,
-          ${makeCodeLocation("protocol://host/script.js", 1, 1)},
-          APPLY.empty,
-          [],
-        );
-        try {
-          return APPLY_RETURN = 123;
-        } catch (APPLY_ERROR) {
-          APPLY_RETURNED = false;
-          APPLY.recordThrow(
+      instrumented: true,
+    }),
+    normalize(
+      `
+        (() => {
+          var
+            APPLY_BUNDLE_TAB = APPLY.getFreshTab(),
+            APPLY_RETURN,
+            APPLY_RETURNED = true;
+          APPLY.recordApply(
             APPLY_BUNDLE_TAB,
-            ${makeCodeLocation("protocol://host/script.js", 1, 1)},
-            APPLY_ERROR,
+            ${makeCodeLocation(file, 1, 1)},
+            APPLY.empty,
+            [],
           );
-          throw APPLY_ERROR;
-        } finally {
-          if (APPLY_RETURNED) {
-            APPLY.recordReturn(
+          try {
+            return APPLY_RETURN = 123;
+          } catch (APPLY_ERROR) {
+            APPLY_RETURNED = false;
+            APPLY.recordThrow(
               APPLY_BUNDLE_TAB,
-              ${makeCodeLocation("protocol://host/script.js", 1, 1)},
-              APPLY_RETURN,
+              ${makeCodeLocation(file, 1, 1)},
+              APPLY_ERROR,
             );
+            throw APPLY_ERROR;
+          } finally {
+            if (APPLY_RETURNED) {
+              APPLY.recordReturn(
+                APPLY_BUNDLE_TAB,
+                ${makeCodeLocation(file, 1, 1)},
+                APPLY_RETURN,
+              );
+            }
           }
-        }
-      });
-    `,
-    "script",
-  ),
-);
+        });
+      `,
+      "script",
+    ),
+  );
+}
 
 // subclass //
-assertEqual(
-  instrument(
-    {
-      url: "protocol://host/script.js",
-      content: "(class C extends D {\nconstructor () { 123; } })",
+{
+  const file = {
+    url: "protocol://host/script.js",
+    content: "(class C extends D {\nconstructor () { 123; } })",
+  };
+  assertEqual(
+    instrument({
+      file,
       type: "script",
-    },
-    ["protocol://host/script.js"],
-  ),
-  normalize(
-    `
-      (class C extends D { constructor () {
-        var
-          APPLY_BUNDLE_TAB = APPLY.getFreshTab(),
-          APPLY_RETURN,
-          APPLY_RETURNED = true;
-        APPLY.recordApply(
-          APPLY_BUNDLE_TAB,
-          ${makeCodeLocation("protocol://host/script.js", 2, 12)},
-          APPLY.empty,
-          [],
-        );
-        try {
-          {
-            123;
-          }
-        } catch (APPLY_ERROR) {
-          APPLY_RETURNED = false;
-          APPLY.recordThrow(
+      instrumented: true,
+    }),
+    normalize(
+      `
+        (class C extends D { constructor () {
+          var
+            APPLY_BUNDLE_TAB = APPLY.getFreshTab(),
+            APPLY_RETURN,
+            APPLY_RETURNED = true;
+          APPLY.recordApply(
             APPLY_BUNDLE_TAB,
-            ${makeCodeLocation("protocol://host/script.js", 2, 12)},
-            APPLY_ERROR,
+            ${makeCodeLocation(file, 2, 12)},
+            APPLY.empty,
+            [],
           );
-          throw APPLY_ERROR;
-        } finally {
-          if (APPLY_RETURNED) {
-            APPLY.recordReturn(
+          try {
+            {
+              123;
+            }
+          } catch (APPLY_ERROR) {
+            APPLY_RETURNED = false;
+            APPLY.recordThrow(
               APPLY_BUNDLE_TAB,
-              ${makeCodeLocation("protocol://host/script.js", 2, 12)},
-              APPLY_RETURN,
+              ${makeCodeLocation(file, 2, 12)},
+              APPLY_ERROR,
             );
+            throw APPLY_ERROR;
+          } finally {
+            if (APPLY_RETURNED) {
+              APPLY.recordReturn(
+                APPLY_BUNDLE_TAB,
+                ${makeCodeLocation(file, 2, 12)},
+                APPLY_RETURN,
+              );
+            }
           }
         }
-      }
-    });
-    `,
-    "script",
-  ),
-);
+      });
+      `,
+      "script",
+    ),
+  );
+}
 
 // parameters && return //
-assertEqual(
-  instrument(
-    {
-      url: "protocol://host/script.js",
-      content: "((x, y = 123, ...rest) => { return 456; });",
+{
+  const file = {
+    url: "protocol://host/script.js",
+    content: "((x, y = 123, ...rest) => { return 456; });",
+  };
+  assertEqual(
+    instrument({
+      file,
       type: "script",
-    },
-    ["protocol://host/script.js"],
-  ),
-  normalize(
-    `
-      ((APPLY_ARGUMENT_0, APPLY_ARGUMENT_1, ...APPLY_ARGUMENT_2) => {
-        var
-          APPLY_BUNDLE_TAB = APPLY.getFreshTab(),
-          APPLY_RETURN,
-          APPLY_RETURNED = true;
-        APPLY.recordApply(
-          APPLY_BUNDLE_TAB,
-          ${makeCodeLocation("protocol://host/script.js", 1, 1)},
-          APPLY.empty,
-          [APPLY_ARGUMENT_0, APPLY_ARGUMENT_1, APPLY_ARGUMENT_2],
-        );
-        try {
+      instrumented: true,
+    }),
+    normalize(
+      `
+        ((APPLY_ARGUMENT_0, APPLY_ARGUMENT_1, ...APPLY_ARGUMENT_2) => {
           var
-            x = APPLY_ARGUMENT_0,
-            y = APPLY_ARGUMENT_1 === void 0 ? 123 : APPLY_ARGUMENT_1,
-            rest = APPLY_ARGUMENT_2;
-          {
-            return APPLY_RETURN = 456;
-          }
-        } catch (APPLY_ERROR) {
-          APPLY_RETURNED = false;
-          APPLY.recordThrow(
+            APPLY_BUNDLE_TAB = APPLY.getFreshTab(),
+            APPLY_RETURN,
+            APPLY_RETURNED = true;
+          APPLY.recordApply(
             APPLY_BUNDLE_TAB,
-            ${makeCodeLocation("protocol://host/script.js", 1, 1)},
-            APPLY_ERROR,
+            ${makeCodeLocation(file, 1, 1)},
+            APPLY.empty,
+            [APPLY_ARGUMENT_0, APPLY_ARGUMENT_1, APPLY_ARGUMENT_2],
           );
-          throw APPLY_ERROR;
-        } finally {
-          if (APPLY_RETURNED) {
-            APPLY.recordReturn(
+          try {
+            var
+              x = APPLY_ARGUMENT_0,
+              y = APPLY_ARGUMENT_1 === void 0 ? 123 : APPLY_ARGUMENT_1,
+              rest = APPLY_ARGUMENT_2;
+            {
+              return APPLY_RETURN = 456;
+            }
+          } catch (APPLY_ERROR) {
+            APPLY_RETURNED = false;
+            APPLY.recordThrow(
               APPLY_BUNDLE_TAB,
-              ${makeCodeLocation("protocol://host/script.js", 1, 1)},
-              APPLY_RETURN,
+              ${makeCodeLocation(file, 1, 1)},
+              APPLY_ERROR,
             );
+            throw APPLY_ERROR;
+          } finally {
+            if (APPLY_RETURNED) {
+              APPLY.recordReturn(
+                APPLY_BUNDLE_TAB,
+                ${makeCodeLocation(file, 1, 1)},
+                APPLY_RETURN,
+              );
+            }
           }
-        }
-      });
-    `,
-    "script",
-  ),
-);
+        });
+      `,
+      "script",
+    ),
+  );
+}
 
 // generator //
-assertEqual(
-  instrument(
-    {
-      url: "protocol://host/script.js",
-      content: "(function* () { yield* 123; });",
+{
+  const file = {
+    url: "protocol://host/script.js",
+    content: "(function* () { yield* 123; });",
+  };
+  assertEqual(
+    instrument({
+      file,
       type: "script",
-    },
-    ["protocol://host/script.js"],
-  ),
-  normalize(
-    `
-      (function* () {
-        var
-          APPLY_BUNDLE_TAB = APPLY.getFreshTab(),
-          APPLY_RETURN,
-          APPLY_RETURNED = true,
-          APPLY_YIELD,
-          APPLY_YIELD_TAB;
-        APPLY.recordApply(
-          APPLY_BUNDLE_TAB,
-          ${makeCodeLocation("protocol://host/script.js", 1, 1)},
-          this,
-          [],
-        );
-        try {
-          {
-            (
-              APPLY_YIELD = 123,
-              APPLY_YIELD_TAB = APPLY.getFreshTab(),
-              APPLY.recordYield(APPLY_YIELD_TAB, true, APPLY_YIELD),
-              APPLY_YIELD = yield* APPLY_YIELD,
-              APPLY.recordResume(APPLY_YIELD_TAB, APPLY_YIELD),
-              APPLY_YIELD
-            );
-          }
-        } catch (APPLY_ERROR) {
-          APPLY_RETURNED = false;
-          APPLY.recordThrow(
+      instrumented: true,
+    }),
+    normalize(
+      `
+        (function* () {
+          var
+            APPLY_BUNDLE_TAB = APPLY.getFreshTab(),
+            APPLY_RETURN,
+            APPLY_RETURNED = true,
+            APPLY_YIELD,
+            APPLY_YIELD_TAB;
+          APPLY.recordApply(
             APPLY_BUNDLE_TAB,
-            ${makeCodeLocation("protocol://host/script.js", 1, 1)},
-            APPLY_ERROR,
+            ${makeCodeLocation(file, 1, 1)},
+            this,
+            [],
           );
-          throw APPLY_ERROR;
-        } finally {
-          if (APPLY_RETURNED) {
-            APPLY.recordReturn(
+          try {
+            {
+              (
+                APPLY_YIELD = 123,
+                APPLY_YIELD_TAB = APPLY.getFreshTab(),
+                APPLY.recordYield(APPLY_YIELD_TAB, true, APPLY_YIELD),
+                APPLY_YIELD = yield* APPLY_YIELD,
+                APPLY.recordResume(APPLY_YIELD_TAB, APPLY_YIELD),
+                APPLY_YIELD
+              );
+            }
+          } catch (APPLY_ERROR) {
+            APPLY_RETURNED = false;
+            APPLY.recordThrow(
               APPLY_BUNDLE_TAB,
-              ${makeCodeLocation("protocol://host/script.js", 1, 1)},
-              APPLY_RETURN,
+              ${makeCodeLocation(file, 1, 1)},
+              APPLY_ERROR,
             );
+            throw APPLY_ERROR;
+          } finally {
+            if (APPLY_RETURNED) {
+              APPLY.recordReturn(
+                APPLY_BUNDLE_TAB,
+                ${makeCodeLocation(file, 1, 1)},
+                APPLY_RETURN,
+              );
+            }
           }
-        }
-      });
-    `,
-    "script",
-  ),
-);
+        });
+      `,
+      "script",
+    ),
+  );
+}
 
 // asynchronous //
-assertEqual(
-  instrument(
-    {
-      url: "protocol://host/script.js",
-      content: `(async () => {
+{
+  const file = {
+    url: "protocol://host/script.js",
+    content: `(async () => {
         try { await 123; }
         catch (error) { 456; }
         finally { 789; }
       });`,
+  };
+  assertEqual(
+    instrument({
+      file,
       type: "script",
-    },
-    ["protocol://host/script.js"],
-  ),
-  normalize(
-    `
-      (async () => {
-        var
-          APPLY_BUNDLE_TAB = APPLY.getFreshTab(),
-          APPLY_RETURN,
-          APPLY_RETURNED = true,
-          APPLY_AWAIT,
-          APPLY_AWAIT_TAB;
-        APPLY.recordApply(
-          APPLY_BUNDLE_TAB,
-          ${makeCodeLocation("protocol://host/script.js", 1, 1)},
-          APPLY.empty,
-          [],
-        );
-        try {
-          {
-            try {
-              (
-                APPLY_AWAIT = 123,
-                APPLY_AWAIT_TAB = APPLY.getFreshTab(),
-                APPLY.recordAwait(APPLY_AWAIT_TAB, APPLY_AWAIT),
-                APPLY_AWAIT = await APPLY_AWAIT,
-                APPLY.recordResolve(APPLY_AWAIT_TAB, APPLY_AWAIT),
-                APPLY_AWAIT_TAB = void 0,
-                APPLY_AWAIT
+      instrumented: true,
+    }),
+    normalize(
+      `
+        (async () => {
+          var
+            APPLY_BUNDLE_TAB = APPLY.getFreshTab(),
+            APPLY_RETURN,
+            APPLY_RETURNED = true,
+            APPLY_AWAIT,
+            APPLY_AWAIT_TAB;
+          APPLY.recordApply(
+            APPLY_BUNDLE_TAB,
+            ${makeCodeLocation(file, 1, 1)},
+            APPLY.empty,
+            [],
+          );
+          try {
+            {
+              try {
+                (
+                  APPLY_AWAIT = 123,
+                  APPLY_AWAIT_TAB = APPLY.getFreshTab(),
+                  APPLY.recordAwait(APPLY_AWAIT_TAB, APPLY_AWAIT),
+                  APPLY_AWAIT = await APPLY_AWAIT,
+                  APPLY.recordResolve(APPLY_AWAIT_TAB, APPLY_AWAIT),
+                  APPLY_AWAIT_TAB = void 0,
+                  APPLY_AWAIT
+                );
+              } catch (APPLY_ERROR) {
+                if (APPLY_AWAIT_TAB !== void 0) {
+                  APPLY.recordReject(APPLY_AWAIT_TAB, APPLY_ERROR);
+                  APPLY_AWAIT_TAB = void 0;
+                }
+                let error = APPLY_ERROR;
+                {
+                  456;
+                }
+              } finally {
+                789;
+              }
+            }
+          } catch (APPLY_ERROR) {
+            if (APPLY_AWAIT_TAB !== void 0) {
+              APPLY.recordReject(APPLY_AWAIT_TAB, APPLY_ERROR);
+            }
+            APPLY_RETURNED = false;
+            APPLY.recordThrow(
+              APPLY_BUNDLE_TAB,
+              ${makeCodeLocation(file, 1, 1)},
+              APPLY_ERROR,
+            );
+            throw APPLY_ERROR;
+          } finally {
+            if (APPLY_RETURNED) {
+              APPLY.recordReturn(
+                APPLY_BUNDLE_TAB,
+                ${makeCodeLocation(file, 1, 1)},
+                APPLY_RETURN,
               );
-            } catch (APPLY_ERROR) {
-              if (APPLY_AWAIT_TAB !== void 0) {
-                APPLY.recordReject(APPLY_AWAIT_TAB, APPLY_ERROR);
-                APPLY_AWAIT_TAB = void 0;
-              }
-              let error = APPLY_ERROR;
-              {
-                456;
-              }
-            } finally {
-              789;
             }
           }
-        } catch (APPLY_ERROR) {
-          if (APPLY_AWAIT_TAB !== void 0) {
-            APPLY.recordReject(APPLY_AWAIT_TAB, APPLY_ERROR);
-          }
-          APPLY_RETURNED = false;
-          APPLY.recordThrow(
-            APPLY_BUNDLE_TAB,
-            ${makeCodeLocation("protocol://host/script.js", 1, 1)},
-            APPLY_ERROR,
-          );
-          throw APPLY_ERROR;
-        } finally {
-          if (APPLY_RETURNED) {
-            APPLY.recordReturn(
-              APPLY_BUNDLE_TAB,
-              ${makeCodeLocation("protocol://host/script.js", 1, 1)},
-              APPLY_RETURN,
-            );
-          }
-        }
-      });
-    `,
-    "script",
-  ),
-);
+        });
+      `,
+      "script",
+    ),
+  );
+}
 
 // not instrumented //
 assertEqual(
-  instrument(
-    {
+  instrument({
+    file: {
       url: "protocol://host/script.js",
       content: `
         (async function* () {
@@ -340,10 +356,10 @@ assertEqual(
           return 123;
         });
       `,
-      type: "script",
     },
-    [],
-  ),
+    type: "script",
+    instrumented: false,
+  }),
   normalize(
     `
       (async function* () {
@@ -359,14 +375,14 @@ assertEqual(
 
 // module >> try without finally //
 assertEqual(
-  instrument(
-    {
+  instrument({
+    file: {
       url: "protocol://host/script.js",
       content: "try { 123; } catch { 456; }",
-      type: "module",
     },
-    ["protocol://host/script.js"],
-  ),
+    type: "module",
+    instrumented: true,
+  }),
   normalize(
     `
       let
@@ -391,14 +407,14 @@ assertEqual(
 
 // module >> try without catch //
 assertEqual(
-  instrument(
-    {
+  instrument({
+    file: {
       url: "protocol://host/script.js",
       content: "try { 123; } finally { 456; }",
-      type: "module",
     },
-    ["protocol://host/script.js"],
-  ),
+    type: "module",
+    instrumented: true,
+  }),
   normalize(
     `
       let
@@ -422,27 +438,27 @@ assertEqual(
 
 // CallExpression //
 assertEqual(
-  instrument(
-    {
+  instrument({
+    file: {
       url: "protocol://host/script.js#hash",
       content: "f();",
-      type: "script",
     },
-    [],
-  ),
+    type: "script",
+    instrumented: false,
+  }),
   normalize("f()", "script"),
 );
 
 // CallExpression >> eval //
 assertEqual(
-  instrument(
-    {
-      url: "protocol://host/script.js#hash",
+  instrument({
+    file: {
+      url: "protocol://host/script.js",
       content: "eval(123, 456);",
-      type: "script",
     },
-    [],
-  ),
+    type: "script",
+    instrumented: false,
+  }),
   normalize(
     `eval(
       EVAL(

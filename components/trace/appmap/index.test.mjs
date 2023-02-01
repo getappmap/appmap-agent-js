@@ -41,6 +41,7 @@ const tabs = {
 };
 
 const location = stringifyLocation({
+  hash: null,
   url: "protocol://host/home/dirname/filename.js",
   line: 1,
   column: 0,

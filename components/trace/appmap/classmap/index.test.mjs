@@ -1,4 +1,9 @@
-import { assertDeepEqual, assertEqual } from "../../../__fixture__.mjs";
+import {
+  assertThrow,
+  assertDeepEqual,
+  assertEqual,
+} from "../../../__fixture__.mjs";
+import { hashFile } from "../../../hash/index.mjs";
 import {
   createConfiguration,
   extendConfiguration,
@@ -10,15 +15,176 @@ import {
   lookupClassmapClosure,
 } from "./index.mjs";
 
-const default_exclusion = {
-  combinator: "and",
-  "qualified-name": true,
-  name: true,
-  "every-label": true,
-  "some-label": true,
-  excluded: false,
-  recursive: false,
-};
+// lookupClassmapClosure >> present source //
+{
+  const classmap = createClassmap(
+    extendConfiguration(
+      createConfiguration("protocol://host/home/"),
+      {
+        packages: [
+          {
+            glob: "directory/*.js",
+            "inline-source": true,
+            exclude: [],
+            shallow: true,
+          },
+        ],
+        "default-package": {
+          "inline-source": false,
+          exclude: [],
+          shallow: false,
+        },
+        "inline-source": false,
+      },
+      "protocol://host/home/",
+    ),
+  );
+  const file1 = {
+    url: "protocol://host/home/directory/dynamic.js",
+    content: "function f (x) {}",
+  };
+  const file2 = {
+    url: "protocol://host/home/directory/dynamic.js",
+    content: "function g (y) {}",
+  };
+  const file3 = {
+    url: "protocol://host/home/directory/static.js",
+    content: "function h (z) {}",
+  };
+  addClassmapSource(classmap, file1);
+  addClassmapSource(classmap, file2);
+  addClassmapSource(classmap, file3);
+  assertDeepEqual(
+    lookupClassmapClosure(classmap, {
+      url: null,
+      hash: hashFile(file1),
+      line: 1,
+      column: 0,
+    }),
+    {
+      parameters: ["x"],
+      shallow: true,
+      link: {
+        defined_class: "dynamic",
+        method_id: "f",
+        path: "directory/dynamic.js#0",
+        lineno: 1,
+        static: false,
+      },
+    },
+  );
+  assertDeepEqual(
+    lookupClassmapClosure(classmap, {
+      url: null,
+      hash: hashFile(file2),
+      line: 1,
+      column: 0,
+    }),
+    {
+      parameters: ["y"],
+      shallow: true,
+      link: {
+        defined_class: "dynamic",
+        method_id: "g",
+        path: "directory/dynamic.js#1",
+        lineno: 1,
+        static: false,
+      },
+    },
+  );
+  assertDeepEqual(
+    lookupClassmapClosure(classmap, {
+      url: file3.url,
+      hash: null,
+      line: 1,
+      column: 0,
+    }),
+    {
+      parameters: ["z"],
+      shallow: true,
+      link: {
+        defined_class: "static",
+        method_id: "h",
+        path: "directory/static.js",
+        lineno: 1,
+        static: false,
+      },
+    },
+  );
+  assertDeepEqual(
+    lookupClassmapClosure(classmap, {
+      url: file1.url,
+      hash: null,
+      line: 1,
+      column: 0,
+    }),
+    null,
+  );
+}
+
+// lookupClassmapClosure >> missing source //
+{
+  const classmap = createClassmap(createConfiguration("protocol://host/home/"));
+  const file1 = {
+    url: "protocol://host/home/directory/empty.js",
+    content: null,
+  };
+  const file2 = {
+    url: "external://relative/url/file.js",
+    content: "",
+  };
+  addClassmapSource(classmap, file1);
+  addClassmapSource(classmap, file2);
+  assertEqual(
+    lookupClassmapClosure(classmap, {
+      url: file1.url,
+      hash: null,
+      line: 123,
+      column: 456,
+    }),
+    null,
+  );
+  assertEqual(
+    lookupClassmapClosure(classmap, {
+      url: file2.url,
+      hash: null,
+      line: 123,
+      column: 456,
+    }),
+    null,
+  );
+  assertEqual(
+    lookupClassmapClosure(classmap, {
+      url: "protocol://host/home/directory/missing.js",
+      hash: null,
+      line: 123,
+      column: 456,
+    }),
+    null,
+  );
+  assertEqual(
+    lookupClassmapClosure(classmap, {
+      url: null,
+      hash: hashFile({
+        url: "protocol://host/home/directory/missing.js",
+        content: "789;",
+      }),
+      line: 123,
+      column: 456,
+    }),
+    null,
+  );
+  assertThrow(
+    () =>
+      lookupClassmapClosure(classmap, {
+        url: null,
+        hash: null,
+        line: 123,
+        column: 456,
+      }),
+    /^InternalAppmapError/u,
+  );
+}
 
 // pruning && collapse //
 {
@@ -28,45 +194,38 @@ const default_exclusion = {
       {
         pruning: true,
         "collapse-package-hierachy": true,
+        packages: [
+          {
+            glob: "directory/*.js",
+            "inline-source": true,
+            exclude: [],
+            shallow: true,
+          },
+        ],
+        "default-package": {
+          "inline-source": false,
+          exclude: [],
+          shallow: false,
+        },
+        "inline-source": false,
       },
-      "protocol://host/dummy/",
+      "protocol://host/home/",
     ),
   );
 
-  addClassmapSource(classmap, {
+  const file = {
     url: "protocol://host/home/directory/file.js",
-    content: "function f (x) {}\nfunction g (y) {}",
+    content: "function f (x) {}",
+  };
+
+  addClassmapSource(classmap, file);
+
+  lookupClassmapClosure(classmap, {
+    url: null,
+    hash: hashFile(file),
+    line: 1,
+    column: 0,
   });
-
-  assertEqual(
-    lookupClassmapClosure(
-      classmap,
-      makeLocation("protocol://host/home/directory/missing.js", {
-        line: 0,
-        column: 0,
-      }),
-    ),
-    null,
-  );
-
-  assertDeepEqual(
-    lookupClassmapClosure(classmap, {
-      url: file1.url,
-      line: 1,
-      column: 0,
-    }),
-    {
-      parameters: ["x"],
-      shallow: true,
-      link: {
-        defined_class: "file",
-        method_id: "f",
-        path: "directory/file.js",
-        lineno: 1,
-        static: false,
-      },
-    },
-  );
 
   assertDeepEqual(compileClassmap(classmap), [
     {
@@ -108,12 +267,12 @@ const default_exclusion = {
   );
 
   addClassmapSource(classmap, {
-    url: "protocol://host/home/file1.js",
+    url: "protocol://host/home/file.js",
     content: "function f (x) {}",
   });
 
   addClassmapSource(classmap, {
-    url: "protocol://host/home/file2.js",
+    url: "protocol://host/home/file.js",
     content: "function g (x) {}",
   });
 
@@ -124,7 +283,7 @@ const default_exclusion = {
       children: [
         {
           type: "class",
-          name: "file1",
+          name: "file",
           children: [
             {
               type: "function",
@@ -133,13 +292,13 @@ const default_exclusion = {
               labels: [],
               source: null,
               static: false,
-              location: "file1.js:1",
+              location: "file.js#0:1",
             },
           ],
         },
         {
           type: "class",
-          name: "file2",
+          name: "file",
           children: [
             {
               type: "function",
@@ -148,7 +307,7 @@ const default_exclusion = {
               labels: [],
               source: null,
               static: false,
-              location: "file2.js:1",
+              location: "file.js#1:1",
             },
           ],
         },

@@ -1,7 +1,8 @@
 import { writeFile as writeFileAsync } from "node:fs/promises";
 import { Buffer } from "node:buffer";
-import { assertEqual } from "../../__fixture__.mjs";
+import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
 import { getUuid } from "../../uuid/random/index.mjs";
+import { hashFile } from "../../hash/index.mjs";
 import { getTmpUrl } from "../../path/index.mjs";
 import { toAbsoluteUrl } from "../../url/index.mjs";
 import { mapSource } from "../../source/index.mjs";
@@ -14,12 +15,12 @@ const {
   JSON: { stringify: stringifyJSON },
 } = globalThis;
 
-assertEqual(
+assertDeepEqual(
   mapSource(
     loadSourceMap(
       {
         url: "http://host/main.js",
-        content: "123;",
+        content: null,
       },
       null,
     ),
@@ -27,6 +28,8 @@ assertEqual(
     789,
   ),
   {
+    hash: null,
+    url: "http://host/main.js",
     line: 456,
     column: 789,
   },
@@ -76,24 +79,17 @@ assertEqual(
 
 const url = toAbsoluteUrl(getUuid(), getTmpUrl());
 
-assertEqual(
-  mapSource(
-    loadSourceMap(
-      {
-        url: "http://host/main.js",
-        content: `123; //# sourceMappingURL=${url}`,
-      },
-      null,
-    ),
-    456,
-    789,
-  ),
-  {
-    url: "http://host/main.js",
-    line: 456,
-    column: 789,
-  },
-);
+const file = {
+  url: "http://host/main.js",
+  content: `123; //# sourceMappingURL=${url}`,
+};
+
+assertDeepEqual(mapSource(loadSourceMap(file, null), 456, 789), {
+  url: "http://host/main.js",
+  hash: hashFile(file),
+  line: 456,
+  column: 789,
+});
 
 await writeFileAsync(new URL(url), stringifyJSON(mapping), "utf8");
 

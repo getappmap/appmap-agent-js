@@ -5,6 +5,7 @@ import {
   assertDeepEqual,
   assertThrow,
 } from "../../__fixture__.mjs";
+import { hashFile } from "../../hash/index.mjs";
 import {
   extractSourceMapUrl,
   createMirrorSourceMap,
@@ -57,11 +58,15 @@ assertEqual(
 ////////////
 
 {
-  const mapping = createMirrorSourceMap({
+  const file = {
     url: "http://host/out.js",
     content: "123;",
+  };
+  const hash = hashFile(file);
+  const mapping = createMirrorSourceMap(file);
   assertDeepEqual(mapSource(mapping, 123, 456), {
     url: file.url,
+    hash,
     line: 123,
     column: 456,
   });
@@ -92,13 +97,17 @@ assertEqual(
   });
   assertDeepEqual(mapSource(mapping, 3, 13), {
     url: "http://host/directory/source.js",
+    hash: null,
     line: 17,
     column: 19,
   });
   assertEqual(mapSource(mapping, 3, 23), null);
   assertEqual(mapSource(mapping, 29, 0), null);
   assertDeepEqual(getSources(mapping), [
-    { url: "http://host/directory/source.js", content: null },
+    {
+      url: "http://host/directory/source.js",
+      content: null,
+    },
   ]);
 }
 
@@ -134,8 +143,14 @@ assertDeepEqual(
     }),
   ),
   [
-    { url: "http://host/directory/root/source1.js", content: "123;" },
-    { url: "http://host/directory/root/source2.js", content: null },
+    {
+      url: "http://host/directory/root/source1.js",
+      content: "123;",
+    },
+    {
+      url: "http://host/directory/root/source2.js",
+      content: null,
+    },
   ],
 );
 
@@ -151,5 +166,10 @@ assertDeepEqual(
       },
     }),
   ),
-  [{ url: "http://host/directory/source.js", content: null }],
+  [
+    {
+      url: "http://host/directory/source.js",
+      content: null,
+    },
+  ],
 );

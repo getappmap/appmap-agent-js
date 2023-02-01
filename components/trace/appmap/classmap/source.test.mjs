@@ -1,5 +1,4 @@
 import { assertEqual, assertDeepEqual } from "../../../__fixture__.mjs";
-
 import {
   createSource,
   getSourceRelativeUrl,
@@ -8,40 +7,38 @@ import {
 } from "./source.mjs";
 
 {
-  const source = createSource(
-    `
-    function f (x) {}
-    function g (y) {}
-    var o = {};
-  `,
-    {
-      pruning: true,
-      inline: true,
-      shallow: true,
-      relative: "dirname/basename.js",
-      url: "protocol://host/home/dirname/basename.js",
-      exclusions: [
-        {
-          combinator: "or",
-          name: false,
-          "qualified-name": "^basename\\.g$",
-          "some-label": false,
-          "every-label": false,
-          excluded: true,
-          recursive: false,
-        },
-        {
-          combinator: "and",
-          name: true,
-          "qualified-name": true,
-          "some-label": true,
-          "every-label": true,
-          excluded: false,
-          recursive: false,
-        },
-      ],
-    },
-  );
+  const source = createSource({
+    url: "protocol://host/home/dirname/basename.js",
+    content: `
+      function f (x) {}
+      function g (y) {}
+      var o = {};
+    `,
+    pruning: true,
+    inline: true,
+    shallow: true,
+    relative: "dirname/basename.js",
+    exclusions: [
+      {
+        combinator: "or",
+        name: false,
+        "qualified-name": "^basename\\.g$",
+        "some-label": false,
+        "every-label": false,
+        excluded: true,
+        recursive: false,
+      },
+      {
+        combinator: "and",
+        name: true,
+        "qualified-name": true,
+        "some-label": true,
+        "every-label": true,
+        excluded: false,
+        recursive: false,
+      },
+    ],
+  });
 
   assertEqual(getSourceRelativeUrl(source), "dirname/basename.js");
 
@@ -59,11 +56,11 @@ import {
       },
     };
     assertDeepEqual(
-      lookupSourceClosure(source, { line: 2, column: 4 }, {}),
+      lookupSourceClosure(source, { line: 2, column: 6 }, {}),
       info,
     );
     assertDeepEqual(
-      lookupSourceClosure(source, { line: 2, column: 4 }, {}),
+      lookupSourceClosure(source, { line: 2, column: 6 }, {}),
       info,
     );
     assertDeepEqual(
@@ -73,10 +70,10 @@ import {
   }
 
   // excluded function //
-  assertEqual(lookupSourceClosure(source, { line: 3, column: 4 }, {}), null);
+  assertEqual(lookupSourceClosure(source, { line: 3, column: 6 }, {}), null);
 
   // missing function //
-  assertEqual(lookupSourceClosure(source, { line: 4, column: 4 }, {}), null);
+  assertEqual(lookupSourceClosure(source, { line: 4, column: 6 }, {}), null);
 
   assertDeepEqual(toSourceClassmap(source), [
     {

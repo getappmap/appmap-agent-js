@@ -16,10 +16,15 @@ const { Map, Set, String } = globalThis;
 
 const hashPosition = ({ line, column }) => `${String(line)}:${String(column)}`;
 
-export const createSource = (
+export const createSource = ({
+  url,
   content,
-  { url, relative, inline, exclusions, shallow, pruning },
-) => {
+  relative,
+  inline,
+  exclusions,
+  shallow,
+  pruning,
+}) => {
   const estree = parseEstree(url, content);
   const getExclusion = compileExclusionArray(exclusions);
   const context = {
@@ -37,7 +42,19 @@ export const createSource = (
   for (const entity of entities) {
     registerFunctionEntity(entity, null, infos);
   }
-  return { relative, estree, entities, infos, paths: new Map(), pruning };
+  return {
+    url,
+    content,
+    relative,
+    inline,
+    exclusions,
+    shallow,
+    pruning,
+    estree,
+    entities,
+    infos,
+    paths: new Map(),
+  };
 };
 
 const isFunctionEstree = ({ type }) =>

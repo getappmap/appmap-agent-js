@@ -120,6 +120,7 @@ for (const shallow of [true, false]) {
   });
   const location = stringifyLocation({
     url: "protocol://host/home/filename.js",
+    hash: null,
     line: 1,
     column: 0,
   });
@@ -149,6 +150,7 @@ for (const shallow of [true, false]) {
 {
   const location = stringifyLocation({
     url: "protocol://host/home/filename.js",
+    hash: null,
     line: 1,
     column: 0,
   });
