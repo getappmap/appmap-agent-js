@@ -29,7 +29,7 @@ assertDeepEqual(
   [
     {
       type: "source",
-      url: "protocol://host/foo/eval-123-456-uuid.js",
+      url: "protocol://host/foo/eval-123-456.js",
       content: "789;",
     },
   ],

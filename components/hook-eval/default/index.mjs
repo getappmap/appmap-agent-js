@@ -6,7 +6,6 @@
 // }};
 
 import { toAbsoluteUrl, toDirectoryUrl } from "../../url/index.mjs";
-import { getUuid } from "../../uuid/index.mjs";
 import { InternalAppmapError } from "../../error/index.mjs";
 import { assert, hasOwnProperty } from "../../util/index.mjs";
 import { instrument } from "../../agent/index.mjs";
@@ -55,18 +54,14 @@ export const hook = (
       writable: false,
       enumerable: false,
       configurable: true,
-      value: (url, location, content) =>
+      value: (url, position, content) =>
         instrument(
           agent,
           {
-            // We need to use a unique filename because
-            // a single eval call location may evaluate
-            // multiple different code.
-            url: toAbsoluteUrl(
-              `eval-${location}-${getUuid()}.js`,
-              toDirectoryUrl(url),
-            ),
             type: "script",
+            // We do not need to use a unique filename
+            // because we support dynamic sources.
+            url: toAbsoluteUrl(`eval-${position}.js`, toDirectoryUrl(url)),
             content: String(content),
           },
           null,

@@ -142,6 +142,7 @@ assertDeepEqual(
   ),
   {
     url: "http://host/main.js",
+    hash: null,
     line: 2, // TODO: This is off by one. It should be 1, not 2.
     column: 1,
   },
