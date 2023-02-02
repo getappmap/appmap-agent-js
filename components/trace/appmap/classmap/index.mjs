@@ -3,9 +3,6 @@ import { assert } from "../../../util/index.mjs";
 import { toRelativeUrl } from "../../../url/index.mjs";
 import { logWarning } from "../../../log/index.mjs";
 import {
-  getLocationPosition,
-  getLocationBase,
-} from "../../../location/index.mjs";
 import {
   createSource,
   toSourceClassmap,
@@ -46,11 +43,10 @@ export const addClassmapSource = (
 };
 
 export const lookupClassmapClosure = ({ sources }, location) => {
-  const base = getLocationBase(location);
-  if (sources.has(base)) {
+  if (sources.has(location.hash)) {
     return lookupSourceClosure(
       sources.get(base),
-      getLocationPosition(location),
+      location,
     );
   } else {
     logWarning(

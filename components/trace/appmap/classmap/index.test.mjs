@@ -1,5 +1,4 @@
 import { assertDeepEqual, assertEqual } from "../../../__fixture__.mjs";
-import { makeLocation } from "../../../location/index.mjs";
 import {
   createConfiguration,
   extendConfiguration,
@@ -54,13 +53,11 @@ const default_exclusion = {
   );
 
   assertDeepEqual(
-    lookupClassmapClosure(
-      classmap,
-      makeLocation("protocol://host/home/directory/file.js", {
-        line: 1,
-        column: 0,
-      }),
-    ),
+    lookupClassmapClosure(classmap, {
+      url: file1.url,
+      line: 1,
+      column: 0,
+    }),
     {
       parameters: ["x"],
       shallow: true,

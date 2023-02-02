@@ -3,7 +3,7 @@ import {
   createConfiguration,
   extendConfiguration,
 } from "../../configuration/index.mjs";
-import { makeLocation } from "../../location/index.mjs";
+import { stringifyLocation } from "../../location/index.mjs";
 import { compileTrace } from "./index.mjs";
 
 const { undefined } = globalThis;
@@ -40,7 +40,8 @@ const tabs = {
   event2: 6,
 };
 
-const location = makeLocation("protocol://host/home/dirname/filename.js", {
+const location = stringifyLocation({
+  url: "protocol://host/home/dirname/filename.js",
   line: 1,
   column: 0,
 });

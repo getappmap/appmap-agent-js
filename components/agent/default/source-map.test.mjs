@@ -4,7 +4,6 @@ import { assertEqual } from "../../__fixture__.mjs";
 import { getUuid } from "../../uuid/random/index.mjs";
 import { getTmpUrl } from "../../path/index.mjs";
 import { toAbsoluteUrl } from "../../url/index.mjs";
-import { makeLocation } from "../../location/index.mjs";
 import { mapSource } from "../../source/index.mjs";
 import { loadSourceMap } from "./source-map.mjs";
 
@@ -27,10 +26,10 @@ assertEqual(
     456,
     789,
   ),
-  makeLocation("http://host/main.js", {
+  {
     line: 456,
     column: 789,
-  }),
+  },
 );
 
 const mapping = {
@@ -89,10 +88,11 @@ assertEqual(
     456,
     789,
   ),
-  makeLocation("http://host/main.js", {
+  {
+    url: "http://host/main.js",
     line: 456,
     column: 789,
-  }),
+  },
 );
 
 await writeFileAsync(new URL(url), stringifyJSON(mapping), "utf8");
@@ -128,7 +128,7 @@ const buildInlineSourceMap = (mediaType, encoding, data) =>
     .join("");
 
 // Proper handling of inline source maps.
-assertEqual(
+assertDeepEqual(
   mapSource(
     loadSourceMap(
       {
@@ -144,10 +144,11 @@ assertEqual(
     1,
     1,
   ),
-  makeLocation("http://host/main.js", {
+  {
+    url: "http://host/main.js",
     line: 2, // TODO: This is off by one. It should be 1, not 2.
     column: 1,
-  }),
+  },
 );
 
 // Invalid encoding should be rejected, returning null.

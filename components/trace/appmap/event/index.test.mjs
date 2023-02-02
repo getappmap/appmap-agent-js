@@ -1,6 +1,6 @@
 import { assertDeepEqual } from "../../../__fixture__.mjs";
-import { makeLocation } from "../../../location/index.mjs";
 import { createConfiguration } from "../../../configuration/index.mjs";
+import { stringifyLocation } from "../../../location/index.mjs";
 import { createClassmap, addClassmapSource } from "../classmap/index.mjs";
 import { digestEventTrace } from "./index.mjs";
 
@@ -114,7 +114,8 @@ for (const shallow of [true, false]) {
     ],
     shallow,
   });
-  const location = makeLocation("protocol://host/home/filename.js", {
+  const location = stringifyLocation({
+    url: "protocol://host/home/filename.js",
     line: 1,
     column: 0,
   });
@@ -142,7 +143,8 @@ for (const shallow of [true, false]) {
 
 // missing apply >> transparent //
 {
-  const location = makeLocation("protocol://host/home/filename.js", {
+  const location = stringifyLocation({
+    url: "protocol://host/home/filename.js",
     line: 1,
     column: 0,
   });
