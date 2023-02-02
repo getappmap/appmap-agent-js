@@ -1,3 +1,10 @@
+# [13.2.0](https://github.com/getappmap/appmap-agent-js/compare/v13.1.2...v13.2.0) (2023-02-02)
+
+
+### Features
+
+* support for dynamic sources ([f169292](https://github.com/getappmap/appmap-agent-js/commit/f1692921e7f50571dfef19558cd16e8c6654b1ff))
+
 ## [13.1.2](https://github.com/getappmap/appmap-agent-js/compare/v13.1.1...v13.1.2) (2023-02-01)
 
 
