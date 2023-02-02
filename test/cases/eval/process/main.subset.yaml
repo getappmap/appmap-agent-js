@@ -1,6 +1,6 @@
 classMap:
   - type: package
-    name: "."
+    name: .
     children:
       - type: class
         name: main
@@ -8,17 +8,28 @@ classMap:
           - type: function
             name: f
             location: main.mjs:3
-            static: false
-            source: null
-            labels: []
   - type: package
     name: main.mjs
     children:
       - type: class
+        name: eval-7-2
         children:
           - type: function
             name: g
-            static: false
-            source: null
-            comment: null
-            labels: []
+            location: main.mjs/eval-7-2.js#0:1
+      - type: class
+        name: eval-7-2
+        children:
+          - type: function
+            name: h
+            location: main.mjs/eval-7-2.js#1:1
+events:
+  - event: call
+    method_id: f
+  - event: return
+  - event: call
+    method_id: g
+  - event: return
+  - event: call
+    method_id: h
+  - event: return

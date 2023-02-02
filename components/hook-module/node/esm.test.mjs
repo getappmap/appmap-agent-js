@@ -1,6 +1,5 @@
 import { hooks } from "../../../lib/node/loader-esm.mjs";
 import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
-import { createConfiguration } from "../../configuration/index.mjs";
 import { testHookAsync } from "../../hook-fixture/index.mjs";
 import * as HookEsm from "./esm.mjs";
 
@@ -15,7 +14,7 @@ assertDeepEqual(
         packages: [
           {
             regexp: "^",
-            shallow: true,
+            enabled: true,
           },
         ],
       },
@@ -64,17 +63,11 @@ assertDeepEqual(
       type: "source",
       url: "protocol://host/foo",
       content: "123;",
-      shallow: true,
-      exclude: createConfiguration("protocol://host/home").exclude,
-      inline: false,
     },
     {
       type: "source",
       url: "protocol://host/bar",
       content: "456;",
-      shallow: true,
-      exclude: createConfiguration("protocol://host/home").exclude,
-      inline: false,
     },
   ],
 );

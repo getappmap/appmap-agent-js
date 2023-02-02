@@ -1,10 +1,10 @@
 import * as Astring from "astring";
 import * as Acorn from "acorn";
 import { logError, logDebug } from "../../log/index.mjs";
-import { generateGet, recoverMaybe } from "../../util/index.mjs";
-import { getConfigurationPackage } from "../../configuration-accessor/index.mjs";
+import { generateGet } from "../../util/index.mjs";
 import { ExternalAppmapError } from "../../error/index.mjs";
 import { getSources } from "../../source/index.mjs";
+import { lookupSpecifier } from "../../specifier/index.mjs";
 import { visit } from "./visit.mjs";
 
 const { Set } = globalThis;
@@ -14,11 +14,10 @@ const { parse: parseAcorn } = Acorn;
 
 const getHead = generateGet("head");
 const getBody = generateGet("body");
-const getURL = generateGet("url");
+const getUrl = generateGet("url");
 
 export const createInstrumentation = (configuration) => ({
   configuration,
-  done: new Set(),
 });
 
 const parseEstree = (type, content, url) => {
@@ -37,18 +36,17 @@ const parseEstree = (type, content, url) => {
 };
 
 export const instrument = (
-  { configuration, done },
+  { configuration },
   { url, type, content },
   mapping,
 ) => {
   const sources = getSources(mapping)
     .map(({ url, content }) => {
-      const {
-        enabled,
-        shallow,
-        exclude,
-        "inline-source": inline,
-      } = getConfigurationPackage(configuration, url);
+      const { enabled } = lookupSpecifier(
+        configuration.packages,
+        url,
+        configuration["default-package"],
+      );
       logDebug(
         "%s source file %j",
         enabled ? "Instrumenting" : "Not instrumenting",
@@ -59,9 +57,6 @@ export const instrument = (
         body: {
           url,
           content,
-          shallow,
-          inline: recoverMaybe(inline, configuration["inline-source"]),
-          exclude: [...exclude, ...configuration.exclude],
         },
       };
     })
@@ -74,10 +69,6 @@ export const instrument = (
     );
     return { url, content, sources: [] };
   } else {
-    const new_sources = sources.filter(({ url }) => !done.has(url));
-    for (const { url } of new_sources) {
-      done.add(url);
-    }
     if (
       configuration.hooks.eval.aliases.length === 0 &&
       configuration.hooks.apply === null
@@ -86,7 +77,7 @@ export const instrument = (
         "Not instrumenting file %j because instrumentation hooks (apply and eval) are disabled",
         url,
       );
-      return { url, content, sources: new_sources };
+      return { url, content, sources };
     } else {
       logDebug("Instrumenting file %j", url);
       return {
@@ -94,13 +85,13 @@ export const instrument = (
         content: generateEstree(
           visit(parseEstree(type, content, url), {
             url,
-            whitelist: new Set(sources.map(getURL)),
+            whitelist: new Set(sources.map(getUrl)),
             eval: configuration.hooks.eval,
             apply: configuration.hooks.apply,
             mapping,
           }),
         ),
-        sources: new_sources,
+        sources,
       };
     }
   }

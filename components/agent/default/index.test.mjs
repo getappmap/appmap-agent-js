@@ -59,9 +59,6 @@ assertDeepEqual(takeLocalAgentTrace(agent, "record"), [
     type: "source",
     url: "protocol://host/base/main.js",
     content: "123;",
-    exclude: createConfiguration("protocol://host/home").exclude,
-    shallow: false,
-    inline: false,
   },
   {
     type: "start",

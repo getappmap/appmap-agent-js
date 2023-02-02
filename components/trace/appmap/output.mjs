@@ -13,7 +13,7 @@ const pickBasename = ({ appmap_file: basename, "map-name": name }) => {
   }
 };
 
-export const getLocationUrl = (configuration) =>
+export const getOutputUrl = (configuration) =>
   toAbsoluteUrl(
     `${configuration.recorder}/${encodeURIComponent(
       sanitizePathFilename(`${pickBasename(configuration)}.appmap.json`),

@@ -1,5 +1,4 @@
 import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
-import { createConfiguration } from "../../configuration/index.mjs";
 import { testHookAsync } from "../../hook-fixture/index.mjs";
 import * as HookEval from "./index.mjs";
 
@@ -14,7 +13,7 @@ assertDeepEqual(
         packages: [
           {
             regexp: "^",
-            shallow: true,
+            enabled: true,
           },
         ],
       },
@@ -30,11 +29,8 @@ assertDeepEqual(
   [
     {
       type: "source",
-      url: "protocol://host/foo/eval-123-456-uuid.js",
+      url: "protocol://host/foo/eval-123-456.js",
       content: "789;",
-      shallow: true,
-      exclude: createConfiguration("protocol://host/home").exclude,
-      inline: false,
     },
   ],
 );

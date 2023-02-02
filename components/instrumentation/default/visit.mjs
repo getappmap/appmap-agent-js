@@ -4,14 +4,13 @@ import {
 } from "../../error/index.mjs";
 import {
   mapMaybe,
-  fromMaybe,
   assert,
   hasOwnProperty,
   coalesce,
 } from "../../util/index.mjs";
 import { mapSource } from "../../source/index.mjs";
 import { logDebugWhen, logErrorWhen } from "../../log/index.mjs";
-import { getLocationBase } from "../../location/index.mjs";
+import { stringifyLocation } from "../../location/index.mjs";
 
 const {
   String,
@@ -19,6 +18,8 @@ const {
   Object: { fromEntries },
   Reflect: { ownKeys },
 } = globalThis;
+
+const getUrl = ({ url }) => url;
 
 //////////////////////////////
 // Difficulties with groups //
@@ -306,9 +307,10 @@ const instrumentClosure = (node, parent, grand_parent, closure, context) => {
     instrumented:
       context.apply !== null &&
       location !== null &&
-      context.whitelist.has(getLocationBase(location)),
+      context.whitelist.has(location.url),
   };
   if (closure.instrumented) {
+    const location_string = stringifyLocation(location);
     return makeClosure(
       node.type,
       node.async,
@@ -372,7 +374,7 @@ const instrumentClosure = (node, parent, grand_parent, closure, context) => {
             makeRegularMemberExpression(context.apply, "recordApply"),
             [
               makeIdentifier(`${context.apply}_BUNDLE_TAB`),
-              makeLiteral(location),
+              makeLiteral(location_string),
               node.type === "ArrowFunctionExpression" ||
               isSubclassConstructor(node, parent, grand_parent)
                 ? makeRegularMemberExpression(context.apply, "empty")
@@ -481,7 +483,7 @@ const instrumentClosure = (node, parent, grand_parent, closure, context) => {
                   makeRegularMemberExpression(context.apply, "recordThrow"),
                   [
                     makeIdentifier(`${context.apply}_BUNDLE_TAB`),
-                    makeLiteral(location),
+                    makeLiteral(location_string),
                     makeIdentifier(`${context.apply}_ERROR`),
                   ],
                 ),
@@ -498,7 +500,7 @@ const instrumentClosure = (node, parent, grand_parent, closure, context) => {
                     makeRegularMemberExpression(context.apply, "recordReturn"),
                     [
                       makeIdentifier(`${context.apply}_BUNDLE_TAB`),
-                      makeLiteral(location),
+                      makeLiteral(location_string),
                       makeIdentifier(`${context.apply}_RETURN`),
                     ],
                   ),
@@ -635,7 +637,7 @@ const instrumenters = {
       );
       return makeCallExpression(makeIdentifier(node.callee.name), [
         makeCallExpression(makeIdentifier(context.eval.hidden), [
-          makeLiteral(fromMaybe(location, context.url, getLocationBase)),
+          makeLiteral(mapMaybe(location, getUrl)),
           makeLiteral(
             `${String(node.loc.start.line)}-${String(node.loc.start.column)}`,
           ),

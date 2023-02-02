@@ -8,7 +8,6 @@ import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
 import { getUuid } from "../../uuid/random/index.mjs";
 import { getTmpUrl, convertPathToFileUrl } from "../../path/index.mjs";
 import { toAbsoluteUrl } from "../../url/index.mjs";
-import { createConfiguration } from "../../configuration/index.mjs";
 import { testHookAsync } from "../../hook-fixture/index.mjs";
 import * as HookCjs from "./cjs.mjs";
 
@@ -54,7 +53,7 @@ assertDeepEqual(
         packages: [
           {
             regexp: "^",
-            shallow: true,
+            enabled: true,
           },
         ],
       },
@@ -69,9 +68,6 @@ assertDeepEqual(
       type: "source",
       url: convertPathToFileUrl(await realpathAsync(new URL(url))),
       content: "module.exports = 123;",
-      exclude: createConfiguration("protocol://host/home").exclude,
-      shallow: true,
-      inline: false,
     },
   ],
 );

@@ -9,6 +9,7 @@ log-inner
 log
 validate
 validate-appmap
+hash
 patch
 peer
 file

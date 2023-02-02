@@ -2,4 +2,7 @@
 /* eslint local/no-globals: ["error", "eval"] */
 function f() {}
 f();
-eval("function g () {}; g();");
+const codes = ["function g () {}; g();", "function h () {}; h();"];
+for (const code of codes) {
+  eval(code);
+}

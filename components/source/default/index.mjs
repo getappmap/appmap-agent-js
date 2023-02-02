@@ -3,15 +3,23 @@ import {
   InternalAppmapError,
   ExternalAppmapError,
 } from "../../error/index.mjs";
+import { hashFile } from "../../hash/index.mjs";
 import { toDirectoryUrl, toAbsoluteUrl } from "../../url/index.mjs";
 import { logInfo, logError } from "../../log/index.mjs";
-import { makeLocation } from "../../location/index.mjs";
 import { validateSourceMap } from "../../validate/index.mjs";
 
 const {
   undefined,
   JSON: { parse: parseJSON },
 } = globalThis;
+
+const addHashToFile = ({ url, content }) => ({
+  url,
+  content,
+  hash: content === null ? null : hashFile({ url, content }),
+});
+
+const removeHashFromFile = ({ url, content }) => ({ url, content });
 
 export const extractSourceMapUrl = ({ url: base, content }) => {
   const parts = /\/\/[#@] sourceMappingURL=(.*)[\s]*$/u.exec(content);
@@ -24,7 +32,7 @@ export const extractSourceMapUrl = ({ url: base, content }) => {
 
 export const createMirrorSourceMap = (file) => ({
   type: "mirror",
-  source: file,
+  source: addHashToFile(file),
 });
 
 const parseSourceMap = (content, url) => {
@@ -99,23 +107,28 @@ export const createSourceMap = ({ url: base, content }) => {
               url,
               content: index < contents.length ? contents[index] : null,
             }),
-      ),
+      )
+      .map(addHashToFile),
     lines: parseGroupArray(mappings),
   };
 };
 
 export const mapSource = (mapping, line, column) => {
   if (mapping.type === "mirror") {
-    return makeLocation(mapping.source.url, { line, column });
+    const { hash, url } = mapping.source;
+    return { hash, url, line, column };
   } else if (mapping.type === "normal") {
     if (line <= mapping.lines.length) {
       for (const fields of mapping.lines[line - 1]) {
         if (fields[0] === column && fields.length >= 4) {
           if (fields[1] < mapping.sources.length) {
-            return makeLocation(mapping.sources[fields[1]].url, {
+            const { hash, url } = mapping.sources[fields[1]];
+            return {
+              hash,
+              url,
               line: fields[2] + 1,
               column: fields[3],
-            });
+            };
           } else {
             logInfo(
               "Source map out of range at file %j, line %j, and column %j",
@@ -149,9 +162,9 @@ export const mapSource = (mapping, line, column) => {
 
 export const getSources = (mapping) => {
   if (mapping.type === "mirror") {
-    return [mapping.source];
+    return [removeHashFromFile(mapping.source)];
   } else if (mapping.type === "normal") {
-    return mapping.sources;
+    return mapping.sources.map(removeHashFromFile);
   } /* c8 ignore start */ else {
     throw new InternalAppmapError("invalid mapping type");
   } /* c8 ignore stop */

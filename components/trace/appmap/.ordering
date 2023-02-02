@@ -2,5 +2,5 @@ classmap
 event
 ordering
 metadata.mjs
-location.mjs
+output.mjs
 index.mjs

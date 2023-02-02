@@ -1,5 +1,4 @@
-import { toRelativeUrl } from "../../../url/index.mjs";
-import { logInfoWhen, logWarning } from "../../../log/index.mjs";
+import { logInfoWhen } from "../../../log/index.mjs";
 import { parseEstree } from "./parse.mjs";
 import { lookupEstreePath } from "./lookup.mjs";
 import {
@@ -17,24 +16,15 @@ const { Map, Set, String } = globalThis;
 
 const hashPosition = ({ line, column }) => `${String(line)}:${String(column)}`;
 
-export const createSource = (
+export const createSource = ({
+  url,
   content,
-  { url, directory, inline, exclusions, shallow, pruning },
-) => {
-  if (content === null) {
-    logWarning("Will treat %j as empty because it could not be loaded", url);
-    content = "";
-  }
-  let relative = toRelativeUrl(url, directory);
-  if (relative === null) {
-    logWarning(
-      "Will treat %j as empty because it could not be expressed relatively to %j",
-      url,
-      directory,
-    );
-    content = "";
-    relative = "dummy/relative/path";
-  }
+  relative,
+  inline,
+  exclusions,
+  shallow,
+  pruning,
+}) => {
   const estree = parseEstree(url, content);
   const getExclusion = compileExclusionArray(exclusions);
   const context = {
@@ -52,7 +42,19 @@ export const createSource = (
   for (const entity of entities) {
     registerFunctionEntity(entity, null, infos);
   }
-  return { estree, entities, infos, paths: new Map(), pruning };
+  return {
+    url,
+    content,
+    relative,
+    inline,
+    exclusions,
+    shallow,
+    pruning,
+    estree,
+    entities,
+    infos,
+    paths: new Map(),
+  };
 };
 
 const isFunctionEstree = ({ type }) =>
@@ -85,6 +87,8 @@ export const lookupSourceClosure = ({ estree, infos, paths }, position) => {
     return null;
   }
 };
+
+export const getSourceRelativeUrl = ({ relative }) => relative;
 
 export const toSourceClassmap = ({ entities, pruning, paths }) => {
   if (pruning) {

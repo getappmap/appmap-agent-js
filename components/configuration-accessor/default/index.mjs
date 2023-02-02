@@ -15,7 +15,7 @@ import {
   extractRepositoryHistory,
   extractRepositoryPackage,
 } from "../../repository/index.mjs";
-import { matchSpecifier } from "../../specifier/index.mjs";
+import { lookupSpecifier } from "../../specifier/index.mjs";
 import { extendConfiguration } from "../../configuration/index.mjs";
 import { resolveShell } from "./escape.mjs";
 import { tokenize } from "./tokenize.mjs";
@@ -40,15 +40,6 @@ const {
   Object: { entries: toEntries },
   JSON: { stringify: stringifyJSON },
 } = globalThis;
-
-const getSpecifierValue = (pairs, key, def) => {
-  for (const [specifier, value] of pairs) {
-    if (matchSpecifier(specifier, key)) {
-      return value;
-    }
-  }
-  return def;
-};
 
 export const resolveConfigurationRepository = (configuration) => {
   assert(
@@ -214,12 +205,12 @@ export const isConfigurationEnabled = ({
   processes,
   main,
   "default-process": default_process,
-}) => main === null || getSpecifierValue(processes, main, default_process);
+}) => main === null || lookupSpecifier(processes, main, default_process);
 
 export const getConfigurationPackage = (
   { packages, "default-package": default_package },
   url,
-) => getSpecifierValue(packages, url, default_package);
+) => lookupSpecifier(packages, url, default_package);
 
 const compileScenario = (scenario) => {
   try {

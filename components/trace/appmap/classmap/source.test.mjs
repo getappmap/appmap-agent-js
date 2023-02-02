@@ -1,60 +1,46 @@
 import { assertEqual, assertDeepEqual } from "../../../__fixture__.mjs";
-
 import {
   createSource,
+  getSourceRelativeUrl,
   lookupSourceClosure,
   toSourceClassmap,
 } from "./source.mjs";
 
-assertDeepEqual(
-  toSourceClassmap(
-    createSource(null, {
-      pruning: true,
-      inline: true,
-      shallow: true,
-      directory: "protocol1://host1/home/",
-      url: "protocol2://host2/home/dirname/basename.js",
-      exclusions: [],
-    }),
-  ),
-  [],
-);
-
 {
-  const source = createSource(
-    `
-    function f (x) {}
-    function g (y) {}
-    var o = {};
-  `,
-    {
-      pruning: true,
-      inline: true,
-      shallow: true,
-      directory: "protocol://host/home/",
-      url: "protocol://host/home/dirname/basename.js",
-      exclusions: [
-        {
-          combinator: "or",
-          name: false,
-          "qualified-name": "^basename\\.g$",
-          "some-label": false,
-          "every-label": false,
-          excluded: true,
-          recursive: false,
-        },
-        {
-          combinator: "and",
-          name: true,
-          "qualified-name": true,
-          "some-label": true,
-          "every-label": true,
-          excluded: false,
-          recursive: false,
-        },
-      ],
-    },
-  );
+  const source = createSource({
+    url: "protocol://host/home/dirname/basename.js",
+    content: `
+      function f (x) {}
+      function g (y) {}
+      var o = {};
+    `,
+    pruning: true,
+    inline: true,
+    shallow: true,
+    relative: "dirname/basename.js",
+    exclusions: [
+      {
+        combinator: "or",
+        name: false,
+        "qualified-name": "^basename\\.g$",
+        "some-label": false,
+        "every-label": false,
+        excluded: true,
+        recursive: false,
+      },
+      {
+        combinator: "and",
+        name: true,
+        "qualified-name": true,
+        "some-label": true,
+        "every-label": true,
+        excluded: false,
+        recursive: false,
+      },
+    ],
+  });
+
+  assertEqual(getSourceRelativeUrl(source), "dirname/basename.js");
 
   // present function //
   {
@@ -70,11 +56,11 @@ assertDeepEqual(
       },
     };
     assertDeepEqual(
-      lookupSourceClosure(source, { line: 2, column: 4 }, {}),
+      lookupSourceClosure(source, { line: 2, column: 6 }, {}),
       info,
     );
     assertDeepEqual(
-      lookupSourceClosure(source, { line: 2, column: 4 }, {}),
+      lookupSourceClosure(source, { line: 2, column: 6 }, {}),
       info,
     );
     assertDeepEqual(
@@ -84,10 +70,10 @@ assertDeepEqual(
   }
 
   // excluded function //
-  assertEqual(lookupSourceClosure(source, { line: 3, column: 4 }, {}), null);
+  assertEqual(lookupSourceClosure(source, { line: 3, column: 6 }, {}), null);
 
   // missing function //
-  assertEqual(lookupSourceClosure(source, { line: 4, column: 4 }, {}), null);
+  assertEqual(lookupSourceClosure(source, { line: 4, column: 6 }, {}), null);
 
   assertDeepEqual(toSourceClassmap(source), [
     {

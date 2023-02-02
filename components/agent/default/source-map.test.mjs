@@ -1,10 +1,10 @@
 import { writeFile as writeFileAsync } from "node:fs/promises";
 import { Buffer } from "node:buffer";
-import { assertEqual } from "../../__fixture__.mjs";
+import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
 import { getUuid } from "../../uuid/random/index.mjs";
+import { hashFile } from "../../hash/index.mjs";
 import { getTmpUrl } from "../../path/index.mjs";
 import { toAbsoluteUrl } from "../../url/index.mjs";
-import { makeLocation } from "../../location/index.mjs";
 import { mapSource } from "../../source/index.mjs";
 import { loadSourceMap } from "./source-map.mjs";
 
@@ -15,22 +15,24 @@ const {
   JSON: { stringify: stringifyJSON },
 } = globalThis;
 
-assertEqual(
+assertDeepEqual(
   mapSource(
     loadSourceMap(
       {
         url: "http://host/main.js",
-        content: "123;",
+        content: null,
       },
       null,
     ),
     456,
     789,
   ),
-  makeLocation("http://host/main.js", {
+  {
+    hash: null,
+    url: "http://host/main.js",
     line: 456,
     column: 789,
-  }),
+  },
 );
 
 const mapping = {
@@ -77,23 +79,17 @@ assertEqual(
 
 const url = toAbsoluteUrl(getUuid(), getTmpUrl());
 
-assertEqual(
-  mapSource(
-    loadSourceMap(
-      {
-        url: "http://host/main.js",
-        content: `123; //# sourceMappingURL=${url}`,
-      },
-      null,
-    ),
-    456,
-    789,
-  ),
-  makeLocation("http://host/main.js", {
-    line: 456,
-    column: 789,
-  }),
-);
+const file = {
+  url: "http://host/main.js",
+  content: `123; //# sourceMappingURL=${url}`,
+};
+
+assertDeepEqual(mapSource(loadSourceMap(file, null), 456, 789), {
+  url: "http://host/main.js",
+  hash: hashFile(file),
+  line: 456,
+  column: 789,
+});
 
 await writeFileAsync(new URL(url), stringifyJSON(mapping), "utf8");
 
@@ -128,7 +124,7 @@ const buildInlineSourceMap = (mediaType, encoding, data) =>
     .join("");
 
 // Proper handling of inline source maps.
-assertEqual(
+assertDeepEqual(
   mapSource(
     loadSourceMap(
       {
@@ -144,10 +140,12 @@ assertEqual(
     1,
     1,
   ),
-  makeLocation("http://host/main.js", {
+  {
+    url: "http://host/main.js",
+    hash: null,
     line: 2, // TODO: This is off by one. It should be 1, not 2.
     column: 1,
-  }),
+  },
 );
 
 // Invalid encoding should be rejected, returning null.

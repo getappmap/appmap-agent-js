@@ -7,25 +7,6 @@ import {
 import { normalize } from "./__fixture__.mjs";
 import { createInstrumentation, instrument } from "./index.mjs";
 
-const and_exclusion = {
-  combinator: "and",
-  name: true,
-  "qualified-name": true,
-  "every-label": true,
-  "some-label": true,
-  excluded: false,
-  recursive: false,
-};
-
-const makeExclusion = (name) => ({
-  ...and_exclusion,
-  "qualified-name": name,
-  excluded: true,
-  recursive: true,
-});
-
-const default_exclude = createConfiguration("protocol://host/home").exclude;
-
 const normalizeContent = ({ content, ...rest }, source) => ({
   content: normalize(content, source),
   ...rest,
@@ -81,9 +62,6 @@ const normalizeContent = ({ content, ...rest }, source) => ({
               {
                 path: "script.js",
                 enabled: true,
-                exclude: [],
-                shallow: true,
-                "inline-source": true,
               },
             ],
           },
@@ -100,9 +78,6 @@ const normalizeContent = ({ content, ...rest }, source) => ({
         {
           url: "protocol://host/base/script.js",
           content: "function main () {}",
-          shallow: true,
-          inline: true,
-          exclude: default_exclude,
         },
       ],
     },
@@ -154,13 +129,6 @@ const instrumentation = createInstrumentation(
         {
           url: "protocol://host/base/foo.js",
           content: "123;",
-          shallow: true,
-          inline: true,
-          exclude: [
-            makeExclusion("foo"),
-            makeExclusion("qux"),
-            ...default_exclude,
-          ],
         },
       ],
     },

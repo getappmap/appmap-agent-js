@@ -1,23 +1,23 @@
 import { InternalAppmapError } from "../../error/index.mjs";
 import { assert } from "../../util/index.mjs";
 
-const { URL, String, parseInt } = globalThis;
+const { String, parseInt } = globalThis;
 
-export const makeLocation = (url, { line, column }) =>
-  new URL(`#${String(line)}-${String(column)}`, url).toString();
+const regexp = /^([\s\S]+)#([0-9]+)-([0-9]+)$/u;
 
-export const getLocationPosition = (url) => {
-  const { hash } = new URL(url);
-  const parts = /^#([0-9]+)-([0-9]+)$/u.exec(hash);
-  assert(parts !== null, "expected a url code location", InternalAppmapError);
+export const stringifyLocation = ({ url, hash, line, column }) =>
+  // Prefer hash location over url location to support dynamic sources.
+  `${hash === null ? url : hash}#${String(line)}-${String(column)}`;
+
+export const parseLocation = (string) => {
+  const parts = regexp.exec(string);
+  assert(parts !== null, InternalAppmapError, "invalid location format");
+  // Hash is base64-encoded and cannot contain `:`.
+  const is_url_based = parts[1].includes(":");
   return {
-    line: parseInt(parts[1]),
-    column: parseInt(parts[2]),
+    url: is_url_based ? parts[1] : null,
+    hash: is_url_based ? null : parts[1],
+    line: parseInt(parts[2]),
+    column: parseInt(parts[3]),
   };
-};
-
-export const getLocationBase = (url) => {
-  const object_url = new URL(url);
-  object_url.hash = "";
-  return object_url.toString();
 };
