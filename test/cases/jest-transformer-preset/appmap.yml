@@ -1,6 +1,4 @@
 recorder: jest
-log:
-  level: debug
 command: npx jest --no-cache
 command-win32: npx.cmd jest --no-cache
 appmap_dir: .
