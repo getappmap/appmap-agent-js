@@ -1,4 +1,4 @@
-export * from "./assert.mjs";
+export * from "../../assert/index.mjs";
 export * from "./array.mjs";
 export * from "./box.mjs";
 export * from "./convert.mjs";

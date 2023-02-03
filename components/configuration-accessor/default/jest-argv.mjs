@@ -70,8 +70,8 @@ export const hookJestArgvAsync = async (argv, base) => {
         "Jest `--transform` argument should not be duplicate: %j",
         argv,
       ),
-      ExternalAppmapError,
       "Jest --transform argument should not be duplicate",
+      ExternalAppmapError,
     );
     assert(
       !logErrorWhen(
@@ -79,8 +79,8 @@ export const hookJestArgvAsync = async (argv, base) => {
         "Jest `--transform` argument should not be in last postion: %j",
         argv,
       ),
-      ExternalAppmapError,
       "Jest `--transform` argument should not be in last postion",
+      ExternalAppmapError,
     );
     let transform = argv[index + 1];
     try {

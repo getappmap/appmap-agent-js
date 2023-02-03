@@ -11,7 +11,7 @@ export const stringifyLocation = ({ url, hash, line, column }) =>
 
 export const parseLocation = (string) => {
   const parts = regexp.exec(string);
-  assert(parts !== null, InternalAppmapError, "invalid location format");
+  assert(parts !== null, "invalid location format", InternalAppmapError);
   // Hash is base64-encoded and cannot contain `:`.
   const is_url_based = parts[1].includes(":");
   return {

@@ -1,4 +1,4 @@
-import { assert, AssertionError } from "./assert.mjs";
+import { assert, AssertionError } from "../../assert/index.mjs";
 
 const {
   Error,

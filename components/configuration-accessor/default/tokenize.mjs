@@ -39,13 +39,13 @@ export const tokenizeShell = (source) => {
   }
   assert(
     !logErrorWhen(quote !== null, "unterminated quote on command %s", source),
-    ExternalAppmapError,
     "unterminated quote on command",
+    ExternalAppmapError,
   );
   assert(
     !logErrorWhen(escaped, "missing escaped character on command %s", source),
-    ExternalAppmapError,
     "missing escaped character",
+    ExternalAppmapError,
   );
   return tokens;
 };

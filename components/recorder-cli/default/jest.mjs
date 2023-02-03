@@ -71,8 +71,8 @@ export const record = (configuration) => {
         this,
         tracks,
       ),
-      ExternalAppmapError,
       "Duplicate beforeEach test context",
+      ExternalAppmapError,
     );
     // We cannot use a counter because another jest
     // agent may be running in a different context.
@@ -98,8 +98,8 @@ export const record = (configuration) => {
         this,
         tracks,
       ),
-      ExternalAppmapError,
       "Missing after test context",
+      ExternalAppmapError,
     );
     logWarningWhen(
       tracks.size > 1,
