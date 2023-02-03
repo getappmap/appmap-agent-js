@@ -7,8 +7,8 @@ import {
   createSession,
   sendSession,
   hasSessionTrack,
-  compileSessionTrace,
-  compileSessionTraceArray,
+  compileSessionTrack,
+  compileSessionTrackArray,
 } from "./session.mjs";
 
 const configuration = extendConfiguration(
@@ -31,8 +31,7 @@ const configuration = extendConfiguration(
     configuration,
   };
   assertEqual(sendSession(session, message1), true);
-  // duplicate track
-  assertEqual(sendSession(session, message1), false);
+  assertEqual(sendSession(session, message1), false); // duplicate track
   assertEqual(hasSessionTrack(session, "record"), true);
   const message2 = {
     type: "error",
@@ -50,17 +49,12 @@ const configuration = extendConfiguration(
     },
   };
   assertEqual(sendSession(session, message3), true);
-  // missing track
-  assertEqual(sendSession(session, message3), false);
-  // duplicate trace
-  assertEqual(sendSession(session, message1), true);
-  assertEqual(sendSession(session, message3), false);
-  assertDeepEqual(compileSessionTrace(session, "record"), {
+  assertDeepEqual(compileSessionTrack(session, "record"), {
     url: "protocol://host/base/dirname/process/basename.appmap.json",
     content: [message1, message2, message3],
   });
-  // missing trace
-  assertEqual(compileSessionTrace(session, "record"), null);
+  assertEqual(compileSessionTrack(session, "record"), null); // missing track
+  assertEqual(sendSession(session, message3), false); // missing track
 }
 
 // stop all && source message //
@@ -70,9 +64,6 @@ const configuration = extendConfiguration(
     type: "source",
     url: "protocol://host/cwd/main.js",
     content: "function main () {}",
-    shallow: false,
-    inline: false,
-    exclude: [],
   };
   assertEqual(sendSession(session, message1), true);
   const message2 = {
@@ -89,11 +80,11 @@ const configuration = extendConfiguration(
     },
   };
   assertEqual(sendSession(session, message3), true),
-    assertDeepEqual(compileSessionTraceArray(session), [
+    assertDeepEqual(compileSessionTrackArray(session), [
       {
         url: "protocol://host/base/dirname/process/basename.appmap.json",
         content: [message1, message2, message3],
       },
     ]);
-  assertDeepEqual(compileSessionTraceArray(session), []);
+  assertDeepEqual(compileSessionTrackArray(session), []);
 }

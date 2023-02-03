@@ -9,8 +9,8 @@ import {
   createSession,
   sendSession,
   hasSessionTrack,
-  compileSessionTrace,
-  compileSessionTraceArray,
+  compileSessionTrack,
+  compileSessionTrackArray,
 } from "./session.mjs";
 
 const { String, Set, Map } = globalThis;
@@ -38,9 +38,9 @@ const refreshTrace = (urls, { url, content }) => ({
   content,
 });
 
-export const compileBackendTraceArray = ({ sessions, urls }, key) => {
+export const compileBackendTrackArray = ({ sessions, urls }, key) => {
   if (sessions.has(key)) {
-    return compileSessionTraceArray(sessions.get(key)).map((trace) =>
+    return compileSessionTrackArray(sessions.get(key)).map((trace) =>
       refreshTrace(urls, trace),
     );
   } else {
@@ -48,9 +48,9 @@ export const compileBackendTraceArray = ({ sessions, urls }, key) => {
   }
 };
 
-export const compileBackendTrace = ({ sessions, urls }, key1, key2) => {
+export const compileBackendTrack = ({ sessions, urls }, key1, key2) => {
   if (sessions.has(key1)) {
-    const maybe_trace = compileSessionTrace(sessions.get(key1), key2);
+    const maybe_trace = compileSessionTrack(sessions.get(key1), key2);
     if (maybe_trace === null) {
       return null;
     } else {

@@ -4,7 +4,7 @@ import { mapMaybe, generateDeadcode } from "../../util/index.mjs";
 import {
   createBackend,
   sendBackend,
-  compileBackendTrace,
+  compileBackendTrack,
 } from "../../backend/index.mjs";
 
 const SESSION = "_appmap";
@@ -30,7 +30,7 @@ export const closeEmitter = (backend) => {
 const getContent = ({ content }) => content;
 
 export const takeLocalEmitterTrace = (backend, track) =>
-  mapMaybe(compileBackendTrace(backend, SESSION, track), getContent);
+  mapMaybe(compileBackendTrack(backend, SESSION, track), getContent);
 
 export const requestRemoteEmitterAsync = generateDeadcode(
   "requestRemoteEmitterAsync should not be called on emitter/local",

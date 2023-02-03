@@ -24,7 +24,7 @@ import {
 import {
   createBackend,
   sendBackend,
-  compileBackendTraceArray,
+  compileBackendTrackArray,
 } from "../../backend/index.mjs";
 import { spawnAsync, killAllAsync } from "./spawn.mjs";
 import { whereAsync } from "./where.mjs";
@@ -125,7 +125,7 @@ export const mainAsync = async (process, configuration) => {
       track: null,
       termination: { type: "unknown" },
     });
-    for (const { url, content } of compileBackendTraceArray(backend, session)) {
+    for (const { url, content } of compileBackendTrackArray(backend, session)) {
       await mkdirAsync(new URL(".", url), { recursive: true });
       await writeFileAsync(
         new URL(url),
