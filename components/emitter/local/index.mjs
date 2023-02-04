@@ -30,7 +30,7 @@ export const closeEmitter = (backend) => {
 const getContent = ({ content }) => content;
 
 export const takeLocalEmitterTrace = (backend, track) =>
-  mapMaybe(compileBackendTrack(backend, SESSION, track), getContent);
+  mapMaybe(compileBackendTrack(backend, SESSION, track, true), getContent);
 
 export const requestRemoteEmitterAsync = generateDeadcode(
   "requestRemoteEmitterAsync should not be called on emitter/local",

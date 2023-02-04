@@ -113,7 +113,7 @@ await new Promise((resolve) => {
   socket.on("close", resolve);
 });
 
-assertDeepEqual(compileBackendTrack(backend, "session", "record"), {
+assertDeepEqual(compileBackendTrack(backend, "session", "record", true), {
   url: toAbsoluteUrl(
     `${uuid}/dirname/process/basename.appmap.json`,
     getTmpUrl(),

@@ -53,4 +53,6 @@ export const sendTrack = (track, message) => {
 };
 
 export const isTrackComplete = (track) =>
-  track.missing_hash_set.size === 0 && track.missing_url_set.size === 0;
+  !track.running &&
+  track.missing_hash_set.size === 0 &&
+  track.missing_url_set.size === 0;

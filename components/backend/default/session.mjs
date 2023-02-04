@@ -1,11 +1,19 @@
 import { logError } from "../../log/index.mjs";
 import { identity } from "../../util/index.mjs";
-import { startTrack, stopTrack, sendTrack, compileTrack } from "./track.mjs";
+import {
+  startTrack,
+  stopTrack,
+  sendTrack,
+  compileTrack,
+  isTrackComplete,
+} from "./track.mjs";
 
 const {
   Map,
   Array: { from: toArray },
 } = globalThis;
+
+const isNotNull = (any) => any !== null;
 
 const processStartMessage = ({ tracks, sources }, key, message) => {
   if (tracks.has(key)) {
@@ -44,20 +52,26 @@ export const createSession = () => ({
 
 export const hasSessionTrack = ({ tracks }, key) => tracks.has(key);
 
-export const compileSessionTrack = ({ tracks }, key) => {
+export const compileSessionTrack = ({ tracks }, key, abrupt) => {
   if (tracks.has(key)) {
     const track = tracks.get(key);
-    tracks.delete(key);
-    return compileTrack(track);
+    if (abrupt || isTrackComplete(track)) {
+      tracks.delete(key);
+      return compileTrack(track);
+    } else {
+      return null;
+    }
   } else {
     return null;
   }
 };
 
-export const compileSessionTrackArray = (session) =>
-  toArray(session.tracks.keys()).map((key) =>
-    compileSessionTrack(session, key),
-  );
+export const compileSessionTrackArray = (session, abrupt) =>
+  toArray(session.tracks.keys())
+    .map((key) => compileSessionTrack(session, key, abrupt))
+    .filter(isNotNull);
+
+export const isSessionEmpty = ({ tracks }) => tracks.size === 0;
 
 export const sendSession = (session, message) => {
   const { type } = message;

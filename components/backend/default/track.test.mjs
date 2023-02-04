@@ -91,6 +91,8 @@ import {
     sendTrack(track, source_message);
     sendTrack(track, return_event_message);
     sendTrack(track, throw_event_message);
+    assertEqual(isTrackComplete(track), false);
+    stopTrack(track);
     assertEqual(isTrackComplete(track), true);
   }
   // first source then location //
@@ -98,6 +100,7 @@ import {
     const track = startTrack();
     sendTrack(track, return_event_message);
     sendTrack(track, throw_event_message);
+    stopTrack(track);
     assertEqual(isTrackComplete(track), false);
     sendTrack(track, source_message);
     assertEqual(isTrackComplete(track), true);

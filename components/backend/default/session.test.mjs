@@ -9,6 +9,7 @@ import {
   hasSessionTrack,
   compileSessionTrack,
   compileSessionTrackArray,
+  isSessionEmpty,
 } from "./session.mjs";
 
 const configuration = extendConfiguration(
@@ -41,6 +42,7 @@ const configuration = extendConfiguration(
     },
   };
   assertEqual(sendSession(session, message2), true);
+  assertDeepEqual(compileSessionTrack(session, "record", false), null);
   const message3 = {
     type: "stop",
     track: "record",
@@ -49,11 +51,13 @@ const configuration = extendConfiguration(
     },
   };
   assertEqual(sendSession(session, message3), true);
-  assertDeepEqual(compileSessionTrack(session, "record"), {
+  assertEqual(isSessionEmpty(session), false);
+  assertDeepEqual(compileSessionTrack(session, "record", true), {
     url: "protocol://host/base/dirname/process/basename.appmap.json",
     content: [message1, message2, message3],
   });
-  assertEqual(compileSessionTrack(session, "record"), null); // missing track
+  assertEqual(isSessionEmpty(session), true);
+  assertEqual(compileSessionTrack(session, "record", true), null); // missing track
   assertEqual(sendSession(session, message3), false); // missing track
 }
 
@@ -80,11 +84,11 @@ const configuration = extendConfiguration(
     },
   };
   assertEqual(sendSession(session, message3), true),
-    assertDeepEqual(compileSessionTrackArray(session), [
+    assertDeepEqual(compileSessionTrackArray(session, true), [
       {
         url: "protocol://host/base/dirname/process/basename.appmap.json",
         content: [message1, message2, message3],
       },
     ]);
-  assertDeepEqual(compileSessionTrackArray(session), []);
+  assertDeepEqual(compileSessionTrackArray(session, true), []);
 }

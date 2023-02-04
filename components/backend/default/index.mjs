@@ -11,6 +11,7 @@ import {
   hasSessionTrack,
   compileSessionTrack,
   compileSessionTrackArray,
+  isSessionEmpty,
 } from "./session.mjs";
 
 const { String, Set, Map } = globalThis;
@@ -38,9 +39,9 @@ const refreshTrace = (urls, { url, content }) => ({
   content,
 });
 
-export const compileBackendTrackArray = ({ sessions, urls }, key) => {
+export const compileBackendTrackArray = ({ sessions, urls }, key, abrupt) => {
   if (sessions.has(key)) {
-    return compileSessionTrackArray(sessions.get(key)).map((trace) =>
+    return compileSessionTrackArray(sessions.get(key), abrupt).map((trace) =>
       refreshTrace(urls, trace),
     );
   } else {
@@ -48,9 +49,9 @@ export const compileBackendTrackArray = ({ sessions, urls }, key) => {
   }
 };
 
-export const compileBackendTrack = ({ sessions, urls }, key1, key2) => {
+export const compileBackendTrack = ({ sessions, urls }, key1, key2, abrupt) => {
   if (sessions.has(key1)) {
-    const maybe_trace = compileSessionTrack(sessions.get(key1), key2);
+    const maybe_trace = compileSessionTrack(sessions.get(key1), key2, abrupt);
     if (maybe_trace === null) {
       return null;
     } else {
@@ -64,6 +65,14 @@ export const compileBackendTrack = ({ sessions, urls }, key1, key2) => {
 export const hasBackendTrack = ({ sessions }, key1, key2) => {
   if (sessions.has(key1)) {
     return hasSessionTrack(sessions.get(key1), key2);
+  } else {
+    return null;
+  }
+};
+
+export const isBackendSessionEmpty = ({ sessions }, key) => {
+  if (sessions.has(key)) {
+    return isSessionEmpty(sessions.get(key));
   } else {
     return null;
   }
