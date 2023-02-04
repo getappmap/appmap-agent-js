@@ -160,7 +160,7 @@ export const compileTrace = (messages) => {
       }
     }
     return toArray(counters.keys())
-      .sort((key1, key2) => counters.get(key1) - counters.get(key2))
+      .sort((key1, key2) => counters.get(key2) - counters.get(key1))
       .slice(0, 20)
       .map(
         (key) =>
