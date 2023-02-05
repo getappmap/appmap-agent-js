@@ -16,6 +16,14 @@ const configuration = extendConfiguration(
     "map-name": "map-name",
     name: "app-name",
     recorder: "process",
+    packages: [
+      {
+        regexp: "^",
+        enabled: true,
+        "inline-source": false,
+        exclude: [],
+      },
+    ],
     agent: {
       directory: "protocol://host/agent/",
       package: {

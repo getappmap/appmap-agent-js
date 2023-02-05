@@ -51,9 +51,10 @@ import {
     url: "protocol://host/home/directory/static.js",
     content: "function h (z) {}",
   };
-  addClassmapSource(classmap, file1);
-  addClassmapSource(classmap, file2);
-  addClassmapSource(classmap, file3);
+  assertEqual(addClassmapSource(classmap, file1), true);
+  assertEqual(addClassmapSource(classmap, file1), true); // caching
+  assertEqual(addClassmapSource(classmap, file2), true);
+  assertEqual(addClassmapSource(classmap, file3), true);
   assertDeepEqual(
     lookupClassmapClosure(classmap, {
       url: null,
@@ -124,17 +125,39 @@ import {
 
 // lookupClassmapClosure >> missing source //
 {
-  const classmap = createClassmap(createConfiguration("protocol://host/home/"));
+  const classmap = createClassmap(
+    extendConfiguration(
+      createConfiguration("protocol://host/home/"),
+      {
+        packages: [
+          {
+            regexp: "disabled\\.js$",
+            enabled: false,
+          },
+          {
+            regexp: "^",
+            enabled: true,
+          },
+        ],
+      },
+      "protocol://host/base/",
+    ),
+  );
   const file1 = {
-    url: "protocol://host/home/directory/empty.js",
+    url: "protocol://host/base/directory/empty.js",
     content: null,
   };
   const file2 = {
     url: "external://relative/url/file.js",
     content: "",
   };
-  addClassmapSource(classmap, file1);
-  addClassmapSource(classmap, file2);
+  const file3 = {
+    url: "protocol://host/base/directory/disabled.js",
+    content: "",
+  };
+  assertEqual(addClassmapSource(classmap, file1), false);
+  assertEqual(addClassmapSource(classmap, file2), false);
+  assertEqual(addClassmapSource(classmap, file3), false);
   assertEqual(
     lookupClassmapClosure(classmap, {
       url: file1.url,
@@ -147,6 +170,15 @@ import {
   assertEqual(
     lookupClassmapClosure(classmap, {
       url: file2.url,
+      hash: null,
+      line: 123,
+      column: 456,
+    }),
+    null,
+  );
+  assertEqual(
+    lookupClassmapClosure(classmap, {
+      url: file3.url,
       hash: null,
       line: 123,
       column: 456,
@@ -218,7 +250,7 @@ import {
     content: "function f (x) {}",
   };
 
-  addClassmapSource(classmap, file);
+  assertEqual(addClassmapSource(classmap, file), true);
 
   lookupClassmapClosure(classmap, {
     url: null,
@@ -260,21 +292,33 @@ import {
       {
         pruning: false,
         "collapse-package-hierachy": false,
+        "default-package": {
+          "inline-source": null,
+          exclude: [],
+          shallow: false,
+          enabled: true,
+        },
         "inline-source": false,
       },
       "protocol://host/base/",
     ),
   );
 
-  addClassmapSource(classmap, {
-    url: "protocol://host/home/file.js",
-    content: "function f (x) {}",
-  });
+  assertEqual(
+    addClassmapSource(classmap, {
+      url: "protocol://host/home/file.js",
+      content: "function f (x) {}",
+    }),
+    true,
+  );
 
-  addClassmapSource(classmap, {
-    url: "protocol://host/home/file.js",
-    content: "function g (x) {}",
-  });
+  assertEqual(
+    addClassmapSource(classmap, {
+      url: "protocol://host/home/file.js",
+      content: "function g (x) {}",
+    }),
+    true,
+  );
 
   assertDeepEqual(compileClassmap(classmap), [
     {
