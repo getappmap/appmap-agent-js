@@ -4,7 +4,7 @@ import {
   createConfiguration,
   extendConfiguration,
 } from "../../../configuration/index.mjs";
-import { createClassmap, addClassmapSource } from "../classmap/index.mjs";
+import { createClassmap, addClassmapSource } from "../../../classmap/index.mjs";
 import { digestEventTrace } from "./index.mjs";
 
 const makeEvent = (site, tab, payload) => ({

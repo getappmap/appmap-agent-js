@@ -10,7 +10,7 @@ import {
   createClassmap,
   addClassmapSource,
   compileClassmap,
-} from "./classmap/index.mjs";
+} from "../../classmap/index.mjs";
 import { digestEventTrace } from "./event/index.mjs";
 import { orderEventArray } from "./ordering/index.mjs";
 import { getOutputUrl } from "./output.mjs";

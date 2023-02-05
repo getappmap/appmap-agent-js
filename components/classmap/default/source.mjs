@@ -1,4 +1,4 @@
-import { logInfoWhen } from "../../../log/index.mjs";
+import { logInfoWhen } from "../../log/index.mjs";
 import { parseEstree } from "./parse.mjs";
 import { lookupEstreePath } from "./lookup.mjs";
 import {
