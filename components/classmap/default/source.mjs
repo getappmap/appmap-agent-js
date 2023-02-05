@@ -1,4 +1,4 @@
-import { logInfoWhen } from "../../log/index.mjs";
+import { logInfo } from "../../log/index.mjs";
 import { parseEstree } from "./parse.mjs";
 import { lookupEstreePath } from "./lookup.mjs";
 import {
@@ -12,9 +12,7 @@ import {
 import { digestEstreeRoot } from "./digest.mjs";
 import { compileExclusionArray } from "./exclusion.mjs";
 
-const { Map, Set, String } = globalThis;
-
-const hashPosition = ({ line, column }) => `${String(line)}:${String(column)}`;
+const { Map, Set } = globalThis;
 
 export const createSource = ({
   url,
@@ -53,7 +51,7 @@ export const createSource = ({
     estree,
     entities,
     infos,
-    paths: new Map(),
+    paths: new Set(),
   };
 };
 
@@ -62,29 +60,18 @@ const isFunctionEstree = ({ type }) =>
   type === "FunctionExpression" ||
   type === "FunctionDeclaration";
 
-const lookupCache = (position, estree, paths) => {
-  const hashed_position = hashPosition(position);
-  if (paths.has(hashed_position)) {
-    return paths.get(hashed_position);
-  } else {
-    const maybe_path = lookupEstreePath(estree, isFunctionEstree, position);
-    logInfoWhen(
-      maybe_path === null,
+export const lookupSourceClosure = ({ estree, infos, paths }, position) => {
+  const maybe_path = lookupEstreePath(estree, isFunctionEstree, position);
+  if (maybe_path === null) {
+    logInfo(
       "Could not find a function in %j at %j, will treat it as excluded.",
       estree.loc.filename,
       position,
     );
-    paths.set(hashed_position, maybe_path);
-    return maybe_path;
-  }
-};
-
-export const lookupSourceClosure = ({ estree, infos, paths }, position) => {
-  const maybe_path = lookupCache(position, estree, paths);
-  if (maybe_path !== null) {
-    return infos.has(maybe_path) ? infos.get(maybe_path) : null;
-  } else {
     return null;
+  } else {
+    paths.add(maybe_path);
+    return infos.has(maybe_path) ? infos.get(maybe_path) : null;
   }
 };
 
@@ -92,9 +79,8 @@ export const getSourceRelativeUrl = ({ relative }) => relative;
 
 export const toSourceClassmap = ({ entities, pruning, paths }) => {
   if (pruning) {
-    const used = new Set(paths.values());
     entities = entities.map((entity) =>
-      hideMissingFunctionEntity(entity, used),
+      hideMissingFunctionEntity(entity, paths),
     );
     entities = entities.flatMap(removeEmptyClassEntity);
   }
