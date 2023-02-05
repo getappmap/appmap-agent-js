@@ -1,20 +1,13 @@
 import * as Astring from "astring";
 import * as Acorn from "acorn";
 import { logError, logDebug } from "../../log/index.mjs";
-import { generateGet } from "../../util/index.mjs";
 import { ExternalAppmapError } from "../../error/index.mjs";
 import { getMappingSourceArray } from "../../mapping/index.mjs";
-import { lookupSpecifier } from "../../specifier/index.mjs";
+import { createExclusion, addExclusionSource } from "./exclusion.mjs";
 import { visit } from "./visit.mjs";
-
-const { Set } = globalThis;
 
 const { generate: generateEstree } = Astring;
 const { parse: parseAcorn } = Acorn;
-
-const getHead = generateGet("head");
-const getBody = generateGet("body");
-const getUrl = generateGet("url");
 
 export const createInstrumentation = (configuration) => ({
   configuration,
@@ -40,28 +33,10 @@ export const instrument = (
   { url, type, content },
   mapping,
 ) => {
-  const sources = getMappingSourceArray(mapping)
-    .map(({ url, content }) => {
-      const { enabled } = lookupSpecifier(
-        configuration.packages,
-        url,
-        configuration["default-package"],
-      );
-      logDebug(
-        "%s source file %j",
-        enabled ? "Instrumenting" : "Not instrumenting",
-        url,
-      );
-      return {
-        head: enabled,
-        body: {
-          url,
-          content,
-        },
-      };
-    })
-    .filter(getHead)
-    .map(getBody);
+  const exclusion = createExclusion(configuration);
+  const sources = getMappingSourceArray(mapping).filter((source) =>
+    addExclusionSource(exclusion, source),
+  );
   if (sources.length === 0) {
     logDebug(
       "Not instrumenting file %j because it has no allowed sources",
@@ -85,7 +60,7 @@ export const instrument = (
         content: generateEstree(
           visit(parseEstree(type, content, url), {
             url,
-            whitelist: new Set(sources.map(getUrl)),
+            exclusion,
             eval: configuration.hooks.eval,
             apply: configuration.hooks.apply,
             mapping,
