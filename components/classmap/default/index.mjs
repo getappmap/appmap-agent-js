@@ -61,55 +61,68 @@ export const addClassmapSource = (
       url,
       directory,
     );
+    return false;
   } else if (content === null) {
     logWarning("Ignoring %j because its content could not be loaded", url);
     indirections.set(url, null);
+    return false;
   } else {
     const hash = hashFile({ url, content });
-    if (!sources.has(hash)) {
+    if (sources.has(hash)) {
+      return true;
+    } else {
       const {
         "inline-source": local_inline_source,
+        enabled,
         exclude: local_exclusion_array,
         shallow,
       } = lookupSpecifier(specifiers, url, default_specifier);
-      // Disable url-based location because there are multiple source contents
-      // for the same source url.
-      if (indirections.has(url)) {
-        const maybe_hash = indirections.get(url);
-        if (maybe_hash !== null) {
-          sources.set(
-            maybe_hash,
-            createSource({
-              ...sources.get(maybe_hash),
-              relative: toDynamicRelativeUrl(url, 0, directory),
-            }),
-          );
-          indirections.set(url, null);
+      if (enabled) {
+        // Disable url-based location because there are multiple source contents
+        // for the same source url.
+        if (indirections.has(url)) {
+          const maybe_hash = indirections.get(url);
+          if (maybe_hash !== null) {
+            sources.set(
+              maybe_hash,
+              createSource({
+                ...sources.get(maybe_hash),
+                relative: toDynamicRelativeUrl(url, 0, directory),
+              }),
+            );
+            indirections.set(url, null);
+          }
+        } else {
+          indirections.set(url, hash);
         }
+        if (urls.has(url)) {
+          let counter = urls.get(url);
+          counter += 1;
+          urls.set(url, counter);
+          relative = toDynamicRelativeUrl(url, counter, directory);
+        } else {
+          urls.set(url, 0);
+        }
+        sources.set(
+          hash,
+          createSource({
+            url,
+            content,
+            relative,
+            placeholder,
+            pruning,
+            inline:
+              local_inline_source === null
+                ? global_inline_source
+                : local_inline_source,
+            exclusions: [...local_exclusion_array, ...global_exclusion_array],
+            shallow,
+          }),
+        );
+        return true;
       } else {
-        indirections.set(url, hash);
+        return false;
       }
-      if (urls.has(url)) {
-        let counter = urls.get(url);
-        counter += 1;
-        urls.set(url, counter);
-        relative = toDynamicRelativeUrl(url, counter, directory);
-      } else {
-        urls.set(url, 0);
-      }
-      sources.set(
-        hash,
-        createSource({
-          url,
-          content,
-          relative,
-          placeholder,
-          pruning,
-          inline: local_inline_source ?? global_inline_source,
-          exclusions: [...global_exclusion_array, ...local_exclusion_array],
-          shallow,
-        }),
-      );
     }
   }
 };
