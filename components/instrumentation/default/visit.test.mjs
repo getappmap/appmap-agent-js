@@ -1,18 +1,38 @@
 import { assertEqual } from "../../__fixture__.mjs";
+import {
+  createConfiguration,
+  extendConfiguration,
+} from "../../configuration/index.mjs";
 import { stringifyLocation } from "../../location/index.mjs";
 import { createCounter } from "../../util/index.mjs";
+import { getUrlFilename } from "../../url/index.mjs";
 import { createMirrorSourceMap } from "../../source-map/index.mjs";
 import { hashFile } from "../../hash/index.mjs";
 import { normalize, parse, generate } from "./__fixture__.mjs";
+import { createExclusion, addExclusionSource } from "./exclusion.mjs";
 import { visit } from "./visit.mjs";
 
 const {
   JSON: { stringify: stringifyJSON },
-  Set,
 } = globalThis;
 
-const instrument = (options) =>
-  generate(
+const instrument = (options) => {
+  const exclusion = createExclusion(
+    extendConfiguration(
+      createConfiguration("protocol://host/home/"),
+      {
+        packages: [
+          {
+            path: getUrlFilename(options.file.url),
+            enabled: options.instrumented,
+          },
+        ],
+      },
+      options.file.url,
+    ),
+  );
+  addExclusionSource(exclusion, options.file);
+  return generate(
     visit(
       parse(options.file.content, {
         ecmaVersion: 2021,
@@ -25,11 +45,12 @@ const instrument = (options) =>
         apply: "APPLY",
         eval: { hidden: "EVAL", aliases: ["eval"] },
         mapping: createMirrorSourceMap(options.file),
-        whitelist: new Set(options.instrumented ? [options.file.url] : []),
+        exclusion,
         counter: createCounter(0),
       },
     ),
   );
+};
 
 const makeCodeLocation = ({ url, content }, line, column) =>
   stringifyJSON(
