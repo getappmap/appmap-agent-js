@@ -154,25 +154,25 @@ for (const shallow of [true, false]) {
     line: 1,
     column: 0,
   });
+  const bundle = {
+    type: "bundle",
+    begin: makeEvent("begin", 123, makeApplyPayload(location)),
+    children: [
+      {
+        type: "jump",
+        before: makeEvent("before", 456, makeQueryPayload()),
+        after: makeEvent("after", 456, makeAnswerPayload()),
+      },
+    ],
+    end: makeEvent("end", 123, makeReturnPayload(location)),
+  };
   assertDeepEqual(
     digestEventTrace(
-      [
-        {
-          type: "bundle",
-          begin: makeEvent("begin", 123, makeApplyPayload(location)),
-          children: [
-            {
-              type: "jump",
-              before: makeEvent("before", 456, makeQueryPayload()),
-              after: makeEvent("after", 456, makeAnswerPayload()),
-            },
-          ],
-          end: makeEvent("end", 123, makeReturnPayload(location)),
-        },
-      ],
+      // double bundle to exercise cache
+      [bundle, bundle],
       createClassmap(createConfiguration("protocol://host/home")),
     ).map(getEvent),
-    ["call", "return"],
+    ["call", "return", "call", "return"],
   );
 }
 
