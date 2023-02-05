@@ -1,4 +1,4 @@
-import { assertDeepEqual } from "../../../__fixture__.mjs";
+import { assertDeepEqual } from "../../__fixture__.mjs";
 import { parseEstree } from "./parse.mjs";
 import { getEntitySummary } from "./entity.mjs";
 import { digestEstreeRoot } from "./digest.mjs";

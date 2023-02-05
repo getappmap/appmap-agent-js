@@ -1,6 +1,6 @@
-import { assert } from "../../../util/index.mjs";
-import { getUrlBasename, toAbsoluteUrl } from "../../../url/index.mjs";
-import { InternalAppmapError } from "../../../error/index.mjs";
+import { assert } from "../../util/index.mjs";
+import { getUrlBasename, toAbsoluteUrl } from "../../url/index.mjs";
+import { InternalAppmapError } from "../../error/index.mjs";
 import {
   getLeadingCommentArray,
   printComment,

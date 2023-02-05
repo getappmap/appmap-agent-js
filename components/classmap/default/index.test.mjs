@@ -2,12 +2,12 @@ import {
   assertThrow,
   assertDeepEqual,
   assertEqual,
-} from "../../../__fixture__.mjs";
-import { hashFile } from "../../../hash/index.mjs";
+} from "../../__fixture__.mjs";
+import { hashFile } from "../../hash/index.mjs";
 import {
   createConfiguration,
   extendConfiguration,
-} from "../../../configuration/index.mjs";
+} from "../../configuration/index.mjs";
 import {
   createClassmap,
   addClassmapSource,

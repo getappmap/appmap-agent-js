@@ -2,7 +2,7 @@ import {
   // assertEqual,
   assertThrow,
   assertDeepEqual,
-} from "../../../__fixture__.mjs";
+} from "../../__fixture__.mjs";
 import { parseEstree } from "./parse.mjs";
 import { digestEstreeRoot } from "./digest.mjs";
 import { makeClassEntity, excludeEntity, getEntitySummary } from "./entity.mjs";

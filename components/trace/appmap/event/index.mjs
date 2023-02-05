@@ -5,7 +5,7 @@ import {
   incrementCounter,
 } from "../../../util/index.mjs";
 import { parseLocation } from "../../../location/index.mjs";
-import { lookupClassmapClosure } from "../classmap/index.mjs";
+import { lookupClassmapClosure } from "../../../classmap/index.mjs";
 import { digestPayload } from "./payload.mjs";
 
 const digestEventPair = (event1, event2, id1, id2, info) => [

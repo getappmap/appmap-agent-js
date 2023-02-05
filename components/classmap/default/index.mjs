@@ -1,13 +1,13 @@
-import { assert } from "../../../util/index.mjs";
-import { InternalAppmapError } from "../../../error/index.mjs";
-import { lookupSpecifier } from "../../../specifier/index.mjs";
-import { hashFile } from "../../../hash/index.mjs";
+import { assert } from "../../util/index.mjs";
+import { InternalAppmapError } from "../../error/index.mjs";
+import { lookupSpecifier } from "../../specifier/index.mjs";
+import { hashFile } from "../../hash/index.mjs";
 import {
   getUrlFilename,
   toAbsoluteUrl,
   toRelativeUrl,
-} from "../../../url/index.mjs";
-import { logWarning } from "../../../log/index.mjs";
+} from "../../url/index.mjs";
+import { logWarning } from "../../log/index.mjs";
 import {
   createSource,
   toSourceClassmap,

@@ -1,4 +1,4 @@
-import { hasOwnProperty, mapMaybe } from "../../../util/index.mjs";
+import { hasOwnProperty, mapMaybe } from "../../util/index.mjs";
 
 import {
   toStaticFunctionEntity,
