@@ -5,9 +5,18 @@ const { String, parseInt } = globalThis;
 
 const regexp = /^([\s\S]+)#([0-9]+)-([0-9]+)$/u;
 
-export const stringifyLocation = ({ url, hash, line, column }) =>
+export const stringifyLocation = ({ url, hash, line, column }) => {
   // Prefer hash location over url location to support dynamic sources.
-  `${hash === null ? url : hash}#${String(line)}-${String(column)}`;
+  if (hash !== null) {
+    return `${hash}#${String(line)}-${String(column)}`;
+  } else if (url !== null) {
+    return `${url}#${String(line)}-${String(column)}`;
+  } else {
+    throw new InternalAppmapError(
+      "location should be either url-based or hash-based",
+    );
+  }
+};
 
 export const parseLocation = (string) => {
   const parts = regexp.exec(string);
