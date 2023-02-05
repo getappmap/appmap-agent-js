@@ -8,7 +8,7 @@ import {
   hasOwnProperty,
   coalesce,
 } from "../../util/index.mjs";
-import { mapSource } from "../../source/index.mjs";
+import { mapSource } from "../../source-map/index.mjs";
 import { logDebugWhen, logErrorWhen } from "../../log/index.mjs";
 import { stringifyLocation } from "../../location/index.mjs";
 

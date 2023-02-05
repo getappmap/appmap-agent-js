@@ -5,7 +5,7 @@ import { getUuid } from "../../uuid/random/index.mjs";
 import { hashFile } from "../../hash/index.mjs";
 import { getTmpUrl } from "../../path/index.mjs";
 import { toAbsoluteUrl } from "../../url/index.mjs";
-import { mapSource } from "../../source/index.mjs";
+import { mapSource } from "../../source-map/index.mjs";
 import { loadSourceMap } from "./source-map.mjs";
 
 const {

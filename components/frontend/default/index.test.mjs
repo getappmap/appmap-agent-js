@@ -1,5 +1,5 @@
 import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
-import { createMirrorSourceMap } from "../../source/index.mjs";
+import { createMirrorSourceMap } from "../../source-map/index.mjs";
 import { validateMessage } from "../../validate/index.mjs";
 import {
   createConfiguration,
