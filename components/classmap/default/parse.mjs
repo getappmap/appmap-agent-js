@@ -1,10 +1,11 @@
-import BabelParser from "@babel/parser";
+import { createRequire } from "node:module";
 import { InternalAppmapError } from "../../error/index.mjs";
 import { getUrlExtension } from "../../url/index.mjs";
 import { assert, coalesce } from "../../util/index.mjs";
 import { logWarning, logError } from "../../log/index.mjs";
 
-const { parse: parseBabel } = BabelParser;
+// Dynamic @babel/parser import because the frontend might not always need it.
+let parseBabel = null;
 
 // const getPredecessorComment = (code, index, comments) => {
 //   index -= 1;
@@ -62,6 +63,10 @@ export const parseEstree = (url, content) => {
   }
   plugins.push("estree", "jsx");
   let result;
+  if (parseBabel === null) {
+    const require = createRequire(import.meta.url);
+    ({ parse: parseBabel } = require("@babel/parser"));
+  }
   try {
     result = parseBabel(content, {
       plugins,
