@@ -10,6 +10,7 @@ assertDeepEqual(
     HookEsm,
     {
       configuration: {
+        "postmortem-function-exclusion": true,
         hooks: { apply: false, esm: true },
         packages: [
           {

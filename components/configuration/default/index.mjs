@@ -267,6 +267,10 @@ const fields = {
     extend: overwrite,
     normalize: identity,
   },
+  "postmortem-function-exclusion": {
+    extend: overwrite,
+    normalize: identity,
+  },
   command: {
     extend: overwrite,
     normalize: normalizeCommand,
@@ -484,6 +488,7 @@ export const createConfiguration = (home) => ({
   "default-process": true,
   processes: [],
   recorder: null,
+  "postmortem-function-exclusion": true,
   "inline-source": false,
   hooks: {
     apply: HOOK_APPLY_GLOBAL,

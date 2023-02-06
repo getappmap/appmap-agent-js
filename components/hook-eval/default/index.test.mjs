@@ -9,6 +9,7 @@ assertDeepEqual(
     HookEval,
     {
       configuration: {
+        "postmortem-function-exclusion": true,
         hooks: { eval: { hidden: "EVAL", aliases: ["eval"] } },
         packages: [
           {

@@ -26,6 +26,7 @@ assertDeepEqual(
     HookCjs,
     {
       configuration: {
+        "postmortem-function-exclusion": true,
         hooks: { cjs: false },
         packages: [
           {
