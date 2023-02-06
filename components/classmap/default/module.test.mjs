@@ -1,13 +1,13 @@
 import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
 import {
-  createSource,
-  getSourceRelativeUrl,
-  lookupSourceClosure,
-  toSourceClassmap,
-} from "./source.mjs";
+  createModule,
+  getModuleRelativeUrl,
+  lookupModuleClosure,
+  toModuleClassmap,
+} from "./module.mjs";
 
 {
-  const source = createSource({
+  const module = createModule({
     url: "protocol://host/home/dirname/basename.js",
     content: `
       function f (x) {}
@@ -40,7 +40,7 @@ import {
     ],
   });
 
-  assertEqual(getSourceRelativeUrl(source), "dirname/basename.js");
+  assertEqual(getModuleRelativeUrl(module), "dirname/basename.js");
 
   // present function //
   {
@@ -56,26 +56,26 @@ import {
       },
     };
     assertDeepEqual(
-      lookupSourceClosure(source, { line: 2, column: 6 }, {}),
+      lookupModuleClosure(module, { line: 2, column: 6 }, {}),
       info,
     );
     assertDeepEqual(
-      lookupSourceClosure(source, { line: 2, column: 6 }, {}),
+      lookupModuleClosure(module, { line: 2, column: 6 }, {}),
       info,
     );
     assertDeepEqual(
-      lookupSourceClosure(source, { line: 2, column: 10 }, {}),
+      lookupModuleClosure(module, { line: 2, column: 10 }, {}),
       info,
     );
   }
 
   // excluded function //
-  assertEqual(lookupSourceClosure(source, { line: 3, column: 6 }, {}), null);
+  assertEqual(lookupModuleClosure(module, { line: 3, column: 6 }, {}), null);
 
   // missing function //
-  assertEqual(lookupSourceClosure(source, { line: 4, column: 6 }, {}), null);
+  assertEqual(lookupModuleClosure(module, { line: 4, column: 6 }, {}), null);
 
-  assertDeepEqual(toSourceClassmap(source), [
+  assertDeepEqual(toModuleClassmap(module), [
     {
       type: "class",
       name: "basename",

@@ -14,7 +14,7 @@ import { compileExclusionArray } from "./exclusion.mjs";
 
 const { Map, Set } = globalThis;
 
-export const createSource = ({
+export const createModule = ({
   url,
   content,
   relative,
@@ -60,7 +60,7 @@ const isFunctionEstree = ({ type }) =>
   type === "FunctionExpression" ||
   type === "FunctionDeclaration";
 
-export const lookupSourceClosure = ({ estree, infos, paths }, position) => {
+export const lookupModuleClosure = ({ estree, infos, paths }, position) => {
   const maybe_path = lookupEstreePath(estree, isFunctionEstree, position);
   if (maybe_path === null) {
     logInfo(
@@ -75,9 +75,9 @@ export const lookupSourceClosure = ({ estree, infos, paths }, position) => {
   }
 };
 
-export const getSourceRelativeUrl = ({ relative }) => relative;
+export const getModuleRelativeUrl = ({ relative }) => relative;
 
-export const toSourceClassmap = ({ entities, pruning, paths }) => {
+export const toModuleClassmap = ({ entities, pruning, paths }) => {
   if (pruning) {
     entities = entities.map((entity) =>
       hideMissingFunctionEntity(entity, paths),
