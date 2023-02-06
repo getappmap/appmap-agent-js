@@ -267,6 +267,10 @@ const fields = {
     extend: overwrite,
     normalize: identity,
   },
+  "late-exclusion": {
+    extend: overwrite,
+    normalize: identity,
+  },
   command: {
     extend: overwrite,
     normalize: normalizeCommand,
@@ -484,6 +488,7 @@ export const createConfiguration = (home) => ({
   "default-process": true,
   processes: [],
   recorder: null,
+  "late-exclusion": true,
   "inline-source": false,
   hooks: {
     apply: HOOK_APPLY_GLOBAL,

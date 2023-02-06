@@ -1,6 +1,6 @@
 type: object
 additionalProperties: false
-minProperties: 40
+minProperties: 41
 properties:
   socket:
     $ref: socket
@@ -75,6 +75,8 @@ properties:
       - const: null
       - $ref: recorder
   inline-source:
+    type: boolean
+  late-exclusion:
     type: boolean
   hooks:
     type: object
