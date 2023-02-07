@@ -1,3 +1,10 @@
+## [13.2.1](https://github.com/getappmap/appmap-agent-js/compare/v13.2.0...v13.2.1) (2023-02-07)
+
+
+### Bug Fixes
+
+* make pure serialization actually pure ([65e04a2](https://github.com/getappmap/appmap-agent-js/commit/65e04a261b397c0fdf4c36d4b3050edd604dd5ff))
+
 # [13.2.0](https://github.com/getappmap/appmap-agent-js/compare/v13.1.2...v13.2.0) (2023-02-02)
 
 
