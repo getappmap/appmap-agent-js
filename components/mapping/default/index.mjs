@@ -21,7 +21,7 @@ const addHashToFile = ({ url, content }) => ({
 
 const removeHashFromFile = ({ url, content }) => ({ url, content });
 
-export const extractSourceMapUrl = ({ url: base, content }) => {
+export const extractMappingUrl = ({ url: base, content }) => {
   const parts = /\/\/[#@] sourceMappingURL=(.*)[\s]*$/u.exec(content);
   if (parts === null) {
     return null;
@@ -30,7 +30,7 @@ export const extractSourceMapUrl = ({ url: base, content }) => {
   }
 };
 
-export const createMirrorSourceMap = (file) => ({
+export const createMirrorMapping = (file) => ({
   type: "mirror",
   source: addHashToFile(file),
 });
@@ -74,7 +74,7 @@ const parseGroupArray = (groups) => {
   });
 };
 
-export const createSourceMap = ({ url: base, content }) => {
+export const createMapping = ({ url: base, content }) => {
   const payload = parseSourceMap(content, base);
   validateSourceMap(payload);
   const {
@@ -160,7 +160,7 @@ export const mapSource = (mapping, line, column) => {
   } /* c8 ignore stop */
 };
 
-export const getSources = (mapping) => {
+export const getMappingSourceArray = (mapping) => {
   if (mapping.type === "mirror") {
     return [removeHashFromFile(mapping.source)];
   } else if (mapping.type === "normal") {

@@ -7,30 +7,30 @@ import {
 } from "../../__fixture__.mjs";
 import { hashFile } from "../../hash/index.mjs";
 import {
-  extractSourceMapUrl,
-  createMirrorSourceMap,
-  createSourceMap,
+  extractMappingUrl,
+  createMirrorMapping,
+  createMapping,
   mapSource,
-  getSources,
+  getMappingSourceArray,
 } from "./index.mjs";
 
 const { SourceMapGenerator } = SourceMap;
 
 assertThrow(
   () =>
-    createSourceMap({
+    createMapping({
       url: "http://host/source-map.json",
       content: "INVALID JSON",
     }),
   /^ExternalAppmapError: Source map is not valid JSON$/u,
 );
 
-/////////////////////////
-// extractSourceMapUrl //
-/////////////////////////
+///////////////////////
+// extractMappingUrl //
+///////////////////////
 
 assertEqual(
-  extractSourceMapUrl({
+  extractMappingUrl({
     url: "data:,foo",
     content: "//# sourceMappingURL=http://host/source.map",
   }),
@@ -38,7 +38,7 @@ assertEqual(
 );
 
 assertEqual(
-  extractSourceMapUrl({
+  extractMappingUrl({
     url: "http://host/directory/filename",
     content: `//@ sourceMappingURL=source.map\r\n\t`,
   }),
@@ -46,7 +46,7 @@ assertEqual(
 );
 
 assertEqual(
-  extractSourceMapUrl({
+  extractMappingUrl({
     url: "http:///host/directory/filename",
     content: "123;",
   }),
@@ -63,14 +63,14 @@ assertEqual(
     content: "123;",
   };
   const hash = hashFile(file);
-  const mapping = createMirrorSourceMap(file);
+  const mapping = createMirrorMapping(file);
   assertDeepEqual(mapSource(mapping, 123, 456), {
     url: file.url,
     hash,
     line: 123,
     column: 456,
   });
-  assertDeepEqual(getSources(mapping), [
+  assertDeepEqual(getMappingSourceArray(mapping), [
     { url: "http://host/out.js", content: "123;" },
   ]);
 }
@@ -91,7 +91,7 @@ assertEqual(
     generated: { line: 3, column: 13 },
     original: { line: 17, column: 19 },
   });
-  const mapping = createSourceMap({
+  const mapping = createMapping({
     url: "http://host/directory/map.json",
     content: generator.toString(),
   });
@@ -103,7 +103,7 @@ assertEqual(
   });
   assertEqual(mapSource(mapping, 3, 23), null);
   assertEqual(mapSource(mapping, 29, 0), null);
-  assertDeepEqual(getSources(mapping), [
+  assertDeepEqual(getMappingSourceArray(mapping), [
     {
       url: "http://host/directory/source.js",
       content: null,
@@ -113,7 +113,7 @@ assertEqual(
 
 assertEqual(
   mapSource(
-    createSourceMap({
+    createMapping({
       url: "http://host/directory/map.json",
       content: {
         version: 3,
@@ -129,8 +129,8 @@ assertEqual(
 );
 
 assertDeepEqual(
-  getSources(
-    createSourceMap({
+  getMappingSourceArray(
+    createMapping({
       url: "http://host/directory/map.json",
       content: {
         version: 3,
@@ -155,8 +155,8 @@ assertDeepEqual(
 );
 
 assertDeepEqual(
-  getSources(
-    createSourceMap({
+  getMappingSourceArray(
+    createMapping({
       url: "http://host/directory/map.json",
       content: {
         version: 3,

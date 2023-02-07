@@ -1,7 +1,7 @@
 import { assertEqual } from "../../__fixture__.mjs";
 import { stringifyLocation } from "../../location/index.mjs";
 import { createCounter } from "../../util/index.mjs";
-import { createMirrorSourceMap } from "../../mapping/index.mjs";
+import { createMirrorMapping } from "../../mapping/index.mjs";
 import { hashFile } from "../../hash/index.mjs";
 import { normalize, parse, generate } from "./__fixture__.mjs";
 import { visit } from "./visit.mjs";
@@ -24,7 +24,7 @@ const instrument = (options) =>
         url: options.file.url,
         apply: "APPLY",
         eval: { hidden: "EVAL", aliases: ["eval"] },
-        mapping: createMirrorSourceMap(options.file),
+        mapping: createMirrorMapping(options.file),
         whitelist: new Set(options.instrumented ? [options.file.url] : []),
         counter: createCounter(0),
       },

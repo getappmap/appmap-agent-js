@@ -1,5 +1,5 @@
 import { assertThrow, assertDeepEqual } from "../../__fixture__.mjs";
-import { createMirrorSourceMap } from "../../mapping/index.mjs";
+import { createMirrorMapping } from "../../mapping/index.mjs";
 import {
   createConfiguration,
   extendConfiguration,
@@ -38,7 +38,7 @@ const normalizeContent = ({ content, ...rest }, source) => ({
           ),
         ),
         file,
-        createMirrorSourceMap(file),
+        createMirrorMapping(file),
       ),
     /^ExternalAppmapError: Failed to parse js file$/u,
   );
@@ -69,7 +69,7 @@ const normalizeContent = ({ content, ...rest }, source) => ({
         ),
       ),
       file,
-      createMirrorSourceMap(file),
+      createMirrorMapping(file),
     ),
     {
       url: "protocol://host/base/script.js",
@@ -120,7 +120,7 @@ const instrumentation = createInstrumentation(
   };
   assertDeepEqual(
     normalizeContent(
-      instrument(instrumentation, file, createMirrorSourceMap(file)),
+      instrument(instrumentation, file, createMirrorMapping(file)),
     ),
     {
       url: "protocol://host/base/foo.js",
@@ -143,7 +143,7 @@ const instrumentation = createInstrumentation(
   };
   assertDeepEqual(
     normalizeContent(
-      instrument(instrumentation, file, createMirrorSourceMap(file)),
+      instrument(instrumentation, file, createMirrorMapping(file)),
     ),
     {
       url: "protocol://host/base/bar.js",

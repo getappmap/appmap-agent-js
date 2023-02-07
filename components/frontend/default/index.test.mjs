@@ -1,5 +1,5 @@
 import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
-import { createMirrorSourceMap } from "../../mapping/index.mjs";
+import { createMirrorMapping } from "../../mapping/index.mjs";
 import { validateMessage } from "../../validate/index.mjs";
 import {
   createConfiguration,
@@ -59,7 +59,7 @@ validateMessage(formatBeginAmend(frontend, 123, getBundlePayload(frontend)));
     content: "123;",
     type: "script",
   };
-  assertDeepEqual(instrument(frontend, file, createMirrorSourceMap(file)), {
+  assertDeepEqual(instrument(frontend, file, createMirrorMapping(file)), {
     url: "protocol://host/filename.js",
     content: "123;\n",
     messages: [

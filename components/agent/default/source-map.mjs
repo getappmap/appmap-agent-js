@@ -1,18 +1,18 @@
 import {
-  extractSourceMapUrl,
-  createMirrorSourceMap,
-  createSourceMap,
+  extractMappingUrl,
+  createMirrorMapping,
+  createMapping,
 } from "../../mapping/index.mjs";
 import { readFile } from "../../file/index.mjs";
 import { logDebug } from "../../log/index.mjs";
 
 export const loadSourceMap = (file, map) => {
   if (map !== null) {
-    return createSourceMap(map);
+    return createMapping(map);
   } else {
-    const maybe_url = extractSourceMapUrl(file);
+    const maybe_url = extractMappingUrl(file);
     if (maybe_url === null) {
-      return createMirrorSourceMap(file);
+      return createMirrorMapping(file);
     } else {
       let content;
       try {
@@ -24,9 +24,9 @@ export const loadSourceMap = (file, map) => {
           file.url,
           error,
         );
-        return createMirrorSourceMap(file);
+        return createMirrorMapping(file);
       }
-      return createSourceMap({
+      return createMapping({
         url: maybe_url.startsWith("data:") ? file.url : maybe_url,
         content,
       });
