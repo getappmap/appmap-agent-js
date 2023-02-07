@@ -2,7 +2,7 @@ import {
   extractSourceMapUrl,
   createMirrorSourceMap,
   createSourceMap,
-} from "../../source/index.mjs";
+} from "../../mapping/index.mjs";
 import { readFile } from "../../file/index.mjs";
 import { logDebug } from "../../log/index.mjs";
 

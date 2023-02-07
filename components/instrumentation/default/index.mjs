@@ -3,7 +3,7 @@ import * as Acorn from "acorn";
 import { logError, logDebug } from "../../log/index.mjs";
 import { generateGet } from "../../util/index.mjs";
 import { ExternalAppmapError } from "../../error/index.mjs";
-import { getSources } from "../../source/index.mjs";
+import { getSources } from "../../mapping/index.mjs";
 import { lookupSpecifier } from "../../specifier/index.mjs";
 import { visit } from "./visit.mjs";
 

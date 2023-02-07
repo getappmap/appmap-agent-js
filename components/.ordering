@@ -30,7 +30,7 @@ configuration-environment
 location
 trace
 backend
-source
+mapping
 instrumentation
 interpretation
 serialization
