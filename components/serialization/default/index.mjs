@@ -4,10 +4,11 @@ import {
   incrementCounter,
   createCounter,
 } from "../../util/index.mjs";
+import { InternalAppmapError } from "../../error/index.mjs";
 import { logDebug, logDebugWhen } from "../../log/index.mjs";
 
 const {
-  Reflect: { getOwnPropertyDescriptor, getPrototypeOf, apply, ownKeys },
+  Reflect: { getOwnPropertyDescriptor, getPrototypeOf, ownKeys },
   Error: { prototype: error_prototype },
   Infinity,
   Symbol,
@@ -18,16 +19,10 @@ const {
   String,
   undefined,
   Math: { min },
-  Object: {
-    prototype: object_prototype,
-    prototype: { toString },
-    fromEntries,
-  },
+  Object: { prototype: object_prototype, fromEntries },
   Array: { isArray },
   JSON: { stringify: stringifyJSON },
 } = globalThis;
-
-const noargs = [];
 
 const empty = symbolFor("APPMAP_EMPTY_MARKER");
 
@@ -100,11 +95,6 @@ const getDataPropertyImpure = (object, key) => {
   }
   return undefined;
 };
-const getTypeTagPure = (any) => apply(toString, any, noargs);
-const getTagPure = (any) => {
-  const type_tag = getTypeTagPure(any);
-  return type_tag.substring(type_tag.indexOf(" ") + 1, type_tag.length - 1);
-};
 const toStringImpure = (object) => {
   try {
     return object.toString();
@@ -144,12 +134,12 @@ const getConstructorName = ({ impure_constructor_naming }, object) => {
         object,
         name,
       );
-      return typeof name === "string" ? name : getTagPure(object);
+      return typeof name === "string" ? name : typeof object;
     } else {
-      return getTagPure(object);
+      return typeof object;
     }
   } else {
-    return getTagPure(object);
+    return typeof object;
   }
 };
 ///////////////
@@ -194,9 +184,9 @@ const generatePrint =
           }
         }
       } else {
-        return getTypeTagPure(any);
+        return "function";
       }
-    } else {
+    } else if (typeof any === "object") {
       if (impure_printing) {
         const representation = toStringImpure(any);
         logDebugWhen(
@@ -205,13 +195,13 @@ const generatePrint =
           any,
           representation,
         );
-        return typeof representation === "string"
-          ? representation
-          : getTypeTagPure(any);
+        return typeof representation === "string" ? representation : "object";
       } else {
-        return getTypeTagPure(any);
+        return "object";
       }
-    }
+    } /* c8 ignore start */ else {
+      throw new InternalAppmapError("unknown type");
+    } /* c8 ignore stop */
   };
 const print = generatePrint(stringifyJSON);
 const show = generatePrint(identity);
@@ -242,7 +232,7 @@ const getSpecific = (serialization, object) => {
     const length = min(keys.length, serialization.maximum_properties_length);
     for (let index = 0; index < length; index += 1) {
       const key = keys[index];
-      entries.push([key, getTagPure(getDataPropertyImpure(object, key))]);
+      entries.push([key, typeof getDataPropertyImpure(object, key)]);
     }
     return {
       type: "hash",

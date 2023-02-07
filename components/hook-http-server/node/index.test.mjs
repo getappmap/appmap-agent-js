@@ -252,9 +252,9 @@ assertDeepEqual(
               type: "hash",
               length: 3,
               properties: {
-                0: "String",
-                param1: "String",
-                param2: "String",
+                0: "string",
+                param1: "string",
+                param2: "string",
               },
             },
           },
