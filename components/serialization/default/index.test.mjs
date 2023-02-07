@@ -107,6 +107,22 @@ validateSerial(
   ),
 );
 
+// object pure //
+validateSerial(
+  testSerialize(
+    {
+      "impure-printing": false,
+      "impure-constructor-naming": false,
+      "impure-hash-inspection": false,
+    },
+    {
+      get [Symbol.toStringTag]() {
+        throw new Error("impure serialization");
+      },
+    },
+  ),
+);
+
 // object impure //
 validateSerial(
   testSerialize(
