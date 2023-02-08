@@ -344,6 +344,7 @@ The agent filter code objects (functions or objects/classes) based on a format c
     * `<object>`
         * `message <boolean>` Indicates whether to validate trace elements as they are buffered. This is useful to help diagnose the root cause of some bugs. *Default* `false`.
         * `appmap <boolean>` Indicates whether to validate the appmap before writing it to a file. *Default* `false`.
+* `postmortem-function-exclusion <boolean> | null` Indicates whether functions should be excluded after collecting the trace or during instrumentation. Postmortem function exclusion makes instrumentation faster but may record useless data. *Default*: `null` functions will be excluded during instrumentation if and only if there is no source mapping. In that case we can reuse the parsing from instrumentation.
 
 ## Application Representation
 
