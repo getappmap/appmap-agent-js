@@ -66,7 +66,7 @@ export const instrument = (
 ) => {
   const source = createSource(url, content);
   const mapping = loadSourceMap(source, map);
-  if (!configuration["postmortem-function-exclusion"]) {
+  if (configuration["postmortem-function-exclusion"] !== true) {
     fillSourceMap(mapping);
   }
   const { messages, content: instrumented_content } = instrumentFrontend(

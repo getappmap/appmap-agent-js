@@ -16,7 +16,7 @@ import {
     extendConfiguration(
       createConfiguration("protocol://host/home/"),
       {
-        "postmortem-function-exclusion": true,
+        "postmortem-function-exclusion": null,
         packages: [
           {
             path: "enabled.js",
@@ -30,6 +30,7 @@ import {
       },
       "protocol://host/base/",
     ),
+    false,
   );
 
   assertEqual(
@@ -86,6 +87,7 @@ for (const postmortem of [true, false]) {
       },
       "protocol://host/base/",
     ),
+    true,
   );
 
   assertEqual(

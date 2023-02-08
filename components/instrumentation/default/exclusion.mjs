@@ -9,8 +9,18 @@ import { lookupSpecifier } from "../../specifier/index.mjs";
 
 const { Set } = globalThis;
 
-export const createExclusion = (configuration) => {
-  if (configuration["postmortem-function-exclusion"]) {
+// In the case of mirror mapping, we are going to parse the source anyway for
+// instrumentation. This mitigates the cost for early function exclusion.
+const shouldExcludeFunctionPostmortem = (postmortem, is_mirror_mapping) =>
+  postmortem === null ? !is_mirror_mapping : postmortem;
+
+export const createExclusion = (configuration, is_mirror_mapping) => {
+  if (
+    shouldExcludeFunctionPostmortem(
+      configuration["postmortem-function-exclusion"],
+      is_mirror_mapping,
+    )
+  ) {
     return {
       type: "basic",
       specifiers: configuration.packages,

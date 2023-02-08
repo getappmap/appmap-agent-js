@@ -19,7 +19,10 @@ export const instrument = ({ configuration }, source, mapping) => {
   const url = getSourceUrl(source);
   const content = getSourceContent(source);
   const sources = getMappingSourceArray(mapping);
-  const exclusion = createExclusion(configuration);
+  const exclusion = createExclusion(
+    configuration,
+    sources.length === 1 && sources[0] === source,
+  );
   const included_source_array = sources.filter((source) =>
     addExclusionSource(exclusion, source),
   );

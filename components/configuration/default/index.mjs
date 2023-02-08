@@ -488,7 +488,7 @@ export const createConfiguration = (home) => ({
   "default-process": true,
   processes: [],
   recorder: null,
-  "postmortem-function-exclusion": true,
+  "postmortem-function-exclusion": null,
   "inline-source": false,
   hooks: {
     apply: HOOK_APPLY_GLOBAL,
