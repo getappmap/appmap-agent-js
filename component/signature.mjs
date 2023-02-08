@@ -1,5 +1,5 @@
 import { readFile as readFileAsync } from "fs/promises";
-import { parse as parseAcorn } from "acorn";
+import BabelParser from "@babel/parser";
 import {
   readInstanceArrayAsync,
   readComponentArrayAsync,
@@ -13,6 +13,8 @@ const {
   URL,
   Error,
 } = globalThis;
+
+const { parse: parseBabel } = BabelParser;
 
 const isNotNull = (any) => any !== null;
 
@@ -69,7 +71,7 @@ const extractStatementAsync = (statement) => {
   } else if (statement.type === "ExportAllDeclaration") {
     /* eslint-disable no-use-before-define */
     return extractExportAsync(
-      new URL(statement.source.value, statement.sourceFile),
+      new URL(statement.source.value, statement.loc.filename),
     );
     /* eslint-enable no-use-before-define */
   } else {
@@ -77,11 +79,15 @@ const extractStatementAsync = (statement) => {
   }
 };
 
-const parseAcornLog = (content, options) => {
+const parseBabelLog = (content, url) => {
   try {
-    return parseAcorn(content, options);
+    return parseBabel(content, {
+      sourceType: "module",
+      sourceFilename: url,
+      plugins: ["estree"],
+    }).program;
   } catch (error) {
-    error.message += ` at ${options.directSourceFile}`;
+    error.message += ` at ${url}`;
     throw error;
   }
 };
@@ -89,12 +95,9 @@ const parseAcornLog = (content, options) => {
 const extractExportAsync = async (url) =>
   (
     await Promise.all(
-      parseAcornLog(await readFileAsync(url, "utf8"), {
-        directSourceFile: url,
-        locations: true,
-        sourceType: "module",
-        ecmaVersion: 2022,
-      }).body.map(extractStatementAsync),
+      parseBabelLog(await readFileAsync(url, "utf8"), url).body.map(
+        extractStatementAsync,
+      ),
     )
   ).flat();
 
