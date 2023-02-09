@@ -458,6 +458,26 @@ assertDeepEqual(
   },
 );
 
+// query empty params//
+
+assertDeepEqual(
+  digestPayload({
+    type: "query",
+    database: "database",
+    version: "version",
+    sql: "sql"
+  }),
+  {
+    sql_query: {
+      database_type: "database",
+      server_version: "version",
+      sql: "sql",
+      explain_sql: undefined,
+    },
+    message: [],
+  },
+);
+
 // answer //
 assertDeepEqual(
   digestPayload(

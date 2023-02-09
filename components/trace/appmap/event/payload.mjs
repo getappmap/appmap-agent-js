@@ -193,7 +193,7 @@ const digesters = {
       sql,
       explain_sql: undefined,
     },
-    message: toEntries(parameters).map(digestParameterSerialTuple),
+    message: toEntries(parameters || {}).map(digestParameterSerialTuple),
   }),
   answer: ({}, _options) => ({}),
 };
