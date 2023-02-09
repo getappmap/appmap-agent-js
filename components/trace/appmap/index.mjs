@@ -27,11 +27,10 @@ const {
 const VERSION = "1.8.0";
 
 const summary_template = `\
-Received %j raw events.
-
+Received trace for %s
+Trace size: %j
 Event Distribution:
 %f
-
 Most frequently applied functions:
 %f
 `;
@@ -39,18 +38,16 @@ Most frequently applied functions:
 const stackoverflow_template = `\
 We cannot process your appmap because it has too many (nested) events.\
 There is three ways to solve this issue:
-
   * You could tweak the \`appmap.yml\` configuration file to record fewer events:
     \`\`\`yaml
     # disable asynchronous jump recording
     ordering: chronological
-    # exclude anonymous functions
-    anonymous-name-separator: '-'
+    # exclude some functions by name
     exclude:
-      - name: '-'
-    # exclude functions in dependencies
+      - name: calledManyTimes
+    # exclude some functions by files
     packages:
-      - glob: 'node_modules/**/*'
+      - glob: 'util/*.js'
         enabled: false
     \`\`\`
   * You could reduce the scope of the recording.\
@@ -127,10 +124,7 @@ export const compileTrace = (messages) => {
     } /* c8 ignore stop */
   }
   assert(configuration !== null, "missing start message", InternalAppmapError);
-  const classmap = createClassmap(configuration);
-  for (const source of sources) {
-    addClassmapSource(classmap, source);
-  }
+  const url = getOutputUrl(configuration);
   const printEventDistribution = () => {
     const counters = new Map();
     for (const { payload } of events) {
@@ -162,7 +156,7 @@ export const compileTrace = (messages) => {
     }
     return toArray(counters.keys())
       .sort((key1, key2) => counters.get(key2) - counters.get(key1))
-      .slice(0, 20)
+      .slice(0, 10)
       .map(
         (key) =>
           `  - ${key}: ${String(counters.get(key))} [${String(
@@ -171,6 +165,17 @@ export const compileTrace = (messages) => {
       )
       .join("\n");
   };
+  logInfo(
+    summary_template,
+    url,
+    events.length,
+    printEventDistribution,
+    printApplyDistribution,
+  );
+  const classmap = createClassmap(configuration);
+  for (const source of sources) {
+    addClassmapSource(classmap, source);
+  }
   let digested_events = null;
   /* c8 ignore start */
   try {
@@ -179,6 +184,7 @@ export const compileTrace = (messages) => {
     if (error instanceof RangeError) {
       logError(
         stackoverflow_template,
+        url,
         events.length,
         printEventDistribution,
         printApplyDistribution,
@@ -200,12 +206,6 @@ export const compileTrace = (messages) => {
   if (configuration.validate.appmap) {
     validateAppmap(appmap);
   }
-  logInfo(
-    summary_template,
-    events.length,
-    printEventDistribution,
-    printApplyDistribution,
-  );
   return {
     url: getOutputUrl(configuration),
     content: appmap,
