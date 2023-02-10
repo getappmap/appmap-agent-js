@@ -15,6 +15,9 @@ import {
 const configuration = extendConfiguration(
   createConfiguration("protocol://host/home"),
   {
+    validate: {
+      message: true,
+    },
     recorder: "process",
     appmap_dir: "dirname",
     appmap_file: "basename",

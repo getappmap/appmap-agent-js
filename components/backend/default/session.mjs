@@ -1,4 +1,5 @@
-import { logError } from "../../log/index.mjs";
+import { logDebug, logError } from "../../log/index.mjs";
+import { validateMessage } from "../../validate/index.mjs";
 import { identity } from "../../util/index.mjs";
 import { fromSourceMessage } from "../../source/index.mjs";
 import {
@@ -45,7 +46,8 @@ const processStopMessage = ({ tracks }, key, termination) => {
   }
 };
 
-export const createSession = () => ({
+export const createSession = (configuration) => ({
+  configuration,
   sources: [],
   tracks: new Map(),
 });
@@ -74,6 +76,10 @@ export const compileSessionTrackArray = (session, abrupt) =>
 export const isSessionEmpty = ({ tracks }) => tracks.size === 0;
 
 export const sendSession = (session, message) => {
+  logDebug("message >> %j", message);
+  if (session.configuration.validate.message) {
+    validateMessage(message);
+  }
   const { type } = message;
   if (type === "start") {
     return processStartMessage(session, message.track, message.configuration);

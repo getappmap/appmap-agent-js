@@ -1,5 +1,4 @@
-import { logDebug, logError } from "../../log/index.mjs";
-import { validateMessage } from "../../validate/index.mjs";
+import { logError } from "../../log/index.mjs";
 import {
   createSession,
   sendSession,
@@ -48,17 +47,13 @@ export const isBackendSessionEmpty = ({ sessions }, key) => {
   }
 };
 
-export const sendBackend = ({ sessions, configuration }, key, message) => {
-  logDebug("message >> %j", message);
-  if (configuration.validate.message) {
-    validateMessage(message);
-  }
+export const sendBackend = ({ configuration, sessions }, key, message) => {
   if (message.type === "open") {
     if (sessions.has(key)) {
       logError("Existing backend session %j on %j", key, message);
       return false;
     } else {
-      sessions.set(key, createSession());
+      sessions.set(key, createSession(configuration));
       return true;
     }
   } else {
