@@ -136,7 +136,7 @@ export const lookupClassmapClosure = ({ sources, indirections }, location) => {
         );
         return null;
       } else {
-        assert(sources.has(hash), InternalAppmapError, "missing resolved hash");
+        assert(sources.has(hash), "missing resolved hash", InternalAppmapError);
         return lookupSourceClosure(sources.get(hash), location);
       }
     } else {

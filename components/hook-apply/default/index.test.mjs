@@ -21,24 +21,24 @@ assertDeepEqual(
       () => {
         {
           const tab = globalThis.$.getFreshTab();
-          globalThis.$.recordApply(tab, "function", "this", ["argument"]);
+          globalThis.$.recordApply(tab, "hash#0-0", "this", ["argument"]);
           globalThis.$.recordAwait(tab, "promise");
           globalThis.$.recordResolve(tab, "result");
-          globalThis.$.recordReturn(tab, "function", "result");
+          globalThis.$.recordReturn(tab, "hash#0-0", "result");
         }
         {
           const tab = globalThis.$.getFreshTab();
-          globalThis.$.recordApply(tab, "function", "this", ["argument"]);
+          globalThis.$.recordApply(tab, "hash#0-0", "this", ["argument"]);
           globalThis.$.recordAwait(tab, "promise");
           globalThis.$.recordReject(tab, "error");
-          globalThis.$.recordThrow(tab, "function", "error");
+          globalThis.$.recordThrow(tab, "hash#0-0", "error");
         }
         {
           const tab = globalThis.$.getFreshTab();
-          globalThis.$.recordApply(tab, "function", "this", ["argument"]);
+          globalThis.$.recordApply(tab, "hash#0-0", "this", ["argument"]);
           globalThis.$.recordYield(tab, "iterator");
           globalThis.$.recordResume(tab);
-          globalThis.$.recordReturn(tab, "function", "result");
+          globalThis.$.recordReturn(tab, "hash#0-0", "result");
         }
       },
     )

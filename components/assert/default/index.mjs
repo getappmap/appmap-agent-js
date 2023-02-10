@@ -1,5 +1,3 @@
-/* c8 ignore start */
-
 const { Error } = globalThis;
 
 export class AssertionError extends Error {

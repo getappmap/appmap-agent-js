@@ -24,16 +24,23 @@ import {
 import {
   createBackend,
   sendBackend,
-  compileBackendTraceArray,
+  compileBackendTrackArray,
+  isBackendSessionEmpty,
 } from "../../backend/index.mjs";
 import { spawnAsync, killAllAsync } from "./spawn.mjs";
 import { whereAsync } from "./where.mjs";
 
 const {
+  Promise,
   URL,
   Set,
+  setTimeout,
+  clearTimeout,
   JSON: { stringify: stringifyJSON },
 } = globalThis;
+
+const ABRUPT_TIMEOUT = 1000;
+const FLUSH_TIMEOUT = 1000;
 
 // Support for remote recording: (GET|POST|DELETE) /_appmap/record
 const DEFAULT_SESSION = "_appmap";
@@ -89,6 +96,18 @@ const defineConfigurationSession = (configuration) => {
   }
 };
 
+export const flushBackendSessionAsync = async (backend, session, abrupt) => {
+  for (const { url, content } of compileBackendTrackArray(
+    backend,
+    session,
+    abrupt,
+  )) {
+    await mkdirAsync(new URL(".", url), { recursive: true });
+    await writeFileAsync(new URL(url), stringifyJSON(content, null, 2), "utf8");
+    logInfo("Appmap written at %j", url);
+  }
+};
+
 export const mainAsync = async (process, configuration) => {
   configuration = resolveConfigurationRepository(configuration);
   const { env } = process;
@@ -109,30 +128,42 @@ export const mainAsync = async (process, configuration) => {
     const { tokens } = configuration.command;
     const command = await compileConfigurationCommandAsync(configuration, env);
     logDebug("spawn child command = %j", command);
-    const { signal, status } = await spawnWithHandlerAsync(
-      command,
-      children,
-      tokens,
-      false,
-    );
+    let signal = null;
+    let status = 0;
+    let done = false;
+    let timer = null;
+    const flush = async () => {
+      timer = null;
+      if (!done) {
+        await flushBackendSessionAsync(backend, session, false);
+        timer = setTimeout(flush, FLUSH_TIMEOUT);
+      }
+    };
+    timer = setTimeout(flush, FLUSH_TIMEOUT);
+    try {
+      ({ signal, status } = await spawnWithHandlerAsync(
+        command,
+        children,
+        tokens,
+        false,
+      ));
+    } finally {
+      done = true;
+      if (timer !== null) {
+        clearTimeout(timer);
+      }
+    }
     if (signal !== null) {
       logInfo("> Killed with: %s", signal);
     } else {
       logInfo("> Exited with: %j", status);
     }
-    sendBatchBackend(backend, session, {
-      type: "stop",
-      track: null,
-      termination: { type: "unknown" },
-    });
-    for (const { url, content } of compileBackendTraceArray(backend, session)) {
-      await mkdirAsync(new URL(".", url), { recursive: true });
-      await writeFileAsync(
-        new URL(url),
-        stringifyJSON(content, null, 2),
-        "utf8",
-      );
-      logInfo("Appmap written at %j", url);
+    await flushBackendSessionAsync(backend, session, false);
+    if (!isBackendSessionEmpty(backend, session)) {
+      await new Promise((resolve) => {
+        setTimeout(resolve, ABRUPT_TIMEOUT);
+      });
+      await flushBackendSessionAsync(backend, session, true);
     }
     sendBatchBackend(backend, session, { type: "close" });
     return { tokens, signal, status };

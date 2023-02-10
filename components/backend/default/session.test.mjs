@@ -7,8 +7,9 @@ import {
   createSession,
   sendSession,
   hasSessionTrack,
-  compileSessionTrace,
-  compileSessionTraceArray,
+  compileSessionTrack,
+  compileSessionTrackArray,
+  isSessionEmpty,
 } from "./session.mjs";
 
 const configuration = extendConfiguration(
@@ -31,8 +32,7 @@ const configuration = extendConfiguration(
     configuration,
   };
   assertEqual(sendSession(session, message1), true);
-  // duplicate track
-  assertEqual(sendSession(session, message1), false);
+  assertEqual(sendSession(session, message1), false); // duplicate track
   assertEqual(hasSessionTrack(session, "record"), true);
   const message2 = {
     type: "error",
@@ -42,6 +42,7 @@ const configuration = extendConfiguration(
     },
   };
   assertEqual(sendSession(session, message2), true);
+  assertDeepEqual(compileSessionTrack(session, "record", false), null);
   const message3 = {
     type: "stop",
     track: "record",
@@ -50,17 +51,14 @@ const configuration = extendConfiguration(
     },
   };
   assertEqual(sendSession(session, message3), true);
-  // missing track
-  assertEqual(sendSession(session, message3), false);
-  // duplicate trace
-  assertEqual(sendSession(session, message1), true);
-  assertEqual(sendSession(session, message3), false);
-  assertDeepEqual(compileSessionTrace(session, "record"), {
+  assertEqual(isSessionEmpty(session), false);
+  assertDeepEqual(compileSessionTrack(session, "record", true), {
     url: "protocol://host/base/dirname/process/basename.appmap.json",
     content: [message1, message2, message3],
   });
-  // missing trace
-  assertEqual(compileSessionTrace(session, "record"), null);
+  assertEqual(isSessionEmpty(session), true);
+  assertEqual(compileSessionTrack(session, "record", true), null); // missing track
+  assertEqual(sendSession(session, message3), false); // missing track
 }
 
 // stop all && source message //
@@ -70,9 +68,6 @@ const configuration = extendConfiguration(
     type: "source",
     url: "protocol://host/cwd/main.js",
     content: "function main () {}",
-    shallow: false,
-    inline: false,
-    exclude: [],
   };
   assertEqual(sendSession(session, message1), true);
   const message2 = {
@@ -89,11 +84,11 @@ const configuration = extendConfiguration(
     },
   };
   assertEqual(sendSession(session, message3), true),
-    assertDeepEqual(compileSessionTraceArray(session), [
+    assertDeepEqual(compileSessionTrackArray(session, true), [
       {
         url: "protocol://host/base/dirname/process/basename.appmap.json",
         content: [message1, message2, message3],
       },
     ]);
-  assertDeepEqual(compileSessionTraceArray(session), []);
+  assertDeepEqual(compileSessionTrackArray(session, true), []);
 }

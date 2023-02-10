@@ -5,10 +5,11 @@ import {
 } from "../../configuration/index.mjs";
 import {
   createBackend,
-  compileBackendTrace,
-  compileBackendTraceArray,
+  compileBackendTrack,
+  compileBackendTrackArray,
   hasBackendTrack,
   sendBackend,
+  isBackendSessionEmpty,
 } from "./index.mjs";
 
 const configuration = extendConfiguration(
@@ -50,7 +51,7 @@ assertEqual(hasBackendTrack(backend, "session", "track"), true);
 
 assertEqual(sendBackend(backend, "session", message2), true);
 
-assertDeepEqual(compileBackendTrace(backend, "session", "track"), {
+assertDeepEqual(compileBackendTrack(backend, "session", "track", true), {
   url: "protocol://host/base/dirname/process/basename.appmap.json",
   content: [message1, message2],
 });
@@ -61,12 +62,16 @@ assertEqual(sendBackend(backend, "session", message1), true);
 
 assertEqual(sendBackend(backend, "session", message2), true);
 
-assertDeepEqual(compileBackendTraceArray(backend, "session"), [
+assertEqual(isBackendSessionEmpty(backend, "session"), false);
+
+assertDeepEqual(compileBackendTrackArray(backend, "session", true), [
   {
     url: "protocol://host/base/dirname/process/basename-1.appmap.json",
     content: [message1, message2],
   },
 ]);
+
+assertEqual(isBackendSessionEmpty(backend, "session"), true);
 
 assertEqual(sendBackend(backend, "session", { type: "close" }), true);
 
@@ -74,11 +79,13 @@ assertEqual(sendBackend(backend, "session", { type: "close" }), true);
 // missing session //
 /////////////////////
 
+assertEqual(isBackendSessionEmpty(backend, "session"), null);
+
 assertEqual(hasBackendTrack(backend, "session", "track"), null);
 
-assertEqual(compileBackendTraceArray(backend, "session"), null);
+assertEqual(compileBackendTrackArray(backend, "session", true), null);
 
-assertEqual(compileBackendTrace(backend, "session", "record"), null);
+assertEqual(compileBackendTrack(backend, "session", "record", true), null);
 
 assertEqual(sendBackend(backend, "session", message1), false);
 
@@ -100,6 +107,6 @@ assertEqual(sendBackend(backend, "session", { type: "close" }), false);
 
 assertEqual(sendBackend(backend, "session", { type: "open" }), true);
 
-assertEqual(compileBackendTrace(backend, "session", "record"), null);
+assertEqual(compileBackendTrack(backend, "session", "record", true), null);
 
 assertEqual(sendBackend(backend, "session", { type: "close" }), true);

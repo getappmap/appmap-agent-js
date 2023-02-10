@@ -7,7 +7,7 @@ import { extendConfiguration } from "../../configuration/index.mjs";
 import {
   sendBackend,
   hasBackendTrack,
-  compileBackendTrace,
+  compileBackendTrack,
 } from "../../backend/index.mjs";
 
 export const success = {
@@ -72,7 +72,12 @@ export const createTrackServer = (configuration, backend) => {
               termination: { type: "manual" },
             })
           ) {
-            const maybe_trace = compileBackendTrace(backend, session, record);
+            const maybe_trace = compileBackendTrack(
+              backend,
+              session,
+              record,
+              true,
+            );
             assert(
               maybe_trace !== null,
               "expected compiled trace after stop",
