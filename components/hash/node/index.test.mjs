@@ -9,3 +9,12 @@ assertNotEqual(
   hashStringArray(["foo", "bar"]),
   hashStringArray(["FOO", "BAR"]),
 );
+
+assertNotEqual(hashStringArray(["foobar"]), hashStringArray(["foo", "bar"]));
+
+assertNotEqual(hashStringArray(["foo\0bar"]), hashStringArray(["foo", "bar"]));
+
+assertNotEqual(
+  hashStringArray(["3|foo3|bar"]),
+  hashStringArray(["foo", "bar"]),
+);
