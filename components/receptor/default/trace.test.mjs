@@ -118,7 +118,10 @@ assertDeepEqual(compileBackendTrack(backend, "session", "record", true), {
     `${uuid}/dirname/process/basename.appmap.json`,
     getTmpUrl(),
   ),
-  content: [message1, message2, { ...message3, content: "123;" }, message4],
+  content: {
+    configuration,
+    messages: [message2, { ...message3, content: "123;" }, message4],
+  },
 });
 
 sendBackend(backend, "session", { type: "close" });

@@ -56,11 +56,7 @@ const location = stringifyLocation({
 });
 
 assertDeepEqual(
-  compileTrace([
-    {
-      type: "start",
-      configuration,
-    },
+  compileTrace(configuration, [
     {
       type: "source",
       url: "protocol://host/home/dirname/filename.js",

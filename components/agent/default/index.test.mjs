@@ -55,49 +55,47 @@ recordBeforeEvent(
 );
 recordAfterEvent(agent, tab, getAnswerPayload(agent));
 recordStopTrack(agent, "record", { type: "manual" });
-assertDeepEqual(takeLocalAgentTrace(agent, "record"), [
-  {
-    type: "start",
-    track: "record",
-    configuration,
-  },
-  {
-    type: "group",
-    group: 0,
-    child: 123,
-    description: "description",
-  },
-  {
-    type: "source",
-    url: "protocol://host/base/main.js",
-    content: "123;",
-  },
-  {
-    type: "event",
-    site: "before",
-    tab: 1,
-    group: 0,
-    time: 0,
-    payload: {
-      type: "query",
-      database: "mysql",
-      version: null,
-      sql: "SELECT 123;",
-      parameters: [],
+assertDeepEqual(takeLocalAgentTrace(agent, "record"), {
+  configuration,
+  messages: [
+    {
+      type: "group",
+      group: 0,
+      child: 123,
+      description: "description",
     },
-  },
-  {
-    type: "event",
-    site: "after",
-    tab: 1,
-    group: 0,
-    time: 0,
-    payload: { type: "answer" },
-  },
-  {
-    type: "stop",
-    track: "record",
-    termination: { type: "manual" },
-  },
-]);
+    {
+      type: "source",
+      url: "protocol://host/base/main.js",
+      content: "123;",
+    },
+    {
+      type: "event",
+      site: "before",
+      tab: 1,
+      group: 0,
+      time: 0,
+      payload: {
+        type: "query",
+        database: "mysql",
+        version: null,
+        sql: "SELECT 123;",
+        parameters: [],
+      },
+    },
+    {
+      type: "event",
+      site: "after",
+      tab: 1,
+      group: 0,
+      time: 0,
+      payload: { type: "answer" },
+    },
+    {
+      type: "stop",
+      track: "record",
+      termination: { type: "manual" },
+    },
+  ],
+});
 closeAgent(agent);

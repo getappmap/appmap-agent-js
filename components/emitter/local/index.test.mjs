@@ -26,6 +26,9 @@ const message2 = {
 sendEmitter(emitter, message1);
 sendEmitter(emitter, message2);
 
-assertDeepEqual(takeLocalEmitterTrace(emitter, "record"), [message1, message2]);
+assertDeepEqual(takeLocalEmitterTrace(emitter, "record"), {
+  configuration,
+  messages: [message2],
+});
 
 closeEmitter(emitter);

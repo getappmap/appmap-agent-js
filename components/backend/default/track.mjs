@@ -4,8 +4,9 @@ import { hashSourceMessage } from "./hash.mjs";
 
 const { Set } = globalThis;
 
-export const startTrack = () => ({
+export const startTrack = (configuration) => ({
   running: true,
+  configuration,
   messages: [],
   present_url_set: new Set(),
   missing_url_set: new Set(),
@@ -17,7 +18,8 @@ export const stopTrack = (track) => {
   track.running = false;
 };
 
-export const compileTrack = (track) => compileTrace(track.messages);
+export const compileTrack = (track) =>
+  compileTrace(track.configuration, track.messages);
 
 export const sendTrack = (track, message) => {
   const { type } = message;

@@ -15,16 +15,15 @@ const {
 
 const isNotNull = (any) => any !== null;
 
-const processStartMessage = ({ tracks, sources }, key, message) => {
+const processStartMessage = ({ tracks, sources }, key, configuration) => {
   if (tracks.has(key)) {
-    logError("Duplicate track for %j", message);
+    logError("Duplicate track %j", key);
     return false;
   } else {
-    const track = startTrack();
+    const track = startTrack(configuration);
     for (const source of sources) {
       sendTrack(track, source);
     }
-    sendTrack(track, message);
     tracks.set(key, track);
     return true;
   }
@@ -76,7 +75,7 @@ export const isSessionEmpty = ({ tracks }) => tracks.size === 0;
 export const sendSession = (session, message) => {
   const { type } = message;
   if (type === "start") {
-    return processStartMessage(session, message.track, message);
+    return processStartMessage(session, message.track, message.configuration);
   } else if (type === "stop") {
     const { track: key } = message;
     if (key === null) {

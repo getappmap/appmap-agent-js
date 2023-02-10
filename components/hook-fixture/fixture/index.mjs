@@ -10,7 +10,7 @@ import {
   closeAgent,
 } from "../../agent/index.mjs";
 
-const isCore = ({ type }) => type !== "start" && type !== "stop";
+const isCore = ({ type }) => type !== "stop";
 
 export const testHookAsync = async (
   { hook, unhook },
@@ -33,7 +33,7 @@ export const testHookAsync = async (
     recordStartTrack(agent, "record", configuration);
     await callbackAsync();
     recordStopTrack(agent, "record", { type: "manual" });
-    return takeLocalAgentTrace(agent, "record").filter(isCore);
+    return takeLocalAgentTrace(agent, "record").messages.filter(isCore);
   } finally {
     closeAgent(agent);
     unhook(hooking);

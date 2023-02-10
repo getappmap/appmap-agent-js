@@ -54,7 +54,10 @@ const configuration = extendConfiguration(
   assertEqual(isSessionEmpty(session), false);
   assertDeepEqual(compileSessionTrack(session, "record", true), {
     url: "protocol://host/base/dirname/process/basename.appmap.json",
-    content: [message1, message2, message3],
+    content: {
+      configuration,
+      messages: [message2, message3],
+    },
   });
   assertEqual(isSessionEmpty(session), true);
   assertEqual(compileSessionTrack(session, "record", true), null); // missing track
@@ -87,7 +90,10 @@ const configuration = extendConfiguration(
     assertDeepEqual(compileSessionTrackArray(session, true), [
       {
         url: "protocol://host/base/dirname/process/basename.appmap.json",
-        content: [message1, message2, message3],
+        content: {
+          configuration,
+          messages: [message1, message3],
+        },
       },
     ]);
   assertDeepEqual(compileSessionTrackArray(session, true), []);
