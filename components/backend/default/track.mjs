@@ -5,25 +5,29 @@ import { hashSourceMessage } from "./hash.mjs";
 const { Set } = globalThis;
 
 export const startTrack = (configuration) => ({
-  running: true,
   configuration,
   messages: [],
+  termination: null,
   present_url_set: new Set(),
   missing_url_set: new Set(),
   present_hash_set: new Set(),
   missing_hash_set: new Set(),
 });
 
-export const stopTrack = (track) => {
-  track.running = false;
+export const stopTrack = (track, termination) => {
+  track.termination = termination;
 };
 
 export const compileTrack = (track) =>
-  compileTrace(track.configuration, track.messages);
+  compileTrace(
+    track.configuration,
+    track.messages,
+    track.termination ?? { type: "unknown" },
+  );
 
 export const sendTrack = (track, message) => {
   const { type } = message;
-  if (type === "amend" || type === "source" || track.running) {
+  if (type === "amend" || type === "source" || track.termination === null) {
     track.messages.push(message);
   }
   if (type === "source") {
@@ -55,6 +59,6 @@ export const sendTrack = (track, message) => {
 };
 
 export const isTrackComplete = (track) =>
-  !track.running &&
+  track.termination !== null &&
   track.missing_hash_set.size === 0 &&
   track.missing_url_set.size === 0;

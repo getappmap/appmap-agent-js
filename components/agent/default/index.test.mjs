@@ -91,11 +91,7 @@ assertDeepEqual(takeLocalAgentTrace(agent, "record"), {
       time: 0,
       payload: { type: "answer" },
     },
-    {
-      type: "stop",
-      track: "record",
-      termination: { type: "manual" },
-    },
   ],
+  termination: { type: "manual" },
 });
 closeAgent(agent);

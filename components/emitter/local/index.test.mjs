@@ -28,7 +28,8 @@ sendEmitter(emitter, message2);
 
 assertDeepEqual(takeLocalEmitterTrace(emitter, "record"), {
   configuration,
-  messages: [message2],
+  messages: [],
+  termination: { type: "manual" },
 });
 
 closeEmitter(emitter);

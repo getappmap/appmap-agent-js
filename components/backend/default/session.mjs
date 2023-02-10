@@ -32,14 +32,13 @@ const processStartMessage = ({ tracks, sources }, key, configuration) => {
 // We do no compile the track at this points because additional
 // source messages may still arrive. That is because the tranformer
 // may reside on a different process.
-const processStopMessage = ({ tracks }, key, message) => {
+const processStopMessage = ({ tracks }, key, termination) => {
   if (tracks.has(key)) {
     const track = tracks.get(key);
-    sendTrack(track, message);
-    stopTrack(track);
+    stopTrack(track, termination);
     return true;
   } else {
-    logError("missing track for %j", message);
+    logError("missing track %j", key);
     return false;
   }
 };
@@ -80,10 +79,10 @@ export const sendSession = (session, message) => {
     const { track: key } = message;
     if (key === null) {
       return toArray(session.tracks.keys())
-        .map((key) => processStopMessage(session, key, message))
+        .map((key) => processStopMessage(session, key, message.termination))
         .every(identity);
     } else {
-      return processStopMessage(session, key, message);
+      return processStopMessage(session, key, message.termination);
     }
   } else {
     if (type === "source") {

@@ -39,6 +39,7 @@ const configuration = extendConfiguration(
     content: {
       configuration,
       messages: [message1],
+      termination: { type: "unknown" },
     },
   });
 }
@@ -87,7 +88,7 @@ const configuration = extendConfiguration(
     sendTrack(track, return_event_message);
     sendTrack(track, throw_event_message);
     assertEqual(isTrackComplete(track), false);
-    stopTrack(track);
+    stopTrack(track, { type: "manual" });
     assertEqual(isTrackComplete(track), true);
   }
   // first source then location //
@@ -95,7 +96,7 @@ const configuration = extendConfiguration(
     const track = startTrack(configuration);
     sendTrack(track, return_event_message);
     sendTrack(track, throw_event_message);
-    stopTrack(track);
+    stopTrack(track, { type: "manual" });
     assertEqual(isTrackComplete(track), false);
     sendTrack(track, source_message);
     assertEqual(isTrackComplete(track), true);

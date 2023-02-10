@@ -120,7 +120,8 @@ assertDeepEqual(compileBackendTrack(backend, "session", "record", true), {
   ),
   content: {
     configuration,
-    messages: [message2, { ...message3, content: "123;" }, message4],
+    messages: [message2, { ...message3, content: "123;" }],
+    termination: { type: "manual" },
   },
 });
 

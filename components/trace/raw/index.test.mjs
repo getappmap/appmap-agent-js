@@ -15,10 +15,11 @@ const configuration = extendConfiguration(
   "protocol://host/base/",
 );
 
-assertDeepEqual(compileTrace(configuration, []), {
+assertDeepEqual(compileTrace(configuration, [], { type: "unknown" }), {
   url: "protocol://host/base/dirname/process/basename.appmap.json",
   content: {
     messages: [],
     configuration,
+    termination: { type: "unknown" },
   },
 });

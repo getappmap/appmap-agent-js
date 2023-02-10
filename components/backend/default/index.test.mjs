@@ -54,8 +54,9 @@ assertEqual(sendBackend(backend, "session", message2), true);
 assertDeepEqual(compileBackendTrack(backend, "session", "track", true), {
   url: "protocol://host/base/dirname/process/basename.appmap.json",
   content: {
-    messages: [message2],
     configuration,
+    messages: [],
+    termination: { type: "manual" },
   },
 });
 
@@ -72,7 +73,8 @@ assertDeepEqual(compileBackendTrackArray(backend, "session", true), [
     url: "protocol://host/base/dirname/process/basename-1.appmap.json",
     content: {
       configuration,
-      messages: [message2],
+      messages: [],
+      termination: { type: "manual" },
     },
   },
 ]);

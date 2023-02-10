@@ -56,7 +56,8 @@ const configuration = extendConfiguration(
     url: "protocol://host/base/dirname/process/basename.appmap.json",
     content: {
       configuration,
-      messages: [message2, message3],
+      messages: [message2],
+      termination: { type: "manual" },
     },
   });
   assertEqual(isSessionEmpty(session), true);
@@ -92,7 +93,8 @@ const configuration = extendConfiguration(
         url: "protocol://host/base/dirname/process/basename.appmap.json",
         content: {
           configuration,
-          messages: [message1, message3],
+          messages: [message1],
+          termination: { type: "manual" },
         },
       },
     ]);

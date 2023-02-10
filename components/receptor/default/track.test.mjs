@@ -60,13 +60,8 @@ assertDeepEqual(await requestAsync(...req("DELETE")), {
   ...success,
   body: {
     configuration: { ...configuration, recorder: "remote" },
-    messages: [
-      {
-        type: "stop",
-        track: "record",
-        termination: { type: "manual" },
-      },
-    ],
+    messages: [],
+    termination: { type: "manual" },
   },
 });
 

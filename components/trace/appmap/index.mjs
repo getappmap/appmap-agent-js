@@ -60,17 +60,14 @@ There is three ways to solve this issue:
 
 ${summary_template}`;
 
-export const compileTrace = (configuration, messages) => {
+export const compileTrace = (configuration, messages, termination) => {
   logDebug("Trace: %j", messages);
   const sources = [];
   const errors = [];
   const events = [];
-  let termination = { type: "unknown" };
   for (const message of messages) {
     const { type } = message;
-    if (type === "stop") {
-      termination = message.termination;
-    } else if (type === "error") {
+    if (type === "error") {
       errors.push(message.error);
     } else if (type === "event") {
       events.push(message);

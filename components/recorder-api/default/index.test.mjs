@@ -54,11 +54,7 @@ assertDeepEqual(appmap.stopRecording(track), {
       url: "protocol://host/base/main.js",
       content: "123;",
     },
-    {
-      type: "stop",
-      track: "uuid",
-      termination: { type: "manual" },
-    },
   ],
+  termination: { type: "manual" },
 });
 appmap.terminate();
