@@ -63,19 +63,6 @@ assertDeepEqual(
         type: "source",
         url: "protocol://host/home/dirname/filename.js",
         content: "function f (x) {}",
-        shallow: false,
-        exclude: [
-          {
-            combinator: "or",
-            "every-label": true,
-            "some-label": true,
-            "qualified-name": true,
-            name: true,
-            excluded: false,
-            recursive: true,
-          },
-        ],
-        inline: false,
       },
       {
         type: "event",

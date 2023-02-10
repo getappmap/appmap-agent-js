@@ -77,9 +77,6 @@ const message2 = {
   type: "source",
   url: missing_source_url,
   content: null,
-  shallow: false,
-  inline: false,
-  exclude: [],
 };
 
 socket.write(createMessage(stringifyJSON(message2)));
@@ -90,9 +87,6 @@ const message3 = {
   type: "source",
   url: source_url,
   content: null,
-  shallow: false,
-  inline: false,
-  exclude: [],
 };
 
 await writeFileAsync(new URL(source_url), "123;", "utf8");
