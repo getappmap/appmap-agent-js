@@ -1,10 +1,12 @@
 import { logError } from "../../log/index.mjs";
 import { identity } from "../../util/index.mjs";
+import { fromSourceMessage } from "../../source/index.mjs";
 import {
   startTrack,
   stopTrack,
   sendTrack,
   compileTrack,
+  addTrackSource,
   isTrackComplete,
 } from "./track.mjs";
 
@@ -22,7 +24,7 @@ const processStartMessage = ({ tracks, sources }, key, configuration) => {
   } else {
     const track = startTrack(configuration);
     for (const source of sources) {
-      sendTrack(track, source);
+      addTrackSource(track, source);
     }
     tracks.set(key, track);
     return true;
@@ -84,10 +86,14 @@ export const sendSession = (session, message) => {
     } else {
       return processStopMessage(session, key, message.termination);
     }
-  } else {
-    if (type === "source") {
-      session.sources.push(message);
+  } else if (type === "source") {
+    const source = fromSourceMessage(message);
+    session.sources.push(source);
+    for (const track of session.tracks.values()) {
+      addTrackSource(track, source);
     }
+    return true;
+  } else {
     for (const track of session.tracks.values()) {
       sendTrack(track, message);
     }

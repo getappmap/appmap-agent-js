@@ -59,15 +59,15 @@ assertDeepEqual(takeLocalAgentTrace(agent, "record"), {
   configuration,
   messages: [
     {
+      type: "source",
+      url: "protocol://host/base/main.js",
+      content: "123;",
+    },
+    {
       type: "group",
       group: 0,
       child: 123,
       description: "description",
-    },
-    {
-      type: "source",
-      url: "protocol://host/base/main.js",
-      content: "123;",
     },
     {
       type: "event",

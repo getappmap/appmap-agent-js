@@ -3,6 +3,7 @@ import {
   createConfiguration,
   extendConfiguration,
 } from "../../configuration/index.mjs";
+import { createSource } from "../../source/index.mjs";
 import { stringifyLocation } from "../../location/index.mjs";
 import { compileTrace } from "./index.mjs";
 
@@ -59,11 +60,12 @@ assertDeepEqual(
   compileTrace(
     configuration,
     [
-      {
-        type: "source",
-        url: "protocol://host/home/dirname/filename.js",
-        content: "function f (x) {}",
-      },
+      createSource(
+        "protocol://host/home/dirname/filename.js",
+        "function f (x) {}",
+      ),
+    ],
+    [
       {
         type: "event",
         site: "begin",

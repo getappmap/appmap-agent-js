@@ -5,7 +5,6 @@ import {
 import { logError, logDebug, logInfo } from "../../log/index.mjs";
 import { validateAppmap } from "../../validate-appmap/index.mjs";
 import { compileMetadata } from "./metadata.mjs";
-import { fromSourceMessage } from "../../source/index.mjs";
 import {
   createClassmap,
   addClassmapSource,
@@ -60,9 +59,8 @@ There is three ways to solve this issue:
 
 ${summary_template}`;
 
-export const compileTrace = (configuration, messages, termination) => {
+export const compileTrace = (configuration, sources, messages, termination) => {
   logDebug("Trace: %j", messages);
-  const sources = [];
   const errors = [];
   const events = [];
   for (const message of messages) {
@@ -97,8 +95,6 @@ export const compileTrace = (configuration, messages, termination) => {
           },
         },
       );
-    } else if (type === "source") {
-      sources.push(fromSourceMessage(message));
     } else if (type === "amend") {
       for (let index = events.length - 1; index >= 0; index -= 1) {
         const event = events[index];
@@ -108,7 +104,7 @@ export const compileTrace = (configuration, messages, termination) => {
         }
       }
     } /* c8 ignore start */ else {
-      throw new InternalAppmapError("invalid message type");
+      throw new InternalAppmapError("invalid core message type");
     } /* c8 ignore stop */
   }
   const url = getOutputUrl(configuration);

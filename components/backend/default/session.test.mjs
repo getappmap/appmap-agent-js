@@ -70,8 +70,8 @@ const configuration = extendConfiguration(
   const session = createSession(configuration);
   const message1 = {
     type: "source",
-    url: "protocol://host/cwd/main.js",
-    content: "function main () {}",
+    url: "protocol://host/before-start.js",
+    content: "function beforeStart () {}",
   };
   assertEqual(sendSession(session, message1), true);
   const message2 = {
@@ -81,19 +81,25 @@ const configuration = extendConfiguration(
   };
   assertEqual(sendSession(session, message2), true);
   const message3 = {
+    type: "source",
+    url: "protocol://host/after-start.js",
+    content: "function afterStart () {}",
+  };
+  assertEqual(sendSession(session, message3), true);
+  const message4 = {
     type: "stop",
     track: null,
     termination: {
       type: "manual",
     },
   };
-  assertEqual(sendSession(session, message3), true),
+  assertEqual(sendSession(session, message4), true),
     assertDeepEqual(compileSessionTrackArray(session, true), [
       {
         url: "protocol://host/base/dirname/process/basename.appmap.json",
         content: {
           configuration,
-          messages: [message1],
+          messages: [message1, message3],
           termination: { type: "manual" },
         },
       },
