@@ -1,3 +1,15 @@
+# [13.3.0](https://github.com/getappmap/appmap-agent-js/compare/v13.2.1...v13.3.0) (2023-02-10)
+
+
+### Bug Fixes
+
+* correct assertion argument order ([de59d4b](https://github.com/getappmap/appmap-agent-js/commit/de59d4b1329e3f1c0512e408294c7fd964f41ece))
+
+
+### Features
+
+* regularly flush appmaps from backend ([cdd0ef5](https://github.com/getappmap/appmap-agent-js/commit/cdd0ef5bb34430436ceab1485343c5d5cf5e9af1))
+
 ## [13.2.1](https://github.com/getappmap/appmap-agent-js/compare/v13.2.0...v13.2.1) (2023-02-07)
 
 
