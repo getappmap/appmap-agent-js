@@ -1,5 +1,5 @@
 import { logInfo } from "../../log/index.mjs";
-import { parseEstree } from "./parse.mjs";
+import { parseSource } from "../../source/index.mjs";
 import { lookupEstreePath } from "./lookup.mjs";
 import {
   wrapRootEntityArray,
@@ -15,22 +15,21 @@ import { compileExclusionArray } from "./exclusion.mjs";
 const { Map, Set } = globalThis;
 
 export const createModule = ({
-  url,
-  content,
+  source,
   relative,
   inline,
   exclusions,
   shallow,
   pruning,
 }) => {
-  const estree = parseEstree(url, content);
+  const estree = parseSource(source);
   const getExclusion = compileExclusionArray(exclusions);
   const context = {
     anonymous: "[anonymous]",
     relative,
     inline,
     shallow,
-    content,
+    source,
   };
   const entities = wrapRootEntityArray(
     digestEstreeRoot(estree, context),
@@ -41,8 +40,7 @@ export const createModule = ({
     registerFunctionEntity(entity, null, infos);
   }
   return {
-    url,
-    content,
+    source,
     relative,
     inline,
     exclusions,

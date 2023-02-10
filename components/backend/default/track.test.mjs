@@ -1,5 +1,5 @@
 import { assertDeepEqual, assertEqual } from "../../__fixture__.mjs";
-import { hashFile } from "../../hash/index.mjs";
+import { makeSourceLocation, fromSourceMessage } from "../../source/index.mjs";
 import { stringifyLocation } from "../../location/index.mjs";
 import {
   createConfiguration,
@@ -59,12 +59,9 @@ import {
     tab: 0,
     payload: {
       type: "return",
-      function: stringifyLocation({
-        hash: hashFile(source_message),
-        url: null,
-        line: 0,
-        column: 0,
-      }),
+      function: stringifyLocation(
+        makeSourceLocation(fromSourceMessage(source_message), 0, 0),
+      ),
       error: { type: "number", print: "0" },
     },
   };

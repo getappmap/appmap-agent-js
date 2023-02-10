@@ -3,9 +3,14 @@ import {
   InternalAppmapError,
   ExternalAppmapError,
 } from "../../error/index.mjs";
-import { hashFile } from "../../hash/index.mjs";
 import { toDirectoryUrl, toAbsoluteUrl } from "../../url/index.mjs";
 import { logInfo, logError } from "../../log/index.mjs";
+import {
+  createSource,
+  makeSourceLocation,
+  getSourceUrl,
+  getSourceContent,
+} from "../../source/index.mjs";
 import { validateSourceMap } from "../../validate/index.mjs";
 
 const {
@@ -13,26 +18,20 @@ const {
   JSON: { parse: parseJSON },
 } = globalThis;
 
-const addHashToFile = ({ url, content }) => ({
-  url,
-  content,
-  hash: content === null ? null : hashFile({ url, content }),
-});
-
-const removeHashFromFile = ({ url, content }) => ({ url, content });
-
-export const extractMappingUrl = ({ url: base, content }) => {
-  const parts = /\/\/[#@] sourceMappingURL=(.*)[\s]*$/u.exec(content);
+export const extractMappingUrl = (source) => {
+  const parts = /\/\/[#@] sourceMappingURL=(.*)[\s]*$/u.exec(
+    getSourceContent(source),
+  );
   if (parts === null) {
     return null;
   } else {
-    return toAbsoluteUrl(parts[1], base);
+    return toAbsoluteUrl(parts[1], getSourceUrl(source));
   }
 };
 
-export const createMirrorMapping = (file) => ({
+export const createMirrorMapping = (source) => ({
   type: "mirror",
-  source: addHashToFile(file),
+  source,
 });
 
 const parseSourceMap = (content, url) => {
@@ -98,37 +97,32 @@ export const createMapping = ({ url: base, content }) => {
   return {
     type: "normal",
     base,
-    sources: relatives
-      .map((relative) => toAbsoluteUrl(relative, root_base))
-      .map(
-        contents === null
-          ? (url) => ({ url, content: null })
-          : (url, index) => ({
-              url,
-              content: index < contents.length ? contents[index] : null,
-            }),
-      )
-      .map(addHashToFile),
+    sources: relatives.map((relative, index) =>
+      createSource(
+        toAbsoluteUrl(relative, root_base),
+        contents === null || contents === undefined || index >= contents.length
+          ? null
+          : contents[index],
+      ),
+    ),
     lines: parseGroupArray(mappings),
   };
 };
 
 export const mapSource = (mapping, line, column) => {
   if (mapping.type === "mirror") {
-    const { hash, url } = mapping.source;
-    return { hash, url, line, column };
+    return makeSourceLocation(mapping.source, line, column);
   } else if (mapping.type === "normal") {
     if (line <= mapping.lines.length) {
       for (const fields of mapping.lines[line - 1]) {
         if (fields[0] === column && fields.length >= 4) {
-          if (fields[1] < mapping.sources.length) {
-            const { hash, url } = mapping.sources[fields[1]];
-            return {
-              hash,
-              url,
-              line: fields[2] + 1,
-              column: fields[3],
-            };
+          const [, source_index, mapped_line, mapped_column] = fields;
+          if (source_index < mapping.sources.length) {
+            return makeSourceLocation(
+              mapping.sources[source_index],
+              mapped_line + 1,
+              mapped_column,
+            );
           } else {
             logInfo(
               "Source map out of range at file %j, line %j, and column %j",
@@ -162,9 +156,28 @@ export const mapSource = (mapping, line, column) => {
 
 export const getMappingSourceArray = (mapping) => {
   if (mapping.type === "mirror") {
-    return [removeHashFromFile(mapping.source)];
+    return [mapping.source];
   } else if (mapping.type === "normal") {
-    return mapping.sources.map(removeHashFromFile);
+    return mapping.sources;
+  } /* c8 ignore start */ else {
+    throw new InternalAppmapError("invalid mapping type");
+  } /* c8 ignore stop */
+};
+
+export const updateMappingSource = (mapping, new_source) => {
+  if (mapping.type === "mirror") {
+    if (getSourceUrl(mapping.source) === getSourceUrl(new_source)) {
+      mapping.source = new_source;
+    }
+  } else if (mapping.type === "normal") {
+    const { sources } = mapping;
+    const { length } = sources;
+    for (let index = 0; index < length; index += 1) {
+      const source = sources[index];
+      if (getSourceUrl(source) === getSourceUrl(new_source)) {
+        sources[index] = new_source;
+      }
+    }
   } /* c8 ignore start */ else {
     throw new InternalAppmapError("invalid mapping type");
   } /* c8 ignore stop */

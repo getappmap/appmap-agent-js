@@ -1,9 +1,10 @@
 import { assertEqual } from "../../__fixture__.mjs";
-import { hashSource } from "./hash.mjs";
+import { hashSourceMessage } from "./hash.mjs";
 
-const file = {
+const message = {
+  type: "source",
   url: "protocol://host/path",
   content: "content",
 };
 
-assertEqual(hashSource(file), hashSource(file));
+assertEqual(hashSourceMessage(message), hashSourceMessage(message));

@@ -1,9 +1,10 @@
 import { createHash } from "node:crypto";
 
-export const hashFile = ({ url, content }) => {
+export const hashStringArray = (strings) => {
   const hash = createHash("sha256");
-  hash.update(url, "utf8");
-  hash.update("\0", "utf8");
-  hash.update(content, "utf8");
+  for (const string of strings) {
+    hash.update(string, "utf8");
+    hash.update("\0", "utf8");
+  }
   return hash.digest("base64");
 };

@@ -1,10 +1,11 @@
 import { assertEqual, assertNotEqual } from "../../__fixture__.mjs";
-import { hashFile } from "./index.mjs";
+import { hashStringArray } from "./index.mjs";
 
-const file = { url: "protocol://host/path", content: "content" };
+assertEqual(typeof hashStringArray(["foo", "bar"]), "string");
 
-assertEqual(typeof hashFile(file), "string");
+assertEqual(hashStringArray(["foo", "bar"]), hashStringArray(["foo", "bar"]));
 
-assertEqual(hashFile(file), hashFile(file));
-
-assertNotEqual(hashFile(file), hashFile({ ...file, content: "CONTENT" }));
+assertNotEqual(
+  hashStringArray(["foo", "bar"]),
+  hashStringArray(["FOO", "BAR"]),
+);

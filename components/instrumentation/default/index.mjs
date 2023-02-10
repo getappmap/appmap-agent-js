@@ -1,43 +1,29 @@
 import * as Astring from "astring";
-import * as Acorn from "acorn";
-import { logError, logDebug } from "../../log/index.mjs";
-import { ExternalAppmapError } from "../../error/index.mjs";
+import { logDebug } from "../../log/index.mjs";
 import { getMappingSourceArray } from "../../mapping/index.mjs";
+import {
+  parseSource,
+  getSourceUrl,
+  getSourceContent,
+} from "../../source/index.mjs";
 import { createExclusion, addExclusionSource } from "./exclusion.mjs";
 import { visit } from "./visit.mjs";
 
 const { generate: generateEstree } = Astring;
-const { parse: parseAcorn } = Acorn;
 
 export const createInstrumentation = (configuration) => ({
   configuration,
 });
 
-const parseEstree = (type, content, url) => {
-  try {
-    return parseAcorn(content, {
-      allowHashBang: true,
-      sourceType: type,
-      allowAwaitOutsideFunction: type === "module",
-      ecmaVersion: "latest",
-      locations: true,
-    });
-  } catch (error) {
-    logError("Failed to parse file %j as %s >> %O", url, type, error);
-    throw new ExternalAppmapError("Failed to parse js file");
-  }
-};
-
-export const instrument = (
-  { configuration },
-  { url, type, content },
-  mapping,
-) => {
+export const instrument = ({ configuration }, source, mapping) => {
+  const url = getSourceUrl(source);
+  const content = getSourceContent(source);
+  const sources = getMappingSourceArray(mapping);
   const exclusion = createExclusion(configuration);
-  const sources = getMappingSourceArray(mapping).filter((source) =>
+  const included_source_array = sources.filter((source) =>
     addExclusionSource(exclusion, source),
   );
-  if (sources.length === 0) {
+  if (included_source_array.length === 0) {
     logDebug(
       "Not instrumenting file %j because it has no allowed sources",
       url,
@@ -52,13 +38,13 @@ export const instrument = (
         "Not instrumenting file %j because instrumentation hooks (apply and eval) are disabled",
         url,
       );
-      return { url, content, sources };
+      return { url, content, sources: included_source_array };
     } else {
       logDebug("Instrumenting file %j", url);
       return {
         url,
         content: generateEstree(
-          visit(parseEstree(type, content, url), {
+          visit(parseSource(source), {
             url,
             exclusion,
             eval: configuration.hooks.eval,
@@ -66,7 +52,7 @@ export const instrument = (
             mapping,
           }),
         ),
-        sources,
+        sources: included_source_array,
       };
     }
   }

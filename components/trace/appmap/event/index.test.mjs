@@ -4,6 +4,7 @@ import {
   createConfiguration,
   extendConfiguration,
 } from "../../../configuration/index.mjs";
+import { createSource } from "../../../source/index.mjs";
 import { createClassmap, addClassmapSource } from "../../../classmap/index.mjs";
 import { digestEventTrace } from "./index.mjs";
 
@@ -114,10 +115,10 @@ for (const shallow of [true, false]) {
       "protocol://host/home/",
     ),
   );
-  addClassmapSource(classmap, {
-    url: "protocol://host/home/filename.js",
-    content: "function f (x) {}",
-  });
+  addClassmapSource(
+    classmap,
+    createSource("protocol://host/home/filename.js", "function f (x) {}"),
+  );
   const location = stringifyLocation({
     url: "protocol://host/home/filename.js",
     hash: null,

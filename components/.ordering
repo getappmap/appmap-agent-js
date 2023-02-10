@@ -28,6 +28,7 @@ configuration-accessor
 configuration-process
 configuration-environment
 location
+source
 classmap
 trace
 backend

@@ -1,9 +1,10 @@
-import { assertThrow, assertDeepEqual } from "../../__fixture__.mjs";
+import { assertDeepEqual } from "../../__fixture__.mjs";
 import { createMirrorMapping } from "../../mapping/index.mjs";
 import {
   createConfiguration,
   extendConfiguration,
 } from "../../configuration/index.mjs";
+import { createSource } from "../../source/index.mjs";
 import { normalize } from "./__fixture__.mjs";
 import { createInstrumentation, instrument } from "./index.mjs";
 
@@ -13,49 +14,17 @@ const normalizeContent = ({ content, ...rest }, source) => ({
 });
 
 {
-  const file = {
-    url: "protocol://host/base/invalid.js",
-    content: "INVALID JAVASCRIPT",
-    type: "script",
-  };
-  assertThrow(
-    () =>
-      instrument(
-        createInstrumentation(
-          extendConfiguration(
-            createConfiguration("protocol://host/home/"),
-            {
-              "inline-source": false,
-              hooks: { apply: "$", eval: false },
-              packages: [
-                {
-                  path: "invalid.js",
-                  enabled: true,
-                },
-              ],
-            },
-            "protocol://host/base/",
-          ),
-        ),
-        file,
-        createMirrorMapping(file),
-      ),
-    /^ExternalAppmapError: Failed to parse js file$/u,
+  const source = createSource(
+    "protocol://host/base/script.js",
+    "function main () {}",
   );
-}
-
-{
-  const file = {
-    url: "protocol://host/base/script.js",
-    content: "function main () {}",
-    type: "script",
-  };
   assertDeepEqual(
     instrument(
       createInstrumentation(
         extendConfiguration(
           createConfiguration("protocol://host/home/"),
           {
+            "postmortem-function-exclusion": true,
             "inline-source": false,
             hooks: { apply: null, eval: false },
             packages: [
@@ -68,18 +37,13 @@ const normalizeContent = ({ content, ...rest }, source) => ({
           "protocol://host/base/",
         ),
       ),
-      file,
-      createMirrorMapping(file),
+      source,
+      createMirrorMapping(source),
     ),
     {
       url: "protocol://host/base/script.js",
       content: "function main () {}",
-      sources: [
-        {
-          url: "protocol://host/base/script.js",
-          content: "function main () {}",
-        },
-      ],
+      sources: [source],
     },
   );
 }
@@ -88,6 +52,7 @@ const instrumentation = createInstrumentation(
   extendConfiguration(
     createConfiguration("protocol://host/home/"),
     {
+      "postmortem-function-exclusion": true,
       "inline-source": false,
       hooks: { apply: "$", eval: false },
       packages: [
@@ -113,37 +78,24 @@ const instrumentation = createInstrumentation(
 );
 
 {
-  const file = {
-    url: "protocol://host/base/foo.js",
-    content: "123;",
-    type: "script",
-  };
+  const source = createSource("protocol://host/base/foo.js", "123;");
   assertDeepEqual(
     normalizeContent(
-      instrument(instrumentation, file, createMirrorMapping(file)),
+      instrument(instrumentation, source, createMirrorMapping(source)),
     ),
     {
       url: "protocol://host/base/foo.js",
       content: normalize("123;", "script"),
-      sources: [
-        {
-          url: "protocol://host/base/foo.js",
-          content: "123;",
-        },
-      ],
+      sources: [source],
     },
   );
 }
 
 {
-  const file = {
-    url: "protocol://host/base/bar.js",
-    content: "456;",
-    type: "script",
-  };
+  const source = createSource("protocol://host/base/bar.js", "456;");
   assertDeepEqual(
     normalizeContent(
-      instrument(instrumentation, file, createMirrorMapping(file)),
+      instrument(instrumentation, source, createMirrorMapping(source)),
     ),
     {
       url: "protocol://host/base/bar.js",

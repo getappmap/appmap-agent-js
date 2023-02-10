@@ -6,6 +6,7 @@ import { assert } from "../../util/index.mjs";
 import { logError, logDebug, logInfo } from "../../log/index.mjs";
 import { validateAppmap } from "../../validate-appmap/index.mjs";
 import { compileMetadata } from "./metadata.mjs";
+import { fromSourceMessage } from "../../source/index.mjs";
 import {
   createClassmap,
   addClassmapSource,
@@ -112,7 +113,7 @@ export const compileTrace = (messages) => {
         },
       );
     } else if (type === "source") {
-      sources.push(message);
+      sources.push(fromSourceMessage(message));
     } else if (type === "amend") {
       for (let index = events.length - 1; index >= 0; index -= 1) {
         const event = events[index];

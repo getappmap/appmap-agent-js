@@ -1,4 +1,5 @@
 import { InternalAppmapError } from "../../error/index.mjs";
+import { getSourceUrl } from "../../source/index.mjs";
 import {
   createClassmap,
   addClassmapSource,
@@ -26,13 +27,14 @@ export const createExclusion = (configuration) => {
 
 export const addExclusionSource = (exclusion, source) => {
   if (exclusion.type === "basic") {
+    const url = getSourceUrl(source);
     const { enabled } = lookupSpecifier(
       exclusion.specifiers,
-      source.url,
+      url,
       exclusion.default_specifier,
     );
     if (enabled) {
-      exclusion.urls.add(source.url);
+      exclusion.urls.add(url);
     }
     return enabled;
   } else if (exclusion.type === "classmap") {

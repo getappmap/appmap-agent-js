@@ -1,6 +1,6 @@
 import { compileTrace } from "../../trace/index.mjs";
 import { parseLocation } from "../../location/index.mjs";
-import { hashSource } from "./hash.mjs";
+import { hashSourceMessage } from "./hash.mjs";
 
 const { Set } = globalThis;
 
@@ -29,7 +29,7 @@ export const sendTrack = (track, message) => {
     track.present_url_set.add(url);
     track.missing_url_set.delete(url);
     if (message.content !== null) {
-      const hash = hashSource(message);
+      const hash = hashSourceMessage(message);
       track.present_hash_set.add(hash);
       track.missing_hash_set.delete(hash);
     }

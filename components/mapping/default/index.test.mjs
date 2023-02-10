@@ -5,14 +5,17 @@ import {
   assertDeepEqual,
   assertThrow,
 } from "../../__fixture__.mjs";
-import { hashFile } from "../../hash/index.mjs";
+import { createSource, makeSourceLocation } from "../../source/index.mjs";
 import {
   extractMappingUrl,
   createMirrorMapping,
   createMapping,
   mapSource,
   getMappingSourceArray,
+  updateMappingSource,
 } from "./index.mjs";
+
+const { undefined } = globalThis;
 
 const { SourceMapGenerator } = SourceMap;
 
@@ -30,26 +33,24 @@ assertThrow(
 ///////////////////////
 
 assertEqual(
-  extractMappingUrl({
-    url: "data:,foo",
-    content: "//# sourceMappingURL=http://host/source.map",
-  }),
+  extractMappingUrl(
+    createSource("data:,foo", "//# sourceMappingURL=http://host/source.map"),
+  ),
   "http://host/source.map",
 );
 
 assertEqual(
-  extractMappingUrl({
-    url: "http://host/directory/filename",
-    content: `//@ sourceMappingURL=source.map\r\n\t`,
-  }),
+  extractMappingUrl(
+    createSource(
+      "http://host/directory/filename",
+      `//@ sourceMappingURL=source.map\r\n\t`,
+    ),
+  ),
   "http://host/directory/source.map",
 );
 
 assertEqual(
-  extractMappingUrl({
-    url: "http:///host/directory/filename",
-    content: "123;",
-  }),
+  extractMappingUrl(createSource("http:///host/directory/filename", "123;")),
   null,
 );
 
@@ -58,21 +59,16 @@ assertEqual(
 ////////////
 
 {
-  const file = {
-    url: "http://host/out.js",
-    content: "123;",
-  };
-  const hash = hashFile(file);
-  const mapping = createMirrorMapping(file);
-  assertDeepEqual(mapSource(mapping, 123, 456), {
-    url: file.url,
-    hash,
-    line: 123,
-    column: 456,
-  });
-  assertDeepEqual(getMappingSourceArray(mapping), [
-    { url: "http://host/out.js", content: "123;" },
-  ]);
+  const source1 = createSource("http://host/out.js", "123;");
+  const mapping = createMirrorMapping(source1);
+  assertDeepEqual(
+    mapSource(mapping, 123, 456),
+    makeSourceLocation(source1, 123, 456),
+  );
+  assertDeepEqual(getMappingSourceArray(mapping), [source1]);
+  const source2 = createSource("http://host/out.js", "456;");
+  assertEqual(updateMappingSource(mapping, source2), undefined);
+  assertDeepEqual(getMappingSourceArray(mapping), [source2]);
 }
 
 ////////////
@@ -104,10 +100,7 @@ assertEqual(
   assertEqual(mapSource(mapping, 3, 23), null);
   assertEqual(mapSource(mapping, 29, 0), null);
   assertDeepEqual(getMappingSourceArray(mapping), [
-    {
-      url: "http://host/directory/source.js",
-      content: null,
-    },
+    createSource("http://host/directory/source.js", null),
   ]);
 }
 
@@ -128,31 +121,34 @@ assertEqual(
   null,
 );
 
-assertDeepEqual(
-  getMappingSourceArray(
-    createMapping({
-      url: "http://host/directory/map.json",
-      content: {
-        version: 3,
-        sourceRoot: "root",
-        sources: ["source1.js", "source2.js"],
-        sourcesContent: ["123;"],
-        names: [],
-        mappings: "",
-      },
-    }),
-  ),
-  [
-    {
-      url: "http://host/directory/root/source1.js",
-      content: "123;",
+{
+  const mapping = createMapping({
+    url: "http://host/directory/map.json",
+    content: {
+      version: 3,
+      sourceRoot: "root",
+      sources: ["source1.js", "source2.js"],
+      sourcesContent: ["123;"],
+      names: [],
+      mappings: "",
     },
-    {
-      url: "http://host/directory/root/source2.js",
-      content: null,
-    },
-  ],
-);
+  });
+  assertDeepEqual(getMappingSourceArray(mapping), [
+    createSource("http://host/directory/root/source1.js", "123;"),
+    createSource("http://host/directory/root/source2.js", null),
+  ]);
+  assertEqual(
+    updateMappingSource(
+      mapping,
+      createSource("http://host/directory/root/source2.js", "456;"),
+    ),
+    undefined,
+  );
+  assertDeepEqual(getMappingSourceArray(mapping), [
+    createSource("http://host/directory/root/source1.js", "123;"),
+    createSource("http://host/directory/root/source2.js", "456;"),
+  ]);
+}
 
 assertDeepEqual(
   getMappingSourceArray(
@@ -166,10 +162,5 @@ assertDeepEqual(
       },
     }),
   ),
-  [
-    {
-      url: "http://host/directory/source.js",
-      content: null,
-    },
-  ],
+  [createSource("http://host/directory/source.js", null)],
 );
