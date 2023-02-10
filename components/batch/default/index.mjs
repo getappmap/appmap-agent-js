@@ -7,6 +7,11 @@ import {
   InternalAppmapError,
   ExternalAppmapError,
 } from "../../error/index.mjs";
+import {
+  toAbsoluteUrl,
+  getUrlBasename,
+  getUrlExtension,
+} from "../../url/index.mjs";
 import { hasOwnProperty, assert } from "../../util/index.mjs";
 import { logError, logDebug, logInfo, logWarning } from "../../log/index.mjs";
 import {
@@ -32,6 +37,7 @@ import { whereAsync } from "./where.mjs";
 
 const {
   Promise,
+  String,
   URL,
   Set,
   setTimeout,
@@ -96,15 +102,37 @@ const defineConfigurationSession = (configuration) => {
   }
 };
 
-export const flushBackendSessionAsync = async (backend, session, abrupt) => {
+const refreshUrl = (urls, url) => {
+  const basename = getUrlBasename(url);
+  const extension = getUrlExtension(url);
+  let index = 0;
+  while (urls.has(url)) {
+    index += 1;
+    url = toAbsoluteUrl(`${basename}-${String(index)}${extension}`, url);
+  }
+  urls.add(url);
+  return url;
+};
+
+export const flushBackendSessionAsync = async (
+  urls,
+  backend,
+  session,
+  abrupt,
+) => {
   for (const { url, content } of compileBackendTrackArray(
     backend,
     session,
     abrupt,
   )) {
-    await mkdirAsync(new URL(".", url), { recursive: true });
-    await writeFileAsync(new URL(url), stringifyJSON(content, null, 2), "utf8");
-    logInfo("Appmap written at %j", url);
+    const fresh_url = refreshUrl(urls, url);
+    await mkdirAsync(new URL(".", fresh_url), { recursive: true });
+    await writeFileAsync(
+      new URL(fresh_url),
+      stringifyJSON(content, null, 2),
+      "utf8",
+    );
+    logInfo("Appmap written at %j", fresh_url);
   }
 };
 
@@ -117,6 +145,7 @@ export const mainAsync = async (process, configuration) => {
     killAllAsync(children);
     interrupted = true;
   });
+  const urls = new Set();
   const backend = createBackend(configuration);
   const receptor = await openReceptorAsync(configuration, backend);
   const runConfigurationAsync = async (configuration, env) => {
@@ -135,7 +164,7 @@ export const mainAsync = async (process, configuration) => {
     const flush = async () => {
       timer = null;
       if (!done) {
-        await flushBackendSessionAsync(backend, session, false);
+        await flushBackendSessionAsync(urls, backend, session, false);
         timer = setTimeout(flush, FLUSH_TIMEOUT);
       }
     };
@@ -158,12 +187,12 @@ export const mainAsync = async (process, configuration) => {
     } else {
       logInfo("> Exited with: %j", status);
     }
-    await flushBackendSessionAsync(backend, session, false);
+    await flushBackendSessionAsync(urls, backend, session, false);
     if (!isBackendSessionEmpty(backend, session)) {
       await new Promise((resolve) => {
         setTimeout(resolve, ABRUPT_TIMEOUT);
       });
-      await flushBackendSessionAsync(backend, session, true);
+      await flushBackendSessionAsync(urls, backend, session, true);
     }
     sendBatchBackend(backend, session, { type: "close" });
     return { tokens, signal, status };

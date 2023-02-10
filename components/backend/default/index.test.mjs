@@ -70,7 +70,7 @@ assertEqual(isBackendSessionEmpty(backend, "session"), false);
 
 assertDeepEqual(compileBackendTrackArray(backend, "session", true), [
   {
-    url: "protocol://host/base/dirname/process/basename-1.appmap.json",
+    url: "protocol://host/base/dirname/process/basename.appmap.json",
     content: {
       configuration,
       messages: [],

@@ -1,8 +1,3 @@
-import {
-  toAbsoluteUrl,
-  getUrlBasename,
-  getUrlExtension,
-} from "../../url/index.mjs";
 import { logDebug, logError } from "../../log/index.mjs";
 import { validateMessage } from "../../validate/index.mjs";
 import {
@@ -14,49 +9,24 @@ import {
   isSessionEmpty,
 } from "./session.mjs";
 
-const { String, Set, Map } = globalThis;
+const { Map } = globalThis;
 
 export const createBackend = (configuration) => ({
   configuration,
-  urls: new Set(),
   sessions: new Map(),
 });
 
-const refreshUrl = (urls, url) => {
-  const basename = getUrlBasename(url);
-  const extension = getUrlExtension(url);
-  let index = 0;
-  while (urls.has(url)) {
-    index += 1;
-    url = toAbsoluteUrl(`${basename}-${String(index)}${extension}`, url);
-  }
-  urls.add(url);
-  return url;
-};
-
-const refreshTrace = (urls, { url, content }) => ({
-  url: refreshUrl(urls, url),
-  content,
-});
-
-export const compileBackendTrackArray = ({ sessions, urls }, key, abrupt) => {
+export const compileBackendTrackArray = ({ sessions }, key, abrupt) => {
   if (sessions.has(key)) {
-    return compileSessionTrackArray(sessions.get(key), abrupt).map((trace) =>
-      refreshTrace(urls, trace),
-    );
+    return compileSessionTrackArray(sessions.get(key), abrupt);
   } else {
     return null;
   }
 };
 
-export const compileBackendTrack = ({ sessions, urls }, key1, key2, abrupt) => {
+export const compileBackendTrack = ({ sessions }, key1, key2, abrupt) => {
   if (sessions.has(key1)) {
-    const maybe_trace = compileSessionTrack(sessions.get(key1), key2, abrupt);
-    if (maybe_trace === null) {
-      return null;
-    } else {
-      return refreshTrace(urls, maybe_trace);
-    }
+    return compileSessionTrack(sessions.get(key1), key2, abrupt);
   } else {
     return null;
   }
