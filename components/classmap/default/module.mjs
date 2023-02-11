@@ -1,5 +1,5 @@
-import { logInfoWhen } from "../../../log/index.mjs";
-import { parseEstree } from "./parse.mjs";
+import { logInfo } from "../../log/index.mjs";
+import { parseSource } from "../../source/index.mjs";
 import { lookupEstreePath } from "./lookup.mjs";
 import {
   wrapRootEntityArray,
@@ -12,27 +12,24 @@ import {
 import { digestEstreeRoot } from "./digest.mjs";
 import { compileExclusionArray } from "./exclusion.mjs";
 
-const { Map, Set, String } = globalThis;
+const { Map, Set } = globalThis;
 
-const hashPosition = ({ line, column }) => `${String(line)}:${String(column)}`;
-
-export const createSource = ({
-  url,
-  content,
+export const createModule = ({
+  source,
   relative,
   inline,
   exclusions,
   shallow,
   pruning,
 }) => {
-  const estree = parseEstree(url, content);
+  const estree = parseSource(source);
   const getExclusion = compileExclusionArray(exclusions);
   const context = {
     anonymous: "[anonymous]",
     relative,
     inline,
     shallow,
-    content,
+    source,
   };
   const entities = wrapRootEntityArray(
     digestEstreeRoot(estree, context),
@@ -43,8 +40,7 @@ export const createSource = ({
     registerFunctionEntity(entity, null, infos);
   }
   return {
-    url,
-    content,
+    source,
     relative,
     inline,
     exclusions,
@@ -53,7 +49,7 @@ export const createSource = ({
     estree,
     entities,
     infos,
-    paths: new Map(),
+    paths: new Set(),
   };
 };
 
@@ -62,39 +58,27 @@ const isFunctionEstree = ({ type }) =>
   type === "FunctionExpression" ||
   type === "FunctionDeclaration";
 
-const lookupCache = (position, estree, paths) => {
-  const hashed_position = hashPosition(position);
-  if (paths.has(hashed_position)) {
-    return paths.get(hashed_position);
-  } else {
-    const maybe_path = lookupEstreePath(estree, isFunctionEstree, position);
-    logInfoWhen(
-      maybe_path === null,
+export const lookupModuleClosure = ({ estree, infos, paths }, position) => {
+  const maybe_path = lookupEstreePath(estree, isFunctionEstree, position);
+  if (maybe_path === null) {
+    logInfo(
       "Could not find a function in %j at %j, will treat it as excluded.",
       estree.loc.filename,
       position,
     );
-    paths.set(hashed_position, maybe_path);
-    return maybe_path;
-  }
-};
-
-export const lookupSourceClosure = ({ estree, infos, paths }, position) => {
-  const maybe_path = lookupCache(position, estree, paths);
-  if (maybe_path !== null) {
-    return infos.has(maybe_path) ? infos.get(maybe_path) : null;
-  } else {
     return null;
+  } else {
+    paths.add(maybe_path);
+    return infos.has(maybe_path) ? infos.get(maybe_path) : null;
   }
 };
 
-export const getSourceRelativeUrl = ({ relative }) => relative;
+export const getModuleRelativeUrl = ({ relative }) => relative;
 
-export const toSourceClassmap = ({ entities, pruning, paths }) => {
+export const toModuleClassmap = ({ entities, pruning, paths }) => {
   if (pruning) {
-    const used = new Set(paths.values());
     entities = entities.map((entity) =>
-      hideMissingFunctionEntity(entity, used),
+      hideMissingFunctionEntity(entity, paths),
     );
     entities = entities.flatMap(removeEmptyClassEntity);
   }

@@ -8,7 +8,7 @@ import {
   serialize,
   getSerializationEmptyValue as getSerializationEmptyValueInner,
 } from "../../serialization/index.mjs";
-
+import { toSourceMessage } from "../../source/index.mjs";
 export {
   getJumpPayload,
   getBundlePayload,
@@ -27,11 +27,6 @@ export {
   formatGroupPayload,
   formatUngroupPayload,
 } from "./payload.mjs";
-
-const toSourceMessage = (source) => ({
-  type: "source",
-  ...source,
-});
 
 const generateFormatAmend =
   (site) =>

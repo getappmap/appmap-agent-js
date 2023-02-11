@@ -1,15 +1,18 @@
-import { hashFile } from "../../hash/index.mjs";
+import { fromSourceMessage, hashSource } from "../../source/index.mjs";
 
 const { WeakMap } = globalThis;
 
 const cache = new WeakMap();
 
-export const hashSource = (source) => {
-  if (cache.has(source)) {
-    return cache.get(source);
+export const hashSourceMessage = (message) => {
+  if (cache.has(message)) {
+    return cache.get(message);
   } else {
-    const hash = hashFile(source);
-    cache.set(source, hash);
+    // This is not optimal, source already has a caching mechanism.
+    // We could convert source messages into sources and pass them
+    // to the trace component.
+    const hash = hashSource(fromSourceMessage(message));
+    cache.set(message, hash);
     return hash;
   }
 };

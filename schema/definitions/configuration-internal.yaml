@@ -1,6 +1,6 @@
 type: object
 additionalProperties: false
-minProperties: 40
+minProperties: 41
 properties:
   socket:
     $ref: socket
@@ -76,6 +76,9 @@ properties:
       - $ref: recorder
   inline-source:
     type: boolean
+  postmortem-function-exclusion:
+    type: boolean
+    nullable: true
   hooks:
     type: object
     additionalProperties: false

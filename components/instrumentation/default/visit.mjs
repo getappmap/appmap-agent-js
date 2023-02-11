@@ -8,9 +8,10 @@ import {
   hasOwnProperty,
   coalesce,
 } from "../../util/index.mjs";
-import { mapSource } from "../../source/index.mjs";
+import { mapSource } from "../../mapping/index.mjs";
 import { logDebugWhen, logErrorWhen } from "../../log/index.mjs";
 import { stringifyLocation } from "../../location/index.mjs";
+import { isExcluded } from "./exclusion.mjs";
 
 const {
   String,
@@ -307,7 +308,7 @@ const instrumentClosure = (node, parent, grand_parent, closure, context) => {
     instrumented:
       context.apply !== null &&
       location !== null &&
-      context.whitelist.has(location.url),
+      !isExcluded(context.exclusion, location),
   };
   if (closure.instrumented) {
     const location_string = stringifyLocation(location);

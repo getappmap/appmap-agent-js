@@ -1,8 +1,8 @@
 import BabelParser from "@babel/parser";
-import { InternalAppmapError } from "../../../error/index.mjs";
-import { getUrlExtension } from "../../../url/index.mjs";
-import { assert, coalesce } from "../../../util/index.mjs";
-import { logWarning, logError } from "../../../log/index.mjs";
+import { InternalAppmapError } from "../../error/index.mjs";
+import { getUrlExtension } from "../../url/index.mjs";
+import { assert, coalesce } from "../../util/index.mjs";
+import { logWarning, logError } from "../../log/index.mjs";
 
 const { parse: parseBabel } = BabelParser;
 

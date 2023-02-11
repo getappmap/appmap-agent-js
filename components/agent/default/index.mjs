@@ -41,9 +41,11 @@ import {
   requestRemoteEmitterAsync,
   takeLocalEmitterTrace,
 } from "../../emitter/index.mjs";
-import { loadSourceMap } from "./source-map.mjs";
+import { createSource } from "../../source/index.mjs";
+import { loadSourceMap, fillSourceMap } from "./source-map.mjs";
 
 export const openAgent = (configuration) => ({
+  configuration,
   emitter: openEmitter(configuration),
   frontend: createFrontend(configuration),
 });
@@ -57,16 +59,25 @@ export const getFreshTab = ({ frontend }) => getFrontendFreshTab(frontend);
 export const getSerializationEmptyValue = ({ frontend }) =>
   getFrontendSerializationEmptyValue(frontend);
 
-export const instrument = ({ frontend, emitter }, file, map) => {
-  const { messages, content } = instrumentFrontend(
+export const instrument = (
+  { configuration, frontend, emitter },
+  { url, content },
+  map,
+) => {
+  const source = createSource(url, content);
+  const mapping = loadSourceMap(source, map);
+  if (configuration["postmortem-function-exclusion"] !== true) {
+    fillSourceMap(mapping);
+  }
+  const { messages, content: instrumented_content } = instrumentFrontend(
     frontend,
-    file,
-    loadSourceMap(file, map),
+    source,
+    mapping,
   );
   for (const message of messages) {
     sendEmitter(emitter, message);
   }
-  return content;
+  return instrumented_content;
 };
 
 export const takeLocalAgentTrace = ({ emitter }, key) =>

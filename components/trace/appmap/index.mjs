@@ -6,11 +6,12 @@ import { assert } from "../../util/index.mjs";
 import { logError, logDebug, logInfo } from "../../log/index.mjs";
 import { validateAppmap } from "../../validate-appmap/index.mjs";
 import { compileMetadata } from "./metadata.mjs";
+import { fromSourceMessage } from "../../source/index.mjs";
 import {
   createClassmap,
   addClassmapSource,
   compileClassmap,
-} from "./classmap/index.mjs";
+} from "../../classmap/index.mjs";
 import { digestEventTrace } from "./event/index.mjs";
 import { orderEventArray } from "./ordering/index.mjs";
 import { getOutputUrl } from "./output.mjs";
@@ -112,7 +113,7 @@ export const compileTrace = (messages) => {
         },
       );
     } else if (type === "source") {
-      sources.push(message);
+      sources.push(fromSourceMessage(message));
     } else if (type === "amend") {
       for (let index = events.length - 1; index >= 0; index -= 1) {
         const event = events[index];
@@ -160,7 +161,7 @@ export const compileTrace = (messages) => {
       }
     }
     return toArray(counters.keys())
-      .sort((key1, key2) => counters.get(key1) - counters.get(key2))
+      .sort((key1, key2) => counters.get(key2) - counters.get(key1))
       .slice(0, 20)
       .map(
         (key) =>

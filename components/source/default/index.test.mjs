@@ -1,175 +1,46 @@
-import { encode as encodeVLQ } from "vlq";
-import SourceMap from "source-map";
 import {
   assertEqual,
   assertDeepEqual,
   assertThrow,
 } from "../../__fixture__.mjs";
-import { hashFile } from "../../hash/index.mjs";
+import { stringifyLocation } from "../../location/index.mjs";
 import {
-  extractSourceMapUrl,
-  createMirrorSourceMap,
-  createSourceMap,
-  mapSource,
-  getSources,
+  createSource,
+  getSourceUrl,
+  getSourceContent,
+  isSourceEmpty,
+  hashSource,
+  parseSource,
+  makeSourceLocation,
+  fromSourceMessage,
+  toSourceMessage,
 } from "./index.mjs";
 
-const { SourceMapGenerator } = SourceMap;
-
-assertThrow(
-  () =>
-    createSourceMap({
-      url: "http://host/source-map.json",
-      content: "INVALID JSON",
-    }),
-  /^ExternalAppmapError: Source map is not valid JSON$/u,
-);
-
-/////////////////////////
-// extractSourceMapUrl //
-/////////////////////////
-
-assertEqual(
-  extractSourceMapUrl({
-    url: "data:,foo",
-    content: "//# sourceMappingURL=http://host/source.map",
-  }),
-  "http://host/source.map",
-);
-
-assertEqual(
-  extractSourceMapUrl({
-    url: "http://host/directory/filename",
-    content: `//@ sourceMappingURL=source.map\r\n\t`,
-  }),
-  "http://host/directory/source.map",
-);
-
-assertEqual(
-  extractSourceMapUrl({
-    url: "http:///host/directory/filename",
-    content: "123;",
-  }),
-  null,
-);
-
-////////////
-// Mirror //
-////////////
-
 {
-  const file = {
-    url: "http://host/out.js",
-    content: "123;",
-  };
-  const hash = hashFile(file);
-  const mapping = createMirrorSourceMap(file);
-  assertDeepEqual(mapSource(mapping, 123, 456), {
-    url: file.url,
-    hash,
-    line: 123,
-    column: 456,
-  });
-  assertDeepEqual(getSources(mapping), [
-    { url: "http://host/out.js", content: "123;" },
-  ]);
+  const source = createSource("protocol://host/esm.mjs", "export foo = 123;");
+  assertDeepEqual(fromSourceMessage(toSourceMessage(source)), source);
+  assertEqual(isSourceEmpty(source), false);
+  assertEqual(getSourceUrl(source), "protocol://host/esm.mjs");
+  assertEqual(getSourceContent(source), "export foo = 123;");
+  assertEqual(hashSource(source), hashSource(source));
+  // Reference comparison to enforce caching for parsing
+  assertEqual(parseSource(source), parseSource(source));
+  assertEqual(
+    typeof stringifyLocation(makeSourceLocation(source, 123, 456)),
+    "string",
+  );
 }
 
-////////////
-// Normal //
-////////////
-
 {
-  const generator = new SourceMapGenerator();
-  generator.addMapping({
-    source: "source.js",
-    generated: { line: 3, column: 5 },
-    original: { line: 7, column: 11 },
-  });
-  generator.addMapping({
-    source: "source.js",
-    generated: { line: 3, column: 13 },
-    original: { line: 17, column: 19 },
-  });
-  const mapping = createSourceMap({
-    url: "http://host/directory/map.json",
-    content: generator.toString(),
-  });
-  assertDeepEqual(mapSource(mapping, 3, 13), {
-    url: "http://host/directory/source.js",
-    hash: null,
-    line: 17,
-    column: 19,
-  });
-  assertEqual(mapSource(mapping, 3, 23), null);
-  assertEqual(mapSource(mapping, 29, 0), null);
-  assertDeepEqual(getSources(mapping), [
-    {
-      url: "http://host/directory/source.js",
-      content: null,
-    },
-  ]);
+  const source = createSource("protocol://host/empty.mjs", null);
+  assertDeepEqual(fromSourceMessage(toSourceMessage(source)), source);
+  assertEqual(isSourceEmpty(source), true);
+  assertEqual(getSourceUrl(source), "protocol://host/empty.mjs");
+  assertThrow(() => getSourceContent(source), /^InternalAppmapError:/u);
+  assertThrow(() => hashSource(source), /^InternalAppmapError:/u);
+  assertThrow(() => parseSource(source), /^InternalAppmapError:/u);
+  assertEqual(
+    typeof stringifyLocation(makeSourceLocation(source, 123, 456)),
+    "string",
+  );
 }
-
-assertEqual(
-  mapSource(
-    createSourceMap({
-      url: "http://host/directory/map.json",
-      content: {
-        version: 3,
-        sources: [],
-        names: [],
-        mappings: encodeVLQ([0, 0, 0, 0]),
-      },
-    }),
-    1,
-    0,
-  ),
-  null,
-);
-
-assertDeepEqual(
-  getSources(
-    createSourceMap({
-      url: "http://host/directory/map.json",
-      content: {
-        version: 3,
-        sourceRoot: "root",
-        sources: ["source1.js", "source2.js"],
-        sourcesContent: ["123;"],
-        names: [],
-        mappings: "",
-      },
-    }),
-  ),
-  [
-    {
-      url: "http://host/directory/root/source1.js",
-      content: "123;",
-    },
-    {
-      url: "http://host/directory/root/source2.js",
-      content: null,
-    },
-  ],
-);
-
-assertDeepEqual(
-  getSources(
-    createSourceMap({
-      url: "http://host/directory/map.json",
-      content: {
-        version: 3,
-        sources: ["source.js"],
-        names: [],
-        mappings: "",
-      },
-    }),
-  ),
-  [
-    {
-      url: "http://host/directory/source.js",
-      content: null,
-    },
-  ],
-);

@@ -40,10 +40,9 @@
   "dependencies": {
     "@appland/appmap-validate": "^2.3.0",
     "@babel/parser": "^7.15.8",
-    "acorn": "^8.5.0",
     "ajv": "^8.6.3",
     "ajv-error-tree": "0.0.5",
-    "astring": "^1.8.3",
+    "astring": "^1.8.4",
     "chalk": "^5.0.1",
     "glob": "^8.0.3",
     "klaw-sync": "^6.0.0",

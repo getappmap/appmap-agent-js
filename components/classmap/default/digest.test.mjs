@@ -1,15 +1,17 @@
-import { assertDeepEqual } from "../../../__fixture__.mjs";
-import { parseEstree } from "./parse.mjs";
+import { assertDeepEqual } from "../../__fixture__.mjs";
+import { createSource, parseSource } from "../../source/index.mjs";
 import { getEntitySummary } from "./entity.mjs";
 import { digestEstreeRoot } from "./digest.mjs";
 
-const digest = (content, anonymous = "dummy") =>
-  digestEstreeRoot(parseEstree("protocol://host/path.mjs", content), {
+const digest = (content, anonymous = "dummy") => {
+  const source = createSource("protocol://host/path.mjs", content);
+  return digestEstreeRoot(parseSource(source), {
     inline: false,
     shallow: false,
-    content: "",
+    source,
     anonymous,
   }).map(getEntitySummary);
+};
 
 //////////////////////
 // ObjectExpression //

@@ -24,6 +24,7 @@ const { eval: evalGlobal } = globalThis;
 const configuration = extendConfiguration(
   createConfiguration("protocol://host/home/"),
   {
+    "postmortem-function-exclusion": false,
     packages: ["*"],
   },
   "protocol://host/base/",

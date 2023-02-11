@@ -56,6 +56,9 @@ properties:
     $ref: recorder
   inline-source:
     type: boolean
+  postmortem-function-exclusion:
+    type: boolean
+    nullable: true
   hooks:
     type: object
     additionalProperties: false

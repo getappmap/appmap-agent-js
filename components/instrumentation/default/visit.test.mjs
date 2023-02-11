@@ -1,51 +1,63 @@
 import { assertEqual } from "../../__fixture__.mjs";
+import {
+  createConfiguration,
+  extendConfiguration,
+} from "../../configuration/index.mjs";
 import { stringifyLocation } from "../../location/index.mjs";
 import { createCounter } from "../../util/index.mjs";
-import { createMirrorSourceMap } from "../../source/index.mjs";
-import { hashFile } from "../../hash/index.mjs";
-import { normalize, parse, generate } from "./__fixture__.mjs";
+import { getUrlFilename } from "../../url/index.mjs";
+import { createMirrorMapping } from "../../mapping/index.mjs";
+import {
+  createSource,
+  makeSourceLocation,
+  getSourceUrl,
+  parseSource,
+} from "../../source/index.mjs";
+import { normalize, generate } from "./__fixture__.mjs";
+import { createExclusion, addExclusionSource } from "./exclusion.mjs";
 import { visit } from "./visit.mjs";
 
 const {
   JSON: { stringify: stringifyJSON },
-  Set,
 } = globalThis;
 
-const instrument = (options) =>
-  generate(
-    visit(
-      parse(options.file.content, {
-        ecmaVersion: 2021,
-        sourceType: options.type,
-        locations: true,
-        allowAwaitOutsideFunction: options.type === "module",
-      }),
+const instrument = (options) => {
+  const exclusion = createExclusion(
+    extendConfiguration(
+      createConfiguration("protocol://host/home/"),
       {
-        url: options.file.url,
-        apply: "APPLY",
-        eval: { hidden: "EVAL", aliases: ["eval"] },
-        mapping: createMirrorSourceMap(options.file),
-        whitelist: new Set(options.instrumented ? [options.file.url] : []),
-        counter: createCounter(0),
+        packages: [
+          {
+            path: getUrlFilename(getSourceUrl(options.source)),
+            enabled: options.instrumented,
+          },
+        ],
       },
+      getSourceUrl(options.source),
     ),
   );
-
-const makeCodeLocation = ({ url, content }, line, column) =>
-  stringifyJSON(
-    stringifyLocation({ url, hash: hashFile({ url, content }), line, column }),
+  addExclusionSource(exclusion, options.source);
+  return generate(
+    visit(parseSource(options.source), {
+      url: getSourceUrl(options.source),
+      apply: "APPLY",
+      eval: { hidden: "EVAL", aliases: ["eval"] },
+      mapping: createMirrorMapping(options.source),
+      exclusion,
+      counter: createCounter(0),
+    }),
   );
+};
+
+const makeCodeLocation = (source, line, column) =>
+  stringifyJSON(stringifyLocation(makeSourceLocation(source, line, column)));
 
 // expression body //
 {
-  const file = {
-    url: "protocol://host/script.js",
-    content: "(() => 123);",
-  };
+  const source = createSource("protocol://host/script.js", "(() => 123);");
   assertEqual(
     instrument({
-      file,
-      type: "script",
+      source,
       instrumented: true,
     }),
     normalize(
@@ -57,7 +69,7 @@ const makeCodeLocation = ({ url, content }, line, column) =>
             APPLY_RETURNED = true;
           APPLY.recordApply(
             APPLY_BUNDLE_TAB,
-            ${makeCodeLocation(file, 1, 1)},
+            ${makeCodeLocation(source, 1, 1)},
             APPLY.empty,
             [],
           );
@@ -67,7 +79,7 @@ const makeCodeLocation = ({ url, content }, line, column) =>
             APPLY_RETURNED = false;
             APPLY.recordThrow(
               APPLY_BUNDLE_TAB,
-              ${makeCodeLocation(file, 1, 1)},
+              ${makeCodeLocation(source, 1, 1)},
               APPLY_ERROR,
             );
             throw APPLY_ERROR;
@@ -75,7 +87,7 @@ const makeCodeLocation = ({ url, content }, line, column) =>
             if (APPLY_RETURNED) {
               APPLY.recordReturn(
                 APPLY_BUNDLE_TAB,
-                ${makeCodeLocation(file, 1, 1)},
+                ${makeCodeLocation(source, 1, 1)},
                 APPLY_RETURN,
               );
             }
@@ -89,14 +101,13 @@ const makeCodeLocation = ({ url, content }, line, column) =>
 
 // subclass //
 {
-  const file = {
-    url: "protocol://host/script.js",
-    content: "(class C extends D {\nconstructor () { 123; } })",
-  };
+  const source = createSource(
+    "protocol://host/script.js",
+    "(class C extends D {\nconstructor () { 123; } })",
+  );
   assertEqual(
     instrument({
-      file,
-      type: "script",
+      source,
       instrumented: true,
     }),
     normalize(
@@ -108,7 +119,7 @@ const makeCodeLocation = ({ url, content }, line, column) =>
             APPLY_RETURNED = true;
           APPLY.recordApply(
             APPLY_BUNDLE_TAB,
-            ${makeCodeLocation(file, 2, 12)},
+            ${makeCodeLocation(source, 2, 12)},
             APPLY.empty,
             [],
           );
@@ -120,7 +131,7 @@ const makeCodeLocation = ({ url, content }, line, column) =>
             APPLY_RETURNED = false;
             APPLY.recordThrow(
               APPLY_BUNDLE_TAB,
-              ${makeCodeLocation(file, 2, 12)},
+              ${makeCodeLocation(source, 2, 12)},
               APPLY_ERROR,
             );
             throw APPLY_ERROR;
@@ -128,7 +139,7 @@ const makeCodeLocation = ({ url, content }, line, column) =>
             if (APPLY_RETURNED) {
               APPLY.recordReturn(
                 APPLY_BUNDLE_TAB,
-                ${makeCodeLocation(file, 2, 12)},
+                ${makeCodeLocation(source, 2, 12)},
                 APPLY_RETURN,
               );
             }
@@ -143,14 +154,13 @@ const makeCodeLocation = ({ url, content }, line, column) =>
 
 // parameters && return //
 {
-  const file = {
-    url: "protocol://host/script.js",
-    content: "((x, y = 123, ...rest) => { return 456; });",
-  };
+  const source = createSource(
+    "protocol://host/script.js",
+    "((x, y = 123, ...rest) => { return 456; });",
+  );
   assertEqual(
     instrument({
-      file,
-      type: "script",
+      source,
       instrumented: true,
     }),
     normalize(
@@ -162,7 +172,7 @@ const makeCodeLocation = ({ url, content }, line, column) =>
             APPLY_RETURNED = true;
           APPLY.recordApply(
             APPLY_BUNDLE_TAB,
-            ${makeCodeLocation(file, 1, 1)},
+            ${makeCodeLocation(source, 1, 1)},
             APPLY.empty,
             [APPLY_ARGUMENT_0, APPLY_ARGUMENT_1, APPLY_ARGUMENT_2],
           );
@@ -178,7 +188,7 @@ const makeCodeLocation = ({ url, content }, line, column) =>
             APPLY_RETURNED = false;
             APPLY.recordThrow(
               APPLY_BUNDLE_TAB,
-              ${makeCodeLocation(file, 1, 1)},
+              ${makeCodeLocation(source, 1, 1)},
               APPLY_ERROR,
             );
             throw APPLY_ERROR;
@@ -186,7 +196,7 @@ const makeCodeLocation = ({ url, content }, line, column) =>
             if (APPLY_RETURNED) {
               APPLY.recordReturn(
                 APPLY_BUNDLE_TAB,
-                ${makeCodeLocation(file, 1, 1)},
+                ${makeCodeLocation(source, 1, 1)},
                 APPLY_RETURN,
               );
             }
@@ -200,14 +210,13 @@ const makeCodeLocation = ({ url, content }, line, column) =>
 
 // generator //
 {
-  const file = {
-    url: "protocol://host/script.js",
-    content: "(function* () { yield* 123; });",
-  };
+  const source = createSource(
+    "protocol://host/script.js",
+    "(function* () { yield* 123; });",
+  );
   assertEqual(
     instrument({
-      file,
-      type: "script",
+      source,
       instrumented: true,
     }),
     normalize(
@@ -221,7 +230,7 @@ const makeCodeLocation = ({ url, content }, line, column) =>
             APPLY_YIELD_TAB;
           APPLY.recordApply(
             APPLY_BUNDLE_TAB,
-            ${makeCodeLocation(file, 1, 1)},
+            ${makeCodeLocation(source, 1, 1)},
             this,
             [],
           );
@@ -240,7 +249,7 @@ const makeCodeLocation = ({ url, content }, line, column) =>
             APPLY_RETURNED = false;
             APPLY.recordThrow(
               APPLY_BUNDLE_TAB,
-              ${makeCodeLocation(file, 1, 1)},
+              ${makeCodeLocation(source, 1, 1)},
               APPLY_ERROR,
             );
             throw APPLY_ERROR;
@@ -248,7 +257,7 @@ const makeCodeLocation = ({ url, content }, line, column) =>
             if (APPLY_RETURNED) {
               APPLY.recordReturn(
                 APPLY_BUNDLE_TAB,
-                ${makeCodeLocation(file, 1, 1)},
+                ${makeCodeLocation(source, 1, 1)},
                 APPLY_RETURN,
               );
             }
@@ -262,18 +271,19 @@ const makeCodeLocation = ({ url, content }, line, column) =>
 
 // asynchronous //
 {
-  const file = {
-    url: "protocol://host/script.js",
-    content: `(async () => {
+  const source = createSource(
+    "protocol://host/script.js",
+    `
+      (async () => {
         try { await 123; }
         catch (error) { 456; }
         finally { 789; }
-      });`,
-  };
+      });
+    `,
+  );
   assertEqual(
     instrument({
-      file,
-      type: "script",
+      source,
       instrumented: true,
     }),
     normalize(
@@ -287,7 +297,7 @@ const makeCodeLocation = ({ url, content }, line, column) =>
             APPLY_AWAIT_TAB;
           APPLY.recordApply(
             APPLY_BUNDLE_TAB,
-            ${makeCodeLocation(file, 1, 1)},
+            ${makeCodeLocation(source, 2, 7)},
             APPLY.empty,
             [],
           );
@@ -323,7 +333,7 @@ const makeCodeLocation = ({ url, content }, line, column) =>
             APPLY_RETURNED = false;
             APPLY.recordThrow(
               APPLY_BUNDLE_TAB,
-              ${makeCodeLocation(file, 1, 1)},
+              ${makeCodeLocation(source, 2, 7)},
               APPLY_ERROR,
             );
             throw APPLY_ERROR;
@@ -331,7 +341,7 @@ const makeCodeLocation = ({ url, content }, line, column) =>
             if (APPLY_RETURNED) {
               APPLY.recordReturn(
                 APPLY_BUNDLE_TAB,
-                ${makeCodeLocation(file, 1, 1)},
+                ${makeCodeLocation(source, 2, 7)},
                 APPLY_RETURN,
               );
             }
@@ -346,9 +356,9 @@ const makeCodeLocation = ({ url, content }, line, column) =>
 // not instrumented //
 assertEqual(
   instrument({
-    file: {
-      url: "protocol://host/script.js",
-      content: `
+    source: createSource(
+      "protocol://host/script.js",
+      `
         (async function* () {
           await 'promise';
           yield 'iterator';
@@ -356,8 +366,7 @@ assertEqual(
           return 123;
         });
       `,
-    },
-    type: "script",
+    ),
     instrumented: false,
   }),
   normalize(
@@ -376,11 +385,10 @@ assertEqual(
 // module >> try without finally //
 assertEqual(
   instrument({
-    file: {
-      url: "protocol://host/script.js",
-      content: "try { 123; } catch { 456; }",
-    },
-    type: "module",
+    source: createSource(
+      "protocol://host/script.js",
+      "try { 123; } catch { 456; } export default 789;",
+    ),
     instrumented: true,
   }),
   normalize(
@@ -400,6 +408,7 @@ assertEqual(
           456;
         }
       }
+      export default 789;
     `,
     "module",
   ),
@@ -408,11 +417,10 @@ assertEqual(
 // module >> try without catch //
 assertEqual(
   instrument({
-    file: {
-      url: "protocol://host/script.js",
-      content: "try { 123; } finally { 456; }",
-    },
-    type: "module",
+    source: createSource(
+      "protocol://host/script.js",
+      "try { 123; } finally { 456; } export default 789;",
+    ),
     instrumented: true,
   }),
   normalize(
@@ -431,6 +439,7 @@ assertEqual(
       } finally {
         456;
       }
+      export default 789;
     `,
     "module",
   ),
@@ -439,11 +448,7 @@ assertEqual(
 // CallExpression //
 assertEqual(
   instrument({
-    file: {
-      url: "protocol://host/script.js#hash",
-      content: "f();",
-    },
-    type: "script",
+    source: createSource("protocol://host/script.js#hash", "f();"),
     instrumented: false,
   }),
   normalize("f()", "script"),
@@ -452,11 +457,7 @@ assertEqual(
 // CallExpression >> eval //
 assertEqual(
   instrument({
-    file: {
-      url: "protocol://host/script.js",
-      content: "eval(123, 456);",
-    },
-    type: "script",
+    source: createSource("protocol://host/script.js", "eval(123, 456);"),
     instrumented: false,
   }),
   normalize(

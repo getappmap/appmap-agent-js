@@ -1,7 +1,6 @@
-parse.mjs
 lookup.mjs
 entity.mjs
 digest.mjs
 exclusion.mjs
-source.mjs
+module.mjs
 index.mjs

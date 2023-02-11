@@ -1,18 +1,33 @@
 import {
-  extractSourceMapUrl,
-  createMirrorSourceMap,
-  createSourceMap,
+  extractMappingUrl,
+  createMapping,
+  createMirrorMapping,
+  getMappingSourceArray,
+  updateMappingSource,
+} from "../../mapping/index.mjs";
+import {
+  createSource,
+  isSourceEmpty,
+  getSourceUrl,
 } from "../../source/index.mjs";
 import { readFile } from "../../file/index.mjs";
 import { logDebug } from "../../log/index.mjs";
 
-export const loadSourceMap = (file, map) => {
+export const fillSourceMap = (mapping) => {
+  for (const url of getMappingSourceArray(mapping)
+    .filter(isSourceEmpty)
+    .map(getSourceUrl)) {
+    updateMappingSource(mapping, createSource(url, readFile(url)));
+  }
+};
+
+export const loadSourceMap = (source, map) => {
   if (map !== null) {
-    return createSourceMap(map);
+    return createMapping(map);
   } else {
-    const maybe_url = extractSourceMapUrl(file);
+    const maybe_url = extractMappingUrl(source);
     if (maybe_url === null) {
-      return createMirrorSourceMap(file);
+      return createMirrorMapping(source);
     } else {
       let content;
       try {
@@ -21,13 +36,13 @@ export const loadSourceMap = (file, map) => {
         logDebug(
           "Cannot read source-map file at %j extracted from %j >> %O",
           maybe_url,
-          file.url,
+          getSourceUrl(source),
           error,
         );
-        return createMirrorSourceMap(file);
+        return createMirrorMapping(source);
       }
-      return createSourceMap({
-        url: maybe_url.startsWith("data:") ? file.url : maybe_url,
+      return createMapping({
+        url: maybe_url.startsWith("data:") ? getSourceUrl(source) : maybe_url,
         content,
       });
     }

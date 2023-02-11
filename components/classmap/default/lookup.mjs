@@ -1,5 +1,5 @@
-import { logInfoWhen } from "../../../log/index.mjs";
-import { hasOwnProperty } from "../../../util/index.mjs";
+import { logInfoWhen } from "../../log/index.mjs";
+import { hasOwnProperty } from "../../util/index.mjs";
 
 const {
   String,

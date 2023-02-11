@@ -1,68 +1,32 @@
 import * as Astring from "astring";
-import * as Acorn from "acorn";
-import { logError, logDebug } from "../../log/index.mjs";
-import { generateGet } from "../../util/index.mjs";
-import { ExternalAppmapError } from "../../error/index.mjs";
-import { getSources } from "../../source/index.mjs";
-import { lookupSpecifier } from "../../specifier/index.mjs";
+import { logDebug } from "../../log/index.mjs";
+import { getMappingSourceArray } from "../../mapping/index.mjs";
+import {
+  parseSource,
+  getSourceUrl,
+  getSourceContent,
+} from "../../source/index.mjs";
+import { createExclusion, addExclusionSource } from "./exclusion.mjs";
 import { visit } from "./visit.mjs";
 
-const { Set } = globalThis;
-
 const { generate: generateEstree } = Astring;
-const { parse: parseAcorn } = Acorn;
-
-const getHead = generateGet("head");
-const getBody = generateGet("body");
-const getUrl = generateGet("url");
 
 export const createInstrumentation = (configuration) => ({
   configuration,
 });
 
-const parseEstree = (type, content, url) => {
-  try {
-    return parseAcorn(content, {
-      allowHashBang: true,
-      sourceType: type,
-      allowAwaitOutsideFunction: type === "module",
-      ecmaVersion: "latest",
-      locations: true,
-    });
-  } catch (error) {
-    logError("Failed to parse file %j as %s >> %O", url, type, error);
-    throw new ExternalAppmapError("Failed to parse js file");
-  }
-};
-
-export const instrument = (
-  { configuration },
-  { url, type, content },
-  mapping,
-) => {
-  const sources = getSources(mapping)
-    .map(({ url, content }) => {
-      const { enabled } = lookupSpecifier(
-        configuration.packages,
-        url,
-        configuration["default-package"],
-      );
-      logDebug(
-        "%s source file %j",
-        enabled ? "Instrumenting" : "Not instrumenting",
-        url,
-      );
-      return {
-        head: enabled,
-        body: {
-          url,
-          content,
-        },
-      };
-    })
-    .filter(getHead)
-    .map(getBody);
-  if (sources.length === 0) {
+export const instrument = ({ configuration }, source, mapping) => {
+  const url = getSourceUrl(source);
+  const content = getSourceContent(source);
+  const sources = getMappingSourceArray(mapping);
+  const exclusion = createExclusion(
+    configuration,
+    sources.length === 1 && sources[0] === source,
+  );
+  const included_source_array = sources.filter((source) =>
+    addExclusionSource(exclusion, source),
+  );
+  if (included_source_array.length === 0) {
     logDebug(
       "Not instrumenting file %j because it has no allowed sources",
       url,
@@ -77,21 +41,21 @@ export const instrument = (
         "Not instrumenting file %j because instrumentation hooks (apply and eval) are disabled",
         url,
       );
-      return { url, content, sources };
+      return { url, content, sources: included_source_array };
     } else {
       logDebug("Instrumenting file %j", url);
       return {
         url,
         content: generateEstree(
-          visit(parseEstree(type, content, url), {
+          visit(parseSource(source), {
             url,
-            whitelist: new Set(sources.map(getUrl)),
+            exclusion,
             eval: configuration.hooks.eval,
             apply: configuration.hooks.apply,
             mapping,
           }),
         ),
-        sources,
+        sources: included_source_array,
       };
     }
   }

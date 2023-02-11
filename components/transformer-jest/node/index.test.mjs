@@ -151,6 +151,7 @@ const {
     extendConfiguration(
       createConfiguration("file:///A:/home/"),
       {
+        "postmortem-function-exclusion": true,
         hooks: {
           apply: false,
           cjs: false,

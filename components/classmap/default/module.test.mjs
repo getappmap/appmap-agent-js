@@ -1,19 +1,22 @@
-import { assertEqual, assertDeepEqual } from "../../../__fixture__.mjs";
+import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
+import { createSource } from "../../source/index.mjs";
 import {
-  createSource,
-  getSourceRelativeUrl,
-  lookupSourceClosure,
-  toSourceClassmap,
-} from "./source.mjs";
+  createModule,
+  getModuleRelativeUrl,
+  lookupModuleClosure,
+  toModuleClassmap,
+} from "./module.mjs";
 
 {
-  const source = createSource({
-    url: "protocol://host/home/dirname/basename.js",
-    content: `
-      function f (x) {}
-      function g (y) {}
-      var o = {};
-    `,
+  const module = createModule({
+    source: createSource(
+      "protocol://host/home/dirname/basename.js",
+      `
+        function f (x) {}
+        function g (y) {}
+        var o = {};
+      `,
+    ),
     pruning: true,
     inline: true,
     shallow: true,
@@ -40,7 +43,7 @@ import {
     ],
   });
 
-  assertEqual(getSourceRelativeUrl(source), "dirname/basename.js");
+  assertEqual(getModuleRelativeUrl(module), "dirname/basename.js");
 
   // present function //
   {
@@ -56,26 +59,26 @@ import {
       },
     };
     assertDeepEqual(
-      lookupSourceClosure(source, { line: 2, column: 6 }, {}),
+      lookupModuleClosure(module, { line: 2, column: 8 }, {}),
       info,
     );
     assertDeepEqual(
-      lookupSourceClosure(source, { line: 2, column: 6 }, {}),
+      lookupModuleClosure(module, { line: 2, column: 8 }, {}),
       info,
     );
     assertDeepEqual(
-      lookupSourceClosure(source, { line: 2, column: 10 }, {}),
+      lookupModuleClosure(module, { line: 2, column: 10 }, {}),
       info,
     );
   }
 
   // excluded function //
-  assertEqual(lookupSourceClosure(source, { line: 3, column: 6 }, {}), null);
+  assertEqual(lookupModuleClosure(module, { line: 3, column: 8 }, {}), null);
 
   // missing function //
-  assertEqual(lookupSourceClosure(source, { line: 4, column: 6 }, {}), null);
+  assertEqual(lookupModuleClosure(module, { line: 4, column: 8 }, {}), null);
 
-  assertDeepEqual(toSourceClassmap(source), [
+  assertDeepEqual(toModuleClassmap(module), [
     {
       type: "class",
       name: "basename",

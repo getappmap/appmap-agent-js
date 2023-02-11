@@ -1,11 +1,12 @@
-import { assert } from "../../../util/index.mjs";
-import { getUrlBasename, toAbsoluteUrl } from "../../../url/index.mjs";
-import { InternalAppmapError } from "../../../error/index.mjs";
+import { assert } from "../../util/index.mjs";
+import { getUrlBasename, toAbsoluteUrl } from "../../url/index.mjs";
+import { InternalAppmapError } from "../../error/index.mjs";
 import {
+  getSourceContent,
   getLeadingCommentArray,
   printComment,
   extractCommentLabelArray,
-} from "./parse.mjs";
+} from "../../source/index.mjs";
 
 const { String, parseInt } = globalThis;
 
@@ -56,14 +57,14 @@ export const makeFunctionEntity = (
     reference,
     shallow: context.shallow,
     parameters: node.params.map((param) =>
-      context.content.substring(param.start, param.end),
+      getSourceContent(context.source).substring(param.start, param.end),
     ),
     children,
     name: maybe_name ?? context.anonymous,
     location: `${context.relative}:${String(node.loc.start.line)}`,
     static: false,
     source: context.inline
-      ? context.content.substring(node.start, node.end)
+      ? getSourceContent(context.source).substring(node.start, node.end)
       : null,
     comment: printCommentArray(comments),
     labels: comments.flatMap(extractCommentLabelArray),

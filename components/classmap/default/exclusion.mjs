@@ -1,4 +1,4 @@
-import { InternalAppmapError } from "../../../error/index.mjs";
+import { InternalAppmapError } from "../../error/index.mjs";
 import {
   getEntityName,
   getEntityQualifiedName,

@@ -4,7 +4,8 @@ import {
   createConfiguration,
   extendConfiguration,
 } from "../../../configuration/index.mjs";
-import { createClassmap, addClassmapSource } from "../classmap/index.mjs";
+import { createSource } from "../../../source/index.mjs";
+import { createClassmap, addClassmapSource } from "../../../classmap/index.mjs";
 import { digestEventTrace } from "./index.mjs";
 
 const makeEvent = (site, tab, payload) => ({
@@ -114,10 +115,10 @@ for (const shallow of [true, false]) {
       "protocol://host/home/",
     ),
   );
-  addClassmapSource(classmap, {
-    url: "protocol://host/home/filename.js",
-    content: "function f (x) {}",
-  });
+  addClassmapSource(
+    classmap,
+    createSource("protocol://host/home/filename.js", "function f (x) {}"),
+  );
   const location = stringifyLocation({
     url: "protocol://host/home/filename.js",
     hash: null,
@@ -154,25 +155,25 @@ for (const shallow of [true, false]) {
     line: 1,
     column: 0,
   });
+  const bundle = {
+    type: "bundle",
+    begin: makeEvent("begin", 123, makeApplyPayload(location)),
+    children: [
+      {
+        type: "jump",
+        before: makeEvent("before", 456, makeQueryPayload()),
+        after: makeEvent("after", 456, makeAnswerPayload()),
+      },
+    ],
+    end: makeEvent("end", 123, makeReturnPayload(location)),
+  };
   assertDeepEqual(
     digestEventTrace(
-      [
-        {
-          type: "bundle",
-          begin: makeEvent("begin", 123, makeApplyPayload(location)),
-          children: [
-            {
-              type: "jump",
-              before: makeEvent("before", 456, makeQueryPayload()),
-              after: makeEvent("after", 456, makeAnswerPayload()),
-            },
-          ],
-          end: makeEvent("end", 123, makeReturnPayload(location)),
-        },
-      ],
+      // double bundle to exercise cache
+      [bundle, bundle],
       createClassmap(createConfiguration("protocol://host/home")),
     ).map(getEvent),
-    ["call", "return"],
+    ["call", "return", "call", "return"],
   );
 }
 

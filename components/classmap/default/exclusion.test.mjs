@@ -2,8 +2,8 @@ import {
   // assertEqual,
   assertThrow,
   assertDeepEqual,
-} from "../../../__fixture__.mjs";
-import { parseEstree } from "./parse.mjs";
+} from "../../__fixture__.mjs";
+import { createSource, parseSource } from "../../source/index.mjs";
 import { digestEstreeRoot } from "./digest.mjs";
 import { makeClassEntity, excludeEntity, getEntitySummary } from "./entity.mjs";
 import { compileExclusionArray } from "./exclusion.mjs";
@@ -60,9 +60,11 @@ assertDeepEqual(
 
 assertDeepEqual(
   digestEstreeRoot(
-    parseEstree(
-      "protocol://host/path.js",
-      "var o = {k: /* @label l1 l2 */ () => {}};",
+    parseSource(
+      createSource(
+        "protocol://host/path.js",
+        "var o = {k: /* @label l1 l2 */ () => {}};",
+      ),
     ),
     default_context,
   )
