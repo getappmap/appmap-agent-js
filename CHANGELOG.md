@@ -1,3 +1,16 @@
+# [13.4.0](https://github.com/getappmap/appmap-agent-js/compare/v13.3.0...v13.4.0) (2023-02-11)
+
+
+### Bug Fixes
+
+* reverse order of apply summary ([1a29c1d](https://github.com/getappmap/appmap-agent-js/commit/1a29c1d540baae711c9dd675c1aee840f655b226))
+
+
+### Features
+
+* support for function exclusion on the frontend ([a5c968e](https://github.com/getappmap/appmap-agent-js/commit/a5c968e864ef36b95f85785b0fef51ad4c4b6a7a))
+* support for smart postmortem-function-exclusion ([259574b](https://github.com/getappmap/appmap-agent-js/commit/259574bf38482695a693a3563d2f8789a88d4d52))
+
 # [13.3.0](https://github.com/getappmap/appmap-agent-js/compare/v13.2.1...v13.3.0) (2023-02-10)
 
 
