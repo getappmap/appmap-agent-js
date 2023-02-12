@@ -3,16 +3,13 @@ import {
   mkdir as mkdirAsync,
   writeFile as writeFileAsync,
 } from "node:fs/promises";
-import {
-  InternalAppmapError,
-  ExternalAppmapError,
-} from "../../error/index.mjs";
+import { ExternalAppmapError } from "../../error/index.mjs";
 import {
   toAbsoluteUrl,
   getUrlBasename,
   getUrlExtension,
 } from "../../url/index.mjs";
-import { hasOwnProperty, assert } from "../../util/index.mjs";
+import { hasOwnProperty } from "../../util/index.mjs";
 import { logError, logDebug, logInfo, logWarning } from "../../log/index.mjs";
 import {
   pickPlatformSpecificCommand,
@@ -28,9 +25,8 @@ import {
 } from "../../receptor/index.mjs";
 import {
   createBackend,
-  sendBackend,
   compileBackendTrackArray,
-  isBackendSessionEmpty,
+  isBackendEmpty,
 } from "../../backend/index.mjs";
 import { spawnAsync, killAllAsync } from "./spawn.mjs";
 import { whereAsync } from "./where.mjs";
@@ -47,9 +43,6 @@ const {
 
 const ABRUPT_TIMEOUT = 1000;
 const FLUSH_TIMEOUT = 1000;
-
-// Support for remote recording: (GET|POST|DELETE) /_appmap/record
-const DEFAULT_SESSION = "_appmap";
 
 const isCommandNonNull = ({ command }) => command !== null;
 
@@ -83,25 +76,6 @@ const spawnWithHandlerAsync = async (command, children, tokens, located) => {
   }
 };
 
-const sendBatchBackend = (backend, session, message) => {
-  assert(
-    sendBackend(backend, session, message),
-    "invalid batch message",
-    InternalAppmapError,
-  );
-};
-
-const defineConfigurationSession = (configuration) => {
-  if (configuration.session === null) {
-    return {
-      ...configuration,
-      session: DEFAULT_SESSION,
-    };
-  } else {
-    return configuration;
-  }
-};
-
 const refreshUrl = (urls, url) => {
   const basename = getUrlBasename(url);
   const extension = getUrlExtension(url);
@@ -114,17 +88,8 @@ const refreshUrl = (urls, url) => {
   return url;
 };
 
-export const flushBackendSessionAsync = async (
-  urls,
-  backend,
-  session,
-  abrupt,
-) => {
-  for (const { url, content } of compileBackendTrackArray(
-    backend,
-    session,
-    abrupt,
-  )) {
+export const flushBackendAsync = async (urls, backend, abrupt) => {
+  for (const { url, content } of compileBackendTrackArray(backend, abrupt)) {
     const fresh_url = refreshUrl(urls, url);
     await mkdirAsync(new URL(".", fresh_url), { recursive: true });
     await writeFileAsync(
@@ -149,11 +114,8 @@ export const mainAsync = async (process, configuration) => {
   const backend = createBackend(configuration);
   const receptor = await openReceptorAsync(configuration, backend);
   const runConfigurationAsync = async (configuration, env) => {
-    configuration = defineConfigurationSession(configuration);
     configuration = resolveConfigurationAutomatedRecorder(configuration, env);
     configuration = adaptReceptorConfiguration(receptor, configuration);
-    const { session } = configuration;
-    sendBatchBackend(backend, session, { type: "open" });
     const { tokens } = configuration.command;
     const command = await compileConfigurationCommandAsync(configuration, env);
     logDebug("spawn child command = %j", command);
@@ -164,7 +126,7 @@ export const mainAsync = async (process, configuration) => {
     const flush = async () => {
       timer = null;
       if (!done) {
-        await flushBackendSessionAsync(urls, backend, session, false);
+        await flushBackendAsync(urls, backend, false);
         timer = setTimeout(flush, FLUSH_TIMEOUT);
       }
     };
@@ -187,14 +149,13 @@ export const mainAsync = async (process, configuration) => {
     } else {
       logInfo("> Exited with: %j", status);
     }
-    await flushBackendSessionAsync(urls, backend, session, false);
-    if (!isBackendSessionEmpty(backend, session)) {
+    await flushBackendAsync(urls, backend, false);
+    if (!isBackendEmpty(backend)) {
       await new Promise((resolve) => {
         setTimeout(resolve, ABRUPT_TIMEOUT);
       });
-      await flushBackendSessionAsync(urls, backend, session, true);
+      await flushBackendAsync(urls, backend, true);
     }
-    sendBatchBackend(backend, session, { type: "close" });
     return { tokens, signal, status };
   };
   const configurations = [

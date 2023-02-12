@@ -37,10 +37,11 @@ export const createTrackServer = (configuration, backend) => {
         logError("Could not parse request path %j", path);
         return failure;
       } else {
-        const [, session, record] = parts;
+        // Session is currently not used but it will be in the future.
+        const [, , record] = parts;
         if (method === "POST") {
           if (
-            sendBackend(backend, session, {
+            sendBackend(backend, {
               type: "start",
               track: record,
               configuration: extendConfiguration(
@@ -55,29 +56,19 @@ export const createTrackServer = (configuration, backend) => {
             return failure;
           }
         } else if (method === "GET") {
-          const maybe_boolean = hasBackendTrack(backend, session, record);
-          if (maybe_boolean === null) {
-            return failure;
-          } else {
-            return {
-              ...success,
-              body: { enabled: maybe_boolean },
-            };
-          }
+          return {
+            ...success,
+            body: { enabled: hasBackendTrack(backend, record) },
+          };
         } else if (method === "DELETE") {
           if (
-            sendBackend(backend, session, {
+            sendBackend(backend, {
               type: "stop",
               track: record,
               termination: { type: "manual" },
             })
           ) {
-            const maybe_trace = compileBackendTrack(
-              backend,
-              session,
-              record,
-              true,
-            );
+            const maybe_trace = compileBackendTrack(backend, record, true);
             assert(
               maybe_trace !== null,
               "expected compiled trace after stop",

@@ -4,12 +4,12 @@ import {
   extendConfiguration,
 } from "../../configuration/index.mjs";
 import {
-  createSession,
-  sendSession,
-  hasSessionTrack,
-  compileSessionTrack,
-  compileSessionTrackArray,
-  isSessionEmpty,
+  createBackend,
+  sendBackend,
+  hasBackendTrack,
+  compileBackendTrack,
+  compileBackendTrackArray,
+  isBackendEmpty,
 } from "./session.mjs";
 
 const configuration = extendConfiguration(
@@ -27,16 +27,16 @@ const configuration = extendConfiguration(
 
 // stop one && standard message //
 {
-  const session = createSession(configuration);
-  assertEqual(hasSessionTrack(session, "record"), false);
+  const backend = createBackend(configuration);
+  assertEqual(hasBackendTrack(backend, "record"), false);
   const message1 = {
     type: "start",
     track: "record",
     configuration,
   };
-  assertEqual(sendSession(session, message1), true);
-  assertEqual(sendSession(session, message1), false); // duplicate track
-  assertEqual(hasSessionTrack(session, "record"), true);
+  assertEqual(sendBackend(backend, message1), true);
+  assertEqual(sendBackend(backend, message1), false); // duplicate track
+  assertEqual(hasBackendTrack(backend, "record"), true);
   const message2 = {
     type: "error",
     error: {
@@ -44,8 +44,8 @@ const configuration = extendConfiguration(
       print: "123",
     },
   };
-  assertEqual(sendSession(session, message2), true);
-  assertDeepEqual(compileSessionTrack(session, "record", false), null);
+  assertEqual(sendBackend(backend, message2), true);
+  assertDeepEqual(compileBackendTrack(backend, "record", false), null);
   const message3 = {
     type: "stop",
     track: "record",
@@ -53,9 +53,9 @@ const configuration = extendConfiguration(
       type: "manual",
     },
   };
-  assertEqual(sendSession(session, message3), true);
-  assertEqual(isSessionEmpty(session), false);
-  assertDeepEqual(compileSessionTrack(session, "record", true), {
+  assertEqual(sendBackend(backend, message3), true);
+  assertEqual(isBackendEmpty(backend), false);
+  assertDeepEqual(compileBackendTrack(backend, "record", true), {
     url: "protocol://host/base/dirname/process/basename.appmap.json",
     content: {
       configuration,
@@ -63,32 +63,32 @@ const configuration = extendConfiguration(
       termination: { type: "manual" },
     },
   });
-  assertEqual(isSessionEmpty(session), true);
-  assertEqual(compileSessionTrack(session, "record", true), null); // missing track
-  assertEqual(sendSession(session, message3), false); // missing track
+  assertEqual(isBackendEmpty(backend), true);
+  assertEqual(compileBackendTrack(backend, "record", true), null); // missing track
+  assertEqual(sendBackend(backend, message3), false); // missing track
 }
 
 // stop all && source message //
 {
-  const session = createSession(configuration);
+  const backend = createBackend(configuration);
   const message1 = {
     type: "source",
     url: "protocol://host/before-start.js",
     content: "function beforeStart () {}",
   };
-  assertEqual(sendSession(session, message1), true);
+  assertEqual(sendBackend(backend, message1), true);
   const message2 = {
     type: "start",
     track: "record",
     configuration,
   };
-  assertEqual(sendSession(session, message2), true);
+  assertEqual(sendBackend(backend, message2), true);
   const message3 = {
     type: "source",
     url: "protocol://host/after-start.js",
     content: "function afterStart () {}",
   };
-  assertEqual(sendSession(session, message3), true);
+  assertEqual(sendBackend(backend, message3), true);
   const message4 = {
     type: "stop",
     track: null,
@@ -96,8 +96,8 @@ const configuration = extendConfiguration(
       type: "manual",
     },
   };
-  assertEqual(sendSession(session, message4), true),
-    assertDeepEqual(compileSessionTrackArray(session, true), [
+  assertEqual(sendBackend(backend, message4), true),
+    assertDeepEqual(compileBackendTrackArray(backend, true), [
       {
         url: "protocol://host/base/dirname/process/basename.appmap.json",
         content: {
@@ -107,5 +107,5 @@ const configuration = extendConfiguration(
         },
       },
     ]);
-  assertDeepEqual(compileSessionTrackArray(session, true), []);
+  assertDeepEqual(compileBackendTrackArray(backend, true), []);
 }

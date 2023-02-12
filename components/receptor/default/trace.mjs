@@ -33,15 +33,12 @@ export const createTraceServer = (backend) => {
   const server = createServer();
   server.on("connection", (socket) => {
     patchSocket(socket);
-    socket.on("message", (session) => {
-      socket.removeAllListeners("message");
-      socket.on("message", (content) => {
-        assert(
-          sendBackend(backend, session, inflateMessage(parseJSON(content))),
-          "backend error",
-          InternalAppmapError,
-        );
-      });
+    socket.on("message", (content) => {
+      assert(
+        sendBackend(backend, inflateMessage(parseJSON(content))),
+        "backend error",
+        InternalAppmapError,
+      );
     });
   });
   return server;

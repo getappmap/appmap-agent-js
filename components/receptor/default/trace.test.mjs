@@ -5,11 +5,7 @@ import NetSocketMessaging from "net-socket-messaging";
 import { getUuid } from "../../uuid/random/index.mjs";
 import { getTmpUrl } from "../../path/index.mjs";
 import { toAbsoluteUrl } from "../../url/index.mjs";
-import {
-  createBackend,
-  sendBackend,
-  compileBackendTrack,
-} from "../../backend/index.mjs";
+import { createBackend, compileBackendTrack } from "../../backend/index.mjs";
 import {
   createConfiguration,
   extendConfiguration,
@@ -55,10 +51,6 @@ socket.connect(port);
 await new Promise((resolve) => {
   socket.on("connect", resolve);
 });
-
-sendBackend(backend, "session", { type: "open" });
-
-socket.write(createMessage("session"));
 
 const message1 = {
   type: "start",
@@ -107,7 +99,7 @@ await new Promise((resolve) => {
   socket.on("close", resolve);
 });
 
-assertDeepEqual(compileBackendTrack(backend, "session", "record", true), {
+assertDeepEqual(compileBackendTrack(backend, "record", true), {
   url: toAbsoluteUrl(
     `${uuid}/dirname/process/basename.appmap.json`,
     getTmpUrl(),
@@ -118,8 +110,6 @@ assertDeepEqual(compileBackendTrack(backend, "session", "record", true), {
     termination: { type: "manual" },
   },
 });
-
-sendBackend(backend, "session", { type: "close" });
 
 server.close();
 

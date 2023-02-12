@@ -46,15 +46,15 @@ const processStopMessage = ({ tracks }, key, termination) => {
   }
 };
 
-export const createSession = (configuration) => ({
+export const createBackend = (configuration) => ({
   configuration,
   sources: [],
   tracks: new Map(),
 });
 
-export const hasSessionTrack = ({ tracks }, key) => tracks.has(key);
+export const hasBackendTrack = ({ tracks }, key) => tracks.has(key);
 
-export const compileSessionTrack = ({ tracks }, key, abrupt) => {
+export const compileBackendTrack = ({ tracks }, key, abrupt) => {
   if (tracks.has(key)) {
     const track = tracks.get(key);
     if (abrupt || isTrackComplete(track)) {
@@ -68,39 +68,39 @@ export const compileSessionTrack = ({ tracks }, key, abrupt) => {
   }
 };
 
-export const compileSessionTrackArray = (session, abrupt) =>
-  toArray(session.tracks.keys())
-    .map((key) => compileSessionTrack(session, key, abrupt))
+export const compileBackendTrackArray = (backend, abrupt) =>
+  toArray(backend.tracks.keys())
+    .map((key) => compileBackendTrack(backend, key, abrupt))
     .filter(isNotNull);
 
-export const isSessionEmpty = ({ tracks }) => tracks.size === 0;
+export const isBackendEmpty = ({ tracks }) => tracks.size === 0;
 
-export const sendSession = (session, message) => {
+export const sendBackend = (backend, message) => {
   logDebug("message >> %j", message);
-  if (session.configuration.validate.message) {
+  if (backend.configuration.validate.message) {
     validateMessage(message);
   }
   const { type } = message;
   if (type === "start") {
-    return processStartMessage(session, message.track, message.configuration);
+    return processStartMessage(backend, message.track, message.configuration);
   } else if (type === "stop") {
     const { track: key } = message;
     if (key === null) {
-      return toArray(session.tracks.keys())
-        .map((key) => processStopMessage(session, key, message.termination))
+      return toArray(backend.tracks.keys())
+        .map((key) => processStopMessage(backend, key, message.termination))
         .every(identity);
     } else {
-      return processStopMessage(session, key, message.termination);
+      return processStopMessage(backend, key, message.termination);
     }
   } else if (type === "source") {
     const source = fromSourceMessage(message);
-    session.sources.push(source);
-    for (const track of session.tracks.values()) {
+    backend.sources.push(source);
+    for (const track of backend.tracks.values()) {
       addTrackSource(track, source);
     }
     return true;
   } else {
-    for (const track of session.tracks.values()) {
+    for (const track of backend.tracks.values()) {
       sendTrack(track, message);
     }
     return true;

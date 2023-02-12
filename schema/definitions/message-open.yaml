@@ -1,7 +1,0 @@
-type: object
-additionalProperties: false
-required:
-  - type
-properties:
-  type:
-    const: open
