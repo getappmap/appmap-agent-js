@@ -7,8 +7,6 @@
 import { InternalAppmapError } from "../../../error/index.mjs";
 import { createCounter, incrementCounter } from "../../../util/index.mjs";
 
-const makeFrame = (enter, children, leave) => ({ enter, children, leave });
-
 const getCurrentFrameArray = (frames, stack) =>
   stack.length === 0 ? frames : stack[stack.length - 1].children;
 
@@ -40,7 +38,11 @@ export const stackify = (events) => {
   const counter = createFreshCounter(events);
   for (const event of events) {
     if (event.site === "begin" || event.site === "after") {
-      stack.push(makeFrame(event, [], null));
+      stack.push({
+        enter: event,
+        children: [],
+        leave: null,
+      });
     } else if (event.site === "end" || event.site === "before") {
       if (stack.length > 0) {
         const frame = stack.pop();
@@ -48,17 +50,17 @@ export const stackify = (events) => {
         getCurrentFrameArray(root, stack).push(frame);
       } else {
         root = [
-          makeFrame(
-            createJumpEvent(
+          {
+            enter: createJumpEvent(
               event.session,
               "after",
               incrementCounter(counter),
               event.group,
               event.time,
             ),
-            root,
-            event,
-          ),
+            children: root,
+            leave: event,
+          },
         ];
       }
     } /* c8 ignore start */ else {
