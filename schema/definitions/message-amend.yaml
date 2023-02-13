@@ -2,12 +2,15 @@ type: object
 additionalProperties: false
 required:
   - type
+  - session
   - site
   - tab
   - payload
 properties:
   type:
     const: amend
+  session:
+    $ref: session
   site:
     $ref: site
   tab:

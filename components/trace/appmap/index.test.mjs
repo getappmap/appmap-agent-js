@@ -68,6 +68,7 @@ assertDeepEqual(
     [
       {
         type: "event",
+        session: "session",
         site: "begin",
         tab: tabs.event1,
         group: 0,
@@ -81,6 +82,7 @@ assertDeepEqual(
       },
       {
         type: "event",
+        session: "session",
         site: "begin",
         tab: tabs.event2,
         group: 0,
@@ -94,12 +96,14 @@ assertDeepEqual(
       },
       {
         type: "group",
+        session: "session",
         group: 0,
         child: 1,
         description: "description",
       },
       {
         type: "event",
+        session: "session",
         site: "end",
         tab: tabs.event2,
         time: 0,
@@ -115,6 +119,7 @@ assertDeepEqual(
       },
       {
         type: "event",
+        session: "session",
         site: "end",
         tab: tabs.event1,
         time: 0,
@@ -130,6 +135,7 @@ assertDeepEqual(
       },
       {
         type: "amend",
+        session: "session",
         tab: tabs.event1,
         site: "begin",
         payload: {
@@ -141,6 +147,7 @@ assertDeepEqual(
       },
       {
         type: "error",
+        session: "session",
         error: {
           type: "number",
           print: "123",

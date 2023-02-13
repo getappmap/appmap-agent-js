@@ -150,6 +150,7 @@ export const manufactureMatchingEvent = (event) => {
   }
   return {
     type: "event",
+    session: event.session,
     site,
     tab: event.tab,
     time: event.time,

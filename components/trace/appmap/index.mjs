@@ -73,6 +73,7 @@ export const compileTrace = (configuration, sources, messages, termination) => {
       events.push(
         {
           type: "event",
+          session: message.session,
           site: "begin",
           tab: 0,
           group: message.group,
@@ -85,6 +86,7 @@ export const compileTrace = (configuration, sources, messages, termination) => {
         },
         {
           type: "event",
+          session: message.session,
           site: "end",
           tab: 0,
           group: message.group,

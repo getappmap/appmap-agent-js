@@ -12,8 +12,9 @@ const makeFrame = (enter, children, leave) => ({ enter, children, leave });
 const getCurrentFrameArray = (frames, stack) =>
   stack.length === 0 ? frames : stack[stack.length - 1].children;
 
-const createJumpEvent = (site, tab, group, time) => ({
+const createJumpEvent = (session, site, tab, group, time) => ({
   type: "event",
+  session,
   site,
   tab,
   group,
@@ -45,6 +46,7 @@ export const stackify = (events) => {
         root = [
           makeFrame(
             createJumpEvent(
+              event.session,
               "after",
               incrementCounter(counter),
               event.group,
@@ -62,6 +64,7 @@ export const stackify = (events) => {
   while (stack.length > 0) {
     const frame = stack.pop();
     frame.leave = createJumpEvent(
+      frame.enter.session,
       "before",
       incrementCounter(counter),
       frame.enter.group,

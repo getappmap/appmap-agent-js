@@ -5,12 +5,15 @@ type: object
 additionalProperties: false
 required:
   - type
+  - session
   - group
   - child
   - description
 properties:
   type:
     const: group
+  session:
+    $ref: session
   group:
     $ref: group
   child:

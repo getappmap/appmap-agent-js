@@ -7,6 +7,7 @@ import { isMatchingEvent, manufactureMatchingEvent } from "./matching.mjs";
 
 const event1 = {
   type: "event",
+  session: "session",
   site: "begin",
   tab: 123,
   group: 0,

@@ -1,5 +1,6 @@
 import { now } from "../../time/index.mjs";
 import { getCurrentGroup } from "../../group/index.mjs";
+import { getUuid } from "../../uuid/index.mjs";
 import {
   createFrontend,
   getFreshTab as getFrontendFreshTab,
@@ -44,11 +45,19 @@ import {
 import { createSource } from "../../source/index.mjs";
 import { loadSourceMap, fillSourceMap } from "./source-map.mjs";
 
-export const openAgent = (configuration) => ({
-  configuration,
-  emitter: openEmitter(configuration),
-  frontend: createFrontend(configuration),
-});
+export const openAgent = (configuration) => {
+  if (configuration.session === null) {
+    configuration = {
+      ...configuration,
+      session: getUuid(),
+    };
+  }
+  return {
+    configuration,
+    emitter: openEmitter(configuration),
+    frontend: createFrontend(configuration),
+  };
+};
 
 export const closeAgent = ({ emitter }) => {
   closeEmitter(emitter);

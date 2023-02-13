@@ -65,12 +65,14 @@ assertDeepEqual(takeLocalAgentTrace(agent, "record"), {
     },
     {
       type: "group",
+      session: "uuid",
       group: 0,
       child: 123,
       description: "description",
     },
     {
       type: "event",
+      session: "uuid",
       site: "before",
       tab: 1,
       group: 0,
@@ -85,6 +87,7 @@ assertDeepEqual(takeLocalAgentTrace(agent, "record"), {
     },
     {
       type: "event",
+      session: "uuid",
       site: "after",
       tab: 1,
       group: 0,

@@ -2,6 +2,7 @@ type: object
 additionalProperties: false
 required:
   - type
+  - session
   - site
   - tab
   - group
@@ -10,6 +11,8 @@ required:
 properties:
   type:
     const: event
+  session:
+    $ref: session
   # The type of event.
   # We do not call this field `type` because it is independent from the other fields.
   # In fancy terms, we keep type fields for algebraic data types.

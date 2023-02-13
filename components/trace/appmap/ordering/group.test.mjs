@@ -3,6 +3,7 @@ import { groupStack } from "./group.mjs";
 
 const makeEvent = (site, group, payload) => ({
   type: "event",
+  session: "session",
   site,
   tab: 0,
   group,

@@ -36,7 +36,7 @@ const proceedAsync = async () => {
   const testCaseAsync = (enabled, runAsync) =>
     testHookAsync(
       HookPg,
-      { configuration: { hooks: { pg: enabled } } },
+      { configuration: { hooks: { pg: enabled }, session: "session" } },
       async () => {
         const client = new Client(auth);
         try {
@@ -51,6 +51,7 @@ const proceedAsync = async () => {
   const events = [
     {
       type: "event",
+      session: "session",
       site: "begin",
       tab: 1,
       group: 0,
@@ -61,6 +62,7 @@ const proceedAsync = async () => {
     },
     {
       type: "event",
+      session: "session",
       site: "before",
       tab: 2,
       group: 0,
@@ -78,6 +80,7 @@ const proceedAsync = async () => {
     },
     {
       type: "event",
+      session: "session",
       site: "after",
       tab: 2,
       group: 0,
@@ -88,6 +91,7 @@ const proceedAsync = async () => {
     },
     {
       type: "event",
+      session: "session",
       site: "end",
       tab: 1,
       group: 0,
@@ -162,6 +166,7 @@ const proceedAsync = async () => {
     )[1],
     {
       type: "event",
+      session: "session",
       site: "before",
       tab: 2,
       group: 0,
@@ -188,6 +193,7 @@ const proceedAsync = async () => {
     )[1],
     {
       type: "event",
+      session: "session",
       site: "before",
       tab: 2,
       group: 0,

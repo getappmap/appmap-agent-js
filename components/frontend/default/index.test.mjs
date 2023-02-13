@@ -25,6 +25,7 @@ const { Error } = globalThis;
 const configuration = extendConfiguration(
   createConfiguration("protocol://host/home"),
   {
+    session: "session",
     packages: [
       {
         regexp: "^",

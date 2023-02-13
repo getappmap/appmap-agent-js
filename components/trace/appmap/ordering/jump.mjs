@@ -13,8 +13,9 @@ const {
   Map,
 } = globalThis;
 
-const manufactureBundleEvent = (site, tab) => ({
+const manufactureBundleEvent = (session, site, tab) => ({
   type: "event",
+  session,
   site,
   tab,
   group: 0,
@@ -64,13 +65,13 @@ const manufactureBundleNode = (orphan) => {
     return makeBundleNode(orphan.open, orphan.children, orphan.close);
   } else if (orphan.open.site === "after" && orphan.close.site === "before") {
     return makeBundleNode(
-      manufactureBundleEvent("begin", 0),
+      manufactureBundleEvent(orphan.open.session, "begin", 0),
       [
         makeJumpNode(manufactureMatchingEvent(orphan.open), orphan.open),
         ...orphan.children,
         makeJumpNode(orphan.close, manufactureMatchingEvent(orphan.close)),
       ],
-      manufactureBundleEvent("end", 0),
+      manufactureBundleEvent(orphan.close.session, "end", 0),
     );
   } else if (orphan.open.site === "after" && orphan.close.site === "end") {
     return makeBundleNode(

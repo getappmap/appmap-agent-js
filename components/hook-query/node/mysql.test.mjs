@@ -44,7 +44,7 @@ const proceedAsync = async () => {
   assertDeepEqual(
     await testHookAsync(
       HookMysql,
-      { configuration: { hooks: { mysql: true } } },
+      { configuration: { hooks: { mysql: true }, session: "session" } },
       async () => {
         const connection = Mysql.createConnection(auth);
         try {
@@ -79,6 +79,7 @@ const proceedAsync = async () => {
     [
       {
         type: "event",
+        session: "session",
         site: "begin",
         tab: 1,
         group: 0,
@@ -89,6 +90,7 @@ const proceedAsync = async () => {
       },
       {
         type: "event",
+        session: "session",
         site: "before",
         tab: 2,
         group: 0,
@@ -106,6 +108,7 @@ const proceedAsync = async () => {
       },
       {
         type: "event",
+        session: "session",
         site: "after",
         tab: 2,
         group: 0,
@@ -116,6 +119,7 @@ const proceedAsync = async () => {
       },
       {
         type: "event",
+        session: "session",
         site: "end",
         tab: 1,
         group: 0,

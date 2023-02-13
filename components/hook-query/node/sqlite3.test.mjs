@@ -35,13 +35,14 @@ const database = new Database(":memory:");
 const testCaseAsync = (enabled, runAsync) =>
   testHookAsync(
     HookSqlite3,
-    { configuration: { hooks: { sqlite3: enabled } } },
+    { configuration: { hooks: { sqlite3: enabled }, session: "session" } },
     runAsync,
   );
 
 const createTrace = (sql, parameters, _error) => [
   {
     type: "event",
+    session: "session",
     site: "begin",
     tab: 1,
     group: 0,
@@ -52,6 +53,7 @@ const createTrace = (sql, parameters, _error) => [
   },
   {
     type: "event",
+    session: "session",
     site: "before",
     tab: 2,
     group: 0,
@@ -66,6 +68,7 @@ const createTrace = (sql, parameters, _error) => [
   },
   {
     type: "event",
+    session: "session",
     site: "after",
     tab: 2,
     group: 0,
@@ -76,6 +79,7 @@ const createTrace = (sql, parameters, _error) => [
   },
   {
     type: "event",
+    session: "session",
     site: "end",
     tab: 1,
     group: 0,

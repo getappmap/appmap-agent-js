@@ -1,4 +1,4 @@
-import { createCounter, incrementCounter } from "../../util/index.mjs";
+import { assert, createCounter, incrementCounter } from "../../util/index.mjs";
 import {
   createInstrumentation,
   instrument as instrumentInner,
@@ -8,6 +8,7 @@ import {
   serialize,
   getSerializationEmptyValue as getSerializationEmptyValueInner,
 } from "../../serialization/index.mjs";
+import { InternalAppmapError } from "../../error/index.mjs";
 import { toSourceMessage } from "../../source/index.mjs";
 export {
   getJumpPayload,
@@ -30,8 +31,9 @@ export {
 
 const generateFormatAmend =
   (site) =>
-  ({}, tab, payload) => ({
+  ({ session }, tab, payload) => ({
     type: "amend",
+    session,
     site,
     tab,
     payload,
@@ -39,8 +41,9 @@ const generateFormatAmend =
 
 const generateFormatEvent =
   (site) =>
-  ({}, tab, group, time, payload) => ({
+  ({ session }, tab, group, time, payload) => ({
     type: "event",
+    session,
     site,
     tab,
     time,
@@ -48,11 +51,19 @@ const generateFormatEvent =
     payload,
   });
 
-export const createFrontend = (configuration) => ({
-  counter: createCounter(0),
-  serialization: createSerialization(configuration),
-  instrumentation: createInstrumentation(configuration),
-});
+export const createFrontend = (configuration) => {
+  assert(
+    configuration.session !== null,
+    "missing session",
+    InternalAppmapError,
+  );
+  return {
+    counter: createCounter(0),
+    session: configuration.session,
+    serialization: createSerialization(configuration),
+    instrumentation: createInstrumentation(configuration),
+  };
+};
 
 export const getFreshTab = ({ counter }) => incrementCounter(counter);
 
@@ -72,8 +83,9 @@ export const instrument = ({ instrumentation }, file, mapping) => {
   };
 };
 
-export const formatError = ({ serialization }, value) => ({
+export const formatError = ({ session, serialization }, value) => ({
   type: "error",
+  session,
   error: serialize(serialization, value),
 });
 
@@ -89,8 +101,9 @@ export const formatStopTrack = ({}, track, termination) => ({
   termination,
 });
 
-export const formatGroup = ({}, group, child, description) => ({
+export const formatGroup = ({ session }, group, child, description) => ({
   type: "group",
+  session,
   group,
   child,
   description,

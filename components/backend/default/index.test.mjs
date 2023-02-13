@@ -39,6 +39,7 @@ const configuration = extendConfiguration(
   assertEqual(hasBackendTrack(backend, "record"), true);
   const message2 = {
     type: "error",
+    session: "session",
     error: {
       type: "number",
       print: "123",

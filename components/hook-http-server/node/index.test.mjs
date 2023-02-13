@@ -138,7 +138,13 @@ assertDeepEqual(
   const events = (
     await testHookAsync(
       HookHttpServer,
-      { configuration: { recorder: "process", hooks: { http: true } } },
+      {
+        configuration: {
+          recorder: "process",
+          hooks: { http: true },
+          session: "session",
+        },
+      },
       async () => {
         const server = Http.createServer();
         const app = createApp();
@@ -181,6 +187,7 @@ assertDeepEqual(
     [
       {
         type: "event",
+        session: "session",
         site: "begin",
         tab: 1,
         group: 0,
@@ -198,6 +205,7 @@ assertDeepEqual(
       },
       {
         type: "event",
+        session: "session",
         site: "before",
         tab: 2,
         group: 0,
@@ -208,6 +216,7 @@ assertDeepEqual(
       },
       {
         type: "amend",
+        session: "session",
         site: "begin",
         tab: 1,
         payload: {
@@ -223,6 +232,7 @@ assertDeepEqual(
       },
       {
         type: "event",
+        session: "session",
         site: "after",
         tab: 2,
         group: 0,
@@ -233,6 +243,7 @@ assertDeepEqual(
       },
       {
         type: "event",
+        session: "session",
         site: "end",
         tab: 1,
         group: 0,
