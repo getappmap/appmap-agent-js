@@ -121,15 +121,15 @@ const matching = [
   ["before/query", "after/answer", []],
 ];
 
-const makeKey = ({ site, payload: { type } }) => `${site}/${type}`;
+const makeMatchingKey = ({ site, payload: { type } }) => `${site}/${type}`;
 
 const makeMatch = (key, copying) => {
   const [site, type] = key.split("/");
   return { site, type, copying };
 };
 
-const matchFirst = (event) => {
-  const key = makeKey(event);
+const lookupMatch = (event) => {
+  const key = makeMatchingKey(event);
   for (const match of matching) {
     if (match[0] === key) {
       return makeMatch(match[1], match[2]);
@@ -143,7 +143,7 @@ const matchFirst = (event) => {
 };
 
 export const manufactureMatchingEvent = (event) => {
-  const { site, type, copying } = matchFirst(event);
+  const { site, type, copying } = lookupMatch(event);
   const payload = { ...payloads[type] };
   for (const field of copying) {
     payload[field] = event.payload[field];
@@ -160,8 +160,8 @@ export const manufactureMatchingEvent = (event) => {
 };
 
 export const isMatchingEvent = (event1, event2) => {
-  const key1 = makeKey(event1);
-  const key2 = makeKey(event2);
+  const key1 = makeMatchingKey(event1);
+  const key2 = makeMatchingKey(event2);
   for (const match of matching) {
     if (match[0] === key1 && match[1] === key2) {
       for (const field of match[2]) {
