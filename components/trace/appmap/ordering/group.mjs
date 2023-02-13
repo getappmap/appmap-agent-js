@@ -8,8 +8,6 @@ const {
   Map,
 } = globalThis;
 
-const makeFrame = (enter, children, leave) => ({ enter, children, leave });
-
 const takeMap = (map, key) => {
   const value = map.get(key);
   map.delete(key);
@@ -45,7 +43,7 @@ export const groupStack = (root) => {
         }
       }
     }
-    return makeFrame(enter, children, leave);
+    return { enter, children, leave };
   };
   for (const group of groups1.keys()) {
     groups2.set(group, takeMap(groups1, group).map(mapping));
