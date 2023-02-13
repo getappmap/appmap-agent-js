@@ -52,8 +52,6 @@ const makeJumpNode = (before, after) => {
   };
 };
 
-const makeFrame = (enter, children, leave) => ({ enter, children, leave });
-
 const makeOrphan = (open, children, close) => ({
   open,
   children,
@@ -110,12 +108,11 @@ const splitJump = (frames, jumps) => {
       return true;
     }
   };
-  const mapping = (frame) =>
-    makeFrame(
-      frame.enter,
-      frame.children.map(mapping).filter(filtering),
-      frame.leave,
-    );
+  const mapping = ({enter, children, leave}) => ({
+    enter,
+    children: children.map(mapping).filter(filtering),
+    leave,
+  });
   return frames.map(mapping).filter(filtering);
 };
 
