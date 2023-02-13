@@ -24,16 +24,20 @@ const createJumpEvent = (session, site, tab, group, time) => ({
   },
 });
 
-export const stackify = (events) => {
-  let root = [];
-  const stack = [];
+const createFreshCounter = (events) => {
   let max = 0;
   for (const event of events) {
     if (event.tab > max) {
       max = event.tab;
     }
   }
-  const counter = createCounter(max);
+  return createCounter(max);
+};
+
+export const stackify = (events) => {
+  let root = [];
+  const stack = [];
+  const counter = createFreshCounter(events);
   for (const event of events) {
     if (event.site === "begin" || event.site === "after") {
       stack.push(makeFrame(event, [], null));
