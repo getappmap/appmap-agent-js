@@ -7,9 +7,6 @@
 import { InternalAppmapError } from "../../../error/index.mjs";
 import { createCounter, incrementCounter } from "../../../util/index.mjs";
 
-const getCurrentFrameArray = (frames, stack) =>
-  stack.length === 0 ? frames : stack[stack.length - 1].children;
-
 const createJumpEvent = (session, site, tab, group, time) => ({
   type: "event",
   session,
@@ -33,8 +30,13 @@ const createFreshCounter = (events) => {
 };
 
 export const stackify = (events) => {
-  let root = [];
-  const stack = [];
+  const stack = [
+    {
+      enter: null,
+      children: [],
+      leave: null,
+    },
+  ];
   const counter = createFreshCounter(events);
   for (const event of events) {
     if (event.site === "begin" || event.site === "after") {
@@ -44,12 +46,12 @@ export const stackify = (events) => {
         leave: null,
       });
     } else if (event.site === "end" || event.site === "before") {
-      if (stack.length > 0) {
+      if (stack.length > 1) {
         const frame = stack.pop();
         frame.leave = event;
-        getCurrentFrameArray(root, stack).push(frame);
+        stack[stack.length - 1].children.push(frame);
       } else {
-        root = [
+        stack[0].children = [
           {
             enter: createJumpEvent(
               event.session,
@@ -58,7 +60,7 @@ export const stackify = (events) => {
               event.group,
               event.time,
             ),
-            children: root,
+            children: stack[0].children,
             leave: event,
           },
         ];
@@ -67,7 +69,7 @@ export const stackify = (events) => {
       throw new InternalAppmapError("invalid event site");
     } /* c8 ignore stop */
   }
-  while (stack.length > 0) {
+  while (stack.length > 1) {
     const frame = stack.pop();
     frame.leave = createJumpEvent(
       frame.enter.session,
@@ -76,7 +78,7 @@ export const stackify = (events) => {
       frame.enter.group,
       frame.enter.time,
     );
-    getCurrentFrameArray(root, stack).push(frame);
+    stack[stack.length - 1].children.push(frame);
   }
-  return root;
+  return stack[0].children;
 };
