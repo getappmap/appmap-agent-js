@@ -15,16 +15,16 @@ const takeMap = (map, key) => {
 };
 
 export const groupStack = (root) => {
-  const groups2 = new Map();
-  const groups1 = new Map();
+  const deep_group_map = new Map();
+  const root_group_map = new Map();
   for (const node of root) {
     const {
       enter: { group },
     } = node;
-    if (groups1.has(group)) {
-      groups1.get(group).push(node);
+    if (root_group_map.has(group)) {
+      root_group_map.get(group).push(node);
     } else {
-      groups1.set(group, [node]);
+      root_group_map.set(group, [node]);
     }
   }
   const mapping = ({ enter, children, leave }) => {
@@ -33,20 +33,20 @@ export const groupStack = (root) => {
       const {
         payload: { group },
       } = enter;
-      if (groups1.has(group)) {
-        for (const async_child of takeMap(groups1, group)) {
+      if (root_group_map.has(group)) {
+        for (const async_child of takeMap(root_group_map, group)) {
           children.push(mapping(async_child));
         }
-      } else if (groups2.has(group)) {
-        for (const async_child of takeMap(groups2, group)) {
+      } else if (deep_group_map.has(group)) {
+        for (const async_child of takeMap(deep_group_map, group)) {
           children.push(async_child);
         }
       }
     }
     return { enter, children, leave };
   };
-  for (const group of groups1.keys()) {
-    groups2.set(group, takeMap(groups1, group).map(mapping));
+  for (const group of root_group_map.keys()) {
+    deep_group_map.set(group, takeMap(root_group_map, group).map(mapping));
   }
-  return toArray(groups2.values()).flat(1);
+  return toArray(deep_group_map.values()).flat(1);
 };
