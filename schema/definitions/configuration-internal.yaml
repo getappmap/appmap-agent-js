@@ -57,7 +57,7 @@ properties:
   session:
     anyOf:
       - const: null
-      - $ref: basename
+      - $ref: session
   trace-port:
     $ref: port-cooked
   trace-protocol:

@@ -33,7 +33,7 @@ properties:
   host:
     const: localhost
   session:
-    $ref: basename
+    $ref: session
   trace-port:
     $ref: port
   trace-protocol:
