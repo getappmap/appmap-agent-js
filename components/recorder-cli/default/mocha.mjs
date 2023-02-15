@@ -2,6 +2,7 @@ import { hooks } from "../../../lib/node/mocha-hook.mjs";
 import { ExternalAppmapError } from "../../error/index.mjs";
 import { logErrorWhen } from "../../log/index.mjs";
 import { hook } from "../../hook/index.mjs";
+import { getUuid } from "../../uuid/index.mjs";
 import { extendConfiguration } from "../../configuration/index.mjs";
 import { assert, coalesce, matchVersion } from "../../util/index.mjs";
 import { requirePeerDependency } from "../../peer/index.mjs";
@@ -11,7 +12,7 @@ import {
   recordStopTrack,
 } from "../../agent/index.mjs";
 
-const { undefined, String } = globalThis;
+const { undefined } = globalThis;
 
 // Accessing mocha version via the prototype is not documented but it seems stable enough.
 // Added in https://github.com/mochajs/mocha/pull/3535
@@ -54,35 +55,39 @@ export const record = (configuration) => {
   const agent = openAgent(configuration);
   hook(agent, configuration);
   let running = null;
-  let counter = 0;
   hooks.beforeEach = (context) => {
-    const name = context.currentTest.parent.fullTitle();
     assert(
       !logErrorWhen(
         running !== null,
-        "Detected conccurent mocha test cases: %j and %j",
+        "Concurrent mocha test cases: %j",
         running,
-        name,
       ),
       "Concurrent mocha test cases",
       ExternalAppmapError,
     );
-    running = name;
-    counter += 1;
+    running = {
+      name: context.currentTest.parent.fullTitle(),
+      track: `mocha-${getUuid()}`,
+    };
     recordStartTrack(
       agent,
-      `mocha-${String(counter)}`,
+      running.track,
       extendConfiguration(
         configuration,
         {
-          "map-name": name,
+          "map-name": running.name,
         },
         null,
       ),
     );
   };
   hooks.afterEach = (context) => {
-    recordStopTrack(agent, `mocha-${String(counter)}`, {
+    assert(
+      !logErrorWhen(running === null, "No running mocha test case"),
+      "No running mocha test case",
+      ExternalAppmapError,
+    );
+    recordStopTrack(agent, running.track, {
       type: "test",
       passed: context.currentTest.state === "passed",
     });
