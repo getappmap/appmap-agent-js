@@ -6,10 +6,11 @@ import {
 } from "../../source/index.mjs";
 import { parseLocation } from "../../location/index.mjs";
 
-const { Set } = globalThis;
+const { RegExp, Set } = globalThis;
 
 export const startTrack = (configuration) => ({
   configuration,
+  regexp: new RegExp(configuration.sessions, "u"),
   sources: [],
   messages: [],
   termination: null,
@@ -44,24 +45,26 @@ export const addTrackSource = (track, source) => {
 };
 
 export const sendTrack = (track, message) => {
-  const { type } = message;
-  if (type === "amend" || track.termination === null) {
-    track.messages.push(message);
-  }
-  if (type === "event") {
-    const { payload } = message;
-    const { type: payload_type } = payload;
-    if (
-      payload_type === "apply" ||
-      payload_type === "return" ||
-      payload_type === "throw"
-    ) {
-      const { url, hash } = parseLocation(payload.function);
-      if (url !== null && !track.present_url_set.has(url)) {
-        track.missing_url_set.add(url);
-      }
-      if (hash !== null && !track.present_hash_set.has(hash)) {
-        track.missing_hash_set.add(hash);
+  const { type, session } = message;
+  if (track.regexp.test(session)) {
+    if (type === "amend" || track.termination === null) {
+      track.messages.push(message);
+    }
+    if (type === "event") {
+      const { payload } = message;
+      const { type: payload_type } = payload;
+      if (
+        payload_type === "apply" ||
+        payload_type === "return" ||
+        payload_type === "throw"
+      ) {
+        const { url, hash } = parseLocation(payload.function);
+        if (url !== null && !track.present_url_set.has(url)) {
+          track.missing_url_set.add(url);
+        }
+        if (hash !== null && !track.present_hash_set.has(hash)) {
+          track.missing_hash_set.add(hash);
+        }
       }
     }
   }

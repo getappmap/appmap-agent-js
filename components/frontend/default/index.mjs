@@ -109,6 +109,8 @@ export const formatGroup = ({ session }, group, child, description) => ({
   description,
 });
 
+export const getSession = ({ session }) => session;
+
 export const formatBeginEvent = generateFormatEvent("begin");
 
 export const formatEndEvent = generateFormatEvent("end");

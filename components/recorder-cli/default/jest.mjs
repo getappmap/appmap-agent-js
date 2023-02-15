@@ -6,6 +6,7 @@ import { extendConfiguration } from "../../configuration/index.mjs";
 import { assert, hasOwnProperty } from "../../util/index.mjs";
 import {
   openAgent,
+  getSession,
   recordStartTrack,
   recordStopTrack,
 } from "../../agent/index.mjs";
@@ -51,6 +52,7 @@ export const record = (configuration) => {
   }
   const { beforeEach, afterEach, expect } = globalThis;
   const agent = openAgent(configuration);
+  const session = getSession(agent);
   // Jest is claiming that it is running the tests from a given file serially.
   // However we detected nested calls of beforeEach / afterEach in practice.
   // So we need to maintain a set of track ids instead of a single one.
@@ -87,7 +89,14 @@ export const record = (configuration) => {
     recordStartTrack(
       agent,
       track,
-      extendConfiguration(configuration, { "map-name": name }, null),
+      extendConfiguration(
+        configuration,
+        {
+          "map-name": name,
+          sessions: session,
+        },
+        null,
+      ),
     );
   });
   afterEach(function () {

@@ -8,6 +8,7 @@ import { assert, coalesce, matchVersion } from "../../util/index.mjs";
 import { requirePeerDependency } from "../../peer/index.mjs";
 import {
   openAgent,
+  getSession,
   recordStartTrack,
   recordStopTrack,
 } from "../../agent/index.mjs";
@@ -53,6 +54,7 @@ export const record = (configuration) => {
     }),
   );
   const agent = openAgent(configuration);
+  const session = getSession(agent);
   hook(agent, configuration);
   let running = null;
   hooks.beforeEach = (context) => {
@@ -76,6 +78,7 @@ export const record = (configuration) => {
         configuration,
         {
           "map-name": running.name,
+          sessions: session,
         },
         null,
       ),

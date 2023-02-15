@@ -6,6 +6,7 @@ import {
 import {
   openAgent,
   closeAgent,
+  getSession,
   instrument,
   takeLocalAgentTrace,
   recordStartTrack,
@@ -31,6 +32,8 @@ const configuration = extendConfiguration(
 );
 
 const agent = openAgent(configuration);
+
+assertEqual(getSession(agent), "uuid");
 
 getSerializationEmptyValue(agent);
 

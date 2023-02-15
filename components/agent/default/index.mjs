@@ -3,6 +3,7 @@ import { getCurrentGroup } from "../../group/index.mjs";
 import { getUuid } from "../../uuid/index.mjs";
 import {
   createFrontend,
+  getSession as getFrontendSession,
   getFreshTab as getFrontendFreshTab,
   instrument as instrumentFrontend,
   getSerializationEmptyValue as getFrontendSerializationEmptyValue,
@@ -62,6 +63,8 @@ export const openAgent = (configuration) => {
 export const closeAgent = ({ emitter }) => {
   closeEmitter(emitter);
 };
+
+export const getSession = ({ frontend }) => getFrontendSession(frontend);
 
 export const getFreshTab = ({ frontend }) => getFrontendFreshTab(frontend);
 
