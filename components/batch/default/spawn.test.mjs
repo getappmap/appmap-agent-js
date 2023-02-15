@@ -3,6 +3,8 @@ import {
   assertEqual,
   assertReject,
 } from "../../__fixture__.mjs";
+import { getCwdUrl } from "../../path/index.mjs";
+import process from "node:process";
 import { killAllAsync, spawnAsync } from "./spawn.mjs";
 
 const { Set } = globalThis;
@@ -20,7 +22,7 @@ assertDeepEqual(
           process.stderr.write("bar");
         `,
       ],
-      options: { stdio: "pipe" },
+      options: { stdio: "pipe", cwd: getCwdUrl(process) },
     },
     children,
   ),

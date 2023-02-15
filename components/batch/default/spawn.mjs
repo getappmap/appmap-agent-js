@@ -1,6 +1,9 @@
 import { InternalAppmapError } from "../../error/index.mjs";
-import { spawn } from "../../spawn/node/index.mjs";
+import { convertFileUrlToPath } from "../../path/index.mjs";
+import { toAbsoluteUrl } from "../../url/index.mjs";
+import { spawn } from "node:child_process";
 import { Buffer } from "node:buffer";
+import { cwd } from "node:process";
 
 const { setTimeout, Promise, undefined } = globalThis;
 
@@ -43,7 +46,13 @@ const bufferReadable = (readable) => {
 
 export const spawnAsync = ({ exec, argv, options }, children) =>
   new Promise((resolve, reject) => {
-    const child = spawn(exec, argv, options);
+    const child = spawn(exec, argv, {
+      ...options,
+      cwd:
+        "cwd" in options
+          ? convertFileUrlToPath(toAbsoluteUrl(".", options.cwd))
+          : cwd(),
+    });
     const stdout =
       options.stdio === "pipe" ? bufferReadable(child.stdout) : null;
     const stderr =
