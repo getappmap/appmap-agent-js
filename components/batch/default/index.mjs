@@ -39,12 +39,11 @@ const {
   URL,
   Set,
   setTimeout,
-  clearTimeout,
   JSON: { stringify: stringifyJSON },
 } = globalThis;
 
-const ABRUPT_TIMEOUT = 1000;
 const FLUSH_TIMEOUT = 1000;
+const ABRUPT_TIMEOUT = 1000;
 
 const isCommandNonNull = ({ command }) => command !== null;
 
@@ -107,56 +106,46 @@ export const mainAsync = async (process, configuration) => {
   configuration = resolveConfigurationRepository(configuration);
   const { env } = process;
   const children = new Set();
-  let interrupted = false;
+  let done = false;
   process.on("SIGINT", () => {
     killAllAsync(children);
-    interrupted = true;
+    done = true;
   });
   const urls = new Set();
   const backend = createBackend(configuration);
   const receptor = await openReceptorAsync(configuration, backend);
+  const flushing = (async () => {
+    while (!done) {
+      await flushBackendAsync(urls, backend, false);
+      if (!done) {
+        await new Promise((resolve) => {
+          setTimeout(resolve, FLUSH_TIMEOUT);
+        });
+      }
+    }
+    if (!isBackendEmpty(backend)) {
+      await new Promise((resolve) => {
+        setTimeout(resolve, ABRUPT_TIMEOUT);
+      });
+      await flushBackendAsync(urls, backend, true);
+    }
+  })();
   const runConfigurationAsync = async (configuration, env) => {
     configuration = resolveConfigurationAutomatedRecorder(configuration, env);
     configuration = adaptReceptorConfiguration(receptor, configuration);
     const { tokens } = configuration.command;
     const command = await compileConfigurationCommandAsync(configuration, env);
     logDebug("spawn child command = %j", command);
-    let signal = null;
-    let status = 0;
-    let done = false;
-    let timer = null;
-    const flush = async () => {
-      timer = null;
-      if (!done) {
-        await flushBackendAsync(urls, backend, false);
-        timer = setTimeout(flush, FLUSH_TIMEOUT);
-      }
-    };
-    timer = setTimeout(flush, FLUSH_TIMEOUT);
-    try {
-      ({ signal, status } = await spawnWithHandlerAsync(
-        command,
-        children,
-        tokens,
-        false,
-      ));
-    } finally {
-      done = true;
-      if (timer !== null) {
-        clearTimeout(timer);
-      }
-    }
+    const { signal, status } = await spawnWithHandlerAsync(
+      command,
+      children,
+      tokens,
+      false,
+    );
     if (signal !== null) {
       logInfo("> Killed with: %s", signal);
     } else {
       logInfo("> Exited with: %j", status);
-    }
-    await flushBackendAsync(urls, backend, false);
-    if (!isBackendEmpty(backend)) {
-      await new Promise((resolve) => {
-        setTimeout(resolve, ABRUPT_TIMEOUT);
-      });
-      await flushBackendAsync(urls, backend, true);
     }
     return { tokens, signal, status };
   };
@@ -177,7 +166,7 @@ export const mainAsync = async (process, configuration) => {
       logInfo("Spawning %j processes sequentially", length);
       const summary = [];
       for (let index = 0; index < length; index += 1) {
-        if (!interrupted) {
+        if (!done) {
           logInfo("%j/%j", index + 1, length);
           summary.push(await runConfigurationAsync(configurations[index], env));
         }
@@ -191,6 +180,8 @@ export const mainAsync = async (process, configuration) => {
     }
   } finally {
     await closeReceptorAsync(receptor);
+    done = true;
+    await flushing;
   }
   return 0;
 };
