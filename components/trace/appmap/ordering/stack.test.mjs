@@ -1,15 +1,17 @@
 import { assertDeepEqual } from "../../../__fixture__.mjs";
 import { stackify } from "./stack.mjs";
 
-export const generateMakeEvent = (site, type) => (tab) => ({
-  type: "event",
-  session: "session",
-  site,
-  tab,
-  group: 0,
-  time: 0,
-  payload: { type },
-});
+export const generateMakeEvent =
+  (site, type) =>
+  (tab, session = "session") => ({
+    type: "event",
+    session,
+    site,
+    tab,
+    group: 0,
+    time: 0,
+    payload: { type },
+  });
 
 export const makeBeginEvent = generateMakeEvent("begin", "bundle");
 
@@ -81,6 +83,29 @@ assertDeepEqual(
         },
       ],
       leave: makeBeforeEvent(457),
+    },
+  ],
+);
+
+// multiple session
+assertDeepEqual(
+  stackify([
+    makeBeginEvent(123, "session1"),
+    makeBeginEvent(456, "session2"),
+    makeEndEvent(123, "session1"),
+    makeEndEvent(456, "session2"),
+  ]),
+  [
+    {
+      enter: makeBeginEvent(123, "session1"),
+      children: [
+        {
+          enter: makeBeginEvent(456, "session2"),
+          children: [],
+          leave: makeEndEvent(456, "session2"),
+        },
+      ],
+      leave: makeEndEvent(123, "session1"),
     },
   ],
 );

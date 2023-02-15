@@ -11,7 +11,10 @@ import { manufactureMatchingEvent, isMatchingEvent } from "./matching.mjs";
 const {
   Array: { from: toArray },
   Map,
+  String,
 } = globalThis;
+
+const makeJumpKey = ({ session, tab }) => `${session}/${String(tab)}`;
 
 const manufactureBundleEvent = (session, site, tab) => ({
   type: "event",
@@ -97,18 +100,15 @@ const manufactureBundleNode = (orphan) => {
 const splitJump = (frames, jumps) => {
   const filtering = (frame) => {
     if (frame.enter.site === "after") {
-      assert(
-        !jumps.has(frame.enter.tab),
-        "duplicate jump",
-        InternalAppmapError,
-      );
-      jumps.set(frame.enter.tab, frame);
+      const key = makeJumpKey(frame.enter);
+      assert(!jumps.has(key), "duplicate jump", InternalAppmapError);
+      jumps.set(key, frame);
       return false;
     } else {
       return true;
     }
   };
-  const mapping = ({enter, children, leave}) => ({
+  const mapping = ({ enter, children, leave }) => ({
     enter,
     children: children.map(mapping).filter(filtering),
     leave,
@@ -126,15 +126,16 @@ const joinJump = (frames, jumps) => {
     const nodes = frame.children.map(mapBeginFrame);
     let close = frame.leave;
     while (close.site === "before") {
-      if (jumps.has(close.tab)) {
-        const frame = jumps.get(close.tab);
-        jumps.delete(close.tab);
+      const key = makeJumpKey(close);
+      if (jumps.has(key)) {
+        const frame = jumps.get(key);
+        jumps.delete(key);
         nodes.push(makeJumpNode(close, frame.enter));
         nodes.push(...frame.children.map(mapBeginFrame));
         close = frame.leave;
-      } else if (orphans.has(close.tab)) {
-        const orphan = orphans.get(close.tab);
-        orphans.delete(close.tab);
+      } else if (orphans.has(key)) {
+        const orphan = orphans.get(key);
+        orphans.delete(key);
         nodes.push(makeJumpNode(close, orphan.open));
         nodes.push(...orphan.children);
         close = orphan.close;
@@ -145,10 +146,10 @@ const joinJump = (frames, jumps) => {
     return makeOrphan(open, nodes, close);
   };
   const nodes = frames.map(mapBeginFrame);
-  for (const tab of jumps.keys()) {
-    const frame = jumps.get(tab);
-    jumps.delete(tab);
-    orphans.set(tab, mapFrame(frame));
+  for (const key of jumps.keys()) {
+    const frame = jumps.get(key);
+    jumps.delete(key);
+    orphans.set(key, mapFrame(frame));
   }
   return [].concat(toArray(orphans.values()).map(manufactureBundleNode), nodes);
 };

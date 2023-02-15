@@ -169,7 +169,7 @@ export const isMatchingEvent = (event1, event2) => {
           return false;
         }
       }
-      return event1.tab === event2.tab;
+      return event1.session === event2.session && event1.tab === event2.tab;
     }
   }
   return false;

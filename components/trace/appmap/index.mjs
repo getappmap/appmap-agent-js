@@ -100,7 +100,11 @@ export const compileTrace = (configuration, sources, messages, termination) => {
     } else if (type === "amend") {
       for (let index = events.length - 1; index >= 0; index -= 1) {
         const event = events[index];
-        if (event.tab === message.tab && event.site === message.site) {
+        if (
+          event.session === message.session &&
+          event.tab === message.tab &&
+          event.site === message.site
+        ) {
           events[index] = { ...event, payload: message.payload };
           break;
         }

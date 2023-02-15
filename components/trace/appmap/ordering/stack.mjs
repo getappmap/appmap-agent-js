@@ -3,9 +3,12 @@
 //   - begin/after events trigger a push
 //   - end/before events trigger a pop
 // Missing events at the beginning or at the end of the trace are manufactured to complete the first and last tree.
-
 import { InternalAppmapError } from "../../../error/index.mjs";
-import { createCounter, incrementCounter } from "../../../util/index.mjs";
+import {
+  assert,
+  createCounter,
+  incrementCounter,
+} from "../../../util/index.mjs";
 
 const createJumpEvent = (session, site, tab, group, time) => ({
   type: "event",
@@ -46,11 +49,18 @@ export const stackify = (events) => {
         leave: null,
       });
     } else if (event.site === "end" || event.site === "before") {
-      if (stack.length > 1) {
-        const frame = stack.pop();
-        frame.leave = event;
-        stack[stack.length - 1].children.push(frame);
-      } else {
+      let maybe_frame = null;
+      for (
+        let index = stack.length - 1;
+        index >= 1 && maybe_frame === null;
+        index -= 1
+      ) {
+        const frame = stack[index];
+        if (frame.enter.session === event.session) {
+          maybe_frame = stack[index];
+        }
+      }
+      if (maybe_frame === null) {
         stack[0].children = [
           {
             enter: createJumpEvent(
@@ -64,6 +74,17 @@ export const stackify = (events) => {
             leave: event,
           },
         ];
+      } else {
+        assert(
+          maybe_frame.leave === null,
+          "frame has already been completed",
+          InternalAppmapError,
+        );
+        maybe_frame.leave = event;
+        while (stack.length > 1 && stack[stack.length - 1].leave !== null) {
+          const frame = stack.pop();
+          stack[stack.length - 1].children.push(frame);
+        }
       }
     } /* c8 ignore start */ else {
       throw new InternalAppmapError("invalid event site");
