@@ -45,32 +45,28 @@ const {
 const FLUSH_TIMEOUT = 1000;
 const ABRUPT_TIMEOUT = 1000;
 
-const spawnWithHandlerAsync = async (command, children, tokens, located) => {
+const spawnWithHandlerAsync = async (command, children) => {
   try {
     return await spawnAsync(command, children);
   } catch (error) {
     /* c8 ignore start */ if (
       hasOwnProperty(error, "code") &&
       error.code === "ENOENT" &&
-      platform === "win32" &&
-      !located
+      platform === "win32"
     ) {
       logWarning(
         "Could not find executable %j, we will try to locate it using `where.exe`. Often, this is caused by a missing extension on Windows. For instance `npx jest` should be `npx.cmd jest`. Note that it is possible to provide a windows-specific command with `command-win32`.",
         command.exec,
       );
-      return await spawnWithHandlerAsync(
+      return await spawnAsync(
         {
           ...command,
           exec: await whereAsync(command.exec, children),
         },
         children,
-        tokens,
-        true,
       );
     } /* c8 ignore start */ else {
-      logError("Child error %j >> %O", tokens, error);
-      throw new ExternalAppmapError("Failed to spawn child process");
+      throw error;
     }
   }
 };
@@ -141,13 +137,15 @@ export const mainAsync = async (process, configuration) => {
         env,
       );
       logDebug("spawn child command = %j", command);
-      const { signal, status } = await spawnWithHandlerAsync(
-        command,
-        children,
-        tokens,
-        false,
-      );
-      return { tokens, signal, status };
+      try {
+        return {
+          tokens,
+          ...(await spawnWithHandlerAsync(command, children)),
+        };
+      } catch (error) {
+        logError("Child error %j >> %O", tokens, error);
+        throw new ExternalAppmapError("Failed to spawn child process");
+      }
     }
   };
   const configurations = [
