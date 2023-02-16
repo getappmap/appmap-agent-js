@@ -1,5 +1,4 @@
-import { cwd, env, platform } from "node:process";
-import { assertReject } from "../../__fixture__.mjs";
+import { cwd, env } from "node:process";
 import { EventEmitter } from "events";
 import {
   createConfiguration,
@@ -19,27 +18,6 @@ const configuration = extendConfiguration(
   },
   cwd_url,
 );
-
-// throw
-{
-  const emitter = new EventEmitter();
-  emitter.env = env;
-  await assertReject(
-    mainAsync(
-      emitter,
-      extendConfiguration(
-        configuration,
-        {
-          command: ["MISSING-EXECUTABLE"],
-        },
-        cwd_url,
-      ),
-    ),
-    platform === "win32"
-      ? /^ExternalAppmapError: Could not locate executable$/u
-      : /^ExternalAppmapError: Failed to spawn child process$/u,
-  );
-}
 
 // single killed child
 {

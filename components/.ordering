@@ -8,6 +8,7 @@ version
 error
 log-inner
 log
+spawn
 validate
 validate-appmap
 hash

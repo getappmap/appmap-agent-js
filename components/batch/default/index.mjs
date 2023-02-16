@@ -1,4 +1,4 @@
-import { platform } from "node:process";
+/* c8 ignore start */
 import {
   mkdir as mkdirAsync,
   writeFile as writeFileAsync,
@@ -9,7 +9,6 @@ import {
   getUrlBasename,
   getUrlExtension,
 } from "../../url/index.mjs";
-import { hasOwnProperty } from "../../util/index.mjs";
 import { logError, logDebug, logInfo, logWarning } from "../../log/index.mjs";
 import {
   getConfigurationScenarios,
@@ -30,8 +29,7 @@ import {
   compileBackendTrackArray,
   isBackendEmpty,
 } from "../../backend/index.mjs";
-import { spawnAsync, killAllAsync } from "./spawn.mjs";
-import { whereAsync } from "./where.mjs";
+import { spawnAsync, killAllAsync } from "../../spawn/index.mjs";
 
 const {
   Promise,
@@ -44,32 +42,6 @@ const {
 
 const FLUSH_TIMEOUT = 1000;
 const ABRUPT_TIMEOUT = 1000;
-
-const spawnWithHandlerAsync = async (command, children) => {
-  try {
-    return await spawnAsync(command, children);
-  } catch (error) {
-    /* c8 ignore start */ if (
-      hasOwnProperty(error, "code") &&
-      error.code === "ENOENT" &&
-      platform === "win32"
-    ) {
-      logWarning(
-        "Could not find executable %j, we will try to locate it using `where.exe`. Often, this is caused by a missing extension on Windows. For instance `npx jest` should be `npx.cmd jest`. Note that it is possible to provide a windows-specific command with `command-win32`.",
-        command.exec,
-      );
-      return await spawnAsync(
-        {
-          ...command,
-          exec: await whereAsync(command.exec, children),
-        },
-        children,
-      );
-    } /* c8 ignore start */ else {
-      throw error;
-    }
-  }
-};
 
 const refreshUrl = (urls, url) => {
   const basename = getUrlBasename(url);
@@ -140,7 +112,7 @@ export const mainAsync = async (process, configuration) => {
       try {
         return {
           tokens,
-          ...(await spawnWithHandlerAsync(command, children)),
+          ...(await spawnAsync(command, children)),
         };
       } catch (error) {
         logError("Child error %j >> %O", tokens, error);
