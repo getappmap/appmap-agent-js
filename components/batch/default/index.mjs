@@ -1,4 +1,3 @@
-/* c8 ignore start */
 import {
   mkdir as mkdirAsync,
   writeFile as writeFileAsync,
@@ -9,7 +8,7 @@ import {
   getUrlBasename,
   getUrlExtension,
 } from "../../url/index.mjs";
-import { logError, logDebug, logInfo, logWarning } from "../../log/index.mjs";
+import { logError, logDebug, logInfo } from "../../log/index.mjs";
 import {
   getConfigurationScenarios,
   resolveConfigurationRepository,
@@ -43,6 +42,8 @@ const {
 const FLUSH_TIMEOUT = 1000;
 const ABRUPT_TIMEOUT = 1000;
 
+const isCommandNonNull = ({ command }) => command !== null;
+
 const refreshUrl = (urls, url) => {
   const basename = getUrlBasename(url);
   const extension = getUrlExtension(url);
@@ -69,24 +70,18 @@ export const flushBackendAsync = async (urls, backend, abrupt) => {
 };
 
 const runConfigurationAsync = async (configuration, env, children) => {
-  configuration = pickPlatformSpecificCommand(configuration);
-  if (configuration.command === null) {
-    logWarning("Missing command to spawn process");
-    return { tokens: [], signal: null, status: 0 };
-  } else {
-    configuration = resolveConfigurationAutomatedRecorder(configuration, env);
-    const { tokens } = configuration.command;
-    const command = await compileConfigurationCommandAsync(configuration, env);
-    logDebug("spawn child command = %j", command);
-    try {
-      return {
-        tokens,
-        ...(await spawnAsync(command, children)),
-      };
-    } catch (error) {
-      logError("Child error %j >> %O", tokens, error);
-      throw new ExternalAppmapError("Failed to spawn child process");
-    }
+  configuration = resolveConfigurationAutomatedRecorder(configuration, env);
+  const { tokens } = configuration.command;
+  const command = await compileConfigurationCommandAsync(configuration, env);
+  logDebug("spawn child command = %j", command);
+  try {
+    return {
+      tokens,
+      ...(await spawnAsync(command, children)),
+    };
+  } catch (error) {
+    logError("Child error %j >> %O", tokens, error);
+    throw new ExternalAppmapError("Failed to spawn child process");
   }
 };
 
@@ -121,39 +116,42 @@ export const mainAsync = async (process, configuration) => {
   const configurations = [
     configuration,
     ...getConfigurationScenarios(configuration),
-  ].map((configuration) => adaptReceptorConfiguration(receptor, configuration));
+  ]
+    .map(pickPlatformSpecificCommand)
+    .filter(isCommandNonNull)
+    .map((configuration) =>
+      adaptReceptorConfiguration(receptor, configuration),
+    );
   const { length } = configurations;
-  try {
-    if (length === 1) {
-      await runConfigurationAsync(configurations[0], env, children);
-    } else {
-      logInfo("Spawning %j processes sequentially", length);
-      const summary = [];
-      for (let index = 0; index < length; index += 1) {
-        if (!done) {
-          logInfo("%j/%j", index + 1, length);
-          const { tokens, signal, status } = await runConfigurationAsync(
-            configurations[index],
-            env,
-            children,
-          );
-          summary.push({ tokens, signal, status });
-          if (signal !== null) {
-            logInfo("%j >> Killed with: %s", tokens, signal);
-          } else {
-            logInfo("%j >> Exited with: %j", tokens, status);
-          }
+  if (length === 1) {
+    await runConfigurationAsync(configurations[0], env, children);
+    done = true;
+  } else {
+    logInfo("Spawning %j processes sequentially", length);
+    const summary = [];
+    for (let index = 0; index < length; index += 1) {
+      if (!done) {
+        logInfo("%j/%j", index + 1, length);
+        const { tokens, signal, status } = await runConfigurationAsync(
+          configurations[index],
+          env,
+          children,
+        );
+        summary.push({ tokens, signal, status });
+        if (signal !== null) {
+          logInfo("%j >> Killed with: %s", tokens, signal);
+        } else {
+          logInfo("%j >> Exited with: %j", tokens, status);
         }
       }
-      logInfo("Summary:");
-      for (const { tokens, signal, status } of summary) {
-        logInfo("%j >> %j", tokens, signal === null ? status : signal);
-      }
     }
-  } finally {
-    await closeReceptorAsync(receptor);
+    logInfo("Summary:");
+    for (const { tokens, signal, status } of summary) {
+      logInfo("%j >> %j", tokens, signal === null ? status : signal);
+    }
     done = true;
-    await flushing;
   }
+  await flushing;
+  await closeReceptorAsync(receptor);
   return 0;
 };
