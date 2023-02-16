@@ -1,4 +1,5 @@
 import { convertFileUrlToPath } from "../../path/index.mjs";
+import { logDebug } from "../../log/index.mjs";
 import { toAbsoluteUrl } from "../../url/index.mjs";
 import { spawn } from "node:child_process";
 import { Buffer } from "node:buffer";
@@ -41,6 +42,7 @@ const bufferReadable = (readable) => {
 
 export const spawnAsync = ({ exec, argv, options }, children) =>
   new Promise((resolve, reject) => {
+    logDebug("Spawn %j %j %j", exec, argv, options);
     const child = spawn(exec, argv, {
       ...options,
       cwd:
@@ -53,10 +55,18 @@ export const spawnAsync = ({ exec, argv, options }, children) =>
     const stderr =
       options.stdio === "pipe" ? bufferReadable(child.stderr) : null;
     child.on("error", (error) => {
+      logDebug("Spawn failure %j %j >> %O", exec, argv, error);
       children.delete(child);
       reject(error);
     });
     child.on("close", (status, signal) => {
+      logDebug(
+        "Spawn success %j %j: signal = %j status = %j ",
+        exec,
+        argv,
+        signal,
+        status,
+      );
       children.delete(child);
       resolve({
         status,
