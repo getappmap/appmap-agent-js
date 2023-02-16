@@ -1,11 +1,10 @@
-import { InternalAppmapError } from "../../error/index.mjs";
 import { convertFileUrlToPath } from "../../path/index.mjs";
 import { toAbsoluteUrl } from "../../url/index.mjs";
 import { spawn } from "node:child_process";
 import { Buffer } from "node:buffer";
 import { cwd } from "node:process";
 
-const { setTimeout, Promise, undefined } = globalThis;
+const { setTimeout, Promise, undefined, Error } = globalThis;
 
 const { concat: concatBuffer } = Buffer;
 
@@ -24,11 +23,7 @@ export const killAllAsync = (children) =>
       children.forEach(sigkill);
       setTimeout(() => {
         /* c8 ignore start */ if (children.size !== 0) {
-          reject(
-            new InternalAppmapError(
-              "Could not kill all spawn child processes in time",
-            ),
-          );
+          reject(new Error("Could not kill all spawn child processes in time"));
         } /* c8 ignore stop */ else {
           resolve(undefined);
         }

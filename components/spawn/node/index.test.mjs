@@ -14,7 +14,7 @@ await assertReject(
     new Set(),
   ),
   platform === "win32"
-    ? /^ExternalAppmapError: Could not locate executable$/u
+    ? /^Error: Could not locate executable$/u
     : /^Error: spawn MISSING-EXECUTABLE ENOENT$/u,
 );
 
