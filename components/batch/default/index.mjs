@@ -45,8 +45,6 @@ const {
 const FLUSH_TIMEOUT = 1000;
 const ABRUPT_TIMEOUT = 1000;
 
-const isCommandNonNull = ({ command }) => command !== null;
-
 const spawnWithHandlerAsync = async (command, children, tokens, located) => {
   try {
     return await spawnAsync(command, children);
@@ -130,52 +128,58 @@ export const mainAsync = async (process, configuration) => {
       await flushBackendAsync(urls, backend, true);
     }
   })();
-  const runConfigurationAsync = async (configuration, env) => {
-    configuration = resolveConfigurationAutomatedRecorder(configuration, env);
-    configuration = adaptReceptorConfiguration(receptor, configuration);
-    const { tokens } = configuration.command;
-    const command = await compileConfigurationCommandAsync(configuration, env);
-    logDebug("spawn child command = %j", command);
-    const { signal, status } = await spawnWithHandlerAsync(
-      command,
-      children,
-      tokens,
-      false,
-    );
-    if (signal !== null) {
-      logInfo("> Killed with: %s", signal);
+  const runConfigurationAsync = async (configuration, env, children) => {
+    configuration = pickPlatformSpecificCommand(configuration);
+    if (configuration.command === null) {
+      logWarning("Missing command to spawn process");
+      return { tokens: [], signal: null, status: 0 };
     } else {
-      logInfo("> Exited with: %j", status);
+      configuration = resolveConfigurationAutomatedRecorder(configuration, env);
+      const { tokens } = configuration.command;
+      const command = await compileConfigurationCommandAsync(
+        configuration,
+        env,
+      );
+      logDebug("spawn child command = %j", command);
+      const { signal, status } = await spawnWithHandlerAsync(
+        command,
+        children,
+        tokens,
+        false,
+      );
+      return { tokens, signal, status };
     }
-    return { tokens, signal, status };
   };
   const configurations = [
     configuration,
     ...getConfigurationScenarios(configuration),
-  ]
-    .map(pickPlatformSpecificCommand)
-    .filter(isCommandNonNull);
+  ].map((configuration) => adaptReceptorConfiguration(receptor, configuration));
   const { length } = configurations;
   try {
-    if (length === 0) {
-      logWarning("Could not find any command to spawn.");
-    } else if (length === 1) {
-      const [configuration] = configurations;
-      await runConfigurationAsync(configuration, env);
+    if (length === 1) {
+      await runConfigurationAsync(configurations[0], env, children);
     } else {
       logInfo("Spawning %j processes sequentially", length);
       const summary = [];
       for (let index = 0; index < length; index += 1) {
         if (!done) {
           logInfo("%j/%j", index + 1, length);
-          summary.push(await runConfigurationAsync(configurations[index], env));
+          const { tokens, signal, status } = await runConfigurationAsync(
+            configurations[index],
+            env,
+            children,
+          );
+          summary.push({ tokens, signal, status });
+          if (signal !== null) {
+            logInfo("%j >> Killed with: %s", tokens, signal);
+          } else {
+            logInfo("%j >> Exited with: %j", tokens, status);
+          }
         }
       }
       logInfo("Summary:");
       for (const { tokens, signal, status } of summary) {
-        /* c8 ignore start */
         logInfo("%j >> %j", tokens, signal === null ? status : signal);
-        /* c8 ignore stop */
       }
     }
   } finally {

@@ -20,13 +20,6 @@ const configuration = extendConfiguration(
   cwd_url,
 );
 
-// no child
-{
-  const emitter = new EventEmitter();
-  emitter.env = env;
-  await mainAsync(emitter, configuration);
-}
-
 // throw
 {
   const emitter = new EventEmitter();
