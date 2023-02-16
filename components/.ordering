@@ -55,6 +55,7 @@ transformer-jest
 recorder-api
 recorder-cli
 receptor
+command
 batch
 questionnaire
 setup

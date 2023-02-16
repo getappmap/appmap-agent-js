@@ -12,12 +12,14 @@ import {
 import { hasOwnProperty } from "../../util/index.mjs";
 import { logError, logDebug, logInfo, logWarning } from "../../log/index.mjs";
 import {
-  pickPlatformSpecificCommand,
   getConfigurationScenarios,
   resolveConfigurationRepository,
+} from "../../configuration-accessor/index.mjs";
+import {
+  pickPlatformSpecificCommand,
   compileConfigurationCommandAsync,
   resolveConfigurationAutomatedRecorder,
-} from "../../configuration-accessor/index.mjs";
+} from "../../command/index.mjs";
 import {
   openReceptorAsync,
   closeReceptorAsync,
