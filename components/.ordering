@@ -57,6 +57,7 @@ recorder-api
 recorder-cli
 receptor
 command
+client
 server
 questionnaire
 setup
