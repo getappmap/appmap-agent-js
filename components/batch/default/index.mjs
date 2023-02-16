@@ -68,6 +68,28 @@ export const flushBackendAsync = async (urls, backend, abrupt) => {
   }
 };
 
+const runConfigurationAsync = async (configuration, env, children) => {
+  configuration = pickPlatformSpecificCommand(configuration);
+  if (configuration.command === null) {
+    logWarning("Missing command to spawn process");
+    return { tokens: [], signal: null, status: 0 };
+  } else {
+    configuration = resolveConfigurationAutomatedRecorder(configuration, env);
+    const { tokens } = configuration.command;
+    const command = await compileConfigurationCommandAsync(configuration, env);
+    logDebug("spawn child command = %j", command);
+    try {
+      return {
+        tokens,
+        ...(await spawnAsync(command, children)),
+      };
+    } catch (error) {
+      logError("Child error %j >> %O", tokens, error);
+      throw new ExternalAppmapError("Failed to spawn child process");
+    }
+  }
+};
+
 export const mainAsync = async (process, configuration) => {
   configuration = resolveConfigurationRepository(configuration);
   const { env } = process;
@@ -96,30 +118,6 @@ export const mainAsync = async (process, configuration) => {
       await flushBackendAsync(urls, backend, true);
     }
   })();
-  const runConfigurationAsync = async (configuration, env, children) => {
-    configuration = pickPlatformSpecificCommand(configuration);
-    if (configuration.command === null) {
-      logWarning("Missing command to spawn process");
-      return { tokens: [], signal: null, status: 0 };
-    } else {
-      configuration = resolveConfigurationAutomatedRecorder(configuration, env);
-      const { tokens } = configuration.command;
-      const command = await compileConfigurationCommandAsync(
-        configuration,
-        env,
-      );
-      logDebug("spawn child command = %j", command);
-      try {
-        return {
-          tokens,
-          ...(await spawnAsync(command, children)),
-        };
-      } catch (error) {
-        logError("Child error %j >> %O", tokens, error);
-        throw new ExternalAppmapError("Failed to spawn child process");
-      }
-    }
-  };
   const configurations = [
     configuration,
     ...getConfigurationScenarios(configuration),
