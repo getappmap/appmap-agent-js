@@ -18,9 +18,9 @@ const {
   Reflect: { get },
 } = globalThis;
 
-//////////////////////////////////////////////
-// CJS && No SourceMap && With processAsync //
-//////////////////////////////////////////////
+///////////////////////////////////////////////////////////////
+// CJS && No SourceMap && With processAsync && String Source //
+///////////////////////////////////////////////////////////////
 
 {
   const specifier = toAbsoluteUrl(`${getUuid()}.cjs`, getTmpUrl());
@@ -34,14 +34,8 @@ const {
           createTransformer: (options) => {
             assertEqual(options, "options");
             return {
-              process: (content, path, options) => ({
-                code: content + content,
-                map: null,
-              }),
-              processAsync: (content, path, options) => Promise.resolve({
-                code: content + content,
-                map: null,
-              }),
+              process: (content, path, options) => content + content,
+              processAsync: (content, path, options) => content + content,
             };
           },
         },
@@ -120,9 +114,9 @@ const {
   }
 }
 
-///////////////////////////////////////////////
-// ESM && With Source Map && No processAsync //
-///////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+// ESM && With Source Map && No processAsync && Object Source //
+////////////////////////////////////////////////////////////////
 
 {
   const specifier = toAbsoluteUrl(`${getUuid()}.js`, getTmpUrl());
