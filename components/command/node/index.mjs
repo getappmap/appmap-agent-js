@@ -69,13 +69,11 @@ export const resolveConfigurationAutomatedRecorder = (configuration, env) => {
   }
   if (recorder === null) {
     recorder = "process";
-    if (configuration.command.tokens !== null) {
-      for (const Recorder of Recorders) {
-        if (Recorder.recursive === recursive || Recorder.recursive === null) {
-          if (Recorder.doesSupport(tokens)) {
-            recorder = Recorder.name;
-            break;
-          }
+    for (const Recorder of Recorders) {
+      if (Recorder.recursive === recursive || Recorder.recursive === null) {
+        if (Recorder.doesSupport(tokens)) {
+          recorder = Recorder.name;
+          break;
         }
       }
     }
