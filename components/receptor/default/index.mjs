@@ -3,7 +3,6 @@ import {
   closeServiceAsync,
   getServicePort,
 } from "../../service/index.mjs";
-import { extendConfigurationPort } from "../../configuration-accessor/index.mjs";
 import { logDebug } from "../../log/index.mjs";
 import { createTraceServer } from "./trace.mjs";
 import { createTrackServer } from "./track.mjs";
@@ -22,14 +21,11 @@ export const openReceptorAsync = async (configuration, backend) => {
   return { trace_service, track_service };
 };
 
-export const adaptReceptorConfiguration = (
-  { trace_service, track_service },
-  configuration,
-) =>
-  extendConfigurationPort(configuration, {
-    "trace-port": getServicePort(trace_service),
-    "track-port": getServicePort(track_service),
-  });
+export const getReceptorTracePort = ({ trace_service }) =>
+  getServicePort(trace_service);
+
+export const getReceptorTrackPort = ({ track_service }) =>
+  getServicePort(track_service);
 
 export const closeReceptorAsync = async ({ trace_service, track_service }) => {
   await closeServiceAsync(trace_service);

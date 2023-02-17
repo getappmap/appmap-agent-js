@@ -8,10 +8,11 @@ import {
   getUrlBasename,
   getUrlExtension,
 } from "../../url/index.mjs";
-import { logError, logDebug, logInfo } from "../../log/index.mjs";
+import { logError, logInfo } from "../../log/index.mjs";
 import {
   getConfigurationScenarios,
   resolveConfigurationRepository,
+  extendConfigurationPort,
 } from "../../configuration-accessor/index.mjs";
 import {
   pickPlatformSpecificCommand,
@@ -21,7 +22,8 @@ import {
 import {
   openReceptorAsync,
   closeReceptorAsync,
-  adaptReceptorConfiguration,
+  getReceptorTrackPort,
+  getReceptorTracePort,
 } from "../../receptor/index.mjs";
 import {
   createBackend,
@@ -71,16 +73,11 @@ export const flushBackendAsync = async (urls, backend, abrupt) => {
 
 const runConfigurationAsync = async (configuration, env, children) => {
   configuration = resolveConfigurationAutomatedRecorder(configuration, env);
-  const { tokens } = configuration.command;
   const command = await compileConfigurationCommandAsync(configuration, env);
-  logDebug("spawn child command = %j", command);
   try {
-    return {
-      tokens,
-      ...(await spawnAsync(command, children)),
-    };
+    return await spawnAsync(command, children);
   } catch (error) {
-    logError("Child error %j >> %O", tokens, error);
+    logError("Child error %j >> %O", configuration.command.tokens, error);
     throw new ExternalAppmapError("Failed to spawn child process");
   }
 };
@@ -97,6 +94,10 @@ export const mainAsync = async (process, configuration) => {
   const urls = new Set();
   const backend = createBackend(configuration);
   const receptor = await openReceptorAsync(configuration, backend);
+  const ports = {
+    "trace-port": getReceptorTracePort(receptor),
+    "track-port": getReceptorTrackPort(receptor),
+  };
   const flushing = (async () => {
     while (!done) {
       await flushBackendAsync(urls, backend, false);
@@ -119,30 +120,59 @@ export const mainAsync = async (process, configuration) => {
   ]
     .map(pickPlatformSpecificCommand)
     .filter(isCommandNonNull)
-    .map((configuration) =>
-      adaptReceptorConfiguration(receptor, configuration),
-    );
+    .map((configuration) => extendConfigurationPort(configuration, ports));
   const { length } = configurations;
-  if (length === 1) {
-    await runConfigurationAsync(configurations[0], env, children);
+  if (length === 0) {
+    logInfo(
+      "Appmap server listening to client connections at: %j",
+      ports["trace-port"],
+    );
+    logInfo(
+      "Appmap server listening to remote recording requests at: %j",
+      ports["track-port"],
+    );
+    logInfo("Waiting for SIGINT to stop ...");
+  } else if (length === 1) {
+    const configuration = configurations[0];
+    logInfo("Spawning %j ...", configuration.command.tokens);
+    logInfo("Send SIGINT to gracefully exit");
+    const { signal, status } = await runConfigurationAsync(
+      configuration,
+      env,
+      children,
+    );
+    /* c8 ignore start */
+    if (signal !== null) {
+      logInfo("Killed with: %s", signal);
+    } else {
+      logInfo("Exited with: %j", status);
+    }
+    /* c8 ignore stop */
     done = true;
   } else {
-    logInfo("Spawning %j processes sequentially", length);
+    logInfo("Spawning %j processes sequentially ...", length);
+    logInfo("Send SIGINT to gracefully exit");
     const summary = [];
     for (let index = 0; index < length; index += 1) {
       if (!done) {
-        logInfo("%j/%j", index + 1, length);
-        const { tokens, signal, status } = await runConfigurationAsync(
+        const configuration = configurations[index];
+        const {
+          command: { tokens },
+        } = configuration;
+        logInfo("Spawning %j [%j/%j] ...", tokens, index + 1, length);
+        const { signal, status } = await runConfigurationAsync(
           configurations[index],
           env,
           children,
         );
         summary.push({ tokens, signal, status });
+        /* c8 ignore start */
         if (signal !== null) {
-          logInfo("%j >> Killed with: %s", tokens, signal);
+          logInfo("Killed with: %s", signal);
         } else {
-          logInfo("%j >> Exited with: %j", tokens, status);
+          logInfo("Exited with: %j", status);
         }
+        /* c8 ignore stop */
       }
     }
     logInfo("Summary:");

@@ -6,7 +6,8 @@ import {
 } from "../../configuration/index.mjs";
 import {
   openReceptorAsync,
-  adaptReceptorConfiguration,
+  getReceptorTracePort,
+  getReceptorTrackPort,
   closeReceptorAsync,
 } from "./index.mjs";
 
@@ -23,9 +24,8 @@ const backend = createBackend(configuration);
 
 const receptor = await openReceptorAsync(configuration, backend);
 
-assertNotEqual(
-  adaptReceptorConfiguration(receptor, configuration)["trace-port"],
-  0,
-);
+assertNotEqual(getReceptorTracePort(receptor), 0);
+
+assertNotEqual(getReceptorTrackPort(receptor), 0);
 
 await closeReceptorAsync(receptor);

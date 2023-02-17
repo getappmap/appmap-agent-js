@@ -29,15 +29,15 @@ const configuration = extendConfiguration(
   cwd_url,
 );
 
-// // endless mode //
-// {
-//   const emitter = new EventEmitter();
-//   emitter.env = env;
-//   setTimeout(() => {
-//     emitter.emit("SIGINT");
-//   }, 0);
-//   assertEqual(await mainAsync(emitter, configuration), 0);
-// }
+// endless mode //
+{
+  const emitter = new EventEmitter();
+  emitter.env = env;
+  setTimeout(() => {
+    emitter.emit("SIGINT");
+  }, 0);
+  assertEqual(await mainAsync(emitter, configuration), 0);
+}
 
 // multiple child >> SIGINT //
 {
@@ -47,7 +47,9 @@ const configuration = extendConfiguration(
   const exit_script_filename = `${getUuid()}.js`;
   await writeFileAsync(
     new URL(exit_script_filename, base),
-    // We cannot use sync exit because windows does not flush
+    // We synchronously exit the process because windows
+    // does not send messages synchronously and the trace
+    // is never reaches the server.
     "setTimeout(() => { process.exit(123); }, 3000);",
     "utf8",
   );
