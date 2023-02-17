@@ -25,7 +25,6 @@ assertEqual(doesSupport(["jest", "--argv"]), true);
 
 assertDeepEqual(await hookCommandAsync(["jest", "--argv"], base), [
   "jest",
-  "--runInBand",
   "--argv",
   "--transform",
   stringifyJSON({

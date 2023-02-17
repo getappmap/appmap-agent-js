@@ -3,6 +3,7 @@ import {
   createConfiguration,
   extendConfiguration,
 } from "../../configuration/index.mjs";
+import { createSource } from "../../source/index.mjs";
 import { stringifyLocation } from "../../location/index.mjs";
 import { compileTrace } from "./index.mjs";
 
@@ -56,115 +57,105 @@ const location = stringifyLocation({
 });
 
 assertDeepEqual(
-  compileTrace([
-    {
-      type: "start",
-      configuration,
-    },
-    {
-      type: "source",
-      url: "protocol://host/home/dirname/filename.js",
-      content: "function f (x) {}",
-      shallow: false,
-      exclude: [
-        {
-          combinator: "or",
-          "every-label": true,
-          "some-label": true,
-          "qualified-name": true,
-          name: true,
-          excluded: false,
-          recursive: true,
-        },
-      ],
-      inline: false,
-    },
-    {
-      type: "event",
-      site: "begin",
-      tab: tabs.event1,
-      group: 0,
-      time: 0,
-      payload: {
-        type: "apply",
-        function: location,
-        this: { type: "string", print: "THIS-PRINT-1" },
-        arguments: [{ type: "string", print: "ARG-PRINT-1" }],
-      },
-    },
-    {
-      type: "event",
-      site: "begin",
-      tab: tabs.event2,
-      group: 0,
-      time: 0,
-      payload: {
-        type: "apply",
-        function: location,
-        this: { type: "string", print: "this-print-2" },
-        arguments: [{ type: "string", print: "arg-print-2" }],
-      },
-    },
-    {
-      type: "group",
-      group: 0,
-      child: 1,
-      description: "description",
-    },
-    {
-      type: "event",
-      site: "end",
-      tab: tabs.event2,
-      time: 0,
-      group: 0,
-      payload: {
-        type: "return",
-        function: location,
-        result: {
-          type: "string",
-          print: "result-print-2",
+  compileTrace(
+    configuration,
+    [
+      createSource(
+        "protocol://host/home/dirname/filename.js",
+        "function f (x) {}",
+      ),
+    ],
+    [
+      {
+        type: "event",
+        session: "session",
+        site: "begin",
+        tab: tabs.event1,
+        group: 0,
+        time: 0,
+        payload: {
+          type: "apply",
+          function: location,
+          this: { type: "string", print: "THIS-PRINT-1" },
+          arguments: [{ type: "string", print: "ARG-PRINT-1" }],
         },
       },
-    },
-    {
-      type: "event",
-      site: "end",
-      tab: tabs.event1,
-      time: 0,
-      group: 0,
-      payload: {
-        type: "return",
-        function: location,
-        result: {
-          type: "string",
-          print: "result-print-1",
+      {
+        type: "event",
+        session: "session",
+        site: "begin",
+        tab: tabs.event2,
+        group: 0,
+        time: 0,
+        payload: {
+          type: "apply",
+          function: location,
+          this: { type: "string", print: "this-print-2" },
+          arguments: [{ type: "string", print: "arg-print-2" }],
         },
       },
-    },
-    {
-      type: "amend",
-      tab: tabs.event1,
-      site: "begin",
-      payload: {
-        type: "apply",
-        function: location,
-        this: { type: "string", print: "this-print-1" },
-        arguments: [{ type: "string", print: "arg-print-1" }],
+      {
+        type: "group",
+        session: "session",
+        group: 0,
+        child: 1,
+        description: "description",
       },
-    },
-    {
-      type: "error",
-      error: {
-        type: "number",
-        print: "123",
+      {
+        type: "event",
+        session: "session",
+        site: "end",
+        tab: tabs.event2,
+        time: 0,
+        group: 0,
+        payload: {
+          type: "return",
+          function: location,
+          result: {
+            type: "string",
+            print: "result-print-2",
+          },
+        },
       },
-    },
-    {
-      type: "stop",
-      track: "track",
-      termination: { type: "manual" },
-    },
-  ]),
+      {
+        type: "event",
+        session: "session",
+        site: "end",
+        tab: tabs.event1,
+        time: 0,
+        group: 0,
+        payload: {
+          type: "return",
+          function: location,
+          result: {
+            type: "string",
+            print: "result-print-1",
+          },
+        },
+      },
+      {
+        type: "amend",
+        session: "session",
+        tab: tabs.event1,
+        site: "begin",
+        payload: {
+          type: "apply",
+          function: location,
+          this: { type: "string", print: "this-print-1" },
+          arguments: [{ type: "string", print: "arg-print-1" }],
+        },
+      },
+      {
+        type: "error",
+        session: "session",
+        error: {
+          type: "number",
+          print: "123",
+        },
+      },
+    ],
+    { type: "manual" },
+  ),
   {
     url: "protocol://host/base/appmap_dir/process/appmap_file.appmap.json",
     content: {

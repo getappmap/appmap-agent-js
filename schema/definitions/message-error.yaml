@@ -2,9 +2,12 @@ type: object
 additionalProperties: false
 required:
   - type
+  - session
   - error
 properties:
   type:
     const: error
+  session:
+    $ref: session
   error:
     $ref: serial

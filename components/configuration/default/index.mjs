@@ -299,6 +299,10 @@ const fields = {
     extend: overwrite,
     normalize: identity,
   },
+  sessions: {
+    extend: overwrite,
+    normalize: identity,
+  },
   "trace-port": {
     extend: overwrite,
     normalize: normalizePort,
@@ -469,6 +473,7 @@ export const createConfiguration = (home) => ({
   threshold: 100,
   host: "localhost",
   session: null,
+  sessions: "^",
   "trace-port": 0, // possibly overwritten by the agent
   "trace-protocol": "TCP",
   "track-port": 0, // possibly overwritten by the agent

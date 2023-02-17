@@ -3,6 +3,7 @@ import { jumpify } from "./jump.mjs";
 
 export const generateMakeEvent = (site, type) => (tab) => ({
   type: "event",
+  session: "session",
   site,
   tab,
   group: 0,

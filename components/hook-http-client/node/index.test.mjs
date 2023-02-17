@@ -39,7 +39,7 @@ const promiseResponse = (request) =>
 assertDeepEqual(
   await testHookAsync(
     HookHttpClient,
-    { configuration: { hooks: { http: false } } },
+    { configuration: { hooks: { http: false }, session: "session" } },
     async () => {
       await promiseResponse(Http.get(url));
     },
@@ -50,6 +50,7 @@ assertDeepEqual(
 const events = [
   {
     type: "event",
+    session: "session",
     site: "begin",
     tab: 1,
     group: 0,
@@ -60,6 +61,7 @@ const events = [
   },
   {
     type: "event",
+    session: "session",
     site: "before",
     tab: 2,
     group: 0,
@@ -77,6 +79,7 @@ const events = [
   },
   {
     type: "event",
+    session: "session",
     site: "after",
     tab: 2,
     group: 0,
@@ -99,6 +102,7 @@ const events = [
   },
   {
     type: "event",
+    session: "session",
     site: "end",
     tab: 1,
     group: 0,
@@ -112,7 +116,7 @@ const events = [
 assertDeepEqual(
   await testHookAsync(
     HookHttpClient,
-    { configuration: { hooks: { http: true } } },
+    { configuration: { hooks: { http: true }, session: "session" } },
     async () => {
       await promiseResponse(Http.get(url));
     },
@@ -123,7 +127,7 @@ assertDeepEqual(
 assertDeepEqual(
   await testHookAsync(
     HookHttpClient,
-    { configuration: { hooks: { http: true } } },
+    { configuration: { hooks: { http: true }, session: "session" } },
     async () => {
       const request = new Http.ClientRequest(url);
       request.end();

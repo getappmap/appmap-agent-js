@@ -44,11 +44,15 @@ const findScriptIndex = (tokens, index) => {
 const executables = [
   ["node"],
   ["npm", "exec"],
-  ["npm", "x"],
-  ["npx"],
   ["npm.cmd", "exec"],
+  ["npm", "x"],
   ["npm.cmd", "x"],
+  ["npx"],
   ["npx.cmd"],
+  ["yarn", "exec"],
+  ["yarn.cmd", "exec"],
+  ["yarn", "node"],
+  ["yarn.cmd", "node"],
   [],
 ];
 

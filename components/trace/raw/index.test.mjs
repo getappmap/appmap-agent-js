@@ -1,4 +1,4 @@
-import { assertThrow, assertDeepEqual } from "../../__fixture__.mjs";
+import { assertDeepEqual } from "../../__fixture__.mjs";
 import {
   createConfiguration,
   extendConfiguration,
@@ -15,12 +15,11 @@ const configuration = extendConfiguration(
   "protocol://host/base/",
 );
 
-assertDeepEqual(compileTrace([{ type: "start", configuration }]), {
+assertDeepEqual(compileTrace(configuration, [], [], { type: "unknown" }), {
   url: "protocol://host/base/dirname/process/basename.appmap.json",
-  content: [{ type: "start", configuration }],
+  content: {
+    configuration,
+    messages: [],
+    termination: { type: "unknown" },
+  },
 });
-
-assertThrow(
-  () => compileTrace([]),
-  /^InternalAppmapError: missing start message$/u,
-);

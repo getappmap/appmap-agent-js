@@ -1,10 +1,8 @@
 import { assert } from "../../util/index.mjs";
-import {
-  InternalAppmapError,
-  ExternalAppmapError,
-} from "../../error/index.mjs";
 import { logErrorWhen } from "../../log/index.mjs";
 import { spawnAsync } from "./spawn.mjs";
+
+const { Error } = globalThis;
 
 /* c8 ignore start */
 const isNotEmptyString = (any) => any !== "";
@@ -27,7 +25,7 @@ export const pickWin32Exec = (execs) => {
   assert(
     execs.length > 0,
     "where succeed and returned an empty executable array",
-    InternalAppmapError,
+    Error,
   );
   execs = execs.slice();
   execs.sort(compareWin32Exec);
@@ -56,7 +54,7 @@ export const whereAsync = async (exec, children) => {
       stderr,
     ),
     "Could not locate executable",
-    ExternalAppmapError,
+    Error,
   );
   return pickWin32Exec(stdout.split("\r\n").filter(isNotEmptyString));
 };

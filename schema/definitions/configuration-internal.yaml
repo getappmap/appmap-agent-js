@@ -1,6 +1,6 @@
 type: object
 additionalProperties: false
-minProperties: 41
+minProperties: 42
 properties:
   socket:
     $ref: socket
@@ -57,7 +57,9 @@ properties:
   session:
     anyOf:
       - const: null
-      - $ref: basename
+      - $ref: session
+  sessions:
+    $ref: regexp
   trace-port:
     $ref: port-cooked
   trace-protocol:

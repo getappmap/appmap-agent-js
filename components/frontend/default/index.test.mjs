@@ -8,6 +8,7 @@ import {
 import { createSource } from "../../source/index.mjs";
 import {
   createFrontend,
+  getSession,
   formatStartTrack,
   formatStopTrack,
   formatError,
@@ -25,6 +26,7 @@ const { Error } = globalThis;
 const configuration = extendConfiguration(
   createConfiguration("protocol://host/home"),
   {
+    session: "session",
     packages: [
       {
         regexp: "^",
@@ -35,6 +37,8 @@ const configuration = extendConfiguration(
 );
 
 const frontend = createFrontend(configuration);
+
+assertEqual(getSession(frontend), "session");
 
 assertEqual(typeof getSerializationEmptyValue(frontend), "symbol");
 

@@ -1,21 +1,31 @@
-import "../../__fixture__.mjs";
-import { getTmpUrl } from "../../path/index.mjs";
-import { spawn } from "./index.mjs";
+import { platform } from "node:process";
+import { assertDeepEqual, assertReject } from "../../__fixture__.mjs";
+import { spawnAsync } from "./index.mjs";
 
-const { Promise, Error, undefined } = globalThis;
+const { Set } = globalThis;
 
-for (const options of [{}, { cwd: getTmpUrl() }]) {
-  await new Promise((resolve, reject) => {
-    const child = spawn("node", ["--version"], options);
-    child.on("error", reject);
-    child.on("exit", (status, signal) => {
-      if (signal !== null) {
-        reject(new Error("command signal"));
-      } else if (status !== 0) {
-        reject(new Error("command status"));
-      } else {
-        resolve(undefined);
-      }
-    });
-  });
-}
+await assertReject(
+  spawnAsync(
+    {
+      exec: "MISSING-EXECUTABLE",
+      argv: [],
+      options: {},
+    },
+    new Set(),
+  ),
+  platform === "win32"
+    ? /^Error: Could not locate executable$/u
+    : /^Error: spawn MISSING-EXECUTABLE ENOENT$/u,
+);
+
+assertDeepEqual(
+  await spawnAsync(
+    {
+      exec: "node",
+      argv: ["-e", "process.exit(123);"],
+      options: { stdio: "ignore" },
+    },
+    new Set(),
+  ),
+  { signal: null, status: 123, stderr: null, stdout: null },
+);

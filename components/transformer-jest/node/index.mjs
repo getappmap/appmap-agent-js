@@ -22,6 +22,16 @@ const require = createRequire(toDirectoryUrl(convertPathToFileUrl(cwd())));
 
 const loadTransformer = (specifier, options) => {
   let transformer = require(specifier);
+  // This `default` indirection is not documented.
+  // But some module bundlers (eg typescript)
+  // wrap module exports in `default`.
+  if (
+    hasOwnProperty(transformer, "default") &&
+    typeof transformer.default === "object" &&
+    transformer.default !== null
+  ) {
+    transformer = transformer.default;
+  }
   if (
     hasOwnProperty(transformer, "createTransformer") &&
     typeof transformer.createTransformer === "function"
@@ -39,18 +49,26 @@ const loadDispatchingEntry = ([pattern, { specifier, options }]) => [
   },
 ];
 
-const sanitizeSource = ({ code = null, map = null }, specifier) => {
-  assert(
-    !logErrorWhen(
-      typeof code !== "string",
-      "Transformer at %j should return an object whose code property is a string, got: %o",
-      specifier,
-      code,
-    ),
-    "Transformer should return an object whose code property is a string",
-    ExternalAppmapError,
-  );
-  return { code, map };
+const sanitizeSource = (source, specifier) => {
+  // This is no documented by transformers can directly
+  // return a string rather than an object.
+  // This is the case for `ts-jest@27.1.4`.
+  if (typeof source === "string") {
+    return { code: source, map: null };
+  } else {
+    const { code = null, map = null } = source;
+    assert(
+      !logErrorWhen(
+        typeof code !== "string",
+        "Transformer at %j should return an object whose code property is a string, got: %o",
+        specifier,
+        code,
+      ),
+      "Transformer should return an object whose code property is a string",
+      ExternalAppmapError,
+    );
+    return { code, map };
+  }
 };
 
 const transform = (
@@ -102,6 +120,7 @@ export const compileCreateTransformer = (configuration) => {
             );
             source = sanitizeSource(
               transformer.process(content, path, options),
+              specifier,
             );
             break;
           }

@@ -8,6 +8,7 @@ version
 error
 log-inner
 log
+spawn
 validate
 validate-appmap
 hash
@@ -16,7 +17,6 @@ peer
 file
 time
 group
-spawn
 prompts
 http
 service
@@ -56,7 +56,9 @@ transformer-jest
 recorder-api
 recorder-cli
 receptor
-batch
+command
+client
+server
 questionnaire
 setup
 init

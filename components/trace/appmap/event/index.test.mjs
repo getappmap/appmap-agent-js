@@ -10,6 +10,7 @@ import { digestEventTrace } from "./index.mjs";
 
 const makeEvent = (site, tab, payload) => ({
   type: "event",
+  session: "session",
   site,
   tab,
   time: 0,

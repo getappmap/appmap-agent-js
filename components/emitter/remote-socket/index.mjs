@@ -19,15 +19,12 @@ export const openEmitter = (configuration) => {
     host,
     "trace-port": trace_port,
     "track-port": track_port,
-    session,
   } = configuration;
-  assert(session !== null, "session is not resolved", InternalAppmapError);
   if (host === "localhost") {
     host = "127.0.0.1";
   }
   const socket = openSocket(host, trace_port, configuration);
-  sendSocket(socket, session);
-  return { socket, session, host, track_port, closed: createBox(false) };
+  return { socket, host, track_port, closed: createBox(false) };
 };
 
 export const closeEmitter = ({ socket, closed }) => {
@@ -55,9 +52,9 @@ export const takeLocalEmitterTrace = generateDeadcode(
 
 /* c8 ignore start */
 export const requestRemoteEmitterAsync = (
-  { host, track_port, session },
+  { host, track_port },
   method,
   path,
   body,
-) => requestAsync(host, track_port, method, `/${session}${path}`, body);
+) => requestAsync(host, track_port, method, `/_appmap${path}`, body);
 /* c8 ignore stop */

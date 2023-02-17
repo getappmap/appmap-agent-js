@@ -18,9 +18,9 @@ const {
   Reflect: { get },
 } = globalThis;
 
-//////////////////////////////////////////////
-// CJS && No SourceMap && With processAsync //
-//////////////////////////////////////////////
+///////////////////////////////////////////////////////////////
+// CJS && No SourceMap && With processAsync && String Source //
+///////////////////////////////////////////////////////////////
 
 {
   const specifier = toAbsoluteUrl(`${getUuid()}.cjs`, getTmpUrl());
@@ -29,18 +29,16 @@ const {
     new URL(specifier),
     `
       const { strict: { equal: assertEqual } } = require("node:assert");
-      exports.createTransformer = (options) => {
-        assertEqual(options, "options");
-        return {
-          process: (content, path, options) => ({
-            code: content + content,
-            map: null,
-          }),
-          processAsync: (content, path, options) => Promise.resolve({
-            code: content + content,
-            map: null,
-          }),
-        };
+      module.exports = {
+        default: {
+          createTransformer: (options) => {
+            assertEqual(options, "options");
+            return {
+              process: (content, path, options) => content + content,
+              processAsync: (content, path, options) => content + content,
+            };
+          },
+        },
       };
     `,
     "utf8",
@@ -116,9 +114,9 @@ const {
   }
 }
 
-///////////////////////////////////////////////
-// ESM && With Source Map && No processAsync //
-///////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+// ESM && With Source Map && No processAsync && Object Source //
+////////////////////////////////////////////////////////////////
 
 {
   const specifier = toAbsoluteUrl(`${getUuid()}.js`, getTmpUrl());

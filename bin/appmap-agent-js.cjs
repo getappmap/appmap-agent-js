@@ -5,7 +5,9 @@ const { process, Map } = globalThis;
 const routes = new Map([
   ["init", "../lib/node/init.mjs"],
   ["setup", "../lib/node/setup.mjs"],
-  ["run", "../lib/node/batch.mjs"],
+  ["run", "../lib/node/server.mjs"],
+  ["server", "../lib/node/server.mjs"],
+  ["client", "../lib/node/client.mjs"],
   ["version", "../lib/node/version.mjs"],
   ["--version", "../lib/node/version.mjs"],
   ["help", "../lib/node/help.mjs"],
@@ -13,7 +15,7 @@ const routes = new Map([
   ["status", "../lib/node/status.mjs"],
 ]);
 
-let verb = "run";
+let verb = "server";
 
 if (routes.has(process.argv[2])) {
   verb = process.argv[2];

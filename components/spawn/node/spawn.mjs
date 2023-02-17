@@ -1,8 +1,11 @@
-import { InternalAppmapError } from "../../error/index.mjs";
-import { spawn } from "../../spawn/node/index.mjs";
+import { convertFileUrlToPath } from "../../path/index.mjs";
+import { logDebug } from "../../log/index.mjs";
+import { toAbsoluteUrl } from "../../url/index.mjs";
+import { spawn } from "node:child_process";
 import { Buffer } from "node:buffer";
+import { cwd } from "node:process";
 
-const { setTimeout, Promise, undefined } = globalThis;
+const { setTimeout, Promise, undefined, Error } = globalThis;
 
 const { concat: concatBuffer } = Buffer;
 
@@ -21,11 +24,7 @@ export const killAllAsync = (children) =>
       children.forEach(sigkill);
       setTimeout(() => {
         /* c8 ignore start */ if (children.size !== 0) {
-          reject(
-            new InternalAppmapError(
-              "Could not kill all spawn child processes in time",
-            ),
-          );
+          reject(new Error("Could not kill all spawn child processes in time"));
         } /* c8 ignore stop */ else {
           resolve(undefined);
         }
@@ -43,16 +42,31 @@ const bufferReadable = (readable) => {
 
 export const spawnAsync = ({ exec, argv, options }, children) =>
   new Promise((resolve, reject) => {
-    const child = spawn(exec, argv, options);
+    logDebug("Spawn %j %j %j", exec, argv, options);
+    const child = spawn(exec, argv, {
+      ...options,
+      cwd:
+        "cwd" in options
+          ? convertFileUrlToPath(toAbsoluteUrl(".", options.cwd))
+          : cwd(),
+    });
     const stdout =
       options.stdio === "pipe" ? bufferReadable(child.stdout) : null;
     const stderr =
       options.stdio === "pipe" ? bufferReadable(child.stderr) : null;
     child.on("error", (error) => {
+      logDebug("Spawn failure %j %j >> %O", exec, argv, error);
       children.delete(child);
       reject(error);
     });
     child.on("close", (status, signal) => {
+      logDebug(
+        "Spawn success %j %j: signal = %j status = %j ",
+        exec,
+        argv,
+        signal,
+        status,
+      );
       children.delete(child);
       resolve({
         status,

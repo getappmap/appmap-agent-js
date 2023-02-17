@@ -1,5 +1,10 @@
 import { assertDeepEqual, assertEqual } from "../../__fixture__.mjs";
-import { makeSourceLocation, fromSourceMessage } from "../../source/index.mjs";
+import {
+  getSourceUrl,
+  createSource,
+  makeSourceLocation,
+  toSourceMessage,
+} from "../../source/index.mjs";
 import { stringifyLocation } from "../../location/index.mjs";
 import {
   createConfiguration,
@@ -10,47 +15,39 @@ import {
   stopTrack,
   compileTrack,
   sendTrack,
+  addTrackSource,
   isTrackComplete,
 } from "./track.mjs";
 
+const configuration = extendConfiguration(
+  createConfiguration("protocol://host/home/"),
+  {
+    recorder: "process",
+    appmap_dir: "appmap_dir",
+    appmap_file: "appmap_file",
+  },
+  "protocol://host/base/",
+);
+
 {
-  const track = startTrack();
-  const configuration = extendConfiguration(
-    createConfiguration("protocol://host/home/"),
-    {
-      recorder: "process",
-      appmap_dir: "appmap_dir",
-      appmap_file: "appmap_file",
-    },
-    "protocol://host/base/",
-  );
-  const message1 = {
-    type: "start",
-    track: "track",
-    configuration,
-  };
-  sendTrack(track, message1);
+  const track = startTrack(configuration);
   stopTrack(track);
-  const message2 = {
-    type: "source",
-    url: "protocol://host/path",
-    content: "content",
-  };
+  const source = createSource("protocol://host/path", "content");
+  addTrackSource(track, source);
+  const message2 = { type: "error", error: { type: "number", print: "123" } };
   sendTrack(track, message2);
-  const message3 = { type: "error", error: { type: "number", print: "123" } };
-  sendTrack(track, message3);
   assertDeepEqual(compileTrack(track), {
     url: "protocol://host/base/appmap_dir/process/appmap_file.appmap.json",
-    content: [message1, message2],
+    content: {
+      configuration,
+      messages: [toSourceMessage(source)],
+      termination: { type: "unknown" },
+    },
   });
 }
 
 {
-  const source_message = {
-    type: "source",
-    url: "protocol://host/path",
-    content: "content",
-  };
+  const source = createSource("protocol://host/path", "content");
   const return_event_message = {
     type: "event",
     site: "end",
@@ -59,9 +56,7 @@ import {
     tab: 0,
     payload: {
       type: "return",
-      function: stringifyLocation(
-        makeSourceLocation(fromSourceMessage(source_message), 0, 0),
-      ),
+      function: stringifyLocation(makeSourceLocation(source, 0, 0)),
       error: { type: "number", print: "0" },
     },
   };
@@ -75,7 +70,7 @@ import {
       type: "throw",
       function: stringifyLocation({
         hash: null,
-        url: source_message.url,
+        url: getSourceUrl(source),
         line: 0,
         column: 0,
       }),
@@ -84,22 +79,22 @@ import {
   };
   // first location then source //
   {
-    const track = startTrack();
-    sendTrack(track, source_message);
+    const track = startTrack(configuration);
+    addTrackSource(track, source);
     sendTrack(track, return_event_message);
     sendTrack(track, throw_event_message);
     assertEqual(isTrackComplete(track), false);
-    stopTrack(track);
+    stopTrack(track, { type: "manual" });
     assertEqual(isTrackComplete(track), true);
   }
   // first source then location //
   {
-    const track = startTrack();
+    const track = startTrack(configuration);
     sendTrack(track, return_event_message);
     sendTrack(track, throw_event_message);
-    stopTrack(track);
+    stopTrack(track, { type: "manual" });
     assertEqual(isTrackComplete(track), false);
-    sendTrack(track, source_message);
+    addTrackSource(track, source);
     assertEqual(isTrackComplete(track), true);
   }
 }

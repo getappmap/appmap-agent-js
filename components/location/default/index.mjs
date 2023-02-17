@@ -1,32 +1,28 @@
 import { InternalAppmapError } from "../../error/index.mjs";
 import { assert } from "../../util/index.mjs";
 
-const { String, parseInt } = globalThis;
+const { String, parseInt, undefined } = globalThis;
 
-const regexp = /^([\s\S]+)#([0-9]+)-([0-9]+)$/u;
+const regexp = /^([A-Za-z0-9+/=]+\|)?([\s\S]+):([0-9]+):([0-9]+)$/u;
 
 export const stringifyLocation = ({ url, hash, line, column }) => {
-  // Prefer hash location over url location to support dynamic sources.
-  if (hash !== null) {
-    return `${hash}#${String(line)}-${String(column)}`;
-  } else if (url !== null) {
-    return `${url}#${String(line)}-${String(column)}`;
+  if (hash === null) {
+    return `${url}:${String(line)}:${String(column)}`;
   } else {
-    throw new InternalAppmapError(
-      "location should be either url-based or hash-based",
-    );
+    return `${hash}|${url}:${String(line)}:${String(column)}`;
   }
 };
 
 export const parseLocation = (string) => {
   const parts = regexp.exec(string);
   assert(parts !== null, "invalid location format", InternalAppmapError);
-  // Hash is base64-encoded and cannot contain `:`.
-  const is_url_based = parts[1].includes(":");
   return {
-    url: is_url_based ? parts[1] : null,
-    hash: is_url_based ? null : parts[1],
-    line: parseInt(parts[2]),
-    column: parseInt(parts[3]),
+    hash:
+      parts[1] === undefined
+        ? null
+        : parts[1].substring(0, parts[1].length - 1),
+    url: parts[2],
+    line: parseInt(parts[3]),
+    column: parseInt(parts[4]),
   };
 };

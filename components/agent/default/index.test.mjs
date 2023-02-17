@@ -6,6 +6,7 @@ import {
 import {
   openAgent,
   closeAgent,
+  getSession,
   instrument,
   takeLocalAgentTrace,
   recordStartTrack,
@@ -32,6 +33,8 @@ const configuration = extendConfiguration(
 
 const agent = openAgent(configuration);
 
+assertEqual(getSession(agent), "uuid");
+
 getSerializationEmptyValue(agent);
 
 recordStartTrack(agent, "record", configuration);
@@ -55,49 +58,46 @@ recordBeforeEvent(
 );
 recordAfterEvent(agent, tab, getAnswerPayload(agent));
 recordStopTrack(agent, "record", { type: "manual" });
-assertDeepEqual(takeLocalAgentTrace(agent, "record"), [
-  {
-    type: "start",
-    track: "record",
-    configuration,
-  },
-  {
-    type: "group",
-    group: 0,
-    child: 123,
-    description: "description",
-  },
-  {
-    type: "source",
-    url: "protocol://host/base/main.js",
-    content: "123;",
-  },
-  {
-    type: "event",
-    site: "before",
-    tab: 1,
-    group: 0,
-    time: 0,
-    payload: {
-      type: "query",
-      database: "mysql",
-      version: null,
-      sql: "SELECT 123;",
-      parameters: [],
+assertDeepEqual(takeLocalAgentTrace(agent, "record"), {
+  configuration,
+  messages: [
+    {
+      type: "source",
+      url: "protocol://host/base/main.js",
+      content: "123;",
     },
-  },
-  {
-    type: "event",
-    site: "after",
-    tab: 1,
-    group: 0,
-    time: 0,
-    payload: { type: "answer" },
-  },
-  {
-    type: "stop",
-    track: "record",
-    termination: { type: "manual" },
-  },
-]);
+    {
+      type: "group",
+      session: "uuid",
+      group: 0,
+      child: 123,
+      description: "description",
+    },
+    {
+      type: "event",
+      session: "uuid",
+      site: "before",
+      tab: 1,
+      group: 0,
+      time: 0,
+      payload: {
+        type: "query",
+        database: "mysql",
+        version: null,
+        sql: "SELECT 123;",
+        parameters: [],
+      },
+    },
+    {
+      type: "event",
+      session: "uuid",
+      site: "after",
+      tab: 1,
+      group: 0,
+      time: 0,
+      payload: { type: "answer" },
+    },
+  ],
+  termination: { type: "manual" },
+});
 closeAgent(agent);

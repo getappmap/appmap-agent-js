@@ -18,7 +18,6 @@ export const hookCommandAsync = async (tokens, base) => {
   const { exec, argv } = splitTokens(tokens);
   return [
     ...exec,
-    "--runInBand",
     ...(await hookJestArgvAsync(
       argv,
       toDirectoryUrl(convertPathToFileUrl(cwd())),

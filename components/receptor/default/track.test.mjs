@@ -1,5 +1,5 @@
-import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
-import { createBackend, sendBackend } from "../../backend/index.mjs";
+import { assertDeepEqual } from "../../__fixture__.mjs";
+import { createBackend } from "../../backend/index.mjs";
 import {
   createConfiguration,
   extendConfiguration,
@@ -34,15 +34,9 @@ assertDeepEqual(
 
 const req = (method) => ["localhost", port, method, "/_appmap/record", null];
 
-assertDeepEqual(await requestAsync(...req("GET")), failure);
-
-assertDeepEqual(await requestAsync(...req("POST")), failure);
-
 assertDeepEqual(await requestAsync(...req("DELETE")), failure);
 
 assertDeepEqual(await requestAsync(...req("HEAD")), failure);
-
-assertEqual(sendBackend(backend, "_appmap", { type: "open" }), true);
 
 assertDeepEqual(await requestAsync(...req("GET")), {
   ...success,
@@ -51,6 +45,8 @@ assertDeepEqual(await requestAsync(...req("GET")), {
 
 assertDeepEqual(await requestAsync(...req("POST")), success);
 
+assertDeepEqual(await requestAsync(...req("POST")), failure);
+
 assertDeepEqual(await requestAsync(...req("GET")), {
   ...success,
   body: { enabled: true },
@@ -58,18 +54,11 @@ assertDeepEqual(await requestAsync(...req("GET")), {
 
 assertDeepEqual(await requestAsync(...req("DELETE")), {
   ...success,
-  body: [
-    {
-      type: "start",
-      track: "record",
-      configuration: { ...configuration, recorder: "remote" },
-    },
-    {
-      type: "stop",
-      track: "record",
-      termination: { type: "manual" },
-    },
-  ],
+  body: {
+    configuration: { ...configuration, recorder: "remote" },
+    messages: [],
+    termination: { type: "manual" },
+  },
 });
 
 server.close();

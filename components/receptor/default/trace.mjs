@@ -7,6 +7,7 @@ import { assert } from "../../util/index.mjs";
 import { sendBackend } from "../../backend/index.mjs";
 
 const {
+  Set,
   URL,
   JSON: { parse: parseJSON },
 } = globalThis;
@@ -29,19 +30,58 @@ const inflateMessage = (message) => {
   }
 };
 
+const sendBackendAssert = (backend, message) => {
+  assert(sendBackend(backend, message), "backend error", InternalAppmapError);
+};
+
 export const createTraceServer = (backend) => {
   const server = createServer();
   server.on("connection", (socket) => {
     patchSocket(socket);
-    socket.on("message", (session) => {
-      socket.removeAllListeners("message");
-      socket.on("message", (content) => {
-        assert(
-          sendBackend(backend, session, inflateMessage(parseJSON(content))),
-          "backend error",
-          InternalAppmapError,
-        );
-      });
+    const tracks = new Set();
+    /* c8 ignore start */
+    socket.on("error", (error) => {
+      logWarning("Socket error: %O", error);
+    });
+    /* c8 ignore stop */
+    socket.on("close", () => {
+      // Normally hook-exit send a stop-all message.
+      // But this message may never arrive due to
+      // underlying network/buffer issue.
+      // This serves as fallback mechanism.
+      for (const track of tracks) {
+        sendBackendAssert(backend, {
+          type: "stop",
+          track,
+          termination: {
+            type: "disconnect",
+          },
+        });
+      }
+      tracks.clear();
+    });
+    socket.on("message", (content) => {
+      const message = inflateMessage(parseJSON(content));
+      if (message.type === "start") {
+        tracks.add(message.track);
+        sendBackendAssert(backend, message);
+      } else if (message.type === "stop") {
+        if (message.track === null) {
+          for (const track of tracks) {
+            sendBackendAssert(backend, {
+              type: "stop",
+              track,
+              termination: message.termination,
+            });
+          }
+          tracks.clear();
+        } else {
+          tracks.delete(message.track);
+          sendBackendAssert(backend, message);
+        }
+      } else {
+        sendBackendAssert(backend, message);
+      }
     });
   });
   return server;

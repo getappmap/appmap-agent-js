@@ -2,16 +2,15 @@ import {
   InternalAppmapError,
   ExternalAppmapError,
 } from "../../error/index.mjs";
-import { assert } from "../../util/index.mjs";
 import { logError, logDebug, logInfo } from "../../log/index.mjs";
 import { validateAppmap } from "../../validate-appmap/index.mjs";
 import { compileMetadata } from "./metadata.mjs";
-import { fromSourceMessage } from "../../source/index.mjs";
 import {
   createClassmap,
   addClassmapSource,
   compileClassmap,
 } from "../../classmap/index.mjs";
+import { stringifyLocation, parseLocation } from "../../location/index.mjs";
 import { digestEventTrace } from "./event/index.mjs";
 import { orderEventArray } from "./ordering/index.mjs";
 import { getOutputUrl } from "./output.mjs";
@@ -26,63 +25,49 @@ const {
 
 const VERSION = "1.8.0";
 
-const summary_template = `\
-Received %j raw events.
+const summary_template = `
+  Appmap %s
+  Trace size: %j
+  Event Distribution:\n%f
+  Most frequently applied functions:\n%f`;
 
-Event Distribution:
-%f
+const stackoverflow_message = `
+  We cannot process your appmap because it has too many (nested) events.\
+  There is three ways to solve this issue:
+    * You could tweak the \`appmap.yml\` configuration file to record fewer events:
+      \`\`\`yaml
+      # disable asynchronous jump recording
+      ordering: chronological
+      # exclude some functions by name
+      exclude:
+        - name: calledManyTimes
+      # exclude some functions by files
+      packages:
+        - glob: util/*.js
+          enabled: false
+      \`\`\`
+    * You could reduce the scope of the recording.\
+      For instance, by splitting test cases or reducing the time span of remote recording.
+    * You could increase the callstack size of this node process.\
+      This can be done via the node \`--stack-size\` cli option.
+      \`\`\`
+      > node --stack-size=5000 node_modules/bin/appmap-agent-js -- npm run test
+      \`\`\`
+      NB: Unfortunately, \`--stack-size\` cannot be set via the \`NODE_OPTIONS\` environment variable.`;
 
-Most frequently applied functions:
-%f
-`;
+const cleanupLocationString = (string) =>
+  stringifyLocation({
+    ...parseLocation(string),
+    hash: null,
+  });
 
-const stackoverflow_template = `\
-We cannot process your appmap because it has too many (nested) events.\
-There is three ways to solve this issue:
-
-  * You could tweak the \`appmap.yml\` configuration file to record fewer events:
-    \`\`\`yaml
-    # disable asynchronous jump recording
-    ordering: chronological
-    # exclude anonymous functions
-    anonymous-name-separator: '-'
-    exclude:
-      - name: '-'
-    # exclude functions in dependencies
-    packages:
-      - glob: 'node_modules/**/*'
-        enabled: false
-    \`\`\`
-  * You could reduce the scope of the recording.\
-    For instance, by splitting test files or reducing the time span of remote recording.
-  * You could increase the callstack size of this node process.\
-    This can be done via the node \`--stack-size\` cli option.
-    \`\`\`
-    > node --stack-size=5000 node_modules/bin/appmap-agent-js -- npm run test
-    \`\`\`
-    NB: Unfortunately, \`--stack-size\` cannot be set via the \`NODE_OPTIONS\` environment variable.
-
-${summary_template}`;
-
-export const compileTrace = (messages) => {
+export const compileTrace = (configuration, sources, messages, termination) => {
   logDebug("Trace: %j", messages);
-  let configuration = null;
-  const sources = [];
   const errors = [];
   const events = [];
-  let termination = { type: "unknown" };
   for (const message of messages) {
     const { type } = message;
-    if (type === "start") {
-      assert(
-        configuration === null,
-        "duplicate start message",
-        InternalAppmapError,
-      );
-      ({ configuration } = message);
-    } else if (type === "stop") {
-      termination = message.termination;
-    } else if (type === "error") {
+    if (type === "error") {
       errors.push(message.error);
     } else if (type === "event") {
       events.push(message);
@@ -90,6 +75,7 @@ export const compileTrace = (messages) => {
       events.push(
         {
           type: "event",
+          session: message.session,
           site: "begin",
           tab: 0,
           group: message.group,
@@ -102,6 +88,7 @@ export const compileTrace = (messages) => {
         },
         {
           type: "event",
+          session: message.session,
           site: "end",
           tab: 0,
           group: message.group,
@@ -112,25 +99,23 @@ export const compileTrace = (messages) => {
           },
         },
       );
-    } else if (type === "source") {
-      sources.push(fromSourceMessage(message));
     } else if (type === "amend") {
       for (let index = events.length - 1; index >= 0; index -= 1) {
         const event = events[index];
-        if (event.tab === message.tab && event.site === message.site) {
+        if (
+          event.session === message.session &&
+          event.tab === message.tab &&
+          event.site === message.site
+        ) {
           events[index] = { ...event, payload: message.payload };
           break;
         }
       }
     } /* c8 ignore start */ else {
-      throw new InternalAppmapError("invalid message type");
+      throw new InternalAppmapError("invalid core message type");
     } /* c8 ignore stop */
   }
-  assert(configuration !== null, "missing start message", InternalAppmapError);
-  const classmap = createClassmap(configuration);
-  for (const source of sources) {
-    addClassmapSource(classmap, source);
-  }
+  const url = getOutputUrl(configuration);
   const printEventDistribution = () => {
     const counters = new Map();
     for (const { payload } of events) {
@@ -139,9 +124,10 @@ export const compileTrace = (messages) => {
     }
     const { length: total } = events;
     return toArray(counters.keys())
+      .sort((key1, key2) => counters.get(key2) - counters.get(key1))
       .map(
         (key) =>
-          `  - ${key}: ${String(counters.get(key))} [${String(
+          `    - ${key}: ${String(counters.get(key))} [${String(
             round((100 * counters.get(key)) / total),
           )}%]`,
       )
@@ -162,29 +148,36 @@ export const compileTrace = (messages) => {
     }
     return toArray(counters.keys())
       .sort((key1, key2) => counters.get(key2) - counters.get(key1))
-      .slice(0, 20)
+      .slice(0, 8)
       .map(
         (key) =>
-          `  - ${key}: ${String(counters.get(key))} [${String(
-            round((100 * counters.get(key)) / total),
-          )}%]`,
+          `    - ${cleanupLocationString(key)}: ${String(
+            counters.get(key),
+          )} [${String(round((100 * counters.get(key)) / total))}%]`,
       )
       .join("\n");
   };
+  logInfo(
+    summary_template,
+    url,
+    events.length,
+    printEventDistribution,
+    printApplyDistribution,
+  );
+  const classmap = createClassmap(configuration);
+  for (const source of sources) {
+    addClassmapSource(classmap, source);
+  }
   let digested_events = null;
   /* c8 ignore start */
   try {
     digested_events = digestEventTrace(orderEventArray(events), classmap);
   } catch (error) {
     if (error instanceof RangeError) {
-      logError(
-        stackoverflow_template,
-        events.length,
-        printEventDistribution,
-        printApplyDistribution,
-      );
+      logError(stackoverflow_message);
+      logError("Stack overflow error >> %O", error);
       throw new ExternalAppmapError(
-        "Cannot create appmap because it contains too deeply nested events",
+        "Cannot create appmap because it contains events that are too deeply nested",
       );
     } else {
       throw error;
@@ -200,12 +193,6 @@ export const compileTrace = (messages) => {
   if (configuration.validate.appmap) {
     validateAppmap(appmap);
   }
-  logInfo(
-    summary_template,
-    events.length,
-    printEventDistribution,
-    printApplyDistribution,
-  );
   return {
     url: getOutputUrl(configuration),
     content: appmap,
