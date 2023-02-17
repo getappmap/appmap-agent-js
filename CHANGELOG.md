@@ -1,3 +1,27 @@
+# [13.5.0](https://github.com/getappmap/appmap-agent-js/compare/v13.4.0...v13.5.0) (2023-02-17)
+
+
+### Bug Fixes
+
+* do not crash if a source file is missing ([15374c5](https://github.com/getappmap/appmap-agent-js/commit/15374c5c03e9553b0852f7c3b1bc98e8c80a70cc))
+* handle default indirection on transformer ([5fd1a54](https://github.com/getappmap/appmap-agent-js/commit/5fd1a5479033ee790161cb631e07ccc29e9312c9))
+* resolve recorder for unparsed commands ([8c8b6f7](https://github.com/getappmap/appmap-agent-js/commit/8c8b6f7660745a7cda131ffccb815969f1a4dc78))
+* support jest transformer that directly returns string ([000dd6f](https://github.com/getappmap/appmap-agent-js/commit/000dd6fc74131fac9cbc866718cd456812f74744))
+
+
+### Features
+
+* appmap clients can be launched separately from appmap server ([75fcd20](https://github.com/getappmap/appmap-agent-js/commit/75fcd20007b74fdda38fe03bd27e680dc9ec624a))
+* endless mode for batch when there is no command ([f290399](https://github.com/getappmap/appmap-agent-js/commit/f29039995e4655abdcfc608633b6e1f9530da52c))
+* improve server logging ([58eddb1](https://github.com/getappmap/appmap-agent-js/commit/58eddb122aaa7d10317e9bb2d71bb00e6717362d))
+* parse package invocation with yarn ([ea1f465](https://github.com/getappmap/appmap-agent-js/commit/ea1f4657e3d2c140745d94e8ff16a4867abfdc2c))
+* support recording of concurrent node processes ([a4fc3f9](https://github.com/getappmap/appmap-agent-js/commit/a4fc3f90cdca5aa8cc84337a5e21af5fe1a0895a))
+
+
+### Performance Improvements
+
+* compile backend tracks one by one during flushing ([18112b2](https://github.com/getappmap/appmap-agent-js/commit/18112b26f4b5c0343c8cd10539fde3c681f74a85))
+
 # [13.4.0](https://github.com/getappmap/appmap-agent-js/compare/v13.3.0...v13.4.0) (2023-02-11)
 
 
