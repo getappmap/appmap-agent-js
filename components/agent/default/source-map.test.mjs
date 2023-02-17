@@ -28,8 +28,9 @@ const empty_source_map = {
 
 {
   const url = toAbsoluteUrl(getUuid(), getTmpUrl());
-  await writeFileAsync(new URL(url), "123;", "utf8");
   const mapping = createMirrorMapping(createSource(url, null));
+  fillSourceMap(mapping);
+  await writeFileAsync(new URL(url), "123;", "utf8");
   fillSourceMap(mapping);
   assertDeepEqual(getMappingSourceArray(mapping), [createSource(url, "123;")]);
 }

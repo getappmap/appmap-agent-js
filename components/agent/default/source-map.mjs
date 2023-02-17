@@ -17,7 +17,19 @@ export const fillSourceMap = (mapping) => {
   for (const url of getMappingSourceArray(mapping)
     .filter(isSourceEmpty)
     .map(getSourceUrl)) {
-    updateMappingSource(mapping, createSource(url, readFile(url)));
+    let content = null;
+    try {
+      // TODO
+      // Lookup the url in `configuration.packages` to see whether the url is
+      // enabled. If it is disabled, we can improve performance by not trying
+      // to load the source file.
+      content = readFile(url);
+    } catch (error) {
+      logDebug("could not load source file %j >> %O", url, error);
+    }
+    if (content !== null) {
+      updateMappingSource(mapping, createSource(url, content));
+    }
   }
 };
 
