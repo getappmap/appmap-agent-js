@@ -27,7 +27,7 @@ import {
 } from "../../receptor/index.mjs";
 import {
   createBackend,
-  compileBackendTrackArray,
+  compileBackendAvailableTrack,
   isBackendEmpty,
 } from "../../backend/index.mjs";
 import { spawnAsync, killAllAsync } from "../../spawn/index.mjs";
@@ -59,7 +59,9 @@ const refreshUrl = (urls, url) => {
 };
 
 export const flushBackendAsync = async (urls, backend, abrupt) => {
-  for (const { url, content } of compileBackendTrackArray(backend, abrupt)) {
+  let trace = compileBackendAvailableTrack(backend, abrupt);
+  while (trace !== null) {
+    const { url, content } = trace;
     const fresh_url = refreshUrl(urls, url);
     await mkdirAsync(new URL(".", fresh_url), { recursive: true });
     await writeFileAsync(
@@ -68,6 +70,7 @@ export const flushBackendAsync = async (urls, backend, abrupt) => {
       "utf8",
     );
     logInfo("Appmap written at %j", fresh_url);
+    trace = compileBackendAvailableTrack(backend, abrupt);
   }
 };
 

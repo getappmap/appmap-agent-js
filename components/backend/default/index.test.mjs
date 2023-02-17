@@ -8,7 +8,7 @@ import {
   sendBackend,
   hasBackendTrack,
   compileBackendTrack,
-  compileBackendTrackArray,
+  compileBackendAvailableTrack,
   isBackendEmpty,
 } from "./index.mjs";
 
@@ -98,15 +98,13 @@ const configuration = extendConfiguration(
     },
   };
   assertEqual(sendBackend(backend, message4), true),
-    assertDeepEqual(compileBackendTrackArray(backend, true), [
-      {
-        url: "protocol://host/base/dirname/process/basename.appmap.json",
-        content: {
-          configuration,
-          messages: [message1, message3],
-          termination: { type: "manual" },
-        },
+    assertDeepEqual(compileBackendAvailableTrack(backend, false), {
+      url: "protocol://host/base/dirname/process/basename.appmap.json",
+      content: {
+        configuration,
+        messages: [message1, message3],
+        termination: { type: "manual" },
       },
-    ]);
-  assertDeepEqual(compileBackendTrackArray(backend, true), []);
+    });
+  assertEqual(compileBackendAvailableTrack(backend, false), null);
 }

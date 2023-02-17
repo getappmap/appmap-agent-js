@@ -16,8 +16,6 @@ const {
   Array: { from: toArray },
 } = globalThis;
 
-const isNotNull = (any) => any !== null;
-
 const processStartMessage = ({ tracks, sources }, key, configuration) => {
   if (tracks.has(key)) {
     logError("Duplicate track %j", key);
@@ -68,10 +66,15 @@ export const compileBackendTrack = ({ tracks }, key, abrupt) => {
   }
 };
 
-export const compileBackendTrackArray = (backend, abrupt) =>
-  toArray(backend.tracks.keys())
-    .map((key) => compileBackendTrack(backend, key, abrupt))
-    .filter(isNotNull);
+export const compileBackendAvailableTrack = ({ tracks }, abrupt) => {
+  for (const [key, track] of tracks) {
+    if (abrupt || isTrackComplete(track)) {
+      tracks.delete(key);
+      return compileTrack(track);
+    }
+  }
+  return null;
+};
 
 export const isBackendEmpty = ({ tracks }) => tracks.size === 0;
 
