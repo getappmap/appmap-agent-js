@@ -29,18 +29,22 @@ const {
     new URL(specifier),
     `
       const { strict: { equal: assertEqual } } = require("node:assert");
-      exports.createTransformer = (options) => {
-        assertEqual(options, "options");
-        return {
-          process: (content, path, options) => ({
-            code: content + content,
-            map: null,
-          }),
-          processAsync: (content, path, options) => Promise.resolve({
-            code: content + content,
-            map: null,
-          }),
-        };
+      module.exports = {
+        default: {
+          createTransformer: (options) => {
+            assertEqual(options, "options");
+            return {
+              process: (content, path, options) => ({
+                code: content + content,
+                map: null,
+              }),
+              processAsync: (content, path, options) => Promise.resolve({
+                code: content + content,
+                map: null,
+              }),
+            };
+          },
+        },
       };
     `,
     "utf8",

@@ -22,6 +22,16 @@ const require = createRequire(toDirectoryUrl(convertPathToFileUrl(cwd())));
 
 const loadTransformer = (specifier, options) => {
   let transformer = require(specifier);
+  // This `default` indirection is not documented.
+  // But some module bundlers (eg typescript)
+  // wrap module exports in `default`.
+  if (
+    hasOwnProperty(transformer, "default") &&
+    typeof transformer.default === "object" &&
+    transformer.default !== null
+  ) {
+    transformer = transformer.default;
+  }
   if (
     hasOwnProperty(transformer, "createTransformer") &&
     typeof transformer.createTransformer === "function"
