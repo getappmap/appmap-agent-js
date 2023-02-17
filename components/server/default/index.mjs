@@ -69,7 +69,6 @@ export const flushBackendAsync = async (urls, backend, abrupt) => {
       stringifyJSON(content, null, 2),
       "utf8",
     );
-    logInfo("Appmap written at %j", fresh_url);
     trace = compileBackendAvailableTrack(backend, abrupt);
   }
 };

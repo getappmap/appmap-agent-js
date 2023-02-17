@@ -10,6 +10,7 @@ import {
   addClassmapSource,
   compileClassmap,
 } from "../../classmap/index.mjs";
+import { stringifyLocation, parseLocation } from "../../location/index.mjs";
 import { digestEventTrace } from "./event/index.mjs";
 import { orderEventArray } from "./ordering/index.mjs";
 import { getOutputUrl } from "./output.mjs";
@@ -24,40 +25,41 @@ const {
 
 const VERSION = "1.8.0";
 
-const summary_template = `\
-Received trace for %s
-Trace size: %j
-Event Distribution:
-%f
-Most frequently applied functions:
-%f
-`;
+const summary_template = `
+  Appmap %s
+  Trace size: %j
+  Event Distribution:\n%f
+  Most frequently applied functions:\n%f`;
 
-const stackoverflow_template = `\
-We cannot process your appmap because it has too many (nested) events.\
-There is three ways to solve this issue:
-  * You could tweak the \`appmap.yml\` configuration file to record fewer events:
-    \`\`\`yaml
-    # disable asynchronous jump recording
-    ordering: chronological
-    # exclude some functions by name
-    exclude:
-      - name: calledManyTimes
-    # exclude some functions by files
-    packages:
-      - glob: 'util/*.js'
-        enabled: false
-    \`\`\`
-  * You could reduce the scope of the recording.\
-    For instance, by splitting test files or reducing the time span of remote recording.
-  * You could increase the callstack size of this node process.\
-    This can be done via the node \`--stack-size\` cli option.
-    \`\`\`
-    > node --stack-size=5000 node_modules/bin/appmap-agent-js -- npm run test
-    \`\`\`
-    NB: Unfortunately, \`--stack-size\` cannot be set via the \`NODE_OPTIONS\` environment variable.
+const stackoverflow_message = `
+  We cannot process your appmap because it has too many (nested) events.\
+  There is three ways to solve this issue:
+    * You could tweak the \`appmap.yml\` configuration file to record fewer events:
+      \`\`\`yaml
+      # disable asynchronous jump recording
+      ordering: chronological
+      # exclude some functions by name
+      exclude:
+        - name: calledManyTimes
+      # exclude some functions by files
+      packages:
+        - glob: util/*.js
+          enabled: false
+      \`\`\`
+    * You could reduce the scope of the recording.\
+      For instance, by splitting test cases or reducing the time span of remote recording.
+    * You could increase the callstack size of this node process.\
+      This can be done via the node \`--stack-size\` cli option.
+      \`\`\`
+      > node --stack-size=5000 node_modules/bin/appmap-agent-js -- npm run test
+      \`\`\`
+      NB: Unfortunately, \`--stack-size\` cannot be set via the \`NODE_OPTIONS\` environment variable.`;
 
-${summary_template}`;
+const cleanupLocationString = (string) =>
+  stringifyLocation({
+    ...parseLocation(string),
+    hash: null,
+  });
 
 export const compileTrace = (configuration, sources, messages, termination) => {
   logDebug("Trace: %j", messages);
@@ -122,9 +124,10 @@ export const compileTrace = (configuration, sources, messages, termination) => {
     }
     const { length: total } = events;
     return toArray(counters.keys())
+      .sort((key1, key2) => counters.get(key2) - counters.get(key1))
       .map(
         (key) =>
-          `  - ${key}: ${String(counters.get(key))} [${String(
+          `    - ${key}: ${String(counters.get(key))} [${String(
             round((100 * counters.get(key)) / total),
           )}%]`,
       )
@@ -145,12 +148,12 @@ export const compileTrace = (configuration, sources, messages, termination) => {
     }
     return toArray(counters.keys())
       .sort((key1, key2) => counters.get(key2) - counters.get(key1))
-      .slice(0, 10)
+      .slice(0, 8)
       .map(
         (key) =>
-          `  - ${key}: ${String(counters.get(key))} [${String(
-            round((100 * counters.get(key)) / total),
-          )}%]`,
+          `    - ${cleanupLocationString(key)}: ${String(
+            counters.get(key),
+          )} [${String(round((100 * counters.get(key)) / total))}%]`,
       )
       .join("\n");
   };
@@ -171,15 +174,10 @@ export const compileTrace = (configuration, sources, messages, termination) => {
     digested_events = digestEventTrace(orderEventArray(events), classmap);
   } catch (error) {
     if (error instanceof RangeError) {
-      logError(
-        stackoverflow_template,
-        url,
-        events.length,
-        printEventDistribution,
-        printApplyDistribution,
-      );
+      logError(stackoverflow_message);
+      logError("Stack overflow error >> %O", error);
       throw new ExternalAppmapError(
-        "Cannot create appmap because it contains too deeply nested events",
+        "Cannot create appmap because it contains events that are too deeply nested",
       );
     } else {
       throw error;
