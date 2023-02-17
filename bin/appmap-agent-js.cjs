@@ -5,7 +5,7 @@ const { process, Map } = globalThis;
 const routes = new Map([
   ["init", "../lib/node/init.mjs"],
   ["setup", "../lib/node/setup.mjs"],
-  ["run", "../lib/node/batch.mjs"],
+  ["run", "../lib/node/server.mjs"],
   ["version", "../lib/node/version.mjs"],
   ["--version", "../lib/node/version.mjs"],
   ["help", "../lib/node/help.mjs"],
