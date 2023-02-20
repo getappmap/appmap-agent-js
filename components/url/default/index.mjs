@@ -112,3 +112,16 @@ export const getUrlExtension = (url) => {
     return null;
   }
 };
+
+// Alternatively:
+//   url.match(/([^\/]+)(\.[^/#]*)(#.*)?$/)[2]
+export const getLastUrlExtension = (url) => {
+  const filename = getUrlFilename(url);
+  if (filename === null) {
+    return null;
+  } else if (filename.includes(".")) {
+    return filename.substring(filename.lastIndexOf("."));
+  } else {
+    return null;
+  }
+};

@@ -8,7 +8,7 @@ import {
   convertFileUrlToPath,
   convertPathToFileUrl,
 } from "../../path/index.mjs";
-import { getUrlFilename, toAbsoluteUrl } from "../../url/index.mjs";
+import { getLastUrlExtension, toAbsoluteUrl } from "../../url/index.mjs";
 
 const {
   URL,
@@ -19,7 +19,7 @@ const {
 const require = createRequire(self_directory);
 
 const loadConfigModuleAsync = async (url) => {
-  if (getUrlFilename(url).endsWith(".mjs")) {
+  if (getLastUrlExtension(url) === ".mjs") {
     return (await import(new URL(url))).default;
   } else {
     return require(convertFileUrlToPath(url));
@@ -28,7 +28,7 @@ const loadConfigModuleAsync = async (url) => {
 
 const loadConfigFileAsync = async (url, strict) => {
   try {
-    if (getUrlFilename(url).endsWith(".json")) {
+    if (getLastUrlExtension(url) === ".json") {
       return parseJSON(await readFileAsync(new URL(url), "utf8"));
     } else {
       const config = await loadConfigModuleAsync(url);
