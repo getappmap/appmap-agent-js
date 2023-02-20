@@ -72,7 +72,16 @@ export const parseEstree = (url, content) => {
     });
   } catch (error) {
     logError("Unrecoverable parsing error at file %j >> %O", url, error);
-    return { type: "Program", body: [], sourceType: "script" };
+    return {
+      type: "Program",
+      body: [],
+      sourceType: "script",
+      loc: {
+        start: { line: 0, column: 0 },
+        end: { line: 0, column: 0 },
+        filename: url,
+      },
+    };
   }
   const { errors, program: node } = result;
   for (const error of errors) {
