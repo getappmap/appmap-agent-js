@@ -76,32 +76,38 @@ export const toDirectoryUrl = (url) => {
   }
 };
 
+// Alternatively:
+//   url.match(/:\/{0,2}.*\/([^/#]+)(#.*)?$/)[1]
 export const getUrlFilename = (url) => {
-  const segments = new URL(url).pathname.split("/");
-  const last = segments[segments.length - 1];
-  return last === "" ? null : last;
+  const { pathname } = new URL(url);
+  if (pathname === "" || pathname.endsWith("/")) {
+    return null;
+  } else {
+    return pathname.substring(pathname.lastIndexOf("/") + 1);
+  }
 };
 
+// Alternatively:
+//   url.match(/([^.\/]+)(\.[^/#]*)(#.*)?$/)[1]
 export const getUrlBasename = (url) => {
   const filename = getUrlFilename(url);
   if (filename === null) {
     return null;
   } else if (filename.includes(".")) {
-    const parts = filename.split(".", 2);
-    return parts[0];
+    return filename.substring(0, filename.indexOf("."));
   } else {
     return filename;
   }
 };
 
+// Alternatively:
+//   url.match(/([^.\/]+)(\.[^/#]*)(#.*)?$/)[2]
 export const getUrlExtension = (url) => {
   const filename = getUrlFilename(url);
   if (filename === null) {
     return null;
   } else if (filename.includes(".")) {
-    const parts = filename.split(".");
-    parts[0] = "";
-    return parts.join(".");
+    return filename.substring(filename.indexOf("."));
   } else {
     return null;
   }
