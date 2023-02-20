@@ -1,6 +1,6 @@
 import BabelParser from "@babel/parser";
 import { InternalAppmapError } from "../../error/index.mjs";
-import { getUrlExtension } from "../../url/index.mjs";
+import { getLastUrlExtension } from "../../url/index.mjs";
 import { assert, coalesce } from "../../util/index.mjs";
 import { logWarning, logError } from "../../log/index.mjs";
 
@@ -47,7 +47,7 @@ export const extractCommentLabelArray = ({ value: text }) => {
 };
 
 export const parseEstree = (url, content) => {
-  const extension = getUrlExtension(url);
+  const extension = getLastUrlExtension(url);
   let source_type = "unambiguous";
   if (extension === ".cjs" || extension === ".node") {
     source_type = "script";
