@@ -7,6 +7,22 @@ import {
   toModuleClassmap,
 } from "./module.mjs";
 
+// empty module //
+assertEqual(
+  lookupModuleClosure(
+    createModule({
+      source: createSource("protocol://host/home/dirname/basename.js", `123;`),
+      pruning: true,
+      inline: true,
+      shallow: true,
+      relative: "dirname/basename.js",
+      exclusions: [],
+    }),
+    { line: 123, column: 456 },
+  ),
+  null,
+);
+
 {
   const module = createModule({
     source: createSource(

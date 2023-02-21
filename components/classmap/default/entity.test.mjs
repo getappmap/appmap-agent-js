@@ -181,7 +181,7 @@ assertEqual(
         excluded: false,
       }),
     );
-    assertDeepEqual(infos.get("reference"), {
+    assertDeepEqual(infos.get("1:0"), {
       shallow: true,
       parameters: ["x", "y", "z"],
       link: {
@@ -208,7 +208,7 @@ assertEqual(
         };
       },
     );
-    assertDeepEqual(infos.get("reference"), null);
+    assertDeepEqual(infos.get("1:0"), null);
   }
 }
 
@@ -234,7 +234,7 @@ assertEqual(
     },
   );
   assertDeepEqual(
-    getEntitySummary(hideMissingFunctionEntity(entity, new Set(["reference"]))),
+    getEntitySummary(hideMissingFunctionEntity(entity, new Set(["1:0"]))),
     {
       type: "function",
       name: "f",

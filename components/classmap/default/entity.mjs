@@ -1,6 +1,7 @@
 import { assert } from "../../util/index.mjs";
 import { getUrlBasename, toAbsoluteUrl } from "../../url/index.mjs";
 import { InternalAppmapError } from "../../error/index.mjs";
+import { stringifyPosition } from "./position.mjs";
 import {
   getSourceContent,
   getLeadingCommentArray,
@@ -46,7 +47,7 @@ export const makeClassEntity = (maybe_name, children, context) => ({
 
 export const makeFunctionEntity = (
   node,
-  reference,
+  _reference,
   maybe_name,
   children,
   context,
@@ -54,7 +55,7 @@ export const makeFunctionEntity = (
   const comments = getLeadingCommentArray(node);
   return {
     type: "function",
-    reference,
+    reference: stringifyPosition(node.loc.start),
     shallow: context.shallow,
     parameters: node.params.map((param) =>
       getSourceContent(context.source).substring(param.start, param.end),
@@ -161,7 +162,7 @@ export const registerEntity = (
       applyExclude(entity, maybe_parent_entity, recursively_excluded, exclude);
     assert(
       !infos.has(entity.reference),
-      "duplicate function entity reference",
+      "duplicate function entity position",
       InternalAppmapError,
     );
     infos.set(
