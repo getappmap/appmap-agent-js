@@ -73,13 +73,19 @@ export const flushBackendAsync = async (urls, backend, abrupt) => {
   }
 };
 
+const describeCommand = ({ source, tokens }) => source ?? tokens;
+
 const runConfigurationAsync = async (configuration, env, children) => {
   configuration = resolveConfigurationAutomatedRecorder(configuration, env);
   const command = await compileConfigurationCommandAsync(configuration, env);
   try {
     return await spawnAsync(command, children);
   } catch (error) {
-    logError("Child error %j >> %O", configuration.command.tokens, error);
+    logError(
+      "Child error %j >> %O",
+      describeCommand(configuration.command),
+      error,
+    );
     throw new ExternalAppmapError("Failed to spawn child process");
   }
 };
@@ -136,7 +142,7 @@ export const mainAsync = async (process, configuration) => {
     logInfo("Waiting for SIGINT to stop ...");
   } else if (length === 1) {
     const configuration = configurations[0];
-    logInfo("Spawning %j ...", configuration.command.tokens);
+    logInfo("Spawning %j ...", describeCommand(configuration.command));
     logInfo("Send SIGINT to gracefully exit");
     const { signal, status } = await runConfigurationAsync(
       configuration,
@@ -158,16 +164,14 @@ export const mainAsync = async (process, configuration) => {
     for (let index = 0; index < length; index += 1) {
       if (!done) {
         const configuration = configurations[index];
-        const {
-          command: { tokens },
-        } = configuration;
-        logInfo("Spawning %j [%j/%j] ...", tokens, index + 1, length);
+        const description = describeCommand(configuration.command);
+        logInfo("Spawning %j [%j/%j] ...", description, index + 1, length);
         const { signal, status } = await runConfigurationAsync(
           configurations[index],
           env,
           children,
         );
-        summary.push({ tokens, signal, status });
+        summary.push({ description, signal, status });
         /* c8 ignore start */
         if (signal !== null) {
           logInfo("Killed with: %s", signal);
@@ -178,8 +182,8 @@ export const mainAsync = async (process, configuration) => {
       }
     }
     logInfo("Summary:");
-    for (const { tokens, signal, status } of summary) {
-      logInfo("%j >> %j", tokens, signal === null ? status : signal);
+    for (const { description, signal, status } of summary) {
+      logInfo("%j >> %j", description, signal === null ? status : signal);
     }
     done = true;
   }
