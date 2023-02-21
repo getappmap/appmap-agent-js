@@ -74,25 +74,16 @@ assertEqual(
         static: false,
       },
     };
-    assertDeepEqual(
-      lookupModuleClosure(module, { line: 2, column: 8 }, {}),
-      info,
-    );
-    assertDeepEqual(
-      lookupModuleClosure(module, { line: 2, column: 8 }, {}),
-      info,
-    );
-    assertDeepEqual(
-      lookupModuleClosure(module, { line: 2, column: 10 }, {}),
-      info,
-    );
+    assertDeepEqual(lookupModuleClosure(module, { line: 2, column: 8 }), info);
+    assertDeepEqual(lookupModuleClosure(module, { line: 2, column: 8 }), info);
+    assertDeepEqual(lookupModuleClosure(module, { line: 2, column: 10 }), info);
   }
 
   // excluded function //
-  assertEqual(lookupModuleClosure(module, { line: 3, column: 8 }, {}), null);
+  assertEqual(lookupModuleClosure(module, { line: 3, column: 8 }), null);
 
   // missing function //
-  assertEqual(lookupModuleClosure(module, { line: 4, column: 8 }, {}), null);
+  assertEqual(lookupModuleClosure(module, { line: 4, column: 8 }), null);
 
   assertDeepEqual(toModuleClassmap(module), [
     {
