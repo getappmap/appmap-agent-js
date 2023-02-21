@@ -10,25 +10,28 @@ import {
   isSourceEmpty,
   getSourceUrl,
 } from "../../source/index.mjs";
+import { getConfigurationPackage } from "../../configuration-accessor/index.mjs";
 import { readFile } from "../../file/index.mjs";
 import { logDebug } from "../../log/index.mjs";
 
-export const fillSourceMap = (mapping) => {
+export const fillSourceMap = (mapping, configuration) => {
   for (const url of getMappingSourceArray(mapping)
     .filter(isSourceEmpty)
     .map(getSourceUrl)) {
-    let content = null;
-    try {
-      // TODO
-      // Lookup the url in `configuration.packages` to see whether the url is
-      // enabled. If it is disabled, we can improve performance by not trying
-      // to load the source file.
-      content = readFile(url);
-    } catch (error) {
-      logDebug("could not load source file %j >> %O", url, error);
-    }
-    if (content !== null) {
-      updateMappingSource(mapping, createSource(url, content));
+    if (getConfigurationPackage(configuration, url).enabled) {
+      let content = null;
+      try {
+        // TODO
+        // Lookup the url in `configuration.packages` to see whether the url is
+        // enabled. If it is disabled, we can improve performance by not trying
+        // to load the source file.
+        content = readFile(url);
+      } catch (error) {
+        logDebug("could not load source file %j >> %O", url, error);
+      }
+      if (content !== null) {
+        updateMappingSource(mapping, createSource(url, content));
+      }
     }
   }
 };
