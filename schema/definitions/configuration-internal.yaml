@@ -157,10 +157,6 @@ properties:
         - $ref: module-cooked
   exclude:
     $ref: exclude-cooked
-  anonymous-name-separator:
-    $ref: separator
-  function-name-placeholder:
-    type: string
   collapse-package-hierachy:
     type: boolean
   recording:
