@@ -3,8 +3,7 @@ import { parseSource } from "../../source/index.mjs";
 import { lookupEstreePath } from "./lookup.mjs";
 import {
   wrapRootEntityArray,
-  excludeEntity,
-  registerFunctionEntity,
+  registerEntityTree,
   hideMissingFunctionEntity,
   removeEmptyClassEntity,
   toClassmapEntity,
@@ -34,10 +33,10 @@ export const createModule = ({
   const entities = wrapRootEntityArray(
     digestEstreeRoot(estree, context),
     context,
-  ).flatMap((entity) => excludeEntity(entity, null, getExclusion));
+  );
   const infos = new Map();
   for (const entity of entities) {
-    registerFunctionEntity(entity, null, infos);
+    registerEntityTree(entity, null, null, infos, getExclusion);
   }
   return {
     source,
@@ -68,8 +67,13 @@ export const lookupModuleClosure = ({ estree, infos, paths }, position) => {
     );
     return null;
   } else {
-    paths.add(maybe_path);
-    return infos.has(maybe_path) ? infos.get(maybe_path) : null;
+    /* c8 ignore start */
+    const info = infos.has(maybe_path) ? infos.get(maybe_path) : null;
+    if (info !== null) {
+      paths.add(maybe_path);
+    }
+    return info;
+    /* c8 ignore stop */
   }
 };
 
