@@ -1,3 +1,18 @@
+## [13.5.1](https://github.com/getappmap/appmap-agent-js/compare/v13.5.0...v13.5.1) (2023-02-22)
+
+
+### Bug Fixes
+
+* add loc on manufactured empty ast ([6f64aa3](https://github.com/getappmap/appmap-agent-js/commit/6f64aa3d3d0c3d396e2aafa32b5605cddc532d69))
+* more robust ast lookup ([54bf1f5](https://github.com/getappmap/appmap-agent-js/commit/54bf1f58c0400844502ca63bed8638a5defcc13f))
+* only use the last extension segment of urls for parsing ([fae2458](https://github.com/getappmap/appmap-agent-js/commit/fae2458b965e51d3050b7991b2b4d3d926a772f7))
+
+
+### Performance Improvements
+
+* do not load disabled source files ([5d488c2](https://github.com/getappmap/appmap-agent-js/commit/5d488c2aec7d7a33f6db91f2499cadd6847f3c91))
+* faster url parsing ([e7c92dc](https://github.com/getappmap/appmap-agent-js/commit/e7c92dccb752ad1a5cc54830c2eb371f1273c199))
+
 # [13.5.0](https://github.com/getappmap/appmap-agent-js/compare/v13.4.0...v13.5.0) (2023-02-17)
 
 
