@@ -7,6 +7,7 @@ import {
   getUrlFilename,
   getUrlBasename,
   getUrlExtension,
+  getLastUrlExtension,
 } from "./index.mjs";
 
 ////////////////////
@@ -51,6 +52,24 @@ assertEqual(
     "protocol://host/directory/basename.extension1.extension2#hash",
   ),
   ".extension1.extension2",
+);
+
+/////////////////////////
+// getLastUrlExtension //
+/////////////////////////
+
+assertEqual(getLastUrlExtension("protocol://host/directory/#hash"), null);
+
+assertEqual(
+  getLastUrlExtension("protocol://host/directory/filename#hash"),
+  null,
+);
+
+assertEqual(
+  getLastUrlExtension(
+    "protocol://host/directory/basename.extension1.extension2#hash",
+  ),
+  ".extension2",
 );
 
 ////////////////////

@@ -9,7 +9,7 @@ import {
   coalesce,
 } from "../../util/index.mjs";
 import { mapSource } from "../../mapping/index.mjs";
-import { logDebugWhen, logErrorWhen } from "../../log/index.mjs";
+import { logErrorWhen } from "../../log/index.mjs";
 import { stringifyLocation } from "../../location/index.mjs";
 import { isExcluded } from "./exclusion.mjs";
 
@@ -293,13 +293,6 @@ const visitGeneric = (node, parent, _grand_parent, closure, context) =>
 const instrumentClosure = (node, parent, grand_parent, closure, context) => {
   const location = mapSource(
     context.mapping,
-    node.loc.start.line,
-    node.loc.start.column,
-  );
-  logDebugWhen(
-    location === null,
-    "Missing source map at file %j at line %j at column %j",
-    context.url,
     node.loc.start.line,
     node.loc.start.column,
   );
@@ -626,13 +619,6 @@ const instrumenters = {
     ) {
       const location = mapSource(
         context.mapping,
-        node.loc.start.line,
-        node.loc.start.column,
-      );
-      logDebugWhen(
-        location === null,
-        "Missing source map at file %j at line %j at column %j",
-        context.url,
         node.loc.start.line,
         node.loc.start.column,
       );

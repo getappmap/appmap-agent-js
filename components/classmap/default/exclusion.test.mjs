@@ -5,7 +5,7 @@ import {
 } from "../../__fixture__.mjs";
 import { createSource, parseSource } from "../../source/index.mjs";
 import { digestEstreeRoot } from "./digest.mjs";
-import { makeClassEntity, excludeEntity, getEntitySummary } from "./entity.mjs";
+import { makeClassEntity } from "./entity.mjs";
 import { compileExclusionArray } from "./exclusion.mjs";
 
 const or_exclusion = {
@@ -58,8 +58,8 @@ assertDeepEqual(
   { excluded: true, recursive: true },
 );
 
-assertDeepEqual(
-  digestEstreeRoot(
+{
+  const entities = digestEstreeRoot(
     parseSource(
       createSource(
         "protocol://host/path.js",
@@ -67,29 +67,29 @@ assertDeepEqual(
       ),
     ),
     default_context,
-  )
-    .flatMap((entity) =>
-      excludeEntity(
-        entity,
-        null,
-        compileExclusionArray([
-          {
-            ...and_exclusion,
-            excluded: true,
-            recursive: true,
-            name: "^k$",
-            "some-label": "^l1$",
-            "every-label": "^l",
-            "qualified-name": "^o.k$",
-          },
-          {
-            ...and_exclusion,
-            excluded: false,
-            recursive: false,
-          },
-        ]),
-      ),
-    )
-    .map(getEntitySummary),
-  [{ type: "class", name: "o", children: [] }],
-);
+  );
+  const exclude = compileExclusionArray([
+    {
+      ...and_exclusion,
+      excluded: true,
+      recursive: true,
+      name: "^k$",
+      "some-label": "^l1$",
+      "every-label": "^l",
+      "qualified-name": "^o.k$",
+    },
+    {
+      ...and_exclusion,
+      excluded: false,
+      recursive: false,
+    },
+  ]);
+  assertDeepEqual(exclude(entities[0], null), {
+    excluded: false,
+    recursive: false,
+  });
+  assertDeepEqual(exclude(entities[0].children[0], entities[0]), {
+    excluded: true,
+    recursive: true,
+  });
+}

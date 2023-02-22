@@ -11,8 +11,7 @@ import {
   getEntityLabelArray,
   getEntityQualifiedName,
   getEntitySummary,
-  excludeEntity,
-  registerFunctionEntity,
+  registerEntityTree,
   hideMissingFunctionEntity,
   removeEmptyClassEntity,
   toClassmapEntity,
@@ -149,57 +148,6 @@ assertEqual(
   );
 }
 
-///////////////////
-// excludeEntity //
-///////////////////
-
-{
-  const root_entity = makeClassEntity(
-    "c",
-    [makeClassEntity("d", [], default_context)],
-    default_context,
-  );
-  assertDeepEqual(
-    excludeEntity(root_entity, null, (_entity, _maybe_parent_entity) => ({
-      recursive: true,
-      excluded: false,
-    })).map(getEntitySummary),
-    [
-      {
-        type: "class",
-        name: "c",
-        children: [
-          {
-            type: "class",
-            name: "d",
-            children: [],
-          },
-        ],
-      },
-    ],
-  );
-  assertDeepEqual(
-    excludeEntity(root_entity, null, (_entity, _maybe_parent_entity) => ({
-      recursive: true,
-      excluded: true,
-    })).map(getEntitySummary),
-    [],
-  );
-  assertDeepEqual(
-    excludeEntity(root_entity, null, (entity, _maybe_parent_entity) => ({
-      recursive: false,
-      excluded: getEntityName(entity) === "c",
-    })).map(getEntitySummary),
-    [
-      {
-        type: "class",
-        name: "d",
-        children: [],
-      },
-    ],
-  );
-}
-
 ////////////////////////////
 // registerFunctionEntity //
 ////////////////////////////
@@ -221,19 +169,47 @@ assertEqual(
     ],
     default_context,
   );
-  const infos = new Map();
-  registerFunctionEntity(entity, null, infos);
-  assertDeepEqual(infos.get("reference"), {
-    shallow: true,
-    parameters: ["x", "y", "z"],
-    link: {
-      defined_class: "c",
-      method_id: "f",
-      path: "relative",
-      lineno: 1,
-      static: false,
-    },
-  });
+  {
+    const infos = new Map();
+    registerEntityTree(
+      entity,
+      null,
+      null,
+      infos,
+      (_entity, _maybe_parent_entity) => ({
+        recursive: false,
+        excluded: false,
+      }),
+    );
+    assertDeepEqual(infos.get("1:0"), {
+      shallow: true,
+      parameters: ["x", "y", "z"],
+      link: {
+        defined_class: "c",
+        method_id: "f",
+        path: "relative",
+        lineno: 1,
+        static: false,
+      },
+    });
+  }
+  {
+    const infos = new Map();
+    registerEntityTree(
+      entity,
+      null,
+      null,
+      infos,
+      (entity, _maybe_parent_entity) => {
+        assertEqual(entity.name, "c");
+        return {
+          recursive: true,
+          excluded: true,
+        };
+      },
+    );
+    assertDeepEqual(infos.get("1:0"), null);
+  }
 }
 
 ///////////////////////////////
@@ -258,7 +234,7 @@ assertEqual(
     },
   );
   assertDeepEqual(
-    getEntitySummary(hideMissingFunctionEntity(entity, new Set(["reference"]))),
+    getEntitySummary(hideMissingFunctionEntity(entity, new Set(["1:0"]))),
     {
       type: "function",
       name: "f",

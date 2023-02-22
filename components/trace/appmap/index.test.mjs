@@ -37,7 +37,6 @@ const configuration = extendConfiguration(
       appmap: true,
     },
     pruning: true,
-    "function-name-placeholder": "$",
   },
   "protocol://host/base/",
 );

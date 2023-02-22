@@ -4,7 +4,7 @@ import {
   ExternalAppmapError,
 } from "../../error/index.mjs";
 import { toDirectoryUrl, toAbsoluteUrl } from "../../url/index.mjs";
-import { logInfo, logError } from "../../log/index.mjs";
+import { logDebug, logWarning, logError } from "../../log/index.mjs";
 import {
   createSource,
   makeSourceLocation,
@@ -124,7 +124,7 @@ export const mapSource = (mapping, line, column) => {
               mapped_column,
             );
           } else {
-            logInfo(
+            logWarning(
               "Source map out of range at file %j, line %j, and column %j",
               mapping.base,
               line,
@@ -134,7 +134,9 @@ export const mapSource = (mapping, line, column) => {
           }
         }
       }
-      logInfo(
+      // This is fine: functions in generated files may not have an associated
+      // function in the sources -- eg: module wrapper && fake async functions.
+      logDebug(
         "Missing source map segment for file %j at line %j and column %j",
         mapping.base,
         line,
@@ -142,7 +144,9 @@ export const mapSource = (mapping, line, column) => {
       );
       return null;
     } else {
-      logInfo(
+      // This is fine: functions in generated files may not have an associated
+      // function in the sources -- eg: module wrapper && fake async functions.
+      logDebug(
         "Missing source map group for file %j and line %j",
         mapping.base,
         line,

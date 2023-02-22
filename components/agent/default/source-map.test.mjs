@@ -3,6 +3,10 @@ import { Buffer } from "node:buffer";
 import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
 import { getUuid } from "../../uuid/random/index.mjs";
 import { createSource, makeSourceLocation } from "../../source/index.mjs";
+import {
+  extendConfiguration,
+  createConfiguration,
+} from "../../configuration/index.mjs";
 import { getTmpUrl } from "../../path/index.mjs";
 import { toAbsoluteUrl } from "../../url/index.mjs";
 import {
@@ -27,11 +31,18 @@ const empty_source_map = {
 };
 
 {
+  const configuration = extendConfiguration(
+    createConfiguration(getTmpUrl()),
+    {
+      "default-package": { enabled: true },
+    },
+    getTmpUrl(),
+  );
   const url = toAbsoluteUrl(getUuid(), getTmpUrl());
   const mapping = createMirrorMapping(createSource(url, null));
-  fillSourceMap(mapping);
+  fillSourceMap(mapping, configuration);
   await writeFileAsync(new URL(url), "123;", "utf8");
-  fillSourceMap(mapping);
+  fillSourceMap(mapping, configuration);
   assertDeepEqual(getMappingSourceArray(mapping), [createSource(url, "123;")]);
 }
 

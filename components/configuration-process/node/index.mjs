@@ -8,7 +8,7 @@ import { assert, hasOwnProperty, coalesce } from "../../util/index.mjs";
 import { getCwdUrl } from "../../path/index.mjs";
 import {
   toAbsoluteUrl,
-  getUrlExtension,
+  getLastUrlExtension,
   toDirectoryUrl,
 } from "../../url/index.mjs";
 import { logError, logErrorWhen } from "../../log/index.mjs";
@@ -78,7 +78,7 @@ const parseConfigurationFile = (parse, content, url) => {
 };
 
 const loadConfigFile = (url) => {
-  const extension = getUrlExtension(url);
+  const extension = getLastUrlExtension(url);
   assert(
     !logErrorWhen(
       !parsers.has(extension),

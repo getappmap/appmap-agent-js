@@ -26,7 +26,19 @@ parseEstree(
   "protocol://host/dirname/filename.js?search#hash",
   "/* @flow */ const x: number = <JSX />;",
 );
-parseEstree("protocol://host/dirname/filename.js?search#hash", "{");
+assertDeepEqual(
+  parseEstree("protocol://host/dirname/filename.js?search#hash", "{"),
+  {
+    type: "Program",
+    body: [],
+    sourceType: "script",
+    loc: {
+      start: { line: 0, column: 0 },
+      end: { line: 0, column: 0 },
+      filename: "protocol://host/dirname/filename.js?search#hash",
+    },
+  },
+);
 
 assertDeepEqual(
   getLeadingCommentArray(

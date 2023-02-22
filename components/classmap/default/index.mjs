@@ -46,7 +46,6 @@ export const addClassmapSource = (
   {
     configuration: {
       pruning,
-      "function-name-placeholder": placeholder,
       repository: { directory },
       packages: specifiers,
       "default-package": default_specifier,
@@ -114,7 +113,6 @@ export const addClassmapSource = (
           createModule({
             source,
             relative,
-            placeholder,
             pruning,
             inline:
               local_inline_source === null

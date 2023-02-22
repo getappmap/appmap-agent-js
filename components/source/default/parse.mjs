@@ -1,6 +1,6 @@
 import BabelParser from "@babel/parser";
 import { InternalAppmapError } from "../../error/index.mjs";
-import { getUrlExtension } from "../../url/index.mjs";
+import { getLastUrlExtension } from "../../url/index.mjs";
 import { assert, coalesce } from "../../util/index.mjs";
 import { logWarning, logError } from "../../log/index.mjs";
 
@@ -47,7 +47,7 @@ export const extractCommentLabelArray = ({ value: text }) => {
 };
 
 export const parseEstree = (url, content) => {
-  const extension = getUrlExtension(url);
+  const extension = getLastUrlExtension(url);
   let source_type = "unambiguous";
   if (extension === ".cjs" || extension === ".node") {
     source_type = "script";
@@ -72,7 +72,16 @@ export const parseEstree = (url, content) => {
     });
   } catch (error) {
     logError("Unrecoverable parsing error at file %j >> %O", url, error);
-    return { type: "Program", body: [], sourceType: "script" };
+    return {
+      type: "Program",
+      body: [],
+      sourceType: "script",
+      loc: {
+        start: { line: 0, column: 0 },
+        end: { line: 0, column: 0 },
+        filename: url,
+      },
+    };
   }
   const { errors, program: node } = result;
   for (const error of errors) {

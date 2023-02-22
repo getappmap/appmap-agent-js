@@ -1,6 +1,7 @@
 import { assert } from "../../util/index.mjs";
 import { getUrlBasename, toAbsoluteUrl } from "../../url/index.mjs";
 import { InternalAppmapError } from "../../error/index.mjs";
+import { stringifyPosition } from "./position.mjs";
 import {
   getSourceContent,
   getLeadingCommentArray,
@@ -46,7 +47,7 @@ export const makeClassEntity = (maybe_name, children, context) => ({
 
 export const makeFunctionEntity = (
   node,
-  reference,
+  _reference,
   maybe_name,
   children,
   context,
@@ -54,7 +55,7 @@ export const makeFunctionEntity = (
   const comments = getLeadingCommentArray(node);
   return {
     type: "function",
-    reference,
+    reference: stringifyPosition(node.loc.start),
     shallow: context.shallow,
     parameters: node.params.map((param) =>
       getSourceContent(context.source).substring(param.start, param.end),
@@ -123,19 +124,28 @@ export const getEntitySummary = ({ type, name, children }) => ({
 // loop //
 //////////
 
-export const excludeEntity = (entity, maybe_parent_entity, getExclusion) => {
-  const { excluded, recursive } = getExclusion(entity, maybe_parent_entity);
-  if (recursive) {
-    return excluded ? [] : [entity];
+const applyExclude = (entity, parent_entity, recursively_excluded, exclude) => {
+  if (recursively_excluded === null) {
+    const { excluded, recursive } = exclude(entity, parent_entity);
+    return {
+      excluded,
+      recursively_excluded: recursive ? excluded : null,
+    };
   } else {
-    const children = entity.children.flatMap((child_entity) =>
-      excludeEntity(child_entity, entity, getExclusion),
-    );
-    return excluded ? children : [{ ...entity, children }];
+    return {
+      excluded: recursively_excluded,
+      recursively_excluded,
+    };
   }
 };
 
-export const registerFunctionEntity = (entity, maybe_parent_entity, infos) => {
+export const registerEntity = (
+  entity,
+  maybe_parent_entity,
+  recursively_excluded,
+  infos,
+  exclude,
+) => {
   if (entity.type === "function") {
     assert(
       maybe_parent_entity !== null,
@@ -148,25 +158,62 @@ export const registerFunctionEntity = (entity, maybe_parent_entity, infos) => {
       "could not parse function classmap entity location",
       InternalAppmapError,
     );
+    const { excluded, recursively_excluded: child_recursively_excluded } =
+      applyExclude(entity, maybe_parent_entity, recursively_excluded, exclude);
     assert(
       !infos.has(entity.reference),
-      "duplicate function entity reference",
+      "duplicate function entity position",
       InternalAppmapError,
     );
-    infos.set(entity.reference, {
-      parameters: entity.parameters,
-      shallow: entity.shallow,
-      link: {
-        defined_class: maybe_parent_entity.name,
-        method_id: entity.name,
-        path: parts[1],
-        lineno: parseInt(parts[2]),
-        static: entity.static,
-      },
-    });
+    infos.set(
+      entity.reference,
+      excluded
+        ? null
+        : {
+            parameters: entity.parameters,
+            shallow: entity.shallow,
+            link: {
+              defined_class: maybe_parent_entity.name,
+              method_id: entity.name,
+              path: parts[1],
+              lineno: parseInt(parts[2]),
+              static: entity.static,
+            },
+          },
+    );
+    return child_recursively_excluded;
+  } else {
+    return applyExclude(
+      entity,
+      maybe_parent_entity,
+      recursively_excluded,
+      exclude,
+    ).recursively_excluded;
   }
+};
+
+export const registerEntityTree = (
+  entity,
+  maybe_parent_entity,
+  recursively_excluded,
+  infos,
+  exclude,
+) => {
+  const child_recursively_excluded = registerEntity(
+    entity,
+    maybe_parent_entity,
+    recursively_excluded,
+    infos,
+    exclude,
+  );
   for (const child_entity of entity.children) {
-    registerFunctionEntity(child_entity, entity, infos);
+    registerEntityTree(
+      child_entity,
+      entity,
+      child_recursively_excluded,
+      infos,
+      exclude,
+    );
   }
 };
 

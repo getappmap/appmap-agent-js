@@ -1,7 +1,7 @@
 import { readFileSync as readFileInner } from "fs";
 import { readFile as readFileInnerAsync } from "fs/promises";
 import { Buffer } from "node:buffer";
-import { logWarningWhen } from "../../log/index.mjs";
+import { logDebugWhen } from "../../log/index.mjs";
 
 const { Error, decodeURIComponent, URL } = globalThis;
 
@@ -22,7 +22,7 @@ const generateReadFile = (readFile) => (url) => {
   } else if (url_obj.protocol === "data:") {
     const { head, body } = splitDataPath(url_obj.pathname);
     if (head.endsWith(";base64")) {
-      logWarningWhen(
+      logDebugWhen(
         !head.toLowerCase().includes(";charset=utf-8;") &&
           !head.toLowerCase().includes(";charset=utf8;"),
         "Data url is encoded as base64 and does not declare UTF-8 as its character encoding, will try to use UTF-8 anyway >> %s",
