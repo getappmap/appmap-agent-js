@@ -92,6 +92,21 @@ const instrumentation = createInstrumentation(
 }
 
 {
+  const js = "class Klass { prop; }";
+  const source = createSource("protocol://host/base/foo.js", js);
+  assertDeepEqual(
+    normalizeContent(
+      instrument(instrumentation, source, createMirrorMapping(source)),
+    ),
+    {
+      url: "protocol://host/base/foo.js",
+      content: normalize(js, "script"),
+      sources: [source],
+    },
+  );
+}
+
+{
   const source = createSource("protocol://host/base/bar.js", "456;");
   assertDeepEqual(
     normalizeContent(

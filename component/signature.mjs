@@ -84,7 +84,7 @@ const parseBabelLog = (content, url) => {
     return parseBabel(content, {
       sourceType: "module",
       sourceFilename: url,
-      plugins: ["estree"],
+      plugins: [["estree", { classFeatures: true }]],
     }).program;
   } catch (error) {
     error.message += ` at ${url}`;

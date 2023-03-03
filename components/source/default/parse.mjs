@@ -60,7 +60,7 @@ export const parseEstree = (url, content) => {
   } else if (/^[ \t\n]*\/(\/[ \t]*|\*[ \t\n]*)@flow/u.test(content)) {
     plugins = ["flow"];
   }
-  plugins.push("estree", "jsx");
+  plugins.push(["estree", { classFeatures: true }], "jsx");
   let result;
   try {
     result = parseBabel(content, {
