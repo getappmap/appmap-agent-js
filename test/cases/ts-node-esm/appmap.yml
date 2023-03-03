@@ -1,0 +1,23 @@
+recorder: process
+processes:
+  - regexp: /child-entrypoint\.js$
+    enabled: true
+default-process:
+  enabled: false
+packages:
+  glob: "*"
+  enabled: true
+default-package:
+  enabled: false
+command: npx ts-node-esm square.test.ts
+appmap_dir: .
+appmap_file: square
+hooks:
+  cjs: true
+  esm: true
+  apply: true
+  eval: false
+  http: false
+  mysql: false
+  pg: false
+  sqlite3: false

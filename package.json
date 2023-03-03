@@ -81,7 +81,8 @@
     "semantic-release": "^19.0.5",
     "sinon": "^14.0.0",
     "source-map": "^0.7.4",
-    "sqlite3": "^5.0.2"
+    "sqlite3": "^5.0.2",
+    "ts-node": "^10.9.1"
   },
   "publishConfig": {
     "cache": "~/.npm",
