@@ -117,7 +117,8 @@ export const isConfigurationEnabled = ({
   processes,
   main,
   "default-process": default_process,
-}) => main === null || lookupSpecifier(processes, main, default_process);
+}) =>
+  main === null || lookupSpecifier(processes, main, default_process).enabled;
 
 export const getConfigurationPackage = (
   { packages, "default-package": default_package },

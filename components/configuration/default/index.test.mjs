@@ -231,6 +231,28 @@ assertDeepEqual(
   ],
 );
 
+// default-process //
+
+assertDeepEqual(
+  extend(
+    "default-process",
+    true,
+    "protocol://host/base/",
+    "protocol://host/home",
+  ),
+  { enabled: true },
+);
+
+assertDeepEqual(
+  extend(
+    "default-process",
+    { enabled: true },
+    "protocol://host/base/",
+    "protocol://host/home",
+  ),
+  { enabled: true },
+);
+
 // processes //
 
 assertDeepEqual(
@@ -238,7 +260,7 @@ assertDeepEqual(
   [
     [
       { base: "protocol://host/base/", source: "^(?:\\/foo)$", flags: "" },
-      true,
+      { enabled: true },
     ],
   ],
 );

@@ -125,7 +125,7 @@ properties:
   ordering:
     $ref: ordering
   default-process:
-    type: boolean
+    $ref: process
   processes:
     type: array
     items:
@@ -134,7 +134,7 @@ properties:
       maxItems: 2
       items:
         - $ref: specifier-cooked
-        - type: boolean
+        - $ref: process
   main:
     anyOf:
       - const: null
