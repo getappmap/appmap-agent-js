@@ -1,4 +1,4 @@
-import { assertDeepEqual } from "../../__fixture__.mjs";
+import { assertDeepEqual, assertEqual } from "../../__fixture__.mjs";
 import {
   parseEstree,
   printComment,
@@ -39,6 +39,16 @@ assertDeepEqual(
     },
   },
 );
+
+{
+  const parsedClass = parseEstree(
+    "protocol://host/dirname/filename.js?search#hash",
+    "class Foo { prop; }",
+  );
+
+  // make sure property definitions have estree-compliant type
+  assertEqual(parsedClass.body[0].body.body[0].type, "PropertyDefinition");
+}
 
 assertDeepEqual(
   getLeadingCommentArray(

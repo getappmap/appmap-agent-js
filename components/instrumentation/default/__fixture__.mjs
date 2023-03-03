@@ -10,6 +10,6 @@ export const normalize = (code, source) =>
       ecmaVersion: 2021,
       sourceType: source,
       allowAwaitOutsideFunction: source === "module",
-      plugins: ["estree"],
+      plugins: [["estree", { classFeatures: true }]],
     }).program,
   );
