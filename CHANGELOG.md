@@ -1,3 +1,10 @@
+## [13.5.2](https://github.com/getappmap/appmap-agent-js/compare/v13.5.1...v13.5.2) (2023-03-03)
+
+
+### Bug Fixes
+
+* Support class features when transforming source code ([46f03b0](https://github.com/getappmap/appmap-agent-js/commit/46f03b0cb1b088aa68c65cc73e3b5eaed6cc853b)), closes [#199](https://github.com/getappmap/appmap-agent-js/issues/199)
+
 ## [13.5.1](https://github.com/getappmap/appmap-agent-js/compare/v13.5.0...v13.5.1) (2023-02-22)
 
 
