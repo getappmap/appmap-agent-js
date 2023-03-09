@@ -226,8 +226,8 @@ const makeCodeLocation = (source, line, column) =>
             APPLY_BUNDLE_TAB = APPLY.getFreshTab(),
             APPLY_RETURN,
             APPLY_RETURNED = true,
-            APPLY_YIELD,
-            APPLY_YIELD_TAB = null;
+            APPLY_JUMP,
+            APPLY_JUMP_TAB = null;
           APPLY.recordApply(
             APPLY_BUNDLE_TAB,
             ${makeCodeLocation(source, 1, 1)},
@@ -237,12 +237,12 @@ const makeCodeLocation = (source, line, column) =>
           try {
             {
               (
-                APPLY_YIELD = 123,
-                APPLY_YIELD_TAB = APPLY.getFreshTab(),
-                APPLY.recordYield(APPLY_YIELD_TAB, true, APPLY_YIELD),
-                APPLY_YIELD = yield* APPLY_YIELD,
-                APPLY.recordResume(APPLY_YIELD_TAB, APPLY_YIELD),
-                APPLY_YIELD
+                APPLY_JUMP = 123,
+                APPLY_JUMP_TAB = APPLY.getFreshTab(),
+                APPLY.recordYield(APPLY_JUMP_TAB, true, APPLY_JUMP),
+                APPLY_JUMP = yield* APPLY_JUMP,
+                APPLY.recordResume(APPLY_JUMP_TAB, APPLY_JUMP),
+                APPLY_JUMP
               );
             }
           } catch (APPLY_ERROR) {
@@ -293,8 +293,8 @@ const makeCodeLocation = (source, line, column) =>
             APPLY_BUNDLE_TAB = APPLY.getFreshTab(),
             APPLY_RETURN,
             APPLY_RETURNED = true,
-            APPLY_AWAIT,
-            APPLY_AWAIT_TAB = null;
+            APPLY_JUMP,
+            APPLY_JUMP_TAB = null;
           APPLY.recordApply(
             APPLY_BUNDLE_TAB,
             ${makeCodeLocation(source, 2, 7)},
@@ -305,18 +305,18 @@ const makeCodeLocation = (source, line, column) =>
             {
               try {
                 (
-                  APPLY_AWAIT = 123,
-                  APPLY_AWAIT_TAB = APPLY.getFreshTab(),
-                  APPLY.recordAwait(APPLY_AWAIT_TAB, APPLY_AWAIT),
-                  APPLY_AWAIT = await APPLY_AWAIT,
-                  APPLY.recordResolve(APPLY_AWAIT_TAB, APPLY_AWAIT),
-                  APPLY_AWAIT_TAB = null,
-                  APPLY_AWAIT
+                  APPLY_JUMP = 123,
+                  APPLY_JUMP_TAB = APPLY.getFreshTab(),
+                  APPLY.recordAwait(APPLY_JUMP_TAB, APPLY_JUMP),
+                  APPLY_JUMP = await APPLY_JUMP,
+                  APPLY.recordResolve(APPLY_JUMP_TAB, APPLY_JUMP),
+                  APPLY_JUMP_TAB = null,
+                  APPLY_JUMP
                 );
               } catch (APPLY_ERROR) {
-                if (APPLY_AWAIT_TAB !== null) {
-                  APPLY.recordReject(APPLY_AWAIT_TAB, APPLY_ERROR);
-                  APPLY_AWAIT_TAB = null;
+                if (APPLY_JUMP_TAB !== null) {
+                  APPLY.recordReject(APPLY_JUMP_TAB, APPLY_ERROR);
+                  APPLY_JUMP_TAB = null;
                 }
                 let error = APPLY_ERROR;
                 {
@@ -327,8 +327,8 @@ const makeCodeLocation = (source, line, column) =>
               }
             }
           } catch (APPLY_ERROR) {
-            if (APPLY_AWAIT_TAB !== null) {
-              APPLY.recordReject(APPLY_AWAIT_TAB, APPLY_ERROR);
+            if (APPLY_JUMP_TAB !== null) {
+              APPLY.recordReject(APPLY_JUMP_TAB, APPLY_ERROR);
             }
             APPLY_RETURNED = false;
             APPLY.recordThrow(
@@ -395,14 +395,14 @@ assertEqual(
     `
       let
         APPLY_BUNDLE_TAB = APPLY.getFreshTab(),
-        APPLY_AWAIT,
-        APPLY_AWAIT_TAB = null;
+        APPLY_JUMP,
+        APPLY_JUMP_TAB = null;
       try {
         123;
       } catch (APPLY_ERROR) {
-        if (APPLY_AWAIT_TAB !== null) {
-          APPLY.recordReject(APPLY_AWAIT_TAB, APPLY_ERROR);
-          APPLY_AWAIT_TAB = null;
+        if (APPLY_JUMP_TAB !== null) {
+          APPLY.recordReject(APPLY_JUMP_TAB, APPLY_ERROR);
+          APPLY_JUMP_TAB = null;
         }
         {
           456;
@@ -427,14 +427,14 @@ assertEqual(
     `
       let
         APPLY_BUNDLE_TAB = APPLY.getFreshTab(),
-        APPLY_AWAIT,
-        APPLY_AWAIT_TAB = null;
+        APPLY_JUMP,
+        APPLY_JUMP_TAB = null;
       try {
         123;
       } catch (APPLY_ERROR) {
-        if (APPLY_AWAIT_TAB !== null) {
-          APPLY.recordReject(APPLY_AWAIT_TAB, APPLY_ERROR);
-          APPLY_AWAIT_TAB = null;
+        if (APPLY_JUMP_TAB !== null) {
+          APPLY.recordReject(APPLY_JUMP_TAB, APPLY_ERROR);
+          APPLY_JUMP_TAB = null;
         }
       } finally {
         456;
