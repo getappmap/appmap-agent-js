@@ -251,6 +251,10 @@ const makeCodeLocation = (source, line, column) =>
               );
             }
           } catch (APPLY_ERROR) {
+            if (APPLY_JUMP_TAB !== null) {
+              APPLY.recordReject(APPLY_JUMP_TAB, APPLY_ERROR);
+              APPLY_JUMP_TAB = null;
+            }
             APPLY_DONE = true;
             APPLY.recordThrow(
               APPLY_BUNDLE_TAB,

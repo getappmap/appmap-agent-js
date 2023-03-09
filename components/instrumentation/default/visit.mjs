@@ -14,6 +14,7 @@ import { stringifyLocation } from "../../location/index.mjs";
 import { isExcluded } from "./exclusion.mjs";
 
 const {
+  Error,
   String,
   Array: { isArray },
   Object: { fromEntries },
@@ -249,6 +250,18 @@ const makeReturnStatement = (argument) => ({
 // Component //
 ///////////////
 
+const isJumpClosureNode = (node) => {
+  if (node.type === "Program") {
+    return node.sourceType === "module";
+  } else if (node.type === "FunctionExpression" || node.type === "FunctionDeclaration") {
+    return node.async || node.generator;
+  } else if (node.type === "ArrowFunctionExpression") {
+    return node.async;
+  } /* c8 ignore start */ else {
+    throw new Error("unexpected closure node");
+  } /* c8 ignore stop */
+};
+
 const isSubclassConstructor = (_node, parent, grand_parent) =>
   parent.type === "MethodDefinition" &&
   parent.kind === "constructor" &&
@@ -345,7 +358,7 @@ const instrumentClosure = (node, parent, grand_parent, closure, context) => {
             makeIdentifier(`${context.apply}_DONE`),
             makeLiteral(false),
           ),
-          ...(node.async || node.generator
+          ...(isJumpClosureNode(node)
             ? [
                 makeVariableDeclarator(
                   makeIdentifier(`${context.apply}_JUMP`),
@@ -435,7 +448,7 @@ const instrumentClosure = (node, parent, grand_parent, closure, context) => {
           makeCatchClause(
             makeIdentifier(`${context.apply}_ERROR`),
             makeBlockStatement([
-              ...(node.async
+              ...(isJumpClosureNode(node)
                 ? [
                     makeIfStatement(
                       makeBinaryExpression(
@@ -634,12 +647,7 @@ const instrumenters = {
     }
   },
   TryStatement: (node, parent, _grand_parent, closure, context) => {
-    if (
-      closure.instrumented &&
-      ((closure.node.type === "Program" &&
-        closure.node.sourceType === "module") ||
-        (hasOwnProperty(closure.node, "async") && closure.node.async))
-    ) {
+    if (closure.instrumented && isJumpClosureNode(closure.node)) {
       return makeTryStatement(
         visitNode(node.block, node, parent, closure, context),
         makeCatchClause(
