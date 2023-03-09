@@ -253,7 +253,10 @@ const makeReturnStatement = (argument) => ({
 const isJumpClosureNode = (node) => {
   if (node.type === "Program") {
     return node.sourceType === "module";
-  } else if (node.type === "FunctionExpression" || node.type === "FunctionDeclaration") {
+  } else if (
+    node.type === "FunctionExpression" ||
+    node.type === "FunctionDeclaration"
+  ) {
     return node.async || node.generator;
   } else if (node.type === "ArrowFunctionExpression") {
     return node.async;
@@ -500,6 +503,38 @@ const instrumentClosure = (node, parent, grand_parent, closure, context) => {
             ]),
           ),
           makeBlockStatement([
+            ...(isJumpClosureNode(node)
+              ? [
+                  makeIfStatement(
+                    makeBinaryExpression(
+                      "!==",
+                      makeIdentifier(`${context.apply}_JUMP_TAB`),
+                      makeLiteral(null),
+                    ),
+                    makeBlockStatement([
+                      makeStatement(
+                        makeCallExpression(
+                          makeRegularMemberExpression(
+                            context.apply,
+                            "recordResolve",
+                          ),
+                          [
+                            makeIdentifier(`${context.apply}_JUMP_TAB`),
+                            makeRegularMemberExpression(context.apply, "empty"),
+                          ],
+                        ),
+                      ),
+                      makeStatement(
+                        makeAssignmentExpression(
+                          makeIdentifier(`${context.apply}_JUMP_TAB`),
+                          makeLiteral(null),
+                        ),
+                      ),
+                    ]),
+                    null,
+                  ),
+                ]
+              : []),
             makeIfStatement(
               makeUnaryExpression("!", makeIdentifier(`${context.apply}_DONE`)),
               makeBlockStatement([
@@ -707,9 +742,36 @@ const instrumenters = {
                 ]),
           ]),
         ),
-        node.finalizer === null
-          ? null
-          : visitNode(node.finalizer, node, parent, closure, context),
+        makeBlockStatement([
+          makeIfStatement(
+            makeBinaryExpression(
+              "!==",
+              makeIdentifier(`${context.apply}_JUMP_TAB`),
+              makeLiteral(null),
+            ),
+            makeBlockStatement([
+              makeStatement(
+                makeCallExpression(
+                  makeRegularMemberExpression(context.apply, "recordResolve"),
+                  [
+                    makeIdentifier(`${context.apply}_JUMP_TAB`),
+                    makeRegularMemberExpression(context.apply, "empty"),
+                  ],
+                ),
+              ),
+              makeStatement(
+                makeAssignmentExpression(
+                  makeIdentifier(`${context.apply}_JUMP_TAB`),
+                  makeLiteral(null),
+                ),
+              ),
+            ]),
+            null,
+          ),
+          ...(node.finalizer === null
+            ? []
+            : [visitNode(node.finalizer, node, parent, closure, context)]),
+        ]),
       );
     } else {
       return null;

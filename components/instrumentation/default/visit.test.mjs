@@ -263,6 +263,10 @@ const makeCodeLocation = (source, line, column) =>
             );
             throw APPLY_ERROR;
           } finally {
+            if (APPLY_JUMP_TAB !== null) {
+              APPLY.recordResolve(APPLY_JUMP_TAB, APPLY.empty);
+              APPLY_JUMP_TAB = null;
+            }
             if (!APPLY_DONE) {
               APPLY.recordReturn(
                 APPLY_BUNDLE_TAB,
@@ -336,7 +340,13 @@ const makeCodeLocation = (source, line, column) =>
                   456;
                 }
               } finally {
-                789;
+                if (APPLY_JUMP_TAB !== null) {
+                  APPLY.recordResolve(APPLY_JUMP_TAB, APPLY.empty);
+                  APPLY_JUMP_TAB = null;
+                }
+                {
+                  789;
+                }
               }
             }
           } catch (APPLY_ERROR) {
@@ -352,6 +362,10 @@ const makeCodeLocation = (source, line, column) =>
             );
             throw APPLY_ERROR;
           } finally {
+            if (APPLY_JUMP_TAB !== null) {
+              APPLY.recordResolve(APPLY_JUMP_TAB, APPLY.empty);
+              APPLY_JUMP_TAB = null;
+            }
             if (!APPLY_DONE) {
               APPLY.recordReturn(
                 APPLY_BUNDLE_TAB,
@@ -421,6 +435,11 @@ assertEqual(
         {
           456;
         }
+      } finally {
+        if (APPLY_JUMP_TAB !== null) {
+          APPLY.recordResolve(APPLY_JUMP_TAB, APPLY.empty);
+          APPLY_JUMP_TAB = null;
+        }
       }
       export default 789;
     `,
@@ -451,7 +470,13 @@ assertEqual(
           APPLY_JUMP_TAB = null;
         }
       } finally {
-        456;
+        if (APPLY_JUMP_TAB !== null) {
+          APPLY.recordResolve(APPLY_JUMP_TAB, APPLY.empty);
+          APPLY_JUMP_TAB = null;
+        }
+        {
+          456;
+        }
       }
       export default 789;
     `,
