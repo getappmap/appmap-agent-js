@@ -346,7 +346,7 @@ const instrumentClosure = (node, parent, grand_parent, closure, context) => {
                 ),
                 makeVariableDeclarator(
                   makeIdentifier(`${context.apply}_YIELD_TAB`),
-                  null,
+                  makeLiteral(null),
                 ),
               ]
             : []),
@@ -358,7 +358,7 @@ const instrumentClosure = (node, parent, grand_parent, closure, context) => {
                 ),
                 makeVariableDeclarator(
                   makeIdentifier(`${context.apply}_AWAIT_TAB`),
-                  null,
+                  makeLiteral(null),
                 ),
               ]
             : []),
@@ -446,7 +446,7 @@ const instrumentClosure = (node, parent, grand_parent, closure, context) => {
                       makeBinaryExpression(
                         "!==",
                         makeIdentifier(`${context.apply}_AWAIT_TAB`),
-                        makeUnaryExpression("void", makeLiteral(0)),
+                        makeLiteral(null),
                       ),
                       makeBlockStatement([
                         makeStatement(
@@ -558,7 +558,7 @@ const instrumenters = {
           ),
           makeAssignmentExpression(
             makeIdentifier(`${context.apply}_AWAIT_TAB`),
-            makeUnaryExpression("void", makeLiteral(0)),
+            makeLiteral(null),
           ),
           makeIdentifier(`${context.apply}_AWAIT`),
         ])
@@ -656,7 +656,7 @@ const instrumenters = {
               makeBinaryExpression(
                 "!==",
                 makeIdentifier(`${context.apply}_AWAIT_TAB`),
-                makeUnaryExpression("void", makeLiteral(0)),
+                makeLiteral(null),
               ),
               makeBlockStatement([
                 makeStatement(
@@ -671,7 +671,7 @@ const instrumenters = {
                 makeStatement(
                   makeAssignmentExpression(
                     makeIdentifier(`${context.apply}_AWAIT_TAB`),
-                    makeUnaryExpression("void", makeLiteral(0)),
+                    makeLiteral(null),
                   ),
                 ),
               ]),
@@ -747,7 +747,7 @@ const instrumenters = {
             ),
             makeVariableDeclarator(
               makeIdentifier(`${context.apply}_AWAIT_TAB`),
-              null,
+              makeLiteral(null),
             ),
           ]),
           ...node.body.map((child) =>

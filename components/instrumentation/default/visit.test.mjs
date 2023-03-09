@@ -227,7 +227,7 @@ const makeCodeLocation = (source, line, column) =>
             APPLY_RETURN,
             APPLY_RETURNED = true,
             APPLY_YIELD,
-            APPLY_YIELD_TAB;
+            APPLY_YIELD_TAB = null;
           APPLY.recordApply(
             APPLY_BUNDLE_TAB,
             ${makeCodeLocation(source, 1, 1)},
@@ -294,7 +294,7 @@ const makeCodeLocation = (source, line, column) =>
             APPLY_RETURN,
             APPLY_RETURNED = true,
             APPLY_AWAIT,
-            APPLY_AWAIT_TAB;
+            APPLY_AWAIT_TAB = null;
           APPLY.recordApply(
             APPLY_BUNDLE_TAB,
             ${makeCodeLocation(source, 2, 7)},
@@ -310,13 +310,13 @@ const makeCodeLocation = (source, line, column) =>
                   APPLY.recordAwait(APPLY_AWAIT_TAB, APPLY_AWAIT),
                   APPLY_AWAIT = await APPLY_AWAIT,
                   APPLY.recordResolve(APPLY_AWAIT_TAB, APPLY_AWAIT),
-                  APPLY_AWAIT_TAB = void 0,
+                  APPLY_AWAIT_TAB = null,
                   APPLY_AWAIT
                 );
               } catch (APPLY_ERROR) {
-                if (APPLY_AWAIT_TAB !== void 0) {
+                if (APPLY_AWAIT_TAB !== null) {
                   APPLY.recordReject(APPLY_AWAIT_TAB, APPLY_ERROR);
-                  APPLY_AWAIT_TAB = void 0;
+                  APPLY_AWAIT_TAB = null;
                 }
                 let error = APPLY_ERROR;
                 {
@@ -327,7 +327,7 @@ const makeCodeLocation = (source, line, column) =>
               }
             }
           } catch (APPLY_ERROR) {
-            if (APPLY_AWAIT_TAB !== void 0) {
+            if (APPLY_AWAIT_TAB !== null) {
               APPLY.recordReject(APPLY_AWAIT_TAB, APPLY_ERROR);
             }
             APPLY_RETURNED = false;
@@ -396,13 +396,13 @@ assertEqual(
       let
         APPLY_BUNDLE_TAB = APPLY.getFreshTab(),
         APPLY_AWAIT,
-        APPLY_AWAIT_TAB;
+        APPLY_AWAIT_TAB = null;
       try {
         123;
       } catch (APPLY_ERROR) {
-        if (APPLY_AWAIT_TAB !== void 0) {
+        if (APPLY_AWAIT_TAB !== null) {
           APPLY.recordReject(APPLY_AWAIT_TAB, APPLY_ERROR);
-          APPLY_AWAIT_TAB = void 0;
+          APPLY_AWAIT_TAB = null;
         }
         {
           456;
@@ -428,13 +428,13 @@ assertEqual(
       let
         APPLY_BUNDLE_TAB = APPLY.getFreshTab(),
         APPLY_AWAIT,
-        APPLY_AWAIT_TAB;
+        APPLY_AWAIT_TAB = null;
       try {
         123;
       } catch (APPLY_ERROR) {
-        if (APPLY_AWAIT_TAB !== void 0) {
+        if (APPLY_AWAIT_TAB !== null) {
           APPLY.recordReject(APPLY_AWAIT_TAB, APPLY_ERROR);
-          APPLY_AWAIT_TAB = void 0;
+          APPLY_AWAIT_TAB = null;
         }
       } finally {
         456;
