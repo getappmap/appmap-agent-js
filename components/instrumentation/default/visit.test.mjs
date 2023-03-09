@@ -65,7 +65,7 @@ const makeCodeLocation = (source, line, column) =>
         (() => {
           var
             APPLY_BUNDLE_TAB = APPLY.getFreshTab(),
-            APPLY_RETURN,
+            APPLY_RESULT,
             APPLY_RETURNED = true;
           APPLY.recordApply(
             APPLY_BUNDLE_TAB,
@@ -74,7 +74,7 @@ const makeCodeLocation = (source, line, column) =>
             [],
           );
           try {
-            return APPLY_RETURN = 123;
+            return APPLY_RESULT = 123;
           } catch (APPLY_ERROR) {
             APPLY_RETURNED = false;
             APPLY.recordThrow(
@@ -88,7 +88,7 @@ const makeCodeLocation = (source, line, column) =>
               APPLY.recordReturn(
                 APPLY_BUNDLE_TAB,
                 ${makeCodeLocation(source, 1, 1)},
-                APPLY_RETURN,
+                APPLY_RESULT,
               );
             }
           }
@@ -115,7 +115,7 @@ const makeCodeLocation = (source, line, column) =>
         (class C extends D { constructor () {
           var
             APPLY_BUNDLE_TAB = APPLY.getFreshTab(),
-            APPLY_RETURN,
+            APPLY_RESULT,
             APPLY_RETURNED = true;
           APPLY.recordApply(
             APPLY_BUNDLE_TAB,
@@ -140,7 +140,7 @@ const makeCodeLocation = (source, line, column) =>
               APPLY.recordReturn(
                 APPLY_BUNDLE_TAB,
                 ${makeCodeLocation(source, 2, 12)},
-                APPLY_RETURN,
+                APPLY_RESULT,
               );
             }
           }
@@ -168,7 +168,7 @@ const makeCodeLocation = (source, line, column) =>
         ((APPLY_ARGUMENT_0, APPLY_ARGUMENT_1, ...APPLY_ARGUMENT_2) => {
           var
             APPLY_BUNDLE_TAB = APPLY.getFreshTab(),
-            APPLY_RETURN,
+            APPLY_RESULT,
             APPLY_RETURNED = true;
           APPLY.recordApply(
             APPLY_BUNDLE_TAB,
@@ -182,7 +182,7 @@ const makeCodeLocation = (source, line, column) =>
               y = APPLY_ARGUMENT_1 === void 0 ? 123 : APPLY_ARGUMENT_1,
               rest = APPLY_ARGUMENT_2;
             {
-              return APPLY_RETURN = 456;
+              return APPLY_RESULT = 456;
             }
           } catch (APPLY_ERROR) {
             APPLY_RETURNED = false;
@@ -197,7 +197,7 @@ const makeCodeLocation = (source, line, column) =>
               APPLY.recordReturn(
                 APPLY_BUNDLE_TAB,
                 ${makeCodeLocation(source, 1, 1)},
-                APPLY_RETURN,
+                APPLY_RESULT,
               );
             }
           }
@@ -224,7 +224,7 @@ const makeCodeLocation = (source, line, column) =>
         (function* () {
           var
             APPLY_BUNDLE_TAB = APPLY.getFreshTab(),
-            APPLY_RETURN,
+            APPLY_RESULT,
             APPLY_RETURNED = true,
             APPLY_JUMP,
             APPLY_JUMP_TAB = null;
@@ -258,7 +258,7 @@ const makeCodeLocation = (source, line, column) =>
               APPLY.recordReturn(
                 APPLY_BUNDLE_TAB,
                 ${makeCodeLocation(source, 1, 1)},
-                APPLY_RETURN,
+                APPLY_RESULT,
               );
             }
           }
@@ -291,7 +291,7 @@ const makeCodeLocation = (source, line, column) =>
         (async () => {
           var
             APPLY_BUNDLE_TAB = APPLY.getFreshTab(),
-            APPLY_RETURN,
+            APPLY_RESULT,
             APPLY_RETURNED = true,
             APPLY_JUMP,
             APPLY_JUMP_TAB = null;
@@ -342,7 +342,7 @@ const makeCodeLocation = (source, line, column) =>
               APPLY.recordReturn(
                 APPLY_BUNDLE_TAB,
                 ${makeCodeLocation(source, 2, 7)},
-                APPLY_RETURN,
+                APPLY_RESULT,
               );
             }
           }

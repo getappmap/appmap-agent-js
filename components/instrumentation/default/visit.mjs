@@ -331,7 +331,7 @@ const instrumentClosure = (node, parent, grand_parent, closure, context) => {
             ),
           ),
           makeVariableDeclarator(
-            makeIdentifier(`${context.apply}_RETURN`),
+            makeIdentifier(`${context.apply}_RESULT`),
             null,
           ),
           makeVariableDeclarator(
@@ -419,7 +419,7 @@ const instrumentClosure = (node, parent, grand_parent, closure, context) => {
             node.expression
               ? makeReturnStatement(
                   makeAssignmentExpression(
-                    makeIdentifier(`${context.apply}_RETURN`),
+                    makeIdentifier(`${context.apply}_RESULT`),
                     visitNode(node.body, node, parent, closure, context),
                   ),
                 )
@@ -483,7 +483,7 @@ const instrumentClosure = (node, parent, grand_parent, closure, context) => {
                     [
                       makeIdentifier(`${context.apply}_BUNDLE_TAB`),
                       makeLiteral(location_string),
-                      makeIdentifier(`${context.apply}_RETURN`),
+                      makeIdentifier(`${context.apply}_RESULT`),
                     ],
                   ),
                 ),
@@ -594,7 +594,7 @@ const instrumenters = {
     closure.instrumented && node.argument !== null
       ? makeReturnStatement(
           makeAssignmentExpression(
-            makeIdentifier(`${context.apply}_RETURN`),
+            makeIdentifier(`${context.apply}_RESULT`),
             visitNode(node.argument, node, parent, closure, context),
           ),
         )
