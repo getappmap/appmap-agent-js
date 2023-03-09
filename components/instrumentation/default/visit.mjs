@@ -335,8 +335,8 @@ const instrumentClosure = (node, parent, grand_parent, closure, context) => {
             null,
           ),
           makeVariableDeclarator(
-            makeIdentifier(`${context.apply}_RETURNED`),
-            makeLiteral(true),
+            makeIdentifier(`${context.apply}_DONE`),
+            makeLiteral(false),
           ),
           ...(node.async || node.generator
             ? [
@@ -456,8 +456,8 @@ const instrumentClosure = (node, parent, grand_parent, closure, context) => {
                 : []),
               makeExpressionStatement(
                 makeAssignmentExpression(
-                  makeIdentifier(`${context.apply}_RETURNED`),
-                  makeLiteral(false),
+                  makeIdentifier(`${context.apply}_DONE`),
+                  makeLiteral(true),
                 ),
               ),
               makeExpressionStatement(
@@ -475,7 +475,7 @@ const instrumentClosure = (node, parent, grand_parent, closure, context) => {
           ),
           makeBlockStatement([
             makeIfStatement(
-              makeIdentifier(`${context.apply}_RETURNED`),
+              makeUnaryExpression("!", makeIdentifier(`${context.apply}_DONE`)),
               makeBlockStatement([
                 makeExpressionStatement(
                   makeCallExpression(

@@ -66,7 +66,7 @@ const makeCodeLocation = (source, line, column) =>
           var
             APPLY_BUNDLE_TAB = APPLY.getFreshTab(),
             APPLY_RESULT,
-            APPLY_RETURNED = true;
+            APPLY_DONE = false;
           APPLY.recordApply(
             APPLY_BUNDLE_TAB,
             ${makeCodeLocation(source, 1, 1)},
@@ -76,7 +76,7 @@ const makeCodeLocation = (source, line, column) =>
           try {
             return APPLY_RESULT = 123;
           } catch (APPLY_ERROR) {
-            APPLY_RETURNED = false;
+            APPLY_DONE = true;
             APPLY.recordThrow(
               APPLY_BUNDLE_TAB,
               ${makeCodeLocation(source, 1, 1)},
@@ -84,7 +84,7 @@ const makeCodeLocation = (source, line, column) =>
             );
             throw APPLY_ERROR;
           } finally {
-            if (APPLY_RETURNED) {
+            if (!APPLY_DONE) {
               APPLY.recordReturn(
                 APPLY_BUNDLE_TAB,
                 ${makeCodeLocation(source, 1, 1)},
@@ -116,7 +116,7 @@ const makeCodeLocation = (source, line, column) =>
           var
             APPLY_BUNDLE_TAB = APPLY.getFreshTab(),
             APPLY_RESULT,
-            APPLY_RETURNED = true;
+            APPLY_DONE = false;
           APPLY.recordApply(
             APPLY_BUNDLE_TAB,
             ${makeCodeLocation(source, 2, 12)},
@@ -128,7 +128,7 @@ const makeCodeLocation = (source, line, column) =>
               123;
             }
           } catch (APPLY_ERROR) {
-            APPLY_RETURNED = false;
+            APPLY_DONE = true;
             APPLY.recordThrow(
               APPLY_BUNDLE_TAB,
               ${makeCodeLocation(source, 2, 12)},
@@ -136,7 +136,7 @@ const makeCodeLocation = (source, line, column) =>
             );
             throw APPLY_ERROR;
           } finally {
-            if (APPLY_RETURNED) {
+            if (!APPLY_DONE) {
               APPLY.recordReturn(
                 APPLY_BUNDLE_TAB,
                 ${makeCodeLocation(source, 2, 12)},
@@ -169,7 +169,7 @@ const makeCodeLocation = (source, line, column) =>
           var
             APPLY_BUNDLE_TAB = APPLY.getFreshTab(),
             APPLY_RESULT,
-            APPLY_RETURNED = true;
+            APPLY_DONE = false;
           APPLY.recordApply(
             APPLY_BUNDLE_TAB,
             ${makeCodeLocation(source, 1, 1)},
@@ -185,7 +185,7 @@ const makeCodeLocation = (source, line, column) =>
               return APPLY_RESULT = 456;
             }
           } catch (APPLY_ERROR) {
-            APPLY_RETURNED = false;
+            APPLY_DONE = true;
             APPLY.recordThrow(
               APPLY_BUNDLE_TAB,
               ${makeCodeLocation(source, 1, 1)},
@@ -193,7 +193,7 @@ const makeCodeLocation = (source, line, column) =>
             );
             throw APPLY_ERROR;
           } finally {
-            if (APPLY_RETURNED) {
+            if (!APPLY_DONE) {
               APPLY.recordReturn(
                 APPLY_BUNDLE_TAB,
                 ${makeCodeLocation(source, 1, 1)},
@@ -225,7 +225,7 @@ const makeCodeLocation = (source, line, column) =>
           var
             APPLY_BUNDLE_TAB = APPLY.getFreshTab(),
             APPLY_RESULT,
-            APPLY_RETURNED = true,
+            APPLY_DONE = false,
             APPLY_JUMP,
             APPLY_JUMP_TAB = null;
           APPLY.recordApply(
@@ -246,7 +246,7 @@ const makeCodeLocation = (source, line, column) =>
               );
             }
           } catch (APPLY_ERROR) {
-            APPLY_RETURNED = false;
+            APPLY_DONE = true;
             APPLY.recordThrow(
               APPLY_BUNDLE_TAB,
               ${makeCodeLocation(source, 1, 1)},
@@ -254,7 +254,7 @@ const makeCodeLocation = (source, line, column) =>
             );
             throw APPLY_ERROR;
           } finally {
-            if (APPLY_RETURNED) {
+            if (!APPLY_DONE) {
               APPLY.recordReturn(
                 APPLY_BUNDLE_TAB,
                 ${makeCodeLocation(source, 1, 1)},
@@ -292,7 +292,7 @@ const makeCodeLocation = (source, line, column) =>
           var
             APPLY_BUNDLE_TAB = APPLY.getFreshTab(),
             APPLY_RESULT,
-            APPLY_RETURNED = true,
+            APPLY_DONE = false,
             APPLY_JUMP,
             APPLY_JUMP_TAB = null;
           APPLY.recordApply(
@@ -330,7 +330,7 @@ const makeCodeLocation = (source, line, column) =>
             if (APPLY_JUMP_TAB !== null) {
               APPLY.recordReject(APPLY_JUMP_TAB, APPLY_ERROR);
             }
-            APPLY_RETURNED = false;
+            APPLY_DONE = true;
             APPLY.recordThrow(
               APPLY_BUNDLE_TAB,
               ${makeCodeLocation(source, 2, 7)},
@@ -338,7 +338,7 @@ const makeCodeLocation = (source, line, column) =>
             );
             throw APPLY_ERROR;
           } finally {
-            if (APPLY_RETURNED) {
+            if (!APPLY_DONE) {
               APPLY.recordReturn(
                 APPLY_BUNDLE_TAB,
                 ${makeCodeLocation(source, 2, 7)},
