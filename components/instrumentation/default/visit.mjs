@@ -456,6 +456,12 @@ const instrumentClosure = (node, parent, grand_parent, closure, context) => {
                             ],
                           ),
                         ),
+                        makeStatement(
+                          makeAssignmentExpression(
+                            makeIdentifier(`${context.apply}_JUMP_TAB`),
+                            makeLiteral(null),
+                          ),
+                        ),
                       ]),
                       null,
                     ),
