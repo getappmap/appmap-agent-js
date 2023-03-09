@@ -238,6 +238,10 @@ const makeCodeLocation = (source, line, column) =>
             {
               (
                 APPLY_JUMP = 123,
+                (
+                  APPLY_JUMP_TAB === null ||
+                  APPLY_APPMAP_JUMP_ASSERTION_VIOLATION
+                ),
                 APPLY_JUMP_TAB = APPLY.getFreshTab(),
                 APPLY.recordYield(APPLY_JUMP_TAB, true, APPLY_JUMP),
                 APPLY_JUMP = yield* APPLY_JUMP,
@@ -307,6 +311,10 @@ const makeCodeLocation = (source, line, column) =>
               try {
                 (
                   APPLY_JUMP = 123,
+                  (
+                    APPLY_JUMP_TAB === null ||
+                    APPLY_APPMAP_JUMP_ASSERTION_VIOLATION
+                  ),
                   APPLY_JUMP_TAB = APPLY.getFreshTab(),
                   APPLY.recordAwait(APPLY_JUMP_TAB, APPLY_JUMP),
                   APPLY_JUMP = await APPLY_JUMP,

@@ -138,6 +138,13 @@ const makeConditionalExpression = (node1, node2, node3) => ({
   alternate: node3,
 });
 
+const makeLogicalExpression = (operator, node1, node2) => ({
+  type: "LogicalExpression",
+  operator,
+  left: node1,
+  right: node2,
+});
+
 const makeCatchClause = (node1, node2) => ({
   type: "CatchClause",
   param: node1,
@@ -519,6 +526,15 @@ const compileInstrumentJumpExpression =
           makeAssignmentExpression(
             makeIdentifier(`${context.apply}_JUMP`),
             visitNode(node.argument, node, parent, closure, context),
+          ),
+          makeLogicalExpression(
+            "||",
+            makeBinaryExpression(
+              "===",
+              makeIdentifier(`${context.apply}_JUMP_TAB`),
+              makeLiteral(null),
+            ),
+            makeIdentifier(`${context.apply}_APPMAP_JUMP_ASSERTION_VIOLATION`),
           ),
           makeAssignmentExpression(
             makeIdentifier(`${context.apply}_JUMP_TAB`),
