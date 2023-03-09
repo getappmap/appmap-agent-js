@@ -242,6 +242,7 @@ const makeCodeLocation = (source, line, column) =>
                 APPLY.recordYield(APPLY_JUMP_TAB, true, APPLY_JUMP),
                 APPLY_JUMP = yield* APPLY_JUMP,
                 APPLY.recordResolve(APPLY_JUMP_TAB, APPLY_JUMP),
+                APPLY_JUMP_TAB = null,
                 APPLY_JUMP
               );
             }

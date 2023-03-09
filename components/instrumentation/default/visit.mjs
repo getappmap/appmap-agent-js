@@ -511,8 +511,9 @@ const instrumentClosure = (node, parent, grand_parent, closure, context) => {
   }
 };
 
-const instrumenters = {
-  AwaitExpression: (node, parent, _grand_parent, closure, context) =>
+const compileInstrumentJumpExpression =
+  (makeRecordJumpExpression, makeForwardJumpExpression) =>
+  (node, parent, _grand_parent, closure, context) =>
     closure.instrumented
       ? makeSequenceExpression([
           makeAssignmentExpression(
@@ -526,16 +527,10 @@ const instrumenters = {
               [],
             ),
           ),
-          makeCallExpression(
-            makeRegularMemberExpression(context.apply, "recordAwait"),
-            [
-              makeIdentifier(`${context.apply}_JUMP_TAB`),
-              makeIdentifier(`${context.apply}_JUMP`),
-            ],
-          ),
+          makeRecordJumpExpression(node, context.apply),
           makeAssignmentExpression(
             makeIdentifier(`${context.apply}_JUMP`),
-            makeAwaitExpression(makeIdentifier(`${context.apply}_JUMP`)),
+            makeForwardJumpExpression(node, context.apply),
           ),
           makeCallExpression(
             makeRegularMemberExpression(context.apply, "recordResolve"),
@@ -550,46 +545,34 @@ const instrumenters = {
           ),
           makeIdentifier(`${context.apply}_JUMP`),
         ])
-      : null,
-  YieldExpression: (node, parent, _grand_parent, closure, context) =>
-    closure.instrumented
-      ? makeSequenceExpression([
-          makeAssignmentExpression(
-            makeIdentifier(`${context.apply}_JUMP`),
-            visitNode(node.argument, node, parent, closure, context),
-          ),
-          makeAssignmentExpression(
-            makeIdentifier(`${context.apply}_JUMP_TAB`),
-            makeCallExpression(
-              makeRegularMemberExpression(context.apply, "getFreshTab"),
-              [],
-            ),
-          ),
-          makeCallExpression(
-            makeRegularMemberExpression(context.apply, "recordYield"),
-            [
-              makeIdentifier(`${context.apply}_JUMP_TAB`),
-              makeLiteral(node.delegate),
-              makeIdentifier(`${context.apply}_JUMP`),
-            ],
-          ),
-          makeAssignmentExpression(
-            makeIdentifier(`${context.apply}_JUMP`),
-            makeYieldExpression(
-              node.delegate,
-              makeIdentifier(`${context.apply}_JUMP`),
-            ),
-          ),
-          makeCallExpression(
-            makeRegularMemberExpression(context.apply, "recordResolve"),
-            [
-              makeIdentifier(`${context.apply}_JUMP_TAB`),
-              makeIdentifier(`${context.apply}_JUMP`),
-            ],
-          ),
-          makeIdentifier(`${context.apply}_JUMP`),
-        ])
-      : null,
+      : null;
+
+const instrumenters = {
+  AwaitExpression: compileInstrumentJumpExpression(
+    (_node, namespace) =>
+      makeCallExpression(
+        makeRegularMemberExpression(namespace, "recordAwait"),
+        [
+          makeIdentifier(`${namespace}_JUMP_TAB`),
+          makeIdentifier(`${namespace}_JUMP`),
+        ],
+      ),
+    (_node, namespace) =>
+      makeAwaitExpression(makeIdentifier(`${namespace}_JUMP`)),
+  ),
+  YieldExpression: compileInstrumentJumpExpression(
+    ({ delegate }, namespace) =>
+      makeCallExpression(
+        makeRegularMemberExpression(namespace, "recordYield"),
+        [
+          makeIdentifier(`${namespace}_JUMP_TAB`),
+          makeLiteral(delegate),
+          makeIdentifier(`${namespace}_JUMP`),
+        ],
+      ),
+    ({ delegate }, namespace) =>
+      makeYieldExpression(delegate, makeIdentifier(`${namespace}_JUMP`)),
+  ),
   ReturnStatement: (node, parent, _grand_parent, closure, context) =>
     closure.instrumented && node.argument !== null
       ? makeReturnStatement(
