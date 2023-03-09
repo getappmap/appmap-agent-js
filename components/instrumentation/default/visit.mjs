@@ -581,7 +581,7 @@ const instrumenters = {
             ),
           ),
           makeCallExpression(
-            makeRegularMemberExpression(context.apply, "recordResume"),
+            makeRegularMemberExpression(context.apply, "recordResolve"),
             [
               makeIdentifier(`${context.apply}_JUMP_TAB`),
               makeIdentifier(`${context.apply}_JUMP`),

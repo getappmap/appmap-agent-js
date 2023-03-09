@@ -70,10 +70,6 @@ const payloads = {
       print: "APPMAP-YIELD",
     },
   },
-  resume: {
-    type: "resume",
-    function: null,
-  },
   await: {
     type: "await",
     function: null,
@@ -115,7 +111,8 @@ const matching = [
   ["begin/group", "end/ungroup", ["group"]],
   ["before/await", "after/resolve", ["function"]],
   ["before/await", "after/reject", ["function"]],
-  ["before/yield", "after/resume", ["function"]],
+  ["before/yield", "after/resolve", ["function"]],
+  ["before/yield", "after/reject", ["function"]],
   ["before/jump", "after/jump", []],
   ["before/request", "after/response", ["side"]],
   ["before/query", "after/answer", []],

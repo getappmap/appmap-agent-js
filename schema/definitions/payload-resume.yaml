@@ -1,9 +1,0 @@
-type: object
-additionalProperties: false
-required:
-  - type
-properties:
-  type:
-    const: resume
-  argument:
-    $ref: serial

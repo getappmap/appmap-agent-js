@@ -19,7 +19,6 @@ import {
   formatResolvePayload,
   formatRejectPayload,
   formatYieldPayload,
-  formatResumePayload,
 } from "../../agent/index.mjs";
 
 const {
@@ -71,9 +70,6 @@ export const hook = (agent, { hooks: { apply: apply_hook_variable } }) => {
       recordYield: (tab, iterator) => {
         recordBeforeEvent(agent, tab, formatYieldPayload(agent, iterator));
       },
-      recordResume: (tab, argument) => {
-        recordAfterEvent(agent, tab, formatResumePayload(agent, argument));
-      },
     };
     defineProperty(globalThis, apply_hook_variable, {
       __proto__: null,
@@ -91,7 +87,6 @@ export const hook = (agent, { hooks: { apply: apply_hook_variable } }) => {
       "recordResolve",
       "recordReject",
       "recordYield",
-      "recordResume",
     ].map((key) => ({
       object: runtime,
       key,

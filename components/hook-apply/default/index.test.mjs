@@ -43,7 +43,7 @@ assertDeepEqual(
             "argument",
           ]);
           globalThis.$.recordYield(tab, "iterator");
-          globalThis.$.recordResume(tab);
+          globalThis.$.recordResolve(tab, "result");
           globalThis.$.recordReturn(tab, "hash|protocol://host:0:0", "result");
         }
       },
@@ -63,7 +63,7 @@ assertDeepEqual(
     // tab3 //
     "begin/apply",
     "before/yield",
-    "after/resume",
+    "after/resolve",
     "end/return",
   ],
 );

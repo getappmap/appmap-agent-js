@@ -20,7 +20,6 @@ export {
   formatResolvePayload,
   formatRejectPayload,
   formatYieldPayload,
-  formatResumePayload,
   formatRequestPayload,
   formatResponsePayload,
   formatQueryPayload,

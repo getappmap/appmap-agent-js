@@ -241,7 +241,7 @@ const makeCodeLocation = (source, line, column) =>
                 APPLY_JUMP_TAB = APPLY.getFreshTab(),
                 APPLY.recordYield(APPLY_JUMP_TAB, true, APPLY_JUMP),
                 APPLY_JUMP = yield* APPLY_JUMP,
-                APPLY.recordResume(APPLY_JUMP_TAB, APPLY_JUMP),
+                APPLY.recordResolve(APPLY_JUMP_TAB, APPLY_JUMP),
                 APPLY_JUMP
               );
             }
