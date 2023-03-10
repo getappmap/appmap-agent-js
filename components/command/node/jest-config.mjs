@@ -3,54 +3,21 @@ import { createRequire } from "node:module";
 import { hasOwnProperty } from "../../util/index.mjs";
 import { logError, logDebug } from "../../log/index.mjs";
 import { ExternalAppmapError } from "../../error/index.mjs";
-import { self_directory } from "../../self/index.mjs";
-import {
-  convertFileUrlToPath,
-  convertPathToFileUrl,
-} from "../../path/index.mjs";
-import { getLastUrlExtension, toAbsoluteUrl } from "../../url/index.mjs";
+import { loadAsync, isLoadMissingError } from "../../load/index.mjs";
+import { convertPathToFileUrl } from "../../path/index.mjs";
+import { toAbsoluteUrl } from "../../url/index.mjs";
 
 const {
   URL,
   JSON: { parse: parseJSON },
 } = globalThis;
 
-// The location of require does not matter because it will only load file urls.
-const require = createRequire(self_directory);
-
-const loadConfigModuleAsync = async (url) => {
-  if (getLastUrlExtension(url) === ".mjs") {
-    return (await import(new URL(url))).default;
-  } else {
-    return require(convertFileUrlToPath(url));
-  }
-};
-
 const loadConfigFileAsync = async (url, strict) => {
   try {
-    if (getLastUrlExtension(url) === ".json") {
-      return parseJSON(await readFileAsync(new URL(url), "utf8"));
-    } else {
-      const config = await loadConfigModuleAsync(url);
-      if (typeof config === "function") {
-        return await config();
-      } else {
-        return config;
-      }
-    }
+    return await loadAsync(url);
   } catch (error) {
-    if (
-      hasOwnProperty(error, "code") &&
-      (error.code === "ENOENT" ||
-        error.code === "ERR_MODULE_NOT_FOUND" ||
-        error.code === "MODULE_NOT_FOUND")
-    ) {
-      if (strict) {
-        logError("Cannot find jest configuration file at %j", url);
-        throw new ExternalAppmapError("Cannot find jest configuration file");
-      } else {
-        return null;
-      }
+    if (!strict && isLoadMissingError(error)) {
+      return null;
     } else {
       logError(
         "Failed to load jest configuration file at %j >> %O",

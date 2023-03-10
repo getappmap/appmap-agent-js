@@ -13,12 +13,7 @@ const { URL } = globalThis;
 const home = toAbsoluteUrl(`${getUuid()}/`, getTmpUrl());
 await mkdirAsync(new URL(home));
 
-//////////////////////
-// Explicit >> JSON //
-//////////////////////
-
-// Missing //
-
+// Explicit >> Missing //
 await assertReject(
   loadJestConfigAsync(
     {
@@ -29,38 +24,27 @@ await assertReject(
       root: "file:///A:/root/",
     },
   ),
-  /^ExternalAppmapError: Cannot find jest configuration file$/u,
-);
-
-// Invalid //
-
-await writeFileAsync(
-  new URL("invalid.config.json", home),
-  "invalid-json",
-  "utf8",
-);
-
-await assertReject(
-  loadJestConfigAsync(
-    {
-      config: "invalid.config.json",
-    },
-    {
-      base: home,
-      root: "file:///A:/root/",
-    },
-  ),
   /^ExternalAppmapError: Failed to load jest configuration file$/u,
 );
 
-// Valid //
+// Implicit >> Missing //
+assertDeepEqual(
+  await loadJestConfigAsync(
+    {},
+    {
+      base: "file:///A:/base/",
+      root: home,
+    },
+  ),
+  {},
+);
 
+// Explicit >> Present //
 await writeFileAsync(
   new URL("valid.config.json", home),
   `{"filename": "valid.config.json"}`,
   "utf8",
 );
-
 assertDeepEqual(
   await loadJestConfigAsync(
     {
@@ -74,167 +58,17 @@ assertDeepEqual(
   { filename: "valid.config.json" },
 );
 
-/////////////////////
-// Explicit >> CJS //
-/////////////////////
-
-// Missing //
-
-await assertReject(
-  loadJestConfigAsync(
-    {
-      config: "missing.config.cjs",
-    },
-    {
-      base: home,
-      root: "file:///A:/root/",
-    },
-  ),
-  /^ExternalAppmapError: Cannot find jest configuration file$/u,
-);
-
-// Invalid //
-
-await writeFileAsync(
-  new URL("invalid.config.cjs", home),
-  "invalid cjs",
-  "utf8",
-);
-
-await assertReject(
-  loadJestConfigAsync(
-    {
-      config: "invalid.config.cjs",
-    },
-    {
-      base: home,
-      root: "file:///A:/root/",
-    },
-  ),
-  /^ExternalAppmapError: Failed to load jest configuration file$/u,
-);
-
-// Valid //
-
-await writeFileAsync(
-  new URL("valid.config.cjs", home),
-  `
-    const { basename } = require("node:path");
-    module.exports = { filename: basename(__filename) };
-  `,
-  "utf8",
-);
-
-assertDeepEqual(
-  await loadJestConfigAsync(
-    {
-      config: "valid.config.cjs",
-    },
-    {
-      base: home,
-      root: "file:///A:/root/",
-    },
-  ),
-  { filename: "valid.config.cjs" },
-);
-
-////////////////////
-// Explict >> ESM //
-////////////////////
-
-// Missing //
-
-await assertReject(
-  loadJestConfigAsync(
-    {
-      config: "missing.config.esm",
-    },
-    {
-      base: home,
-      root: "file:///A:/root/",
-    },
-  ),
-  /^ExternalAppmapError: Cannot find jest configuration file$/u,
-);
-
-// Invalid //
-
-await writeFileAsync(
-  new URL("invalid.config.mjs", home),
-  "invalid esm",
-  "utf8",
-);
-
-await assertReject(
-  loadJestConfigAsync(
-    {
-      config: "invalid.config.mjs",
-    },
-    {
-      base: home,
-      root: "file:///A:/root/",
-    },
-  ),
-  /^ExternalAppmapError: Failed to load jest configuration file$/u,
-);
-
-// Valid //
-
-await writeFileAsync(
-  new URL("valid.config.mjs", home),
-  `
-    import { basename } from "node:path";
-    import { fileURLToPath } from "node:url";
-    export default () => ({
-      filename: basename(fileURLToPath(import.meta.url)),
-    });
-  `,
-  "utf8",
-);
-
-assertDeepEqual(
-  await loadJestConfigAsync(
-    {
-      config: "valid.config.mjs",
-    },
-    {
-      base: home,
-      root: "file:///A:/root/",
-    },
-  ),
-  { filename: "valid.config.mjs" },
-);
-
-//////////////
-// Implicit //
-//////////////
-
-// Missing //
-
-assertDeepEqual(
-  await loadJestConfigAsync(
-    {},
-    {
-      base: "file:///A:/base/",
-      root: home,
-    },
-  ),
-  {},
-);
-
-// Config //
-
+// Implicit >> Present //
 await writeFileAsync(
   new URL("jest.config.json", home),
   `{"filename": "jest.config.json"}`,
   "utf8",
 );
-
 assertDeepEqual(
   await loadJestConfigAsync(
     {},
     {
-      base: "file:///A:/base/",
+      base: "file://A:/base/",
       root: home,
     },
   ),
@@ -281,7 +115,7 @@ assertDeepEqual(
 
 await assertReject(
   resolveJestPresetAsync({ preset: "./missing-jest-preset.json" }, home),
-  /^ExternalAppmapError: Cannot find jest configuration file$/u,
+  /^ExternalAppmapError: Failed to load jest configuration file$/u,
 );
 
 await assertReject(
