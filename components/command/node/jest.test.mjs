@@ -8,14 +8,15 @@ const {
   JSON: { stringify: stringifyJSON },
 } = globalThis;
 
+const self = "file:///A:/self/";
 const base = "file:///A:/base/";
 const recorder_path = convertFileUrlToPath(
-  "file:///A:/base/lib/node/recorder.mjs",
+  "file:///A:/self/lib/node/recorder.mjs",
 );
 const transformer_path = convertFileUrlToPath(
   toAbsoluteUrl("lib/node/transformer-jest.mjs", self_directory),
 );
-const loader_url = "file:///A:/base/lib/node/loader-esm.mjs";
+const loader_url = "file:///A:/self/lib/node/loader-esm.mjs";
 
 //////////////////
 // mocha --argv //
@@ -23,7 +24,7 @@ const loader_url = "file:///A:/base/lib/node/loader-esm.mjs";
 
 assertEqual(doesSupport(["jest", "--argv"]), true);
 
-assertDeepEqual(await hookCommandAsync(["jest", "--argv"], base), [
+assertDeepEqual(await hookCommandAsync(["jest", "--argv"], self, base), [
   "jest",
   "--argv",
   "--transform",
@@ -44,7 +45,7 @@ assertDeepEqual(await hookCommandAsync(["jest", "--argv"], base), [
 /////////////////////
 
 assertDeepEqual(
-  hookEnvironment({ FOO: "bar", NODE_OPTIONS: "options" }, base),
+  hookEnvironment({ FOO: "bar", NODE_OPTIONS: "options" }, self, base),
   {
     FOO: "bar",
     NODE_OPTIONS: `options --experimental-vm-modules --experimental-loader=${loader_url}`,

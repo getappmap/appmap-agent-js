@@ -111,7 +111,7 @@ export const compileConfigurationCommandAsync = async (configuration, env) => {
   const {
     "recursive-process-recording": recursive,
     recorder,
-    agent: { directory },
+    agent: { directory: self },
     command: { tokens },
     "command-options": options,
   } = configuration;
@@ -125,13 +125,13 @@ export const compileConfigurationCommandAsync = async (configuration, env) => {
       (recorder_recursive === null || recorder_recursive === recursive) &&
       name === recorder,
   );
-  const [exec, ...argv] = await hookCommandAsync(tokens, directory);
+  const [exec, ...argv] = await hookCommandAsync(tokens, self, options.cwd);
   return {
     exec,
     argv,
     options: {
       ...options,
-      env: hookEnvironment(env, directory),
+      env: hookEnvironment(env, self, options.cwd),
     },
   };
 };

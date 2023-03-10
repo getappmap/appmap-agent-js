@@ -8,15 +8,15 @@ export const generateNodeRecorder = (recorder) => ({
   name: recorder,
   recursive: true,
   doesSupport,
-  hookCommandAsync: (tokens, _base) => tokens,
-  hookEnvironment: (env, base) => ({
+  hookCommandAsync: (tokens, _self, _base) => tokens,
+  hookEnvironment: (env, self, _base) => ({
     ...env,
     NODE_OPTIONS: `${coalesce(
       env,
       "NODE_OPTIONS",
       "",
     )} --experimental-loader=${escapeNodeOption(
-      toAbsoluteUrl(`lib/node/recorder.mjs`, base),
+      toAbsoluteUrl(`lib/node/recorder.mjs`, self),
     )}`,
   }),
 });

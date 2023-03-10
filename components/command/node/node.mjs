@@ -26,14 +26,14 @@ export const generateNodeRecorder = (recorder) => ({
   doesSupport,
   recursive: false,
   name: recorder,
-  hookCommandAsync: (tokens, base) => {
+  hookCommandAsync: (tokens, self, _base) => {
     const { exec, argv } = splitNodeCommand(tokens);
     return [
       ...exec,
       "--experimental-loader",
-      toAbsoluteUrl(`lib/node/recorder.mjs`, base),
+      toAbsoluteUrl(`lib/node/recorder.mjs`, self),
       ...argv,
     ];
   },
-  hookEnvironment: (env, _base) => env,
+  hookEnvironment: (env, _self, _base) => env,
 });
