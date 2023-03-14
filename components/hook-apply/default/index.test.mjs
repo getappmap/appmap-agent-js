@@ -1,4 +1,5 @@
 import { assertDeepEqual } from "../../__fixture__.mjs";
+import { readGlobal } from "../../global/index.mjs";
 import { testHookAsync } from "../../hook-fixture/index.mjs";
 import * as HookApply from "./index.mjs";
 
@@ -19,32 +20,33 @@ assertDeepEqual(
       HookApply,
       { configuration: { hooks: { apply: "$" } } },
       () => {
+        const runtime = readGlobal("$");
         {
-          const tab = globalThis.$.getFreshTab();
-          globalThis.$.recordApply(tab, "hash|protocol://host:0:0", "this", [
+          const tab = runtime.getFreshTab();
+          runtime.recordApply(tab, "hash|protocol://host:0:0", "this", [
             "argument",
           ]);
-          globalThis.$.recordAwait(tab, "promise");
-          globalThis.$.recordResolve(tab, "result");
-          globalThis.$.recordReturn(tab, "hash|protocol://host:0:0", "result");
+          runtime.recordAwait(tab, "promise");
+          runtime.recordResolve(tab, "result");
+          runtime.recordReturn(tab, "hash|protocol://host:0:0", "result");
         }
         {
-          const tab = globalThis.$.getFreshTab();
-          globalThis.$.recordApply(tab, "hash|protocol://host:0:0", "this", [
+          const tab = runtime.getFreshTab();
+          runtime.recordApply(tab, "hash|protocol://host:0:0", "this", [
             "argument",
           ]);
-          globalThis.$.recordAwait(tab, "promise");
-          globalThis.$.recordReject(tab, "error");
-          globalThis.$.recordThrow(tab, "hash|protocol://host:0:0", "error");
+          runtime.recordAwait(tab, "promise");
+          runtime.recordReject(tab, "error");
+          runtime.recordThrow(tab, "hash|protocol://host:0:0", "error");
         }
         {
-          const tab = globalThis.$.getFreshTab();
-          globalThis.$.recordApply(tab, "hash|protocol://host:0:0", "this", [
+          const tab = runtime.getFreshTab();
+          runtime.recordApply(tab, "hash|protocol://host:0:0", "this", [
             "argument",
           ]);
-          globalThis.$.recordYield(tab, "iterator");
-          globalThis.$.recordResolve(tab, "result");
-          globalThis.$.recordReturn(tab, "hash|protocol://host:0:0", "result");
+          runtime.recordYield(tab, "iterator");
+          runtime.recordResolve(tab, "result");
+          runtime.recordReturn(tab, "hash|protocol://host:0:0", "result");
         }
       },
     )

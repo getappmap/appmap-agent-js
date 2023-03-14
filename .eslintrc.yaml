@@ -16,6 +16,9 @@ rules:
   ################
   # Core Complex #
   ################
+  local/global-object-access:
+    - error
+    - globalThis
   local/no-globals:
     - error
     - globalThis
@@ -29,7 +32,6 @@ rules:
       caughtErrors: all
       caughtErrorsIgnorePattern: "^_"
       ignoreRestSiblings: false
-
   ###############
   # Core Simple #
   ###############

@@ -1,4 +1,5 @@
 import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
+import { readGlobal } from "../../global/index.mjs";
 import { testHookAsync } from "../../hook-fixture/index.mjs";
 import * as HookEval from "./index.mjs";
 
@@ -22,7 +23,9 @@ assertDeepEqual(
     },
     () => {
       assertEqual(
-        evalGlobal(globalThis.EVAL("protocol://host/foo", "123-456", "789;")),
+        evalGlobal(
+          readGlobal("EVAL")("protocol://host/foo", "123-456", "789;"),
+        ),
         789,
       );
     },
@@ -37,7 +40,7 @@ assertDeepEqual(
 );
 
 assertEqual(
-  evalGlobal(globalThis.EVAL("protocol://host/foo", "123-456", "789;")),
+  evalGlobal(readGlobal("EVAL")("protocol://host/foo", "123-456", "789;")),
   789,
 );
 

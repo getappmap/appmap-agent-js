@@ -1,10 +1,6 @@
 import { InternalAppmapError } from "../../error/index.mjs";
-import {
-  assert,
-  noop,
-  assignProperty,
-  hasOwnProperty,
-} from "../../util/index.mjs";
+import { assert, noop, assignProperty } from "../../util/index.mjs";
+import { defineGlobal } from "../../global/index.mjs";
 import {
   getFreshTab,
   getSerializationEmptyValue,
@@ -21,10 +17,6 @@ import {
   formatYieldPayload,
 } from "../../agent/index.mjs";
 
-const {
-  Reflect: { defineProperty },
-} = globalThis;
-
 export const unhook = (backup) => {
   backup.forEach(assignProperty);
 };
@@ -33,11 +25,6 @@ export const hook = (agent, { hooks: { apply: apply_hook_variable } }) => {
   if (apply_hook_variable === null) {
     return [];
   } else {
-    assert(
-      !hasOwnProperty(globalThis, apply_hook_variable),
-      "global apply hook variable already defined",
-      InternalAppmapError,
-    );
     const runtime = {
       empty: getSerializationEmptyValue(agent),
       getFreshTab: () => getFreshTab(agent),
@@ -71,13 +58,11 @@ export const hook = (agent, { hooks: { apply: apply_hook_variable } }) => {
         recordBeforeEvent(agent, tab, formatYieldPayload(agent, iterator));
       },
     };
-    defineProperty(globalThis, apply_hook_variable, {
-      __proto__: null,
-      writable: false,
-      enumerable: false,
-      configurable: true,
-      value: runtime,
-    });
+    assert(
+      defineGlobal(apply_hook_variable, runtime),
+      "global apply hook variable already defined",
+      InternalAppmapError,
+    );
     return [
       "getFreshTab",
       "recordApply",

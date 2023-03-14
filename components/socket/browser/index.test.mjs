@@ -1,10 +1,10 @@
 /* eslint-env node */
-
+import { defineGlobal } from "../../global/index.mjs";
 import { assertDeepEqual } from "../../__fixture__.mjs";
 
 const trace = [];
 
-globalThis.WebSocket = function (url) {
+defineGlobal("WebSocket", function (url) {
   trace.push(["open", url]);
   return {
     send(message) {
@@ -14,7 +14,7 @@ globalThis.WebSocket = function (url) {
       trace.push(["close"]);
     },
   };
-};
+});
 
 const { openSocket, sendSocket, closeSocket } = await import("./index.mjs");
 

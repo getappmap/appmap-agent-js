@@ -3,7 +3,8 @@ import { logErrorWhen, logWarningWhen } from "../../log/index.mjs";
 import { getUuid } from "../../uuid/index.mjs";
 import { hook } from "../../hook/index.mjs";
 import { extendConfiguration } from "../../configuration/index.mjs";
-import { assert, hasOwnProperty } from "../../util/index.mjs";
+import { readGlobal } from "../../global/index.mjs";
+import { assert } from "../../util/index.mjs";
 import {
   openAgent,
   getSession,
@@ -39,18 +40,9 @@ export const record = (configuration) => {
   // Error: There should always be a Jest object already
   //
   // Which might be a bug in jest related to `createRequire`.
-  for (const name of ["beforeEach", "afterEach", "expect"]) {
-    assert(
-      !logErrorWhen(
-        !hasOwnProperty(globalThis, "beforeEach"),
-        "Missing jest-related global variable: %s",
-        name,
-      ),
-      "Missing jest-related global variable",
-      ExternalAppmapError,
-    );
-  }
-  const { beforeEach, afterEach, expect } = globalThis;
+  const beforeEach = readGlobal("beforeEach");
+  const afterEach = readGlobal("afterEach");
+  const expect = readGlobal("expect");
   const agent = openAgent(configuration);
   const session = getSession(agent);
   // Jest is claiming that it is running the tests from a given file serially.
