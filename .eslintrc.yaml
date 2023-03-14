@@ -1,10 +1,6 @@
 globals:
   globalThis: readonly
   console: readonly
-overrides:
-  - files: "**/*.test.mjs"
-    env:
-      node: true
 parser: "@babel/eslint-parser"
 env:
   es2017: true
