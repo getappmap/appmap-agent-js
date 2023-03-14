@@ -10,7 +10,6 @@ anyOf:
   - $ref: payload-request
   - $ref: payload-resolve
   - $ref: payload-response
-  - $ref: payload-resume
   - $ref: payload-return
   - $ref: payload-throw
   - $ref: payload-ungroup

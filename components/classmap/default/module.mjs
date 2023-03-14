@@ -62,7 +62,13 @@ export const createModule = ({
 };
 
 export const lookupModuleClosure = (
-  { estree: { filename }, infos, references },
+  {
+    estree: {
+      loc: { filename },
+    },
+    infos,
+    references,
+  },
   position,
 ) => {
   const position_string = stringifyPosition(position);

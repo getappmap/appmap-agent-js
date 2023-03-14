@@ -99,7 +99,9 @@ properties:
   ordering:
     $ref: ordering
   default-process:
-    type: boolean
+    anyOf:
+      - type: boolean
+      - $ref: process
   processes:
     anyOf:
       - $ref: specifier-process

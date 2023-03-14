@@ -54,11 +54,6 @@ export const formatYieldPayload = ({ serialization }, iterator) => ({
   iterator: serialize(serialization, iterator),
 });
 
-export const formatResumePayload = ({ serialization }, argument) => ({
-  type: "resume",
-  argument: serialize(serialization, argument),
-});
-
 export const formatRequestPayload = (
   { serialization },
   side,

@@ -12,7 +12,6 @@ import {
   formatResolvePayload,
   formatRejectPayload,
   formatYieldPayload,
-  formatResumePayload,
   formatQueryPayload,
   getAnswerPayload,
   formatRequestPayload,
@@ -28,8 +27,6 @@ const serialization = createSerialization(configuration);
 validatePayload(getBundlePayload({ serialization }));
 
 validatePayload(getJumpPayload({ serialization }));
-
-validatePayload(formatResumePayload({ serialization }), "argument");
 
 validatePayload(getAnswerPayload({ serialization }));
 

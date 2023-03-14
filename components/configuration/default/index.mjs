@@ -44,6 +44,17 @@ const extendCommandOptions = (options1, options2) => ({
 // Normalize //
 ///////////////
 
+const normalizeDefaultProcess = (default_process, _base) => {
+  if (typeof default_process === "boolean") {
+    return { enabled: default_process };
+  } else {
+    return {
+      enabled: false,
+      ...default_process,
+    };
+  }
+};
+
 const normalizeExclusion = (exclusion, _base) => {
   if (typeof exclusion === "string") {
     exclusion = {
@@ -218,7 +229,7 @@ const normalizeProcessSpecifier = (specifier, base) => {
     enabled: true,
     ...specifier,
   };
-  return [createSpecifier(rest, base), enabled];
+  return [createSpecifier(rest, base), { enabled }];
 };
 
 const normalizeProcesses = (specifiers, base) => {
@@ -333,7 +344,7 @@ const fields = {
   },
   "default-process": {
     extend: overwrite,
-    normalize: identity,
+    normalize: normalizeDefaultProcess,
   },
   processes: {
     extend: prepend,
@@ -486,7 +497,7 @@ export const createConfiguration = (home) => ({
   },
   appmap_dir: toAbsoluteUrl("tmp/appmap/", home),
   appmap_file: null,
-  "default-process": true,
+  "default-process": { enabled: true },
   processes: [],
   recorder: null,
   "postmortem-function-exclusion": null,
