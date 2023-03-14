@@ -1,4 +1,4 @@
-import { createHook } from "async_hooks";
+import { createHook } from "node:async_hooks";
 import { recordGroup } from "../../agent/index.mjs";
 
 const { Set } = globalThis;

@@ -1,5 +1,5 @@
-import Http from "http";
-import Https from "https";
+import Http from "node:http";
+import Https from "node:https";
 import { ExternalAppmapError } from "../../error/index.mjs";
 import { logError, logErrorWhen } from "../../log/index.mjs";
 import {

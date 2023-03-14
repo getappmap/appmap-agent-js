@@ -1,5 +1,4 @@
-import Module from "module";
-
+import Module from "node:module";
 import { convertPathToFileUrl } from "../../path/index.mjs";
 import { assignProperty } from "../../util/index.mjs";
 import { instrument } from "../../agent/index.mjs";

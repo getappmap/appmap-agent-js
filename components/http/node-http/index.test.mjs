@@ -1,4 +1,4 @@
-import { createServer, request as createRequest } from "http";
+import { createServer, request as createRequest } from "node:http";
 import {
   assert,
   assertReject,

@@ -1,6 +1,6 @@
 import { assertDeepEqual, assertEqual } from "../../__fixture__.mjs";
-import { Buffer } from "buffer";
-import { Writable, Readable } from "stream";
+import { Buffer } from "node:buffer";
+import { Writable, Readable } from "node:stream";
 import {
   formatHeaders,
   formatStatus,

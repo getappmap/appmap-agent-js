@@ -1,4 +1,4 @@
-import { createServer as createTCPServer } from "net";
+import { createServer as createTCPServer } from "node:net";
 import { toIpcPath, convertFileUrlToPath } from "../../path/index.mjs";
 import NetSocketMessaging from "net-socket-messaging";
 

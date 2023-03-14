@@ -1,8 +1,8 @@
-import fs from "fs";
-import { basename as getBasename, join as joinPath } from "path";
-import { tmpdir } from "os";
-import { strict as assert } from "assert";
-import { mkdir } from "fs/promises";
+import fs from "node:fs";
+import { basename as getBasename, join as joinPath } from "node:path";
+import { tmpdir } from "node:os";
+import { strict as assert } from "node:assert";
+import { mkdir } from "node:fs/promises";
 import YAML from "yaml";
 import Mocha from "mocha";
 import * as sinon from "sinon";

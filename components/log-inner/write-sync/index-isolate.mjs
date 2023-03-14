@@ -1,5 +1,5 @@
 // NB: Synchronous loggin is important to avoid infinite loop when async hooks are enabled.
-import { openSync, writeSync } from "fs";
+import { openSync, writeSync } from "node:fs";
 import { hasOwnProperty } from "../../util/index.mjs";
 
 const { URL, parseInt } = globalThis;

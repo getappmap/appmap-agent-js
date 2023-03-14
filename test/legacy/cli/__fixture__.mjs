@@ -1,12 +1,12 @@
-import { tmpdir as getTmpDir, platform as getPlatform } from "os";
-import { join as joinPath } from "path";
+import { tmpdir as getTmpDir, platform as getPlatform } from "node:os";
+import { join as joinPath } from "node:path";
 import {
   rmdir as rmdirAsync,
   mkdir as mkdirAsync,
   symlink as symlinkAsync,
   writeFile as writeFileAsync,
   realpath as realpathAsync,
-} from "fs/promises";
+} from "node:fs/promises";
 import YAML from "yaml";
 import { spawnStrictAsync } from "../../spawn.mjs";
 

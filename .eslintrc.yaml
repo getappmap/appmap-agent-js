@@ -201,7 +201,49 @@ rules:
   # no-redeclare >> Only es2015 variables enforced by no-restricted-syntax
   # no-regex-spaces >> RegExp
   # no-restricted-exports
-  # no-restricted-imports
+  # Enforce `node:` prefix:
+  no-restricted-imports:
+    - error
+    - assert
+    - assert/strict
+    - async_hooks
+    - buffer
+    - child_process
+    - cluster
+    - crypto
+    - dns
+    - events
+    - fs
+    - fs/promises
+    - http
+    - http2
+    - https
+    - inspector
+    - module
+    - net
+    - os
+    - path
+    - perf_hooks
+    - process
+    - querystring
+    - readline
+    - readline/promises
+    - repl
+    - stream
+    - stream/web
+    - string_decoder
+    - timers
+    - timers/promises
+    - tls
+    - trace_events
+    - tty
+    - dgram
+    - url
+    - util
+    - "v8"
+    - vm
+    - worker_threads
+    - zlib
   # no-restricted-properties
   # no-return-assign >> AssignmentExpression disabled in this context by no-restricted-syntax
   # no-return-await >> Asynchronous closures disabled by no-restricted-syntax

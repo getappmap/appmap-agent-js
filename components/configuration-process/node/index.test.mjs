@@ -1,4 +1,4 @@
-import { writeFile as writeFileAsync } from "fs/promises";
+import { writeFile as writeFileAsync } from "node:fs/promises";
 
 import {
   assertThrow,

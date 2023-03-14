@@ -1,4 +1,4 @@
-import { createServer, Socket } from "net";
+import { createServer, Socket } from "node:net";
 import "../../__fixture__.mjs";
 import { toIpcPath, convertFileUrlToPath } from "../../path/index.mjs";
 import {

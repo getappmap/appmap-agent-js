@@ -1,4 +1,4 @@
-import { createServer } from "http";
+import { createServer } from "node:http";
 import { hook } from "../../hook/index.mjs";
 import { generateRespond } from "../../http/index.mjs";
 import { openAgent, requestRemoteAgentAsync } from "../../agent/index.mjs";

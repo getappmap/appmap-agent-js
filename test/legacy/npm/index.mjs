@@ -1,13 +1,13 @@
 import { spawnStrictAsync } from "../../spawn.mjs";
-import { join as joinPath } from "path";
-import { tmpdir as getTmpdir, platform as getPlatform } from "os";
+import { join as joinPath } from "node:path";
+import { tmpdir as getTmpdir, platform as getPlatform } from "node:os";
 import {
   rmdir as rmdirAsync,
   readFile as readFileAsync,
   writeFile as writeFileAsync,
   readdir as readdirAsync,
-} from "fs/promises";
-import { strict as Assert } from "assert";
+} from "node:fs/promises";
+import { strict as Assert } from "node:assert";
 
 const {
   process: { stdout, env },

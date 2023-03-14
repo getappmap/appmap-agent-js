@@ -2,8 +2,8 @@ import {
   readFile as readFileAsync,
   writeFile as writeFileAsync,
   readdir as readdirAsync,
-} from "fs/promises";
-import { createRequire } from "module";
+} from "node:fs/promises";
+import { createRequire } from "node:module";
 import YAML from "yaml";
 import Semver from "semver";
 import Chalk from "chalk";

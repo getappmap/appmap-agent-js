@@ -1,5 +1,5 @@
-import { connect } from "net";
-import { Buffer } from "buffer";
+import { connect } from "node:net";
+import { Buffer } from "node:buffer";
 import NetSocketMessaging from "net-socket-messaging";
 import { toIpcPath, convertFileUrlToPath } from "../../path/index.mjs";
 import { mapMaybe } from "../../util/index.mjs";

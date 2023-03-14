@@ -1,5 +1,5 @@
-import { readFileSync as readFileInner } from "fs";
-import { readFile as readFileInnerAsync } from "fs/promises";
+import { readFileSync as readFileInner } from "node:fs";
+import { readFile as readFileInnerAsync } from "node:fs/promises";
 import { Buffer } from "node:buffer";
 import { logDebugWhen } from "../../log/index.mjs";
 

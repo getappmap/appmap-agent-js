@@ -1,4 +1,4 @@
-import { strict as Assert } from "assert";
+import { strict as Assert } from "node:assert";
 
 const { Error, Infinity } = globalThis;
 

@@ -1,6 +1,6 @@
 import process from "node:process";
 import { platform as getPlatform } from "node:os";
-import { spawn } from "child_process";
+import { spawn } from "node:child_process";
 
 const { String, Error } = globalThis;
 
