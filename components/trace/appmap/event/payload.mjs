@@ -1,4 +1,5 @@
 import { InternalAppmapError } from "../../../error/index.mjs";
+import { URL, URLSearchParams } from "../../../url/index.mjs";
 import {
   assert,
   coalesceCaseInsensitive,
@@ -9,8 +10,6 @@ import {
 } from "../../../util/index.mjs";
 
 const {
-  URL,
-  URLSearchParams,
   String,
   undefined,
   Object: { entries: toEntries },

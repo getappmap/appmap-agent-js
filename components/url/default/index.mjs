@@ -1,4 +1,7 @@
-const { URL, decodeURIComponent, encodeURIComponent } = globalThis;
+import { URL } from "../../url-inner/index.mjs";
+export * from "../../url-inner/index.mjs";
+
+const { decodeURIComponent, encodeURIComponent } = globalThis;
 
 const getDrive = (protocol, pathname) =>
   protocol.toLowerCase() === "file:"

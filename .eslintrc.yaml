@@ -6,6 +6,8 @@ overrides:
     env:
       node: true
 parser: "@babel/eslint-parser"
+env:
+  es2017: true
 parserOptions:
   ecmaVersion: 2021
   sourceType: module

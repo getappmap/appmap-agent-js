@@ -5,7 +5,6 @@ import { validateExternalConfiguration } from "../../validate/index.mjs";
 import { createSpecifier } from "../../specifier/index.mjs";
 
 const {
-  URL,
   Array: { isArray },
   Reflect: { ownKeys },
   Object: { entries: toEntries },
@@ -16,8 +15,6 @@ const HOOK_APPLY_GLOBAL = "APPMAP_HOOK_APPLY";
 const HOOK_EVAL_GLOBAL = "APPMAP_HOOK_EVAL";
 
 const EXPECTED_EXTRA_PROPERTIES = ["test_recording"];
-
-const resolveUrl = (url, base) => new URL(url, base).href;
 
 ////////////
 // Extend //
@@ -150,14 +147,14 @@ const normalizeLog = (log, base) => {
     log = { level: log };
   }
   if (hasOwnProperty(log, "file") && typeof log.file !== "number") {
-    log.file = resolveUrl(log.file, base);
+    log.file = toAbsoluteUrl(log.file, base);
   }
   return log;
 };
 
 const normalizePort = (port, base) => {
   if (typeof port === "string" && port !== "") {
-    port = resolveUrl(port, base);
+    port = toAbsoluteUrl(port, base);
   }
   return port;
 };

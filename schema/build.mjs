@@ -4,12 +4,12 @@ import {
   readFile as readFileAsync,
   writeFile as writeFileAsync,
 } from "node:fs/promises";
+import { URL } from "node:url";
 import { default as Ajv } from "ajv";
 import { default as generateStandaloneModule } from "ajv/dist/standalone/index.js";
 import { parse as parseYAML } from "yaml";
 
 const {
-  URL,
   JSON: { stringify: stringifyJSON },
 } = globalThis;
 
