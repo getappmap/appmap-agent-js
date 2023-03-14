@@ -8,7 +8,6 @@ for (const [name, component, env, resolution] of [
   [null, "init", "node", {}],
   [null, "status", "node", {}],
   [null, "setup", "node", {}],
-  [null, "configuration", "node", {}],
   [null, "configuration-process", "node", {}],
   [null, "configuration-environment", "node", {}],
   [null, "recorder-api", "node", { emitter: "local" }],
