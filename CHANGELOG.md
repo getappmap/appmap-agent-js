@@ -1,3 +1,18 @@
+# [13.6.0](https://github.com/getappmap/appmap-agent-js/compare/v13.5.2...v13.6.0) (2023-03-14)
+
+
+### Bug Fixes
+
+* cleanup JUMP_TAB in generator to support Generator.prototype.return ([361afc3](https://github.com/getappmap/appmap-agent-js/commit/361afc3b86b6b39832f5f37c682d59dee796930e))
+* cleanup JUMP_TAB in generator to support Generator.prototype.throw ([0e390ed](https://github.com/getappmap/appmap-agent-js/commit/0e390ed3b8dc7c49e0a5da54006bc69b9a5389b7))
+* no longer log undefined for the source url ([e5caf45](https://github.com/getappmap/appmap-agent-js/commit/e5caf4594e4a3780db806e3c25d393be05d4e378))
+* use command-options.cwd to load jest config ([8b8a70c](https://github.com/getappmap/appmap-agent-js/commit/8b8a70c08466f08e243e0524588d5da0daf43480))
+
+
+### Features
+
+* support jest.config.js as esm ([e2cd6b6](https://github.com/getappmap/appmap-agent-js/commit/e2cd6b6d1b5b325234063d5273125fb5cf3c1aca))
+
 ## [13.5.2](https://github.com/getappmap/appmap-agent-js/compare/v13.5.1...v13.5.2) (2023-03-03)
 
 
