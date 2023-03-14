@@ -1,7 +1,7 @@
-import { assertDeepEqual } from "../../__fixture__.mjs";
 import { writeFile as writeFileAsync } from "node:fs/promises";
 import { Socket } from "node:net";
 import NetSocketMessaging from "net-socket-messaging";
+import { assertDeepEqual } from "../../__fixture__.mjs";
 import { getUuid } from "../../uuid/random/index.mjs";
 import { getTmpUrl } from "../../path/index.mjs";
 import { toAbsoluteUrl } from "../../url/index.mjs";

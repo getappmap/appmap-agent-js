@@ -2,10 +2,10 @@ import * as Minimist from "minimist";
 import { ExternalAppmapError } from "../../error/index.mjs";
 import { logError, logErrorWhen } from "../../log/index.mjs";
 import { hasOwnProperty, assert, constant } from "../../util/index.mjs";
-import { loadJestConfigAsync, resolveJestPresetAsync } from "./jest-config.mjs";
 import { self_directory } from "../../self/index.mjs";
 import { convertFileUrlToPath } from "../../path/index.mjs";
 import { toAbsoluteUrl, toDirectoryUrl } from "../../url/index.mjs";
+import { loadJestConfigAsync, resolveJestPresetAsync } from "./jest-config.mjs";
 
 const {
   JSON: { stringify: stringifyJSON, parse: parseJSON },

@@ -1,7 +1,7 @@
 import { readFile as readFileAsync } from "node:fs/promises";
+import { parse as parseYaml } from "yaml";
 import { hasOwnProperty } from "../../util/index.mjs";
 import { getLastUrlExtension } from "../../url/index.mjs";
-import { parse as parseYaml } from "yaml";
 
 const {
   URL,

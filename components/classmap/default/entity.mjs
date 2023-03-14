@@ -1,13 +1,13 @@
 import { assert } from "../../util/index.mjs";
 import { getUrlBasename, toAbsoluteUrl } from "../../url/index.mjs";
 import { InternalAppmapError } from "../../error/index.mjs";
-import { stringifyPosition } from "./position.mjs";
 import {
   getSourceContent,
   getLeadingCommentArray,
   printComment,
   extractCommentLabelArray,
 } from "../../source/index.mjs";
+import { stringifyPosition } from "./position.mjs";
 
 const { String, parseInt } = globalThis;
 

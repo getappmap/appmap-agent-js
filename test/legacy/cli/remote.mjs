@@ -4,8 +4,8 @@ import { writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { request as createRequest } from "node:http";
 import { strict as Assert } from "node:assert";
-import { runAsync } from "./__fixture__.mjs";
 import { Buffer } from "node:buffer";
+import { runAsync } from "./__fixture__.mjs";
 
 const {
   URL,

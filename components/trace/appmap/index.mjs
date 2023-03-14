@@ -4,13 +4,13 @@ import {
 } from "../../error/index.mjs";
 import { logError, logDebug, logInfo } from "../../log/index.mjs";
 import { validateAppmap } from "../../validate-appmap/index.mjs";
-import { compileMetadata } from "./metadata.mjs";
 import {
   createClassmap,
   addClassmapSource,
   compileClassmap,
 } from "../../classmap/index.mjs";
 import { stringifyLocation, parseLocation } from "../../location/index.mjs";
+import { compileMetadata } from "./metadata.mjs";
 import { digestEventTrace } from "./event/index.mjs";
 import { orderEventArray } from "./ordering/index.mjs";
 import { getOutputUrl } from "./output.mjs";

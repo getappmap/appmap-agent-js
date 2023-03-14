@@ -347,7 +347,6 @@ rules:
   # wrap-regex: error
   # yield-star-spacing >> Generator closures disabled by no-restrict-syntax
   yoda: [error, never]
-
   #################
   # Plugin Import #
   #################
@@ -390,6 +389,6 @@ rules:
   # import/no-unused-modules: error
   import/no-useless-path-segments: error
   # import/no-webpack-loader-syntax: error
-  # import/order: error
+  import/order: error
   # import/prefer-default-export: error
   # import/unambiguous: error

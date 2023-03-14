@@ -1,7 +1,7 @@
 import fs from "node:fs";
+import { basename as getBasename, join as joinPath } from "node:path";
 import glob from "glob";
 import klaw from "klaw-sync";
-import { basename as getBasename, join as joinPath } from "node:path";
 import YAML from "yaml";
 import { hasOwnProperty } from "../../util/index.mjs";
 

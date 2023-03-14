@@ -1,5 +1,5 @@
-import SourceMap from "source-map";
 import { writeFile as writeFileAsync } from "node:fs/promises";
+import SourceMap from "source-map";
 const { SourceMapGenerator } = SourceMap;
 const generator = new SourceMapGenerator();
 const { URL } = globalThis;

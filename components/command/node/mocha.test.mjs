@@ -1,5 +1,5 @@
-import { assertDeepEqual, assertEqual } from "../../__fixture__.mjs";
 import { fileURLToPath } from "node:url";
+import { assertDeepEqual, assertEqual } from "../../__fixture__.mjs";
 import { doesSupport, hookCommandAsync, hookEnvironment } from "./mocha.mjs";
 
 const self = "file:///A:/self/";

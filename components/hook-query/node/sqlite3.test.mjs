@@ -1,3 +1,4 @@
+import Sqlite3 from "sqlite3";
 import {
   assertEqual,
   assertDeepEqual,
@@ -5,7 +6,6 @@ import {
   assertMatch,
   assertThrow,
 } from "../../__fixture__.mjs";
-import Sqlite3 from "sqlite3";
 import { testHookAsync } from "../../hook-fixture/index.mjs";
 import * as HookSqlite3 from "./sqlite3.mjs";
 
