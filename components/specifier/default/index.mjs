@@ -1,4 +1,4 @@
-import Minimatch from "minimatch";
+import { compileGlob } from "../../glob/index.mjs";
 import {
   InternalAppmapError,
   ExternalAppmapError,
@@ -8,8 +8,6 @@ import { assert } from "../../util/index.mjs";
 import { toRelativeUrl } from "../../url/index.mjs";
 
 const { Map, RegExp } = globalThis;
-
-const { Minimatch: MinimatchClass } = Minimatch;
 
 const regexps = new Map();
 
@@ -64,7 +62,7 @@ export const createSpecifier = (options, base) => {
     };
   }
   if (glob !== null) {
-    const { source, flags } = new MinimatchClass(glob).makeRe();
+    const { source, flags } = compileGlob(glob);
     return {
       base,
       source,

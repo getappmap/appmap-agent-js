@@ -10,6 +10,7 @@ version
 error
 log-inner
 log
+glob
 spawn
 validate
 validate-appmap
