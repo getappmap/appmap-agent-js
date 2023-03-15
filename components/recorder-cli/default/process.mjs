@@ -1,3 +1,4 @@
+import process from "node:process";
 import { hook } from "../../hook/index.mjs";
 import { getUuid } from "../../uuid/index.mjs";
 import { logInfo } from "../../log/index.mjs";
@@ -8,7 +9,7 @@ import {
 } from "../../configuration-accessor/index.mjs";
 import { openAgent, getSession, recordStartTrack } from "../../agent/index.mjs";
 
-export const record = (process, configuration) => {
+export const record = (configuration) => {
   configuration = extendConfigurationNode(configuration, process);
   if (isConfigurationEnabled(configuration)) {
     logInfo(

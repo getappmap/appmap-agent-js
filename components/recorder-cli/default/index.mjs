@@ -4,16 +4,16 @@ import { record as recordRemote } from "./remote.mjs";
 import { record as recordMocha } from "./mocha.mjs";
 import { record as recordJest } from "./jest.mjs";
 
-export const record = (process, configuration) => {
+export const record = (configuration) => {
   /* c8 ignore start */
   if (configuration.recorder === "process") {
-    recordProcess(process, configuration);
+    recordProcess(configuration);
   } else if (configuration.recorder === "remote") {
-    recordRemote(process, configuration);
+    recordRemote(configuration);
   } else if (configuration.recorder === "mocha") {
-    recordMocha(process, configuration);
+    recordMocha(configuration);
   } else if (configuration.recorder === "jest") {
-    recordJest(process, configuration);
+    recordJest(configuration);
   } else {
     throw new InternalAppmapError("invalid recorder configuration property");
   }

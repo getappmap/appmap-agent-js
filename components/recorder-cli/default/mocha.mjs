@@ -1,3 +1,4 @@
+import process from "node:process";
 import { hooks } from "../../../lib/node/mocha-hook.mjs";
 import { ExternalAppmapError } from "../../error/index.mjs";
 import { logInfo, logErrorWhen } from "../../log/index.mjs";
@@ -47,7 +48,7 @@ const validateMocha = (Mocha) => {
   );
 };
 
-export const record = (process, configuration) => {
+export const record = (configuration) => {
   configuration = extendConfigurationNode(configuration, process);
   logInfo(
     "Recording mocha test cases of process #%j -- %j",

@@ -1,6 +1,7 @@
-import { version } from "node:process";
+import { cwd } from "node:process";
 import "../../__fixture__.mjs";
-import { convertFileUrlToPath } from "../../path/index.mjs";
+import { toDirectoryUrl } from "../../url/index.mjs";
+import { convertPathToFileUrl } from "../../path/index.mjs";
 import {
   createConfiguration,
   extendConfiguration,
@@ -9,11 +10,6 @@ import { record } from "./index.mjs";
 
 for (const enabled of [false, true]) {
   record(
-    {
-      cwd: () => convertFileUrlToPath("file:///w:/cwd"),
-      argv: ["node", "main.mjs"],
-      version,
-    },
     extendConfiguration(
       createConfiguration("file:///w:/home/"),
       {
@@ -30,7 +26,7 @@ for (const enabled of [false, true]) {
           sqlite3: false,
         },
       },
-      "file:///w:/base/",
+      toDirectoryUrl(convertPathToFileUrl(cwd())),
     ),
   );
 }

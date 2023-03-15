@@ -1,3 +1,4 @@
+import process from "node:process";
 import { ExternalAppmapError } from "../../error/index.mjs";
 import { logInfo, logErrorWhen, logWarningWhen } from "../../log/index.mjs";
 import { getUuid } from "../../uuid/index.mjs";
@@ -25,7 +26,7 @@ function showTrackMap() {
   return toArray(this.values()).map(getName);
 }
 
-export const record = (process, configuration) => {
+export const record = (configuration) => {
   configuration = extendConfigurationNode(configuration, process);
   logInfo(
     "Recording jest test cases of process #%j -- %j",
