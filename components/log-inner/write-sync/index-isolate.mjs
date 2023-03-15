@@ -1,22 +1,25 @@
 // NB: Synchronous loggin is important to avoid infinite loop when async hooks are enabled.
 import { openSync, writeSync } from "node:fs";
-import { hasOwnProperty } from "../../util/index.mjs";
+import { InternalAppmapError } from "../../error/index.mjs";
 
-const { URL, parseInt } = globalThis;
+const { URL } = globalThis;
 
-const openLogFile = (specifier) =>
-  /^[0-9]+$/u.test(specifier)
-    ? parseInt(specifier)
-    : openSync(new URL(specifier), "w");
+const openLogFile = (specifier) => {
+  if (typeof specifier === "number") {
+    return specifier;
+  } else if (typeof specifier === "string") {
+    return openSync(new URL(specifier), "w");
+  } else {
+    throw new InternalAppmapError("invalid specifier type for log file");
+  }
+};
 
 const generateLog = (fd, name) => (message) => {
   writeSync(fd, `APPMAP-${name} ${message}\n`);
 };
 
-export const makeLog = (env) => {
-  const fd = hasOwnProperty(env, "APPMAP_LOG_FILE")
-    ? openLogFile(env.APPMAP_LOG_FILE)
-    : 1;
+export const makeLog = (specifier) => {
+  const fd = openLogFile(specifier);
   return {
     logDebug: generateLog(fd, "DEBUG"),
     logInfo: generateLog(fd, "INFO"),
