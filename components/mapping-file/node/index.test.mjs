@@ -14,7 +14,7 @@ import {
   mapSource,
   getMappingSourceArray,
 } from "../../mapping/index.mjs";
-import { fillSourceMap, loadSourceMap } from "./source-map.mjs";
+import { fillSourceMap, loadSourceMap } from "./index.mjs";
 
 const {
   Boolean,

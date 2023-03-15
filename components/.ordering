@@ -37,6 +37,7 @@ classmap
 trace
 backend
 mapping
+mapping-file
 instrumentation
 interpretation
 serialization

@@ -43,7 +43,7 @@ import {
   takeLocalEmitterTrace,
 } from "../../emitter/index.mjs";
 import { createSource } from "../../source/index.mjs";
-import { loadSourceMap, fillSourceMap } from "./source-map.mjs";
+import { loadSourceMap, fillSourceMap } from "../../mapping-file/index.mjs";
 
 export const openAgent = (configuration) => {
   if (configuration.session === null) {
