@@ -60,6 +60,7 @@ hook
 transformer-jest
 recorder-api
 recorder-cli
+recorder-standalone
 receptor
 command
 client

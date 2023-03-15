@@ -3,6 +3,14 @@ import { home } from "./home.mjs";
 import { bundleAsync } from "./bundle.mjs";
 
 for (const [name, component, env, resolution] of [
+  [
+    "recorder-browser",
+    "recorder-standalone",
+    "browser",
+    {
+      emitter: "remote-socket",
+    },
+  ],
   [null, "error", "node", {}],
   [null, "server", "node", { validate: "ajv", source: "default" }],
   [null, "client", "node", { validate: "stub" }],
