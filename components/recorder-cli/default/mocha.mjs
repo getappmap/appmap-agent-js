@@ -1,6 +1,6 @@
 import { hooks } from "../../../lib/node/mocha-hook.mjs";
 import { ExternalAppmapError } from "../../error/index.mjs";
-import { logErrorWhen } from "../../log/index.mjs";
+import { logInfo, logErrorWhen } from "../../log/index.mjs";
 import { hook } from "../../hook/index.mjs";
 import { getUuid } from "../../uuid/index.mjs";
 import { extendConfiguration } from "../../configuration/index.mjs";
@@ -46,7 +46,12 @@ const validateMocha = (Mocha) => {
   );
 };
 
-export const record = (configuration) => {
+export const record = (process, configuration) => {
+  logInfo(
+    "Recording mocha test cases of process #%j -- %j",
+    process.pid,
+    process.argv,
+  );
   validateMocha(
     requirePeerDependency("mocha", {
       directory: configuration.repository.directory,

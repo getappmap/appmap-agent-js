@@ -10,6 +10,7 @@ import { extendConfigurationNode } from "../../configuration-accessor/index.mjs"
 import { record } from "./mocha.mjs";
 
 record(
+  { pid: 123, argv: [] },
   extendConfigurationNode(
     extendConfiguration(
       createConfiguration(convertPathToFileUrl(toDirectoryPath(cwd()))),

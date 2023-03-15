@@ -9,6 +9,7 @@ import { extendConfigurationNode } from "../../configuration-accessor/index.mjs"
 import { record } from "./remote.mjs";
 
 record(
+  { pid: 123, argv: [] },
   extendConfigurationNode(
     extendConfiguration(
       createConfiguration("file:///w:/home/"),

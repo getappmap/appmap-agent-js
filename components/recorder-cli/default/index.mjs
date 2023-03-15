@@ -14,36 +14,13 @@ export const record = (process, configuration) => {
   if (isConfigurationEnabled(configuration)) {
     /* c8 ignore start */
     if (configuration.recorder === "process") {
-      logInfo(
-        "Recording the entire process #%j -- %j",
-        process.pid,
-        process.argv,
-      );
-      recordProcess(configuration);
+      recordProcess(process, configuration);
     } else if (configuration.recorder === "remote") {
-      logInfo(
-        "Enabling remote recording on process #%j -- %j",
-        process.pid,
-        process.argv,
-      );
-      logInfo(
-        "Remote recording api documention: https://appmap.io/docs/reference/remote-recording-api.html",
-      );
-      recordRemote(configuration);
+      recordRemote(process, configuration);
     } else if (configuration.recorder === "mocha") {
-      logInfo(
-        "Recording mocha test cases of process #%j -- %j",
-        process.pid,
-        process.argv,
-      );
-      recordMocha(configuration);
+      recordMocha(process, configuration);
     } else if (configuration.recorder === "jest") {
-      logInfo(
-        "Recording jest test cases of process #%j -- %j",
-        process.pid,
-        process.argv,
-      );
-      recordJest(configuration);
+      recordJest(process, configuration);
     } else {
       throw new InternalAppmapError("invalid recorder configuration field");
     }

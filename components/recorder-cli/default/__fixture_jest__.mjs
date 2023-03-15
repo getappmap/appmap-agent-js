@@ -12,6 +12,7 @@ import { record } from "./jest.mjs";
 const { test: testJest } = Jest;
 
 record(
+  { pid: 123, argv: [] },
   extendConfigurationNode(
     extendConfiguration(
       createConfiguration("file:///w:/home/"),

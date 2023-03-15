@@ -1,5 +1,5 @@
 import { ExternalAppmapError } from "../../error/index.mjs";
-import { logErrorWhen, logWarningWhen } from "../../log/index.mjs";
+import { logInfo, logErrorWhen, logWarningWhen } from "../../log/index.mjs";
 import { getUuid } from "../../uuid/index.mjs";
 import { hook } from "../../hook/index.mjs";
 import { extendConfiguration } from "../../configuration/index.mjs";
@@ -24,7 +24,12 @@ function showTrackMap() {
   return toArray(this.values()).map(getName);
 }
 
-export const record = (configuration) => {
+export const record = (process, configuration) => {
+  logInfo(
+    "Recording jest test cases of process #%j -- %j",
+    process.pid,
+    process.argv,
+  );
   // I would prefer to use require rather that global variable:
   //
   // const { beforeEach, afterEach, expect } = requirePeerDependency(
