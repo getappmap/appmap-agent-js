@@ -3,6 +3,7 @@ import { logInfo, logErrorWhen, logWarningWhen } from "../../log/index.mjs";
 import { getUuid } from "../../uuid/index.mjs";
 import { hook } from "../../hook/index.mjs";
 import { extendConfiguration } from "../../configuration/index.mjs";
+import { extendConfigurationNode } from "../../configuration-accessor/index.mjs";
 import { readGlobal } from "../../global/index.mjs";
 import { assert } from "../../util/index.mjs";
 import {
@@ -25,6 +26,7 @@ function showTrackMap() {
 }
 
 export const record = (process, configuration) => {
+  configuration = extendConfigurationNode(configuration, process);
   logInfo(
     "Recording jest test cases of process #%j -- %j",
     process.pid,

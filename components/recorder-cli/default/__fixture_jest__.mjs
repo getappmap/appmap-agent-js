@@ -6,37 +6,34 @@ import {
   createConfiguration,
   extendConfiguration,
 } from "../../configuration/index.mjs";
-import { extendConfigurationNode } from "../../configuration-accessor/index.mjs";
 import { record } from "./jest.mjs";
 
 const { test: testJest } = Jest;
 
 record(
-  { pid: 123, argv: [] },
-  extendConfigurationNode(
-    extendConfiguration(
-      createConfiguration("file:///w:/home/"),
-      {
-        processes: [{ regexp: "", enabled: true }],
-        recorder: "jest",
-        hooks: {
-          cjs: false,
-          esm: false,
-          eval: false,
-          apply: false,
-          http: false,
-          mysql: false,
-          pg: false,
-          sqlite3: false,
-        },
-      },
-      "file:///w:/base/",
-    ),
+  {
+    cwd: () => convertFileUrlToPath("file:///w:/cwd"),
+    argv: ["node", "main.mjs"],
+    version,
+    pid: 123,
+  },
+  extendConfiguration(
+    createConfiguration("file:///w:/home/"),
     {
-      cwd: () => convertFileUrlToPath("file:///w:/cwd"),
-      argv: ["node", "main.mjs"],
-      version,
+      processes: [{ regexp: "", enabled: true }],
+      recorder: "jest",
+      hooks: {
+        cjs: false,
+        esm: false,
+        eval: false,
+        apply: false,
+        http: false,
+        mysql: false,
+        pg: false,
+        sqlite3: false,
+      },
     },
+    "file:///w:/base/",
   ),
 );
 

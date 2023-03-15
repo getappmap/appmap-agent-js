@@ -5,34 +5,31 @@ import {
   createConfiguration,
   extendConfiguration,
 } from "../../configuration/index.mjs";
-import { extendConfigurationNode } from "../../configuration-accessor/index.mjs";
 import { record } from "./remote.mjs";
 
 record(
-  { pid: 123, argv: [] },
-  extendConfigurationNode(
-    extendConfiguration(
-      createConfiguration("file:///w:/home/"),
-      {
-        processes: [{ regexp: "", enabled: true }],
-        recorder: "remote",
-        hooks: {
-          cjs: false,
-          esm: false,
-          eval: false,
-          apply: false,
-          http: false,
-          mysql: false,
-          pg: false,
-          sqlite3: false,
-        },
-      },
-      "file:///w:/base/",
-    ),
+  {
+    pid: 123,
+    cwd: () => convertFileUrlToPath("file:///w:/cwd"),
+    argv: ["node", "main.mjs"],
+    version,
+  },
+  extendConfiguration(
+    createConfiguration("file:///w:/home/"),
     {
-      cwd: () => convertFileUrlToPath("file:///w:/cwd"),
-      argv: ["node", "main.mjs"],
-      version,
+      processes: [{ regexp: "", enabled: true }],
+      recorder: "remote",
+      hooks: {
+        cjs: false,
+        esm: false,
+        eval: false,
+        apply: false,
+        http: false,
+        mysql: false,
+        pg: false,
+        sqlite3: false,
+      },
     },
+    "file:///w:/base/",
   ),
 );

@@ -4,6 +4,7 @@ import { logInfo, logErrorWhen } from "../../log/index.mjs";
 import { hook } from "../../hook/index.mjs";
 import { getUuid } from "../../uuid/index.mjs";
 import { extendConfiguration } from "../../configuration/index.mjs";
+import { extendConfigurationNode } from "../../configuration-accessor/index.mjs";
 import { assert, coalesce, matchVersion } from "../../util/index.mjs";
 import { requirePeerDependency } from "../../peer/index.mjs";
 import {
@@ -47,6 +48,7 @@ const validateMocha = (Mocha) => {
 };
 
 export const record = (process, configuration) => {
+  configuration = extendConfigurationNode(configuration, process);
   logInfo(
     "Recording mocha test cases of process #%j -- %j",
     process.pid,

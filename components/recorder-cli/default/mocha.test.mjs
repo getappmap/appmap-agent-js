@@ -6,34 +6,31 @@ import {
   createConfiguration,
   extendConfiguration,
 } from "../../configuration/index.mjs";
-import { extendConfigurationNode } from "../../configuration-accessor/index.mjs";
 import { record } from "./mocha.mjs";
 
 record(
-  { pid: 123, argv: [] },
-  extendConfigurationNode(
-    extendConfiguration(
-      createConfiguration(convertPathToFileUrl(toDirectoryPath(cwd()))),
-      {
-        recorder: "mocha",
-        hooks: {
-          cjs: false,
-          esm: false,
-          eval: false,
-          apply: false,
-          http: false,
-          mysql: false,
-          pg: false,
-          sqlite3: false,
-        },
-      },
-      "file:///w:/base/",
-    ),
+  {
+    pid: 123,
+    cwd,
+    argv: ["node", "main.mjs"],
+    version,
+  },
+  extendConfiguration(
+    createConfiguration(convertPathToFileUrl(toDirectoryPath(cwd()))),
     {
-      cwd,
-      argv: ["node", "main.mjs"],
-      version,
+      recorder: "mocha",
+      hooks: {
+        cjs: false,
+        esm: false,
+        eval: false,
+        apply: false,
+        http: false,
+        mysql: false,
+        pg: false,
+        sqlite3: false,
+      },
     },
+    "file:///w:/base/",
   ),
 );
 
