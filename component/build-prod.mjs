@@ -4,7 +4,7 @@ import { bundleAsync } from "./bundle.mjs";
 
 for (const [name, component, env, resolution] of [
   [null, "error", "node", {}],
-  [null, "server", "node", { validate: "ajv" }],
+  [null, "server", "node", { validate: "ajv", source: "default" }],
   [null, "client", "node", { validate: "stub" }],
   [null, "init", "node", {}],
   [null, "status", "node", {}],
@@ -17,6 +17,7 @@ for (const [name, component, env, resolution] of [
     "node",
     {
       instrumentation: "default",
+      source: "default",
       emitter: "local",
       validate: "ajv",
     },
@@ -28,6 +29,7 @@ for (const [name, component, env, resolution] of [
     {
       "recorder-cli": "process",
       instrumentation: "default",
+      source: "default",
       emitter: "remote-socket",
       validate: "stub",
     },
@@ -39,6 +41,7 @@ for (const [name, component, env, resolution] of [
     {
       "recorder-cli": "remote",
       instrumentation: "default",
+      source: "default",
       emitter: "remote-socket",
       validate: "stub",
     },
@@ -50,6 +53,7 @@ for (const [name, component, env, resolution] of [
     {
       "recorder-cli": "mocha",
       instrumentation: "default",
+      source: "default",
       emitter: "remote-socket",
       validate: "stub",
     },
@@ -62,6 +66,7 @@ for (const [name, component, env, resolution] of [
       "recorder-cli": "jest",
       // jest instrumentation happens on another process
       instrumentation: "dead",
+      source: "dead",
       emitter: "remote-socket",
       validate: "stub",
     },
@@ -72,6 +77,7 @@ for (const [name, component, env, resolution] of [
     "node",
     {
       instrumentation: "default",
+      source: "default",
       emitter: "remote-socket",
       validate: "stub",
     },
