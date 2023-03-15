@@ -22,11 +22,46 @@ for (const [name, component, env, resolution] of [
     },
   ],
   [
-    null,
+    "recorder-process",
     "recorder-cli",
     "node",
     {
+      "recorder-cli": "process",
       instrumentation: "default",
+      emitter: "remote-socket",
+      validate: "stub",
+    },
+  ],
+  [
+    "recorder-remote",
+    "recorder-cli",
+    "node",
+    {
+      "recorder-cli": "remote",
+      instrumentation: "default",
+      emitter: "remote-socket",
+      validate: "stub",
+    },
+  ],
+  [
+    "recorder-mocha",
+    "recorder-cli",
+    "node",
+    {
+      "recorder-cli": "mocha",
+      instrumentation: "default",
+      emitter: "remote-socket",
+      validate: "stub",
+    },
+  ],
+  [
+    "recorder-jest",
+    "recorder-cli",
+    "node",
+    {
+      "recorder-cli": "jest",
+      // jest instrumentation happens on another process
+      instrumentation: "dead",
       emitter: "remote-socket",
       validate: "stub",
     },

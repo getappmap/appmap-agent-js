@@ -6,7 +6,7 @@ import {
   createConfiguration,
   extendConfiguration,
 } from "../../configuration/index.mjs";
-import { record } from "./remote.mjs";
+import { record } from "./index.mjs";
 
 const base = toDirectoryUrl(convertPathToFileUrl(cwd()));
 

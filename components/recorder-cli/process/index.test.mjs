@@ -1,19 +1,21 @@
+import { cwd } from "node:process";
 import "../../__fixture__.mjs";
-import * as Jest from "@jest/globals";
+import { toDirectoryUrl } from "../../url/index.mjs";
+import { convertPathToFileUrl } from "../../path/index.mjs";
 import {
   createConfiguration,
   extendConfiguration,
 } from "../../configuration/index.mjs";
-import { record } from "./jest.mjs";
+import { record } from "./index.mjs";
 
-const { test: testJest } = Jest;
+const base = toDirectoryUrl(convertPathToFileUrl(cwd()));
 
 record(
   extendConfiguration(
     createConfiguration("file:///w:/home/"),
     {
       processes: [{ regexp: "", enabled: true }],
-      recorder: "jest",
+      recorder: "remote",
       hooks: {
         cjs: false,
         esm: false,
@@ -25,10 +27,6 @@ record(
         sqlite3: false,
       },
     },
-    "file:///w:/base/",
+    base,
   ),
 );
-
-testJest("name1", () => {});
-
-testJest("name2", () => {});
