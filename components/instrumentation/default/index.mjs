@@ -11,11 +11,7 @@ import { visit } from "./visit.mjs";
 
 const { generate: generateEstree } = Astring;
 
-export const createInstrumentation = (configuration) => ({
-  configuration,
-});
-
-export const instrument = ({ configuration }, source, mapping) => {
+export const instrument = (configuration, source, mapping) => {
   const url = getSourceUrl(source);
   const content = getSourceContent(source);
   const sources = getMappingSourceArray(mapping);

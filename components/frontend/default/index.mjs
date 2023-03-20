@@ -1,8 +1,5 @@
 import { assert, createCounter, incrementCounter } from "../../util/index.mjs";
-import {
-  createInstrumentation,
-  instrument as instrumentInner,
-} from "../../instrumentation/index.mjs";
+import { instrument as instrumentInner } from "../../instrumentation/index.mjs";
 import {
   createSerialization,
   serialize,
@@ -60,7 +57,7 @@ export const createFrontend = (configuration) => {
     counter: createCounter(0),
     session: configuration.session,
     serialization: createSerialization(configuration),
-    instrumentation: createInstrumentation(configuration),
+    configuration,
   };
 };
 
@@ -69,9 +66,9 @@ export const getFreshTab = ({ counter }) => incrementCounter(counter);
 export const getSerializationEmptyValue = ({ serialization }) =>
   getSerializationEmptyValueInner(serialization);
 
-export const instrument = ({ instrumentation }, file, mapping) => {
+export const instrument = ({ configuration }, file, mapping) => {
   const { url, content, sources } = instrumentInner(
-    instrumentation,
+    configuration,
     file,
     mapping,
   );
