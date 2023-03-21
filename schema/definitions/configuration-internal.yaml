@@ -102,7 +102,7 @@ properties:
         type: object
         properties:
           hidden:
-            $ref: identifier-regular
+            $ref: identifier
           aliases:
             type: array
             items:
@@ -110,7 +110,7 @@ properties:
       apply:
         anyOf:
           - const: null
-          - $ref: identifier-regular
+          - $ref: identifier
       http:
         type: boolean
       mysql:
