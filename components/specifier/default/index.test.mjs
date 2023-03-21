@@ -106,15 +106,7 @@ assertEqual(
 // Path //
 //////////
 
-// file //
-
-assertEqual(
-  matchSpecifier(
-    createSpecifier({ path: "path" }, "protocol://host/base/"),
-    "protocol://host/base/path",
-  ),
-  true,
-);
+// encoding //
 
 assertEqual(
   matchSpecifier(
@@ -127,25 +119,41 @@ assertEqual(
   true,
 );
 
-// directory //
+// deep >> file //
 
 assertEqual(
   matchSpecifier(
-    createSpecifier({ path: "path" }, "protocol://host/base/"),
+    createSpecifier({ path: "path", recursive: true }, "protocol://host/base/"),
+    "protocol://host/base/path",
+  ),
+  true,
+);
+
+assertEqual(
+  matchSpecifier(
+    createSpecifier({ path: "path", recursive: true }, "protocol://host/base/"),
     "protocol://host/base/path/file.ext",
   ),
   true,
 );
 
-// recursive //
+assertEqual(
+  matchSpecifier(
+    createSpecifier({ path: "path", recursive: true }, "protocol://host/base/"),
+    "protocol://host/base/path/dir/file.ext",
+  ),
+  true,
+);
+
+// deep >> directory
 
 assertEqual(
   matchSpecifier(
     createSpecifier(
-      { path: "path", recursive: false },
+      { path: "path/", recursive: true },
       "protocol://host/base/",
     ),
-    "protocol://host/base/path/dir/file.ext",
+    "protocol://host/base/path",
   ),
   false,
 );
@@ -153,7 +161,7 @@ assertEqual(
 assertEqual(
   matchSpecifier(
     createSpecifier(
-      { path: "path/", recursive: false },
+      { path: "path/", recursive: true },
       "protocol://host/base/",
     ),
     "protocol://host/base/path/file.ext",
@@ -172,12 +180,74 @@ assertEqual(
   true,
 );
 
+// shallow >> file //
+
 assertEqual(
   matchSpecifier(
-    createSpecifier({ path: "path", recursive: true }, "protocol://host/base/"),
-    "protocol://host/base/path/dir/file.ext",
+    createSpecifier(
+      { path: "path", recursive: false },
+      "protocol://host/base/",
+    ),
+    "protocol://host/base/path",
   ),
   true,
+);
+
+assertEqual(
+  matchSpecifier(
+    createSpecifier(
+      { path: "path", recursive: false },
+      "protocol://host/base/",
+    ),
+    "protocol://host/base/path/file.ext",
+  ),
+  false,
+);
+
+assertEqual(
+  matchSpecifier(
+    createSpecifier(
+      { path: "path", recursive: false },
+      "protocol://host/base/",
+    ),
+    "protocol://host/base/path/dir/file.ext",
+  ),
+  false,
+);
+
+// shallow >> directory //
+
+assertEqual(
+  matchSpecifier(
+    createSpecifier(
+      { path: "path/", recursive: false },
+      "protocol://host/base/",
+    ),
+    "protocol://host/base/path",
+  ),
+  false,
+);
+
+assertEqual(
+  matchSpecifier(
+    createSpecifier(
+      { path: "path/", recursive: false },
+      "protocol://host/base/",
+    ),
+    "protocol://host/base/path/file.ext",
+  ),
+  true,
+);
+
+assertEqual(
+  matchSpecifier(
+    createSpecifier(
+      { path: "path/", recursive: false },
+      "protocol://host/base/",
+    ),
+    "protocol://host/base/path/dir/file.ext",
+  ),
+  false,
 );
 
 //////////
