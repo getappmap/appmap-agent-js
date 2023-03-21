@@ -315,6 +315,10 @@ const fields = {
     extend: overwrite,
     normalize: normalizePort,
   },
+  "http-switch": {
+    extend: overwrite,
+    normalize: identity,
+  },
   "trace-protocol": {
     extend: overwrite,
     normalize: identity,
@@ -479,6 +483,7 @@ export const createConfiguration = (home) => ({
   session: null,
   sessions: "^",
   "trace-port": 0, // possibly overwritten by the agent
+  "http-switch": "__APPMAP__",
   "trace-protocol": "TCP",
   "track-port": 0, // possibly overwritten by the agent
   "track-protocol": "HTTP/1.1",

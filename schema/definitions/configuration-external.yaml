@@ -40,6 +40,8 @@ properties:
     $ref: port
   trace-protocol:
     const: TCP
+  http-switch:
+    $ref: url-component
   track-port:
     $ref: port
   track-protocol:

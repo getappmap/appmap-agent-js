@@ -64,6 +64,8 @@ properties:
     $ref: port-cooked
   trace-protocol:
     const: TCP
+  http-switch:
+    $ref: url-component
   track-port:
     $ref: port-cooked
   track-protocol:
