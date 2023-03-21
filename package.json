@@ -53,6 +53,7 @@
     "semver": "^7.3.5",
     "treeify": "^1.1.0",
     "vlq": "^2.0.4",
+    "ws": "^8.13.0",
     "yaml": "^2.1.1"
   },
   "devDependencies": {
