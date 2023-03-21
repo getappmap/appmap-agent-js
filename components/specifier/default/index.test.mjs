@@ -152,6 +152,28 @@ assertEqual(
 
 assertEqual(
   matchSpecifier(
+    createSpecifier(
+      { path: "path/", recursive: false },
+      "protocol://host/base/",
+    ),
+    "protocol://host/base/path/file.ext",
+  ),
+  true,
+);
+
+assertEqual(
+  matchSpecifier(
+    createSpecifier(
+      { path: "path/", recursive: true },
+      "protocol://host/base/",
+    ),
+    "protocol://host/base/path/dir/file.ext",
+  ),
+  true,
+);
+
+assertEqual(
+  matchSpecifier(
     createSpecifier({ path: "path", recursive: true }, "protocol://host/base/"),
     "protocol://host/base/path/dir/file.ext",
   ),

@@ -43,6 +43,22 @@ const sanitizeForRegExp = (string) =>
 
 // const sanitizeForGlob = (string) => string.replace(/[*?[\]]/g, escape);
 
+const toPathRegExp = (path, recursive) => {
+  if (recursive) {
+    if (path.endsWith("/")) {
+      return `^${sanitizeForRegExp(path)}`;
+    } else {
+      return `^${sanitizeForRegExp(path)}(/|$)`;
+    }
+  } else {
+    if (path.endsWith("/")) {
+      return `^${sanitizeForRegExp(path)}[^/]*$`;
+    } else {
+      return `^${sanitizeForRegExp(path)}$`;
+    }
+  }
+};
+
 export const createSpecifier = (options, base) => {
   const { glob, path, dist, regexp, flags, recursive, external } = {
     glob: null,
@@ -70,14 +86,9 @@ export const createSpecifier = (options, base) => {
     };
   }
   if (path !== null) {
-    assert(
-      path[path.length - 1] !== "/",
-      "directory path should not end with a path separator",
-      InternalAppmapError,
-    );
     return {
       base,
-      source: `^${sanitizeForRegExp(path)}($|/${recursive ? "" : "[^/]*$"})`,
+      source: toPathRegExp(path, recursive),
       flags: "",
     };
   }
