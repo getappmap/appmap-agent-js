@@ -64,6 +64,17 @@ assertEqual(
   false,
 );
 
+assertEqual(
+  matchSpecifier(
+    createSpecifier(
+      { regexp: "/file\\.ext$", relative: false },
+      "protocol1://host1/base1/",
+    ),
+    "protocol2://host2/base2/file.ext",
+  ),
+  true,
+);
+
 //////////
 // glob //
 //////////
@@ -246,6 +257,32 @@ assertEqual(
       "protocol://host/base/",
     ),
     "protocol://host/base/path/dir/file.ext",
+  ),
+  false,
+);
+
+/////////
+// Url //
+/////////
+
+assertEqual(
+  matchSpecifier(
+    createSpecifier(
+      { url: "protocol1://host1/base1/file.ext", recursive: false },
+      "protocol2://host2/base2/",
+    ),
+    "protocol1://host1/base1/file.ext",
+  ),
+  true,
+);
+
+assertEqual(
+  matchSpecifier(
+    createSpecifier(
+      { url: "protocol1://host1/base1/file.ext", recursive: false },
+      "protocol2://host2/base2/",
+    ),
+    "protocol2://host2/base2/file.ext",
   ),
   false,
 );

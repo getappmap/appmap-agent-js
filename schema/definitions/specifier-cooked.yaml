@@ -8,7 +8,9 @@ anyOf:
       - flags
     properties:
       base:
-        $ref: url
+        anyOf:
+          - const: null
+          - $ref: url
       source:
         type: string
       flags:

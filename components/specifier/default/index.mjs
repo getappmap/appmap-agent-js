@@ -43,36 +43,48 @@ const sanitizeForRegExp = (string) =>
 
 // const sanitizeForGlob = (string) => string.replace(/[*?[\]]/g, escape);
 
-const toPathRegExp = (path, recursive) => {
+const toTargetRegExp = (target, recursive) => {
   if (recursive) {
-    if (path.endsWith("/")) {
-      return `^${sanitizeForRegExp(path)}`;
+    if (target.endsWith("/")) {
+      return `^${sanitizeForRegExp(target)}`;
     } else {
-      return `^${sanitizeForRegExp(path)}(/|$)`;
+      return `^${sanitizeForRegExp(target)}(/|$)`;
     }
   } else {
-    if (path.endsWith("/")) {
-      return `^${sanitizeForRegExp(path)}[^/]*$`;
+    if (target.endsWith("/")) {
+      return `^${sanitizeForRegExp(target)}[^/]*$`;
     } else {
-      return `^${sanitizeForRegExp(path)}$`;
+      return `^${sanitizeForRegExp(target)}$`;
     }
   }
 };
 
 export const createSpecifier = (options, base) => {
-  const { glob, path, dist, regexp, flags, recursive, external } = {
+  const {
+    glob,
+    url,
+    path,
+    dist,
+    regexp,
+    flags,
+    recursive,
+    external,
+    relative,
+  } = {
     glob: null,
     path: null,
+    url: null,
     dist: null,
     regexp: null,
     flags: "",
     recursive: true,
     external: false,
+    relative: true,
     ...options,
   };
   if (regexp !== null) {
     return {
-      base,
+      base: relative ? base : null,
       source: regexp,
       flags,
     };
@@ -88,7 +100,14 @@ export const createSpecifier = (options, base) => {
   if (path !== null) {
     return {
       base,
-      source: toPathRegExp(path, recursive),
+      source: toTargetRegExp(path, recursive),
+      flags: "",
+    };
+  }
+  if (url !== null) {
+    return {
+      base: null,
+      source: toTargetRegExp(url, recursive),
       flags: "",
     };
   }
@@ -128,27 +147,39 @@ const escapeSegment = (segment) => segment.replace(/[/#?]/gu, escapeCharacter);
 
 export const matchSpecifier = (specifier, url) => {
   const { base, source, flags } = specifier;
-  const relative = toRelativeUrl(url, base, escapeSegment);
-  if (relative === null) {
+  if (base === null) {
+    const matched = makeRegExpCache(source, flags).test(url);
     logDebug(
-      "could not apply specifier %j because %j cannot be expressed relatively to %j, will treat it as unmatched",
-      source,
+      "url %j %s absolute regexp specifier %j with flags %j",
       url,
-      base,
-    );
-    return false;
-  } else {
-    const matched = makeRegExpCache(source, flags).test(relative);
-    logDebug(
-      "url %j which resolves to %j relatively to %j %s regexp specifier %j with flags %j",
-      url,
-      relative,
-      base,
       matched ? "matched" : "did not match",
       source,
       flags,
     );
     return matched;
+  } else {
+    const relative = toRelativeUrl(url, base, escapeSegment);
+    if (relative === null) {
+      logDebug(
+        "could not apply specifier %j because %j cannot be expressed relatively to %j, will treat it as unmatched",
+        source,
+        url,
+        base,
+      );
+      return false;
+    } else {
+      const matched = makeRegExpCache(source, flags).test(relative);
+      logDebug(
+        "url %j which resolves to %j relatively to %j %s relative regexp specifier %j with flags %j",
+        url,
+        relative,
+        base,
+        matched ? "matched" : "did not match",
+        source,
+        flags,
+      );
+      return matched;
+    }
   }
 };
 
