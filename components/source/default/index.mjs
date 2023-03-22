@@ -15,6 +15,9 @@ export const createSource = (url, content) => ({
   hash: null,
 });
 
+export const resetSourceUrl = (source, url) =>
+  createSource(url, source.content);
+
 export const isSourceEmpty = ({ content }) => content === null;
 
 export const getSourceUrl = ({ url }) => url;

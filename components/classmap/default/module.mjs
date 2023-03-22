@@ -1,5 +1,9 @@
 import { logInfo } from "../../log/index.mjs";
-import { parseSource } from "../../source/index.mjs";
+import {
+  parseSource,
+  getSourceUrl,
+  resetSourceUrl,
+} from "../../source/index.mjs";
 import {
   wrapRootEntityArray,
   registerEntityTree,
@@ -23,8 +27,8 @@ const MAXIMUM_LOOKUP_DISTANCE = measurePositionDistance(
 );
 
 export const createModule = ({
+  base,
   source,
-  relative,
   inline,
   exclusions,
   shallow,
@@ -33,8 +37,9 @@ export const createModule = ({
   const estree = parseSource(source);
   const getExclusion = compileExclusionArray(exclusions);
   const context = {
+    base,
     anonymous: "[anonymous]",
-    relative,
+    url: getSourceUrl(source),
     inline,
     shallow,
     source,
@@ -48,8 +53,8 @@ export const createModule = ({
     registerEntityTree(entity, null, null, infos, getExclusion);
   }
   return {
+    base,
     source,
-    relative,
     inline,
     exclusions,
     shallow,
@@ -60,6 +65,12 @@ export const createModule = ({
     references: new Set(),
   };
 };
+
+export const resetModuleUrl = (module, url) =>
+  createModule({
+    ...module,
+    source: resetSourceUrl(module.source, url),
+  });
 
 export const lookupModuleClosure = (
   {
@@ -116,7 +127,7 @@ export const lookupModuleClosure = (
   }
 };
 
-export const getModuleRelativeUrl = ({ relative }) => relative;
+export const getModuleUrl = ({ source }) => getSourceUrl(source);
 
 export const toModuleClassmap = ({ entities, pruning, references }) => {
   if (pruning) {

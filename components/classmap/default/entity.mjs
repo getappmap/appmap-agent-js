@@ -1,5 +1,4 @@
 import { assert } from "../../util/index.mjs";
-import { getUrlBasename, toAbsoluteUrl } from "../../url/index.mjs";
 import { InternalAppmapError } from "../../error/index.mjs";
 import {
   getSourceContent,
@@ -7,9 +6,9 @@ import {
   printComment,
   extractCommentLabelArray,
 } from "../../source/index.mjs";
+import { toSpecifier, toSpecifierBasename } from "./specifier.mjs";
+import { stringifyLoc, parseLoc } from "./loc.mjs";
 import { stringifyPosition } from "./position.mjs";
-
-const { String, parseInt } = globalThis;
 
 const isFunctionEntity = ({ type }) => type === "function";
 
@@ -31,9 +30,7 @@ export const wrapRootEntityArray = (entities, context) =>
     ? [
         {
           type: "class",
-          name: getUrlBasename(
-            toAbsoluteUrl(context.relative, "protocol://host"),
-          ),
+          name: toSpecifierBasename(context.url, context.base),
           children: entities,
         },
       ]
@@ -62,7 +59,10 @@ export const makeFunctionEntity = (
     ),
     children,
     name: maybe_name ?? context.anonymous,
-    location: `${context.relative}:${String(node.loc.start.line)}`,
+    location: stringifyLoc(
+      toSpecifier(context.url, context.base),
+      node.loc.start.line,
+    ),
     static: false,
     source: context.inline
       ? getSourceContent(context.source).substring(node.start, node.end)
@@ -152,12 +152,6 @@ export const registerEntity = (
       "function entity at root level",
       InternalAppmapError,
     );
-    const parts = /^(.*):([0-9]+)$/u.exec(entity.location);
-    assert(
-      parts !== null,
-      "could not parse function classmap entity location",
-      InternalAppmapError,
-    );
     const { excluded, recursively_excluded: child_recursively_excluded } =
       applyExclude(entity, maybe_parent_entity, recursively_excluded, exclude);
     assert(
@@ -175,8 +169,7 @@ export const registerEntity = (
             link: {
               defined_class: maybe_parent_entity.name,
               method_id: entity.name,
-              path: parts[1],
-              lineno: parseInt(parts[2]),
+              ...parseLoc(entity.location),
               static: entity.static,
             },
           },

@@ -6,6 +6,11 @@ export const createSource = generateDeadcode(
   InternalAppmapError,
 );
 
+export const resetSourceUrl = generateDeadcode(
+  "forbidden call to resetSourceUrl",
+  InternalAppmapError,
+);
+
 export const extractCommentLabelArray = generateDeadcode(
   "forbidden call to extractCommentLabelArray",
   InternalAppmapError,

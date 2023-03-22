@@ -3,20 +3,19 @@ import { InternalAppmapError } from "../../error/index.mjs";
 import { lookupUrl } from "../../matcher/index.mjs";
 import {
   hashSource,
+  resetSourceUrl,
   getSourceUrl,
   isSourceEmpty,
 } from "../../source/index.mjs";
-import {
-  getUrlFilename,
-  toAbsoluteUrl,
-  toRelativeUrl,
-} from "../../url/index.mjs";
-import { logWarning } from "../../log/index.mjs";
+import { URL } from "../../url/index.mjs";
+import { logWarning, logWarningWhen } from "../../log/index.mjs";
+import { toSpecifier, splitSpecifierDirectory } from "./specifier.mjs";
 import {
   createModule,
+  resetModuleUrl,
   toModuleClassmap,
   lookupModuleClosure,
-  getModuleRelativeUrl,
+  getModuleUrl,
 } from "./module.mjs";
 
 const { String, Map } = globalThis;
@@ -26,50 +25,43 @@ export const createClassmap = (configuration) => ({
   // Mapping from the hash of a file (url + content) to the associated source
   // object.
   modules: new Map(),
-  // Mapping from url to counter to provide unique relative urls for function
-  // entities.
+  // Mapping from url to either:
+  // - a number (its current index) if the source is dynamic
+  // - a string (its hash) if the source is static
   urls: new Map(),
-  // Mapping from url to file hash to support url-based lookup. When a url is
-  // mapped to null, it means that there is multiple different content for that
-  // url. In other words, the source is dynamic.
-  indirections: new Map(),
 });
 
-const toDynamicRelativeUrl = (url, index, base) =>
-  toRelativeUrl(
-    toAbsoluteUrl(`${getUrlFilename(url)}#${String(index)}`, url),
-    base,
+const setUrlHash = (url, hash) => {
+  const url_obj = new URL(url);
+  logWarningWhen(
+    url_obj.hash !== "",
+    "overwritting hash of %j with %j because it is a dynamic source",
+    url,
+    hash,
   );
+  url_obj.hash = `#${hash}`;
+  return url_obj.toString();
+};
 
 // Returns boolean indicating whether the source was ignored.
 export const addClassmapSource = (
   {
     configuration: {
+      repository: { directory: base },
       pruning,
-      repository: { directory },
       packages,
       "default-package": default_package,
       exclude: global_exclusion_array,
       "inline-source": global_inline_source,
     },
     modules,
-    indirections,
     urls,
   },
   source,
 ) => {
   const url = getSourceUrl(source);
-  let relative = toRelativeUrl(url, directory);
-  if (relative === null) {
-    logWarning(
-      "Ignoring %j because it could not be expressed relatively to %j",
-      url,
-      directory,
-    );
-    return false;
-  } else if (isSourceEmpty(source)) {
+  if (isSourceEmpty(source)) {
     logWarning("Ignoring %j because its content could not be loaded", url);
-    indirections.set(url, null);
     return false;
   } else {
     const hash = hashSource(source);
@@ -83,36 +75,28 @@ export const addClassmapSource = (
         shallow,
       } = lookupUrl(packages, url, default_package);
       if (enabled) {
-        // Disable url-based location because there are multiple source contents
-        // for the same source url.
-        if (indirections.has(url)) {
-          const maybe_hash = indirections.get(url);
-          if (maybe_hash !== null) {
-            modules.set(
-              maybe_hash,
-              createModule({
-                ...modules.get(maybe_hash),
-                relative: toDynamicRelativeUrl(url, 0, directory),
-              }),
-            );
-            indirections.set(url, null);
-          }
-        } else {
-          indirections.set(url, hash);
-        }
         if (urls.has(url)) {
-          let counter = urls.get(url);
-          counter += 1;
-          urls.set(url, counter);
-          relative = toDynamicRelativeUrl(url, counter, directory);
+          let resolution = urls.get(url);
+          // The source was initially though to be static.
+          if (typeof resolution === "string") {
+            // Change the url of the inital module to a dynamic url.
+            modules.set(
+              resolution,
+              resetModuleUrl(modules.get(resolution), setUrlHash(url, "0")),
+            );
+            resolution = 0;
+          }
+          resolution += 1;
+          source = resetSourceUrl(source, setUrlHash(url, String(resolution)));
+          urls.set(url, resolution);
         } else {
-          urls.set(url, 0);
+          urls.set(url, hash);
         }
         modules.set(
           hash,
           createModule({
+            base,
             source,
-            relative,
             pruning,
             inline:
               local_inline_source === null
@@ -130,7 +114,7 @@ export const addClassmapSource = (
   }
 };
 
-export const lookupClassmapClosure = ({ modules, indirections }, location) => {
+export const lookupClassmapClosure = ({ modules, urls }, location) => {
   // Prefer hash over url to support dynamic sources.
   if (location.hash !== null) {
     if (modules.has(location.hash)) {
@@ -143,18 +127,24 @@ export const lookupClassmapClosure = ({ modules, indirections }, location) => {
       return null;
     }
   } else if (location.url !== null) {
-    if (indirections.has(location.url)) {
-      const hash = indirections.get(location.url);
-      if (hash === null) {
+    if (urls.has(location.url)) {
+      const resolution = urls.get(location.url);
+      if (typeof resolution === "number") {
         logWarning(
           "Ignoring closure at %j because its source is dynamic",
           location,
         );
         return null;
-      } else {
-        assert(modules.has(hash), "missing resolved hash", InternalAppmapError);
-        return lookupModuleClosure(modules.get(hash), location);
-      }
+      } else if (typeof resolution === "string") {
+        assert(
+          modules.has(resolution),
+          "missing resolved hash",
+          InternalAppmapError,
+        );
+        return lookupModuleClosure(modules.get(resolution), location);
+      } /* c8 ignore start */ else {
+        throw new InternalAppmapError("invalid url resolution");
+      } /* c8 ignore stop */
     } else {
       logWarning(
         "Ignoring closure at %j because its source is missing",
@@ -169,22 +159,26 @@ export const lookupClassmapClosure = ({ modules, indirections }, location) => {
   }
 };
 
-const registerPackageEntity = (entities, dirname) => {
+const registerPackageEntity = (entities, segment) => {
   const predicate = (entity) =>
-    entity.type === "package" && entity.name === dirname;
+    entity.type === "package" && entity.name === segment;
   if (!entities.some(predicate)) {
-    entities.push({ type: "package", name: dirname, children: [] });
+    entities.push({ type: "package", name: segment, children: [] });
   }
   return entities.find(predicate).children;
 };
 
 export const compileClassmap = ({
   modules,
-  configuration: { pruning, "collapse-package-hierachy": collapse },
+  configuration: {
+    repository: { directory: base },
+    pruning,
+    "collapse-package-hierachy": collapse,
+  },
 }) => {
   const root = [];
   for (const module of modules.values()) {
-    const relative = getModuleRelativeUrl(module);
+    const specifier = toSpecifier(getModuleUrl(module), base);
     const entities = toModuleClassmap(module);
     if (
       /* c8 ignore start */ !pruning ||
@@ -193,16 +187,13 @@ export const compileClassmap = ({
       if (collapse) {
         root.push({
           type: "package",
-          name: relative,
+          name: specifier,
           children: entities,
         });
       } else {
-        const dirnames = relative.split("/");
-        dirnames.pop();
-        if (dirnames.length === 0) {
-          dirnames.push(".");
-        }
-        dirnames.reduce(registerPackageEntity, root).push(...entities);
+        splitSpecifierDirectory(specifier)
+          .reduce(registerPackageEntity, root)
+          .push(...entities);
       }
     }
   }

@@ -6,6 +6,7 @@ import {
 import { stringifyLocation } from "../../location/index.mjs";
 import {
   createSource,
+  resetSourceUrl,
   getSourceUrl,
   getSourceContent,
   isSourceEmpty,
@@ -30,6 +31,16 @@ import {
     "string",
   );
 }
+
+assertEqual(
+  getSourceUrl(
+    resetSourceUrl(
+      createSource("protocol1://host1/path1", null),
+      "protocol2://host2/path2",
+    ),
+  ),
+  "protocol2://host2/path2",
+);
 
 {
   const source = createSource("protocol://host/empty.mjs", null);

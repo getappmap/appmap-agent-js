@@ -20,7 +20,8 @@ import {
 const { Map, Set } = globalThis;
 
 const default_context = {
-  relative: "script.js",
+  url: "protocol://host/script.js",
+  base: "protocol://host/",
   source: null,
   anonymous: "anonymous",
   inline: false,
@@ -41,7 +42,10 @@ const default_context = {
           source,
         }),
       ],
-      { ...default_context, relative: "dirname/basename.extension" },
+      {
+        ...default_context,
+        url: "protocol://host/dirname/basename.extension?search=123#hash",
+      },
     ).map(getEntitySummary),
     [
       {
@@ -163,7 +167,8 @@ assertEqual(
       makeFunctionEntity(parseSource(source).body[0], "reference", "f", [], {
         ...default_context,
         shallow: true,
-        relative: "relative",
+        url: "protocol://host/base/script.js",
+        base: "protocol://host/base/",
         source,
       }),
     ],
@@ -187,7 +192,7 @@ assertEqual(
       link: {
         defined_class: "c",
         method_id: "f",
-        path: "relative",
+        path: "./script.js",
         lineno: 1,
         static: false,
       },
@@ -298,14 +303,20 @@ assertDeepEqual(
         "reference",
         "f",
         [makeClassEntity("c", [], default_context)],
-        { ...default_context, inline: true, source },
+        {
+          ...default_context,
+          inline: true,
+          source,
+          url: "protocol://host/base/script.js",
+          base: "protocol://host/base/",
+        },
       ),
     ),
     [
       {
         type: "function",
         name: "f",
-        location: "script.js:1",
+        location: "./script.js:1",
         static: false,
         source: "function f () {}",
         comment: null,
@@ -326,6 +337,8 @@ assertDeepEqual(
     toClassmapEntity(
       makeFunctionEntity(parseSource(source).body[0], "reference", "f", [], {
         ...default_context,
+        url: "protocol://host/base/script.js",
+        base: "protocol://host/base/",
         inline: true,
         source,
       }),
@@ -334,7 +347,7 @@ assertDeepEqual(
       {
         type: "function",
         name: "f",
-        location: "script.js:1",
+        location: "./script.js:1",
         static: false,
         source: "function f () {}",
         comment: null,

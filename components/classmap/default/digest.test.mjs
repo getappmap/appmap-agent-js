@@ -4,12 +4,14 @@ import { getEntitySummary } from "./entity.mjs";
 import { digestEstreeRoot } from "./digest.mjs";
 
 const digest = (content, anonymous = "dummy") => {
-  const source = createSource("protocol://host/path.mjs", content);
+  const source = createSource("protocol://host/base/script.js", content);
   return digestEstreeRoot(parseSource(source), {
     inline: false,
     shallow: false,
     source,
     anonymous,
+    base: "protocol://host/base/",
+    url: "protocol://host/base/script.js",
   }).map(getEntitySummary);
 };
 

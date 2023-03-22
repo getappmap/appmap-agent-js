@@ -29,7 +29,8 @@ const and_exclusion = {
 };
 
 const default_context = {
-  relative: "script.js",
+  url: "protocol://host/base/script.js",
+  base: "protocol://host/base/",
   content: "",
   anonymous: "anonymous",
   inline: false,

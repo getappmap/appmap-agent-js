@@ -2,7 +2,8 @@ import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
 import { createSource } from "../../source/index.mjs";
 import {
   createModule,
-  getModuleRelativeUrl,
+  resetModuleUrl,
+  getModuleUrl,
   lookupModuleClosure,
   toModuleClassmap,
 } from "./module.mjs";
@@ -11,11 +12,11 @@ import {
 assertEqual(
   lookupModuleClosure(
     createModule({
-      source: createSource("protocol://host/home/dirname/basename.js", `123;`),
+      base: "protocol://host/base/",
+      source: createSource("protocol://host/base/script.js", `123;`),
       pruning: true,
       inline: true,
       shallow: true,
-      relative: "dirname/basename.js",
       exclusions: [],
     }),
     { line: 123, column: 456 },
@@ -23,10 +24,29 @@ assertEqual(
   null,
 );
 
+// resetModuleUrl //
+assertEqual(
+  getModuleUrl(
+    resetModuleUrl(
+      createModule({
+        base: "protocol://host/base/",
+        source: createSource("protocol://host/base/script1.js", `123;`),
+        pruning: true,
+        inline: true,
+        shallow: true,
+        exclusions: [],
+      }),
+      "protocol://host/base/script2.js",
+    ),
+  ),
+  "protocol://host/base/script2.js",
+);
+
 {
   const module = createModule({
+    base: "protocol://host/base/",
     source: createSource(
-      "protocol://host/home/dirname/basename.js",
+      "protocol://host/base/script.js",
       `
         function f (x) {}
         function g (y) {}
@@ -36,12 +56,11 @@ assertEqual(
     pruning: true,
     inline: true,
     shallow: true,
-    relative: "dirname/basename.js",
     exclusions: [
       {
         combinator: "or",
         name: false,
-        "qualified-name": "^basename\\.g$",
+        "qualified-name": "^script\\.g$",
         "some-label": false,
         "every-label": false,
         excluded: true,
@@ -59,7 +78,7 @@ assertEqual(
     ],
   });
 
-  assertEqual(getModuleRelativeUrl(module), "dirname/basename.js");
+  assertEqual(getModuleUrl(module), "protocol://host/base/script.js");
 
   // present function //
   {
@@ -67,9 +86,9 @@ assertEqual(
       parameters: ["x"],
       shallow: true,
       link: {
-        defined_class: "basename",
+        defined_class: "script",
         method_id: "f",
-        path: "dirname/basename.js",
+        path: "./script.js",
         lineno: 2,
         static: false,
       },
@@ -88,12 +107,12 @@ assertEqual(
   assertDeepEqual(toModuleClassmap(module), [
     {
       type: "class",
-      name: "basename",
+      name: "script",
       children: [
         {
           type: "function",
           name: "f",
-          location: "dirname/basename.js:2",
+          location: "./script.js:2",
           static: false,
           source: "function f (x) {}",
           comment: null,

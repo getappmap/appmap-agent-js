@@ -68,7 +68,7 @@ const toStaticLocation = (location) => ({
       link: {
         defined_class: "dynamic",
         method_id: "f",
-        path: "directory/dynamic.js#0",
+        path: "./directory/dynamic.js#0",
         lineno: 1,
         static: false,
       },
@@ -82,7 +82,7 @@ const toStaticLocation = (location) => ({
       link: {
         defined_class: "dynamic",
         method_id: "g",
-        path: "directory/dynamic.js#1",
+        path: "./directory/dynamic.js#1",
         lineno: 1,
         static: false,
       },
@@ -99,7 +99,7 @@ const toStaticLocation = (location) => ({
       link: {
         defined_class: "static",
         method_id: "h",
-        path: "directory/static.js",
+        path: "./directory/static.js",
         lineno: 1,
         static: false,
       },
@@ -228,7 +228,7 @@ const toStaticLocation = (location) => ({
   assertDeepEqual(compileClassmap(classmap), [
     {
       type: "package",
-      name: "directory/file.js",
+      name: "./directory/file.js",
       children: [
         {
           type: "class",
@@ -241,7 +241,7 @@ const toStaticLocation = (location) => ({
               labels: [],
               source: "function f (x) {}",
               static: false,
-              location: "directory/file.js:1",
+              location: "./directory/file.js:1",
             },
           ],
         },
@@ -302,7 +302,7 @@ const toStaticLocation = (location) => ({
               labels: [],
               source: null,
               static: false,
-              location: "file.js#0:1",
+              location: "./file.js#0:1",
             },
           ],
         },
@@ -317,7 +317,7 @@ const toStaticLocation = (location) => ({
               labels: [],
               source: null,
               static: false,
-              location: "file.js#1:1",
+              location: "./file.js#1:1",
             },
           ],
         },

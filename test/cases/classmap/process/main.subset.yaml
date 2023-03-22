@@ -7,7 +7,7 @@ classMap:
         children:
           - type: function
             name: main
-            location: main.mjs:3
+            location: ./main.mjs:3
             static: false
             source: null
             comment: null
@@ -17,7 +17,7 @@ classMap:
         children:
           - type: function
             name: native
-            location: native.mjs:1
+            location: ./native.mjs:1
             static: false
             source: null
             comment: null
@@ -27,7 +27,7 @@ classMap:
         children:
           - type: function
             name: common
-            location: common.cjs:2
+            location: ./common.cjs:2
             static: false
             source: null
             comment: null

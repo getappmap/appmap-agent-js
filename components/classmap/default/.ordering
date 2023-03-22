@@ -1,4 +1,6 @@
+specifier.mjs
 position.mjs
+loc.mjs
 entity.mjs
 digest.mjs
 exclusion.mjs

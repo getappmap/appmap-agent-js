@@ -7,14 +7,14 @@ classMap:
         children:
           - type: function
             name: f
-            location: source.mjs:2
+            location: ./source.mjs:2
             static: false
             source:
             comment: "// Source //"
             labels: []
           - type: function
             name: g
-            location: source.mjs:4
+            location: ./source.mjs:4
             static: false
             source:
             comment:
@@ -24,7 +24,7 @@ events:
     id: 1
     defined_class: source
     method_id: f
-    path: source.mjs
+    path: ./source.mjs
     lineno: 2
     parameters: []
   - event: return
@@ -38,7 +38,7 @@ events:
     id: 3
     defined_class: source
     method_id: g
-    path: source.mjs
+    path: ./source.mjs
     lineno: 4
     parameters: []
   - event: return

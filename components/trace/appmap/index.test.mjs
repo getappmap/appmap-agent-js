@@ -195,7 +195,7 @@ assertDeepEqual(
                 {
                   type: "function",
                   name: "f",
-                  location: "dirname/filename.js:1",
+                  location: "./dirname/filename.js:1",
                   static: false,
                   labels: [],
                   comment: null,
@@ -213,7 +213,7 @@ assertDeepEqual(
           thread_id: 0,
           defined_class: "filename",
           method_id: "f",
-          path: "dirname/filename.js",
+          path: "./dirname/filename.js",
           lineno: 1,
           static: false,
           receiver: {
@@ -237,7 +237,7 @@ assertDeepEqual(
           thread_id: 0,
           defined_class: "filename",
           method_id: "f",
-          path: "dirname/filename.js",
+          path: "./dirname/filename.js",
           lineno: 1,
           static: false,
           receiver: {
