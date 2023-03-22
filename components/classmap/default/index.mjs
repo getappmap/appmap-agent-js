@@ -1,6 +1,6 @@
 import { assert } from "../../util/index.mjs";
 import { InternalAppmapError } from "../../error/index.mjs";
-import { lookupSpecifier } from "../../specifier/index.mjs";
+import { lookupUrl } from "../../matcher/index.mjs";
 import {
   hashSource,
   getSourceUrl,
@@ -47,8 +47,8 @@ export const addClassmapSource = (
     configuration: {
       pruning,
       repository: { directory },
-      packages: specifiers,
-      "default-package": default_specifier,
+      packages,
+      "default-package": default_package,
       exclude: global_exclusion_array,
       "inline-source": global_inline_source,
     },
@@ -81,7 +81,7 @@ export const addClassmapSource = (
         enabled,
         exclude: local_exclusion_array,
         shallow,
-      } = lookupSpecifier(specifiers, url, default_specifier);
+      } = lookupUrl(packages, url, default_package);
       if (enabled) {
         // Disable url-based location because there are multiple source contents
         // for the same source url.

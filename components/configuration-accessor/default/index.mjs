@@ -14,7 +14,7 @@ import {
   extractRepositoryHistory,
   extractRepositoryPackage,
 } from "../../repository/index.mjs";
-import { lookupSpecifier } from "../../specifier/index.mjs";
+import { lookupUrl } from "../../matcher/index.mjs";
 import { extendConfiguration } from "../../configuration/index.mjs";
 
 const {
@@ -117,13 +117,12 @@ export const isConfigurationEnabled = ({
   processes,
   main,
   "default-process": default_process,
-}) =>
-  main === null || lookupSpecifier(processes, main, default_process).enabled;
+}) => main === null || lookupUrl(processes, main, default_process).enabled;
 
 export const getConfigurationPackage = (
   { packages, "default-package": default_package },
   url,
-) => lookupSpecifier(packages, url, default_package);
+) => lookupUrl(packages, url, default_package);
 
 const compileScenario = (scenario) => {
   try {

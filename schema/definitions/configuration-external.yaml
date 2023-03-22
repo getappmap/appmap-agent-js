@@ -106,10 +106,10 @@ properties:
       - $ref: process
   processes:
     anyOf:
-      - $ref: specifier-process
+      - $ref: matcher-process
       - type: array
         items:
-          $ref: specifier-process
+          $ref: matcher-process
   main:
     $ref: path
   engine:
@@ -120,10 +120,10 @@ properties:
     $ref: module
   packages:
     anyOf:
-      - $ref: specifier-module
+      - $ref: matcher-module
       - type: array
         items:
-          $ref: specifier-module
+          $ref: matcher-module
   exclude:
     $ref: exclude
   collapse-package-hierachy:

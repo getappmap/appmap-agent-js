@@ -135,7 +135,7 @@ properties:
       minItems: 2
       maxItems: 2
       items:
-        - $ref: specifier-cooked
+        - $ref: matcher-cooked
         - $ref: process
   main:
     anyOf:
@@ -155,7 +155,7 @@ properties:
       minItems: 2
       maxItems: 2
       items:
-        - $ref: specifier-cooked
+        - $ref: matcher-cooked
         - $ref: module-cooked
   exclude:
     $ref: exclude-cooked

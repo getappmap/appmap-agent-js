@@ -24,7 +24,7 @@ group
 prompts
 http
 service
-specifier
+matcher
 engine
 repository
 configuration

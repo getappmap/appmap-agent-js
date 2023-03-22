@@ -5,7 +5,7 @@ import {
   addClassmapSource,
   lookupClassmapClosure,
 } from "../../classmap/index.mjs";
-import { lookupSpecifier } from "../../specifier/index.mjs";
+import { lookupUrl } from "../../matcher/index.mjs";
 
 const { Set } = globalThis;
 
@@ -23,8 +23,8 @@ export const createExclusion = (configuration, is_mirror_mapping) => {
   ) {
     return {
       type: "basic",
-      specifiers: configuration.packages,
-      default_specifier: configuration["default-package"],
+      packages: configuration.packages,
+      default_package: configuration["default-package"],
       urls: new Set(),
     };
   } else {
@@ -38,10 +38,10 @@ export const createExclusion = (configuration, is_mirror_mapping) => {
 export const addExclusionSource = (exclusion, source) => {
   if (exclusion.type === "basic") {
     const url = getSourceUrl(source);
-    const { enabled } = lookupSpecifier(
-      exclusion.specifiers,
+    const { enabled } = lookupUrl(
+      exclusion.packages,
       url,
-      exclusion.default_specifier,
+      exclusion.default_package,
     );
     if (enabled) {
       exclusion.urls.add(url);

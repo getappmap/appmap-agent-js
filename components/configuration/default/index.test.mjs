@@ -1,6 +1,6 @@
 import { assertDeepEqual, assertEqual } from "../../__fixture__.mjs";
 import { validateInternalConfiguration } from "../../validate/index.mjs";
-import { matchSpecifier } from "../../specifier/index.mjs";
+import { matchUrl } from "../../matcher/index.mjs";
 import { createConfiguration, extendConfiguration } from "./index.mjs";
 
 const { undefined } = globalThis;
@@ -54,7 +54,7 @@ assertDeepEqual(extend("default-package", true, "protocol://host/base/"), {
 // packages //
 
 {
-  const [specifier, value] = extend(
+  const [matcher, value] = extend(
     "packages",
     "lib/*.js",
     "protocol://host/base/",
@@ -65,18 +65,9 @@ assertDeepEqual(extend("default-package", true, "protocol://host/base/"), {
     exclude: [],
     shallow: false,
   });
-  assertEqual(
-    matchSpecifier(specifier, "protocol://host/base/lib/foo.js"),
-    true,
-  );
-  assertEqual(
-    matchSpecifier(specifier, "protocol://host/base/lib/foo.mjs"),
-    false,
-  );
-  assertEqual(
-    matchSpecifier(specifier, "protocol://host/base/src/foo.js"),
-    false,
-  );
+  assertEqual(matchUrl(matcher, "protocol://host/base/lib/foo.js"), true);
+  assertEqual(matchUrl(matcher, "protocol://host/base/lib/foo.mjs"), false);
+  assertEqual(matchUrl(matcher, "protocol://host/base/src/foo.js"), false);
 }
 
 // hooks.eval //

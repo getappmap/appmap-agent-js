@@ -2,7 +2,7 @@ import { logInfoWhen } from "../../log/index.mjs";
 import { hasOwnProperty, coalesce, identity } from "../../util/index.mjs";
 import { toAbsoluteUrl, toDirectoryUrl } from "../../url/index.mjs";
 import { validateExternalConfiguration } from "../../validate/index.mjs";
-import { createSpecifier } from "../../specifier/index.mjs";
+import { createMatcher } from "../../matcher/index.mjs";
 
 const {
   Array: { isArray },
@@ -181,9 +181,9 @@ const normalizeFramework = generateNormalizeSplit("@", "name", "version");
 const normalizeFrameworkArray = (frameworks) =>
   frameworks.map(normalizeFramework);
 
-const normalizePackageSpecifier = (specifier, base) => {
-  if (typeof specifier === "string") {
-    specifier = { glob: specifier };
+const normalizePackageMatcher = (matcher, base) => {
+  if (typeof matcher === "string") {
+    matcher = { glob: matcher };
   }
   const {
     enabled,
@@ -194,12 +194,12 @@ const normalizePackageSpecifier = (specifier, base) => {
   } = {
     enabled: true,
     "inline-source": null,
-    shallow: hasOwnProperty(specifier, "dist"),
+    shallow: hasOwnProperty(matcher, "dist"),
     exclude: [],
-    ...specifier,
+    ...matcher,
   };
   return [
-    createSpecifier(rest, base),
+    createMatcher(rest, base),
     {
       enabled,
       "inline-source": inline,
@@ -209,33 +209,29 @@ const normalizePackageSpecifier = (specifier, base) => {
   ];
 };
 
-const normalizePackages = (specifiers, base) => {
-  if (!isArray(specifiers)) {
-    specifiers = [specifiers];
+const normalizePackageMatcherArray = (matchers, base) => {
+  if (!isArray(matchers)) {
+    matchers = [matchers];
   }
-  return specifiers.map((specifier) =>
-    normalizePackageSpecifier(specifier, base),
-  );
+  return matchers.map((matcher) => normalizePackageMatcher(matcher, base));
 };
 
-const normalizeProcessSpecifier = (specifier, base) => {
-  if (typeof specifier === "string") {
-    specifier = { glob: specifier };
+const normalizeProcessMatcher = (matcher, base) => {
+  if (typeof matcher === "string") {
+    matcher = { glob: matcher };
   }
   const { enabled, ...rest } = {
     enabled: true,
-    ...specifier,
+    ...matcher,
   };
-  return [createSpecifier(rest, base), { enabled }];
+  return [createMatcher(rest, base), { enabled }];
 };
 
-const normalizeProcesses = (specifiers, base) => {
-  if (!isArray(specifiers)) {
-    specifiers = [specifiers];
+const normalizeProcesseMatcherArray = (matchers, base) => {
+  if (!isArray(matchers)) {
+    matchers = [matchers];
   }
-  return specifiers.map((specifier) =>
-    normalizeProcessSpecifier(specifier, base),
-  );
+  return matchers.map((matcher) => normalizeProcessMatcher(matcher, base));
 };
 
 ////////////
@@ -349,7 +345,7 @@ const fields = {
   },
   processes: {
     extend: prepend,
-    normalize: normalizeProcesses,
+    normalize: normalizeProcesseMatcherArray,
   },
   recorder: {
     extend: overwrite,
@@ -393,7 +389,7 @@ const fields = {
   },
   packages: {
     extend: prepend,
-    normalize: normalizePackages,
+    normalize: normalizePackageMatcherArray,
   },
   exclude: {
     extend: prepend,

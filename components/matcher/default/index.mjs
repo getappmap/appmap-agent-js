@@ -21,7 +21,7 @@ const makeRegExp = (source, flags) => {
       flags,
       error,
     );
-    throw new ExternalAppmapError("Failed to compile specifier regexp");
+    throw new ExternalAppmapError("Failed to compile matcher regexp");
   }
 };
 
@@ -59,7 +59,7 @@ const toTargetRegExp = (target, recursive) => {
   }
 };
 
-export const createSpecifier = (options, base) => {
+export const createMatcher = (options, base) => {
   const {
     glob,
     url,
@@ -130,7 +130,7 @@ export const createSpecifier = (options, base) => {
       flags: "",
     };
   }
-  throw new InternalAppmapError("invalid specifier options");
+  throw new InternalAppmapError("invalid matcher options");
 };
 
 // We escape as few character as possible to hide the fact that configuration fields are urls rather than paths.
@@ -145,12 +145,12 @@ const escapeCharacter = (match) => escaping[match];
 
 const escapeSegment = (segment) => segment.replace(/[/#?]/gu, escapeCharacter);
 
-export const matchSpecifier = (specifier, url) => {
-  const { base, source, flags } = specifier;
+export const matchUrl = (matcher, url) => {
+  const { base, source, flags } = matcher;
   if (base === null) {
     const matched = makeRegExpCache(source, flags).test(url);
     logDebug(
-      "url %j %s absolute regexp specifier %j with flags %j",
+      "url %j %s absolute regexp matcher %j with flags %j",
       url,
       matched ? "matched" : "did not match",
       source,
@@ -161,7 +161,7 @@ export const matchSpecifier = (specifier, url) => {
     const relative = toRelativeUrl(url, base, escapeSegment);
     if (relative === null) {
       logDebug(
-        "could not apply specifier %j because %j cannot be expressed relatively to %j, will treat it as unmatched",
+        "could not apply matcher %j because %j cannot be expressed relatively to %j, will treat it as not matched",
         source,
         url,
         base,
@@ -170,7 +170,7 @@ export const matchSpecifier = (specifier, url) => {
     } else {
       const matched = makeRegExpCache(source, flags).test(relative);
       logDebug(
-        "url %j which resolves to %j relatively to %j %s relative regexp specifier %j with flags %j",
+        "url %j which resolves to %j relatively to %j %s relative regexp matcher %j with flags %j",
         url,
         relative,
         base,
@@ -183,9 +183,9 @@ export const matchSpecifier = (specifier, url) => {
   }
 };
 
-export const lookupSpecifier = (entries, url, default_value) => {
-  for (const [specifier, value] of entries) {
-    if (matchSpecifier(specifier, url)) {
+export const lookupUrl = (entries, url, default_value) => {
+  for (const [matcher, value] of entries) {
+    if (matchUrl(matcher, url)) {
       return value;
     }
   }

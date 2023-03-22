@@ -1,11 +1,11 @@
 import { assertEqual, assertThrow } from "../../__fixture__.mjs";
-import { createSpecifier, matchSpecifier, lookupSpecifier } from "./index.mjs";
+import { createMatcher, matchUrl, lookupUrl } from "./index.mjs";
 
 const { encodeURIComponent } = globalThis;
 
 assertThrow(
-  () => createSpecifier({}, "protocol://host/base/"),
-  /^InternalAppmapError: invalid specifier options/u,
+  () => createMatcher({}, "protocol://host/base/"),
+  /^InternalAppmapError: invalid matcher options/u,
 );
 
 ////////////
@@ -13,32 +13,32 @@ assertThrow(
 ////////////
 
 assertEqual(
-  matchSpecifier(
-    createSpecifier({ regexp: "^file\\." }, "protocol://host/base/"),
+  matchUrl(
+    createMatcher({ regexp: "^file\\." }, "protocol://host/base/"),
     "protocol://host/base/file.ext",
   ),
   true,
 );
 
 assertEqual(
-  matchSpecifier(
-    createSpecifier({ regexp: "^file1\\." }, "protocol://host/base/"),
+  matchUrl(
+    createMatcher({ regexp: "^file1\\." }, "protocol://host/base/"),
     "protocol://host/base/file2.ext",
   ),
   false,
 );
 
 assertEqual(
-  matchSpecifier(
-    createSpecifier({ regexp: "^file\\." }, "protocol://host/base1/"),
+  matchUrl(
+    createMatcher({ regexp: "^file\\." }, "protocol://host/base1/"),
     "protocol://host/base2/file.ext",
   ),
   false,
 );
 
 assertEqual(
-  matchSpecifier(
-    createSpecifier(
+  matchUrl(
+    createMatcher(
       { regexp: "^\\.\\./base2/file2\\." },
       "protocol://host/base1/",
     ),
@@ -49,24 +49,24 @@ assertEqual(
 
 assertThrow(
   () =>
-    matchSpecifier(
-      createSpecifier({ regexp: ")(" }, "protocol://host/base/"),
+    matchUrl(
+      createMatcher({ regexp: ")(" }, "protocol://host/base/"),
       "protocol://host/base/file.ext",
     ),
-  /^ExternalAppmapError: Failed to compile specifier regexp$/u,
+  /^ExternalAppmapError: Failed to compile matcher regexp$/u,
 );
 
 assertEqual(
-  matchSpecifier(
-    createSpecifier({ regexp: "^" }, "protocol://host1/base/"),
+  matchUrl(
+    createMatcher({ regexp: "^" }, "protocol://host1/base/"),
     "protocol://host2/base/file.ext",
   ),
   false,
 );
 
 assertEqual(
-  matchSpecifier(
-    createSpecifier(
+  matchUrl(
+    createMatcher(
       { regexp: "/file\\.ext$", relative: false },
       "protocol1://host1/base1/",
     ),
@@ -82,32 +82,32 @@ assertEqual(
 // normal //
 
 assertEqual(
-  matchSpecifier(
-    createSpecifier({ glob: "*.ext" }, "protocol://host/base/"),
+  matchUrl(
+    createMatcher({ glob: "*.ext" }, "protocol://host/base/"),
     "protocol://host/base/file.ext",
   ),
   true,
 );
 
 assertEqual(
-  matchSpecifier(
-    createSpecifier({ glob: "*.ext" }, "protocol://host/base/"),
+  matchUrl(
+    createMatcher({ glob: "*.ext" }, "protocol://host/base/"),
     "protocol://host/base/dir/file.ext",
   ),
   false,
 );
 
 assertEqual(
-  matchSpecifier(
-    createSpecifier({ glob: "**/*.ext" }, "protocol://host/base/"),
+  matchUrl(
+    createMatcher({ glob: "**/*.ext" }, "protocol://host/base/"),
     "protocol://host/base/dir/file.ext",
   ),
   true,
 );
 
 assertEqual(
-  matchSpecifier(
-    createSpecifier({ glob: "**/*.js" }, "protocol://host/base/"),
+  matchUrl(
+    createMatcher({ glob: "**/*.js" }, "protocol://host/base/"),
     "protocol://host/base/../file.ext",
   ),
   false,
@@ -120,8 +120,8 @@ assertEqual(
 // encoding //
 
 assertEqual(
-  matchSpecifier(
-    createSpecifier(
+  matchUrl(
+    createMatcher(
       { path: `][ ${encodeURIComponent("#?")}` },
       "protocol://host/base/",
     ),
@@ -133,24 +133,24 @@ assertEqual(
 // deep >> file //
 
 assertEqual(
-  matchSpecifier(
-    createSpecifier({ path: "path", recursive: true }, "protocol://host/base/"),
+  matchUrl(
+    createMatcher({ path: "path", recursive: true }, "protocol://host/base/"),
     "protocol://host/base/path",
   ),
   true,
 );
 
 assertEqual(
-  matchSpecifier(
-    createSpecifier({ path: "path", recursive: true }, "protocol://host/base/"),
+  matchUrl(
+    createMatcher({ path: "path", recursive: true }, "protocol://host/base/"),
     "protocol://host/base/path/file.ext",
   ),
   true,
 );
 
 assertEqual(
-  matchSpecifier(
-    createSpecifier({ path: "path", recursive: true }, "protocol://host/base/"),
+  matchUrl(
+    createMatcher({ path: "path", recursive: true }, "protocol://host/base/"),
     "protocol://host/base/path/dir/file.ext",
   ),
   true,
@@ -159,33 +159,24 @@ assertEqual(
 // deep >> directory
 
 assertEqual(
-  matchSpecifier(
-    createSpecifier(
-      { path: "path/", recursive: true },
-      "protocol://host/base/",
-    ),
+  matchUrl(
+    createMatcher({ path: "path/", recursive: true }, "protocol://host/base/"),
     "protocol://host/base/path",
   ),
   false,
 );
 
 assertEqual(
-  matchSpecifier(
-    createSpecifier(
-      { path: "path/", recursive: true },
-      "protocol://host/base/",
-    ),
+  matchUrl(
+    createMatcher({ path: "path/", recursive: true }, "protocol://host/base/"),
     "protocol://host/base/path/file.ext",
   ),
   true,
 );
 
 assertEqual(
-  matchSpecifier(
-    createSpecifier(
-      { path: "path/", recursive: true },
-      "protocol://host/base/",
-    ),
+  matchUrl(
+    createMatcher({ path: "path/", recursive: true }, "protocol://host/base/"),
     "protocol://host/base/path/dir/file.ext",
   ),
   true,
@@ -194,33 +185,24 @@ assertEqual(
 // shallow >> file //
 
 assertEqual(
-  matchSpecifier(
-    createSpecifier(
-      { path: "path", recursive: false },
-      "protocol://host/base/",
-    ),
+  matchUrl(
+    createMatcher({ path: "path", recursive: false }, "protocol://host/base/"),
     "protocol://host/base/path",
   ),
   true,
 );
 
 assertEqual(
-  matchSpecifier(
-    createSpecifier(
-      { path: "path", recursive: false },
-      "protocol://host/base/",
-    ),
+  matchUrl(
+    createMatcher({ path: "path", recursive: false }, "protocol://host/base/"),
     "protocol://host/base/path/file.ext",
   ),
   false,
 );
 
 assertEqual(
-  matchSpecifier(
-    createSpecifier(
-      { path: "path", recursive: false },
-      "protocol://host/base/",
-    ),
+  matchUrl(
+    createMatcher({ path: "path", recursive: false }, "protocol://host/base/"),
     "protocol://host/base/path/dir/file.ext",
   ),
   false,
@@ -229,33 +211,24 @@ assertEqual(
 // shallow >> directory //
 
 assertEqual(
-  matchSpecifier(
-    createSpecifier(
-      { path: "path/", recursive: false },
-      "protocol://host/base/",
-    ),
+  matchUrl(
+    createMatcher({ path: "path/", recursive: false }, "protocol://host/base/"),
     "protocol://host/base/path",
   ),
   false,
 );
 
 assertEqual(
-  matchSpecifier(
-    createSpecifier(
-      { path: "path/", recursive: false },
-      "protocol://host/base/",
-    ),
+  matchUrl(
+    createMatcher({ path: "path/", recursive: false }, "protocol://host/base/"),
     "protocol://host/base/path/file.ext",
   ),
   true,
 );
 
 assertEqual(
-  matchSpecifier(
-    createSpecifier(
-      { path: "path/", recursive: false },
-      "protocol://host/base/",
-    ),
+  matchUrl(
+    createMatcher({ path: "path/", recursive: false }, "protocol://host/base/"),
     "protocol://host/base/path/dir/file.ext",
   ),
   false,
@@ -266,8 +239,8 @@ assertEqual(
 /////////
 
 assertEqual(
-  matchSpecifier(
-    createSpecifier(
+  matchUrl(
+    createMatcher(
       { url: "protocol1://host1/base1/file.ext", recursive: false },
       "protocol2://host2/base2/",
     ),
@@ -277,8 +250,8 @@ assertEqual(
 );
 
 assertEqual(
-  matchSpecifier(
-    createSpecifier(
+  matchUrl(
+    createMatcher(
       { url: "protocol1://host1/base1/file.ext", recursive: false },
       "protocol2://host2/base2/",
     ),
@@ -294,8 +267,8 @@ assertEqual(
 // normal //
 
 assertEqual(
-  matchSpecifier(
-    createSpecifier({ dist: "dist" }, "protocol://host/base/"),
+  matchUrl(
+    createMatcher({ dist: "dist" }, "protocol://host/base/"),
     "protocol://host/base/node_modules/dist/file.ext",
   ),
   true,
@@ -304,19 +277,16 @@ assertEqual(
 // recursive //
 
 assertEqual(
-  matchSpecifier(
-    createSpecifier(
-      { dist: "dist", recursive: false },
-      "protocol://host/base/",
-    ),
+  matchUrl(
+    createMatcher({ dist: "dist", recursive: false }, "protocol://host/base/"),
     "protocol://host/base/node_modules/dist/dir/file.ext",
   ),
   false,
 );
 
 assertEqual(
-  matchSpecifier(
-    createSpecifier({ dist: "dist", recursive: true }, "protocol://host/base/"),
+  matchUrl(
+    createMatcher({ dist: "dist", recursive: true }, "protocol://host/base/"),
     "protocol://host/base/node_modules/dist/dir/file.ext",
   ),
   true,
@@ -325,38 +295,33 @@ assertEqual(
 // external //
 
 assertEqual(
-  matchSpecifier(
-    createSpecifier({ dist: "dist" }, "protocol://host/base/"),
+  matchUrl(
+    createMatcher({ dist: "dist" }, "protocol://host/base/"),
     "protocol://host/node_modules/dist/file.ext",
   ),
   false,
 );
 
 assertEqual(
-  matchSpecifier(
-    createSpecifier({ dist: "dist", external: true }, "protocol://host/base/"),
+  matchUrl(
+    createMatcher({ dist: "dist", external: true }, "protocol://host/base/"),
     "protocol://host/node_modules/dist/file.ext",
   ),
   true,
 );
 
 /////////////////////
-// lookupSpecifier //
+// lookupUrl //
 /////////////////////
 
 assertEqual(
-  lookupSpecifier([], "protocol://host/base/file.ext", "default_value"),
+  lookupUrl([], "protocol://host/base/file.ext", "default_value"),
   "default_value",
 );
 
 assertEqual(
-  lookupSpecifier(
-    [
-      [
-        createSpecifier({ regexp: "^file\\." }, "protocol://host/base/"),
-        "value",
-      ],
-    ],
+  lookupUrl(
+    [[createMatcher({ regexp: "^file\\." }, "protocol://host/base/"), "value"]],
     "protocol://host/base/file.ext",
     "default_value",
   ),
