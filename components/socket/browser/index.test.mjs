@@ -9,10 +9,6 @@ import { defineGlobal } from "../../global/index.mjs";
 
 const { Promise } = globalThis;
 
-defineGlobal("WebSocket", WebSocket);
-
-const { openSocket, sendSocket, closeSocket } = await import("./index.mjs");
-
 const server = new WebSocketServer({ port: 0 });
 
 await new Promise((resolve, reject) => {
@@ -20,9 +16,14 @@ await new Promise((resolve, reject) => {
   server.on("error", reject);
 });
 
+defineGlobal("WebSocket", WebSocket);
+defineGlobal("window", {
+  location: `http://localhost:${server.address().port}/index.html`,
+});
+
+const { openSocket, sendSocket, closeSocket } = await import("./index.mjs");
+
 const socket = openSocket(
-  "localhost",
-  server.address().port,
   extendConfiguration(
     createConfiguration("protocol://host/home"),
     {

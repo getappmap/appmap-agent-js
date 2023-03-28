@@ -20,7 +20,12 @@ const flush = (socket, messages) => {
   }
 };
 
-export const openSocket = (host, port, { heartbeat, threshold }) => {
+export const openSocket = ({
+  host,
+  "trace-port": port,
+  heartbeat,
+  threshold,
+}) => {
   const socket =
     typeof port === "string"
       ? connect(toIpcPath(convertFileUrlToPath(port)))

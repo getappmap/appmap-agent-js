@@ -9,7 +9,7 @@ sendSocket(socket, "message");
 closeSocket(socket);
 
 assertDeepEqual(readGlobal("SOCKET_TRACE"), [
-  { type: "open", host: "host", port: "port" },
+  { type: "open" },
   { type: "send", socket: "socket", message: "message" },
   { type: "close", socket: "socket" },
 ]);

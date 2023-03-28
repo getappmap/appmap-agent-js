@@ -13,7 +13,9 @@ const sleepAsync = (ms) =>
   });
 
 const runAsync = async (port) => {
-  const socket = openSocket("localhost", port, {
+  const socket = openSocket({
+    host: "localhost",
+    "trace-port": port,
     heartbeat: 10000,
     threshold: 0,
   });

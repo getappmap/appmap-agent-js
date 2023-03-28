@@ -14,7 +14,10 @@ if (getPlatform() !== "win32") {
     require("posix-socket-messaging"),
   );
   const runAsync = (port) => {
-    const socket = openSocket("127.0.0.1", port);
+    const socket = openSocket({
+      host: "localhost",
+      "trace-port": port,
+    });
     sendSocket(socket, "message");
     closeSocket(socket);
   };

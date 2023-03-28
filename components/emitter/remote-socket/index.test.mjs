@@ -19,7 +19,7 @@ sendEmitter(emitter, 123);
 closeEmitter(emitter);
 sendEmitter(emitter, 456);
 assertDeepEqual(readGlobal("SOCKET_TRACE"), [
-  { type: "open", host: "127.0.0.1", port: 0 },
+  { type: "open" },
   { type: "send", socket: "socket", message: "123" },
   { type: "close", socket: "socket" },
 ]);
