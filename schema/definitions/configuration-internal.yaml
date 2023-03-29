@@ -60,6 +60,8 @@ properties:
       - $ref: session
   sessions:
     $ref: regexp
+  proxy-port:
+    $ref: port-proxy
   trace-port:
     $ref: port-cooked
   trace-protocol:

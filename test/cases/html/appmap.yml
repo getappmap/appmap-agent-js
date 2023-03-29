@@ -1,0 +1,20 @@
+recorder: process
+packages:
+  - regexp: "^http://localhost:8080/index.html"
+    relative: false
+    enabled: true
+  - url: "http://localhost:8080/index.js"
+    enabled: true
+proxy-port: 8888
+ordering: chronological
+appmap_dir: .
+appmap_file: main
+hooks:
+  cjs: false
+  esm: false
+  eval: false
+  apply: true
+  http: false
+  mysql: false
+  pg: false
+  sqlite3: false

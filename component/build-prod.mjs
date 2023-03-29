@@ -12,7 +12,12 @@ for (const [name, component, env, resolution] of [
     },
   ],
   [null, "error", "node", {}],
-  [null, "server", "node", { validate: "ajv", source: "default" }],
+  [
+    null,
+    "server",
+    "node",
+    { validate: "ajv", source: "default", instrumentation: "default" },
+  ],
   [null, "client", "node", { validate: "stub" }],
   [null, "init", "node", {}],
   [null, "status", "node", {}],

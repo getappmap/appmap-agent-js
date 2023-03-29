@@ -25,11 +25,12 @@ const configuration = extendConfiguration(
   createConfiguration(cwd_url),
   {
     "command-options": { shell: false },
+    "proxy-port": null,
   },
   cwd_url,
 );
 
-// endless mode //
+// endless mode && no mitm //
 {
   const emitter = new EventEmitter();
   emitter.env = env;
@@ -39,7 +40,7 @@ const configuration = extendConfiguration(
   assertEqual(await mainAsync(emitter, configuration), 0);
 }
 
-// multiple child >> SIGINT //
+// multiple child >> SIGINT && mitm //
 {
   const emitter = new EventEmitter();
   const base = getTmpUrl();
@@ -69,6 +70,7 @@ const configuration = extendConfiguration(
       extendConfiguration(
         configuration,
         {
+          "proxy-port": 0,
           hooks: {
             cjs: false,
             esm: false,

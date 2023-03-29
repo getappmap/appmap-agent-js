@@ -307,6 +307,10 @@ const fields = {
     extend: overwrite,
     normalize: identity,
   },
+  "proxy-port": {
+    extend: overwrite,
+    normalize: identity,
+  },
   "trace-port": {
     extend: overwrite,
     normalize: normalizePort,
@@ -478,6 +482,7 @@ export const createConfiguration = (home) => ({
   host: "localhost",
   session: null,
   sessions: "^",
+  "proxy-port": null,
   "trace-port": 0, // possibly overwritten by the agent
   "http-switch": "__APPMAP__",
   "trace-protocol": "TCP",

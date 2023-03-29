@@ -31,6 +31,11 @@ import {
   isBackendEmpty,
 } from "../../backend/index.mjs";
 import { spawnAsync, killAllAsync } from "../../spawn/index.mjs";
+import {
+  openMitmAsync,
+  getMitmPort,
+  closeMitmAsync,
+} from "../../mitm/index.mjs";
 
 const {
   Promise,
@@ -106,6 +111,13 @@ export const mainAsync = async (process, configuration) => {
     "trace-port": getReceptorTracePort(receptor),
     "track-port": getReceptorTrackPort(receptor),
   };
+  const maybe_mitm =
+    configuration["proxy-port"] === null
+      ? null
+      : await openMitmAsync(configuration, backend);
+  if (maybe_mitm !== null) {
+    logInfo("proxy listening to %j", getMitmPort(maybe_mitm));
+  }
   const flushing = (async () => {
     while (!done) {
       await flushBackendAsync(urls, backend, false);
@@ -188,6 +200,9 @@ export const mainAsync = async (process, configuration) => {
     done = true;
   }
   await flushing;
+  if (maybe_mitm !== null) {
+    await closeMitmAsync(maybe_mitm);
+  }
   await closeReceptorAsync(receptor);
   return 0;
 };

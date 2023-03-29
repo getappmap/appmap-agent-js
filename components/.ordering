@@ -64,6 +64,7 @@ recorder-standalone
 receptor
 command
 client
+mitm
 server
 questionnaire
 setup
