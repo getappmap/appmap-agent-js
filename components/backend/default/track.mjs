@@ -14,10 +14,8 @@ export const startTrack = (configuration) => ({
   sources: [],
   messages: [],
   termination: null,
-  present_url_set: new Set(),
-  missing_url_set: new Set(),
-  present_hash_set: new Set(),
-  missing_hash_set: new Set(),
+  present: new Set(),
+  missing: new Set(),
 });
 
 export const stopTrack = (track, termination) => {
@@ -32,15 +30,21 @@ export const compileTrack = (track) =>
     track.termination ?? { type: "unknown" },
   );
 
+const makeStaticKey = (url) => `|${url}`;
+
+const makeDynamicKey = (url, hash) => `${hash}|${url}`;
+
 export const addTrackSource = (track, source) => {
   track.sources.push(source);
   const url = getSourceUrl(source);
-  track.present_url_set.add(url);
-  track.missing_url_set.delete(url);
+  const key1 = makeStaticKey(url);
+  track.present.add(key1);
+  track.missing.delete(key1);
   if (!isSourceEmpty(source)) {
     const hash = hashSource(source);
-    track.present_hash_set.add(hash);
-    track.missing_hash_set.delete(hash);
+    const key2 = makeDynamicKey(url, hash);
+    track.present.add(key2);
+    track.missing.delete(key2);
   }
 };
 
@@ -59,11 +63,15 @@ export const sendTrack = (track, message) => {
         payload_type === "throw"
       ) {
         const { url, hash } = parseLocation(payload.function);
-        if (url !== null && !track.present_url_set.has(url)) {
-          track.missing_url_set.add(url);
+        const key1 = makeStaticKey(url);
+        if (!track.present.has(key1)) {
+          track.missing.add(key1);
         }
-        if (hash !== null && !track.present_hash_set.has(hash)) {
-          track.missing_hash_set.add(hash);
+        if (hash !== null) {
+          const key2 = makeDynamicKey(url, hash);
+          if (!track.present.has(key2)) {
+            track.missing.add(key2);
+          }
         }
       }
     }
@@ -71,6 +79,4 @@ export const sendTrack = (track, message) => {
 };
 
 export const isTrackComplete = (track) =>
-  track.termination !== null &&
-  track.missing_hash_set.size === 0 &&
-  track.missing_url_set.size === 0;
+  track.termination !== null && track.missing.size === 0;

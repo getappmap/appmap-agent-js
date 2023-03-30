@@ -1,8 +1,4 @@
-import {
-  assertThrow,
-  assertDeepEqual,
-  assertEqual,
-} from "../../__fixture__.mjs";
+import { assertDeepEqual, assertEqual } from "../../__fixture__.mjs";
 import {
   createConfiguration,
   extendConfiguration,
@@ -60,6 +56,15 @@ const toStaticLocation = (location) => ({
   assertEqual(addClassmapSource(classmap, source1), true); // caching
   assertEqual(addClassmapSource(classmap, source2), true);
   assertEqual(addClassmapSource(classmap, source3), true);
+  assertEqual(
+    lookupClassmapClosure(classmap, {
+      url: "protocol://host/home/directory/dynamic.js",
+      hash: "missing-hash",
+      line: 1,
+      column: 0,
+    }),
+    null,
+  );
   assertDeepEqual(
     lookupClassmapClosure(classmap, makeSourceLocation(source1, 1, 0)),
     {
@@ -176,16 +181,6 @@ const toStaticLocation = (location) => ({
       ),
     ),
     null,
-  );
-  assertThrow(
-    () =>
-      lookupClassmapClosure(classmap, {
-        url: null,
-        hash: null,
-        line: 123,
-        column: 456,
-      }),
-    /^InternalAppmapError/u,
   );
 }
 

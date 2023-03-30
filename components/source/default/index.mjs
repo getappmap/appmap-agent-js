@@ -1,4 +1,4 @@
-import { hashStringArray } from "../../hash/index.mjs";
+import { digest } from "../../hash/index.mjs";
 import { InternalAppmapError } from "../../error/index.mjs";
 import { assert } from "../../util/index.mjs";
 import { parseEstree } from "./parse.mjs";
@@ -40,7 +40,7 @@ export const hashSource = (source) => {
       "hashSource called on empty source",
       InternalAppmapError,
     );
-    const hash = hashStringArray([source.url, source.content]);
+    const hash = digest(source.content);
     source.hash = hash;
     return hash;
   }
