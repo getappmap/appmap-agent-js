@@ -1,12 +1,12 @@
 import { digest } from "../../hash/index.mjs";
 import { InternalAppmapError } from "../../error/index.mjs";
 import { assert } from "../../util/index.mjs";
-import { parseEstree } from "./parse.mjs";
+import { parseEstree } from "../../parse/index.mjs";
 export {
   printComment,
   getLeadingCommentArray,
   extractCommentLabelArray,
-} from "./parse.mjs";
+} from "../../parse/index.mjs";
 
 export const createSource = (url, content) => ({
   url,
@@ -55,7 +55,7 @@ export const parseSource = (source) => {
       "parseSource called on empty source",
       InternalAppmapError,
     );
-    const estree = parseEstree(source.url, source.content);
+    const estree = parseEstree({ url: source.url, content: source.content });
     source.estree = estree;
     return estree;
   }

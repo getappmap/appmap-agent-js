@@ -4,29 +4,29 @@ import {
   printComment,
   getLeadingCommentArray,
   extractCommentLabelArray,
-} from "./parse.mjs";
+} from "./index.mjs";
 
-parseEstree(
+parseEstree({
   "protocol://host/dirname/filename.mjs?search#hash",
   "export const x = 123;",
-);
-parseEstree(
+});
+parseEstree({
   "protocol://host/dirname/filename.mjs?search#hash",
   "export const x = 123; delete x;",
-);
-parseEstree(
+});
+parseEstree({
   "protocol://host/dirname/filename.cjs?search#hash",
   "exports.x = 123;",
-);
-parseEstree(
+});
+parseEstree({
   "protocol://host/dirname/filename.ts?search#hash",
   "const x: number = <JSX />;",
-);
-parseEstree(
+});
+parseEstree({
   "protocol://host/dirname/filename.js?search#hash",
   "/* @flow */ const x: number = <JSX />;",
-);
-assertDeepEqual(
+});
+assertDeepEqual({
   parseEstree("protocol://host/dirname/filename.js?search#hash", "{"),
   {
     type: "Program",
@@ -38,13 +38,13 @@ assertDeepEqual(
       filename: "protocol://host/dirname/filename.js?search#hash",
     },
   },
-);
+});
 
 {
-  const parsedClass = parseEstree(
+  const parsedClass = parseEstree({
     "protocol://host/dirname/filename.js?search#hash",
     "class Foo { prop; }",
-  );
+  });
 
   // make sure property definitions have estree-compliant type
   assertEqual(parsedClass.body[0].body.body[0].type, "PropertyDefinition");
@@ -52,17 +52,17 @@ assertDeepEqual(
 
 assertDeepEqual(
   getLeadingCommentArray(
-    parseEstree(
+    parseEstree({
       "protocol://host/dirname/filename.js",
       "// line\n/* block */\n123;",
-    ).body[0],
+    }).body[0],
   ).map(printComment),
   ["// line", "/* block */"],
 );
 
 assertDeepEqual(
   getLeadingCommentArray(
-    parseEstree(
+    parseEstree({
       "protocol://host/dirname/filename.js",
       `
       // foo
@@ -75,7 +75,7 @@ assertDeepEqual(
       /* @label l4 */
       123;
     `,
-    ).body[0],
+  }).body[0],
   ).flatMap(extractCommentLabelArray),
   ["l1", "l2", "l3", "l4"],
 );
