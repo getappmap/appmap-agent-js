@@ -1,9 +1,4 @@
 import { compileTrace } from "../../trace/index.mjs";
-import {
-  getSourceUrl,
-  hashSource,
-  isSourceEmpty,
-} from "../../source/index.mjs";
 import { parseLocation } from "../../location/index.mjs";
 
 const { RegExp, Set } = globalThis;
@@ -30,19 +25,17 @@ export const compileTrack = (track) =>
     track.termination ?? { type: "unknown" },
   );
 
-const makeStaticKey = (url) => `|${url}`;
+const makeStaticKey = ({ url }) => `|${url}`;
 
-const makeDynamicKey = (url, hash) => `${hash}|${url}`;
+const makeDynamicKey = ({ url, hash }) => `${hash}|${url}`;
 
 export const addTrackSource = (track, source) => {
   track.sources.push(source);
-  const url = getSourceUrl(source);
-  const key1 = makeStaticKey(url);
+  const key1 = makeStaticKey(source);
   track.present.add(key1);
   track.missing.delete(key1);
-  if (!isSourceEmpty(source)) {
-    const hash = hashSource(source);
-    const key2 = makeDynamicKey(url, hash);
+  if (source.hash !== null) {
+    const key2 = makeDynamicKey(source);
     track.present.add(key2);
     track.missing.delete(key2);
   }
@@ -62,13 +55,13 @@ export const sendTrack = (track, message) => {
         payload_type === "return" ||
         payload_type === "throw"
       ) {
-        const { url, hash } = parseLocation(payload.function);
-        const key1 = makeStaticKey(url);
+        const location = parseLocation(payload.function);
+        const key1 = makeStaticKey(location);
         if (!track.present.has(key1)) {
           track.missing.add(key1);
         }
-        if (hash !== null) {
-          const key2 = makeDynamicKey(url, hash);
+        if (location.hash !== null) {
+          const key2 = makeDynamicKey(location);
           if (!track.present.has(key2)) {
             track.missing.add(key2);
           }

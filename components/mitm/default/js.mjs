@@ -1,15 +1,13 @@
 import { sendBackend } from "../../backend/index.mjs";
-import { createSource, toSourceMessage } from "../../source/index.mjs";
 import { loadSourceMap, fillSourceMap } from "../../mapping-file/index.mjs";
 import { instrument } from "../../instrumentation/index.mjs";
 
-export const instrumentJs = (configuration, backend, file) => {
-  const source = createSource(file.url, file.content);
+export const instrumentJs = (configuration, backend, source) => {
   const mapping = loadSourceMap(source, null);
   fillSourceMap(mapping, configuration);
-  const { content, sources } = instrument(configuration, source, mapping);
-  for (const source of sources) {
-    sendBackend(backend, toSourceMessage(source));
+  const { content, messages } = instrument(configuration, source, mapping);
+  for (const message of messages) {
+    sendBackend(backend, message);
   }
   return content;
 };

@@ -1,11 +1,10 @@
 import { assert } from "../../util/index.mjs";
 import { InternalAppmapError } from "../../error/index.mjs";
 import {
-  getSourceContent,
   getLeadingCommentArray,
   printComment,
   extractCommentLabelArray,
-} from "../../source/index.mjs";
+} from "../../parse/index.mjs";
 import { toSpecifier, toSpecifierBasename } from "./specifier.mjs";
 import { stringifyLoc, parseLoc } from "./loc.mjs";
 import { stringifyPosition } from "./position.mjs";
@@ -55,7 +54,7 @@ export const makeFunctionEntity = (
     reference: stringifyPosition(node.loc.start),
     shallow: context.shallow,
     parameters: node.params.map((param) =>
-      getSourceContent(context.source).substring(param.start, param.end),
+      context.content.substring(param.start, param.end),
     ),
     children,
     name: maybe_name ?? context.anonymous,
@@ -65,7 +64,7 @@ export const makeFunctionEntity = (
     ),
     static: false,
     source: context.inline
-      ? getSourceContent(context.source).substring(node.start, node.end)
+      ? context.content.substring(node.start, node.end)
       : null,
     comment: printCommentArray(comments),
     labels: comments.flatMap(extractCommentLabelArray),

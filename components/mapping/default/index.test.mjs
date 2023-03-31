@@ -5,7 +5,7 @@ import {
   assertDeepEqual,
   assertThrow,
 } from "../../__fixture__.mjs";
-import { createSource, makeSourceLocation } from "../../source/index.mjs";
+import { digest } from "../../hash/index.mjs";
 import {
   extractMappingUrl,
   createMirrorMapping,
@@ -33,24 +33,26 @@ assertThrow(
 ///////////////////////
 
 assertEqual(
-  extractMappingUrl(
-    createSource("data:,foo", "//# sourceMappingURL=http://host/source.map"),
-  ),
+  extractMappingUrl({
+    url: "data:,foo",
+    content: "//# sourceMappingURL=http://host/source.map",
+  }),
   "http://host/source.map",
 );
 
 assertEqual(
-  extractMappingUrl(
-    createSource(
-      "http://host/directory/filename",
-      `//@ sourceMappingURL=source.map\r\n\t`,
-    ),
-  ),
+  extractMappingUrl({
+    url: "http://host/directory/filename",
+    content: `//@ sourceMappingURL=source.map\r\n\t`,
+  }),
   "http://host/directory/source.map",
 );
 
 assertEqual(
-  extractMappingUrl(createSource("http:///host/directory/filename", "123;")),
+  extractMappingUrl({
+    url: "http:///host/directory/filename",
+    content: "123;",
+  }),
   null,
 );
 
@@ -59,14 +61,16 @@ assertEqual(
 ////////////
 
 {
-  const source1 = createSource("http://host/out.js", "123;");
+  const source1 = { url: "http://host/out.js", content: "123;" };
   const mapping = createMirrorMapping(source1);
-  assertDeepEqual(
-    mapSource(mapping, 123, 456),
-    makeSourceLocation(source1, 123, 456),
-  );
+  assertDeepEqual(mapSource(mapping, 123, 456), {
+    url: source1.url,
+    hash: digest("123;"),
+    line: 123,
+    column: 456,
+  });
   assertDeepEqual(getMappingSourceArray(mapping), [source1]);
-  const source2 = createSource("http://host/out.js", "456;");
+  const source2 = { url: "http://host/out.js", content: "456;" };
   assertEqual(updateMappingSource(mapping, source2), undefined);
   assertDeepEqual(getMappingSourceArray(mapping), [source2]);
 }
@@ -100,7 +104,7 @@ assertEqual(
   assertEqual(mapSource(mapping, 3, 23), null);
   assertEqual(mapSource(mapping, 29, 0), null);
   assertDeepEqual(getMappingSourceArray(mapping), [
-    createSource("http://host/directory/source.js", null),
+    { url: "http://host/directory/source.js", content: null },
   ]);
 }
 
@@ -134,19 +138,28 @@ assertEqual(
     },
   });
   assertDeepEqual(getMappingSourceArray(mapping), [
-    createSource("http://host/directory/root/source1.js", "123;"),
-    createSource("http://host/directory/root/source2.js", null),
+    {
+      url: "http://host/directory/root/source1.js",
+      content: "123;",
+    },
+    { url: "http://host/directory/root/source2.js", content: null },
   ]);
   assertEqual(
-    updateMappingSource(
-      mapping,
-      createSource("http://host/directory/root/source2.js", "456;"),
-    ),
+    updateMappingSource(mapping, {
+      url: "http://host/directory/root/source2.js",
+      content: "456;",
+    }),
     undefined,
   );
   assertDeepEqual(getMappingSourceArray(mapping), [
-    createSource("http://host/directory/root/source1.js", "123;"),
-    createSource("http://host/directory/root/source2.js", "456;"),
+    {
+      url: "http://host/directory/root/source1.js",
+      content: "123;",
+    },
+    {
+      url: "http://host/directory/root/source2.js",
+      content: "456;",
+    },
   ]);
 }
 
@@ -162,5 +175,5 @@ assertDeepEqual(
       },
     }),
   ),
-  [createSource("http://host/directory/source.js", null)],
+  [{ url: "http://host/directory/source.js", content: null }],
 );

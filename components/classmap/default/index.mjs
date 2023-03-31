@@ -1,11 +1,5 @@
 import { InternalAppmapError } from "../../error/index.mjs";
 import { lookupUrl } from "../../matcher/index.mjs";
-import {
-  hashSource,
-  resetSourceUrl,
-  getSourceUrl,
-  isSourceEmpty,
-} from "../../source/index.mjs";
 import { URL } from "../../url/index.mjs";
 import { logWarning, logWarningWhen } from "../../log/index.mjs";
 import { toSpecifier, splitSpecifierDirectory } from "./specifier.mjs";
@@ -56,9 +50,8 @@ export const addClassmapSource = (
     codebase,
     disabled,
   },
-  source,
+  { url, content, hash },
 ) => {
-  const url = getSourceUrl(source);
   const {
     "inline-source": local_inline_source,
     enabled,
@@ -66,12 +59,11 @@ export const addClassmapSource = (
     shallow,
   } = lookupUrl(packages, url, default_package);
   if (enabled) {
-    if (isSourceEmpty(source)) {
+    if (content === null) {
       logWarning("Ignoring source %j because it could not be loaded", url);
       disabled.add(url);
       return false;
     } else {
-      const hash = hashSource(source);
       if (!codebase.has(url)) {
         codebase.set(url, new Map());
       }
@@ -80,7 +72,7 @@ export const addClassmapSource = (
         return true;
       }
       if (versions.size > 0) {
-        source = resetSourceUrl(source, setUrlHash(url, String(versions.size)));
+        url = setUrlHash(url, String(versions.size));
         if (versions.size === 1) {
           const { value: previous_hash } = versions.keys().next();
           versions.set(
@@ -93,7 +85,8 @@ export const addClassmapSource = (
         hash,
         createModule({
           base,
-          source,
+          url,
+          content,
           pruning,
           inline:
             local_inline_source === null

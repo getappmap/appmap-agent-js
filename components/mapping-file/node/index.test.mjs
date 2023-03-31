@@ -1,8 +1,8 @@
 import { writeFile as writeFileAsync } from "node:fs/promises";
 import { Buffer } from "node:buffer";
+import { digest } from "../../hash/index.mjs";
 import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
 import { getUuid } from "../../uuid/random/index.mjs";
-import { createSource, makeSourceLocation } from "../../source/index.mjs";
 import {
   extendConfiguration,
   createConfiguration,
@@ -39,30 +39,35 @@ const empty_source_map = {
     getTmpUrl(),
   );
   const url = toAbsoluteUrl(getUuid(), getTmpUrl());
-  const mapping = createMirrorMapping(createSource(url, null));
+  const mapping = createMirrorMapping({ url, content: null });
   fillSourceMap(mapping, configuration);
   await writeFileAsync(new URL(url), "123;", "utf8");
   fillSourceMap(mapping, configuration);
-  assertDeepEqual(getMappingSourceArray(mapping), [createSource(url, "123;")]);
+  assertDeepEqual(getMappingSourceArray(mapping), [{ url, content: "123;" }]);
 }
 
 // no source map //
 {
-  const source = createSource("http://host/main.js", "123;");
+  const source = { url: "http://host/main.js", content: "123;" };
   const mapping = loadSourceMap(source, null);
-  assertDeepEqual(
-    mapSource(mapping, 456, 789),
-    makeSourceLocation(source, 456, 789),
-  );
+  assertDeepEqual(mapSource(mapping, 456, 789), {
+    url: source.url,
+    hash: digest(source.content),
+    line: 456,
+    column: 789,
+  });
 }
 
 // explicit source map //
 assertEqual(
   mapSource(
-    loadSourceMap(createSource("http://host/main.js", `123;`), {
-      url: "http://host/map.json",
-      content: empty_source_map,
-    }),
+    loadSourceMap(
+      { url: "http://host/main.js", content: `123;` },
+      {
+        url: "http://host/map.json",
+        content: empty_source_map,
+      },
+    ),
     456,
     789,
   ),
@@ -73,12 +78,12 @@ assertEqual(
 assertEqual(
   mapSource(
     loadSourceMap(
-      createSource(
-        "http://host/main.js",
-        `123; //# sourceMappingURL=data:,${encodeURIComponent(
+      {
+        url: "http://host/main.js",
+        content: `123; //# sourceMappingURL=data:,${encodeURIComponent(
           stringifyJSON(empty_source_map),
         )}`,
-      ),
+      },
       null,
     ),
     456,
@@ -91,16 +96,18 @@ assertEqual(
 {
   const url = toAbsoluteUrl(getUuid(), getTmpUrl());
 
-  const source = createSource(
-    "http://host/main.js",
-    `123; //# sourceMappingURL=${url}`,
-  );
+  const source = {
+    url: "http://host/main.js",
+    content: `123; //# sourceMappingURL=${url}`,
+  };
 
   // missing external source map
-  assertDeepEqual(
-    mapSource(loadSourceMap(source, null), 456, 789),
-    makeSourceLocation(source, 456, 789),
-  );
+  assertDeepEqual(mapSource(loadSourceMap(source, null), 456, 789), {
+    url: source.url,
+    hash: digest(source.content),
+    line: 456,
+    column: 789,
+  });
 
   await writeFileAsync(new URL(url), stringifyJSON(empty_source_map), "utf8");
 
@@ -108,7 +115,10 @@ assertEqual(
   assertEqual(
     mapSource(
       loadSourceMap(
-        createSource("http://host/main.js", `123; //# sourceMappingURL=${url}`),
+        {
+          url: "http://host/main.js",
+          content: `123; //# sourceMappingURL=${url}`,
+        },
         null,
       ),
       456,
@@ -139,14 +149,14 @@ assertEqual(
   assertDeepEqual(
     mapSource(
       loadSourceMap(
-        createSource(
-          "http://host/main.js",
-          `() => {}; //# sourceMappingURL=${buildInlineSourceMap(
+        {
+          url: "http://host/main.js",
+          content: `() => {}; //# sourceMappingURL=${buildInlineSourceMap(
             "application/json",
             "base64",
             inlineSourceMapData,
           )}`,
-        ),
+        },
         null,
       ),
       1,
@@ -164,14 +174,14 @@ assertEqual(
   assertEqual(
     mapSource(
       loadSourceMap(
-        createSource(
-          "http://host/main.js",
-          `123; //# sourceMappingURL=${buildInlineSourceMap(
+        {
+          url: "http://host/main.js",
+          content: `123; //# sourceMappingURL=${buildInlineSourceMap(
             "image/png",
             "base64",
             inlineSourceMapData,
           )}`,
-        ),
+        },
         null,
       ),
       456,

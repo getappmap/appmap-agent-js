@@ -5,7 +5,6 @@ import {
   createConfiguration,
   extendConfiguration,
 } from "../../configuration/index.mjs";
-import { createSource } from "../../source/index.mjs";
 import {
   createFrontend,
   getSession,
@@ -59,7 +58,10 @@ validateMessage(
 validateMessage(formatBeginAmend(frontend, 123, getBundlePayload(frontend)));
 
 {
-  const source = createSource("protocol://host/filename.js", "123;");
+  const source = {
+    url: "protocol://host/filename.js",
+    content: "123;",
+  };
   assertDeepEqual(instrument(frontend, source, createMirrorMapping(source)), {
     url: "protocol://host/filename.js",
     content: "123;\n",

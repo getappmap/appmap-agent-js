@@ -1,11 +1,6 @@
 import { assertDeepEqual, assertEqual } from "../../__fixture__.mjs";
-import {
-  getSourceUrl,
-  createSource,
-  makeSourceLocation,
-  toSourceMessage,
-} from "../../source/index.mjs";
 import { stringifyLocation } from "../../location/index.mjs";
+import { digest } from "../../hash/index.mjs";
 import {
   createConfiguration,
   extendConfiguration,
@@ -32,7 +27,11 @@ const configuration = extendConfiguration(
 {
   const track = startTrack(configuration);
   stopTrack(track);
-  const source = createSource("protocol://host/path", "content");
+  const source = {
+    url: "protocol://host/path",
+    content: "content",
+    hash: digest("content"),
+  };
   addTrackSource(track, source);
   const message2 = { type: "error", error: { type: "number", print: "123" } };
   sendTrack(track, message2);
@@ -40,14 +39,24 @@ const configuration = extendConfiguration(
     url: "protocol://host/base/appmap_dir/process/appmap_file.appmap.json",
     content: {
       configuration,
-      messages: [toSourceMessage(source)],
+      messages: [
+        {
+          type: "source",
+          url: source.url,
+          content: source.content,
+        },
+      ],
       termination: { type: "unknown" },
     },
   });
 }
 
 {
-  const source = createSource("protocol://host/path", "content");
+  const source = {
+    url: "protocol://host/path",
+    content: "content",
+    hash: digest("content"),
+  };
   const return_event_message = {
     type: "event",
     site: "end",
@@ -56,7 +65,11 @@ const configuration = extendConfiguration(
     tab: 0,
     payload: {
       type: "return",
-      function: stringifyLocation(makeSourceLocation(source, 0, 0)),
+      function: stringifyLocation({
+        ...source,
+        line: 0,
+        column: 0,
+      }),
       error: { type: "number", print: "0" },
     },
   };
@@ -70,7 +83,7 @@ const configuration = extendConfiguration(
       type: "throw",
       function: stringifyLocation({
         hash: null,
-        url: getSourceUrl(source),
+        url: source.url,
         line: 0,
         column: 0,
       }),

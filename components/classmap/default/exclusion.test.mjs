@@ -3,7 +3,7 @@ import {
   assertThrow,
   assertDeepEqual,
 } from "../../__fixture__.mjs";
-import { createSource, parseSource } from "../../source/index.mjs";
+import { parseEstree } from "../../parse/index.mjs";
 import { digestEstreeRoot } from "./digest.mjs";
 import { makeClassEntity } from "./entity.mjs";
 import { compileExclusionArray } from "./exclusion.mjs";
@@ -61,12 +61,10 @@ assertDeepEqual(
 
 {
   const entities = digestEstreeRoot(
-    parseSource(
-      createSource(
-        "protocol://host/path.js",
-        "var o = {k: /* @label l1 l2 */ () => {}};",
-      ),
-    ),
+    parseEstree({
+      url: "protocol://host/path.js",
+      content: "var o = {k: /* @label l1 l2 */ () => {}};",
+    }),
     default_context,
   );
   const exclude = compileExclusionArray([

@@ -1,7 +1,5 @@
 import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
-
-import { createSource, parseSource } from "../../source/index.mjs";
-
+import { parseEstree } from "../../parse/index.mjs";
 import {
   wrapRootEntityArray,
   makeClassEntity,
@@ -21,8 +19,8 @@ const { Map, Set } = globalThis;
 
 const default_context = {
   url: "protocol://host/script.js",
+  content: null,
   base: "protocol://host/",
-  source: null,
   anonymous: "anonymous",
   inline: false,
   shallow: false,
@@ -33,11 +31,14 @@ const default_context = {
 //////////////////
 
 {
-  const source = createSource("protocol://host/path.js", "function f () {}");
+  const source = {
+    url: "protocol://host/path.js",
+    content: "function f () {}",
+  };
   assertDeepEqual(
     wrapRootEntityArray(
       [
-        makeFunctionEntity(parseSource(source).body[0], "reference", "f", [], {
+        makeFunctionEntity(parseEstree(source).body[0], "reference", "f", [], {
           ...default_context,
           source,
         }),
@@ -94,13 +95,13 @@ assertEqual(
 /////////////////////////
 
 {
-  const source = createSource(
-    "protocol://host/path.js",
-    "/* @label label */ function f () {}",
-  );
+  const source = {
+    url: "protocol://host/path.js",
+    content: "/* @label label */ function f () {}",
+  };
   assertDeepEqual(
     getEntityLabelArray(
-      makeFunctionEntity(parseSource(source).body[0], "reference", null, [], {
+      makeFunctionEntity(parseEstree(source).body[0], "reference", null, [], {
         ...default_context,
         source,
       }),
@@ -124,9 +125,12 @@ assertEqual(
 );
 
 {
-  const source = createSource("protocol://host/path.js", "function f () {}");
+  const source = {
+    url: "protocol://host/path.js",
+    content: "function f () {}",
+  };
   const entity = makeFunctionEntity(
-    parseSource(source).body[0],
+    parseEstree(source).body[0],
     "reference",
     "f",
     [],
@@ -136,9 +140,12 @@ assertEqual(
 }
 
 {
-  const source = createSource("protocol://host/path.js", "function f () {}");
+  const source = {
+    url: "protocol://host/path.js",
+    content: "function f () {}",
+  };
   const entity = makeFunctionEntity(
-    parseSource(source).body[0],
+    parseEstree(source).body[0],
     "reference",
     "f",
     [],
@@ -157,19 +164,18 @@ assertEqual(
 ////////////////////////////
 
 {
-  const source = createSource(
-    "protocol://host/path.js",
-    "function f (x, y, z) {}",
-  );
+  const source = {
+    url: "protocol://host/base/script.js",
+    content: "function f (x, y, z) {}",
+  };
   const entity = makeClassEntity(
     "c",
     [
-      makeFunctionEntity(parseSource(source).body[0], "reference", "f", [], {
+      makeFunctionEntity(parseEstree(source).body[0], "reference", "f", [], {
         ...default_context,
+        ...source,
         shallow: true,
-        url: "protocol://host/base/script.js",
         base: "protocol://host/base/",
-        source,
       }),
     ],
     default_context,
@@ -222,9 +228,12 @@ assertEqual(
 ///////////////////////////////
 
 {
-  const source = createSource("protocol://host/path.js", "function f () {}");
+  const source = {
+    url: "protocol://host/path.js",
+    content: "function f () {}",
+  };
   const entity = makeFunctionEntity(
-    parseSource(source).body[0],
+    parseEstree(source).body[0],
     "reference",
     "f",
     [],
@@ -253,11 +262,14 @@ assertEqual(
 ////////////////////////////
 
 {
-  const source = createSource("protocol://host/path.js", "function f () {}");
+  const source = {
+    url: "protocol://host/path.js",
+    content: "function f () {}",
+  };
   const entity = makeClassEntity(
     "c",
     [
-      makeFunctionEntity(parseSource(source).body[0], "reference", "f", [], {
+      makeFunctionEntity(parseEstree(source).body[0], "reference", "f", [], {
         ...default_context,
         source,
       }),
@@ -295,18 +307,21 @@ assertDeepEqual(
 //////////////////////
 
 {
-  const source = createSource("protocol://host/path.js", "function f () {}");
+  const source = {
+    url: "protocol://host/path.js",
+    content: "function f () {}",
+  };
   assertDeepEqual(
     toClassmapEntity(
       makeFunctionEntity(
-        parseSource(source).body[0],
+        parseEstree(source).body[0],
         "reference",
         "f",
         [makeClassEntity("c", [], default_context)],
         {
           ...default_context,
+          ...source,
           inline: true,
-          source,
           url: "protocol://host/base/script.js",
           base: "protocol://host/base/",
         },
@@ -332,15 +347,18 @@ assertDeepEqual(
 }
 
 {
-  const source = createSource("protocol://host/path.js", "function f () {}");
+  const source = {
+    url: "protocol://host/path.js",
+    content: "function f () {}",
+  };
   assertDeepEqual(
     toClassmapEntity(
-      makeFunctionEntity(parseSource(source).body[0], "reference", "f", [], {
+      makeFunctionEntity(parseEstree(source).body[0], "reference", "f", [], {
         ...default_context,
+        ...source,
         url: "protocol://host/base/script.js",
         base: "protocol://host/base/",
         inline: true,
-        source,
       }),
     ),
     [

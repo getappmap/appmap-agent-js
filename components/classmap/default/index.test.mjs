@@ -3,18 +3,12 @@ import {
   createConfiguration,
   extendConfiguration,
 } from "../../configuration/index.mjs";
-import { createSource, makeSourceLocation } from "../../source/index.mjs";
 import {
   createClassmap,
   addClassmapSource,
   compileClassmap,
   lookupClassmapClosure,
 } from "./index.mjs";
-
-const toStaticLocation = (location) => ({
-  ...location,
-  hash: null,
-});
 
 // lookupClassmapClosure >> present source //
 {
@@ -40,18 +34,21 @@ const toStaticLocation = (location) => ({
       "protocol://host/home/",
     ),
   );
-  const source1 = createSource(
-    "protocol://host/home/directory/dynamic.js",
-    "function f (x) {}",
-  );
-  const source2 = createSource(
-    "protocol://host/home/directory/dynamic.js",
-    "function g (y) {}",
-  );
-  const source3 = createSource(
-    "protocol://host/home/directory/static.js",
-    "function h (z) {}",
-  );
+  const source1 = {
+    url: "protocol://host/home/directory/dynamic.js",
+    content: "function f (x) {}",
+    hash: "hash1",
+  };
+  const source2 = {
+    url: "protocol://host/home/directory/dynamic.js",
+    content: "function g (y) {}",
+    hash: "hash2",
+  };
+  const source3 = {
+    url: "protocol://host/home/directory/static.js",
+    content: "function h (z) {}",
+    hash: "hash3",
+  };
   assertEqual(addClassmapSource(classmap, source1), true);
   assertEqual(addClassmapSource(classmap, source1), true); // caching
   assertEqual(addClassmapSource(classmap, source2), true);
@@ -66,7 +63,12 @@ const toStaticLocation = (location) => ({
     null,
   );
   assertDeepEqual(
-    lookupClassmapClosure(classmap, makeSourceLocation(source1, 1, 0)),
+    lookupClassmapClosure(classmap, {
+      url: source1.url,
+      hash: source1.hash,
+      line: 1,
+      column: 0,
+    }),
     {
       parameters: ["x"],
       shallow: true,
@@ -80,7 +82,12 @@ const toStaticLocation = (location) => ({
     },
   );
   assertDeepEqual(
-    lookupClassmapClosure(classmap, makeSourceLocation(source2, 1, 0)),
+    lookupClassmapClosure(classmap, {
+      url: source2.url,
+      hash: source2.hash,
+      line: 1,
+      column: 0,
+    }),
     {
       parameters: ["y"],
       shallow: true,
@@ -94,10 +101,12 @@ const toStaticLocation = (location) => ({
     },
   );
   assertDeepEqual(
-    lookupClassmapClosure(
-      classmap,
-      toStaticLocation(makeSourceLocation(source3, 1, 0)),
-    ),
+    lookupClassmapClosure(classmap, {
+      url: source3.url,
+      hash: null,
+      line: 1,
+      column: 0,
+    }),
     {
       parameters: ["z"],
       shallow: true,
@@ -111,10 +120,12 @@ const toStaticLocation = (location) => ({
     },
   );
   assertDeepEqual(
-    lookupClassmapClosure(
-      classmap,
-      toStaticLocation(makeSourceLocation(source1, 1, 0)),
-    ),
+    lookupClassmapClosure(classmap, {
+      url: source1.url,
+      hash: null,
+      line: 1,
+      column: 0,
+    }),
     null,
   );
 }
@@ -139,47 +150,58 @@ const toStaticLocation = (location) => ({
       "protocol://host/base/",
     ),
   );
-  const source1 = createSource("protocol://host/base/directory/empty.js", null);
-  const source2 = createSource("external://relative/url/file.js", "");
-  const source3 = createSource(
-    "protocol://host/base/directory/disabled.js",
-    "",
-  );
+  const source1 = {
+    url: "protocol://host/base/directory/empty.js",
+    content: null,
+    hash: null,
+  };
+  const source2 = {
+    url: "external://relative/url/file.js",
+    content: "",
+    hash: "hash2",
+  };
+  const source3 = {
+    url: "protocol://host/base/directory/disabled.js",
+    content: "",
+    hash: "hash3",
+  };
   assertEqual(addClassmapSource(classmap, source1), false);
   assertEqual(addClassmapSource(classmap, source2), false);
   assertEqual(addClassmapSource(classmap, source3), false);
   assertEqual(
-    lookupClassmapClosure(classmap, makeSourceLocation(source1, 123, 456)),
+    lookupClassmapClosure(classmap, {
+      url: source1.url,
+      hash: null,
+      line: 123,
+      column: 456,
+    }),
     null,
   );
   assertEqual(
-    lookupClassmapClosure(classmap, makeSourceLocation(source2, 123, 456)),
+    lookupClassmapClosure(classmap, {
+      url: source2.url,
+      hash: null,
+      line: 123,
+      column: 456,
+    }),
     null,
   );
   assertEqual(
-    lookupClassmapClosure(classmap, makeSourceLocation(source3, 123, 456)),
+    lookupClassmapClosure(classmap, {
+      url: source3.url,
+      hash: null,
+      line: 123,
+      column: 456,
+    }),
     null,
   );
   assertEqual(
-    lookupClassmapClosure(
-      classmap,
-      makeSourceLocation(
-        createSource("protocol://host/base/directory/missing.js", null),
-        123,
-        456,
-      ),
-    ),
-    null,
-  );
-  assertEqual(
-    lookupClassmapClosure(
-      classmap,
-      makeSourceLocation(
-        createSource("protocol://host/base/directory/missing.js", "789;"),
-        123,
-        456,
-      ),
-    ),
+    lookupClassmapClosure(classmap, {
+      url: "protocol://host/base/directory/missing.js",
+      hash: null,
+      line: 123,
+      column: 456,
+    }),
     null,
   );
 }
@@ -211,14 +233,20 @@ const toStaticLocation = (location) => ({
     ),
   );
 
-  const source = createSource(
-    "protocol://host/home/directory/file.js",
-    "function f (x) {}",
-  );
+  const source = {
+    url: "protocol://host/home/directory/file.js",
+    content: "function f (x) {}",
+    hash: "hash",
+  };
 
   assertEqual(addClassmapSource(classmap, source), true);
 
-  lookupClassmapClosure(classmap, makeSourceLocation(source, 1, 0));
+  lookupClassmapClosure(classmap, {
+    url: source.url,
+    hash: null,
+    line: 1,
+    column: 0,
+  });
 
   assertDeepEqual(compileClassmap(classmap), [
     {
@@ -266,18 +294,20 @@ const toStaticLocation = (location) => ({
   );
 
   assertEqual(
-    addClassmapSource(
-      classmap,
-      createSource("protocol://host/home/file.js", "function f (x) {}"),
-    ),
+    addClassmapSource(classmap, {
+      url: "protocol://host/home/file.js",
+      content: "function f (x) {}",
+      hash: "hash1",
+    }),
     true,
   );
 
   assertEqual(
-    addClassmapSource(
-      classmap,
-      createSource("protocol://host/home/file.js", "function g (x) {}"),
-    ),
+    addClassmapSource(classmap, {
+      url: "protocol://host/home/file.js",
+      content: "function g (x) {}",
+      hash: "hash2",
+    }),
     true,
   );
 

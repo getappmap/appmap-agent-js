@@ -4,7 +4,6 @@ import {
   createConfiguration,
   extendConfiguration,
 } from "../../configuration/index.mjs";
-import { createSource } from "../../source/index.mjs";
 import { normalize } from "./__fixture__.mjs";
 import { instrument } from "./index.mjs";
 
@@ -14,10 +13,10 @@ const normalizeContent = ({ content, ...rest }, source) => ({
 });
 
 {
-  const source = createSource(
-    "protocol://host/base/script.js",
-    "function main () {}",
-  );
+  const source = {
+    url: "protocol://host/base/script.js",
+    content: "function main () {}",
+  };
   assertDeepEqual(
     instrument(
       extendConfiguration(
@@ -41,7 +40,7 @@ const normalizeContent = ({ content, ...rest }, source) => ({
     {
       url: "protocol://host/base/script.js",
       content: "function main () {}",
-      sources: [source],
+      messages: [{ type: "source", ...source }],
     },
   );
 }
@@ -74,7 +73,7 @@ const configuration = extendConfiguration(
 );
 
 {
-  const source = createSource("protocol://host/base/foo.js", "123;");
+  const source = { url: "protocol://host/base/foo.js", content: "123;" };
   assertDeepEqual(
     normalizeContent(
       instrument(configuration, source, createMirrorMapping(source)),
@@ -82,14 +81,14 @@ const configuration = extendConfiguration(
     {
       url: "protocol://host/base/foo.js",
       content: normalize("123;", "script"),
-      sources: [source],
+      messages: [{ type: "source", ...source }],
     },
   );
 }
 
 {
   const js = "class Klass { prop; }";
-  const source = createSource("protocol://host/base/foo.js", js);
+  const source = { url: "protocol://host/base/foo.js", content: js };
   assertDeepEqual(
     normalizeContent(
       instrument(configuration, source, createMirrorMapping(source)),
@@ -97,13 +96,13 @@ const configuration = extendConfiguration(
     {
       url: "protocol://host/base/foo.js",
       content: normalize(js, "script"),
-      sources: [source],
+      messages: [{ type: "source", ...source }],
     },
   );
 }
 
 {
-  const source = createSource("protocol://host/base/bar.js", "456;");
+  const source = { url: "protocol://host/base/bar.js", content: "456;" };
   assertDeepEqual(
     normalizeContent(
       instrument(configuration, source, createMirrorMapping(source)),
@@ -111,7 +110,7 @@ const configuration = extendConfiguration(
     {
       url: "protocol://host/base/bar.js",
       content: normalize("456;", "script"),
-      sources: [],
+      messages: [],
     },
   );
 }

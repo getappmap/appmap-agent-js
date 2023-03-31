@@ -3,7 +3,6 @@ import {
   createConfiguration,
   extendConfiguration,
 } from "../../configuration/index.mjs";
-import { createSource } from "../../source/index.mjs";
 import {
   createExclusion,
   addExclusionSource,
@@ -34,18 +33,20 @@ import {
   );
 
   assertEqual(
-    addExclusionSource(
-      exclusion,
-      createSource("protocol://host/base/enabled.js", null),
-    ),
+    addExclusionSource(exclusion, {
+      url: "protocol://host/base/enabled.js",
+      content: null,
+      hash: null,
+    }),
     true,
   );
 
   assertEqual(
-    addExclusionSource(
-      exclusion,
-      createSource("protocol://host/base/disabled.js", null),
-    ),
+    addExclusionSource(exclusion, {
+      url: "protocol://host/base/disabled.js",
+      content: null,
+      hash: null,
+    }),
     false,
   );
 
@@ -91,16 +92,14 @@ for (const postmortem of [true, false]) {
   );
 
   assertEqual(
-    addExclusionSource(
-      exclusion,
-      createSource(
-        "protocol://host/base/enabled.js",
-        `
-        function f () {}
-        function g () {}
-      `,
-      ),
-    ),
+    addExclusionSource(exclusion, {
+      url: "protocol://host/base/enabled.js",
+      content: `
+          function f () {}
+          function g () {}
+        `,
+      hash: "hash",
+    }),
     true,
   );
 

@@ -1,10 +1,10 @@
 import { InternalAppmapError } from "../../error/index.mjs";
-import { getSourceUrl } from "../../source/index.mjs";
 import {
   createClassmap,
   addClassmapSource,
   lookupClassmapClosure,
 } from "../../classmap/index.mjs";
+import { digest } from "../../hash/index.mjs";
 import { lookupUrl } from "../../matcher/index.mjs";
 
 const { Set } = globalThis;
@@ -35,9 +35,8 @@ export const createExclusion = (configuration, is_mirror_mapping) => {
   }
 };
 
-export const addExclusionSource = (exclusion, source) => {
+export const addExclusionSource = (exclusion, { url, content }) => {
   if (exclusion.type === "basic") {
-    const url = getSourceUrl(source);
     const { enabled } = lookupUrl(
       exclusion.packages,
       url,
@@ -48,7 +47,11 @@ export const addExclusionSource = (exclusion, source) => {
     }
     return enabled;
   } else if (exclusion.type === "classmap") {
-    return addClassmapSource(exclusion.classmap, source);
+    return addClassmapSource(exclusion.classmap, {
+      url,
+      content,
+      hash: digest(content),
+    });
   } /* c8 ignore start */ else {
     throw new InternalAppmapError("invalid exclusion type");
   } /* c8 ignore stop */

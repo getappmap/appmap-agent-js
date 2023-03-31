@@ -1,5 +1,4 @@
 import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
-import { createSource } from "../../source/index.mjs";
 import {
   createModule,
   resetModuleUrl,
@@ -13,7 +12,8 @@ assertEqual(
   lookupModuleClosure(
     createModule({
       base: "protocol://host/base/",
-      source: createSource("protocol://host/base/script.js", `123;`),
+      url: "protocol://host/base/script.js",
+      content: `123;`,
       pruning: true,
       inline: true,
       shallow: true,
@@ -30,7 +30,8 @@ assertEqual(
     resetModuleUrl(
       createModule({
         base: "protocol://host/base/",
-        source: createSource("protocol://host/base/script1.js", `123;`),
+        url: "protocol://host/base/script1.js",
+        content: `123;`,
         pruning: true,
         inline: true,
         shallow: true,
@@ -45,14 +46,12 @@ assertEqual(
 {
   const module = createModule({
     base: "protocol://host/base/",
-    source: createSource(
-      "protocol://host/base/script.js",
-      `
-        function f (x) {}
-        function g (y) {}
-        var o = {};
-      `,
-    ),
+    url: "protocol://host/base/script.js",
+    content: `
+      function f (x) {}
+      function g (y) {}
+      var o = {};
+    `,
     pruning: true,
     inline: true,
     shallow: true,
@@ -93,8 +92,8 @@ assertEqual(
         static: false,
       },
     };
-    assertDeepEqual(lookupModuleClosure(module, { line: 2, column: 8 }), info);
-    assertDeepEqual(lookupModuleClosure(module, { line: 2, column: 8 }), info);
+    assertDeepEqual(lookupModuleClosure(module, { line: 2, column: 6 }), info);
+    assertDeepEqual(lookupModuleClosure(module, { line: 2, column: 6 }), info);
     assertDeepEqual(lookupModuleClosure(module, { line: 2, column: 10 }), info);
   }
 

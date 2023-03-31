@@ -15,11 +15,31 @@ const configuration = extendConfiguration(
   "protocol://host/base/",
 );
 
-assertDeepEqual(compileTrace(configuration, [], [], { type: "unknown" }), {
-  url: "protocol://host/base/dirname/process/basename.appmap.json",
-  content: {
+assertDeepEqual(
+  compileTrace(
     configuration,
-    messages: [],
-    termination: { type: "unknown" },
+    [
+      {
+        url: "protocol://host/base/script.js",
+        content: "123;",
+        hash: "hash",
+      },
+    ],
+    [],
+    { type: "unknown" },
+  ),
+  {
+    url: "protocol://host/base/dirname/process/basename.appmap.json",
+    content: {
+      configuration,
+      messages: [
+        {
+          type: "source",
+          url: "protocol://host/base/script.js",
+          content: "123;",
+        },
+      ],
+      termination: { type: "unknown" },
+    },
   },
-});
+);

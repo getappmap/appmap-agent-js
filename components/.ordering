@@ -15,6 +15,7 @@ spawn
 validate
 validate-appmap
 hash
+parse
 patch
 peer
 file
@@ -32,7 +33,6 @@ configuration-accessor
 configuration-process
 configuration-environment
 location
-source
 classmap
 trace
 backend

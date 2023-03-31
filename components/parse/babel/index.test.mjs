@@ -7,27 +7,30 @@ import {
 } from "./index.mjs";
 
 parseEstree({
-  "protocol://host/dirname/filename.mjs?search#hash",
-  "export const x = 123;",
+  url: "protocol://host/dirname/filename.mjs?search#hash",
+  content: "export const x = 123;",
 });
 parseEstree({
-  "protocol://host/dirname/filename.mjs?search#hash",
-  "export const x = 123; delete x;",
+  url: "protocol://host/dirname/filename.mjs?search#hash",
+  content: "export const x = 123; delete x;",
 });
 parseEstree({
-  "protocol://host/dirname/filename.cjs?search#hash",
-  "exports.x = 123;",
+  url: "protocol://host/dirname/filename.cjs?search#hash",
+  content: "exports.x = 123;",
 });
 parseEstree({
-  "protocol://host/dirname/filename.ts?search#hash",
-  "const x: number = <JSX />;",
+  url: "protocol://host/dirname/filename.ts?search#hash",
+  content: "const x: number = <JSX />;",
 });
 parseEstree({
-  "protocol://host/dirname/filename.js?search#hash",
-  "/* @flow */ const x: number = <JSX />;",
+  url: "protocol://host/dirname/filename.js?search#hash",
+  content: "/* @flow */ const x: number = <JSX />;",
 });
-assertDeepEqual({
-  parseEstree("protocol://host/dirname/filename.js?search#hash", "{"),
+assertDeepEqual(
+  parseEstree({
+    url: "protocol://host/dirname/filename.js?search#hash",
+    content: "{",
+  }),
   {
     type: "Program",
     body: [],
@@ -38,14 +41,13 @@ assertDeepEqual({
       filename: "protocol://host/dirname/filename.js?search#hash",
     },
   },
-});
+);
 
 {
   const parsedClass = parseEstree({
-    "protocol://host/dirname/filename.js?search#hash",
-    "class Foo { prop; }",
+    url: "protocol://host/dirname/filename.js?search#hash",
+    content: "class Foo { prop; }",
   });
-
   // make sure property definitions have estree-compliant type
   assertEqual(parsedClass.body[0].body.body[0].type, "PropertyDefinition");
 }
@@ -53,8 +55,8 @@ assertDeepEqual({
 assertDeepEqual(
   getLeadingCommentArray(
     parseEstree({
-      "protocol://host/dirname/filename.js",
-      "// line\n/* block */\n123;",
+      url: "protocol://host/dirname/filename.js",
+      content: "// line\n/* block */\n123;",
     }).body[0],
   ).map(printComment),
   ["// line", "/* block */"],
@@ -63,19 +65,19 @@ assertDeepEqual(
 assertDeepEqual(
   getLeadingCommentArray(
     parseEstree({
-      "protocol://host/dirname/filename.js",
-      `
-      // foo
-      // @label l1 l2
-      // @label${" "}
-      /*
-        @label l3
-        bar
-      */
-      /* @label l4 */
-      123;
-    `,
-  }).body[0],
+      url: "protocol://host/dirname/filename.js",
+      content: `
+        // foo
+        // @label l1 l2
+        // @label${" "}
+        /*
+          @label l3
+          bar
+        */
+        /* @label l4 */
+        123;
+      `,
+    }).body[0],
   ).flatMap(extractCommentLabelArray),
   ["l1", "l2", "l3", "l4"],
 );

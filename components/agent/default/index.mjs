@@ -42,7 +42,6 @@ import {
   requestRemoteEmitterAsync,
   takeLocalEmitterTrace,
 } from "../../emitter/index.mjs";
-import { createSource } from "../../source/index.mjs";
 import { loadSourceMap, fillSourceMap } from "../../mapping-file/index.mjs";
 
 export const openAgent = (configuration) => {
@@ -72,10 +71,9 @@ export const getSerializationEmptyValue = ({ frontend }) =>
 
 export const instrument = (
   { configuration, frontend, emitter },
-  { url, content },
+  source,
   map,
 ) => {
-  const source = createSource(url, content);
   const mapping = loadSourceMap(source, map);
   if (configuration["postmortem-function-exclusion"] !== true) {
     fillSourceMap(mapping, configuration);

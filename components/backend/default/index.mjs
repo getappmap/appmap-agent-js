@@ -1,7 +1,7 @@
 import { logDebug, logError } from "../../log/index.mjs";
 import { validateMessage } from "../../validate/index.mjs";
 import { identity } from "../../util/index.mjs";
-import { fromSourceMessage } from "../../source/index.mjs";
+import { digest } from "../../hash/index.mjs";
 import {
   startTrack,
   stopTrack,
@@ -96,7 +96,11 @@ export const sendBackend = (backend, message) => {
       return processStopMessage(backend, key, message.termination);
     }
   } else if (type === "source") {
-    const source = fromSourceMessage(message);
+    const source = {
+      url: message.url,
+      content: message.content,
+      hash: message.content === null ? null : digest(message.content),
+    };
     backend.sources.push(source);
     for (const track of backend.tracks.values()) {
       addTrackSource(track, source);

@@ -5,14 +5,13 @@ import {
   getMappingSourceArray,
   updateMappingSource,
 } from "../../mapping/index.mjs";
-import {
-  createSource,
-  isSourceEmpty,
-  getSourceUrl,
-} from "../../source/index.mjs";
 import { getConfigurationPackage } from "../../configuration-accessor/index.mjs";
 import { readFile } from "../../file/index.mjs";
 import { logDebug } from "../../log/index.mjs";
+
+const isSourceEmpty = ({ content }) => content === null;
+
+const getSourceUrl = ({ url }) => url;
 
 export const fillSourceMap = (mapping, configuration) => {
   for (const url of getMappingSourceArray(mapping)
@@ -30,7 +29,7 @@ export const fillSourceMap = (mapping, configuration) => {
         logDebug("could not load source file %j >> %O", url, error);
       }
       if (content !== null) {
-        updateMappingSource(mapping, createSource(url, content));
+        updateMappingSource(mapping, { url, content });
       }
     }
   }

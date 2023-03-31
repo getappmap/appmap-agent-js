@@ -46,7 +46,7 @@ export const extractCommentLabelArray = ({ value: text }) => {
   return maybe_lines === null ? [] : maybe_lines.flatMap(extractLineLabel);
 };
 
-export const parseEstree = ({url, content}) => {
+export const parseEstree = ({ url, content }) => {
   const extension = getLastUrlExtension(url);
   let source_type = "unambiguous";
   if (extension === ".cjs" || extension === ".node") {

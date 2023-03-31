@@ -6,7 +6,6 @@ import {
   getSerializationEmptyValue as getSerializationEmptyValueInner,
 } from "../../serialization/index.mjs";
 import { InternalAppmapError } from "../../error/index.mjs";
-import { toSourceMessage } from "../../source/index.mjs";
 export {
   getJumpPayload,
   getBundlePayload,
@@ -66,18 +65,8 @@ export const getFreshTab = ({ counter }) => incrementCounter(counter);
 export const getSerializationEmptyValue = ({ serialization }) =>
   getSerializationEmptyValueInner(serialization);
 
-export const instrument = ({ configuration }, file, mapping) => {
-  const { url, content, sources } = instrumentInner(
-    configuration,
-    file,
-    mapping,
-  );
-  return {
-    url,
-    content,
-    messages: sources.map(toSourceMessage),
-  };
-};
+export const instrument = ({ configuration }, file, mapping) =>
+  instrumentInner(configuration, file, mapping);
 
 export const formatError = ({ session, serialization }, value) => ({
   type: "error",
