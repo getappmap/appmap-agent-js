@@ -1,4 +1,4 @@
-import { logDebug, logError } from "../../log/index.mjs";
+import { logDebug, logError, logWarning } from "../../log/index.mjs";
 import { validateMessage } from "../../validate/index.mjs";
 import { identity } from "../../util/index.mjs";
 import { digest } from "../../hash/index.mjs";
@@ -96,14 +96,18 @@ export const sendBackend = (backend, message) => {
       return processStopMessage(backend, key, message.termination);
     }
   } else if (type === "source") {
-    const source = {
-      url: message.url,
-      content: message.content,
-      hash: message.content === null ? null : digest(message.content),
-    };
-    backend.sources.push(source);
-    for (const track of backend.tracks.values()) {
-      addTrackSource(track, source);
+    if (message.content === null) {
+      logWarning("Ignoring file %j because it was empty", message.url);
+    } else {
+      const source = {
+        url: message.url,
+        content: message.content,
+        hash: digest(message.content),
+      };
+      backend.sources.push(source);
+      for (const track of backend.tracks.values()) {
+        addTrackSource(track, source);
+      }
     }
     return true;
   } else {

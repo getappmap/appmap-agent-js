@@ -108,7 +108,7 @@ const configuration = extendConfiguration(
     url: "protocol://host/base/dirname/process/basename.appmap.json",
     content: {
       configuration,
-      messages: [message1, message3, message5],
+      messages: [message1, message3],
       termination: { type: "manual" },
     },
   });

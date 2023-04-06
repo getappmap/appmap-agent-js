@@ -137,10 +137,7 @@ const test = (track, termination) => {
     ),
     content: {
       configuration,
-      messages: [
-        missing_source_message,
-        { ...source_message, content: "123;" },
-      ],
+      messages: [{ ...source_message, content: "123;" }],
       termination,
     },
   });

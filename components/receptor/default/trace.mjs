@@ -14,17 +14,21 @@ const {
 
 const { patch: patchSocket } = NetSocketMessaging;
 
+const readFileSafe = (url) => {
+  try {
+    return readFile(new URL(url), "utf8");
+  } catch (error) {
+    logWarning("Could not load source at %j >> %O", url, error);
+    return null;
+  }
+};
+
 const inflateMessage = (message) => {
   if (message.type === "source" && message.content === null) {
-    try {
-      return {
-        ...message,
-        content: readFile(new URL(message.url), "utf8"),
-      };
-    } catch (error) {
-      logWarning("Could not load source file %j >> %O", message.url, error);
-      return message;
-    }
+    return {
+      ...message,
+      content: readFileSafe(message.url),
+    };
   } else {
     return message;
   }
