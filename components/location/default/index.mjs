@@ -5,7 +5,11 @@ const { String, parseInt, undefined } = globalThis;
 
 const regexp = /^([A-Za-z0-9+/=]+\|)?([\s\S]+):([0-9]+):([0-9]+)$/u;
 
-export const stringifyLocation = ({ url, hash, line, column }) => {
+export const stringifyLocation = ({
+  url,
+  hash,
+  position: { line, column },
+}) => {
   if (hash === null) {
     return `${url}:${String(line)}:${String(column)}`;
   } else {
@@ -22,7 +26,9 @@ export const parseLocation = (string) => {
         ? null
         : parts[1].substring(0, parts[1].length - 1),
     url: parts[2],
-    line: parseInt(parts[3]),
-    column: parseInt(parts[4]),
+    position: {
+      line: parseInt(parts[3]),
+      column: parseInt(parts[4]),
+    },
   };
 };

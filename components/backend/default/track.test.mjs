@@ -67,8 +67,7 @@ const configuration = extendConfiguration(
       type: "return",
       function: stringifyLocation({
         ...source,
-        line: 0,
-        column: 0,
+        position: { line: 0, column: 0 },
       }),
       error: { type: "number", print: "0" },
     },
@@ -84,8 +83,7 @@ const configuration = extendConfiguration(
       function: stringifyLocation({
         hash: null,
         url: source.url,
-        line: 0,
-        column: 0,
+        position: { line: 0, column: 0 },
       }),
       result: { type: "number", print: "0" },
     },

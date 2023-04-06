@@ -123,8 +123,7 @@ for (const shallow of [true, false]) {
   const location = stringifyLocation({
     url: "protocol://host/home/filename.js",
     hash: null,
-    line: 1,
-    column: 0,
+    position: { line: 1, column: 0 },
   });
   assertDeepEqual(
     digestEventTrace(
@@ -153,8 +152,7 @@ for (const shallow of [true, false]) {
   const location = stringifyLocation({
     url: "protocol://host/home/filename.js",
     hash: null,
-    line: 1,
-    column: 0,
+    position: { line: 1, column: 0 },
   });
   const bundle = {
     type: "bundle",

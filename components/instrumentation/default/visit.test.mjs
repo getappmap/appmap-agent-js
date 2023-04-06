@@ -48,8 +48,7 @@ const makeCodeLocation = ({ url, content }, line, column) =>
     stringifyLocation({
       url,
       hash: digest(content),
-      line,
-      column,
+      position: { line, column },
     }),
   );
 

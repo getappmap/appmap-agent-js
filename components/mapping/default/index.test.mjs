@@ -63,11 +63,13 @@ assertEqual(
 {
   const source1 = { url: "http://host/out.js", content: "123;" };
   const mapping = createMirrorMapping(source1);
-  assertDeepEqual(mapSource(mapping, 123, 456), {
     url: source1.url,
     hash: digest("123;"),
-    line: 123,
-    column: 456,
+  assertDeepEqual(mapSource(mapping, { line: 123, column: 456 }), {
+    position: {
+      line: 123,
+      column: 456,
+    },
   });
   assertDeepEqual(getMappingSourceArray(mapping), [source1]);
   const source2 = { url: "http://host/out.js", content: "456;" };
@@ -95,14 +97,16 @@ assertEqual(
     url: "http://host/directory/map.json",
     content: generator.toString(),
   });
-  assertDeepEqual(mapSource(mapping, 3, 13), {
     url: "http://host/directory/source.js",
     hash: null,
-    line: 17,
-    column: 19,
+  assertDeepEqual(mapSource(mapping, { line: 3, column: 13 }), {
+    position: {
+      line: 17,
+      column: 19,
+    },
   });
-  assertEqual(mapSource(mapping, 3, 23), null);
-  assertEqual(mapSource(mapping, 29, 0), null);
+  assertEqual(mapSource(mapping, { line: 3, column: 23 }), null);
+  assertEqual(mapSource(mapping, { line: 29, column: 0 }), null);
   assertDeepEqual(getMappingSourceArray(mapping), [
     { url: "http://host/directory/source.js", content: null },
   ]);

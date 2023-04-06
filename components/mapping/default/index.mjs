@@ -119,8 +119,10 @@ export const mapSource = (mapping, line, column) => {
     return {
       url: mapping.source.url,
       hash: mapping.source.hash,
-      line,
-      column,
+      position: {
+        line,
+        column,
+      },
     };
   } else if (mapping.type === "normal") {
     if (line <= mapping.lines.length) {
@@ -132,6 +134,7 @@ export const mapSource = (mapping, line, column) => {
             return {
               url,
               hash,
+            position: {
               line: mapped_line + 1,
               column: mapped_column,
             };
@@ -144,6 +147,7 @@ export const mapSource = (mapping, line, column) => {
             );
             return null;
           }
+            },
         }
       }
       // This is fine: functions in generated files may not have an associated

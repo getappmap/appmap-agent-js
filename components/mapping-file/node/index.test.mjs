@@ -1,6 +1,5 @@
 import { writeFile as writeFileAsync } from "node:fs/promises";
 import { Buffer } from "node:buffer";
-import { digest } from "../../hash/index.mjs";
 import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
 import { getUuid } from "../../uuid/random/index.mjs";
 import {
@@ -50,11 +49,12 @@ const empty_source_map = {
 {
   const source = { url: "http://host/main.js", content: "123;" };
   const mapping = loadSourceMap(source, null);
-  assertDeepEqual(mapSource(mapping, 456, 789), {
-    url: source.url,
-    hash: digest(source.content),
-    line: 456,
-    column: 789,
+  assertDeepEqual(mapSource(mapping, { line: 456, column: 789 }), {
+    index: 0,
+    position: {
+      line: 456,
+      column: 789,
+    },
   });
 }
 
@@ -68,8 +68,7 @@ assertEqual(
         content: empty_source_map,
       },
     ),
-    456,
-    789,
+    { line: 456, column: 789 },
   ),
   null,
 );
@@ -86,8 +85,7 @@ assertEqual(
       },
       null,
     ),
-    456,
-    789,
+    { line: 456, column: 789 },
   ),
   null,
 );
@@ -102,12 +100,16 @@ assertEqual(
   };
 
   // missing external source map
-  assertDeepEqual(mapSource(loadSourceMap(source, null), 456, 789), {
-    url: source.url,
-    hash: digest(source.content),
-    line: 456,
-    column: 789,
-  });
+  assertDeepEqual(
+    mapSource(loadSourceMap(source, null), { line: 456, column: 789 }),
+    {
+      index: 0,
+      position: {
+        line: 456,
+        column: 789,
+      },
+    },
+  );
 
   await writeFileAsync(new URL(url), stringifyJSON(empty_source_map), "utf8");
 
@@ -121,8 +123,7 @@ assertEqual(
         },
         null,
       ),
-      456,
-      789,
+      { line: 456, column: 789 },
     ),
     null,
   );
@@ -159,14 +160,14 @@ assertEqual(
         },
         null,
       ),
-      1,
-      1,
+      { line: 1, column: 1 },
     ),
     {
-      url: "http://host/main.js",
-      hash: null,
-      line: 2, // TODO: This is off by one. It should be 1, not 2.
-      column: 1,
+      index: 0,
+      position: {
+        line: 2, // TODO: This is off by one. It should be 1, not 2.
+        column: 1,
+      },
     },
   );
 
@@ -184,8 +185,7 @@ assertEqual(
         },
         null,
       ),
-      456,
-      789,
+      { line: 456, column: 789 },
     ),
     null,
   );

@@ -32,6 +32,7 @@ configuration
 configuration-accessor
 configuration-process
 configuration-environment
+position
 location
 classmap
 trace
