@@ -34,7 +34,7 @@ configuration-process
 configuration-environment
 position
 location
-classmap
+source
 trace
 backend
 mapping
