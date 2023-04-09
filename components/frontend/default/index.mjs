@@ -1,5 +1,8 @@
 import { assert, createCounter, incrementCounter } from "../../util/index.mjs";
-import { instrument as instrumentInner } from "../../instrumentation/index.mjs";
+import {
+  instrument as instrumentInner,
+  extractMissingUrlArray as extractMissingUrlArrayInner,
+} from "../../instrumentation/index.mjs";
 import {
   createSerialization,
   serialize,
@@ -65,8 +68,11 @@ export const getFreshTab = ({ counter }) => incrementCounter(counter);
 export const getSerializationEmptyValue = ({ serialization }) =>
   getSerializationEmptyValueInner(serialization);
 
-export const instrument = ({ configuration }, file, mapping) =>
-  instrumentInner(configuration, file, mapping);
+export const extractMissingUrlArray = ({ configuration }, url, cache) =>
+  extractMissingUrlArrayInner(url, cache, configuration);
+
+export const instrument = ({ configuration }, url, cache) =>
+  instrumentInner(url, cache, configuration);
 
 export const formatError = ({ session, serialization }, value) => ({
   type: "error",

@@ -1,11 +1,13 @@
 import { now } from "../../time/index.mjs";
 import { getCurrentGroup } from "../../group/index.mjs";
 import { getUuid } from "../../uuid/index.mjs";
+import { readFile } from "../../file/index.mjs";
 import {
   createFrontend,
   getSession as getFrontendSession,
   getFreshTab as getFrontendFreshTab,
   instrument as instrumentFrontend,
+  extractMissingUrlArray,
   getSerializationEmptyValue as getFrontendSerializationEmptyValue,
   formatError,
   formatStartTrack,
@@ -42,7 +44,11 @@ import {
   requestRemoteEmitterAsync,
   takeLocalEmitterTrace,
 } from "../../emitter/index.mjs";
-import { loadSourceMap, fillSourceMap } from "../../mapping-file/index.mjs";
+
+const {
+  Map,
+  JSON: { stringify: stringifyJSON },
+} = globalThis;
 
 export const openAgent = (configuration) => {
   if (configuration.session === null) {
@@ -52,7 +58,6 @@ export const openAgent = (configuration) => {
     };
   }
   return {
-    configuration,
     emitter: openEmitter(configuration),
     frontend: createFrontend(configuration),
   };
@@ -69,19 +74,33 @@ export const getFreshTab = ({ frontend }) => getFrontendFreshTab(frontend);
 export const getSerializationEmptyValue = ({ frontend }) =>
   getFrontendSerializationEmptyValue(frontend);
 
-export const instrument = (
-  { configuration, frontend, emitter },
-  source,
-  map,
-) => {
-  const mapping = loadSourceMap(source, map);
-  if (configuration["postmortem-function-exclusion"] !== true) {
-    fillSourceMap(mapping, configuration);
+export const instrument = ({ frontend, emitter }, { url, content }, map) => {
+  // TODO: improve performance by not parsing the source map multiple times.
+  const cache = new Map();
+  if (map !== null) {
+    let { url: map_url, content: map_content } = map;
+    content = `${content}\n//# sourceMappingURL=${map_url}`;
+    if (map_content !== "string") {
+      map_content = stringifyJSON(map_content);
+    }
+    cache.set(map_url, map_content);
+  }
+  cache.set(url, content);
+  let complete = false;
+  while (!complete) {
+    const urls = extractMissingUrlArray(frontend, url, cache);
+    if (urls.length === 0) {
+      complete = true;
+    } else {
+      for (const url of urls) {
+        cache.set(url, readFile(url));
+      }
+    }
   }
   const { messages, content: instrumented_content } = instrumentFrontend(
     frontend,
-    source,
-    mapping,
+    url,
+    cache,
   );
   for (const message of messages) {
     sendEmitter(emitter, message);

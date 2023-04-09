@@ -26,7 +26,7 @@ const configuration = extendConfiguration(
   createConfiguration("protocol://host/home/"),
   {
     "postmortem-function-exclusion": false,
-    packages: ["*"],
+    packages: [{ regexp: "^", relative: false }],
   },
   "protocol://host/base/",
 );
@@ -43,8 +43,20 @@ assertEqual(
   evalGlobal(
     instrument(
       agent,
-      { url: "protocol://host/base/main.js", content: "123;" },
-      null,
+      {
+        url: "protocol://host/base/main.js",
+        content: "123;",
+      },
+      {
+        url: "protocol://host/base/sourcemap.json",
+        content: {
+          version: 3,
+          file: "main.js",
+          sources: ["data:,456%3B"],
+          names: [],
+          mappings: "A,AAAB;;ABCDE;",
+        },
+      },
     ),
   ),
   123,
@@ -63,8 +75,8 @@ assertDeepEqual(takeLocalAgentTrace(agent, "record"), {
   messages: [
     {
       type: "source",
-      url: "protocol://host/base/main.js",
-      content: "123;",
+      url: "data:,456%3B",
+      content: "456;",
     },
     {
       type: "group",

@@ -5,43 +5,41 @@ import {
 } from "../../configuration/index.mjs";
 import { stringifyLocation } from "../../location/index.mjs";
 import { getUrlFilename } from "../../url/index.mjs";
-import { createMirrorMapping } from "../../mapping/index.mjs";
 import { parseEstree } from "../../parse/index.mjs";
 import { digest } from "../../hash/index.mjs";
 import { normalize, generate } from "./__fixture__.mjs";
-import { createExclusion, addExclusionSource } from "./exclusion.mjs";
+import { createCodebase } from "./codebase.mjs";
 import { visit } from "./visit.mjs";
 
 const {
+  Map,
   JSON: { stringify: stringifyJSON },
 } = globalThis;
 
-const instrument = (options) => {
-  const exclusion = createExclusion(
-    extendConfiguration(
-      createConfiguration("protocol://host/home/"),
-      {
-        packages: [
-          {
-            path: getUrlFilename(options.source.url),
-            enabled: options.instrumented,
-          },
-        ],
-      },
-      options.source.url,
-    ),
-  );
-  addExclusionSource(exclusion, options.source);
-  return generate(
+const instrument = (options) =>
+  generate(
     visit(parseEstree(options.source), {
       url: options.source.url,
       apply: "APPLY",
       eval: { hidden: "EVAL", aliases: ["eval"] },
-      mapping: createMirrorMapping(options.source),
-      exclusion,
+      codebase: createCodebase(
+        options.source.url,
+        new Map([[options.source.url, options.source.content]]),
+        extendConfiguration(
+          createConfiguration("protocol://host/home/"),
+          {
+            packages: [
+              {
+                path: getUrlFilename(options.source.url),
+                enabled: options.instrumented,
+              },
+            ],
+          },
+          options.source.url,
+        ),
+      ),
     }),
   );
-};
 
 const makeCodeLocation = ({ url, content }, line, column) =>
   stringifyJSON(

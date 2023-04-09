@@ -37,8 +37,6 @@ location
 source
 trace
 backend
-mapping
-mapping-file
 instrumentation
 interpretation
 serialization
