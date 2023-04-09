@@ -5,7 +5,7 @@ import {
   incrementCounter,
 } from "../../../util/index.mjs";
 import { parseLocation } from "../../../location/index.mjs";
-import { lookupClassmapClosure } from "../../../classmap/index.mjs";
+import { lookupClosureLocation } from "../codebase/index.mjs";
 import { digestPayload } from "./payload.mjs";
 
 const { Map } = globalThis;
@@ -27,16 +27,36 @@ const digestEventPair = (event1, event2, id1, id2, info) => [
   },
 ];
 
-export const digestEventTrace = (root, classmap) => {
+const toClosureInfo = ({
+  specifier,
+  position: { line },
+  parent,
+  name,
+  static: is_static,
+  parameters,
+  shallow,
+}) => ({
+  link: {
+    path: specifier,
+    lineno: line,
+    defined_class: parent,
+    static: is_static,
+    method_id: name,
+  },
+  shallow,
+  parameters,
+});
+
+export const digestEventTrace = (root, codebase) => {
   const counter = createCounter(0);
   const cache = new Map();
   const getClosureInfo = (location_string) => {
     if (cache.has(location_string)) {
       return cache.get(location_string);
     } else {
-      const info = lookupClassmapClosure(
-        classmap,
-        parseLocation(location_string),
+      const info = mapMaybe(
+        lookupClosureLocation(codebase, parseLocation(location_string)),
+        toClosureInfo,
       );
       cache.set(location_string, info);
       return info;
