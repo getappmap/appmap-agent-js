@@ -1,11 +1,6 @@
-import { readFile } from "node:fs";
+import { readFileSync } from "node:fs";
 import { Buffer } from "node:buffer";
-import {
-  logDebugWhen,
-  logErrorWhen,
-  logWarning,
-  logDebug,
-} from "../../log/index.mjs";
+import { logDebugWhen, logWarning, logDebug } from "../../log/index.mjs";
 import { self_directory } from "../../self/index.mjs";
 import { URL } from "../../url/index.mjs";
 import { InternalAppmapError } from "../../error/index.mjs";
@@ -37,6 +32,11 @@ const isJavascriptContentType = (header) =>
   header.startsWith("application/ecmascript");
 
 const isHtmlContentType = (header) => header.startsWith("text/html");
+
+const recorder_browser_content = readFileSync(
+  new URL("dist/bundles/recorder-browser.mjs", self_directory),
+  "utf8",
+);
 
 const getContentTypeCharset = (header) => {
   logDebugWhen(
@@ -90,61 +90,46 @@ export const interceptRequest = (
         hasOwnProperty(inc_res.headers, "content-type") &&
         isHtmlContentType(inc_res.headers["content-type"])
       ) {
-        readFile(
-          new URL("dist/bundles/recorder-browser.mjs", self_directory),
-          "utf8",
-          (error, content) => {
-            assert(
-              !logErrorWhen(
-                error !== null,
-                "could not read recorder bundle for browser >> %o",
-                error,
-              ),
-              "could not read recorder bundle for browser",
-              InternalAppmapError,
-            );
-            bufferReadable(inc_res, (buffer) => {
-              const encoding = getContentTypeCharset(
-                inc_res.headers["content-type"],
-              );
-              const body = toBuffer(
-                instrumentHtml(
-                  partialxx_(instrumentJs, configuration, backend),
-                  [
-                    {
-                      type: "script",
-                      url: null,
-                      content: `
-                      "use strict";
-                      ((() => {
-                        if (globalThis.__APPMAP_CONFIGURATION__ === void 0) {
-                          globalThis.__APPMAP_CONFIGURATION__ = ${stringifyJSON(
-                            configuration,
-                          )};
-                          globalThis.__APPMAP_LOG_LEVEL__ = ${stringifyJSON(
-                            configuration.log.level,
-                          )};
-                          ${content}
-                        }
-                      }) ());
-                    `,
-                    },
-                  ],
-                  {
-                    url: resolveHostPath(host, inc_req.url),
-                    content: buffer.toString(encoding),
-                  },
-                ),
-                encoding,
-              );
-              out_res.writeHead(inc_res.statusCode, inc_res.statusMessage, {
-                ...inc_res.headers,
-                "content-length": body.length,
-              });
-              out_res.end(body);
-            });
-          },
-        );
+        bufferReadable(inc_res, (buffer) => {
+          const encoding = getContentTypeCharset(
+            inc_res.headers["content-type"],
+          );
+          const body = toBuffer(
+            instrumentHtml(
+              partialxx_(instrumentJs, configuration, backend),
+              [
+                {
+                  type: "script",
+                  url: null,
+                  content: `
+                    "use strict";
+                    ((() => {
+                      if (globalThis.__APPMAP_CONFIGURATION__ === void 0) {
+                        globalThis.__APPMAP_CONFIGURATION__ = ${stringifyJSON(
+                          configuration,
+                        )};
+                        globalThis.__APPMAP_LOG_LEVEL__ = ${stringifyJSON(
+                          configuration.log.level,
+                        )};
+                        ${recorder_browser_content}
+                      }
+                    }) ());
+                  `,
+                },
+              ],
+              {
+                url: resolveHostPath(host, inc_req.url),
+                content: buffer.toString(encoding),
+              },
+            ),
+            encoding,
+          );
+          out_res.writeHead(inc_res.statusCode, inc_res.statusMessage, {
+            ...inc_res.headers,
+            "content-length": body.length,
+          });
+          out_res.end(body);
+        });
       } else if (
         hasOwnProperty(inc_res.headers, "content-type") &&
         isJavascriptContentType(inc_res.headers["content-type"])
