@@ -3,7 +3,6 @@ import {
   createConfiguration,
   extendConfiguration,
 } from "../../configuration/index.mjs";
-import { createSource } from "../../source/index.mjs";
 import { stringifyLocation } from "../../location/index.mjs";
 import { compileTrace } from "./index.mjs";
 
@@ -51,18 +50,18 @@ const tabs = {
 const location = stringifyLocation({
   hash: null,
   url: "protocol://host/home/dirname/filename.js",
-  line: 1,
-  column: 0,
+  position: { line: 1, column: 0 },
 });
 
 assertDeepEqual(
   compileTrace(
     configuration,
     [
-      createSource(
-        "protocol://host/home/dirname/filename.js",
-        "function f (x) {}",
-      ),
+      {
+        url: "protocol://host/home/dirname/filename.js",
+        content: "function f (x) {}",
+        hash: "hash",
+      },
     ],
     [
       {
@@ -195,7 +194,7 @@ assertDeepEqual(
                 {
                   type: "function",
                   name: "f",
-                  location: "dirname/filename.js:1",
+                  location: "./dirname/filename.js:1",
                   static: false,
                   labels: [],
                   comment: null,
@@ -213,7 +212,7 @@ assertDeepEqual(
           thread_id: 0,
           defined_class: "filename",
           method_id: "f",
-          path: "dirname/filename.js",
+          path: "./dirname/filename.js",
           lineno: 1,
           static: false,
           receiver: {
@@ -237,7 +236,7 @@ assertDeepEqual(
           thread_id: 0,
           defined_class: "filename",
           method_id: "f",
-          path: "dirname/filename.js",
+          path: "./dirname/filename.js",
           lineno: 1,
           static: false,
           receiver: {

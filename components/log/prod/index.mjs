@@ -1,5 +1,5 @@
-import { env } from "node:process";
 import { InternalAppmapError } from "../../error/index.mjs";
+import { readGlobal } from "../../global/index.mjs";
 import { hasOwnProperty, noop, assert, format } from "../../util/index.mjs";
 import {
   logDebug as logDebugInner,
@@ -16,11 +16,7 @@ const levels = {
   off: 5,
 };
 
-/* c8 ignore start */
-const max_level = hasOwnProperty(env, "APPMAP_LOG_LEVEL")
-  ? env.APPMAP_LOG_LEVEL
-  : "info";
-/* c8 ignore stop */
+const max_level = readGlobal("__APPMAP_LOG_LEVEL__");
 
 assert(
   hasOwnProperty(levels, max_level),

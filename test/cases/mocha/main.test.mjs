@@ -1,4 +1,4 @@
-import { strict as Assert } from "assert";
+import { strict as Assert } from "node:assert";
 import { describe, it } from "mocha";
 import { main, mainAsync } from "./main.mjs";
 const { setTimeout } = globalThis;

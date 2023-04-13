@@ -97,14 +97,20 @@ const configuration = extendConfiguration(
       type: "manual",
     },
   };
-  assertEqual(sendBackend(backend, message4), true),
-    assertDeepEqual(compileBackendAvailableTrack(backend, false), {
-      url: "protocol://host/base/dirname/process/basename.appmap.json",
-      content: {
-        configuration,
-        messages: [message1, message3],
-        termination: { type: "manual" },
-      },
-    });
+  assertEqual(sendBackend(backend, message4), true);
+  const message5 = {
+    type: "source",
+    url: "protocol://host/missing.js",
+    content: null,
+  };
+  assertEqual(sendBackend(backend, message5), true);
+  assertDeepEqual(compileBackendAvailableTrack(backend, false), {
+    url: "protocol://host/base/dirname/process/basename.appmap.json",
+    content: {
+      configuration,
+      messages: [message1, message3],
+      termination: { type: "manual" },
+    },
+  });
   assertEqual(compileBackendAvailableTrack(backend, false), null);
 }

@@ -36,10 +36,14 @@ properties:
     $ref: session
   sessions:
     $ref: regexp
+  proxy-port:
+    $ref: port-proxy
   trace-port:
     $ref: port
   trace-protocol:
     const: TCP
+  http-switch:
+    $ref: url-component
   track-port:
     $ref: port
   track-protocol:
@@ -75,7 +79,7 @@ properties:
           - type: object
             properties:
               hidden:
-                $ref: identifier-regular
+                $ref: identifier
               aliases:
                 type: array
                 items:
@@ -84,7 +88,7 @@ properties:
         anyOf:
           - type: boolean
           - const: null
-          - $ref: identifier-regular
+          - $ref: identifier
       http:
         type: boolean
       mysql:
@@ -104,10 +108,10 @@ properties:
       - $ref: process
   processes:
     anyOf:
-      - $ref: specifier-process
+      - $ref: matcher-process
       - type: array
         items:
-          $ref: specifier-process
+          $ref: matcher-process
   main:
     $ref: path
   engine:
@@ -118,10 +122,10 @@ properties:
     $ref: module
   packages:
     anyOf:
-      - $ref: specifier-module
+      - $ref: matcher-module
       - type: array
         items:
-          $ref: specifier-module
+          $ref: matcher-module
   exclude:
     $ref: exclude
   collapse-package-hierachy:

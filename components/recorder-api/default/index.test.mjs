@@ -3,14 +3,10 @@ import {
   assertDeepEqual,
   assertThrow,
 } from "../../__fixture__.mjs";
-import {
-  createConfiguration,
-  extendConfiguration,
-} from "../../configuration/index.mjs";
 import { Appmap } from "./index.mjs";
 
-const configuration = extendConfiguration(
-  createConfiguration("protocol://host/home/"),
+const appmap = new Appmap(
+  "protocol://host/home/",
   {
     name: "name1",
     recorder: "manual",
@@ -29,7 +25,6 @@ const configuration = extendConfiguration(
   "protocol://host/base/",
 );
 
-const appmap = new Appmap(configuration);
 assertEqual(
   typeof appmap.instrumentModule("123;", "protocol://host/base/main.js"),
   "string",
@@ -41,20 +36,16 @@ assertThrow(
   /^ExternalAppmapError: Invalid url argument$/u,
 );
 assertEqual(appmap.recordScript("123;", "protocol://host/base/main.js"), 123);
-assertDeepEqual(appmap.stopRecording(track), {
-  configuration: { ...configuration, name: "name2" },
-  messages: [
-    {
-      type: "source",
-      url: "protocol://host/base/main.js",
-      content: "123;",
-    },
-    {
-      type: "source",
-      url: "protocol://host/base/main.js",
-      content: "123;",
-    },
-  ],
-  termination: { type: "manual" },
-});
+assertDeepEqual(appmap.stopRecording(track).messages, [
+  {
+    type: "source",
+    url: "protocol://host/base/main.js",
+    content: "123;",
+  },
+  {
+    type: "source",
+    url: "protocol://host/base/main.js",
+    content: "123;",
+  },
+]);
 appmap.terminate();

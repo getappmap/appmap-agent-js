@@ -1,4 +1,4 @@
-import Http from "http";
+import Http from "node:http";
 import createApp from "express";
 import { assertDeepEqual, assertReject } from "../../__fixture__.mjs";
 import {

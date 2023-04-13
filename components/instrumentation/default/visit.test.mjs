@@ -4,57 +4,55 @@ import {
   extendConfiguration,
 } from "../../configuration/index.mjs";
 import { stringifyLocation } from "../../location/index.mjs";
-import { createCounter } from "../../util/index.mjs";
 import { getUrlFilename } from "../../url/index.mjs";
-import { createMirrorMapping } from "../../mapping/index.mjs";
-import {
-  createSource,
-  makeSourceLocation,
-  getSourceUrl,
-  parseSource,
-} from "../../source/index.mjs";
+import { parseEstree } from "../../parse/index.mjs";
+import { digest } from "../../hash/index.mjs";
 import { normalize, generate } from "./__fixture__.mjs";
-import { createExclusion, addExclusionSource } from "./exclusion.mjs";
+import { createCodebase } from "./codebase.mjs";
 import { visit } from "./visit.mjs";
 
 const {
+  Map,
   JSON: { stringify: stringifyJSON },
 } = globalThis;
 
-const instrument = (options) => {
-  const exclusion = createExclusion(
-    extendConfiguration(
-      createConfiguration("protocol://host/home/"),
-      {
-        packages: [
-          {
-            path: getUrlFilename(getSourceUrl(options.source)),
-            enabled: options.instrumented,
-          },
-        ],
-      },
-      getSourceUrl(options.source),
-    ),
-  );
-  addExclusionSource(exclusion, options.source);
-  return generate(
-    visit(parseSource(options.source), {
-      url: getSourceUrl(options.source),
+const instrument = (options) =>
+  generate(
+    visit(parseEstree(options.source), {
+      url: options.source.url,
       apply: "APPLY",
       eval: { hidden: "EVAL", aliases: ["eval"] },
-      mapping: createMirrorMapping(options.source),
-      exclusion,
-      counter: createCounter(0),
+      codebase: createCodebase(
+        options.source.url,
+        new Map([[options.source.url, options.source.content]]),
+        extendConfiguration(
+          createConfiguration("protocol://host/home/"),
+          {
+            packages: [
+              {
+                path: getUrlFilename(options.source.url),
+                enabled: options.instrumented,
+              },
+            ],
+          },
+          options.source.url,
+        ),
+      ),
     }),
   );
-};
 
-const makeCodeLocation = (source, line, column) =>
-  stringifyJSON(stringifyLocation(makeSourceLocation(source, line, column)));
+const makeCodeLocation = ({ url, content }, line, column) =>
+  stringifyJSON(
+    stringifyLocation({
+      url,
+      hash: digest(content),
+      position: { line, column },
+    }),
+  );
 
 // expression body //
 {
-  const source = createSource("protocol://host/script.js", "(() => 123);");
+  const source = { url: "protocol://host/script.js", content: "(() => 123);" };
   assertEqual(
     instrument({
       source,
@@ -101,10 +99,10 @@ const makeCodeLocation = (source, line, column) =>
 
 // subclass //
 {
-  const source = createSource(
-    "protocol://host/script.js",
-    "(class C extends D {\nconstructor () { 123; } })",
-  );
+  const source = {
+    url: "protocol://host/script.js",
+    content: "(class C extends D {\nconstructor () { 123; } })",
+  };
   assertEqual(
     instrument({
       source,
@@ -154,10 +152,10 @@ const makeCodeLocation = (source, line, column) =>
 
 // parameters && return //
 {
-  const source = createSource(
-    "protocol://host/script.js",
-    "((x, y = 123, ...rest) => { return 456; });",
-  );
+  const source = {
+    url: "protocol://host/script.js",
+    content: "((x, y = 123, ...rest) => { return 456; });",
+  };
   assertEqual(
     instrument({
       source,
@@ -210,10 +208,10 @@ const makeCodeLocation = (source, line, column) =>
 
 // generator //
 {
-  const source = createSource(
-    "protocol://host/script.js",
-    "(function* () { yield* 123; });",
-  );
+  const source = {
+    url: "protocol://host/script.js",
+    content: "(function* () { yield* 123; });",
+  };
   assertEqual(
     instrument({
       source,
@@ -284,16 +282,16 @@ const makeCodeLocation = (source, line, column) =>
 
 // asynchronous //
 {
-  const source = createSource(
-    "protocol://host/script.js",
-    `
+  const source = {
+    url: "protocol://host/script.js",
+    content: `
       (async () => {
         try { await 123; }
         catch (error) { 456; }
         finally { 789; }
       });
     `,
-  );
+  };
   assertEqual(
     instrument({
       source,
@@ -384,9 +382,9 @@ const makeCodeLocation = (source, line, column) =>
 // not instrumented //
 assertEqual(
   instrument({
-    source: createSource(
-      "protocol://host/script.js",
-      `
+    source: {
+      url: "protocol://host/script.js",
+      content: `
         (async function* () {
           await 'promise';
           yield 'iterator';
@@ -394,7 +392,7 @@ assertEqual(
           return 123;
         });
       `,
-    ),
+    },
     instrumented: false,
   }),
   normalize(
@@ -413,10 +411,10 @@ assertEqual(
 // module >> try without finally //
 assertEqual(
   instrument({
-    source: createSource(
-      "protocol://host/script.js",
-      "try { 123; } catch { 456; } export default 789;",
-    ),
+    source: {
+      url: "protocol://host/script.js",
+      content: "try { 123; } catch { 456; } export default 789;",
+    },
     instrumented: true,
   }),
   normalize(
@@ -450,10 +448,10 @@ assertEqual(
 // module >> try without catch //
 assertEqual(
   instrument({
-    source: createSource(
-      "protocol://host/script.js",
-      "try { 123; } finally { 456; } export default 789;",
-    ),
+    source: {
+      url: "protocol://host/script.js",
+      content: "try { 123; } finally { 456; } export default 789;",
+    },
     instrumented: true,
   }),
   normalize(
@@ -487,7 +485,10 @@ assertEqual(
 // CallExpression //
 assertEqual(
   instrument({
-    source: createSource("protocol://host/script.js#hash", "f();"),
+    source: {
+      url: "protocol://host/script.js#hash",
+      content: "f();",
+    },
     instrumented: false,
   }),
   normalize("f()", "script"),
@@ -496,7 +497,10 @@ assertEqual(
 // CallExpression >> eval //
 assertEqual(
   instrument({
-    source: createSource("protocol://host/script.js", "eval(123, 456);"),
+    source: {
+      url: "protocol://host/script.js",
+      content: "eval(123, 456);",
+    },
     instrumented: false,
   }),
   normalize(

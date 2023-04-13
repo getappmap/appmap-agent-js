@@ -1,6 +1,6 @@
-import { spawn } from "child_process";
+import { spawn } from "node:child_process";
 import { platform as getPlatform } from "node:os";
-import { rm as rmAsync } from "fs/promises";
+import { rm as rmAsync } from "node:fs/promises";
 import Mysql from "mysql";
 import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
 import { getUuid } from "../../uuid/random/index.mjs";

@@ -1,13 +1,13 @@
-import { tmpdir } from "os";
-import { pathToFileURL } from "url";
-import { strict as Assert } from "assert";
-import { createRequire } from "module";
+import { tmpdir } from "node:os";
+import { pathToFileURL } from "node:url";
+import { strict as Assert } from "node:assert";
+import { createRequire } from "node:module";
 import {
   mkdir as mkdirAsync,
   symlink as symlinkAsync,
   writeFile as writeFileAsync,
   realpath as realpathAsync,
-} from "fs/promises";
+} from "node:fs/promises";
 import { createAppMap } from "../../../lib/node/recorder-api.mjs";
 
 const { Error, Infinity, process, JSON, Math, URL } = globalThis;

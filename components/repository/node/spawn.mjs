@@ -1,4 +1,4 @@
-import { spawnSync as spawnChildProcess } from "child_process";
+import { spawnSync as spawnChildProcess } from "node:child_process";
 import { ExternalAppmapError } from "../../error/index.mjs";
 
 import { logWarning, logErrorWhen } from "../../log/index.mjs";

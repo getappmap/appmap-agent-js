@@ -1,5 +1,8 @@
 import { assertEqual } from "../../__fixture__.mjs";
-import { logWarning, logWarningWhen, logInfo } from "./index.mjs";
+import { defineGlobal } from "../../global/index.mjs";
+
+defineGlobal("__APPMAP_LOG_LEVEL__", "info");
+const { logWarning, logWarningWhen, logInfo } = await import("./index.mjs");
 
 logInfo("foo");
 logWarning("bar");

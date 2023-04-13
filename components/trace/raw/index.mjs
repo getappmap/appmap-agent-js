@@ -1,5 +1,10 @@
-import { toSourceMessage } from "../../source/index.mjs";
 import { toAbsoluteUrl } from "../../url/index.mjs";
+
+const toSourceMessage = ({ url, content }) => ({
+  type: "source",
+  url,
+  content,
+});
 
 export const compileTrace = (configuration, sources, messages, termination) => {
   const { recorder, appmap_file, appmap_dir } = configuration;

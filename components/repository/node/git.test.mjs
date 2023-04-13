@@ -1,5 +1,5 @@
-import { mkdir as mkdirAsync } from "fs/promises";
-import { execSync } from "child_process";
+import { mkdir as mkdirAsync } from "node:fs/promises";
+import { execSync } from "node:child_process";
 import { assertEqual, assertThrow } from "../../__fixture__.mjs";
 import { getUuid } from "../../uuid/random/index.mjs";
 import { getTmpUrl } from "../../path/index.mjs";

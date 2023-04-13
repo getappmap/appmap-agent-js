@@ -1,7 +1,4 @@
-import {
-  writeFile as writeFileAsync,
-  unlink as unlinkAsync,
-} from "node:fs/promises";
+import { writeFile as writeFileAsync } from "node:fs/promises";
 import {
   getInstanceEslintUrl,
   readInstanceArrayAsync,
@@ -11,65 +8,37 @@ import { readInstanceSupportAsync } from "./support.mjs";
 
 const {
   Promise,
-  Map,
-  undefined,
-  Error,
-  Reflect: { getOwnPropertyDescriptor },
-  Object: {
-    fromEntries,
-    hasOwn = (obj, key) => getOwnPropertyDescriptor(obj, key) !== undefined,
-  },
   JSON: { stringify: stringifyJSON },
 } = globalThis;
 
-export const doesNotInclude = (array, element) => !array.includes(element);
-
-const start = ["node", "browser"];
-
-const exclusion = new Map([
-  ["node", ["browser"]],
-  ["test", ["browser"]],
-  ["browser", ["node"]],
-]);
-
-export const toTrueEntry = (key) => [key, true];
-
-const getEnvExclusion = (env) => {
-  if (exclusion.has(env)) {
-    return exclusion.get(env);
-  } else {
-    throw new Error(`Missing eslint environment: ${env}`);
-  }
-};
-
-const toEslintEnvs = (envs) =>
-  start.filter(doesNotInclude.bind(undefined, envs.flatMap(getEnvExclusion)));
-
 export const writeInstanceEslintAsync = async (home, component, instance) => {
-  const eslint_envs = toEslintEnvs(
-    await readInstanceSupportAsync(home, component, instance),
-  );
-  if (eslint_envs.length === 0) {
-    try {
-      await unlinkAsync(getInstanceEslintUrl(home, component, instance));
-    } catch (error) {
-      if (!hasOwn(error, "code") || error.code !== "ENOENT") {
-        throw error;
-      }
-    }
-  } else {
-    await writeFileAsync(
-      getInstanceEslintUrl(home, component, instance),
-      stringifyJSON(
-        {
-          env: fromEntries(eslint_envs.map(toTrueEntry)),
+  const envs = await readInstanceSupportAsync(home, component, instance);
+  await writeFileAsync(
+    getInstanceEslintUrl(home, component, instance),
+    stringifyJSON(
+      {
+        env: {
+          node: !envs.includes("browser"),
+          browser: !envs.includes("node") && !envs.includes("test"),
         },
-        null,
-        2,
-      ),
-      "utf8",
-    );
-  }
+        rules: {
+          "import/no-nodejs-modules": [
+            envs.includes("browser") ? "error" : "off",
+          ],
+        },
+        overrides: [
+          {
+            files: "**/*.test.mjs",
+            env: { node: true },
+            rules: { "import/no-nodejs-modules": ["off"] },
+          },
+        ],
+      },
+      null,
+      2,
+    ),
+    "utf8",
+  );
 };
 
 export const writeComponentEslintAsync = async (home, component) => {

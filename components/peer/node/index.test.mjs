@@ -1,4 +1,7 @@
-import { mkdir as mkdirAsync, writeFile as writeFileAsync } from "fs/promises";
+import {
+  mkdir as mkdirAsync,
+  writeFile as writeFileAsync,
+} from "node:fs/promises";
 import { assertEqual, assertThrow } from "../../__fixture__.mjs";
 import { getTmpUrl } from "../../path/index.mjs";
 import { getUuid } from "../../uuid/random/index.mjs";

@@ -1,11 +1,9 @@
 import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
-import { createMirrorMapping } from "../../mapping/index.mjs";
 import { validateMessage } from "../../validate/index.mjs";
 import {
   createConfiguration,
   extendConfiguration,
 } from "../../configuration/index.mjs";
-import { createSource } from "../../source/index.mjs";
 import {
   createFrontend,
   getSession,
@@ -13,6 +11,7 @@ import {
   formatStopTrack,
   formatError,
   getSerializationEmptyValue,
+  extractMissingUrlArray,
   instrument,
   getFreshTab,
   getBundlePayload,
@@ -21,7 +20,7 @@ import {
   formatBeginAmend,
 } from "./index.mjs";
 
-const { Error } = globalThis;
+const { Map, Error } = globalThis;
 
 const configuration = extendConfiguration(
   createConfiguration("protocol://host/home"),
@@ -58,9 +57,18 @@ validateMessage(
 
 validateMessage(formatBeginAmend(frontend, 123, getBundlePayload(frontend)));
 
-{
-  const source = createSource("protocol://host/filename.js", "123;");
-  assertDeepEqual(instrument(frontend, source, createMirrorMapping(source)), {
+assertDeepEqual(
+  extractMissingUrlArray(frontend, "protocol://host/filename.js", new Map()),
+  ["protocol://host/filename.js"],
+);
+
+assertDeepEqual(
+  instrument(
+    frontend,
+    "protocol://host/filename.js",
+    new Map([["protocol://host/filename.js", "123;"]]),
+  ),
+  {
     url: "protocol://host/filename.js",
     content: "123;\n",
     messages: [
@@ -70,5 +78,5 @@ validateMessage(formatBeginAmend(frontend, 123, getBundlePayload(frontend)));
         content: "123;",
       },
     ],
-  });
-}
+  },
+);

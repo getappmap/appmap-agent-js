@@ -1,5 +1,5 @@
-import { connect } from "net";
-import { Buffer } from "buffer";
+import { connect } from "node:net";
+import { Buffer } from "node:buffer";
 import NetSocketMessaging from "net-socket-messaging";
 import { toIpcPath, convertFileUrlToPath } from "../../path/index.mjs";
 import { mapMaybe } from "../../util/index.mjs";
@@ -20,7 +20,12 @@ const flush = (socket, messages) => {
   }
 };
 
-export const openSocket = (host, port, { heartbeat, threshold }) => {
+export const openSocket = ({
+  host,
+  "trace-port": port,
+  heartbeat,
+  threshold,
+}) => {
   const socket =
     typeof port === "string"
       ? connect(toIpcPath(convertFileUrlToPath(port)))

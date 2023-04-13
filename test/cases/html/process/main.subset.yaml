@@ -1,0 +1,13 @@
+events:
+  - event: call
+    id: 1
+    method_id: internal
+  - event: return
+    id: 2
+    parent_id: 1
+  - event: call
+    id: 3
+    method_id: external
+  - event: return
+    id: 4
+    parent_id: 3

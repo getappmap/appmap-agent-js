@@ -1,7 +1,7 @@
 import { assert, createCounter, incrementCounter } from "../../util/index.mjs";
 import {
-  createInstrumentation,
   instrument as instrumentInner,
+  extractMissingUrlArray as extractMissingUrlArrayInner,
 } from "../../instrumentation/index.mjs";
 import {
   createSerialization,
@@ -9,7 +9,6 @@ import {
   getSerializationEmptyValue as getSerializationEmptyValueInner,
 } from "../../serialization/index.mjs";
 import { InternalAppmapError } from "../../error/index.mjs";
-import { toSourceMessage } from "../../source/index.mjs";
 export {
   getJumpPayload,
   getBundlePayload,
@@ -60,7 +59,7 @@ export const createFrontend = (configuration) => {
     counter: createCounter(0),
     session: configuration.session,
     serialization: createSerialization(configuration),
-    instrumentation: createInstrumentation(configuration),
+    configuration,
   };
 };
 
@@ -69,18 +68,11 @@ export const getFreshTab = ({ counter }) => incrementCounter(counter);
 export const getSerializationEmptyValue = ({ serialization }) =>
   getSerializationEmptyValueInner(serialization);
 
-export const instrument = ({ instrumentation }, file, mapping) => {
-  const { url, content, sources } = instrumentInner(
-    instrumentation,
-    file,
-    mapping,
-  );
-  return {
-    url,
-    content,
-    messages: sources.map(toSourceMessage),
-  };
-};
+export const extractMissingUrlArray = ({ configuration }, url, cache) =>
+  extractMissingUrlArrayInner(url, cache, configuration);
+
+export const instrument = ({ configuration }, url, cache) =>
+  instrumentInner(url, cache, configuration);
 
 export const formatError = ({ session, serialization }, value) => ({
   type: "error",

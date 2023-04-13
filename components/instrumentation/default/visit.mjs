@@ -8,10 +8,9 @@ import {
   hasOwnProperty,
   coalesce,
 } from "../../util/index.mjs";
-import { mapSource } from "../../mapping/index.mjs";
 import { logErrorWhen } from "../../log/index.mjs";
 import { stringifyLocation } from "../../location/index.mjs";
-import { isExcluded } from "./exclusion.mjs";
+import { resolveClosureLocation } from "./codebase.mjs";
 
 const {
   Error,
@@ -20,8 +19,6 @@ const {
   Object: { fromEntries },
   Reflect: { ownKeys },
 } = globalThis;
-
-const getUrl = ({ url }) => url;
 
 //////////////////////////////
 // Difficulties with groups //
@@ -314,20 +311,16 @@ const visitGeneric = (node, parent, _grand_parent, closure, context) =>
   );
 
 const instrumentClosure = (node, parent, grand_parent, closure, context) => {
-  const location = mapSource(
-    context.mapping,
-    node.loc.start.line,
-    node.loc.start.column,
+  const maybe_location = resolveClosureLocation(
+    context.codebase,
+    node.loc.start,
   );
   closure = {
     node,
-    instrumented:
-      context.apply !== null &&
-      location !== null &&
-      !isExcluded(context.exclusion, location),
+    instrumented: context.apply !== null && maybe_location !== null,
   };
   if (closure.instrumented) {
-    const location_string = stringifyLocation(location);
+    const location_string = stringifyLocation(maybe_location);
     return makeClosure(
       node.type,
       node.async,
@@ -658,14 +651,9 @@ const instrumenters = {
       context.eval.aliases.includes(node.callee.name) &&
       node.arguments.length > 0
     ) {
-      const location = mapSource(
-        context.mapping,
-        node.loc.start.line,
-        node.loc.start.column,
-      );
       return makeCallExpression(makeIdentifier(node.callee.name), [
         makeCallExpression(makeIdentifier(context.eval.hidden), [
-          makeLiteral(mapMaybe(location, getUrl)),
+          makeLiteral(context.url),
           makeLiteral(
             `${String(node.loc.start.line)}-${String(node.loc.start.column)}`,
           ),

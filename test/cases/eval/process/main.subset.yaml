@@ -7,7 +7,7 @@ classMap:
         children:
           - type: function
             name: f
-            location: main.mjs:3
+            location: ./main.mjs:3
   - type: package
     name: main.mjs
     children:
@@ -16,13 +16,13 @@ classMap:
         children:
           - type: function
             name: g
-            location: main.mjs/eval-7-2.js#0:1
+            location: ./main.mjs/eval-7-2.js#0:1
       - type: class
         name: eval-7-2
         children:
           - type: function
             name: h
-            location: main.mjs/eval-7-2.js#1:1
+            location: ./main.mjs/eval-7-2.js#1:1
 events:
   - event: call
     method_id: f

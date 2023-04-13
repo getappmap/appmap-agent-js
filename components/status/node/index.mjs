@@ -1,6 +1,6 @@
-import { execSync } from "child_process";
-import os from "os";
-import { readFile as readFileAsync } from "fs/promises";
+import { execSync } from "node:child_process";
+import os from "node:os";
+import { readFile as readFileAsync } from "node:fs/promises";
 import semver from "semver";
 import { self_directory, self_package } from "../../self/index.mjs";
 

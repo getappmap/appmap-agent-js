@@ -60,10 +60,14 @@ properties:
       - $ref: session
   sessions:
     $ref: regexp
+  proxy-port:
+    $ref: port-proxy
   trace-port:
     $ref: port-cooked
   trace-protocol:
     const: TCP
+  http-switch:
+    $ref: url-component
   track-port:
     $ref: port-cooked
   track-protocol:
@@ -102,7 +106,7 @@ properties:
         type: object
         properties:
           hidden:
-            $ref: identifier-regular
+            $ref: identifier
           aliases:
             type: array
             items:
@@ -110,7 +114,7 @@ properties:
       apply:
         anyOf:
           - const: null
-          - $ref: identifier-regular
+          - $ref: identifier
       http:
         type: boolean
       mysql:
@@ -133,7 +137,7 @@ properties:
       minItems: 2
       maxItems: 2
       items:
-        - $ref: specifier-cooked
+        - $ref: matcher-cooked
         - $ref: process
   main:
     anyOf:
@@ -153,7 +157,7 @@ properties:
       minItems: 2
       maxItems: 2
       items:
-        - $ref: specifier-cooked
+        - $ref: matcher-cooked
         - $ref: module-cooked
   exclude:
     $ref: exclude-cooked

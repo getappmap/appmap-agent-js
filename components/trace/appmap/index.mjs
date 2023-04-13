@@ -4,13 +4,9 @@ import {
 } from "../../error/index.mjs";
 import { logError, logDebug, logInfo } from "../../log/index.mjs";
 import { validateAppmap } from "../../validate-appmap/index.mjs";
-import { compileMetadata } from "./metadata.mjs";
-import {
-  createClassmap,
-  addClassmapSource,
-  compileClassmap,
-} from "../../classmap/index.mjs";
 import { stringifyLocation, parseLocation } from "../../location/index.mjs";
+import { createCodebase, exportClassmap } from "./codebase/index.mjs";
+import { compileMetadata } from "./metadata.mjs";
 import { digestEventTrace } from "./event/index.mjs";
 import { orderEventArray } from "./ordering/index.mjs";
 import { getOutputUrl } from "./output.mjs";
@@ -61,7 +57,7 @@ const cleanupLocationString = (string) =>
     hash: null,
   });
 
-export const compileTrace = (configuration, sources, messages, termination) => {
+export const compileTrace = (configuration, files, messages, termination) => {
   logDebug("Trace: %j", messages);
   const errors = [];
   const events = [];
@@ -164,14 +160,11 @@ export const compileTrace = (configuration, sources, messages, termination) => {
     printEventDistribution,
     printApplyDistribution,
   );
-  const classmap = createClassmap(configuration);
-  for (const source of sources) {
-    addClassmapSource(classmap, source);
-  }
+  const codebase = createCodebase(files, configuration);
   let digested_events = null;
   /* c8 ignore start */
   try {
-    digested_events = digestEventTrace(orderEventArray(events), classmap);
+    digested_events = digestEventTrace(orderEventArray(events), codebase);
   } catch (error) {
     if (error instanceof RangeError) {
       logError(stackoverflow_message);
@@ -187,7 +180,7 @@ export const compileTrace = (configuration, sources, messages, termination) => {
   const appmap = {
     version: VERSION,
     metadata: compileMetadata(configuration, errors, termination),
-    classMap: compileClassmap(classmap),
+    classMap: exportClassmap(codebase),
     events: digested_events,
   };
   if (configuration.validate.appmap) {

@@ -1,6 +1,5 @@
 export const {
   String,
-  RegExp,
   Array: { isArray },
   Reflect: { ownKeys, getOwnPropertyDescriptor },
   JSON: { stringify: stringifyJSON },

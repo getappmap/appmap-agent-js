@@ -6,7 +6,8 @@ import { assert, hasOwnProperty } from "../../util/index.mjs";
 import { convertPathToFileUrl } from "../../path/index.mjs";
 import { ExternalAppmapError } from "../../error/index.mjs";
 import { logErrorWhen } from "../../log/index.mjs";
-import { toDirectoryUrl } from "../../url/index.mjs";
+import { getUuid } from "../../uuid/index.mjs";
+import { toAbsoluteUrl, toDirectoryUrl } from "../../url/index.mjs";
 // TODO: Make a stateless agent.
 // - counter to index references
 // - counter to index events
@@ -90,7 +91,12 @@ const transform = (
       code: instrument(
         agent,
         { url, type: is_module ? "module" : "script", content: source.code },
-        source.map === null ? null : { url, content: source.map },
+        source.map === null
+          ? null
+          : {
+              url: toAbsoluteUrl(`${getUuid()}.sourcemap.json`, url),
+              content: source.map,
+            },
       ),
       map: null,
     };

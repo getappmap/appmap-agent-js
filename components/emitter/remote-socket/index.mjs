@@ -15,15 +15,8 @@ const {
 } = globalThis;
 
 export const openEmitter = (configuration) => {
-  let {
-    host,
-    "trace-port": trace_port,
-    "track-port": track_port,
-  } = configuration;
-  if (host === "localhost") {
-    host = "127.0.0.1";
-  }
-  const socket = openSocket(host, trace_port, configuration);
+  const { host, "track-port": track_port } = configuration;
+  const socket = openSocket(configuration);
   return { socket, host, track_port, closed: createBox(false) };
 };
 

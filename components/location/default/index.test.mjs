@@ -5,6 +5,14 @@ const test = (location) => {
   assertDeepEqual(parseLocation(stringifyLocation(location)), location);
 };
 
-test({ hash: "hash", url: "protocol://host/path", line: 123, column: 456 });
+test({
+  hash: "hash",
+  url: "protocol://host/path",
+  position: { line: 123, column: 456 },
+});
 
-test({ hash: null, url: "protocol://host/path", line: 123, column: 456 });
+test({
+  hash: null,
+  url: "protocol://host/path",
+  position: { line: 123, column: 456 },
+});

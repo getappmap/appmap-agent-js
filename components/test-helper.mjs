@@ -1,8 +1,8 @@
 /* eslint-env node */
 /* eslint-disable no-console */
 
-import { dirname } from "path";
-import { fileURLToPath } from "url";
+import { dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 import glob from "glob";
 import Mocha from "mocha";
 

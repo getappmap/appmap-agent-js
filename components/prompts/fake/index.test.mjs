@@ -1,5 +1,6 @@
+import { defineGlobal } from "../../global/index.mjs";
 import { prompts } from "./index.mjs";
 
-globalThis.GLOBAL_PROMPTS = (prompt) => prompt;
+defineGlobal("GLOBAL_PROMPTS", (prompt) => prompt);
 
 prompts({});

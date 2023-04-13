@@ -1,1 +1,1 @@
-export { executionAsyncId as getCurrentGroup } from "async_hooks";
+export { executionAsyncId as getCurrentGroup } from "node:async_hooks";

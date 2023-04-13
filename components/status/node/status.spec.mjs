@@ -1,6 +1,6 @@
 /* eslint-disable no-undef */
 
-import { strict as assert } from "assert";
+import { strict as assert } from "node:assert";
 import * as sinon from "sinon";
 import "../../__fixture__.mjs";
 import { main, run, externals } from "./index.mjs";

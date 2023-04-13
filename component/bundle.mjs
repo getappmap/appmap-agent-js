@@ -44,7 +44,7 @@ const isExternal = (specifier, parent, resolved) => {
   }
 };
 
-export const bundleAsync = async (home, component, env, resolution) => {
+export const bundleAsync = async (home, name, component, env, resolution) => {
   await routeAsync(home, env, resolution);
   await (
     await rollup({
@@ -52,6 +52,6 @@ export const bundleAsync = async (home, component, env, resolution) => {
       input: fileURLToPath(getComponentMainUrl(home, component)),
     })
   ).write({
-    file: fileURLToPath(getBundleUrl(home, component)),
+    file: fileURLToPath(getBundleUrl(home, name)),
   });
 };

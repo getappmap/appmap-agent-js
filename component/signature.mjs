@@ -1,4 +1,4 @@
-import { readFile as readFileAsync } from "fs/promises";
+import { readFile as readFileAsync } from "node:fs/promises";
 import BabelParser from "@babel/parser";
 import {
   readInstanceArrayAsync,

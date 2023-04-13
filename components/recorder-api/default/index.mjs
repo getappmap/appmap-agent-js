@@ -5,8 +5,12 @@ import {
 import { logError, logErrorWhen } from "../../log/index.mjs";
 import { assert } from "../../util/index.mjs";
 import { getUuid } from "../../uuid/index.mjs";
+import { toDirectoryUrl } from "../../url/index.mjs";
 import { runScript } from "../../interpretation/index.mjs";
-import { extendConfiguration } from "../../configuration/index.mjs";
+import {
+  createConfiguration,
+  extendConfiguration,
+} from "../../configuration/index.mjs";
 import { resolveConfigurationManualRecorder } from "../../configuration-accessor/index.mjs";
 import { hook, unhook } from "../../hook/index.mjs";
 import {
@@ -50,7 +54,7 @@ const expectRunning = (hooking) => {
 };
 
 export class Appmap {
-  constructor(configuration) {
+  constructor(home, conf, base) {
     assert(
       !logErrorWhen(
         global_running,
@@ -59,7 +63,13 @@ export class Appmap {
       "Concurrent appmap instances",
       ExternalAppmapError,
     );
-    configuration = resolveConfigurationManualRecorder(configuration);
+    const configuration = resolveConfigurationManualRecorder(
+      extendConfiguration(
+        createConfiguration(toDirectoryUrl(home)),
+        conf,
+        toDirectoryUrl(base),
+      ),
+    );
     this.configuration = configuration;
     this.agent = openAgent(configuration);
     this.hooking = hook(this.agent, configuration);

@@ -1,5 +1,5 @@
-import { spawnSync } from "child_process";
-import { readdirSync as readdir } from "fs";
+import { spawnSync } from "node:child_process";
+import { readdirSync as readdir } from "node:fs";
 import { convertFileUrlToPath } from "../../path/index.mjs";
 import { ExternalAppmapError } from "../../error/index.mjs";
 

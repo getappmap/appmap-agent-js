@@ -1,6 +1,7 @@
 import { assertEqual } from "../../__fixture__.mjs";
+import { defineGlobal } from "../../global/index.mjs";
 
-globalThis.performance = { now: () => 0 };
+defineGlobal("performance", { now: () => 0 });
 
 const { now } = await import("./index.mjs");
 

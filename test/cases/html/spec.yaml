@@ -1,0 +1,8 @@
+# not sure what is happening but jsdom
+# does not seems to interact weel with
+# windows.
+# Even `node test/cases/html/base.mjs`
+# does not work...
+os: ^(?!win32$)
+commands:
+  - node spec.mjs $1

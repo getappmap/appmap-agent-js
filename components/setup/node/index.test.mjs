@@ -11,6 +11,7 @@ import {
   convertFileUrlToPath,
   convertPathToFileUrl,
 } from "../../path/index.mjs";
+import { defineGlobal } from "../../global/index.mjs";
 import { toAbsoluteUrl } from "../../url/index.mjs";
 import { assertEqual } from "../../__fixture__.mjs";
 
@@ -18,7 +19,7 @@ import { mainAsync } from "./index.mjs";
 
 const { URL, process } = globalThis;
 
-globalThis.GLOBAL_PROMPTS = () => ({ value: false });
+defineGlobal("GLOBAL_PROMPTS", () => ({ value: false }));
 
 const base = toAbsoluteUrl(`${getUuid()}/`, getTmpUrl());
 

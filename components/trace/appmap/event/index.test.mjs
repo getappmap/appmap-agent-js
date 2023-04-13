@@ -4,8 +4,7 @@ import {
   createConfiguration,
   extendConfiguration,
 } from "../../../configuration/index.mjs";
-import { createSource } from "../../../source/index.mjs";
-import { createClassmap, addClassmapSource } from "../../../classmap/index.mjs";
+import { createCodebase } from "../codebase/index.mjs";
 import { digestEventTrace } from "./index.mjs";
 
 const makeEvent = (site, tab, payload) => ({
@@ -94,14 +93,21 @@ assertDeepEqual(
         end: makeEvent("end", 123, makeBundlePayload()),
       },
     ],
-    createClassmap(createConfiguration("protocol://host/home")),
+    createCodebase([], createConfiguration("protocol://host/home")),
   ).map(getEvent),
   [],
 );
 
 // apply //
 for (const shallow of [true, false]) {
-  const classmap = createClassmap(
+  const codebase = createCodebase(
+    [
+      {
+        url: "protocol://host/home/filename.js",
+        content: "function f (x) {}",
+        hash: "hash",
+      },
+    ],
     extendConfiguration(
       createConfiguration("protocol://host/home"),
       {
@@ -116,15 +122,10 @@ for (const shallow of [true, false]) {
       "protocol://host/home/",
     ),
   );
-  addClassmapSource(
-    classmap,
-    createSource("protocol://host/home/filename.js", "function f (x) {}"),
-  );
   const location = stringifyLocation({
     url: "protocol://host/home/filename.js",
     hash: null,
-    line: 1,
-    column: 0,
+    position: { line: 1, column: 0 },
   });
   assertDeepEqual(
     digestEventTrace(
@@ -142,7 +143,7 @@ for (const shallow of [true, false]) {
           end: makeEvent("end", 123, makeReturnPayload(location)),
         },
       ],
-      classmap,
+      codebase,
     ).map(getEvent),
     shallow ? ["call", "return"] : ["call", "call", "return", "return"],
   );
@@ -153,8 +154,7 @@ for (const shallow of [true, false]) {
   const location = stringifyLocation({
     url: "protocol://host/home/filename.js",
     hash: null,
-    line: 1,
-    column: 0,
+    position: { line: 1, column: 0 },
   });
   const bundle = {
     type: "bundle",
@@ -172,7 +172,7 @@ for (const shallow of [true, false]) {
     digestEventTrace(
       // double bundle to exercise cache
       [bundle, bundle],
-      createClassmap(createConfiguration("protocol://host/home")),
+      createCodebase([], createConfiguration("protocol://host/home")),
     ).map(getEvent),
     ["call", "return", "call", "return"],
   );
@@ -195,7 +195,7 @@ assertDeepEqual(
         end: makeEvent("end", 123, makeResponsePayload("server")),
       },
     ],
-    createClassmap(createConfiguration("protocol://host/home")),
+    createCodebase([], createConfiguration("protocol://host/home")),
   ).map(getEvent),
   ["call", "call", "return", "return"],
 );

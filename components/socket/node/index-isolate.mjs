@@ -1,10 +1,11 @@
 import { createRequire } from "node:module";
+import { InternalAppmapError } from "../../error/index.mjs";
 import { hasOwnProperty } from "../../util/index.mjs";
 import * as NetSocket from "./net.mjs";
 import { generateUnixSocket } from "./unix.mjs";
 
-export const generateSocket = (env) => {
-  if (hasOwnProperty(env, "APPMAP_SOCKET") && env.APPMAP_SOCKET === "unix") {
+export const generateSocket = (implementation) => {
+  if (implementation === "unix") {
     const require = createRequire(import.meta.url);
     try {
       const PosixSocket = require("posix-socket");
@@ -21,7 +22,9 @@ export const generateSocket = (env) => {
         throw error;
       }
     } /* c8 ignore stop */
-  } else {
+  } else if (implementation === "net") {
     return NetSocket;
+  } else {
+    throw new InternalAppmapError("invalid socket implementation name");
   }
 };

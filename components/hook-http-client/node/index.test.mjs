@@ -1,5 +1,5 @@
+import Http from "node:http";
 import { assertDeepEqual } from "../../__fixture__.mjs";
-import Http from "http";
 import { testHookAsync } from "../../hook-fixture/index.mjs";
 import * as HookHttpClient from "./index.mjs";
 

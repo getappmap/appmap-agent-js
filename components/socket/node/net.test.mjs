@@ -2,7 +2,7 @@ import { assertDeepEqual } from "../../__fixture__.mjs";
 import { getUuid } from "../../uuid/random/index.mjs";
 import { getTmpUrl } from "../../path/index.mjs";
 import { toAbsoluteUrl } from "../../url/index.mjs";
-import { openSocket, closeSocket, sendSocket } from "./index.mjs";
+import { openSocket, closeSocket, sendSocket } from "./net.mjs";
 import { testAsync } from "./__fixture__.mjs";
 
 const { Promise, setTimeout } = globalThis;
@@ -13,7 +13,9 @@ const sleepAsync = (ms) =>
   });
 
 const runAsync = async (port) => {
-  const socket = openSocket("localhost", port, {
+  const socket = openSocket({
+    host: "localhost",
+    "trace-port": port,
     heartbeat: 10000,
     threshold: 0,
   });

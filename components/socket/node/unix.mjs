@@ -13,7 +13,10 @@ export const generateUnixSocket = (
 ) => ({
   closeSocket,
   sendSocket,
-  openSocket: (host, port, _configuration) => {
+  openSocket: ({ host, "trace-port": port }) => {
+    if (host === "localhost") {
+      host = "127.0.0.1";
+    }
     const fd = createSocket(
       typeof port === "number" ? AF_INET : AF_UNIX,
       SOCK_STREAM,

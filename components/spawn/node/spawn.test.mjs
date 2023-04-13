@@ -1,10 +1,10 @@
+import process from "node:process";
 import {
   assertDeepEqual,
   assertEqual,
   assertReject,
 } from "../../__fixture__.mjs";
 import { getCwdUrl } from "../../path/index.mjs";
-import process from "node:process";
 import { killAllAsync, spawnAsync } from "./spawn.mjs";
 
 const { Set } = globalThis;

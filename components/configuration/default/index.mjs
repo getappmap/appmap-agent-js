@@ -2,10 +2,9 @@ import { logInfoWhen } from "../../log/index.mjs";
 import { hasOwnProperty, coalesce, identity } from "../../util/index.mjs";
 import { toAbsoluteUrl, toDirectoryUrl } from "../../url/index.mjs";
 import { validateExternalConfiguration } from "../../validate/index.mjs";
-import { createSpecifier } from "../../specifier/index.mjs";
+import { createMatcher } from "../../matcher/index.mjs";
 
 const {
-  URL,
   Array: { isArray },
   Reflect: { ownKeys },
   Object: { entries: toEntries },
@@ -16,8 +15,6 @@ const HOOK_APPLY_GLOBAL = "APPMAP_HOOK_APPLY";
 const HOOK_EVAL_GLOBAL = "APPMAP_HOOK_EVAL";
 
 const EXPECTED_EXTRA_PROPERTIES = ["test_recording"];
-
-const resolveUrl = (url, base) => new URL(url, base).href;
 
 ////////////
 // Extend //
@@ -150,14 +147,14 @@ const normalizeLog = (log, base) => {
     log = { level: log };
   }
   if (hasOwnProperty(log, "file") && typeof log.file !== "number") {
-    log.file = resolveUrl(log.file, base);
+    log.file = toAbsoluteUrl(log.file, base);
   }
   return log;
 };
 
 const normalizePort = (port, base) => {
   if (typeof port === "string" && port !== "") {
-    port = resolveUrl(port, base);
+    port = toAbsoluteUrl(port, base);
   }
   return port;
 };
@@ -184,9 +181,9 @@ const normalizeFramework = generateNormalizeSplit("@", "name", "version");
 const normalizeFrameworkArray = (frameworks) =>
   frameworks.map(normalizeFramework);
 
-const normalizePackageSpecifier = (specifier, base) => {
-  if (typeof specifier === "string") {
-    specifier = { glob: specifier };
+const normalizePackageMatcher = (matcher, base) => {
+  if (typeof matcher === "string") {
+    matcher = { glob: matcher };
   }
   const {
     enabled,
@@ -197,12 +194,12 @@ const normalizePackageSpecifier = (specifier, base) => {
   } = {
     enabled: true,
     "inline-source": null,
-    shallow: hasOwnProperty(specifier, "dist"),
+    shallow: hasOwnProperty(matcher, "dist"),
     exclude: [],
-    ...specifier,
+    ...matcher,
   };
   return [
-    createSpecifier(rest, base),
+    createMatcher(rest, base),
     {
       enabled,
       "inline-source": inline,
@@ -212,33 +209,29 @@ const normalizePackageSpecifier = (specifier, base) => {
   ];
 };
 
-const normalizePackages = (specifiers, base) => {
-  if (!isArray(specifiers)) {
-    specifiers = [specifiers];
+const normalizePackageMatcherArray = (matchers, base) => {
+  if (!isArray(matchers)) {
+    matchers = [matchers];
   }
-  return specifiers.map((specifier) =>
-    normalizePackageSpecifier(specifier, base),
-  );
+  return matchers.map((matcher) => normalizePackageMatcher(matcher, base));
 };
 
-const normalizeProcessSpecifier = (specifier, base) => {
-  if (typeof specifier === "string") {
-    specifier = { glob: specifier };
+const normalizeProcessMatcher = (matcher, base) => {
+  if (typeof matcher === "string") {
+    matcher = { glob: matcher };
   }
   const { enabled, ...rest } = {
     enabled: true,
-    ...specifier,
+    ...matcher,
   };
-  return [createSpecifier(rest, base), { enabled }];
+  return [createMatcher(rest, base), { enabled }];
 };
 
-const normalizeProcesses = (specifiers, base) => {
-  if (!isArray(specifiers)) {
-    specifiers = [specifiers];
+const normalizeProcesseMatcherArray = (matchers, base) => {
+  if (!isArray(matchers)) {
+    matchers = [matchers];
   }
-  return specifiers.map((specifier) =>
-    normalizeProcessSpecifier(specifier, base),
-  );
+  return matchers.map((matcher) => normalizeProcessMatcher(matcher, base));
 };
 
 ////////////
@@ -314,9 +307,17 @@ const fields = {
     extend: overwrite,
     normalize: identity,
   },
+  "proxy-port": {
+    extend: overwrite,
+    normalize: identity,
+  },
   "trace-port": {
     extend: overwrite,
     normalize: normalizePort,
+  },
+  "http-switch": {
+    extend: overwrite,
+    normalize: identity,
   },
   "trace-protocol": {
     extend: overwrite,
@@ -348,7 +349,7 @@ const fields = {
   },
   processes: {
     extend: prepend,
-    normalize: normalizeProcesses,
+    normalize: normalizeProcesseMatcherArray,
   },
   recorder: {
     extend: overwrite,
@@ -392,7 +393,7 @@ const fields = {
   },
   packages: {
     extend: prepend,
-    normalize: normalizePackages,
+    normalize: normalizePackageMatcherArray,
   },
   exclude: {
     extend: prepend,
@@ -481,7 +482,9 @@ export const createConfiguration = (home) => ({
   host: "localhost",
   session: null,
   sessions: "^",
+  "proxy-port": null,
   "trace-port": 0, // possibly overwritten by the agent
+  "http-switch": "__APPMAP__",
   "trace-protocol": "TCP",
   "track-port": 0, // possibly overwritten by the agent
   "track-protocol": "HTTP/1.1",

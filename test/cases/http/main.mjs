@@ -1,4 +1,4 @@
-import Http from "http";
+import Http from "node:http";
 const { String } = globalThis;
 const server = Http.createServer();
 server.on("request", function onServerRequest(request, response) {

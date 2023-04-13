@@ -5,32 +5,19 @@
 //   throw new ExternalAppmapError("lib/emitter/hook/esm.js must be preloaded with --experimental loader");
 // }};
 
+import { defineGlobal, writeGlobal } from "../../global/index.mjs";
 import { toAbsoluteUrl, toDirectoryUrl } from "../../url/index.mjs";
 import { InternalAppmapError } from "../../error/index.mjs";
-import { assert, hasOwnProperty } from "../../util/index.mjs";
+import { assert } from "../../util/index.mjs";
 import { instrument } from "../../agent/index.mjs";
 
-const {
-  String,
-  Reflect: { defineProperty },
-} = globalThis;
+const { String } = globalThis;
 
 const forward = (_url, _location, content) => content;
 
 export const unhook = (maybe_hidden) => {
   if (maybe_hidden !== null) {
-    assert(
-      hasOwnProperty(globalThis, maybe_hidden),
-      "global eval hook variable not defined",
-      InternalAppmapError,
-    );
-    defineProperty(globalThis, maybe_hidden, {
-      __proto__: null,
-      writable: false,
-      enumerable: false,
-      configurable: true,
-      value: forward,
-    });
+    writeGlobal(maybe_hidden, forward);
   }
 };
 
@@ -45,28 +32,25 @@ export const hook = (
   const enabled = aliases.length > 0;
   if (enabled) {
     assert(
-      !hasOwnProperty(globalThis, hidden),
+      defineGlobal(
+        hidden,
+        (url, position, content) =>
+          instrument(
+            agent,
+            {
+              type: "script",
+              // We do not need to use a unique filename
+              // because we support dynamic sources.
+              url: toAbsoluteUrl(`eval-${position}.js`, toDirectoryUrl(url)),
+              content: String(content),
+            },
+            null,
+          ),
+        true,
+      ),
       "global eval hook variable already defined",
       InternalAppmapError,
     );
-    defineProperty(globalThis, hidden, {
-      __proto__: null,
-      writable: false,
-      enumerable: false,
-      configurable: true,
-      value: (url, position, content) =>
-        instrument(
-          agent,
-          {
-            type: "script",
-            // We do not need to use a unique filename
-            // because we support dynamic sources.
-            url: toAbsoluteUrl(`eval-${position}.js`, toDirectoryUrl(url)),
-            content: String(content),
-          },
-          null,
-        ),
-    });
   }
   return enabled ? hidden : null;
 };

@@ -1,11 +1,11 @@
-import { join as joinPath } from "path";
-import { pathToFileURL, fileURLToPath } from "url";
-import { writeFile } from "fs/promises";
-import { tmpdir } from "os";
-import { request as createRequest } from "http";
-import { strict as Assert } from "assert";
+import { join as joinPath } from "node:path";
+import { pathToFileURL, fileURLToPath } from "node:url";
+import { writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { request as createRequest } from "node:http";
+import { strict as Assert } from "node:assert";
+import { Buffer } from "node:buffer";
 import { runAsync } from "./__fixture__.mjs";
-import { Buffer } from "buffer";
 
 const {
   URL,

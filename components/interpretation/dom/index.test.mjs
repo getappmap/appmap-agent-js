@@ -1,6 +1,7 @@
 import { assertDeepEqual } from "../../__fixture__.mjs";
+import { defineGlobal } from "../../global/index.mjs";
 
-globalThis.document = {
+defineGlobal("document", {
   createElement: (tag) => ({
     tag,
     type: null,
@@ -15,7 +16,7 @@ globalThis.document = {
       });
     },
   },
-};
+});
 
 const { runScript } = await import("./index.mjs");
 

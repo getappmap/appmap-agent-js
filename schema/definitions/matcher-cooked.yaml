@@ -1,0 +1,17 @@
+anyOf:
+  - type: boolean
+  - type: object
+    additionalProperties: false
+    required:
+      - base
+      - source
+      - flags
+    properties:
+      base:
+        anyOf:
+          - const: null
+          - $ref: url
+      source:
+        type: string
+      flags:
+        type: string

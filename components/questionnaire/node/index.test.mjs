@@ -1,4 +1,5 @@
 import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
+import { defineGlobal, writeGlobal } from "../../global/index.mjs";
 import { validateExternalConfiguration } from "../../validate/index.mjs";
 import { questionConfigAsync } from "./index.mjs";
 
@@ -6,15 +7,17 @@ const { Symbol } = globalThis;
 
 const BREAK = {};
 
+defineGlobal("GLOBAL_PROMPTS", null, true);
+
 const runAsync = async (answers) => {
   const iterator = answers[Symbol.iterator]();
-  globalThis.GLOBAL_PROMPTS = ({ name, ...prompt }) => {
+  writeGlobal("GLOBAL_PROMPTS", ({ name, ...prompt }) => {
     const answer = iterator.next().value(prompt);
     if (answer === BREAK) {
       return {};
     }
     return { [name]: answer };
-  };
+  });
   const configuration = await questionConfigAsync();
   assertEqual(iterator.next().done, true);
   validateExternalConfiguration(configuration);
