@@ -1,3 +1,19 @@
+# [13.7.0](https://github.com/getappmap/appmap-agent-js/compare/v13.6.0...v13.7.0) (2023-04-13)
+
+
+### Features
+
+* can record files with external urls ([c697916](https://github.com/getappmap/appmap-agent-js/commit/c697916df0ae13551eb2875a7f513640be134e93))
+* record browser applications with man-in-the-middle proxy ([e896646](https://github.com/getappmap/appmap-agent-js/commit/e896646291b9ccddeb54254af98000d9cfdad1f5))
+* support package and process matching against absolute url ([fadae4e](https://github.com/getappmap/appmap-agent-js/commit/fadae4e56aff4d52dd84c8d11ce51ec6ad7a1c48))
+
+
+### Performance Improvements
+
+* add dead instance in source component ([263756e](https://github.com/getappmap/appmap-agent-js/commit/263756ed56ecc814707749d21a13a34eda7a8020))
+* cache browser recorder bundle to speed up html instrumentation ([662d759](https://github.com/getappmap/appmap-agent-js/commit/662d759734b00e61191d2199fe81447e99cc99f0))
+* frontend no longer validate data ([13cfc30](https://github.com/getappmap/appmap-agent-js/commit/13cfc30206c08876d0df8ddb866c8fad266ad9a8))
+
 # [13.6.0](https://github.com/getappmap/appmap-agent-js/compare/v13.5.2...v13.6.0) (2023-03-14)
 
 
