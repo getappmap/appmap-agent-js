@@ -12,3 +12,7 @@ anyOf:
         nullable: true
       exclude:
         $ref: exclude
+      source-type:
+        $ref: source-type
+      parsing:
+        $ref: parsing

@@ -128,6 +128,8 @@ assertThrow(
       shallow: false,
       exclude: [],
       "inline-source": null,
+      "source-type": null,
+      parsing: null,
     },
   );
   assertDeepEqual(
@@ -140,6 +142,8 @@ assertThrow(
       shallow: false,
       exclude: [],
       "inline-source": null,
+      "source-type": null,
+      parsing: null,
     },
   );
   assertDeepEqual(
@@ -152,6 +156,8 @@ assertThrow(
       shallow: false,
       exclude: [],
       "inline-source": null,
+      "source-type": null,
+      parsing: null,
     },
   );
 }

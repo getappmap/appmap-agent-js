@@ -1,0 +1,11 @@
+type: array
+nullable: true
+items:
+  anyOf:
+    - type: string
+    - type: array
+      minItems: 2
+      maxItems: 2
+      items:
+        - type: string
+        - type: object

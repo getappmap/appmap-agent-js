@@ -115,6 +115,8 @@ const normalizeDefaultPackage = (package_, _base) => {
     shallow: false,
     exclude: [],
     "inline-source": null,
+    "source-type": null,
+    parsing: null,
     ...package_,
   };
 };
@@ -188,23 +190,29 @@ const normalizePackageMatcher = (matcher, base) => {
   const {
     enabled,
     shallow,
-    "inline-source": inline,
+    "inline-source": inline_source,
     exclude,
+    "source-type": source_type,
+    parsing,
     ...rest
   } = {
     enabled: true,
     "inline-source": null,
     shallow: hasOwnProperty(matcher, "dist"),
     exclude: [],
+    "source-type": null,
+    parsing: null,
     ...matcher,
   };
   return [
     createMatcher(rest, base),
     {
       enabled,
-      "inline-source": inline,
+      "inline-source": inline_source,
       shallow,
       exclude: exclude.map(normalizeExclusion),
+      "source-type": source_type,
+      parsing,
     },
   ];
 };
@@ -535,6 +543,8 @@ export const createConfiguration = (home) => ({
     shallow: false,
     exclude: [],
     "inline-source": null,
+    "source-type": null,
+    parsing: null,
   },
   packages: [],
   exclude: [

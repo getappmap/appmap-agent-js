@@ -1,6 +1,6 @@
 import BabelParser from "@babel/parser";
 import { InternalAppmapError } from "../../error/index.mjs";
-import { getLastUrlExtension } from "../../url/index.mjs";
+import { getLastUrlExtension, getUrlExtensionArray } from "../../url/index.mjs";
 import { assert, coalesce } from "../../util/index.mjs";
 import { logWarning, logError } from "../../log/index.mjs";
 
@@ -46,44 +46,88 @@ export const extractCommentLabelArray = ({ value: text }) => {
   return maybe_lines === null ? [] : maybe_lines.flatMap(extractLineLabel);
 };
 
-export const parseEstree = ({ url, content }) => {
-  const extension = getLastUrlExtension(url);
-  let source_type = "unambiguous";
-  if (extension === ".cjs" || extension === ".node") {
-    source_type = "script";
-  } else if (extension === ".mjs") {
-    source_type = "module";
+const resolveSource = (source, { url }) => {
+  if (source === null) {
+    const extension = getLastUrlExtension(url);
+    if (extension === ".cjs" || extension === ".cts" || extension === ".node") {
+      return "script";
+    } else if (extension === ".mjs" || extension === ".mts") {
+      return "module";
+    } else {
+      return "unambiguous";
+    }
+  } else {
+    return source;
   }
-  let plugins = [];
-  if (extension === ".ts" || extension === ".tsx") {
-    plugins = ["typescript"];
-  } else if (/^[ \t\n]*\/(\/[ \t]*|\*[ \t\n]*)@flow/u.test(content)) {
-    plugins = ["flow"];
+};
+
+const resolvePluginArray = (plugins, { url, content }) => {
+  if (plugins === null) {
+    const extensions = getUrlExtensionArray(url);
+    const plugins = [];
+    if (extensions.includes(".jsx")) {
+      plugins.push(["jsx", {}]);
+    }
+    if (
+      extensions.includes(".ts") ||
+      extensions.includes(".mts") ||
+      extensions.includes(".cts")
+    ) {
+      plugins.push(["typescript", {}]);
+    }
+    if (
+      extensions.includes(".tsx") ||
+      extensions.includes(".mtsx") ||
+      extensions.includes(".ctsx")
+    ) {
+      plugins.push(["jsx", {}], ["typescript", {}]);
+    }
+    if (
+      extensions.includes(".flow") ||
+      /^[ \t\n]*\/(\/[ \t]*|\*[ \t\n]*)@flow/u.test(content)
+    ) {
+      plugins.push(["flow", {}]);
+    }
+    return plugins;
+  } else {
+    return plugins;
   }
-  plugins.push(["estree", { classFeatures: true }], "jsx");
-  let result;
+};
+
+const parseSafe = ({ url, content }, options) => {
   try {
-    result = parseBabel(content, {
-      plugins,
-      sourceFilename: url,
-      sourceType: source_type,
-      errorRecovery: true,
-      attachComment: true,
-    });
+    return parseBabel(content, options);
   } catch (error) {
     logError("Unrecoverable parsing error at file %j >> %O", url, error);
+    const { sourceType: source_type } = options;
     return {
-      type: "Program",
-      body: [],
-      sourceType: "script",
-      loc: {
-        start: { line: 0, column: 0 },
-        end: { line: 0, column: 0 },
-        filename: url,
+      errors: [],
+      program: {
+        type: "Program",
+        body: [],
+        sourceType: source_type === "unambiguous" ? "script" : source_type,
+        loc: {
+          start: { line: 0, column: 0 },
+          end: { line: 0, column: 0 },
+          filename: url,
+        },
       },
     };
   }
-  const { errors, program: node } = result;
+};
+
+export const parseEstree = (file, { source, plugins }) => {
+  const { url } = file;
+  const { errors, program: node } = parseSafe(file, {
+    sourceFilename: url,
+    sourceType: resolveSource(source, file),
+    plugins: [
+      ["estree", { classFeatures: true }],
+      ...resolvePluginArray(plugins, file),
+    ],
+    errorRecovery: true,
+    attachComment: true,
+  });
   for (const error of errors) {
     logWarning("Recoverable parsing error at file %j >> %O", url, error);
   }

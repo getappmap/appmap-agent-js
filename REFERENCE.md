@@ -314,6 +314,8 @@ The agent filter code objects (functions or objects/classes) based on a format c
         * `enabled <boolean>` Indicates whether the filtered file should be instrumented or not. *Default*: `true`.
         * `shallow <boolean>` Indicates whether the filtered file should
         * `exclude <Exclusion[]>` Additional code object filtering for the matched file.
+        * `source-type "script" | "module" | null` The `sourceType` options given to `@babel/parser`. *Default*: `null` attempt to retrieve this information from the extension of the file, else provide `"unambiguous"`.
+        * `parsing <array>` A set of plugin names to give to `@babel/parser`. Options can be given to plugins by providing a pair instead of just the name -- eg: `["recordAndtuple", {syntaxType: bar}]`. *Default*: `null` attempt to guess the plugins based on the extension and content of the file.
         * `... <Specifier>` Extends from any specifier format.
 * `exclude <Exclusion[]>` Code object filtering to apply to every file.
 * `source <boolean>` Indicates whether to include source code in the appmap file. *Default* `false`.

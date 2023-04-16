@@ -16,15 +16,17 @@ export const createSource = (
     "postmortem-function-exclusion": postmortem,
   },
 ) => {
-  const { enabled, exclude: local_criteria } = lookupUrl(
-    package_matcher_array,
-    url,
-    default_package,
-  );
+  const {
+    enabled,
+    exclude: local_criteria,
+    "source-type": source,
+    parsing: plugins,
+  } = lookupUrl(package_matcher_array, url, default_package);
   if (enabled) {
     return {
       postmortem,
       enabled: true,
+      parsing: { source, plugins },
       criteria: [...local_criteria, ...global_criteria],
       url,
       content,
@@ -36,6 +38,7 @@ export const createSource = (
     return {
       postmortem,
       enabled: false,
+      parsing: { source, plugins },
       criteria: [],
       url,
       content,
@@ -52,8 +55,8 @@ export const createSource = (
 
 export const parseSource = (source) => {
   if (source.program === null) {
-    const { url, content } = source;
-    const program = parseEstree({ url, content });
+    const { url, content, parsing } = source;
+    const program = parseEstree({ url, content }, parsing);
     source.program = program;
     return program;
   } else {

@@ -40,6 +40,8 @@ const registerFileUrl = (
       enabled,
       exclude: criteria,
       "inline-source": inline,
+      "source-type": source,
+      parsing: plugins,
       shallow,
     } = lookupUrl(package_matcher_array, url, default_package);
     if (enabled) {
@@ -47,22 +49,24 @@ const registerFileUrl = (
         inline: inline === null ? global_inline : inline,
         criteria: [...criteria, ...global_criteria],
         shallow,
+        parsing: { source, plugins },
         versions: new Map(),
       });
+      return true;
     } else {
       disabled.add(url);
+      return false;
     }
-    return enabled;
   }
 };
 
 const registerFile = ({ url, hash, content }, codebase) => {
-  const { versions, criteria } = codebase.get(url);
+  const { versions, criteria, parsing } = codebase.get(url);
   const version = String(versions.size);
   const source = createSource({
     url,
     content,
-    program: parseEstree({ url, content }),
+    program: parseEstree({ url, content }, parsing),
   });
   applyExclusionCriteria(source, criteria);
   versions.set(hash, { version, source });

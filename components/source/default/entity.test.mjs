@@ -5,10 +5,13 @@ import { toEntity } from "./entity.mjs";
 const testFile = (code, file, pattern) => {
   assertMatchJSON(
     toEntity(
-      parseEstree({
-        url: `protocol://host/directory/${file}`,
-        content: code,
-      }),
+      parseEstree(
+        {
+          url: `protocol://host/directory/${file}`,
+          content: code,
+        },
+        { source: null, plugins: null },
+      ),
       file.split(".")[0],
     ),
     pattern,

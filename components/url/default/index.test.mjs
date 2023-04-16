@@ -1,4 +1,4 @@
-import { assertEqual } from "../../__fixture__.mjs";
+import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
 
 import {
   toAbsoluteUrl,
@@ -8,6 +8,7 @@ import {
   getUrlBasename,
   getUrlExtension,
   getLastUrlExtension,
+  getUrlExtensionArray,
 } from "./index.mjs";
 
 ////////////////////
@@ -52,6 +53,24 @@ assertEqual(
     "protocol://host/directory/basename.extension1.extension2#hash",
   ),
   ".extension1.extension2",
+);
+
+//////////////////////////
+// getUrlExtensionArray //
+//////////////////////////
+
+assertEqual(getUrlExtensionArray("protocol://host/directory/#hash"), null);
+
+assertDeepEqual(
+  getUrlExtensionArray("protocol://host/directory/filename#hash"),
+  [],
+);
+
+assertDeepEqual(
+  getUrlExtensionArray(
+    "protocol://host/directory/basename.extension1.extension2#hash",
+  ),
+  [".extension1", ".extension2"],
 );
 
 /////////////////////////

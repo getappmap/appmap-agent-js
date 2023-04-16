@@ -1,7 +1,11 @@
 recorder: process
+pruning: false
 packages:
   path: source.mjs
   enabled: true
+  source-type: module
+  parsing:
+    - decorators
 command: node script.mjs
 appmap_dir: .
 appmap_file: script
