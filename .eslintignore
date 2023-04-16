@@ -5,4 +5,5 @@
 /doc
 /node_modules
 /test/pack
+/test/cases/apply-source/source.mjs
 /tmp

@@ -5,6 +5,7 @@ required:
   - shallow
   - inline-source
   - exclude
+  - parsing
 properties:
   enabled:
     type: boolean
@@ -15,3 +16,7 @@ properties:
     nullable: true
   exclude:
     $ref: exclude-cooked
+  source-type:
+    $ref: source-type
+  parsing:
+    $ref: parsing

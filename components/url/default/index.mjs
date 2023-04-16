@@ -116,6 +116,19 @@ export const getUrlExtension = (url) => {
   }
 };
 
+const prefixDot = (string) => `.${string}`;
+
+export const getUrlExtensionArray = (url) => {
+  const filename = getUrlFilename(url);
+  if (filename === null) {
+    return null;
+  } else {
+    const extensions = filename.split(".");
+    extensions.shift();
+    return extensions.map(prefixDot);
+  }
+};
+
 // Alternatively:
 //   url.match(/([^\/]+)(\.[^/#]*)(#.*)?$/)[2]
 export const getLastUrlExtension = (url) => {

@@ -20,6 +20,10 @@ anyOf:
       inline-source:
         type: boolean
         nullable: true
+      source-type:
+        $ref: source-type
+      parsing:
+        $ref: parsing
   - type: object
     additionalProperties: false
     required:
@@ -36,6 +40,10 @@ anyOf:
       inline-source:
         type: boolean
         nullable: true
+      source-type:
+        $ref: source-type
+      parsing:
+        $ref: parsing
   - type: object
     additionalProperties: false
     required:
@@ -54,6 +62,10 @@ anyOf:
       inline-source:
         type: boolean
         nullable: true
+      source-type:
+        $ref: source-type
+      parsing:
+        $ref: parsing
   - type: object
     additionalProperties: false
     required:
@@ -74,6 +86,10 @@ anyOf:
       inline-source:
         type: boolean
         nullable: true
+      source-type:
+        $ref: source-type
+      parsing:
+        $ref: parsing
   - type: object
     additionalProperties: false
     required:
@@ -92,3 +108,7 @@ anyOf:
       inline-source:
         type: boolean
         nullable: true
+      source-type:
+        $ref: source-type
+      parsing:
+        $ref: parsing

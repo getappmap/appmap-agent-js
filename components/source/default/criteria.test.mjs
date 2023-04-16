@@ -31,10 +31,13 @@ const bottom = {
 const FILE = "file";
 
 const test = (code, criteria, path, excluded) => {
-  const node = parseEstree({
-    url: `protocol://host/directory/${FILE}.ext`,
-    content: code,
-  });
+  const node = parseEstree(
+    {
+      url: `protocol://host/directory/${FILE}.ext`,
+      content: code,
+    },
+    { source: "module", plugins: [] },
+  );
   let parent = null;
   let entity = toEntity(node, FILE);
   for (const segment of path.split("/")) {

@@ -44,11 +44,14 @@ assertDeepEqual(
 );
 
 // default-package //
+
 assertDeepEqual(extend("default-package", true, "protocol://host/base/"), {
   enabled: true,
   shallow: false,
   "inline-source": null,
   exclude: [],
+  "source-type": null,
+  parsing: null,
 });
 
 // packages //
@@ -64,6 +67,8 @@ assertDeepEqual(extend("default-package", true, "protocol://host/base/"), {
     enabled: true,
     exclude: [],
     shallow: false,
+    "source-type": null,
+    parsing: null,
   });
   assertEqual(matchUrl(matcher, "protocol://host/base/lib/foo.js"), true);
   assertEqual(matchUrl(matcher, "protocol://host/base/lib/foo.mjs"), false);

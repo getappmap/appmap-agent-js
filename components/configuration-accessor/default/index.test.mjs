@@ -154,6 +154,8 @@ assertDeepEqual(
     shallow: false,
     exclude: [],
     "inline-source": null,
+    "source-type": null,
+    parsing: null,
   },
 );
 
@@ -186,6 +188,8 @@ assertDeepEqual(
       },
     ],
     "inline-source": null,
+    "source-type": null,
+    parsing: null,
   },
 );
 

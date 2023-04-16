@@ -24,7 +24,7 @@ const createSourceHelper = (url, content) =>
   createSource({
     url,
     content,
-    program: parseEstree({ url, content }),
+    program: parseEstree({ url, content }, { source: "module", plugins: [] }),
   });
 
 ////////////////////////////

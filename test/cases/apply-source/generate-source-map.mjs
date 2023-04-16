@@ -5,13 +5,13 @@ const generator = new SourceMapGenerator();
 const { URL } = globalThis;
 generator.addMapping({
   source: "source.mjs",
-  original: { line: 2, column: 0 },
+  original: { line: 3, column: 0 },
   generated: { line: 1, column: 0 },
 });
 generator.addMapping({
   source: "source.mjs",
-  original: { line: 4, column: 0 },
-  generated: { line: 3, column: 0 },
+  original: { line: 6, column: 0 },
+  generated: { line: 4, column: 0 },
 });
 await writeFileAsync(
   new URL("source.map", import.meta.url),

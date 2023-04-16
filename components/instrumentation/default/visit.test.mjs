@@ -18,7 +18,7 @@ const {
 
 const instrument = (options) =>
   generate(
-    visit(parseEstree(options.source), {
+    visit(parseEstree(options.source, { source: null, plugins: null }), {
       url: options.source.url,
       apply: "APPLY",
       eval: { hidden: "EVAL", aliases: ["eval"] },
