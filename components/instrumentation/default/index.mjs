@@ -12,12 +12,6 @@ export { extractMissingUrlArray } from "./codebase.mjs";
 
 const { generate: generateEstree } = Astring;
 
-const toSourceMessage = ({ url, content }) => ({
-  type: "source",
-  url,
-  content,
-});
-
 export const instrument = (url, cache, configuration) => {
   const codebase = createCodebase(url, cache, configuration);
   const files = getEnabledSourceFileArray(codebase);
@@ -25,7 +19,7 @@ export const instrument = (url, cache, configuration) => {
     logDebug("*Not* recording file %j", url);
     return {
       ...getMainFile(codebase),
-      messages: [],
+      sources: [],
     };
   } else {
     logDebug("Recording file %j", url);
@@ -39,7 +33,7 @@ export const instrument = (url, cache, configuration) => {
           codebase,
         }),
       ),
-      messages: files.map(toSourceMessage),
+      sources: files,
     };
   }
 };

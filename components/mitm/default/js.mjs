@@ -20,13 +20,17 @@ export const instrumentJs = (configuration, backend, { url, content }) => {
       }
     } /* c8 ignore stop */
   }
-  const { content: instrumented_content, messages } = instrument(
+  const { content: instrumented_content, sources } = instrument(
     url,
     cache,
     configuration,
   );
-  for (const message of messages) {
-    sendBackend(backend, message);
+  for (const { url, content } of sources) {
+    sendBackend(backend, {
+      type: "source",
+      url,
+      content,
+    });
   }
   return instrumented_content;
 };

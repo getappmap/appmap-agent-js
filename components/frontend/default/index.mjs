@@ -71,8 +71,19 @@ export const getSerializationEmptyValue = ({ serialization }) =>
 export const extractMissingUrlArray = ({ configuration }, url, cache) =>
   extractMissingUrlArrayInner(url, cache, configuration);
 
-export const instrument = ({ configuration }, url, cache) =>
-  instrumentInner(url, cache, configuration);
+const toSourceMessage = ({url, content}) => ({
+  type: "source",
+  url,
+  content,
+});
+
+export const instrument = ({ configuration }, url, cache) => {
+  const { sources, ... rest } = instrumentInner(url, cache, configuration);
+  return {
+    messages: toSourceMessage(sources),
+    ... rest,
+  };
+};
 
 export const formatError = ({ session, serialization }, value) => ({
   type: "error",
