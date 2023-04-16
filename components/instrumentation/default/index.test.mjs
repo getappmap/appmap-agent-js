@@ -12,7 +12,7 @@ import { instrument } from "./index.mjs";
 const { Map } = globalThis;
 
 for (const enabled of [true, false]) {
-  const { url, content, messages } = instrument(
+  const { url, content, sources } = instrument(
     "http://host/directory/script.js",
     new Map([["http://host/directory/script.js", "function f () {}"]]),
     extendConfiguration(
@@ -30,11 +30,10 @@ for (const enabled of [true, false]) {
     assertEqual(content, "function f () {}");
   }
   assertDeepEqual(
-    messages,
+    sources,
     enabled
       ? [
           {
-            type: "source",
             url: "http://host/directory/script.js",
             content: "function f () {}",
           },
