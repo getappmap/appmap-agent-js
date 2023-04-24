@@ -63,7 +63,7 @@ const refreshUrl = (urls, url) => {
   return url;
 };
 
-export const flushBackendAsync = async (urls, backend, abrupt) => {
+const flushBackendAsync = async (urls, backend, abrupt) => {
   let trace = compileBackendAvailableTrack(backend, abrupt);
   while (trace !== null) {
     const { url, content } = trace;
