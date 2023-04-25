@@ -1,6 +1,6 @@
 recorder: jest
-command: npx jest --no-cache
-command-win32: npx.cmd jest --no-cache
+command: npx jest
+command-win32: npx.cmd jest
 appmap_dir: .
 packages:
   path: main.json
