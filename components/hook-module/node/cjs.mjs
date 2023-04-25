@@ -1,7 +1,7 @@
 import Module from "node:module";
 import { convertPathToFileUrl } from "../../path/index.mjs";
 import { readFile } from "../../file/index.mjs";
-import { assignProperty } from "../../util/index.mjs";
+import { assignProperty, toString } from "../../util/index.mjs";
 import { instrument, extractMissingUrlArray } from "../../frontend/index.mjs";
 
 const {
@@ -21,8 +21,8 @@ export const hook = (frontend, { hooks: { cjs } }) => {
   } else {
     const { _compile: original } = prototype;
     prototype._compile = function _compile(content, path) {
-      const url = convertPathToFileUrl(path);
-      const cache = new Map([[url, content]]);
+      const url = convertPathToFileUrl(toString(path));
+      const cache = new Map([[url, toString(content)]]);
       let complete = false;
       while (!complete) {
         const urls = extractMissingUrlArray(frontend, url, cache);

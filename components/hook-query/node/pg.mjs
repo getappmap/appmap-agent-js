@@ -9,9 +9,9 @@ import {
   recordBeforeQueryEvent,
   recordAfterAnswerEvent,
 } from "../../frontend/index.mjs";
+import { toParameterCollection } from "./convert.mjs";
 
 const {
-  Object,
   undefined,
   Reflect: { apply },
   Promise,
@@ -88,7 +88,7 @@ export const hook = (
             DATABASE,
             VERSION,
             toString(query.text),
-            Object(query.values),
+            toParameterCollection(query.values),
           );
           const { callback: query_callback } = query;
           query.callback = spyOnce((_error, _result) => {
