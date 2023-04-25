@@ -1,30 +1,86 @@
 const {
+  Boolean,
   String,
-  undefined,
-  JSON: { stringify: stringifyJSON },
-  Reflect: { apply },
-  Object: {
-    prototype: { toString: Object_prototype_toString },
-  },
   Number,
-  Number: { isNaN, NEGATIVE_INFINITY, POSITIVE_INFINITY, NaN },
+  parseInt,
+  Array: { isArray },
+  Number: {
+    isNaN,
+    NaN,
+    NEGATIVE_INFINITY,
+    POSITIVE_INFINITY,
+    MAX_SAFE_INTEGER,
+    MIN_SAFE_INTEGER,
+  },
+  Math: { round },
+  JSON: { stringify: stringifyJSON },
 } = globalThis;
 
-export const toBoolean = (any) =>
-  any !== null &&
-  any !== undefined &&
-  any !== false &&
-  any !== 0 &&
-  any !== 0n &&
-  any !== "";
+export const toBoolean = Boolean;
+
+export const toInteger = (any) => {
+  if (typeof any === "boolean") {
+    return Number(any);
+  } else if (typeof any === "number") {
+    if (any < MIN_SAFE_INTEGER) {
+      return NEGATIVE_INFINITY;
+    } else if (any > MAX_SAFE_INTEGER) {
+      return POSITIVE_INFINITY;
+    } else {
+      return round(any);
+    }
+  } else if (typeof any === "bigint") {
+    if (any < MIN_SAFE_INTEGER) {
+      return NEGATIVE_INFINITY;
+    } else if (any > MAX_SAFE_INTEGER) {
+      return POSITIVE_INFINITY;
+    } else {
+      return Number(any);
+    }
+  } else if (typeof any === "string") {
+    return parseInt(any);
+  } else {
+    return NaN;
+  }
+};
 
 export const toNumber = (any) => {
-  if (typeof any === "number") {
+  if (typeof any === "boolean") {
+    return any ? 1 : 0;
+  } else if (typeof any === "number") {
     return any;
-  } else if (typeof any === "bigint" || typeof any === "string") {
+  } else if (typeof any === "bigint") {
+    return Number(any);
+  } else if (typeof any === "string") {
     return Number(any);
   } else {
     return NaN;
+  }
+};
+
+export const toString = (any) => {
+  if (typeof any === "function") {
+    return "[function]";
+  } else if (isArray(any)) {
+    return "[array]";
+  } else if (typeof any === "object" && any !== null) {
+    return "[object]";
+  } else {
+    return String(any);
+  }
+};
+
+export const print = (any) => {
+  if (typeof any === "function") {
+    return "[function]";
+  } else if (isArray(any)) {
+    return "[array]";
+  } else if (typeof any === "object" && any !== null) {
+    return "[object]";
+  } else if (typeof any === "string") {
+    return stringifyJSON(any);
+  } else {
+    return String(any);
   }
 };
 
@@ -39,26 +95,3 @@ export const jsonifyNumber = (number, replacements) => {
     return number;
   }
 };
-
-const generateStringify = (stringifyString) => (any) => {
-  if (
-    typeof any === "boolean" ||
-    typeof any === "bigint" ||
-    typeof any === "number" ||
-    typeof any === "symbol" ||
-    any === null ||
-    any === undefined
-  ) {
-    return String(any);
-  } else if (typeof any === "string") {
-    return stringifyString(any);
-  } else {
-    return apply(Object_prototype_toString, any, []);
-  }
-};
-
-export const print = generateStringify(stringifyJSON);
-
-const identity = (any) => any;
-
-export const toString = generateStringify(identity);

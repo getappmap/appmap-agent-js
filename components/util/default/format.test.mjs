@@ -34,7 +34,7 @@ assertEqual(format("%j", [[123]]), "[123]");
 
 // % o //
 
-assertEqual(format("%o", [() => {}]), "[object Function]");
+assertEqual(format("%o", [() => {}]), "[function]");
 
 // %O //
 
@@ -48,5 +48,5 @@ assertEqual(
       },
     },
   ]),
-  "[object Object]",
+  "[object]",
 );
