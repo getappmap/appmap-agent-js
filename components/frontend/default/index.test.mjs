@@ -198,3 +198,26 @@ testRecordEvent(
 );
 
 testRecordEvent(recordAfterAnswerEvent, frontend);
+
+testRecordEvent(
+  recordBeforeQueryEvent,
+  frontend,
+  "database",
+  "version",
+  "sql",
+  [
+    {
+      toString: () => {
+        assertEqual(
+          instrument(
+            frontend,
+            "protocol://host/filename.js",
+            new Map([["protocol://host/filename.js", "123;"]]),
+          ),
+          "123;",
+        );
+        return "parameter";
+      },
+    },
+  ],
+);

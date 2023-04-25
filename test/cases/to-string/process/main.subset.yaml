@@ -1,0 +1,10 @@
+events:
+  - event: call
+    id: 1
+    method_id: identity
+    parameters:
+      - name: x
+        value: obj
+  - event: return
+    id: 2
+    parent_id: 1
