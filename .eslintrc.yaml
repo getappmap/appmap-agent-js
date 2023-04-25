@@ -5,6 +5,9 @@ globals:
   clearTimeout: readonly
   setInterval: readonly
   clearInterval: readonly
+  TextEncoder: readonly
+  TextDecoder: readonly
+  BigInt: readonly
 parser: "@babel/eslint-parser"
 env:
   es2017: true

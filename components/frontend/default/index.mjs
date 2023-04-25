@@ -5,7 +5,7 @@ import {
 } from "../../instrumentation/index.mjs";
 import {
   createSerialization,
-  serialize,
+  serialize as serializeInner,
   getSerializationEmptyValue as getSerializationEmptyValueInner,
 } from "../../serialization/index.mjs";
 import { InternalAppmapError } from "../../error/index.mjs";
@@ -15,10 +15,20 @@ const {
   Object: { fromEntries, entries: toEntries },
 } = globalThis;
 
+const serialize = (serialization, enabled, value) => {
+  enabled.value = false;
+  try {
+    return serializeInner(serialization, value);
+  } finally {
+    enabled.value = true;
+  }
+};
+
 export const createFrontend = (configuration) => {
   const { session } = configuration;
   assert(session !== null, "missing session", InternalAppmapError);
   return {
+    enabled: { value: true },
     buffer: [],
     counter: createCounter(0),
     session,
@@ -39,54 +49,74 @@ export const getSerializationEmptyValue = ({ serialization }) =>
 export const extractMissingUrlArray = ({ configuration }, url, cache) =>
   extractMissingUrlArrayInner(url, cache, configuration);
 
-export const instrument = ({ buffer, configuration }, url, cache) => {
-  const { sources, content: instrumented_content } = instrumentInner(
-    url,
-    cache,
-    configuration,
-  );
-  for (const { url, content } of sources) {
-    buffer.push({
-      type: "source",
+export const instrument = ({ enabled, buffer, configuration }, url, cache) => {
+  if (enabled.value) {
+    const { sources, content: instrumented_content } = instrumentInner(
       url,
-      content,
+      cache,
+      configuration,
+    );
+    for (const { url, content } of sources) {
+      buffer.push({
+        type: "source",
+        url,
+        content,
+      });
+    }
+    return instrumented_content;
+  } else {
+    return cache.get(url);
+  }
+};
+
+export const recordError = (
+  { enabled, buffer, session, serialization },
+  error,
+) => {
+  if (enabled.value) {
+    buffer.push({
+      type: "error",
+      session,
+      error: serialize(serialization, enabled, error),
     });
   }
-  return instrumented_content;
 };
 
-export const recordError = ({ buffer, session, serialization }, error) => {
-  buffer.push({
-    type: "error",
-    session,
-    error: serialize(serialization, error),
-  });
+export const recordStartTrack = ({ enabled, buffer }, track, configuration) => {
+  if (enabled.value) {
+    buffer.push({
+      type: "start",
+      track,
+      configuration,
+    });
+  }
 };
 
-export const recordStartTrack = ({ buffer }, track, configuration) => {
-  buffer.push({
-    type: "start",
-    track,
-    configuration,
-  });
+export const recordStopTrack = ({ enabled, buffer }, track, termination) => {
+  if (enabled.value) {
+    buffer.push({
+      type: "stop",
+      track,
+      termination,
+    });
+  }
 };
 
-export const recordStopTrack = ({ buffer }, track, termination) => {
-  buffer.push({
-    type: "stop",
-    track,
-    termination,
-  });
-};
-
-export const recordGroup = ({ buffer, session }, group, child, description) => {
-  buffer.push({
-    type: "group",
-    session,
-    group,
-    child,
-    description,
-  });
+export const recordGroup = (
+  { enabled, buffer, session },
+  group,
+  child,
+  description,
+) => {
+  if (enabled.value) {
+    buffer.push({
+      type: "group",
+      session,
+      group,
+      child,
+      description,
+    });
+  }
 };
 
 // jump && bundle //
@@ -97,16 +127,18 @@ const BUNDLE_PAYLOAD = { type: "bundle" };
 
 const compileRecordEmpty =
   (type, site, payload) =>
-  ({ buffer, session }, tab, group, time) => {
-    buffer.push({
-      type,
-      session,
-      site,
-      tab,
-      time,
-      group,
-      payload,
-    });
+  ({ enabled, buffer, session }, tab, group, time) => {
+    if (enabled.value) {
+      buffer.push({
+        type,
+        session,
+        site,
+        tab,
+        time,
+        group,
+        payload,
+      });
+    }
   };
 
 export const recordBeforeJumpEvent = compileRecordEmpty(
@@ -136,7 +168,7 @@ export const recordEndBundleEvent = compileRecordEmpty(
 // function //
 
 export const recordBeginApplyEvent = (
-  { buffer, session, serialization },
+  { enabled, buffer, session, serialization },
   tab,
   group,
   time,
@@ -144,154 +176,168 @@ export const recordBeginApplyEvent = (
   this_,
   arguments_,
 ) => {
-  buffer.push({
-    type: "event",
-    session,
-    site: "begin",
-    tab,
-    time,
-    group,
-    payload: {
-      type: "apply",
-      function: function_,
-      this: serialize(serialization, this_),
-      arguments: arguments_.map((argument) =>
-        serialize(serialization, argument),
-      ),
-    },
-  });
+  if (enabled.value) {
+    buffer.push({
+      type: "event",
+      session,
+      site: "begin",
+      tab,
+      time,
+      group,
+      payload: {
+        type: "apply",
+        function: function_,
+        this: serialize(serialization, enabled, this_),
+        arguments: arguments_.map((argument) =>
+          serialize(serialization, enabled, argument),
+        ),
+      },
+    });
+  }
 };
 
 export const recordEndReturnEvent = (
-  { buffer, session, serialization },
+  { enabled, buffer, session, serialization },
   tab,
   group,
   time,
   function_,
   result,
 ) => {
-  buffer.push({
-    type: "event",
-    session,
-    site: "end",
-    tab,
-    time,
-    group,
-    payload: {
-      type: "return",
-      function: function_,
-      result: serialize(serialization, result),
-    },
-  });
+  if (enabled.value) {
+    buffer.push({
+      type: "event",
+      session,
+      site: "end",
+      tab,
+      time,
+      group,
+      payload: {
+        type: "return",
+        function: function_,
+        result: serialize(serialization, enabled, result),
+      },
+    });
+  }
 };
 
 export const recordEndThrowEvent = (
-  { buffer, session, serialization },
+  { enabled, buffer, session, serialization },
   tab,
   group,
   time,
   function_,
   error,
 ) => {
-  buffer.push({
-    type: "event",
-    session,
-    site: "end",
-    tab,
-    time,
-    group,
-    payload: {
-      type: "throw",
-      function: function_,
-      error: serialize(serialization, error),
-    },
-  });
+  if (enabled.value) {
+    buffer.push({
+      type: "event",
+      session,
+      site: "end",
+      tab,
+      time,
+      group,
+      payload: {
+        type: "throw",
+        function: function_,
+        error: serialize(serialization, enabled, error),
+      },
+    });
+  }
 };
 
 // promise && iterator //
 
 export const recordBeforeAwaitEvent = (
-  { buffer, session, serialization },
+  { enabled, buffer, session, serialization },
   tab,
   group,
   time,
   promise,
 ) => {
-  buffer.push({
-    type: "event",
-    session,
-    site: "before",
-    tab,
-    time,
-    group,
-    payload: {
-      type: "await",
-      promise: serialize(serialization, promise),
-    },
-  });
+  if (enabled.value) {
+    buffer.push({
+      type: "event",
+      session,
+      site: "before",
+      tab,
+      time,
+      group,
+      payload: {
+        type: "await",
+        promise: serialize(serialization, enabled, promise),
+      },
+    });
+  }
 };
 
 export const recordBeforeYieldEvent = (
-  { buffer, session, serialization },
+  { enabled, buffer, session, serialization },
   tab,
   group,
   time,
   iterator,
 ) => {
-  buffer.push({
-    type: "event",
-    session,
-    site: "before",
-    tab,
-    time,
-    group,
-    payload: {
-      type: "yield",
-      iterator: serialize(serialization, iterator),
-    },
-  });
+  if (enabled.value) {
+    buffer.push({
+      type: "event",
+      session,
+      site: "before",
+      tab,
+      time,
+      group,
+      payload: {
+        type: "yield",
+        iterator: serialize(serialization, enabled, iterator),
+      },
+    });
+  }
 };
 
 export const recordAfterResolveEvent = (
-  { buffer, session, serialization },
+  { enabled, buffer, session, serialization },
   tab,
   group,
   time,
   result,
 ) => {
-  buffer.push({
-    type: "event",
-    session,
-    site: "after",
-    tab,
-    time,
-    group,
-    payload: {
-      type: "resolve",
-      result: serialize(serialization, result),
-    },
-  });
+  if (enabled.value) {
+    buffer.push({
+      type: "event",
+      session,
+      site: "after",
+      tab,
+      time,
+      group,
+      payload: {
+        type: "resolve",
+        result: serialize(serialization, enabled, result),
+      },
+    });
+  }
 };
 
 export const recordAfterRejectEvent = (
-  { buffer, session, serialization },
+  { enabled, buffer, session, serialization },
   tab,
   group,
   time,
   error,
 ) => {
-  buffer.push({
-    type: "event",
-    session,
-    site: "after",
-    tab,
-    time,
-    group,
-    payload: {
-      type: "reject",
-      error: serialize(serialization, error),
-    },
-  });
+  if (enabled.value) {
+    buffer.push({
+      type: "event",
+      session,
+      site: "after",
+      tab,
+      time,
+      group,
+      payload: {
+        type: "reject",
+        error: serialize(serialization, enabled, error),
+      },
+    });
+  }
 };
 
 // client && server //
@@ -299,7 +345,7 @@ export const recordAfterRejectEvent = (
 const compileRecordRequest =
   (type, site, side) =>
   (
-    { buffer, session, serialization },
+    { enabled, buffer, session, serialization },
     tab,
     group,
     time,
@@ -310,30 +356,32 @@ const compileRecordRequest =
     headers,
     body,
   ) => {
-    buffer.push({
-      type,
-      session,
-      site,
-      tab,
-      time,
-      group,
-      payload: {
-        type: "request",
-        side,
-        protocol,
-        method,
-        url,
-        route,
-        headers,
-        body: serialize(serialization, body),
-      },
-    });
+    if (enabled.value) {
+      buffer.push({
+        type,
+        session,
+        site,
+        tab,
+        time,
+        group,
+        payload: {
+          type: "request",
+          side,
+          protocol,
+          method,
+          url,
+          route,
+          headers,
+          body: serialize(serialization, enabled, body),
+        },
+      });
+    }
   };
 
 const compileRecordResponse =
   (type, site, side) =>
   (
-    { buffer, session, serialization },
+    { enabled, buffer, session, serialization },
     tab,
     group,
     time,
@@ -342,22 +390,24 @@ const compileRecordResponse =
     headers,
     body,
   ) => {
-    buffer.push({
-      type,
-      session,
-      site,
-      tab,
-      time,
-      group,
-      payload: {
-        type: "response",
-        side,
-        status,
-        message,
-        headers,
-        body: serialize(serialization, body),
-      },
-    });
+    if (enabled.value) {
+      buffer.push({
+        type,
+        session,
+        site,
+        tab,
+        time,
+        group,
+        payload: {
+          type: "response",
+          side,
+          status,
+          message,
+          headers,
+          body: serialize(serialization, enabled, body),
+        },
+      });
+    }
   };
 
 export const recordBeforeRequestEvent = compileRecordRequest(
@@ -379,7 +429,7 @@ export const recordBeginRequestEvent = compileRecordRequest(
 );
 
 export const recordBeginRequestAmend = (
-  { buffer, session, serialization },
+  { enabled, buffer, session, serialization },
   tab,
   protocol,
   method,
@@ -388,22 +438,24 @@ export const recordBeginRequestAmend = (
   headers,
   body,
 ) => {
-  buffer.push({
-    type: "amend",
-    session,
-    site: "begin",
-    tab,
-    payload: {
-      type: "request",
-      side: "server",
-      protocol,
-      method,
-      url,
-      route,
-      headers,
-      body: serialize(serialization, body),
-    },
-  });
+  if (enabled.value) {
+    buffer.push({
+      type: "amend",
+      session,
+      site: "begin",
+      tab,
+      payload: {
+        type: "request",
+        side: "server",
+        protocol,
+        method,
+        url,
+        route,
+        headers,
+        body: serialize(serialization, enabled, body),
+      },
+    });
+  }
 };
 
 export const recordEndResponseEvent = compileRecordResponse(
@@ -415,7 +467,7 @@ export const recordEndResponseEvent = compileRecordResponse(
 // database //
 
 export const recordBeforeQueryEvent = (
-  { buffer, session, serialization },
+  { enabled, buffer, session, serialization },
   tab,
   group,
   time,
@@ -424,28 +476,32 @@ export const recordBeforeQueryEvent = (
   sql,
   parameters,
 ) => {
-  buffer.push({
-    type: "event",
-    session,
-    site: "before",
-    tab,
-    time,
-    group,
-    payload: {
-      type: "query",
-      database,
-      version,
-      sql,
-      parameters: isArray(parameters)
-        ? parameters.map((parameter) => serialize(serialization, parameter))
-        : fromEntries(
-            toArray(toEntries(parameters)).map(([name, parameter]) => [
-              name,
-              serialize(serialization, parameter),
-            ]),
-          ),
-    },
-  });
+  if (enabled.value) {
+    buffer.push({
+      type: "event",
+      session,
+      site: "before",
+      tab,
+      time,
+      group,
+      payload: {
+        type: "query",
+        database,
+        version,
+        sql,
+        parameters: isArray(parameters)
+          ? parameters.map((parameter) =>
+              serialize(serialization, enabled, parameter),
+            )
+          : fromEntries(
+              toArray(toEntries(parameters)).map(([name, parameter]) => [
+                name,
+                serialize(serialization, enabled, parameter),
+              ]),
+            ),
+      },
+    });
+  }
 };
 
 export const recordAfterAnswerEvent = compileRecordEmpty("event", "after", {
