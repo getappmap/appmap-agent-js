@@ -103,7 +103,7 @@ const configuration = extendConfiguration(
         base,
       ),
     ),
-    0,
+    1,
   );
   const assertOutputAsync = async (basename) => {
     assertEqual(
