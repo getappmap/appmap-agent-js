@@ -58,6 +58,9 @@ const hookTransformObject = (transform, root) => ({
 });
 
 export const hookJestArgvAsync = async (argv, base) => {
+  if (!argv.includes("--no-cache")) {
+    argv = ["--no-cache", ...argv];
+  }
   const options = minimist(argv);
   const root = hasOwnProperty(options, "rootDir")
     ? toDirectoryUrl(toAbsoluteUrl(options.rootDir, base))

@@ -36,6 +36,7 @@ assertDeepEqual(
     "file:///A:/base/",
   ),
   [
+    "--no-cache",
     "--key1",
     "value1",
     "--transform",
@@ -70,6 +71,7 @@ assertDeepEqual(
   assertDeepEqual(
     await hookJestArgvAsync(["--rootDir", dirname], getTmpUrl()),
     [
+      "--no-cache",
       "--rootDir",
       dirname,
       "--transform",
@@ -98,6 +100,7 @@ assertDeepEqual(
   assertDeepEqual(
     await hookJestArgvAsync(["--config", filename], getTmpUrl()),
     [
+      "--no-cache",
       "--config",
       filename,
       "--transform",
