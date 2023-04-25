@@ -8,6 +8,7 @@ uuid
 self
 version
 error
+crash-reporter
 log-inner
 log
 glob
