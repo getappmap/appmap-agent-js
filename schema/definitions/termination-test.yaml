@@ -1,6 +1,8 @@
 type: object
-required: [type, passed]
 additionalProperties: false
+required:
+  - type
+  - passed
 properties:
   type:
     const: test

@@ -1,4 +1,5 @@
 globals:
+  URL: readonly
   globalThis: readonly
   console: readonly
   setTimeout: readonly

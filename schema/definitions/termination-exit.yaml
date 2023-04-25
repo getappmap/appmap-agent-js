@@ -1,6 +1,8 @@
 type: object
-required: [type, status]
 additionalProperties: false
+required:
+  - type
+  - status
 properties:
   type:
     const: exit

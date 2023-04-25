@@ -1,6 +1,7 @@
 anyOf:
   - type: string
   - type: object
+    additionalProperties: false
     properties:
       combinator:
         $ref: combinator
