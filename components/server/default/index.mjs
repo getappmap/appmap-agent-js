@@ -142,6 +142,7 @@ export const mainAsync = async (process, configuration) => {
     .filter(isCommandNonNull)
     .map((configuration) => extendConfigurationPort(configuration, ports));
   const { length } = configurations;
+  let aggregate_status = 0;
   if (length === 0) {
     logInfo(
       "Appmap server listening to client connections at: %j",
@@ -164,8 +165,10 @@ export const mainAsync = async (process, configuration) => {
     /* c8 ignore start */
     if (signal !== null) {
       logInfo("Killed with: %s", signal);
+      aggregate_status = 1;
     } else {
       logInfo("Exited with: %j", status);
+      aggregate_status = status;
     }
     /* c8 ignore stop */
     done = true;
@@ -187,8 +190,12 @@ export const mainAsync = async (process, configuration) => {
         /* c8 ignore start */
         if (signal !== null) {
           logInfo("Killed with: %s", signal);
+          aggregate_status = 1;
         } else {
           logInfo("Exited with: %j", status);
+          if (status !== 0) {
+            aggregate_status = 1;
+          }
         }
         /* c8 ignore stop */
       }
@@ -204,5 +211,5 @@ export const mainAsync = async (process, configuration) => {
     await closeMitmAsync(maybe_mitm);
   }
   await closeReceptorAsync(receptor);
-  return 0;
+  return aggregate_status;
 };
