@@ -9,9 +9,9 @@ import {
   recordBeforeQueryEvent,
   recordAfterAnswerEvent,
 } from "../../frontend/index.mjs";
+import { toParameterCollection } from "./convert.mjs";
 
 const {
-  Object,
   Array: { isArray },
   Object: { assign },
   Reflect: { apply },
@@ -133,7 +133,7 @@ export const hook = (
           DATABASE,
           VERSION,
           toString(sql),
-          Object(parameters),
+          toParameterCollection(parameters),
         );
         return spyOnce(() => {
           recordAfterAnswerEvent(frontend, jump_tab, getCurrentGroup(), now());

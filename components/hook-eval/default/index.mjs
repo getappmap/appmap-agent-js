@@ -9,10 +9,10 @@ import { defineGlobal, writeGlobal } from "../../global/index.mjs";
 import { toAbsoluteUrl, toDirectoryUrl } from "../../url/index.mjs";
 import { InternalAppmapError } from "../../error/index.mjs";
 import { readFile } from "../../file/index.mjs";
-import { assert } from "../../util/index.mjs";
+import { assert, toString } from "../../util/index.mjs";
 import { instrument, extractMissingUrlArray } from "../../frontend/index.mjs";
 
-const { Map, String } = globalThis;
+const { Map } = globalThis;
 
 const forward = (_url, _location, content) => content;
 
@@ -37,7 +37,7 @@ export const hook = (
         hidden,
         (url, position, content) => {
           url = toAbsoluteUrl(`eval-${position}.js`, toDirectoryUrl(url));
-          const cache = new Map([[url, String(content)]]);
+          const cache = new Map([[url, toString(content)]]);
           let complete = false;
           while (!complete) {
             const urls = extractMissingUrlArray(frontend, url, cache);

@@ -16,4 +16,17 @@ assertDeepEqual(
   ],
 );
 
+assertDeepEqual(
+  await testHookAsync(HookExit, {}, () => {
+    process.emit("exit", -1);
+  }),
+  [
+    {
+      type: "stop",
+      track: null,
+      termination: { type: "exit", status: 1 },
+    },
+  ],
+);
+
 process.exitCode = 0;

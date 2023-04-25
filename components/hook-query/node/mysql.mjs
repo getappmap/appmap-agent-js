@@ -9,9 +9,9 @@ import {
   recordBeginBundleEvent,
   recordEndBundleEvent,
 } from "../../frontend/index.mjs";
+import { toParameterCollection } from "./convert.mjs";
 
 const {
-  Object,
   Reflect: { apply },
 } = globalThis;
 
@@ -52,7 +52,7 @@ export const hook = (
           DATABASE,
           VERSION,
           toString(query.sql),
-          Object(query.values),
+          toParameterCollection(query.values),
         );
         const { _callback: query_callback } = query;
         query._callback = spyOnce((_error, _result, _field) => {
