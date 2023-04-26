@@ -30,22 +30,11 @@ for (const [name, component, env, resolution] of [
     },
   ],
   [
-    "recorder-process",
+    "recorder-node",
     "recorder-cli",
     "node",
     {
-      "recorder-cli": "process",
-      instrumentation: "default",
-      emitter: "remote-socket",
-      validate: "stub",
-    },
-  ],
-  [
-    "recorder-remote",
-    "recorder-cli",
-    "node",
-    {
-      "recorder-cli": "remote",
+      "recorder-cli": "node",
       instrumentation: "default",
       emitter: "remote-socket",
       validate: "stub",
