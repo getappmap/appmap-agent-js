@@ -1,3 +1,10 @@
+# [13.8.0](https://github.com/getappmap/appmap-agent-js/compare/v13.7.0...v13.8.0) (2023-04-27)
+
+
+### Features
+
+* Report unhandled exceptions ([b1fb7e6](https://github.com/getappmap/appmap-agent-js/commit/b1fb7e64646f36fcadd94d3e411d642227d70a1b))
+
 # [13.7.0](https://github.com/getappmap/appmap-agent-js/compare/v13.6.0...v13.7.0) (2023-04-13)
 
 
