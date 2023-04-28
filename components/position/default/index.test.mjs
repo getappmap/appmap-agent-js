@@ -1,4 +1,4 @@
-import { assert, assertDeepEqual } from "../../__fixture__.mjs";
+import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
 import {
   parsePosition,
   stringifyPosition,
@@ -24,33 +24,41 @@ const {
 // measurePositionDistance //
 /////////////////////////////
 
-{
-  const position = { line: 123, column: 456 };
-  assert(
-    measurePositionDistance(position, {
-      ...position,
-      line: position.line + 1,
-    }) >
-      measurePositionDistance(position, {
-        ...position,
-        column: position.column + 1,
-      }),
-  );
-}
+assertEqual(
+  measurePositionDistance(
+    { line: 10, column: 100 },
+    { line: 12, column: 102 },
+    { line_weight: 4, column_weight: 2 },
+  ),
+  4 * (12 - 10) + 2 * (102 - 100),
+);
 
 /////////////////////
 // lookupPosition //
 /////////////////////
 
+const options = {
+  threshold: 100,
+  line_weight: 1,
+  column_weight: 1,
+};
+
 // Miss >> empty //
-assertDeepEqual(lookupPosition(new Map(), { line: 123, column: 456 }), null);
+assertDeepEqual(
+  lookupPosition(new Map(), { line: 123, column: 456 }, options),
+  null,
+);
 
 // Miss >> too far //
 assertDeepEqual(
-  lookupPosition(new Map([[stringifyPosition({ line: 0, column: 0 })]]), {
-    line: MAX_SAFE_INTEGER,
-    column: 0,
-  }),
+  lookupPosition(
+    new Map([[stringifyPosition({ line: 0, column: 0 })]]),
+    {
+      line: MAX_SAFE_INTEGER,
+      column: 0,
+    },
+    options,
+  ),
   null,
 );
 
@@ -62,6 +70,7 @@ assertDeepEqual(
       line: 123,
       column: 456,
     },
+    options,
   ),
   [{ line: 123, column: 456 }, "value"],
 );
@@ -74,6 +83,7 @@ assertDeepEqual(
       line: 123,
       column: 457,
     },
+    options,
   ),
   [{ line: 123, column: 456 }, "value"],
 );

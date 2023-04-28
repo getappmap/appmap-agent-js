@@ -96,8 +96,18 @@ export const applyExclusionCriteria = ({ root }, criteria) => {
 // Query //
 ///////////
 
+const LINE_WEIGHT = 1024;
+const COLUMN_WEIGHT = 1;
+const THRESHOLD = 10 * LINE_WEIGHT;
+
+const DISTANCE_OPTIONS = {
+  line_weight: LINE_WEIGHT,
+  column_weight: COLUMN_WEIGHT,
+  threshold: THRESHOLD,
+};
+
 export const resolveClosurePosition = ({ url, root, closures }, position) => {
-  const pair = lookupPosition(closures, position);
+  const pair = lookupPosition(closures, position, DISTANCE_OPTIONS);
   if (pair === null) {
     logWarning(
       "Could find a closure at %j in %j, treating it as excluded",
@@ -117,7 +127,7 @@ export const lookupClosurePosition = (
   { url, root, closures, content },
   position,
 ) => {
-  const pair = lookupPosition(closures, position);
+  const pair = lookupPosition(closures, position, DISTANCE_OPTIONS);
   if (pair === null) {
     logWarning(
       "Could find a closure at %j in %j, treating it as excluded",
