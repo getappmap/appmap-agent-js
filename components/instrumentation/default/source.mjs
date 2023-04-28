@@ -1,6 +1,7 @@
 import {
   createSource as createSourceInner,
   resolveClosurePosition,
+  isClosurePositionExcluded,
   applyExclusionCriteria,
 } from "../../source/index.mjs";
 import { parseEstree } from "../../parse/index.mjs";
@@ -125,17 +126,25 @@ export const resolveClosureLocation = (source, position) => {
         position,
       };
     } else {
-      const maybe_position = resolveClosurePosition(
+      const maybe_resolved_position = resolveClosurePosition(
         toInnerSource(source),
         position,
       );
-      return maybe_position === null
-        ? null
-        : {
-            url,
-            hash: digestSourceContent(source),
-            position: maybe_position,
-          };
+      if (
+        maybe_resolved_position === null ||
+        isClosurePositionExcluded(
+          toInnerSource(source),
+          maybe_resolved_position,
+        )
+      ) {
+        return null;
+      } else {
+        return {
+          url,
+          hash: digestSourceContent(source),
+          position: maybe_resolved_position,
+        };
+      }
     }
   } else {
     return null;

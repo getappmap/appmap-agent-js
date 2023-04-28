@@ -64,6 +64,7 @@ import {
       position: { line: 1, column: 0 },
     }),
     {
+      excluded: false,
       specifier: "./directory/dynamic.js#1",
       position: { line: 1, column: 0 },
       parent: "dynamic",
@@ -71,6 +72,7 @@ import {
       name: "f",
       parameters: ["x"],
       shallow: true,
+      labels: [],
     },
   );
   assertDeepEqual(
@@ -80,6 +82,7 @@ import {
       position: { line: 1, column: 0 },
     }),
     {
+      excluded: false,
       specifier: "./directory/dynamic.js#1",
       position: { line: 1, column: 0 },
       parent: "dynamic",
@@ -87,6 +90,7 @@ import {
       name: "g",
       parameters: ["y"],
       shallow: true,
+      labels: [],
     },
   );
   assertDeepEqual(
@@ -96,6 +100,7 @@ import {
       position: { line: 1, column: 0 },
     }),
     {
+      excluded: false,
       specifier: "./directory/static.js",
       position: { line: 1, column: 0 },
       parent: "static",
@@ -103,6 +108,7 @@ import {
       name: "h",
       parameters: ["z"],
       shallow: true,
+      labels: [],
     },
   );
   assertDeepEqual(
@@ -118,22 +124,32 @@ import {
 // lookupClosureLocation >> missing source //
 {
   const source1 = {
-    url: "external://relative/url/empty.js",
-    content: "",
+    url: "protocol://host/base/directory/empty.js",
+    content: "123;",
     hash: "hash1",
   };
   const source2 = {
-    url: "protocol://host/base/directory/disabled.js",
+    url: "protocol://host/base/directory/duplicate.js",
     content: "function f () {}",
-    hash: "hash2",
+    hash: "hash_2",
+  };
+  const source2_2 = {
+    url: "protocol://host/base/directory/duplicate.js",
+    content: "function g () {}",
+    hash: "hash_2_1",
   };
   const source3 = {
-    url: "protocol://host/base/directory/excluded.js",
-    content: "function g () {}",
+    url: "protocol://host/base/directory/disabled.js",
+    content: "function f () {}",
     hash: "hash3",
   };
+  const source4 = {
+    url: "protocol://host/base/directory/excluded.js",
+    content: "function g () {}",
+    hash: "hash4",
+  };
   const codebase = createCodebase(
-    [source1, source1, source2, source3],
+    [source1, source2, source2_2, source3, source3, source4],
     extendConfiguration(
       createConfiguration("protocol://host/home/"),
       {
@@ -175,6 +191,24 @@ import {
       position: { line: 1, column: 0 },
     }),
     null,
+  );
+  assertDeepEqual(
+    lookupClosureLocation(codebase, {
+      url: source4.url,
+      hash: null,
+      position: { line: 1, column: 0 },
+    }),
+    {
+      excluded: true,
+      parameters: [],
+      parent: "excluded",
+      name: "g",
+      static: false,
+      labels: [],
+      position: { line: 1, column: 0 },
+      shallow: false,
+      specifier: "../base/directory/excluded.js",
+    },
   );
   assertEqual(
     lookupClosureLocation(codebase, {

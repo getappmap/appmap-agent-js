@@ -3,7 +3,7 @@ import {
   parsePosition,
   stringifyPosition,
   measurePositionDistance,
-  lookupPosition,
+  resolvePosition,
 } from "./index.mjs";
 
 const {
@@ -34,7 +34,7 @@ assertEqual(
 );
 
 /////////////////////
-// lookupPosition //
+// resolvePosition //
 /////////////////////
 
 const options = {
@@ -45,13 +45,13 @@ const options = {
 
 // Miss >> empty //
 assertDeepEqual(
-  lookupPosition(new Map(), { line: 123, column: 456 }, options),
+  resolvePosition(new Map(), { line: 123, column: 456 }, options),
   null,
 );
 
 // Miss >> too far //
 assertDeepEqual(
-  lookupPosition(
+  resolvePosition(
     new Map([[stringifyPosition({ line: 0, column: 0 })]]),
     {
       line: MAX_SAFE_INTEGER,
@@ -64,7 +64,7 @@ assertDeepEqual(
 
 // Hit >> bullseye //
 assertDeepEqual(
-  lookupPosition(
+  resolvePosition(
     new Map([[stringifyPosition({ line: 123, column: 456 }), "value"]]),
     {
       line: 123,
@@ -72,12 +72,12 @@ assertDeepEqual(
     },
     options,
   ),
-  [{ line: 123, column: 456 }, "value"],
+  { line: 123, column: 456 },
 );
 
 // Hit >> near //
 assertDeepEqual(
-  lookupPosition(
+  resolvePosition(
     new Map([[stringifyPosition({ line: 123, column: 456 }), "value"]]),
     {
       line: 123,
@@ -85,5 +85,5 @@ assertDeepEqual(
     },
     options,
   ),
-  [{ line: 123, column: 456 }, "value"],
+  { line: 123, column: 456 },
 );

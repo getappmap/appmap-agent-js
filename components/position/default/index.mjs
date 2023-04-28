@@ -26,24 +26,22 @@ export const measurePositionDistance = (
   { line_weight, column_weight },
 ) => line_weight * abs(line2 - line1) + column_weight * abs(column2 - column1);
 
-export const lookupPosition = (map, position1, options) => {
+export const resolvePosition = (map, position1, options) => {
   const key1 = stringifyPosition(position1);
-  if (map.has(stringifyPosition(position1))) {
-    return [position1, map.get(key1)];
+  if (map.has(key1)) {
+    return position1;
   } else {
     let best_distance = Infinity;
     let best_position = null;
-    let best_value = null;
-    for (const [key2, value2] of map) {
+    for (const key2 of map.keys()) {
       const position2 = parsePosition(key2);
       const distance = measurePositionDistance(position1, position2, options);
       if (distance < best_distance) {
         best_distance = distance;
         best_position = position2;
-        best_value = value2;
       }
     }
     const { threshold } = options;
-    return best_distance <= threshold ? [best_position, best_value] : null;
+    return best_distance <= threshold ? best_position : null;
   }
 };

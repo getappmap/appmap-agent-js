@@ -3,6 +3,7 @@ import { lookupUrl } from "../../../matcher/index.mjs";
 import { logWarning, logWarningWhen } from "../../../log/index.mjs";
 import {
   createSource,
+  resolveClosurePosition,
   lookupClosurePosition,
   applyExclusionCriteria,
   exportClassmap as exportSourceClassmap,
@@ -98,14 +99,19 @@ export const createCodebase = (files, configuration) => {
 // query //
 ///////////
 
-const completeClosure = (maybe_result, specifier, shallow) =>
-  maybe_result === null
-    ? null
-    : {
-        ...maybe_result,
-        shallow,
-        specifier,
-      };
+const completeClosure = (source, specifier, shallow, position) => {
+  const maybe_resolved_position = resolveClosurePosition(source, position);
+  if (maybe_resolved_position === null) {
+    return null;
+  } else {
+    return {
+      ...lookupClosurePosition(source, maybe_resolved_position),
+      position: maybe_resolved_position,
+      shallow,
+      specifier,
+    };
+  }
+};
 
 export const lookupClosureLocation = (
   { codebase, disabled, base },
@@ -122,9 +128,10 @@ export const lookupClosureLocation = (
           value: { source },
         } = versions.values().next();
         return completeClosure(
-          lookupClosurePosition(source, position),
+          source,
           toStaticSpecifier(url, base),
           shallow,
+          position,
         );
       } else {
         logWarning(
@@ -136,9 +143,10 @@ export const lookupClosureLocation = (
     } else if (versions.has(hash)) {
       const { source, version } = versions.get(hash);
       return completeClosure(
-        lookupClosurePosition(source, position),
+        source,
         toDynamicSpecifier(url, base, version),
         shallow,
+        position,
       );
     } else {
       logWarning(

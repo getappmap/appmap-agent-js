@@ -4,6 +4,7 @@ import {
   createSource,
   applyExclusionCriteria,
   resolveClosurePosition,
+  isClosurePositionExcluded,
   lookupClosurePosition,
   exportClassmap,
 } from "./index.mjs";
@@ -59,27 +60,35 @@ assertDeepEqual(
 
 assertDeepEqual(
   lookupClosurePosition(
-    createSourceHelper("protocol://host/directory/file.ext", "123;"),
-    { line: 1, column: 0 },
-  ),
-  null,
-);
-
-assertDeepEqual(
-  lookupClosurePosition(
     createSourceHelper(
       "protocol://host/directory/file.ext",
-      "function f (x, y, z) {}",
+      "/* @label foo */\nfunction f (x, y, z) {}",
     ),
-    { line: 1, column: 1 },
+    { line: 2, column: 0 },
   ),
   {
-    position: { line: 1, column: 0 },
+    excluded: false,
     parameters: ["x", "y", "z"],
     parent: "file",
     name: "f",
     static: false,
+    labels: ["foo"],
   },
+);
+
+///////////////////////////////
+// isClosurePositionExcluded //
+///////////////////////////////
+
+assertDeepEqual(
+  isClosurePositionExcluded(
+    createSourceHelper(
+      "protocol://host/directory/file.ext",
+      "/* @label foo */\nfunction f (x, y, z) {}",
+    ),
+    { line: 2, column: 0 },
+  ),
+  false,
 );
 
 ////////////////////
@@ -205,11 +214,10 @@ for (const recursive of [true, false]) {
     ]),
     undefined,
   );
-  assertEqual(resolveClosurePosition(source, { line: 1, column: 0 }), null);
-  assertEqual(lookupClosurePosition(source, { line: 1, column: 0 }), null);
-  assertDeepEqual(
-    resolveClosurePosition(source, { line: 1, column: 16 }),
-    recursive ? null : { line: 1, column: 16 },
+  assertEqual(isClosurePositionExcluded(source, { line: 1, column: 0 }), true);
+  assertEqual(
+    isClosurePositionExcluded(source, { line: 1, column: 16 }),
+    recursive,
   );
   assertDeepEqual(
     exportClassmap(source, {
