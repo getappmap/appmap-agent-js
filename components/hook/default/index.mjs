@@ -20,12 +20,12 @@ const Hooks = [
   HookHttpServer,
 ];
 
-const generateHookSingle = (agent, configuration) => (_, index) =>
-  Hooks[index].hook(agent, configuration);
+const generateHookSingle = (frontend, configuration) => (_, index) =>
+  Hooks[index].hook(frontend, configuration);
 
 const unhookSingle = (hooking, index) => Hooks[index].unhook(hooking);
 
-export const hook = (agent, configuration) =>
-  Hooks.map(generateHookSingle(agent, configuration));
+export const hook = (frontend, configuration) =>
+  Hooks.map(generateHookSingle(frontend, configuration));
 
 export const unhook = (hooking) => hooking.map(unhookSingle);

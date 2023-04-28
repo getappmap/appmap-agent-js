@@ -24,20 +24,18 @@ import {
   formatStatus,
 } from "../../hook-http/index.mjs";
 import { patch } from "../../patch/index.mjs";
+import { getCurrentGroup } from "../../group/index.mjs";
+import { now } from "../../time/index.mjs";
 import {
   getFreshTab,
   getSerializationEmptyValue,
-  requestRemoteAgentAsync,
-  recordBeginAmend,
-  recordBeginEvent,
-  recordEndEvent,
-  recordBeforeEvent,
-  recordAfterEvent,
-  formatRequestPayload,
-  formatResponsePayload,
-  getJumpPayload,
-} from "../../agent/index.mjs";
-import { generateRespond } from "../../http/index.mjs";
+  recordBeginRequestAmend,
+  recordBeginRequestEvent,
+  recordEndResponseEvent,
+  recordBeforeJumpEvent,
+  recordAfterJumpEvent,
+} from "../../frontend/index.mjs";
+import { generateRespond, requestAsync } from "../../http/index.mjs";
 
 const {
   RegExp,
@@ -57,7 +55,7 @@ const getStringPort = (server) => {
 };
 
 const interceptTraffic = (
-  { agent, recorder, regexp },
+  { host, track_port, recorder, regexp },
   server,
   request,
   response,
@@ -69,7 +67,7 @@ const interceptTraffic = (
   ) {
     request.url = request.url.substring("/_appmap".length);
     generateRespond((method, path, body) =>
-      requestRemoteAgentAsync(agent, method, path, body),
+      requestAsync(host, track_port, method, `/_appmap${path}`, body),
     )(request, response);
     return true;
   } else {
@@ -79,22 +77,20 @@ const interceptTraffic = (
 
 /* c8 ignore stop */
 
-const recordBegin = ({ agent, empty }, tab, request) => {
+const recordBegin = ({ frontend, empty }, tab, request) => {
   const { httpVersion: version, method, url, headers } = request;
   const protocol = `HTTP/${version}`;
-  recordBeginEvent(
-    agent,
+  recordBeginRequestEvent(
+    frontend,
     tab,
-    formatRequestPayload(
-      agent,
-      "server",
-      toString(protocol),
-      toString(method),
-      toString(url),
-      null,
-      formatHeaders(headers),
-      empty,
-    ),
+    getCurrentGroup(),
+    now(),
+    toString(protocol),
+    toString(method),
+    toString(url),
+    null,
+    formatHeaders(headers),
+    empty,
   );
   // Give time for express to populate the request
   nextTick(() => {
@@ -103,36 +99,30 @@ const recordBegin = ({ agent, empty }, tab, request) => {
       typeof coalesce(request, "route", undefined) === "object" &&
       typeof coalesce(request.route, "path", undefined) === "string"
     ) {
-      recordBeginAmend(
-        agent,
+      recordBeginRequestAmend(
+        frontend,
         tab,
-        formatRequestPayload(
-          agent,
-          "server",
-          toString(protocol),
-          toString(method),
-          toString(url),
-          `${request.baseUrl}${request.route.path}`,
-          formatHeaders(headers),
-          empty,
-        ),
+        toString(protocol),
+        toString(method),
+        toString(url),
+        `${request.baseUrl}${request.route.path}`,
+        formatHeaders(headers),
+        empty,
       );
     }
   });
 };
 
-const recordEnd = ({ agent }, tab, response, body) => {
-  recordEndEvent(
-    agent,
+const recordEnd = ({ frontend }, tab, response, body) => {
+  recordEndResponseEvent(
+    frontend,
     tab,
-    formatResponsePayload(
-      agent,
-      "server",
-      formatStatus(response.statusCode),
-      toString(response.statusMessage),
-      formatHeaders(response.getHeaders()),
-      body,
-    ),
+    getCurrentGroup(),
+    now(),
+    formatStatus(response.statusCode),
+    toString(response.statusMessage),
+    formatHeaders(response.getHeaders()),
+    body,
   );
 };
 
@@ -157,7 +147,7 @@ const serializeResponseBody = ({ empty }, response, buffer) => {
   } /* c8 ignore stop */
 };
 
-const trackJump = ({ agent, jump_payload }, box, emitter) => {
+const trackJump = ({ frontend }, box, emitter) => {
   const tracking = createBox(true);
   patch(
     emitter,
@@ -165,12 +155,17 @@ const trackJump = ({ agent, jump_payload }, box, emitter) => {
     (original_emit) =>
       function emit(...args) {
         if (getBox(tracking)) {
-          recordAfterEvent(agent, getBox(box), jump_payload);
-          setBox(box, getFreshTab(agent));
+          recordAfterJumpEvent(frontend, getBox(box), getCurrentGroup(), now());
+          setBox(box, getFreshTab(frontend));
           try {
             return apply(original_emit, this, args);
           } finally {
-            recordBeforeEvent(agent, getBox(box), jump_payload);
+            recordBeforeJumpEvent(
+              frontend,
+              getBox(box),
+              getCurrentGroup(),
+              now(),
+            );
           }
         } else {
           return apply(original_emit, this, args);
@@ -189,9 +184,9 @@ const forwardTraffic = (
 ) => apply(original_server_emit, server, ["request", request, response]);
 
 const spyTraffic = (state, original_server_emit, server, request, response) => {
-  const { agent, empty } = state;
-  const bundle_tab = getFreshTab(agent);
-  const jump_box = createBox(getFreshTab(agent));
+  const { frontend, empty } = state;
+  const bundle_tab = getFreshTab(frontend);
+  const jump_box = createBox(getFreshTab(frontend));
   const request_tracking = trackJump(state, jump_box, request);
   const response_tracking = trackJump(state, jump_box, response);
   let body = empty;
@@ -203,7 +198,12 @@ const spyTraffic = (state, original_server_emit, server, request, response) => {
     if (!getBox(peer_box)) {
       // make sure the end event is the last of the tab
       nextTick(() => {
-        recordAfterEvent(state.agent, getBox(jump_box), state.jump_payload);
+        recordAfterJumpEvent(
+          state.frontend,
+          getBox(jump_box),
+          getCurrentGroup(),
+          now(),
+        );
         recordEnd(state, bundle_tab, response, body);
       });
     }
@@ -232,7 +232,7 @@ const spyTraffic = (state, original_server_emit, server, request, response) => {
       response,
     );
   } finally {
-    recordBeforeEvent(state.agent, getBox(jump_box), state.jump_payload);
+    recordBeforeJumpEvent(frontend, getBox(jump_box), getCurrentGroup(), now());
   }
 };
 
@@ -281,8 +281,14 @@ const compileInterceptTrackPort = (source) => {
 };
 
 export const hook = (
-  agent,
-  { recorder, "intercept-track-port": intercept_track_port, hooks: { http } },
+  frontend,
+  {
+    recorder,
+    host,
+    "intercept-track-port": intercept_track_port,
+    "track-port": track_port,
+    hooks: { http },
+  },
 ) => {
   if (!http && recorder !== "remote") {
     return [];
@@ -296,10 +302,11 @@ export const hook = (
       })),
     );
     const state = {
-      agent,
+      frontend,
       recorder,
-      jump_payload: getJumpPayload(agent),
-      empty: getSerializationEmptyValue(agent),
+      track_port,
+      host,
+      empty: getSerializationEmptyValue(frontend),
       regexp: compileInterceptTrackPort(intercept_track_port),
     };
     const traps = {

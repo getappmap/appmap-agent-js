@@ -2,20 +2,30 @@ import process from "node:process";
 import { hooks } from "../../../lib/node/mocha-hook.mjs";
 import { ExternalAppmapError } from "../../error/index.mjs";
 import { logInfo, logErrorWhen } from "../../log/index.mjs";
-import { hook } from "../../hook/index.mjs";
 import { getUuid } from "../../uuid/index.mjs";
 import { extendConfiguration } from "../../configuration/index.mjs";
 import { extendConfigurationNode } from "../../configuration-accessor/index.mjs";
 import { assert, coalesce, matchVersion } from "../../util/index.mjs";
 import { requirePeerDependency } from "../../peer/index.mjs";
 import {
-  openAgent,
-  getSession,
+  createFrontend,
+  flush as flushFrontend,
   recordStartTrack,
   recordStopTrack,
-} from "../../agent/index.mjs";
+} from "../../frontend/index.mjs";
+import { hook, unhook } from "../../hook/index.mjs";
+import {
+  createSocket,
+  openSocketAsync,
+  isSocketReady,
+  sendSocket,
+  closeSocketAsync,
+} from "../../socket/index.mjs";
 
-const { undefined } = globalThis;
+const {
+  undefined,
+  JSON: { stringify: stringifyJSON },
+} = globalThis;
 
 // Accessing mocha version via the prototype is not documented but it seems stable enough.
 // Added in https://github.com/mochajs/mocha/pull/3535
@@ -50,6 +60,10 @@ const validateMocha = (Mocha) => {
 
 export const record = (configuration) => {
   configuration = extendConfigurationNode(configuration, process);
+  if (configuration.session === null) {
+    configuration = { ...configuration, session: getUuid() };
+  }
+  const { session } = configuration;
   logInfo(
     "Recording mocha test cases of process #%j -- %j",
     process.pid,
@@ -61,10 +75,23 @@ export const record = (configuration) => {
       strict: true,
     }),
   );
-  const agent = openAgent(configuration);
-  const session = getSession(agent);
-  hook(agent, configuration);
+  const frontend = createFrontend(configuration);
+  const backup = hook(frontend, configuration);
+  const socket = createSocket(configuration);
+  const flush = () => {
+    if (isSocketReady(socket)) {
+      for (const message of flushFrontend(frontend)) {
+        sendSocket(socket, stringifyJSON(message));
+      }
+    }
+  };
   let running = null;
+  hooks.beforeAll = async () => {
+    await openSocketAsync(socket);
+    process.once("beforeExit", flush);
+    process.on("exit", flush);
+    process.on("uncaughtExceptionMonitor", flush);
+  };
   hooks.beforeEach = (context) => {
     assert(
       !logErrorWhen(
@@ -80,7 +107,7 @@ export const record = (configuration) => {
       track: `mocha-${getUuid()}`,
     };
     recordStartTrack(
-      agent,
+      frontend,
       running.track,
       extendConfiguration(
         configuration,
@@ -98,10 +125,18 @@ export const record = (configuration) => {
       "No running mocha test case",
       ExternalAppmapError,
     );
-    recordStopTrack(agent, running.track, {
+    recordStopTrack(frontend, running.track, {
       type: "test",
       passed: context.currentTest.state === "passed",
     });
+    flush();
     running = null;
+  };
+  hooks.afterAll = async () => {
+    unhook(backup);
+    await closeSocketAsync(socket);
+    process.off("beforeExit", flush);
+    process.off("exit", flush);
+    process.off("uncaughtExceptionMonitor", flush);
   };
 };

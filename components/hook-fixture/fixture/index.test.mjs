@@ -4,7 +4,7 @@ import { testHookAsync } from "./index.mjs";
 assertDeepEqual(
   await testHookAsync(
     {
-      hook: (_agent, _configuration) => "hooking",
+      hook: (_frontend, _configuration) => "hooking",
       unhook: (hooking) => {
         assertEqual(hooking, "hooking");
       },

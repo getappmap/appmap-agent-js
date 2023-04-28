@@ -1,15 +1,14 @@
 import { toString, spyOnce, assignProperty } from "../../util/index.mjs";
 import { requirePeerDependency } from "../../peer/index.mjs";
+import { getCurrentGroup } from "../../group/index.mjs";
+import { now } from "../../time/index.mjs";
 import {
   getFreshTab,
-  recordBeginEvent,
-  recordEndEvent,
-  recordBeforeEvent,
-  recordAfterEvent,
-  formatQueryPayload,
-  getAnswerPayload,
-  getBundlePayload,
-} from "../../agent/index.mjs";
+  recordBeforeQueryEvent,
+  recordAfterAnswerEvent,
+  recordBeginBundleEvent,
+  recordEndBundleEvent,
+} from "../../frontend/index.mjs";
 
 const {
   Object,
@@ -24,7 +23,7 @@ export const unhook = (backup) => {
 };
 
 export const hook = (
-  agent,
+  frontend,
   { repository: { directory }, hooks: { mysql } },
 ) => {
   if (mysql === false) {
@@ -37,31 +36,28 @@ export const hook = (
     /* c8 ignore start */ if (Mysql === null) {
       return [];
     } /* c8 ignore stop */ else {
-      const bundle_payload = getBundlePayload(agent);
-      const answer_payload = getAnswerPayload(agent);
       const { createConnection, createQuery } = Mysql;
       const { __proto__: prototype } = createConnection({});
       const { query: original } = prototype;
       prototype.query = function query(sql, values, callback) {
         const query = createQuery(sql, values, callback);
-        const bundle_tab = getFreshTab(agent);
-        recordBeginEvent(agent, bundle_tab, bundle_payload);
-        const jump_tab = getFreshTab(agent);
-        recordBeforeEvent(
-          agent,
+        const bundle_tab = getFreshTab(frontend);
+        const jump_tab = getFreshTab(frontend);
+        recordBeginBundleEvent(frontend, bundle_tab, getCurrentGroup(), now());
+        recordBeforeQueryEvent(
+          frontend,
           jump_tab,
-          formatQueryPayload(
-            agent,
-            DATABASE,
-            VERSION,
-            toString(query.sql),
-            Object(query.values),
-          ),
+          getCurrentGroup(),
+          now(),
+          DATABASE,
+          VERSION,
+          toString(query.sql),
+          Object(query.values),
         );
         const { _callback: query_callback } = query;
         query._callback = spyOnce((_error, _result, _field) => {
-          recordAfterEvent(agent, jump_tab, answer_payload);
-          recordEndEvent(agent, bundle_tab, bundle_payload);
+          recordAfterAnswerEvent(frontend, jump_tab, getCurrentGroup(), now());
+          recordEndBundleEvent(frontend, bundle_tab, getCurrentGroup(), now());
         }, query_callback);
         return apply(original, this, [query]);
       };

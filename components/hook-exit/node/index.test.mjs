@@ -7,7 +7,13 @@ assertDeepEqual(
   await testHookAsync(HookExit, {}, () => {
     process.emit("exit", 0);
   }),
-  [],
+  [
+    {
+      type: "stop",
+      track: null,
+      termination: { type: "exit", status: 0 },
+    },
+  ],
 );
 
-process.exit(0);
+process.exitCode = 0;

@@ -8,10 +8,11 @@
 import { defineGlobal, writeGlobal } from "../../global/index.mjs";
 import { toAbsoluteUrl, toDirectoryUrl } from "../../url/index.mjs";
 import { InternalAppmapError } from "../../error/index.mjs";
+import { readFile } from "../../file/index.mjs";
 import { assert } from "../../util/index.mjs";
-import { instrument } from "../../agent/index.mjs";
+import { instrument, extractMissingUrlArray } from "../../frontend/index.mjs";
 
-const { String } = globalThis;
+const { Map, String } = globalThis;
 
 const forward = (_url, _location, content) => content;
 
@@ -22,7 +23,7 @@ export const unhook = (maybe_hidden) => {
 };
 
 export const hook = (
-  agent,
+  frontend,
   {
     hooks: {
       eval: { hidden, aliases },
@@ -34,18 +35,22 @@ export const hook = (
     assert(
       defineGlobal(
         hidden,
-        (url, position, content) =>
-          instrument(
-            agent,
-            {
-              type: "script",
-              // We do not need to use a unique filename
-              // because we support dynamic sources.
-              url: toAbsoluteUrl(`eval-${position}.js`, toDirectoryUrl(url)),
-              content: String(content),
-            },
-            null,
-          ),
+        (url, position, content) => {
+          url = toAbsoluteUrl(`eval-${position}.js`, toDirectoryUrl(url));
+          const cache = new Map([[url, String(content)]]);
+          let complete = false;
+          while (!complete) {
+            const urls = extractMissingUrlArray(frontend, url, cache);
+            if (urls.length === 0) {
+              complete = true;
+            } /* c8 ignore start */ else {
+              for (const url of urls) {
+                cache.set(url, readFile(url));
+              }
+            } /* c8 ignore stop */
+          }
+          return instrument(frontend, url, cache);
+        },
         true,
       ),
       "global eval hook variable already defined",

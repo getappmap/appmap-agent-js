@@ -15,17 +15,16 @@ import {
   formatHeaders,
   formatStatus,
 } from "../../hook-http/index.mjs";
+import { getCurrentGroup } from "../../group/index.mjs";
+import { now } from "../../time/index.mjs";
 import {
   getSerializationEmptyValue,
   getFreshTab,
-  recordBeginEvent,
-  recordEndEvent,
-  recordBeforeEvent,
-  recordAfterEvent,
-  getBundlePayload,
-  formatRequestPayload,
-  formatResponsePayload,
-} from "../../agent/index.mjs";
+  recordBeginBundleEvent,
+  recordEndBundleEvent,
+  recordBeforeRequestEvent,
+  recordAfterResponseEvent,
+} from "../../frontend/index.mjs";
 
 const {
   Reflect: { apply, construct },
@@ -34,12 +33,11 @@ const {
 
 export const unhook = (backup) => backup.forEach(assignProperty);
 
-export const hook = (agent, { hooks: { http } }) => {
+export const hook = (frontend, { hooks: { http } }) => {
   if (!http) {
     return [];
   } else {
-    const empty = getSerializationEmptyValue(agent);
-    const bundle_payload = getBundlePayload(agent);
+    const empty = getSerializationEmptyValue(frontend);
     const backup = [
       ...["ClientRequest", "request", "get"].map((key) => ({
         object: Http,
@@ -48,22 +46,20 @@ export const hook = (agent, { hooks: { http } }) => {
       ...["request", "get"].map((key) => ({ object: Https, key })),
     ].map(({ object, key }) => ({ object, key, value: object[key] }));
     const spyRequest = (request) => {
-      const bundle_tab = getFreshTab(agent);
-      const jump_tab = getFreshTab(agent);
-      recordBeginEvent(agent, bundle_tab, bundle_payload);
-      recordBeforeEvent(
-        agent,
+      const bundle_tab = getFreshTab(frontend);
+      const jump_tab = getFreshTab(frontend);
+      recordBeginBundleEvent(frontend, bundle_tab, getCurrentGroup(), now());
+      recordBeforeRequestEvent(
+        frontend,
         jump_tab,
-        formatRequestPayload(
-          agent,
-          "client",
-          "HTTP/1.1",
-          toString(request.method),
-          toString(request.path),
-          null,
-          formatHeaders(request.getHeaders()),
-          empty,
-        ),
+        getCurrentGroup(),
+        now(),
+        "HTTP/1.1",
+        toString(request.method),
+        toString(request.path),
+        null,
+        formatHeaders(request.getHeaders()),
+        empty,
       );
       request.on("response", (response) => {
         const {
@@ -99,19 +95,22 @@ export const hook = (agent, { hooks: { http } }) => {
         response.once(
           "end",
           spyOnce(() => {
-            recordAfterEvent(
-              agent,
+            recordAfterResponseEvent(
+              frontend,
               jump_tab,
-              formatResponsePayload(
-                agent,
-                "client",
-                formatStatus(status),
-                toString(message),
-                formatHeaders(headers),
-                body,
-              ),
+              getCurrentGroup(),
+              now(),
+              formatStatus(status),
+              toString(message),
+              formatHeaders(headers),
+              body,
             );
-            recordEndEvent(agent, bundle_tab, bundle_payload);
+            recordEndBundleEvent(
+              frontend,
+              bundle_tab,
+              getCurrentGroup(),
+              now(),
+            );
           }, identity),
         );
       });

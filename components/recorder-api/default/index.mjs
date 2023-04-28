@@ -14,23 +14,27 @@ import {
 import { resolveConfigurationManualRecorder } from "../../configuration-accessor/index.mjs";
 import { hook, unhook } from "../../hook/index.mjs";
 import {
-  openAgent,
-  closeAgent,
+  createFrontend,
+  flush as flushFrontend,
   instrument,
   recordStartTrack,
   recordStopTrack,
-  takeLocalAgentTrace,
-} from "../../agent/index.mjs";
+} from "../../frontend/index.mjs";
+import {
+  createBackend,
+  sendBackend,
+  compileBackendTrack,
+} from "../../backend/index.mjs";
 
-const { URL, Set, String } = globalThis;
+const { Map, URL, Set, String } = globalThis;
 
 let global_running = false;
 
-const makeFile = (type, content, url = "file:///w:/missing-file-url.mjs") => {
-  content = String(content);
-  url = String(url);
+const validateUrl = (url = "file:///w:/missing-file-url.mjs") => {
   try {
+    url = String(url);
     new URL(url);
+    return url;
   } catch (error) {
     logError(
       "The second argument of appmap.recordScript is not a valid url, got: %j >> %O",
@@ -39,7 +43,6 @@ const makeFile = (type, content, url = "file:///w:/missing-file-url.mjs") => {
     );
     throw new ExternalAppmapError("Invalid url argument");
   }
-  return { type, url, content };
 };
 
 const expectRunning = (hooking) => {
@@ -51,6 +54,12 @@ const expectRunning = (hooking) => {
     "Terminated appmap instance",
     ExternalAppmapError,
   );
+};
+
+const flush = (frontend, backend) => {
+  for (const message of flushFrontend(frontend)) {
+    sendBackend(backend, message);
+  }
 };
 
 export class Appmap {
@@ -65,24 +74,30 @@ export class Appmap {
     );
     const configuration = resolveConfigurationManualRecorder(
       extendConfiguration(
-        createConfiguration(toDirectoryUrl(home)),
+        {
+          ...createConfiguration(toDirectoryUrl(home)),
+          session: "singleton",
+        },
         conf,
         toDirectoryUrl(base),
       ),
     );
     this.configuration = configuration;
-    this.agent = openAgent(configuration);
-    this.hooking = hook(this.agent, configuration);
+    this.frontend = createFrontend(configuration);
+    this.backend = createBackend(configuration);
+    this.hooking = hook(this.frontend, configuration);
     this.tracks = new Set();
     global_running = true;
   }
   instrumentScript(content, url) {
     expectRunning(this.hooking);
-    return instrument(this.agent, makeFile("script", content, url), null);
+    url = validateUrl(url);
+    return instrument(this.frontend, url, new Map([[url, String(content)]]));
   }
   instrumentModule(content, url) {
     expectRunning(this.hooking);
-    return instrument(this.agent, makeFile("module", content, url), null);
+    url = validateUrl(url);
+    return instrument(this.frontend, url, new Map([[url, String(content)]]));
   }
   recordScript(content, url) {
     expectRunning(this.hooking);
@@ -104,10 +119,11 @@ export class Appmap {
     );
     this.tracks.add(track);
     recordStartTrack(
-      this.agent,
+      this.frontend,
       track,
       extendConfiguration(this.configuration, conf, base),
     );
+    flush(this.frontend, this.backend);
     return track;
   }
   stopRecording(track, termination = { type: "manual" }) {
@@ -122,8 +138,9 @@ export class Appmap {
       ExternalAppmapError,
     );
     this.tracks.delete(track);
-    recordStopTrack(this.agent, track, termination);
-    return takeLocalAgentTrace(this.agent, track);
+    recordStopTrack(this.frontend, track, termination);
+    flush(this.frontend, this.backend);
+    return compileBackendTrack(this.backend, track).content;
   }
   terminate() {
     expectRunning(this.hooking);
@@ -135,6 +152,5 @@ export class Appmap {
     global_running = false;
     unhook(this.hooking);
     this.hooking = null;
-    closeAgent(this.agent);
   }
 }

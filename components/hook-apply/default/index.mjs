@@ -1,61 +1,91 @@
 import { InternalAppmapError } from "../../error/index.mjs";
 import { assert, noop, assignProperty } from "../../util/index.mjs";
 import { defineGlobal } from "../../global/index.mjs";
+import { now } from "../../time/index.mjs";
+import { getCurrentGroup } from "../../group/index.mjs";
 import {
   getFreshTab,
   getSerializationEmptyValue,
-  recordBeginEvent,
-  recordEndEvent,
-  recordBeforeEvent,
-  recordAfterEvent,
-  formatApplyPayload,
-  formatReturnPayload,
-  formatThrowPayload,
-  formatAwaitPayload,
-  formatResolvePayload,
-  formatRejectPayload,
-  formatYieldPayload,
-} from "../../agent/index.mjs";
+  recordBeginApplyEvent,
+  recordEndReturnEvent,
+  recordEndThrowEvent,
+  recordBeforeAwaitEvent,
+  recordBeforeYieldEvent,
+  recordAfterResolveEvent,
+  recordAfterRejectEvent,
+} from "../../frontend/index.mjs";
 
 export const unhook = (backup) => {
   backup.forEach(assignProperty);
 };
 
-export const hook = (agent, { hooks: { apply: apply_hook_variable } }) => {
+export const hook = (frontend, { hooks: { apply: apply_hook_variable } }) => {
   if (apply_hook_variable === null) {
     return [];
   } else {
     const runtime = {
-      empty: getSerializationEmptyValue(agent),
-      getFreshTab: () => getFreshTab(agent),
-      recordApply: (tab, _function, _this, _arguments) => {
-        recordBeginEvent(
-          agent,
+      empty: getSerializationEmptyValue(frontend),
+      getFreshTab: () => getFreshTab(frontend),
+      recordApply: (tab, function_, this_, arguments_) => {
+        recordBeginApplyEvent(
+          frontend,
           tab,
-          formatApplyPayload(agent, _function, _this, _arguments),
+          getCurrentGroup(),
+          now(),
+          function_,
+          this_,
+          arguments_,
         );
       },
-      recordReturn: (tab, _function, result) => {
-        recordEndEvent(
-          agent,
+      recordReturn: (tab, function_, result) => {
+        recordEndReturnEvent(
+          frontend,
           tab,
-          formatReturnPayload(agent, _function, result),
+          getCurrentGroup(),
+          now(),
+          function_,
+          result,
         );
       },
-      recordThrow: (tab, _function, error) => {
-        recordEndEvent(agent, tab, formatThrowPayload(agent, _function, error));
+      recordThrow: (tab, function_, error) => {
+        recordEndThrowEvent(
+          frontend,
+          tab,
+          getCurrentGroup(),
+          now(),
+          function_,
+          error,
+        );
       },
       recordAwait: (tab, promise) => {
-        recordBeforeEvent(agent, tab, formatAwaitPayload(agent, promise));
-      },
-      recordResolve: (tab, result) => {
-        recordAfterEvent(agent, tab, formatResolvePayload(agent, result));
-      },
-      recordReject: (tab, error) => {
-        recordAfterEvent(agent, tab, formatRejectPayload(agent, error));
+        recordBeforeAwaitEvent(
+          frontend,
+          tab,
+          getCurrentGroup(),
+          now(),
+          promise,
+        );
       },
       recordYield: (tab, iterator) => {
-        recordBeforeEvent(agent, tab, formatYieldPayload(agent, iterator));
+        recordBeforeYieldEvent(
+          frontend,
+          tab,
+          getCurrentGroup(),
+          now(),
+          iterator,
+        );
+      },
+      recordResolve: (tab, result) => {
+        recordAfterResolveEvent(
+          frontend,
+          tab,
+          getCurrentGroup(),
+          now(),
+          result,
+        );
+      },
+      recordReject: (tab, error) => {
+        recordAfterRejectEvent(frontend, tab, getCurrentGroup(), now(), error);
       },
     };
     assert(

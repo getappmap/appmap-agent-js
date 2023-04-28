@@ -4,6 +4,8 @@ import {
   assertDeepEqual,
   assertMatch,
 } from "../../__fixture__.mjs";
+import { validateMessage } from "../../validate/index.mjs";
+import { readGlobal } from "../../global/index.mjs";
 import { getUuid } from "../../uuid/random/index.mjs";
 import { toAbsoluteUrl } from "../../url/index.mjs";
 import { convertFileUrlToPath, getTmpUrl } from "../../path/index.mjs";
@@ -16,7 +18,14 @@ import { compileCreateTransformer } from "./index.mjs";
 const {
   URL,
   Reflect: { get },
+  JSON: { parse: parseJSON },
 } = globalThis;
+
+const validateMockSocketBuffer = () => {
+  for (const message of readGlobal("GET_LAST_MOCK_SOCKET_BUFFER")()) {
+    validateMessage(parseJSON(message));
+  }
+};
 
 ///////////////////////////////////////////////////////////////
 // CJS && No SourceMap && With processAsync && String Source //
@@ -53,10 +62,6 @@ const {
           cjs: true,
           esm: false,
           eval: true,
-          http: false,
-          mysql: false,
-          sqlite3: false,
-          pg: false,
         },
         packages: [
           {
@@ -112,6 +117,8 @@ const {
       });
     }
   }
+
+  validateMockSocketBuffer();
 }
 
 ////////////////////////////////////////////////////////////////
@@ -155,10 +162,6 @@ const {
           cjs: false,
           esm: true,
           eval: true,
-          http: false,
-          mysql: false,
-          sqlite3: false,
-          pg: false,
         },
         packages: [
           {
@@ -192,4 +195,6 @@ const {
     ),
     /APPMAP_HOOK_EVAL.*\n.*APPMAP_HOOK_EVAL/u,
   );
+
+  validateMockSocketBuffer();
 }

@@ -1,10 +1,10 @@
-import { recordError } from "../../agent/index.mjs";
+import { recordError } from "../../frontend/index.mjs";
 
 const { window } = globalThis;
 
-export const hook = (agent, _configuration) => {
+export const hook = (frontend, _configuration) => {
   const listener = (error) => {
-    recordError(agent, error);
+    recordError(frontend, error);
   };
   window.addEventListener("error", listener);
   return listener;

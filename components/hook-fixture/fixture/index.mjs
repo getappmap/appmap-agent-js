@@ -2,13 +2,8 @@ import {
   createConfiguration,
   extendConfiguration,
 } from "../../configuration/index.mjs";
-import {
-  recordStopTrack,
-  recordStartTrack,
-  openAgent,
-  takeLocalAgentTrace,
-  closeAgent,
-} from "../../agent/index.mjs";
+import { validateMessage } from "../../validate/index.mjs";
+import { createFrontend, flush } from "../../frontend/index.mjs";
 
 export const testHookAsync = async (
   { hook, unhook },
@@ -22,18 +17,17 @@ export const testHookAsync = async (
   };
   const configuration = extendConfiguration(
     createConfiguration(import.meta.url),
-    options.configuration,
+    { ...options.configuration, session: "session" },
     options.url,
   );
-  const agent = openAgent(configuration);
-  const hooking = hook(agent, configuration);
+  const frontend = createFrontend(configuration);
+  const hooking = hook(frontend, configuration);
   try {
-    recordStartTrack(agent, "record", configuration);
     await callbackAsync();
-    recordStopTrack(agent, "record", { type: "manual" });
-    return takeLocalAgentTrace(agent, "record").messages;
   } finally {
-    closeAgent(agent);
     unhook(hooking);
   }
+  const messages = flush(frontend);
+  messages.forEach(validateMessage);
+  return messages;
 };

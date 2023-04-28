@@ -1,6 +1,6 @@
 import { platform as getPlatform } from "node:os";
 import { createRequire } from "node:module";
-import { assertDeepEqual } from "../../__fixture__.mjs";
+import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
 import { getUuid } from "../../uuid/random/index.mjs";
 import { getTmpUrl } from "../../path/index.mjs";
 import { toAbsoluteUrl } from "../../url/index.mjs";
@@ -9,17 +9,29 @@ import { generateUnixSocket } from "./unix.mjs";
 
 if (getPlatform() !== "win32") {
   const require = createRequire(import.meta.url);
-  const { openSocket, closeSocket, sendSocket } = generateUnixSocket(
+  const {
+    createSocket,
+    isSocketReady,
+    openSocketAsync,
+    sendSocket,
+    closeSocketAsync,
+  } = generateUnixSocket(
     require("posix-socket"),
     require("posix-socket-messaging"),
   );
-  const runAsync = (port) => {
-    const socket = openSocket({
+  const runAsync = async (port) => {
+    const socket = createSocket({
       host: "localhost",
       "trace-port": port,
     });
+    assertEqual(isSocketReady(socket), false);
+    sendSocket(socket, "before");
+    await openSocketAsync(socket);
+    assertEqual(isSocketReady(socket), true);
     sendSocket(socket, "message");
-    closeSocket(socket);
+    await closeSocketAsync(socket);
+    assertEqual(isSocketReady(socket), false);
+    sendSocket(socket, "after");
   };
   assertDeepEqual(await testAsync(0, runAsync), ["message"]);
   assertDeepEqual(

@@ -1,35 +1,36 @@
-import { assertDeepEqual } from "../../__fixture__.mjs";
+import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
 import { getUuid } from "../../uuid/random/index.mjs";
 import { getTmpUrl } from "../../path/index.mjs";
 import { toAbsoluteUrl } from "../../url/index.mjs";
-import { openSocket, closeSocket, sendSocket } from "./net.mjs";
+import {
+  createSocket,
+  isSocketReady,
+  openSocketAsync,
+  sendSocket,
+  closeSocketAsync,
+} from "./net.mjs";
 import { testAsync } from "./__fixture__.mjs";
 
-const { Promise, setTimeout } = globalThis;
-
-const sleepAsync = (ms) =>
-  new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
-
 const runAsync = async (port) => {
-  const socket = openSocket({
+  const socket = createSocket({
     host: "localhost",
     "trace-port": port,
     heartbeat: 10000,
     threshold: 0,
   });
-  sendSocket(socket, "message1");
-  await sleepAsync(1000);
-  sendSocket(socket, "message2");
-  closeSocket(socket);
-  await sleepAsync(1000);
-  sendSocket(socket, "message3");
+  assertEqual(isSocketReady(socket), false);
+  sendSocket(socket, "before");
+  await openSocketAsync(socket);
+  assertEqual(isSocketReady(socket), true);
+  sendSocket(socket, "message");
+  await closeSocketAsync(socket);
+  assertEqual(isSocketReady(socket), false);
+  sendSocket(socket, "after");
 };
 
-assertDeepEqual(await testAsync(0, runAsync), ["message1", "message2"]);
+assertDeepEqual(await testAsync(0, runAsync), ["message"]);
 
 assertDeepEqual(
   await testAsync(toAbsoluteUrl(getUuid(), getTmpUrl()), runAsync),
-  ["message1", "message2"],
+  ["message"],
 );

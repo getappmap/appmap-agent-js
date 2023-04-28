@@ -1,6 +1,10 @@
 globals:
   globalThis: readonly
   console: readonly
+  setTimeout: readonly
+  clearTimeout: readonly
+  setInterval: readonly
+  clearInterval: readonly
 parser: "@babel/eslint-parser"
 env:
   es2017: true
