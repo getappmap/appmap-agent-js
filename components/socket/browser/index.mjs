@@ -1,8 +1,9 @@
-import { logError, logWarningWhen } from "../../log/index.mjs";
+import { logError, logWarning } from "../../log/index.mjs";
 import { InternalAppmapError } from "../../error/index.mjs";
-import { CONNECTING, OPEN } from "./ready-state.mjs";
+import { OPEN, CLOSED } from "./ready-state.mjs";
 
 const {
+  Promise,
   URL,
   WebSocket,
   window: { location },
@@ -15,33 +16,42 @@ const toWebSocketUrl = (base, path) => {
   return url_obj.toString();
 };
 
-export const openSocket = ({ "http-switch": segment }) => {
-  const buffer = [];
+export const createSocket = ({ "http-switch": segment }) => {
   const socket = new WebSocket(toWebSocketUrl(location, `/${segment}`));
-  socket.addEventListener("open", () => {
-    for (const message of buffer) {
-      socket.send(message);
-    }
-  });
   /* c8 ignore start */
-  socket.addEventListener("error", () => {
+  socket.addEventListener("error", (_event) => {
     logError("Websocket error at %j", socket.url);
-    throw new InternalAppmapError("Websocket connection error");
+    throw new InternalAppmapError("Websocket error");
   });
   /* c8 ignore stop */
-  return { socket, buffer };
+  return socket;
 };
 
-export const sendSocket = ({ socket, buffer }, message) => {
-  if (socket.readyState === CONNECTING) {
-    buffer.push(message);
-  } else if (socket.readyState === OPEN) {
-    socket.send(message);
-  } else {
-    logWarningWhen("Lost message >> %j", message);
+export const openSocketAsync = async (socket) => {
+  if (socket.readyState !== OPEN) {
+    await new Promise((resolve, reject) => {
+      socket.addEventListener("open", resolve);
+      socket.addEventListener("error", reject);
+    });
   }
 };
 
-export const closeSocket = ({ socket }) => {
+export const isSocketReady = (socket) => socket.readyState === OPEN;
+
+export const sendSocket = (socket, message) => {
+  if (socket.readyState === OPEN) {
+    socket.send(message);
+  } else {
+    logWarning("Lost message >> %s", message);
+  }
+};
+
+export const closeSocketAsync = async (socket) => {
   socket.close();
+  if (socket.readyState !== CLOSED) {
+    await new Promise((resolve, reject) => {
+      socket.addEventListener("close", resolve);
+      socket.addEventListener("error", reject);
+    });
+  }
 };

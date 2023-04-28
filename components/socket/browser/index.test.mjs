@@ -21,9 +21,15 @@ defineGlobal("window", {
   location: `http://localhost:${server.address().port}/index.html`,
 });
 
-const { openSocket, sendSocket, closeSocket } = await import("./index.mjs");
+const {
+  createSocket,
+  isSocketReady,
+  openSocketAsync,
+  sendSocket,
+  closeSocketAsync,
+} = await import("./index.mjs");
 
-const socket = openSocket(
+const socket = createSocket(
   extendConfiguration(
     createConfiguration("protocol://host/home"),
     {
@@ -33,27 +39,24 @@ const socket = openSocket(
   ),
 );
 
-sendSocket(socket, "connecting");
+assertEqual(isSocketReady(socket), false);
 
-const ws = await new Promise((resolve, reject) => {
-  server.on("error", reject);
-  server.on("connection", (ws, req) => {
-    assertEqual(req.url, "/__appmap__");
-    resolve(ws);
-  });
-});
+sendSocket(socket, "before");
 
-assertEqual(
-  (
-    await new Promise((resolve, reject) => {
-      ws.on("error", reject);
-      ws.on("message", resolve);
-    })
-  ).toString("utf8"),
-  "connecting",
-);
+const [ws] = await Promise.all([
+  new Promise((resolve, reject) => {
+    server.on("error", reject);
+    server.on("connection", (ws, req) => {
+      assertEqual(req.url, "/__appmap__");
+      resolve(ws);
+    });
+  }),
+  openSocketAsync(socket),
+]);
 
-sendSocket(socket, "open");
+assertEqual(isSocketReady(socket), true);
+
+sendSocket(socket, "message");
 
 assertEqual(
   (
@@ -62,11 +65,13 @@ assertEqual(
       ws.on("message", resolve);
     })
   ).toString("utf8"),
-  "open",
+  "message",
 );
 
-closeSocket(socket);
+await closeSocketAsync(socket);
 
-sendSocket(socket, "closing");
+assertEqual(isSocketReady(socket), false);
+
+sendSocket(socket, "after");
 
 server.close();

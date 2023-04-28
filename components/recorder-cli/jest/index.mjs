@@ -2,22 +2,30 @@ import process from "node:process";
 import { ExternalAppmapError } from "../../error/index.mjs";
 import { logInfo, logErrorWhen, logWarningWhen } from "../../log/index.mjs";
 import { getUuid } from "../../uuid/index.mjs";
-import { hook } from "../../hook/index.mjs";
 import { extendConfiguration } from "../../configuration/index.mjs";
 import { extendConfigurationNode } from "../../configuration-accessor/index.mjs";
 import { readGlobal } from "../../global/index.mjs";
 import { assert } from "../../util/index.mjs";
 import {
-  openAgent,
-  getSession,
+  createFrontend,
+  flush as flushFrontend,
   recordStartTrack,
   recordStopTrack,
-} from "../../agent/index.mjs";
+} from "../../frontend/index.mjs";
+import { hook, unhook } from "../../hook/index.mjs";
+import {
+  createSocket,
+  openSocketAsync,
+  isSocketReady,
+  sendSocket,
+  closeSocketAsync,
+} from "../../socket/index.mjs";
 
 const {
   Map,
   Array: { from: toArray },
   Reflect: { defineProperty },
+  JSON: { stringify: stringifyJSON },
 } = globalThis;
 
 const getName = ({ name }) => name;
@@ -28,6 +36,10 @@ function showTrackMap() {
 
 export const record = (configuration) => {
   configuration = extendConfigurationNode(configuration, process);
+  if (configuration.session === null) {
+    configuration = { ...configuration, session: getUuid() };
+  }
+  const { session } = configuration;
   logInfo(
     "Recording jest test cases of process #%j -- %j",
     process.pid,
@@ -48,11 +60,12 @@ export const record = (configuration) => {
   // Error: There should always be a Jest object already
   //
   // Which might be a bug in jest related to `createRequire`.
+  const beforeAll = readGlobal("beforeAll");
   const beforeEach = readGlobal("beforeEach");
   const afterEach = readGlobal("afterEach");
+  const afterAll = readGlobal("afterAll");
   const expect = readGlobal("expect");
-  const agent = openAgent(configuration);
-  const session = getSession(agent);
+  const frontend = createFrontend(configuration);
   // Jest is claiming that it is running the tests from a given file serially.
   // However we detected nested calls of beforeEach / afterEach in practice.
   // So we need to maintain a set of track ids instead of a single one.
@@ -64,7 +77,21 @@ export const record = (configuration) => {
     enumerable: true,
     value: showTrackMap,
   });
-  hook(agent, configuration);
+  const backup = hook(frontend, configuration);
+  const socket = createSocket(configuration);
+  const flush = () => {
+    if (isSocketReady(socket)) {
+      for (const message of flushFrontend(frontend)) {
+        sendSocket(socket, stringifyJSON(message));
+      }
+    }
+  };
+  beforeAll(async () => {
+    await openSocketAsync(socket);
+    process.once("beforeExit", flush);
+    process.on("exit", flush);
+    process.on("uncaughtExceptionMonitor", flush);
+  });
   beforeEach(function () {
     assert(
       !logErrorWhen(
@@ -87,7 +114,7 @@ export const record = (configuration) => {
       tracks,
     );
     recordStartTrack(
-      agent,
+      frontend,
       track,
       extendConfiguration(
         configuration,
@@ -98,6 +125,7 @@ export const record = (configuration) => {
         null,
       ),
     );
+    flush();
   });
   afterEach(function () {
     assert(
@@ -117,10 +145,19 @@ export const record = (configuration) => {
     );
     const { track } = tracks.get(this);
     tracks.delete(this);
-    recordStopTrack(agent, track, {
+    recordStopTrack(frontend, track, {
       type: "test",
       // TODO: figure out how to fetch the status of the current test case
       passed: true,
     });
+    flush();
+  });
+  afterAll(async () => {
+    unhook(backup);
+    flush();
+    await closeSocketAsync(socket);
+    process.off("beforeExit", flush);
+    process.off("exit", flush);
+    process.off("uncaughtExceptionMonitor", flush);
   });
 };

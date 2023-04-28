@@ -1,71 +1,50 @@
-import { connect } from "node:net";
-import { Buffer } from "node:buffer";
+import { Socket } from "node:net";
 import NetSocketMessaging from "net-socket-messaging";
 import { toIpcPath, convertFileUrlToPath } from "../../path/index.mjs";
-import { mapMaybe } from "../../util/index.mjs";
-import { logWarningWhen, logWarning } from "../../log/index.mjs";
+import { logWarning } from "../../log/index.mjs";
 
-const { process, setInterval, clearInterval } = globalThis;
+const { Promise } = globalThis;
 
-const { concat: concatBuffer } = Buffer;
 const { createMessage } = NetSocketMessaging;
 
-const flush = (socket, messages) => {
-  if (socket.writable && messages.length > 0) {
-    const buffers = messages.map(createMessage);
-    // Socket.write registers asynchronous resources hence synchronous
-    // message writing so we need to empty the messages array before
-    messages.length = 0;
-    socket.write(concatBuffer(buffers));
+export const createSocket = ({ host, "trace-port": port }) => {
+  const socket = new Socket();
+  if (typeof port === "string") {
+    socket.connect(toIpcPath(convertFileUrlToPath(port)));
+  } else {
+    socket.connect(port, host);
+  }
+  socket.on("connect", () => {
+    socket.unref();
+  });
+  return socket;
+};
+
+export const isSocketReady = (socket) => !socket.pending && socket.writable;
+
+export const openSocketAsync = async (socket) => {
+  if (socket.pending) {
+    await new Promise((resolve, reject) => {
+      socket.on("connect", resolve);
+      socket.on("error", reject);
+    });
   }
 };
 
-export const openSocket = ({
-  host,
-  "trace-port": port,
-  heartbeat,
-  threshold,
-}) => {
-  const socket =
-    typeof port === "string"
-      ? connect(toIpcPath(convertFileUrlToPath(port)))
-      : connect(port, host);
-  socket.unref();
-  const messages = [];
-  socket.on("connect", () => {
-    const flushBind = () => {
-      flush(socket, messages);
-    };
-    process.once("beforeExit", flushBind);
-    flushBind();
-    const timer = mapMaybe(heartbeat, () => setInterval(flushBind, heartbeat));
-    mapMaybe(timer, (timer) => {
-      timer.unref();
-    });
-    socket.on("close", () => {
-      process.off("beforeExit", flushBind);
-      logWarningWhen(messages.length > 0, "Lost messages >> %j", messages);
-      messages.length = 0;
-      clearInterval(timer);
-    });
-  });
-  return { messages, socket, threshold };
-};
-
-export const closeSocket = ({ socket, messages }) => {
-  // TODO: investigate how to make this flush is done synchronously
-  // because closeSocket is often called on process exit event.
-  flush(socket, messages);
-  socket.end();
-};
-
-export const sendSocket = ({ socket, messages, threshold }, message) => {
-  if (socket.destroyed) {
-    logWarning("Lost message >> %s", message);
+export const sendSocket = (socket, message) => {
+  if (!socket.pending && socket.writable) {
+    socket.write(createMessage(message));
   } else {
-    messages.push(message);
-    if (threshold !== null && messages.length > threshold) {
-      flush(socket, messages);
-    }
+    logWarning("Lost message >> %s", message);
+  }
+};
+
+export const closeSocketAsync = async (socket) => {
+  if (!socket.writableFinished) {
+    socket.end();
+    await new Promise((resolve, reject) => {
+      socket.on("finish", resolve);
+      socket.on("error", reject);
+    });
   }
 };

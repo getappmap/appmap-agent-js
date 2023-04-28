@@ -1,15 +1,14 @@
 import { toString, spyOnce, assignProperty } from "../../util/index.mjs";
 import { requirePeerDependency } from "../../peer/index.mjs";
+import { getCurrentGroup } from "../../group/index.mjs";
+import { now } from "../../time/index.mjs";
 import {
   getFreshTab,
-  recordBeginEvent,
-  recordEndEvent,
-  recordBeforeEvent,
-  recordAfterEvent,
-  formatQueryPayload,
-  getAnswerPayload,
-  getBundlePayload,
-} from "../../agent/index.mjs";
+  recordBeginBundleEvent,
+  recordEndBundleEvent,
+  recordBeforeQueryEvent,
+  recordAfterAnswerEvent,
+} from "../../frontend/index.mjs";
 
 const {
   Object,
@@ -26,7 +25,10 @@ export const unhook = (backup) => {
   backup.forEach(assignProperty);
 };
 
-export const hook = (agent, { repository: { directory }, hooks: { pg } }) => {
+export const hook = (
+  frontend,
+  { repository: { directory }, hooks: { pg } },
+) => {
   if (pg === false) {
     return [];
   } else {
@@ -37,8 +39,6 @@ export const hook = (agent, { repository: { directory }, hooks: { pg } }) => {
     /* c8 ignore start */ if (Postgres === null) {
       return [];
     } /* c8 ignore stop */ else {
-      const bundle_payload = getBundlePayload(agent);
-      const answer_payload = getAnswerPayload(agent);
       const { Client, Query } = Postgres;
       const { prototype } = Client;
       const { query: original } = prototype;
@@ -72,24 +72,38 @@ export const hook = (agent, { repository: { directory }, hooks: { pg } }) => {
               });
             }
           }
-          const bundle_tab = getFreshTab(agent);
-          const jump_tab = getFreshTab(agent);
-          recordBeginEvent(agent, bundle_tab, bundle_payload);
-          recordBeforeEvent(
-            agent,
+          const bundle_tab = getFreshTab(frontend);
+          const jump_tab = getFreshTab(frontend);
+          recordBeginBundleEvent(
+            frontend,
+            bundle_tab,
+            getCurrentGroup(),
+            now(),
+          );
+          recordBeforeQueryEvent(
+            frontend,
             jump_tab,
-            formatQueryPayload(
-              agent,
-              DATABASE,
-              VERSION,
-              toString(query.text),
-              Object(query.values),
-            ),
+            getCurrentGroup(),
+            now(),
+            DATABASE,
+            VERSION,
+            toString(query.text),
+            Object(query.values),
           );
           const { callback: query_callback } = query;
           query.callback = spyOnce((_error, _result) => {
-            recordAfterEvent(agent, jump_tab, answer_payload);
-            recordEndEvent(agent, bundle_tab, bundle_payload);
+            recordAfterAnswerEvent(
+              frontend,
+              jump_tab,
+              getCurrentGroup(),
+              now(),
+            );
+            recordEndBundleEvent(
+              frontend,
+              bundle_tab,
+              getCurrentGroup(),
+              now(),
+            );
           }, query_callback);
           apply(original, this, [query]);
           return result;

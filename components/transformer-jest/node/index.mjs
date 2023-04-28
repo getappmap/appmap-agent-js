@@ -6,20 +6,42 @@ import { assert, hasOwnProperty } from "../../util/index.mjs";
 import { convertPathToFileUrl } from "../../path/index.mjs";
 import { ExternalAppmapError } from "../../error/index.mjs";
 import { logErrorWhen } from "../../log/index.mjs";
-import { getUuid } from "../../uuid/index.mjs";
-import { toAbsoluteUrl, toDirectoryUrl } from "../../url/index.mjs";
+import { readFile } from "../../file/index.mjs";
+import { toDirectoryUrl } from "../../url/index.mjs";
+import {
+  createFrontend,
+  instrument,
+  flush as flushFrontend,
+  extractMissingUrlArray,
+} from "../../frontend/index.mjs";
+import {
+  createSocket,
+  openSocketAsync,
+  sendSocket,
+  isSocketReady,
+} from "../../socket/index.mjs";
+
 // TODO: Make a stateless agent.
 // - counter to index references
 // - counter to index events
 
-import { openAgent, instrument } from "../../agent/index.mjs";
-
 const {
+  Map,
   RegExp,
+  encodeURIComponent,
   Object: { entries: toEntries },
+  JSON: { stringify: stringifyJSON },
 } = globalThis;
 
 const require = createRequire(toDirectoryUrl(convertPathToFileUrl(cwd())));
+
+const flush = (frontend, socket) => {
+  if (isSocketReady(socket)) {
+    for (const message of flushFrontend(frontend)) {
+      sendSocket(socket, stringifyJSON(message));
+    }
+  }
+};
 
 const loadTransformer = (specifier, options) => {
   let transformer = require(specifier);
@@ -73,7 +95,8 @@ const sanitizeSource = (source, specifier) => {
 };
 
 const transform = (
-  agent,
+  frontend,
+  socket,
   source,
   path,
   { supportsStaticESM: is_module },
@@ -87,17 +110,35 @@ const transform = (
     return source;
   } else if (is_module ? esm : cjs) {
     const url = convertPathToFileUrl(path);
+    let { code: content, map: map_content = null } = source;
+    const cache = new Map();
+    if (map_content !== null) {
+      if (typeof map_content !== "string") {
+        map_content = stringifyJSON(map_content);
+      }
+      // Escaping `${"="}` to prevent c8 to choke on this literal.
+      // https://github.com/bcoe/c8/blob/854f9f6c2ea36e583ea02fa3f8a850804e671df3/lib/source-map-from-file.js#L41
+      content = `${content}\n//# sourceMappingURL${"="}data:text/json,${encodeURIComponent(
+        map_content,
+      )}`;
+    }
+    cache.set(url, content);
+    let complete = false;
+    while (!complete) {
+      const urls = extractMissingUrlArray(frontend, url, cache);
+      if (urls.length === 0) {
+        complete = true;
+      } else {
+        for (const url of urls) {
+          cache.set(url, readFile(url));
+        }
+      }
+    }
+    // const source_type = is_module ? "module" : "script";
+    const content2 = instrument(frontend, url, cache);
+    flush(frontend, socket);
     return {
-      code: instrument(
-        agent,
-        { url, type: is_module ? "module" : "script", content: source.code },
-        source.map === null
-          ? null
-          : {
-              url: toAbsoluteUrl(`${getUuid()}.sourcemap.json`, url),
-              content: source.map,
-            },
-      ),
+      code: content2,
       map: null,
     };
   } else {
@@ -106,7 +147,13 @@ const transform = (
 };
 
 export const compileCreateTransformer = (configuration) => {
-  const agent = openAgent(configuration);
+  // Only source messages will be send from the frontend.
+  // As they are shared in the backend, session is a noop.
+  const frontend = createFrontend({ ...configuration, session: "noop" });
+  const socket = createSocket(configuration);
+  openSocketAsync(socket).then(() => {
+    flush(frontend, socket);
+  });
   return (dispatching) => {
     const transformers = toEntries(dispatching).map(loadDispatchingEntry);
     return {
@@ -131,7 +178,14 @@ export const compileCreateTransformer = (configuration) => {
             break;
           }
         }
-        return transform(agent, source, path, options, configuration);
+        return transform(
+          frontend,
+          socket,
+          source,
+          path,
+          options,
+          configuration,
+        );
       },
       processAsync: async (content, path, options) => {
         let source = { code: content, map: null };
@@ -156,7 +210,14 @@ export const compileCreateTransformer = (configuration) => {
             break;
           }
         }
-        return transform(agent, source, path, options, configuration);
+        return transform(
+          frontend,
+          socket,
+          source,
+          path,
+          options,
+          configuration,
+        );
       },
     };
   };

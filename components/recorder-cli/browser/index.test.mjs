@@ -1,14 +1,24 @@
+import { exit } from "node:process";
 import "../../__fixture__.mjs";
+import { defineGlobal } from "../../global/index.mjs";
 import {
   createConfiguration,
   extendConfiguration,
 } from "../../configuration/index.mjs";
-import { record } from "./index.mjs";
+
+const { Promise, setTimeout } = globalThis;
+
+defineGlobal("window", {
+  addEventListener: () => {},
+});
+
+const { record } = await import("./index.mjs");
 
 record(
   extendConfiguration(
     createConfiguration("file:///w:/home/"),
     {
+      heartbeat: 100,
       recorder: "process",
       hooks: {
         cjs: false,
@@ -24,3 +34,9 @@ record(
     "file:///w:/base/",
   ),
 );
+
+await new Promise((resolve) => {
+  setTimeout(resolve, 300);
+});
+
+exit(0);

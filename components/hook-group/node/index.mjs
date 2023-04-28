@@ -1,15 +1,15 @@
 import { createHook } from "node:async_hooks";
-import { recordGroup } from "../../agent/index.mjs";
+import { recordGroup } from "../../frontend/index.mjs";
 
 const { Set } = globalThis;
 
-export const hook = (agent, { ordering }) => {
+export const hook = (frontend, { ordering }) => {
   if (ordering !== "causal") {
     return null;
   } else {
     const groups = new Set();
     const hook = createHook({
-      init: (id, description, _origin) => {
+      init: (id, description, origin) => {
         // In the presence of a debugger, the init hook may be called multiple times for the same asyncId.
         // However, the asyncId is guaranteed to be unique so we should be able to safely ignore it if it's
         // already been seen.
@@ -17,9 +17,8 @@ export const hook = (agent, { ordering }) => {
         if (groups.has(id)) {
           return;
         }
-
         groups.add(id);
-        recordGroup(agent, id, description);
+        recordGroup(frontend, origin, id, description);
       },
     });
     hook.enable();

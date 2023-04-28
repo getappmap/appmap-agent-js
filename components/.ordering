@@ -42,9 +42,6 @@ instrumentation
 interpretation
 serialization
 frontend
-socket
-emitter
-agent
 hook-fixture
 hook-error
 hook-exit
@@ -57,6 +54,7 @@ hook-http
 hook-http-client
 hook-http-server
 hook
+socket
 transformer-jest
 recorder-api
 recorder-cli

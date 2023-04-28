@@ -4,7 +4,7 @@ import { assert, noop } from "../../util/index.mjs";
 
 export const unhook = noop;
 
-export const hook = (_agent, { hooks: { mysql, pg, sqlite3 } }) => {
+export const hook = (_frontend, { hooks: { mysql, pg, sqlite3 } }) => {
   assert(
     !logErrorWhen(
       mysql || pg || sqlite3,

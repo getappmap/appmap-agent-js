@@ -8,13 +8,13 @@ export const unhook = (backup) => {
   }
 };
 
-export const hook = (agent, configuration) => {
+export const hook = (frontend, configuration) => {
   if (configuration.recorder === "jest") {
     return null;
   } else {
     return {
-      cjs: hookCjs(agent, configuration),
-      esm: hookEsm(agent, configuration),
+      cjs: hookCjs(frontend, configuration),
+      esm: hookEsm(frontend, configuration),
     };
   }
 };

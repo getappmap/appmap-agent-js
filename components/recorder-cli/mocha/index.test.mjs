@@ -31,9 +31,11 @@ record(
   ),
 );
 
-const { beforeEach, afterEach } = hooks;
+const { beforeAll, beforeEach, afterEach, afterAll } = hooks;
 
-beforeEach.call({
+await beforeAll();
+
+await beforeEach.call({
   currentTest: {
     parent: {
       fullTitle: () => "full-title-1",
@@ -41,8 +43,10 @@ beforeEach.call({
   },
 });
 
-afterEach.call({
+await afterEach.call({
   currentTest: {
     state: "passed",
   },
 });
+
+await afterAll();

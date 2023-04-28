@@ -18,8 +18,11 @@ import {
 } from "../../../lib/node/loader-esm.mjs";
 import { InternalAppmapError } from "../../error/index.mjs";
 import { assert } from "../../util/index.mjs";
-import { instrument } from "../../agent/index.mjs";
+import { readFileAsync } from "../../file/index.mjs";
+import { instrument, extractMissingUrlArray } from "../../frontend/index.mjs";
 import { stringifyContent } from "./stringify.mjs";
+
+const { Map } = globalThis;
 
 let hooked = false;
 
@@ -32,34 +35,43 @@ export const unhook = (esm) => {
   }
 };
 
-export const hook = (agent, { hooks: { esm } }) => {
+export const hook = (frontend, { hooks: { esm } }) => {
   if (esm) {
     assert(!hooked, "esm already hooked", InternalAppmapError);
     hooked = esm;
-    const transformModule = (url, format, content) =>
-      format === "module"
-        ? instrument(
-            agent,
-            {
-              url,
-              type: "module",
-              content: stringifyContent(content),
-            },
-            null,
-          )
-        : content;
+    const transformModuleAsync = async (url, format, content) => {
+      // We do not want to intrument commonjs here
+      // because cjs has its own hook mechanism.
+      if (format === "module") {
+        const cache = new Map([[url, stringifyContent(content)]]);
+        let complete = false;
+        while (!complete) {
+          const urls = extractMissingUrlArray(frontend, url, cache);
+          if (urls.length === 0) {
+            complete = true;
+          } /* c8 ignore start */ else {
+            for (const url of urls) {
+              cache.set(url, await readFileAsync(url));
+            }
+          } /* c8 ignore start */
+        }
+        return instrument(frontend, url, cache);
+      } else {
+        return content;
+      }
+    };
     hooks.load = async (url, context, nextAsync) => {
       const { format, source } = await nextAsync(url, context, nextAsync);
       return {
         format,
-        source: transformModule(url, format, source),
+        source: await transformModuleAsync(url, format, source),
       };
     };
     hooks.transformSource = async (content, context, nextAsync) => {
       const { format, url } = context;
       const { source } = await nextAsync(content, context, nextAsync);
       return {
-        source: transformModule(url, format, source),
+        source: await transformModuleAsync(url, format, source),
       };
     };
   }
