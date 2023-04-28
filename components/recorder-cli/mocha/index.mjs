@@ -9,7 +9,7 @@ import { assert, coalesce, matchVersion } from "../../util/index.mjs";
 import { requirePeerDependency } from "../../peer/index.mjs";
 import {
   createFrontend,
-  flush as flushFrontend,
+  flushContent,
   recordStartTrack,
   recordStopTrack,
 } from "../../frontend/index.mjs";
@@ -22,10 +22,7 @@ import {
   closeSocketAsync,
 } from "../../socket/index.mjs";
 
-const {
-  undefined,
-  JSON: { stringify: stringifyJSON },
-} = globalThis;
+const { undefined } = globalThis;
 
 // Accessing mocha version via the prototype is not documented but it seems stable enough.
 // Added in https://github.com/mochajs/mocha/pull/3535
@@ -80,8 +77,9 @@ export const record = (configuration) => {
   const socket = createSocket(configuration);
   const flush = () => {
     if (isSocketReady(socket)) {
-      for (const message of flushFrontend(frontend)) {
-        sendSocket(socket, stringifyJSON(message));
+      const content = flushContent(frontend);
+      if (content !== null) {
+        sendSocket(socket, content);
       }
     }
   };

@@ -8,7 +8,7 @@ import { readGlobal } from "../../global/index.mjs";
 import { assert } from "../../util/index.mjs";
 import {
   createFrontend,
-  flush as flushFrontend,
+  flushContent,
   recordStartTrack,
   recordStopTrack,
 } from "../../frontend/index.mjs";
@@ -25,7 +25,6 @@ const {
   Map,
   Array: { from: toArray },
   Reflect: { defineProperty },
-  JSON: { stringify: stringifyJSON },
 } = globalThis;
 
 const getName = ({ name }) => name;
@@ -81,8 +80,9 @@ export const record = (configuration) => {
   const socket = createSocket(configuration);
   const flush = () => {
     if (isSocketReady(socket)) {
-      for (const message of flushFrontend(frontend)) {
-        sendSocket(socket, stringifyJSON(message));
+      const content = flushContent(frontend);
+      if (content !== null) {
+        sendSocket(socket, content);
       }
     }
   };

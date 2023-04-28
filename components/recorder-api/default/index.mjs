@@ -15,7 +15,7 @@ import { resolveConfigurationManualRecorder } from "../../configuration-accessor
 import { hook, unhook } from "../../hook/index.mjs";
 import {
   createFrontend,
-  flush as flushFrontend,
+  flushMessageArray,
   instrument,
   recordStartTrack,
   recordStopTrack,
@@ -57,7 +57,7 @@ const expectRunning = (hooking) => {
 };
 
 const flush = (frontend, backend) => {
-  for (const message of flushFrontend(frontend)) {
+  for (const message of flushMessageArray(frontend)) {
     sendBackend(backend, message);
   }
 };

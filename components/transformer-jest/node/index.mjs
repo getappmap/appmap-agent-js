@@ -11,7 +11,7 @@ import { toDirectoryUrl } from "../../url/index.mjs";
 import {
   createFrontend,
   instrument,
-  flush as flushFrontend,
+  flushContent,
   extractMissingUrlArray,
 } from "../../frontend/index.mjs";
 import {
@@ -37,8 +37,9 @@ const require = createRequire(toDirectoryUrl(convertPathToFileUrl(cwd())));
 
 const flush = (frontend, socket) => {
   if (isSocketReady(socket)) {
-    for (const message of flushFrontend(frontend)) {
-      sendSocket(socket, stringifyJSON(message));
+    const content = flushContent(frontend);
+    if (content !== null) {
+      sendSocket(socket, content);
     }
   }
 };

@@ -3,7 +3,7 @@ import {
   extendConfiguration,
 } from "../../configuration/index.mjs";
 import { validateMessage } from "../../validate/index.mjs";
-import { createFrontend, flush } from "../../frontend/index.mjs";
+import { createFrontend, flushMessageArray } from "../../frontend/index.mjs";
 
 export const testHookAsync = async (
   { hook, unhook },
@@ -27,7 +27,7 @@ export const testHookAsync = async (
   } finally {
     unhook(hooking);
   }
-  const messages = flush(frontend);
+  const messages = flushMessageArray(frontend);
   messages.forEach(validateMessage);
   return messages;
 };

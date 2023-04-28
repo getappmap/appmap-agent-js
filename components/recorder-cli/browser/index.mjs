@@ -1,7 +1,7 @@
 import { getUuid } from "../../uuid/index.mjs";
 import {
   createFrontend,
-  flush as flushFrontend,
+  flushContent,
   recordStartTrack,
 } from "../../frontend/index.mjs";
 import { hook } from "../../hook/index.mjs";
@@ -12,11 +12,7 @@ import {
   sendSocket,
 } from "../../socket/index.mjs";
 
-const {
-  window,
-  setInterval,
-  JSON: { stringify: stringifyJSON },
-} = globalThis;
+const { window, setInterval } = globalThis;
 
 export const record = (configuration) => {
   if (configuration.session === null) {
@@ -34,8 +30,9 @@ export const record = (configuration) => {
   const socket = createSocket(configuration);
   const flush = () => {
     if (isSocketReady(socket)) {
-      for (const message of flushFrontend(frontend)) {
-        sendSocket(socket, stringifyJSON(message));
+      const content = flushContent(frontend);
+      if (content !== null) {
+        sendSocket(socket, content);
       }
     }
   };
