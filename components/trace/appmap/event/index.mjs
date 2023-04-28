@@ -28,6 +28,7 @@ const digestEventPair = (event1, event2, id1, id2, info) => [
 ];
 
 const toClosureInfo = ({
+  excluded,
   specifier,
   position: { line },
   parent,
@@ -36,6 +37,7 @@ const toClosureInfo = ({
   parameters,
   shallow,
 }) => ({
+  excluded,
   link: {
     path: specifier,
     lineno: line,
@@ -96,7 +98,7 @@ export const digestEventTrace = (root, codebase) => {
         return digestTransparentBundle(node, null);
       } else if (type === "apply") {
         const info = mapMaybe(node.begin.payload.function, getClosureInfo);
-        if (info === null) {
+        if (info === null || info.excluded) {
           return digestTransparentBundle(node, info);
         } else if (info.shallow) {
           return digestShallowBundle(node, info);

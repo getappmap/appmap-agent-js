@@ -1,8 +1,7 @@
 import { getUrlBasename } from "../../url/index.mjs";
 import { assert } from "../../util/index.mjs";
-import { logWarning } from "../../log/index.mjs";
 import { printComment } from "../../parse/index.mjs";
-import { lookupPosition, stringifyPosition } from "../../position/index.mjs";
+import { resolvePosition, stringifyPosition } from "../../position/index.mjs";
 import { InternalAppmapError } from "../../error/index.mjs";
 import { toEntity } from "./entity.mjs";
 import { compileCriteria } from "./criteria.mjs";
@@ -106,57 +105,38 @@ const DISTANCE_OPTIONS = {
   threshold: THRESHOLD,
 };
 
-export const resolveClosurePosition = ({ url, root, closures }, position) => {
-  const pair = lookupPosition(closures, position, DISTANCE_OPTIONS);
-  if (pair === null) {
-    logWarning(
-      "Could find a closure at %j in %j, treating it as excluded",
-      position,
-      url,
-    );
-    return null;
-  } else {
-    const [resolved_position, path] = pair;
-    return path.split("/").reduce(getChild, root).excluded
-      ? null
-      : resolved_position;
-  }
+export const resolveClosurePosition = ({ closures }, position) =>
+  resolvePosition(closures, position, DISTANCE_OPTIONS);
+
+export const isClosurePositionExcluded = ({ closures, root }, position) => {
+  const key = stringifyPosition(position);
+  assert(closures.has(key), "missing closure", InternalAppmapError);
+  return closures.get(key).split("/").reduce(getChild, root).excluded;
 };
 
 export const lookupClosurePosition = (
-  { url, root, closures, content },
+  { root, closures, content },
   position,
 ) => {
-  const pair = lookupPosition(closures, position, DISTANCE_OPTIONS);
-  if (pair === null) {
-    logWarning(
-      "Could find a closure at %j in %j, treating it as excluded",
-      position,
-      url,
-    );
-    return null;
-  } else {
-    let parent = null;
-    let entity = root;
-    for (const index of pair[1].split("/")) {
-      parent = entity;
-      entity = entity.children[index];
-    }
-    if (entity.excluded) {
-      return null;
-    } else {
-      entity.used = true;
-      return {
-        position: entity.position,
-        parameters: entity.parameters.map(({ start, end }) =>
-          content.substring(start, end),
-        ),
-        parent: parent.name,
-        name: entity.name,
-        static: entity.static,
-      };
-    }
+  const key = stringifyPosition(position);
+  assert(closures.has(key), "missing closure", InternalAppmapError);
+  let parent = null;
+  let entity = root;
+  for (const index of closures.get(key).split("/")) {
+    parent = entity;
+    entity = entity.children[index];
   }
+  entity.used = true;
+  return {
+    excluded: entity.excluded,
+    parameters: entity.parameters.map(({ start, end }) =>
+      content.substring(start, end),
+    ),
+    parent: parent.name,
+    name: entity.name,
+    static: entity.static,
+    labels: entity.labels,
+  };
 };
 
 ////////////
