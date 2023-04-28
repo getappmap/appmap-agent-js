@@ -5,6 +5,7 @@ import { self_directory } from "../../self/index.mjs";
 import { URL } from "../../url/index.mjs";
 import { InternalAppmapError } from "../../error/index.mjs";
 import { assert, hasOwnProperty } from "../../util/index.mjs";
+import { inflate } from "../../compress/index.mjs";
 import { sendBackend } from "../../backend/index.mjs";
 import { partialxx_, resolveHostPath } from "./util.mjs";
 import { bufferReadable } from "./stream.mjs";
@@ -189,7 +190,9 @@ export const interceptUpgrade = (
     /* c8 ignore stop */
     wss.handleUpgrade(req, socket, head, (ws) => {
       ws.on("message", (data) => {
-        sendBackend(backend, parseJSON(data.toString("utf8")));
+        for (const message of inflate(parseJSON(data.toString("utf8")))) {
+          sendBackend(backend, message);
+        }
       });
       /* c8 ignore start */
       ws.on("error", (error) => {

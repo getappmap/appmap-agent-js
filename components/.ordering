@@ -40,6 +40,7 @@ backend
 instrumentation
 interpretation
 serialization
+compress
 frontend
 hook-fixture
 hook-error

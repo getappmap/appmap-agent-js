@@ -4,6 +4,7 @@ import NetSocketMessaging from "net-socket-messaging";
 import { InternalAppmapError } from "../../error/index.mjs";
 import { logWarning } from "../../log/index.mjs";
 import { assert } from "../../util/index.mjs";
+import { inflate } from "../../compress/index.mjs";
 import { sendBackend } from "../../backend/index.mjs";
 
 const {
@@ -20,17 +21,6 @@ const readFileSafe = (url) => {
   } catch (error) {
     logWarning("Could not load source at %j >> %O", url, error);
     return null;
-  }
-};
-
-const inflateMessage = (message) => {
-  if (message.type === "source" && message.content === null) {
-    return {
-      ...message,
-      content: readFileSafe(message.url),
-    };
-  } else {
-    return message;
   }
 };
 
@@ -65,26 +55,32 @@ export const createTraceServer = (backend) => {
       tracks.clear();
     });
     socket.on("message", (content) => {
-      const message = inflateMessage(parseJSON(content));
-      if (message.type === "start") {
-        tracks.add(message.track);
-        sendBackendAssert(backend, message);
-      } else if (message.type === "stop") {
-        if (message.track === null) {
-          for (const track of tracks) {
-            sendBackendAssert(backend, {
-              type: "stop",
-              track,
-              termination: message.termination,
-            });
+      for (const message of inflate(parseJSON(content))) {
+        if (message.type === "start") {
+          tracks.add(message.track);
+          sendBackendAssert(backend, message);
+        } else if (message.type === "stop") {
+          if (message.track === null) {
+            for (const track of tracks) {
+              sendBackendAssert(backend, {
+                type: "stop",
+                track,
+                termination: message.termination,
+              });
+            }
+            tracks.clear();
+          } else {
+            tracks.delete(message.track);
+            sendBackendAssert(backend, message);
           }
-          tracks.clear();
+        } else if (message.type === "source" && message.content === null) {
+          sendBackendAssert(backend, {
+            ...message,
+            content: readFileSafe(message.url),
+          });
         } else {
-          tracks.delete(message.track);
           sendBackendAssert(backend, message);
         }
-      } else {
-        sendBackendAssert(backend, message);
       }
     });
   });

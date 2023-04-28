@@ -5,9 +5,10 @@ import {
   createConfiguration,
   extendConfiguration,
 } from "../../configuration/index.mjs";
+import { inflate } from "../../compress/index.mjs";
 import {
   createFrontend,
-  flush,
+  flushContent,
   getFreshTab,
   getSession,
   getSerializationEmptyValue,
@@ -37,11 +38,18 @@ import {
   recordAfterAnswerEvent,
 } from "./index.mjs";
 
-const { Map, undefined } = globalThis;
+const {
+  Map,
+  undefined,
+  JSON: { parse: parseJSON },
+} = globalThis;
 
 const validateBuffer = (frontend) => {
-  for (const message of flush(frontend)) {
-    validateMessage(message);
+  const content = flushContent(frontend);
+  if (content !== null) {
+    for (const message of inflate(parseJSON(content))) {
+      validateMessage(message);
+    }
   }
 };
 
@@ -59,6 +67,8 @@ const configuration = extendConfiguration(
 );
 
 const frontend = createFrontend(configuration);
+
+validateBuffer(frontend);
 
 assertEqual(getSession(frontend), "session");
 

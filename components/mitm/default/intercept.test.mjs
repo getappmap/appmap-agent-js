@@ -9,6 +9,7 @@ import {
   createConfiguration,
   extendConfiguration,
 } from "../../configuration/index.mjs";
+import { deflate } from "../../compress/index.mjs";
 import { createBackend } from "../../backend/index.mjs";
 import { bufferReadable } from "./stream.mjs";
 import {
@@ -260,11 +261,15 @@ await new Promise((resolve, reject) => {
   });
   ws.send(
     toBuffer(
-      stringifyJSON({
-        type: "error",
-        session: "session",
-        error: { type: "number", print: "123" },
-      }),
+      stringifyJSON(
+        deflate([
+          {
+            type: "error",
+            session: "session",
+            error: { type: "number", print: "123" },
+          },
+        ]),
+      ),
     ),
   );
   ws.close();

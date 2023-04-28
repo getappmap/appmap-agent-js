@@ -13,6 +13,7 @@ import {
   createConfiguration,
   extendConfiguration,
 } from "../../configuration/index.mjs";
+import { inflate } from "../../compress/index.mjs";
 import { compileCreateTransformer } from "./index.mjs";
 
 const {
@@ -22,9 +23,10 @@ const {
 } = globalThis;
 
 const validateMockSocketBuffer = () => {
-  for (const message of readGlobal("GET_LAST_MOCK_SOCKET_BUFFER")()) {
-    validateMessage(parseJSON(message));
-  }
+  readGlobal("GET_LAST_MOCK_SOCKET_BUFFER")()
+    .map(parseJSON)
+    .flatMap(inflate)
+    .forEach(validateMessage);
 };
 
 ///////////////////////////////////////////////////////////////

@@ -5,6 +5,7 @@ import { assertDeepEqual } from "../../__fixture__.mjs";
 import { getUuid } from "../../uuid/random/index.mjs";
 import { getTmpUrl } from "../../path/index.mjs";
 import { toAbsoluteUrl } from "../../url/index.mjs";
+import { deflate } from "../../compress/index.mjs";
 import { createBackend, compileBackendTrack } from "../../backend/index.mjs";
 import {
   createConfiguration,
@@ -19,6 +20,10 @@ const {
 } = globalThis;
 
 const { createMessage } = NetSocketMessaging;
+
+const send = (socket, messages) => {
+  socket.write(createMessage(stringifyJSON(deflate(messages))));
+};
 
 const uuid = getUuid();
 
@@ -58,7 +63,7 @@ const start_1_message = {
   configuration,
 };
 
-socket.write(createMessage(stringifyJSON(start_1_message)));
+send(socket, [start_1_message]);
 
 const start_2_message = {
   type: "start",
@@ -66,7 +71,7 @@ const start_2_message = {
   configuration,
 };
 
-socket.write(createMessage(stringifyJSON(start_2_message)));
+send(socket, [start_2_message]);
 
 const missing_source_url = toAbsoluteUrl(
   `${uuid}-missing-source.js`,
@@ -79,7 +84,7 @@ const missing_source_message = {
   content: null,
 };
 
-socket.write(createMessage(stringifyJSON(missing_source_message)));
+send(socket, [missing_source_message]);
 
 const source_url = toAbsoluteUrl(`${uuid}-source.js`, getTmpUrl());
 
@@ -91,7 +96,7 @@ const source_message = {
 
 await writeFileAsync(new URL(source_url), "123;", "utf8");
 
-socket.write(createMessage(stringifyJSON(source_message)));
+send(socket, [source_message, { ...source_message, content: "456;" }]);
 
 const stop_1_message = {
   type: "stop",
@@ -99,7 +104,7 @@ const stop_1_message = {
   termination: { type: "manual" },
 };
 
-socket.write(createMessage(stringifyJSON(stop_1_message)));
+send(socket, [stop_1_message]);
 
 const stop_all_message = {
   type: "stop",
@@ -107,7 +112,7 @@ const stop_all_message = {
   termination: { type: "unknown" },
 };
 
-socket.write(createMessage(stringifyJSON(stop_all_message)));
+send(socket, [stop_all_message]);
 
 const start_3_message = {
   type: "start",
@@ -115,7 +120,7 @@ const start_3_message = {
   configuration,
 };
 
-socket.write(createMessage(stringifyJSON(start_3_message)));
+send(socket, [start_3_message]);
 
 socket.end();
 
@@ -137,7 +142,10 @@ const test = (track, termination) => {
     ),
     content: {
       configuration,
-      messages: [{ ...source_message, content: "123;" }],
+      messages: [
+        { ...source_message, content: "123;" },
+        { ...source_message, content: "456;" },
+      ],
       termination,
     },
   });

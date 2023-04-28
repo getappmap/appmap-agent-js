@@ -13,7 +13,7 @@ import {
 import {
   createFrontend,
   recordStartTrack,
-  flush as flushFrontend,
+  flushContent,
 } from "../../frontend/index.mjs";
 import {
   createSocket,
@@ -22,10 +22,7 @@ import {
   sendSocket,
 } from "../../socket/index.mjs";
 
-const {
-  setInterval,
-  JSON: { stringify: stringifyJSON },
-} = globalThis;
+const { setInterval } = globalThis;
 
 export const record = (configuration) => {
   configuration = extendConfigurationNode(configuration, process);
@@ -46,8 +43,9 @@ export const record = (configuration) => {
     const socket = createSocket(configuration);
     const flush = () => {
       if (isSocketReady(socket)) {
-        for (const message of flushFrontend(frontend)) {
-          sendSocket(socket, stringifyJSON(message));
+        const content = flushContent(frontend);
+        if (content !== null) {
+          sendSocket(socket, content);
         }
       }
     };
