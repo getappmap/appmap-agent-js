@@ -484,7 +484,7 @@ export const createConfiguration = (home) => ({
   main: null,
   recording: null,
   // provided by the user
-  socket: "unix",
+  socket: "net",
   heartbeat: 1000,
   threshold: 100,
   host: "localhost",
