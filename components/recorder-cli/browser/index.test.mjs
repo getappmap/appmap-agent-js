@@ -12,9 +12,9 @@ defineGlobal("window", {
   addEventListener: () => {},
 });
 
-const { record } = await import("./index.mjs");
+const { recordAsync } = await import("./index.mjs");
 
-record(
+await recordAsync(
   extendConfiguration(
     createConfiguration("file:///w:/home/"),
     {

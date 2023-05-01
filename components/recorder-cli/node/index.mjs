@@ -22,9 +22,9 @@ import {
   addSocketListener,
 } from "../../socket/index.mjs";
 
-const { setInterval } = globalThis;
+const { Promise, setInterval, undefined } = globalThis;
 
-export const record = (configuration) => {
+export const recordAsync = (configuration) => {
   configuration = extendConfigurationNode(configuration, process);
   if (isConfigurationEnabled(configuration)) {
     if (configuration.session === null) {
@@ -98,7 +98,12 @@ export const record = (configuration) => {
     } else {
       throw new InternalAppmapError("invalid node recorder");
     }
+    return new Promise((resolve, reject) => {
+      addSocketListener(socket, "error", reject);
+      addSocketListener(socket, "open", resolve);
+    });
   } /* c8 ignore start */ else {
     logInfo("Not recording process #%j -- %j", process.pid, process.argv);
+    return Promise.resolve(undefined);
   } /* c8 ignore stop */
 };

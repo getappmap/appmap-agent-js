@@ -6,12 +6,12 @@ import {
   createConfiguration,
   extendConfiguration,
 } from "../../configuration/index.mjs";
-import { record } from "./index.mjs";
+import { recordAsync } from "./index.mjs";
 
 const base = toDirectoryUrl(convertPathToFileUrl(cwd()));
 
 for (const recorder of ["process", "remote"]) {
-  record(
+  await recordAsync(
     extendConfiguration(
       createConfiguration("file:///w:/home/"),
       {

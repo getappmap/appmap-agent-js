@@ -1,1 +1,1 @@
-export { noop as record } from "../../util/index.mjs";
+export { noop as recordAsync } from "../../util/index.mjs";

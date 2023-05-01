@@ -12,9 +12,9 @@ import {
   sendSocket,
 } from "../../socket/index.mjs";
 
-const { window, setInterval } = globalThis;
+const { Promise, window, setInterval, undefined } = globalThis;
 
-export const record = (configuration) => {
+export const recordAsync = (configuration) => {
   if (configuration.session === null) {
     configuration = { ...configuration, session: getUuid() };
   }
@@ -41,4 +41,11 @@ export const record = (configuration) => {
   }
   window.addEventListener("beforeunload", flush);
   hook(frontend, configuration);
+  // We do not want to wait for the socket in browser setting.
+  // That is because we want to be sure that this code is
+  // evaluated before the observed application.
+  // In the other recorders, there is a mechanism to wait for
+  // the promise returned by this function before evaluating
+  // the rest of the code.
+  return Promise.resolve(undefined);
 };
