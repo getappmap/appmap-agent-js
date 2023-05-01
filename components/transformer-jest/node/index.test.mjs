@@ -22,8 +22,11 @@ const {
   JSON: { parse: parseJSON },
 } = globalThis;
 
+const getLastMockSocket = readGlobal("GET_LAST_MOCK_SOCKET");
+const getMockSocketBuffer = readGlobal("GET_MOCK_SOCKET_BUFFER");
+
 const validateMockSocketBuffer = () => {
-  readGlobal("GET_LAST_MOCK_SOCKET_BUFFER")()
+  getMockSocketBuffer(getLastMockSocket())
     .map(parseJSON)
     .flatMap(inflate)
     .forEach(validateMessage);

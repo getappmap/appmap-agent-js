@@ -16,10 +16,10 @@ import {
   flushContent,
 } from "../../frontend/index.mjs";
 import {
-  createSocket,
+  openSocket,
   isSocketReady,
-  openSocketAsync,
   sendSocket,
+  addSocketListener,
 } from "../../socket/index.mjs";
 
 const { setInterval } = globalThis;
@@ -40,7 +40,7 @@ export const record = (configuration) => {
     } = configuration;
     const frontend = createFrontend(configuration);
     hook(frontend, configuration);
-    const socket = createSocket(configuration);
+    const socket = openSocket(configuration);
     const flush = () => {
       if (isSocketReady(socket)) {
         const content = flushContent(frontend);
@@ -55,7 +55,7 @@ export const record = (configuration) => {
     process.once("beforeExit", flush);
     process.on("exit", flush);
     process.on("uncaughtExceptionMonitor", flush);
-    openSocketAsync(socket).then(flush);
+    addSocketListener(socket, "open", flush);
     if (recorder === "remote") {
       logInfo(
         "Enabling remote recording on process #%j -- %j",

@@ -15,14 +15,19 @@ import {
 } from "../../frontend/index.mjs";
 import { hook, unhook } from "../../hook/index.mjs";
 import {
-  createSocket,
-  openSocketAsync,
+  createThrottle,
+  updateThrottle,
+  throttleAsync,
+} from "../../throttle/index.mjs";
+import {
+  openSocket,
   isSocketReady,
   sendSocket,
-  closeSocketAsync,
+  closeSocket,
+  addSocketListener,
 } from "../../socket/index.mjs";
 
-const { undefined } = globalThis;
+const { undefined, parseInt, Promise } = globalThis;
 
 // Accessing mocha version via the prototype is not documented but it seems stable enough.
 // Added in https://github.com/mochajs/mocha/pull/3535
@@ -74,7 +79,11 @@ export const record = (configuration) => {
   );
   const frontend = createFrontend(configuration);
   const backup = hook(frontend, configuration);
-  const socket = createSocket(configuration);
+  const socket = openSocket(configuration);
+  const throttle = createThrottle(configuration);
+  addSocketListener(socket, "message", (message) => {
+    updateThrottle(throttle, parseInt(message));
+  });
   const flush = () => {
     if (isSocketReady(socket)) {
       const content = flushContent(frontend);
@@ -85,12 +94,20 @@ export const record = (configuration) => {
   };
   let running = null;
   hooks.beforeAll = async () => {
-    await openSocketAsync(socket);
+    /* c8 ignore start */
+    if (!isSocketReady(socket)) {
+      await new Promise((resolve, reject) => {
+        addSocketListener(socket, "error", reject);
+        addSocketListener(socket, "open", resolve);
+      });
+    }
+    /* c8 ignore stop */
     process.once("beforeExit", flush);
     process.on("exit", flush);
     process.on("uncaughtExceptionMonitor", flush);
   };
-  hooks.beforeEach = (context) => {
+  hooks.beforeEach = async (context) => {
+    await throttleAsync(throttle);
     assert(
       !logErrorWhen(
         running !== null,
@@ -132,7 +149,11 @@ export const record = (configuration) => {
   };
   hooks.afterAll = async () => {
     unhook(backup);
-    await closeSocketAsync(socket);
+    closeSocket(socket);
+    await new Promise((resolve, reject) => {
+      addSocketListener(socket, "error", reject);
+      addSocketListener(socket, "close", resolve);
+    });
     process.off("beforeExit", flush);
     process.off("exit", flush);
     process.off("uncaughtExceptionMonitor", flush);

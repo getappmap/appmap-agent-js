@@ -5,13 +5,21 @@ import { InternalAppmapError } from "../../error/index.mjs";
 import { logWarning } from "../../log/index.mjs";
 import { assert } from "../../util/index.mjs";
 import { inflate } from "../../compress/index.mjs";
-import { sendBackend } from "../../backend/index.mjs";
+import {
+  sendBackend,
+  countBackendCompleteTrack,
+} from "../../backend/index.mjs";
 
 const {
+  setInterval,
+  clearInterval,
+  String,
   Set,
   URL,
   JSON: { parse: parseJSON },
 } = globalThis;
+
+const BACK_PRESSURE_INTERVAL = 1000;
 
 const { patch: patchSocket } = NetSocketMessaging;
 
@@ -32,6 +40,15 @@ export const createTraceServer = (backend) => {
   const server = createServer();
   server.on("connection", (socket) => {
     patchSocket(socket);
+    socket.send(String(countBackendCompleteTrack(backend)));
+    /* c8 ignore start */
+    const timer = setInterval(() => {
+      if (socket.writable) {
+        socket.send(String(countBackendCompleteTrack(backend)));
+      }
+    }, BACK_PRESSURE_INTERVAL);
+    timer.unref();
+    /* c8 ignore stop */
     const tracks = new Set();
     /* c8 ignore start */
     socket.on("error", (error) => {
@@ -39,6 +56,7 @@ export const createTraceServer = (backend) => {
     });
     /* c8 ignore stop */
     socket.on("close", () => {
+      clearInterval(timer);
       // Normally hook-exit send a stop-all message.
       // But this message may never arrive due to
       // underlying network/buffer issue.

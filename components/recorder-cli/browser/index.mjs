@@ -6,9 +6,9 @@ import {
 } from "../../frontend/index.mjs";
 import { hook } from "../../hook/index.mjs";
 import {
-  createSocket,
+  openSocket,
   isSocketReady,
-  openSocketAsync,
+  addSocketListener,
   sendSocket,
 } from "../../socket/index.mjs";
 
@@ -26,8 +26,7 @@ export const record = (configuration) => {
       sessions: session,
     });
   }
-  hook(frontend, configuration);
-  const socket = createSocket(configuration);
+  const socket = openSocket(configuration);
   const flush = () => {
     if (isSocketReady(socket)) {
       const content = flushContent(frontend);
@@ -36,9 +35,10 @@ export const record = (configuration) => {
       }
     }
   };
+  addSocketListener(socket, "open", flush);
   if (heartbeat !== null) {
     setInterval(flush, heartbeat);
   }
   window.addEventListener("beforeunload", flush);
-  openSocketAsync(socket).then(flush);
+  hook(frontend, configuration);
 };

@@ -11,6 +11,7 @@ error
 crash-reporter
 log-inner
 log
+event
 glob
 spawn
 validate
@@ -56,6 +57,7 @@ hook-http-client
 hook-http-server
 hook
 socket
+throttle
 transformer-jest
 recorder-api
 recorder-cli

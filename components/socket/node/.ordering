@@ -1,4 +1,4 @@
-unix.mjs
+__fixture__.mjs
 net.mjs
-index-isolate.mjs
+unix.mjs
 index.mjs

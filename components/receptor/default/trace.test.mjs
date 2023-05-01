@@ -3,6 +3,7 @@ import { Socket } from "node:net";
 import NetSocketMessaging from "net-socket-messaging";
 import { assertDeepEqual } from "../../__fixture__.mjs";
 import { getUuid } from "../../uuid/random/index.mjs";
+import { logInfo } from "../../log/index.mjs";
 import { getTmpUrl } from "../../path/index.mjs";
 import { toAbsoluteUrl } from "../../url/index.mjs";
 import { deflate } from "../../compress/index.mjs";
@@ -19,10 +20,10 @@ const {
   URL,
 } = globalThis;
 
-const { createMessage } = NetSocketMessaging;
+const { patch: patchSocket } = NetSocketMessaging;
 
 const send = (socket, messages) => {
-  socket.write(createMessage(stringifyJSON(deflate(messages))));
+  socket.send(stringifyJSON(deflate(messages)));
 };
 
 const uuid = getUuid();
@@ -50,6 +51,8 @@ await new Promise((resolve) => {
 const { port } = server.address();
 
 const socket = new Socket();
+
+patchSocket(socket);
 
 socket.connect(port);
 
@@ -121,6 +124,10 @@ const start_3_message = {
 };
 
 send(socket, [start_3_message]);
+
+socket.on("message", (message) => {
+  logInfo(message);
+});
 
 socket.end();
 
