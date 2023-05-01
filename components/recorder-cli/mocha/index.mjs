@@ -60,7 +60,7 @@ const validateMocha = (Mocha) => {
   );
 };
 
-export const record = (configuration) => {
+export const recordAsync = (configuration) => {
   configuration = extendConfigurationNode(configuration, process);
   if (configuration.session === null) {
     configuration = { ...configuration, session: getUuid() };
@@ -158,4 +158,5 @@ export const record = (configuration) => {
     process.off("exit", flush);
     process.off("uncaughtExceptionMonitor", flush);
   };
+  return Promise.resolve(undefined);
 };

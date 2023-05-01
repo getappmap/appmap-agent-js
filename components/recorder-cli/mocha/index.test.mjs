@@ -8,7 +8,7 @@ import {
   createConfiguration,
   extendConfiguration,
 } from "../../configuration/index.mjs";
-import { record } from "./index.mjs";
+import { recordAsync } from "./index.mjs";
 
 const { setImmediate } = globalThis;
 
@@ -17,7 +17,7 @@ const receiveMockSocket = readGlobal("RECEIVE_MOCK_SOCKET");
 
 const home = toDirectoryUrl(convertPathToFileUrl(cwd()));
 
-record(
+await recordAsync(
   extendConfiguration(
     createConfiguration(home),
     {

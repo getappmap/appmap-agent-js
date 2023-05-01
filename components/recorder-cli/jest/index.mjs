@@ -28,6 +28,7 @@ import {
 
 const {
   Promise,
+  undefined,
   parseInt,
   Map,
   Array: { from: toArray },
@@ -43,7 +44,7 @@ function showTrackMap() {
   return toArray(this.values()).map(getName);
 }
 
-export const record = (configuration) => {
+export const recordAsync = (configuration) => {
   configuration = extendConfigurationNode(configuration, process);
   if (configuration.session === null) {
     configuration = { ...configuration, session: getUuid() };
@@ -186,4 +187,5 @@ export const record = (configuration) => {
     process.off("exit", flush);
     process.off("uncaughtExceptionMonitor", flush);
   }, TIMEOUT);
+  return Promise.resolve(undefined);
 };

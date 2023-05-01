@@ -5,14 +5,14 @@ import {
   extendConfiguration,
 } from "../../configuration/index.mjs";
 import { readGlobal } from "../../global/index.mjs";
-import { record } from "./index.mjs";
+import { recordAsync } from "./index.mjs";
 
 const { test: testJest } = Jest;
 
 const getLastMockSocket = readGlobal("GET_LAST_MOCK_SOCKET");
 const receiveMockSocket = readGlobal("RECEIVE_MOCK_SOCKET");
 
-record(
+await recordAsync(
   extendConfiguration(
     createConfiguration("file:///w:/home/"),
     {
