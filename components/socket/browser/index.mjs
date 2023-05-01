@@ -1,13 +1,15 @@
-import { logError, logWarning } from "../../log/index.mjs";
-import { InternalAppmapError } from "../../error/index.mjs";
-import { OPEN, CLOSED } from "./ready-state.mjs";
+import { logWarning } from "../../log/index.mjs";
+import { OPEN } from "./ready-state.mjs";
 
 const {
-  Promise,
+  WeakMap,
   URL,
   WebSocket,
+  TextDecoder,
   window: { location },
 } = globalThis;
+
+const cache = new WeakMap();
 
 const toWebSocketUrl = (base, path) => {
   const url_obj = new URL(base);
@@ -16,24 +18,27 @@ const toWebSocketUrl = (base, path) => {
   return url_obj.toString();
 };
 
-export const createSocket = ({ "http-switch": segment }) => {
-  const socket = new WebSocket(toWebSocketUrl(location, `/${segment}`));
-  /* c8 ignore start */
-  socket.addEventListener("error", (_event) => {
-    logError("Websocket error at %j", socket.url);
-    throw new InternalAppmapError("Websocket error");
-  });
-  /* c8 ignore stop */
-  return socket;
+export const openSocket = ({ "http-switch": segment }) =>
+  new WebSocket(toWebSocketUrl(location, `/${segment}`));
+
+export const addSocketListener = (socket, name, listener) => {
+  if (name === "message") {
+    const old_listener = listener;
+    const new_listener = ({ data }) => {
+      listener(new TextDecoder().decode(data));
+    };
+    cache.set(old_listener, new_listener);
+    socket.addEventListener(name, new_listener);
+  } else {
+    socket.addEventListener(name, listener);
+  }
 };
 
-export const openSocketAsync = async (socket) => {
-  if (socket.readyState !== OPEN) {
-    await new Promise((resolve, reject) => {
-      socket.addEventListener("open", resolve);
-      socket.addEventListener("error", reject);
-    });
-  }
+export const removeSocketListener = (socket, name, listener) => {
+  socket.removeEventListener(
+    name,
+    cache.has(listener) ? cache.get(listener) : listener,
+  );
 };
 
 export const isSocketReady = (socket) => socket.readyState === OPEN;
@@ -46,12 +51,6 @@ export const sendSocket = (socket, message) => {
   }
 };
 
-export const closeSocketAsync = async (socket) => {
+export const closeSocket = (socket) => {
   socket.close();
-  if (socket.readyState !== CLOSED) {
-    await new Promise((resolve, reject) => {
-      socket.addEventListener("close", resolve);
-      socket.addEventListener("error", reject);
-    });
-  }
 };

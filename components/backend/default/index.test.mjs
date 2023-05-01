@@ -9,6 +9,7 @@ import {
   hasBackendTrack,
   compileBackendTrack,
   compileBackendAvailableTrack,
+  countBackendCompleteTrack,
   isBackendEmpty,
 } from "./index.mjs";
 
@@ -56,6 +57,7 @@ const configuration = extendConfiguration(
   };
   assertEqual(sendBackend(backend, message3), true);
   assertEqual(isBackendEmpty(backend), false);
+  assertEqual(countBackendCompleteTrack(backend), 1);
   assertDeepEqual(compileBackendTrack(backend, "record", true), {
     url: "protocol://host/base/dirname/process/basename.appmap.json",
     content: {

@@ -1,25 +1,43 @@
+import {
+  createEventTarget,
+  addEventListener,
+  removeEventListener,
+  dispatchEvent,
+} from "../../event/index.mjs";
 import { defineGlobal } from "../../global/index.mjs";
 
-const { Promise, Error, undefined } = globalThis;
+const { setImmediate, Error } = globalThis;
 
-let buffer = null;
+let socket = null;
 
-defineGlobal("GET_LAST_MOCK_SOCKET_BUFFER", () => buffer);
+defineGlobal("GET_LAST_MOCK_SOCKET", () => socket);
 
-export const createSocket = (_configuration) => {
-  buffer = [];
-  return {
-    ready: { value: false },
-    buffer,
+defineGlobal("GET_MOCK_SOCKET_BUFFER", ({ buffer }) => buffer);
+
+defineGlobal("RECEIVE_MOCK_SOCKET", ({ target }, message) => {
+  setImmediate(dispatchEvent, target, "message", message);
+});
+
+export const openSocket = ({}) => {
+  const target = createEventTarget();
+  socket = {
+    ready: { value: true },
+    buffer: [],
+    target,
   };
+  setImmediate(dispatchEvent, target, "open", null);
+  return socket;
+};
+
+export const addSocketListener = ({ target }, name, listener) => {
+  addEventListener(target, name, listener);
+};
+
+export const removeSocketListener = ({ target }, name, listener) => {
+  removeEventListener(target, name, listener);
 };
 
 export const isSocketReady = ({ ready }) => ready.value;
-
-export const openSocketAsync = ({ ready }) => {
-  ready.value = true;
-  return Promise.resolve(undefined);
-};
 
 export const sendSocket = ({ buffer, ready }, message) => {
   if (ready.value) {
@@ -29,7 +47,9 @@ export const sendSocket = ({ buffer, ready }, message) => {
   }
 };
 
-export const closeSocketAsync = ({ ready }) => {
-  ready.value = false;
-  return Promise.resolve(undefined);
+export const closeSocket = ({ ready, target }) => {
+  if (ready.value) {
+    ready.value = false;
+    setImmediate(dispatchEvent, target, "close", null);
+  }
 };

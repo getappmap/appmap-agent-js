@@ -4,9 +4,13 @@ import {
   createConfiguration,
   extendConfiguration,
 } from "../../configuration/index.mjs";
+import { readGlobal } from "../../global/index.mjs";
 import { record } from "./index.mjs";
 
 const { test: testJest } = Jest;
+
+const getLastMockSocket = readGlobal("GET_LAST_MOCK_SOCKET");
+const receiveMockSocket = readGlobal("RECEIVE_MOCK_SOCKET");
 
 record(
   extendConfiguration(
@@ -28,6 +32,8 @@ record(
     "file:///w:/base/",
   ),
 );
+
+receiveMockSocket(getLastMockSocket(), "0");
 
 testJest("name1", () => {});
 

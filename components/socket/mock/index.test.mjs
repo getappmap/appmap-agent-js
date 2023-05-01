@@ -4,31 +4,52 @@ import {
   assertDeepEqual,
 } from "../../__fixture__.mjs";
 import { readGlobal } from "../../global/index.mjs";
-import { createConfiguration } from "../../configuration/index.mjs";
 import {
-  createSocket,
+  openSocket,
+  addSocketListener,
+  removeSocketListener,
   isSocketReady,
-  openSocketAsync,
   sendSocket,
-  closeSocketAsync,
+  closeSocket,
 } from "./index.mjs";
 
-const socket = createSocket(createConfiguration("protocol://host/home/"));
+const { Promise } = globalThis;
 
-assertEqual(isSocketReady(socket), false);
+const getLastMockSocket = readGlobal("GET_LAST_MOCK_SOCKET");
+const getMockSocketBuffer = readGlobal("GET_MOCK_SOCKET_BUFFER");
+const receiveMockSocket = readGlobal("RECEIVE_MOCK_SOCKET");
 
-assertThrow(() => sendSocket(socket, "before"), /^Error: socket not ready$/u);
+const socket = openSocket({});
 
-await openSocketAsync(socket);
+assertEqual(socket, getLastMockSocket());
 
 assertEqual(isSocketReady(socket), true);
 
-sendSocket(socket, "message");
+await new Promise((resolve) => {
+  addSocketListener(socket, "open", resolve);
+});
 
-await closeSocketAsync(socket);
+sendSocket(socket, "output");
+
+receiveMockSocket(socket, "input");
+
+assertEqual(
+  await new Promise((resolve) => {
+    addSocketListener(socket, "message", resolve);
+  }),
+  "input",
+);
+
+closeSocket(socket);
 
 assertEqual(isSocketReady(socket), false);
 
+await new Promise((resolve) => {
+  addSocketListener(socket, "close", resolve);
+});
+
 assertThrow(() => sendSocket(socket, "after"), /^Error: socket not ready$/u);
 
-assertDeepEqual(readGlobal("GET_LAST_MOCK_SOCKET_BUFFER")(), ["message"]);
+assertDeepEqual(getMockSocketBuffer(socket), ["output"]);
+
+removeSocketListener(socket, "message", () => {});

@@ -2,7 +2,7 @@
 
 import { cwd } from "node:process";
 import { createRequire } from "node:module";
-import { assert, hasOwnProperty } from "../../util/index.mjs";
+import { noop, assert, hasOwnProperty } from "../../util/index.mjs";
 import { convertPathToFileUrl } from "../../path/index.mjs";
 import { ExternalAppmapError } from "../../error/index.mjs";
 import { logErrorWhen } from "../../log/index.mjs";
@@ -15,8 +15,8 @@ import {
   extractMissingUrlArray,
 } from "../../frontend/index.mjs";
 import {
-  createSocket,
-  openSocketAsync,
+  openSocket,
+  addSocketListener,
   sendSocket,
   isSocketReady,
 } from "../../socket/index.mjs";
@@ -151,8 +151,9 @@ export const compileCreateTransformer = (configuration) => {
   // Only source messages will be send from the frontend.
   // As they are shared in the backend, session is a noop.
   const frontend = createFrontend({ ...configuration, session: "noop" });
-  const socket = createSocket(configuration);
-  openSocketAsync(socket).then(() => {
+  const socket = openSocket(configuration);
+  addSocketListener(socket, "message", noop);
+  addSocketListener(socket, "open", () => {
     flush(frontend, socket);
   });
   return (dispatching) => {

@@ -13,6 +13,7 @@ import {
 
 const {
   Map,
+  Boolean,
   Array: { from: toArray },
 } = globalThis;
 
@@ -65,6 +66,9 @@ export const compileBackendTrack = ({ tracks }, key, abrupt) => {
     return null;
   }
 };
+
+export const countBackendCompleteTrack = ({ tracks }) =>
+  toArray(tracks.values()).map(isTrackComplete).filter(Boolean).length;
 
 export const compileBackendAvailableTrack = ({ tracks }, abrupt) => {
   for (const [key, track] of tracks) {
