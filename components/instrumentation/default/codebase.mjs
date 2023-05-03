@@ -1,6 +1,9 @@
 import { assert } from "../../util/index.mjs";
-import { logWarning } from "../../log/index.mjs";
-import { InternalAppmapError } from "../../error/index.mjs";
+import { logWarning, logErrorWhen } from "../../log/index.mjs";
+import {
+  InternalAppmapError,
+  ExternalAppmapError,
+} from "../../error/index.mjs";
 import {
   extractSourcemapUrl,
   parseSourcemap,
@@ -20,38 +23,44 @@ const getUrl = ({ url }) => url;
 
 export const extractMissingUrlArray = (url, cache, configuration) => {
   if (cache.has(url)) {
-    const map_url = extractSourcemapUrl({
-      url,
-      content: cache.get(url),
-    });
-    if (map_url === null) {
+    const content = cache.get(url);
+    if (content === null) {
       return [];
     } else {
-      if (cache.has(map_url)) {
-        const sourcemap = parseSourcemap(
-          {
-            url: map_url,
-            content: cache.get(map_url),
-          },
-          url,
-        );
-        if (sourcemap === null) {
-          return [];
-        } else {
-          const { sources } = sourcemap;
-          return sources
-            .filter(
-              ({ url, content }) =>
-                content === null &&
-                !cache.has(url) &&
-                isSourceContentRequired(
-                  createSource({ url, content }, configuration),
-                ),
-            )
-            .map(getUrl);
-        }
+      const file = { url, content };
+      const map_url = extractSourcemapUrl(file);
+      if (map_url === null) {
+        return [];
       } else {
-        return [map_url];
+        if (cache.has(map_url)) {
+          const map_content = cache.get(map_url);
+          if (map_content === null) {
+            return [];
+          } else {
+            const map_file = {
+              url: map_url,
+              content: map_content,
+            };
+            const sourcemap = parseSourcemap(map_file, url);
+            if (sourcemap === null) {
+              return [];
+            } else {
+              const { sources } = sourcemap;
+              return sources
+                .filter(
+                  ({ url, content }) =>
+                    content === null &&
+                    !cache.has(url) &&
+                    isSourceContentRequired(
+                      createSource({ url, content }, configuration),
+                    ),
+                )
+                .map(getUrl);
+            }
+          }
+        } else {
+          return [map_url];
+        }
       }
     }
   } else {
@@ -66,30 +75,35 @@ const loadSourcemap = (file, cache, configuration) => {
   } else {
     const { url } = file;
     if (cache.has(map_url)) {
-      const sourcemap = parseSourcemap(
-        {
-          url: map_url,
-          content: cache.get(map_url),
-        },
-        url,
-      );
-      if (sourcemap === null) {
+      const map_content = cache.get(map_url);
+      if (map_content === null) {
         return null;
       } else {
-        const { sources, payload } = sourcemap;
-        return {
-          mapping: compileSourcemap(payload),
-          sources: sources.map(({ url, content }) =>
-            createSource(
-              {
-                url,
-                content:
-                  content === null && cache.has(url) ? cache.get(url) : content,
-              },
-              configuration,
-            ),
-          ),
+        const map_file = {
+          url: map_url,
+          content: map_content,
         };
+        const sourcemap = parseSourcemap(map_file, url);
+        if (sourcemap === null) {
+          return null;
+        } else {
+          const { sources, payload } = sourcemap;
+          return {
+            mapping: compileSourcemap(payload),
+            sources: sources.map(({ url, content }) =>
+              createSource(
+                {
+                  url,
+                  content:
+                    content === null && cache.has(url)
+                      ? cache.get(url)
+                      : content,
+                },
+                configuration,
+              ),
+            ),
+          };
+        }
       }
     } else {
       return null;
@@ -100,6 +114,15 @@ const loadSourcemap = (file, cache, configuration) => {
 export const createCodebase = (url, cache, configuration) => {
   assert(cache.has(url), "missing main content", InternalAppmapError);
   const content = cache.get(url);
+  assert(
+    !logErrorWhen(
+      content === null,
+      "Cannot not instrument file %j because it could not be loaded",
+      url,
+    ),
+    "missing main content",
+    ExternalAppmapError,
+  );
   const file = { url, content };
   return {
     main: createSource(file, configuration),

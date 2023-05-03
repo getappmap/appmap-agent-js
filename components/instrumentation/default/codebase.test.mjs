@@ -37,7 +37,7 @@ const testCreation = (url, cache, configuration, missing_url_array) => {
   assertEqual(typeof createCodebase(url, cache, configuration), "object");
 };
 
-// missing main content //
+// missing main content >> cache miss //
 assertThrow(
   () =>
     testCreation(
@@ -49,6 +49,18 @@ assertThrow(
   /^InternalAppmapError: missing main content$/u,
 );
 
+// missing main content >> cache null //
+assertThrow(
+  () =>
+    testCreation(
+      "http://host/directory/script.js",
+      new Map([["http://host/directory/script.js", null]]),
+      createConfiguration("http://host/home/"),
+      [],
+    ),
+  /^ExternalAppmapError: missing main content$/u,
+);
+
 // no sourcemap //
 testCreation(
   "http://host/directory/script.js",
@@ -57,7 +69,7 @@ testCreation(
   [],
 );
 
-// missing sourcemap //
+// missing sourcemap >> cache miss //
 testCreation(
   "http://host/directory/script.js",
   new Map([
@@ -68,6 +80,20 @@ testCreation(
   ]),
   createConfiguration("http://host/home/"),
   ["http://host/directory/sourcemap.json"],
+);
+
+// missing sourcemap >> cache null //
+testCreation(
+  "http://host/directory/script.js",
+  new Map([
+    [
+      "http://host/directory/script.js",
+      "123; //# sourceMappingURL=sourcemap.json",
+    ],
+    ["http://host/directory/sourcemap.json", null],
+  ]),
+  createConfiguration("http://host/home/"),
+  [],
 );
 
 // invalid sourcemap //

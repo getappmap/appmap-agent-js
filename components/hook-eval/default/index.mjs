@@ -10,9 +10,7 @@ import { toAbsoluteUrl, toDirectoryUrl } from "../../url/index.mjs";
 import { InternalAppmapError } from "../../error/index.mjs";
 import { readFile } from "../../file/index.mjs";
 import { assert, toString } from "../../util/index.mjs";
-import { instrument, extractMissingUrlArray } from "../../frontend/index.mjs";
-
-const { Map } = globalThis;
+import { instrument } from "../../frontend/index.mjs";
 
 const forward = (_url, _location, content) => content;
 
@@ -35,22 +33,13 @@ export const hook = (
     assert(
       defineGlobal(
         hidden,
-        (url, position, content) => {
-          url = toAbsoluteUrl(`eval-${position}.js`, toDirectoryUrl(url));
-          const cache = new Map([[url, toString(content)]]);
-          let complete = false;
-          while (!complete) {
-            const urls = extractMissingUrlArray(frontend, url, cache);
-            if (urls.length === 0) {
-              complete = true;
-            } /* c8 ignore start */ else {
-              for (const url of urls) {
-                cache.set(url, readFile(url));
-              }
-            } /* c8 ignore stop */
-          }
-          return instrument(frontend, url, cache);
-        },
+        (url, position, content) =>
+          instrument(
+            frontend,
+            toAbsoluteUrl(`eval-${position}.js`, toDirectoryUrl(url)),
+            toString(content),
+            readFile,
+          ),
         true,
       ),
       "global eval hook variable already defined",

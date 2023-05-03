@@ -19,10 +19,8 @@ import {
 import { InternalAppmapError } from "../../error/index.mjs";
 import { assert } from "../../util/index.mjs";
 import { readFileAsync } from "../../file/index.mjs";
-import { instrument, extractMissingUrlArray } from "../../frontend/index.mjs";
+import { instrumentAsync } from "../../frontend/index.mjs";
 import { stringifyContent } from "./stringify.mjs";
-
-const { Map } = globalThis;
 
 let hooked = false;
 
@@ -43,19 +41,12 @@ export const hook = (frontend, { hooks: { esm } }) => {
       // We do not want to intrument commonjs here
       // because cjs has its own hook mechanism.
       if (format === "module") {
-        const cache = new Map([[url, stringifyContent(content)]]);
-        let complete = false;
-        while (!complete) {
-          const urls = extractMissingUrlArray(frontend, url, cache);
-          if (urls.length === 0) {
-            complete = true;
-          } /* c8 ignore start */ else {
-            for (const url of urls) {
-              cache.set(url, await readFileAsync(url));
-            }
-          } /* c8 ignore start */
-        }
-        return instrument(frontend, url, cache);
+        return await instrumentAsync(
+          frontend,
+          url,
+          stringifyContent(content),
+          readFileAsync,
+        );
       } else {
         return content;
       }
