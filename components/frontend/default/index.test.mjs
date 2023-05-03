@@ -12,8 +12,8 @@ import {
   getFreshTab,
   getSession,
   getSerializationEmptyValue,
-  extractMissingUrlArray,
   instrument,
+  instrumentAsync,
   recordError,
   recordStartTrack,
   recordStopTrack,
@@ -39,7 +39,7 @@ import {
 } from "./index.mjs";
 
 const {
-  Map,
+  Error,
   undefined,
   JSON: { parse: parseJSON },
 } = globalThis;
@@ -77,16 +77,16 @@ assertEqual(typeof getSerializationEmptyValue(frontend), "symbol");
 assertEqual(typeof getFreshTab(frontend), "number");
 
 assertDeepEqual(
-  extractMissingUrlArray(frontend, "protocol://host/filename.js", new Map()),
-  ["protocol://host/filename.js"],
+  instrument(frontend, "protocol://host/filename.js", "123;", () => {
+    throw new Error("deadcode");
+  }),
+  "123;\n",
 );
 
 assertDeepEqual(
-  instrument(
-    frontend,
-    "protocol://host/filename.js",
-    new Map([["protocol://host/filename.js", "123;"]]),
-  ),
+  await instrumentAsync(frontend, "protocol://host/filename.js", "123;", () => {
+    throw new Error("deadcode");
+  }),
   "123;\n",
 );
 
@@ -217,17 +217,7 @@ testRecordEvent(
   "sql",
   [
     {
-      toString: () => {
-        assertEqual(
-          instrument(
-            frontend,
-            "protocol://host/filename.js",
-            new Map([["protocol://host/filename.js", "123;"]]),
-          ),
-          "123;",
-        );
-        return "parameter";
-      },
+      toString: () => "parameter",
     },
   ],
 );

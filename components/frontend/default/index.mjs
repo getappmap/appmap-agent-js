@@ -1,8 +1,8 @@
 import { assert, createCounter, incrementCounter } from "../../util/index.mjs";
 import {
-  instrument as instrumentInner,
-  extractMissingUrlArray as extractMissingUrlArrayInner,
-} from "../../instrumentation/index.mjs";
+  instrumentInject,
+  instrumentInjectAsync,
+} from "../../instrumentation-inject/index.mjs";
 import {
   createSerialization,
   serialize as serializeInner,
@@ -111,23 +111,44 @@ export const getSession = ({ session }) => session;
 export const getSerializationEmptyValue = ({ serialization }) =>
   getSerializationEmptyValueInner(serialization);
 
-export const extractMissingUrlArray = ({ configuration }, url, cache) =>
-  extractMissingUrlArrayInner(url, cache, configuration);
-
-export const instrument = ({ enabled, buffer, configuration }, url, cache) => {
+export const instrument = (
+  { enabled, buffer, configuration },
+  url,
+  content,
+  readFile,
+) => {
   if (enabled.value) {
-    const { sources, content: instrumented_content } = instrumentInner(
+    const { sources, content: instrumented_content } = instrumentInject(
       url,
-      cache,
+      content,
       configuration,
+      readFile,
     );
     for (const { url, content } of sources) {
       buffer.push([SOURCE, url, content]);
     }
     return instrumented_content;
-  } else {
-    return cache.get(url);
-  }
+  } /* c8 ignore start */ else {
+    return content;
+  } /* c8 ignore stop */
+};
+
+export const instrumentAsync = async (
+  { enabled, buffer, configuration },
+  url,
+  content,
+  readFileAsync,
+) => {
+  if (enabled.value) {
+    const { sources, content: instrumented_content } =
+      await instrumentInjectAsync(url, content, configuration, readFileAsync);
+    for (const { url, content } of sources) {
+      buffer.push([SOURCE, url, content]);
+    }
+    return instrumented_content;
+  } /* c8 ignore start */ else {
+    return content;
+  } /* c8 ignore stop */
 };
 
 export const recordError = ({ enabled, buffer, serialization }, error) => {

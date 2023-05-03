@@ -26,7 +26,7 @@ import {
   compileBackendTrack,
 } from "../../backend/index.mjs";
 
-const { Map, URL, Set, String } = globalThis;
+const { URL, Set, String } = globalThis;
 
 let global_running = false;
 
@@ -44,6 +44,12 @@ const validateUrl = (url = "file:///w:/missing-file-url.mjs") => {
     throw new ExternalAppmapError("Invalid url argument");
   }
 };
+
+/* c8 ignore start */
+const readFile = (_url) => {
+  throw new ExternalAppmapError("Recorder API does not support source map");
+};
+/* c8 ignore stop */
 
 const expectRunning = (hooking) => {
   assert(
@@ -92,12 +98,12 @@ export class Appmap {
   instrumentScript(content, url) {
     expectRunning(this.hooking);
     url = validateUrl(url);
-    return instrument(this.frontend, url, new Map([[url, String(content)]]));
+    return instrument(this.frontend, url, String(content), readFile);
   }
   instrumentModule(content, url) {
     expectRunning(this.hooking);
     url = validateUrl(url);
-    return instrument(this.frontend, url, new Map([[url, String(content)]]));
+    return instrument(this.frontend, url, String(content), readFile);
   }
   recordScript(content, url) {
     expectRunning(this.hooking);

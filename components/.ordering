@@ -39,6 +39,7 @@ source
 trace
 backend
 instrumentation
+instrumentation-inject
 interpretation
 serialization
 compress

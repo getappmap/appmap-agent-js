@@ -12,7 +12,6 @@ import {
   createFrontend,
   instrument,
   flushContent,
-  extractMissingUrlArray,
 } from "../../frontend/index.mjs";
 import {
   openSocket,
@@ -26,7 +25,6 @@ import {
 // - counter to index events
 
 const {
-  Map,
   RegExp,
   encodeURIComponent,
   Object: { entries: toEntries },
@@ -95,6 +93,20 @@ const sanitizeSource = (source, specifier) => {
   }
 };
 
+const getSourceContent = ({ code: content, map: map_content = null }) =>
+  map_content === null
+    ? content
+    : // Escaping `${"="}` to prevent c8 to choke on this literal.
+      // https://github.com/bcoe/c8/blob/854f9f6c2ea36e583ea02fa3f8a850804e671df3/lib/source-map-from-file.js#L41
+      // https://github.com/bcoe/c8/issues/467
+      `${content}\n//# sourceMappingURL${"="}data:text/json,${encodeURIComponent(
+        /* c8 ignore start */
+        typeof map_content === "string"
+          ? map_content
+          : stringifyJSON(map_content),
+        /* c8 ignore stop */
+      )}`;
+
 const transform = (
   frontend,
   socket,
@@ -111,32 +123,8 @@ const transform = (
     return source;
   } else if (is_module ? esm : cjs) {
     const url = convertPathToFileUrl(path);
-    let { code: content, map: map_content = null } = source;
-    const cache = new Map();
-    if (map_content !== null) {
-      if (typeof map_content !== "string") {
-        map_content = stringifyJSON(map_content);
-      }
-      // Escaping `${"="}` to prevent c8 to choke on this literal.
-      // https://github.com/bcoe/c8/blob/854f9f6c2ea36e583ea02fa3f8a850804e671df3/lib/source-map-from-file.js#L41
-      content = `${content}\n//# sourceMappingURL${"="}data:text/json,${encodeURIComponent(
-        map_content,
-      )}`;
-    }
-    cache.set(url, content);
-    let complete = false;
-    while (!complete) {
-      const urls = extractMissingUrlArray(frontend, url, cache);
-      if (urls.length === 0) {
-        complete = true;
-      } else {
-        for (const url of urls) {
-          cache.set(url, readFile(url));
-        }
-      }
-    }
-    // const source_type = is_module ? "module" : "script";
-    const content2 = instrument(frontend, url, cache);
+    const content1 = getSourceContent(source);
+    const content2 = instrument(frontend, url, content1, readFile);
     flush(frontend, socket);
     return {
       code: content2,
