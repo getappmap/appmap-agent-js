@@ -13,5 +13,6 @@ plugins:
       - $RELATIVE_MAIN_PATH
       - --
       - node
+      - --loader=ts-node/esm
       - --unhandled-rejections=strict
       - $RELATIVE_TEST_PATH
