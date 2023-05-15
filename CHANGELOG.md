@@ -1,3 +1,28 @@
+# [13.9.0](https://github.com/getappmap/appmap-agent-js/compare/v13.8.0...v13.9.0) (2023-05-15)
+
+
+### Bug Fixes
+
+* add data url in JSON schema ([f8abc37](https://github.com/getappmap/appmap-agent-js/commit/f8abc37152904ef3e1fdc000b85a2fc9e1481534))
+* do not crash on missing source map ([d025826](https://github.com/getappmap/appmap-agent-js/commit/d0258263d6c4f25daec713cf48953f0a7a69e6f3))
+* more restrictive schema to improve error message ([e1f5531](https://github.com/getappmap/appmap-agent-js/commit/e1f5531d2f30e5c7b0469c1ab876f1a85d172340))
+* prevent infinite recursion on user-defined toString ([d9a1715](https://github.com/getappmap/appmap-agent-js/commit/d9a17150a35b79061d65bbe869e9df52b0246b73))
+* solve oom issue on large test suite ([773245e](https://github.com/getappmap/appmap-agent-js/commit/773245e29b3952dec52d09f7d81d35ecd346dec1))
+* use trully pure convertions ([1416486](https://github.com/getappmap/appmap-agent-js/commit/1416486c2c6855028723ad63624b6ad5dd71ff47))
+
+
+### Features
+
+* improve feeedback for large appmaps ([0448fb8](https://github.com/getappmap/appmap-agent-js/commit/0448fb8f96a52db0dac406201edb7ac80f4e4e42))
+* make babel parsing options configurable by the user ([f45d9c4](https://github.com/getappmap/appmap-agent-js/commit/f45d9c4136b83503533f5ff4ad198d95bf4ae1f9))
+* no longer always exit with 0 ([3b6f55a](https://github.com/getappmap/appmap-agent-js/commit/3b6f55ae2ecb6d8d160c2e672f69b018bbdb193b))
+* no longer requires the user to use jest --no-cache flag ([d0b260a](https://github.com/getappmap/appmap-agent-js/commit/d0b260a8dee10ae01b382249d95abd9206172b82))
+
+
+### Performance Improvements
+
+* use a more compact format to send message to the backend ([aba0510](https://github.com/getappmap/appmap-agent-js/commit/aba0510afa2a54dee3ebf9be8621a4816603d03f))
+
 # [13.8.0](https://github.com/getappmap/appmap-agent-js/compare/v13.7.0...v13.8.0) (2023-04-27)
 
 
