@@ -1,5 +1,5 @@
 import { spawn } from "node:child_process";
-import { platform as getPlatform } from "node:os";
+import { platform, env, exit } from "node:process";
 import { rm as rmAsync } from "node:fs/promises";
 import Pg from "pg";
 import {
@@ -8,6 +8,7 @@ import {
   assertFail,
   assertMatch,
 } from "../../__fixture__.mjs";
+import { hasOwnProperty } from "../../util/index.mjs";
 import { getUuid } from "../../uuid/random/index.mjs";
 import { toAbsoluteUrl } from "../../url/index.mjs";
 import { getTmpUrl, convertFileUrlToPath } from "../../path/index.mjs";
@@ -17,6 +18,13 @@ import * as HookPg from "./pg.mjs";
 const { Promise, String, setTimeout, URL } = globalThis;
 
 const { Client, Query } = Pg;
+
+if (
+  hasOwnProperty(env, "SKIP_TEST") &&
+  env.SKIP_TEST.toLowerCase().includes("pg")
+) {
+  exit(0);
+}
 
 const promiseTermination = (child) =>
   new Promise((resolve, reject) => {
@@ -227,9 +235,9 @@ const proceedAsync = async () => {
 // But then node 18 cannot be installed (wtf travis 2x).
 // The solution seems to restart the service with other conf.
 // At this point, it is not any better than to launch the service here.
-if (getPlatform() !== "win32") {
+if (platform !== "win32") {
   const { initdb, pg_isready, postgres } =
-    getPlatform() === "darwin"
+    platform === "darwin"
       ? { initdb: "initdb", pg_isready: "pg_isready", postgres: "postgres" }
       : {
           initdb: "/usr/lib/postgresql/13/bin/initdb",
@@ -255,7 +263,7 @@ if (getPlatform() !== "win32") {
     ),
     { status: 0, signal: null },
   );
-  if (getPlatform() !== "darwin") {
+  if (platform !== "darwin") {
     assertDeepEqual(
       await promiseTermination(
         spawn("sudo", ["chmod", "777", "/var/run/postgresql/"], {

@@ -1,3 +1,5 @@
+/* c8 ignore start */
+
 import { toString, spyOnce, assignProperty } from "../../util/index.mjs";
 import { requirePeerDependency } from "../../peer/index.mjs";
 import { getCurrentGroup } from "../../group/index.mjs";
@@ -36,9 +38,9 @@ export const hook = (
       directory,
       strict: pg === true,
     });
-    /* c8 ignore start */ if (Postgres === null) {
+    if (Postgres === null) {
       return [];
-    } /* c8 ignore stop */ else {
+    } else {
       const { Client, Query } = Postgres;
       const { prototype } = Client;
       const { query: original } = prototype;

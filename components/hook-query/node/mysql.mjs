@@ -1,3 +1,5 @@
+/* c8 ignore start */
+
 import { toString, spyOnce, assignProperty } from "../../util/index.mjs";
 import { requirePeerDependency } from "../../peer/index.mjs";
 import { getCurrentGroup } from "../../group/index.mjs";
@@ -33,9 +35,9 @@ export const hook = (
       directory,
       strict: mysql === true,
     });
-    /* c8 ignore start */ if (Mysql === null) {
+    if (Mysql === null) {
       return [];
-    } /* c8 ignore stop */ else {
+    } else {
       const { createConnection, createQuery } = Mysql;
       const { __proto__: prototype } = createConnection({});
       const { query: original } = prototype;

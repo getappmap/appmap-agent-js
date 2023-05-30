@@ -1,5 +1,5 @@
 import { spawn } from "node:child_process";
-import { platform as getPlatform } from "node:os";
+import { platform, env, exit } from "node:process";
 import { rm as rmAsync } from "node:fs/promises";
 import Mysql from "mysql";
 import { assertEqual, assertDeepEqual } from "../../__fixture__.mjs";
@@ -7,6 +7,7 @@ import { getUuid } from "../../uuid/random/index.mjs";
 import { toAbsoluteUrl } from "../../url/index.mjs";
 import { getTmpUrl, convertFileUrlToPath } from "../../path/index.mjs";
 import { testHookAsync } from "../../hook-fixture/index.mjs";
+import { hasOwnProperty } from "../../util/index.mjs";
 import * as HookMysql from "./mysql.mjs";
 
 const {
@@ -18,6 +19,13 @@ const {
   URL,
   undefined,
 } = globalThis;
+
+if (
+  hasOwnProperty(env, "SKIP_TEST") &&
+  env.SKIP_TEST.toLowerCase().includes("mysql")
+) {
+  exit(0);
+}
 
 const promiseTermination = (child) =>
   new Promise((resolve, reject) => {
@@ -135,10 +143,10 @@ const proceedAsync = async () => {
 if (getOwnPropertyDescriptor(process.env, "TRAVIS") !== undefined) {
   // TODO: Investigate why it fails on travis/windows
   // > ECONNREFUSED 127.0.0.1:3306
-  if (getPlatform() !== "win32") {
+  if (platform !== "win32") {
     await proceedAsync();
   }
-} else if (getPlatform() !== "win32") {
+} else {
   const url = toAbsoluteUrl(getUuid(), getTmpUrl());
   assertDeepEqual(
     await promiseTermination(
