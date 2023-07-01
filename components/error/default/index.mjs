@@ -30,7 +30,7 @@ const external_message = `
 
 const unknown_message = `
 [appmap@${version}] Detected an unknown error.\
- If this error disapear when not recording your application, it is probably an issue within the appmap framework.\
+ If this error disappears when not recording your application, it is probably an issue within the appmap framework.\
  If this is the case, please consider submitting a bug report at:
   ${issues}
 
