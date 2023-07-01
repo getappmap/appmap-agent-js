@@ -7,6 +7,7 @@ import {
   hasOwnProperty,
   mapMaybe,
   recoverMaybe,
+  format,
 } from "../../../util/index.mjs";
 
 const {
@@ -204,5 +205,13 @@ export const digestPayload = (payload, options) => {
     "cannot digest payload",
     InternalAppmapError,
   );
-  return digesters[type](payload, options);
+  try {
+    return digesters[type](payload, options);
+  } catch (error) {
+    const err = new InternalAppmapError(
+      format("Error digesting payload %j", [payload]),
+    );
+    err.stack = `${err.message}: ${error.stack}`;
+    throw err;
+  }
 };
