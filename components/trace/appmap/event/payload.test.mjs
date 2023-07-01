@@ -1,4 +1,4 @@
-import { assertDeepEqual } from "../../../__fixture__.mjs";
+import { assertDeepEqual, assertThrow } from "../../../__fixture__.mjs";
 import {
   digestParameterPrimitive,
   digestExceptionSerial,
@@ -467,4 +467,12 @@ assertDeepEqual(
     null,
   ),
   {},
+);
+
+assertThrow(
+  () =>
+    digestPayload({
+      type: "request",
+    }),
+  /InternalAppmapError: Error digesting payload \{"type":"request"\}/u,
 );
