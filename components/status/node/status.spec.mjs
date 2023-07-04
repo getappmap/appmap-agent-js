@@ -14,7 +14,7 @@ describe("the status command", () => {
     externals.getPlatform = sinon.stub().returns("darwin");
     externals.lsPackage = sinon.stub().returns("{}");
     externals.showResults = sinon.stub();
-    externals.getNodeVersion = sinon.stub().returns("14.19.0");
+    externals.getNodeVersion = sinon.stub().returns("16.18.1");
 
     // Make sure we got them all, notCalled will be undefined if the function
     // hasn't been replaced.
@@ -40,7 +40,7 @@ describe("the status command", () => {
 
   describe("run", () => {
     it("fails for unsupported node", () => {
-      const node_version = "13.0";
+      const node_version = "14.19.0";
       externals.getNodeVersion = sinon.stub().returns(node_version);
       const result = JSON.parse(run(process));
       assert(externals.getNodeVersion.calledOnce);
