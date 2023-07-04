@@ -66,11 +66,7 @@ export const run = (root) => {
 
   const mocha_info = externals.lsPackage(root, "mocha");
   const package_json = parseJSON(mocha_info);
-  // It's possible we'll be run in a pre-14 Node VM, so don't use the
-  // optional-chaining operator here.
-  const deps = package_json.dependencies;
-  const mocha = deps && deps.mocha;
-  const mocha_version = mocha && mocha.version;
+  const mocha_version = package_json.dependencies?.mocha?.version;
   if (mocha_version) {
     if (!semver.satisfies(mocha_version, ">= 8")) {
       errors.push({
