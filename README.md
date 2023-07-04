@@ -16,7 +16,7 @@
 
 Supported platforms:
 * Mainstream os: Linux distros, macOS, and Windows.
-* Node.js: any up-to-date major versions that is not in end-of-life -- ie: 14, 16, 18, and 19.
+* Node.js: any up-to-date major versions that is not in end-of-life -- ie: 16, 18, and 19.
 * Express.js: 4.
 * git is highly recommended.
 * mocha >= 8.0.0 is required for recording AppMaps from test cases (earlier versions do not support required root hooks).
