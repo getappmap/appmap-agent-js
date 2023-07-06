@@ -1,6 +1,4 @@
-import { spawn } from "node:child_process";
-import { platform, env, exit } from "node:process";
-import { rm as rmAsync } from "node:fs/promises";
+import { env, exit, platform } from "node:process";
 import Pg from "pg";
 import {
   assertEqual,
@@ -9,13 +7,10 @@ import {
   assertMatch,
 } from "../../__fixture__.mjs";
 import { hasOwnProperty } from "../../util/index.mjs";
-import { getUuid } from "../../uuid/random/index.mjs";
-import { toAbsoluteUrl } from "../../url/index.mjs";
-import { getTmpUrl, convertFileUrlToPath } from "../../path/index.mjs";
 import { testHookAsync } from "../../hook-fixture/index.mjs";
 import * as HookPg from "./pg.mjs";
 
-const { Promise, String, setTimeout, URL } = globalThis;
+const { Promise } = globalThis;
 
 const { Client, Query } = Pg;
 
@@ -26,18 +21,8 @@ if (
   exit(0);
 }
 
-const promiseTermination = (child) =>
-  new Promise((resolve, reject) => {
-    child.on("exit", (status, signal) => resolve({ status, signal }));
-    child.on("error", reject);
-  });
-
 const auth = {
-  host: "localhost",
-  password: "",
-  port: 5432,
-  user: "postgres",
-  database: "postgres",
+  host: "/var/run/postgresql",
 };
 
 const proceedAsync = async () => {
@@ -217,90 +202,6 @@ const proceedAsync = async () => {
   );
 };
 
-// It would be nicer to use travis service:
-//
-// os: linux
-// dist: focal
-// service:
-//   - postgresql
-//
-// Unfortunatelly (wtf travis), it doesn't work:
-//
-// $ travis_setup_postgresql
-// Starting PostgreSQL v12
-// Assertion failed on job for postgresql@12-main.service.
-// sudo systemctl start postgresql@12-main
-//
-// Downgrading dist to bionic or xenial makes it work.
-// But then node 18 cannot be installed (wtf travis 2x).
-// The solution seems to restart the service with other conf.
-// At this point, it is not any better than to launch the service here.
 if (platform !== "win32") {
-  const { initdb, pg_isready, postgres } =
-    platform === "darwin"
-      ? { initdb: "initdb", pg_isready: "pg_isready", postgres: "postgres" }
-      : {
-          initdb: "/usr/lib/postgresql/13/bin/initdb",
-          pg_isready: "/usr/lib/postgresql/13/bin/pg_isready",
-          postgres: "/usr/lib/postgresql/13/bin/postgres",
-        };
-  const url = toAbsoluteUrl(getUuid(), getTmpUrl());
-  assertDeepEqual(
-    await promiseTermination(
-      spawn(
-        initdb,
-        [
-          "--pgdata",
-          convertFileUrlToPath(url),
-          "--no-locale",
-          "--encoding",
-          "UTF-8",
-          "--username",
-          auth.user,
-        ],
-        { stdio: "inherit" },
-      ),
-    ),
-    { status: 0, signal: null },
-  );
-  if (platform !== "darwin") {
-    assertDeepEqual(
-      await promiseTermination(
-        spawn("sudo", ["chmod", "777", "/var/run/postgresql/"], {
-          stdio: "inherit",
-        }),
-      ),
-      { status: 0, signal: null },
-    );
-  }
-  const child = spawn(
-    postgres,
-    ["-D", convertFileUrlToPath(url), "-p", String(auth.port)],
-    {
-      stdio: "inherit",
-    },
-  );
-  const termination = promiseTermination(child);
-  let ready = false;
-  while (!ready) {
-    await new Promise((resolve) => {
-      setTimeout(resolve, 1000);
-    });
-    const { status, signal } = await promiseTermination(
-      spawn(
-        pg_isready,
-        ["-U", auth.user, "-p", String(auth.port), "-d", "postgres", "-t", "0"],
-        { stdio: "inherit" },
-      ),
-    );
-    assertEqual(signal, null);
-    ready = status === 0;
-  }
-  try {
-    await proceedAsync();
-  } finally {
-    child.kill("SIGTERM");
-    assertDeepEqual(await termination, { status: 0, signal: null });
-    await rmAsync(new URL(url), { recursive: true });
-  }
+  proceedAsync();
 }

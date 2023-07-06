@@ -1,0 +1,60 @@
+name: Lint, test and release
+
+on:
+  - push
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with: { cache: npm }
+      - run: npm ci
+      - run: npm run lint
+
+  test:
+    strategy:
+      matrix:
+        node-version: [19, 18, 16]
+        os: [ubuntu, windows]
+    
+    runs-on: ${{matrix.os}}-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          cache: npm
+          node-version: ${{matrix.node-version}}
+      - run: npm ci
+      - name: Setup databases
+        run: |
+          sudo systemctl start postgresql
+          sudo -upostgres createuser -d -r -s runner
+          createdb runner
+          sudo systemctl start mysql
+          mysql -u root -proot -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY ''; FLUSH PRIVILEGES"
+        if: matrix.os == 'ubuntu'
+      - run: npm run coverage
+        if: matrix.node-version == 18 && matrix.os == 'ubuntu'
+      - run: npm run test:unit
+        if: matrix.node-version != 18 || matrix.os != 'ubuntu'
+      - run: npm run test:system
+
+  deploy:
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+    if: github.ref_name == 'main'
+    needs: [lint, test]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with: { cache: npm }
+      - run: npm ci
+      - run: npm run deploy
+    env:
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

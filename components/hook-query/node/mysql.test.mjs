@@ -34,7 +34,7 @@ const promiseTermination = (child) =>
   });
 
 const auth = {
-  host: "localhost",
+  host: "127.0.0.1",
   port: 3306,
   user: "root",
   password: "",
@@ -140,7 +140,7 @@ const proceedAsync = async () => {
   );
 };
 
-if (getOwnPropertyDescriptor(process.env, "TRAVIS") !== undefined) {
+if (getOwnPropertyDescriptor(process.env, "CI") !== undefined) {
   // TODO: Investigate why it fails on travis/windows
   // > ECONNREFUSED 127.0.0.1:3306
   if (platform !== "win32") {
