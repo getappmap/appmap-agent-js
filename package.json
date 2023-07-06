@@ -29,7 +29,9 @@
     "prepare": "node schema/build.mjs && node component/build.mjs",
     "lint": "node component/lint.mjs && npx eslint '**/*.@(mjs|cjs)' && npx prettier --check .",
     "format": "npx prettier --write .",
-    "test": "npx bercow .bercowrc-test-only.yaml && node test/system.mjs --pack",
+    "test": "npm run test:unit && npm run test:system",
+    "test:unit": "npx bercow .bercowrc-test-only.yaml",
+    "test:system": "node test/system.mjs --pack",
     "coverage": "npx bercow .bercowrc-test-only-cov.yaml",
     "deploy": "npx semantic-release"
   },
