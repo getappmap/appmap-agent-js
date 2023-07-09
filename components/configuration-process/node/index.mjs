@@ -4,7 +4,12 @@ import minimist from "minimist";
 import YAML from "yaml";
 
 import { ExternalAppmapError } from "../../error/index.mjs";
-import { assert, hasOwnProperty, coalesce } from "../../util/index.mjs";
+import {
+  assert,
+  hasOwnProperty,
+  coalesce,
+  isFileNotFound,
+} from "../../util/index.mjs";
 import { getCwdUrl } from "../../path/index.mjs";
 import {
   toAbsoluteUrl,
@@ -94,10 +99,9 @@ const loadConfigFile = (url) => {
   try {
     content = readFileSync(new URL(url), "utf8");
   } catch (error) {
-    const { code } = error;
     assert(
       !logErrorWhen(
-        code !== "ENOENT",
+        !isFileNotFound(error),
         "Cannot read configuration file at %j >> %O",
         url,
         error,

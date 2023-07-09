@@ -2,6 +2,7 @@ export * from "../../assert/index.mjs";
 export * from "./array.mjs";
 export * from "./box.mjs";
 export * from "./convert.mjs";
+export * from "./error.mjs";
 export * from "./format.mjs";
 export * from "./counter.mjs";
 export * from "./either.mjs";

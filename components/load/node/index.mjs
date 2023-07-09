@@ -1,6 +1,6 @@
 import { readFile as readFileAsync } from "node:fs/promises";
 import { parse as parseYaml } from "yaml";
-import { hasOwnProperty } from "../../util/index.mjs";
+import { hasOwnProperty, isFileNotFound } from "../../util/index.mjs";
 import { getLastUrlExtension } from "../../url/index.mjs";
 
 const {
@@ -34,6 +34,6 @@ export const loadAsync = async (url) => {
 
 export const isLoadMissingError = (error) =>
   hasOwnProperty(error, "code") &&
-  (error.code === "ENOENT" ||
+  (isFileNotFound(error) ||
     error.code === "ERR_MODULE_NOT_FOUND" ||
     error.code === "MODULE_NOT_FOUND");

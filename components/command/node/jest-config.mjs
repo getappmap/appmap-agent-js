@@ -1,6 +1,6 @@
 import { readFile as readFileAsync } from "node:fs/promises";
 import { createRequire } from "node:module";
-import { format, hasOwnProperty } from "../../util/index.mjs";
+import { format, hasOwnProperty, isFileNotFound } from "../../util/index.mjs";
 import { logError, logDebug } from "../../log/index.mjs";
 import { ExternalAppmapError } from "../../error/index.mjs";
 import { loadAsync, isLoadMissingError } from "../../load/index.mjs";
@@ -38,7 +38,7 @@ const loadPackageJsonAsync = async (directory) => {
       ),
     );
   } catch (error) {
-    if (hasOwnProperty(error, "code") && error.code === "ENOENT") {
+    if (isFileNotFound(error)) {
       return null;
     } else {
       logError("Could not load package.json from %j >> %O", directory, error);
