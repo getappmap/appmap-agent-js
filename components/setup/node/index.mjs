@@ -10,7 +10,7 @@ import Chalk from "chalk";
 import { self_directory, self_package } from "../../self/index.mjs";
 import { validateExternalConfiguration } from "../../validate/index.mjs";
 import { questionConfigAsync } from "../../questionnaire/index.mjs";
-import { hasOwnProperty } from "../../util/index.mjs";
+import { hasOwnProperty, isFileNotFound } from "../../util/index.mjs";
 import {
   convertPathToFileUrl,
   toAbsolutePath,
@@ -64,10 +64,10 @@ export const mainAsync = async (
     let content;
     try {
       content = await readFileAsync(new URL(conf_url), "utf8");
-    } catch ({ code, message }) {
+    } catch (error) {
       /* c8 ignore start */
-      if (code !== "ENOENT") {
-        logFailure(`configuration file cannot be read: ${message}`);
+      if (!isFileNotFound(error)) {
+        logFailure(`configuration file cannot be read: ${error}`);
         return false;
       }
       /* c8 ignore stop */
@@ -157,12 +157,12 @@ export const mainAsync = async (
         new URL(toAbsoluteUrl("package.json", repo_url)),
         "utf8",
       );
-    } catch ({ code, message }) {
+    } catch (error) {
       success = false;
-      if (code === "ENOENT") {
+      if (isFileNotFound(error)) {
         logWarning(`missing package.json file`);
       } /* c8 ignore start */ else {
-        logWarning(`cannot read package.json file: ${message}`);
+        logWarning(`cannot read package.json file: ${error}`);
       } /* c8 ignore stop */
     }
     if (success) {

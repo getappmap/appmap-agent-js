@@ -10,9 +10,9 @@ import { platform, argv, cwd as getCwd } from "node:process";
 import { parse as parseYAML } from "yaml";
 import glob from "glob";
 import minimist from "minimist";
+import { isFileNotFound } from "../components/util/index.mjs";
 import { logTitle, logFailure } from "./log.mjs";
 import { match } from "./match.mjs";
-import { hasOwn } from "./util.mjs";
 import { spawnStrictAsync } from "./spawn.mjs";
 
 const {
@@ -46,7 +46,7 @@ const readFileMaybeAsync = async (url) => {
   try {
     return await readFileAsync(url, "utf8");
   } catch (error) {
-    if (hasOwn(error, "code") && error.code === "ENOENT") {
+    if (isFileNotFound(error)) {
       return null;
     } else {
       throw error;

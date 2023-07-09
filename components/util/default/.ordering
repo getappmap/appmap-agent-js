@@ -1,6 +1,7 @@
 array.mjs
 box.mjs
 convert.mjs
+error.mjs
 format.mjs
 counter.mjs
 either.mjs
