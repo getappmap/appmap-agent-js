@@ -87,7 +87,7 @@ await assertReject(
       root: home,
     },
   ),
-  /^ExternalAppmapError: Could not load package.json$/u,
+  /^ExternalAppmapError: Could not load package.json/u,
 );
 
 // Package >> Valid //
