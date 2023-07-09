@@ -1,4 +1,5 @@
 import { win32 as Win32Path } from "node:path";
+import fswin from "fswin";
 
 const {
   undefined,
@@ -70,8 +71,11 @@ export const fromIpcPath = (path) => {
   }
 };
 
+/* c8 ignore next */
+const toLongPath = (path) => fswin?.convertPathSync(path, true) || path;
+
 export const toDirectoryPath = (path) =>
-  path.endsWith("/") || path.endsWith("\\") ? path : `${path}\\`;
+  toLongPath(path.endsWith("/") || path.endsWith("\\") ? path : `${path}\\`);
 
 export const toAbsolutePath = (relative, base) => {
   const path =
