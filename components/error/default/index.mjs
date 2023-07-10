@@ -46,8 +46,14 @@ export class InternalAppmapError extends AppmapError {
 }
 
 export class ExternalAppmapError extends AppmapError {
-  constructor(message) {
+  constructor(message, from = null) {
+    if (from) {
+      message = [message, from].join(": ");
+    }
     super(message);
+    if (from) {
+      this.stack = `ExternalAppmapError: ${message}\n  ${from.stack}`;
+    }
     this.name = "ExternalAppmapError";
   }
 }
