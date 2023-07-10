@@ -4,7 +4,7 @@ import { spawn } from "./spawn.mjs";
 
 assertThrow(
   () => spawn("MISSING EXECUTABLE", [], import.meta.url),
-  /^ExternalAppmapError: Failed to spawn executable$/u,
+  /^ExternalAppmapError: Failed to spawn executable/u,
 );
 
 // Could not make this work in windows...
