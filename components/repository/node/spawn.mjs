@@ -12,7 +12,7 @@ export const spawn = (exec, argv, url) => {
   const result = spawnChildProcess(exec, argv, {
     cwd: convertFileUrlToPath(new URL(".", url)),
     encoding: "utf8",
-    timeout: 1000,
+    timeout: 10000,
     stdio: ["ignore", "pipe", "pipe"],
   });
   const error = coalesce(result, "error", null);
