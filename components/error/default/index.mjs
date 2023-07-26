@@ -1,6 +1,6 @@
 import { version } from "../../version/index.mjs";
 
-const { Error } = globalThis;
+const { Boolean, Error, Number, undefined } = globalThis;
 
 const issues = "https://github.com/getappmap/appmap-agent-js/issues";
 const slack = "https://appmap.io/slack";
@@ -67,3 +67,24 @@ export const reportError = (error) => {
     return unknown_message;
   }
 };
+
+export const parseExceptionStack = ({ stack }) =>
+  [...(stack || "").matchAll(/^\s+at (?:(.+) \((.+)\)|(.+)$)/gmu)]
+    .map(([, method, loc1, loc2], level) => {
+      const location = loc1 || loc2;
+      const [, fileName, line, column] =
+        location === "native"
+          ? [undefined, "native"]
+          : location.match(/^(?:\w+:\/\/)?(.+):(\d+):(\d+)$/u) || [];
+      if (fileName) {
+        return {
+          fileName,
+          level,
+          method: method || "",
+          line: Number(line || 0),
+          column: Number(column || 0),
+        };
+      }
+      return undefined;
+    })
+    .filter(Boolean);
