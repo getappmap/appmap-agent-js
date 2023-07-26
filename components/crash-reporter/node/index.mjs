@@ -1,11 +1,11 @@
 import { request } from "node:https";
+import { parseExceptionStack } from "../../error/index.mjs";
 
 const {
   Boolean,
   Buffer,
   Date,
   JSON: { stringify: stringifyJSON },
-  Number,
   process: {
     env: { APPMAP_TELEMETRY_DISABLED },
   },
@@ -26,29 +26,7 @@ const INSTRUMENTATION_KEY = [
   .map((x) => Buffer.from(x, "base64").toString("utf8"))
   .join("-");
 
-const METHOD_REGEX = /at\s(?!\w+:\/\/)(.*?)[\s:]/u;
 const INGESTION_ENDPOINT = "centralus-2.in.applicationinsights.azure.com";
-const LOCATION_REGEX = /at\s+(\w+:\/\/|.*\()?(?:\w+:\/\/)?(.*):(\d+):\d+/u;
-
-export const parseExceptionStack = (exception) =>
-  exception.stack
-    ?.split("\n")
-    .filter((line) => line.match(/^\s+at\s/u))
-    .map((line, index) => {
-      const method = line.match(METHOD_REGEX)?.[1] ?? "";
-      const [, , fileName, lineNumber] = line.match(LOCATION_REGEX) ?? [];
-      if (!fileName || !lineNumber) {
-        return null;
-      }
-
-      return {
-        level: index,
-        method,
-        fileName,
-        line: Number(lineNumber),
-      };
-    })
-    .filter(Boolean) ?? [];
 
 /* c8 ignore start */
 export const reportException = (exception) => {
