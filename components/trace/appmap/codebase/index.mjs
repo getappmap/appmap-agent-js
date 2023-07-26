@@ -120,40 +120,42 @@ export const lookupClosureLocation = (
   const { url, hash, position } = location;
   if (codebase.has(url)) {
     const { shallow, versions } = codebase.get(url);
-    if (hash === null) {
-      if (/* c8 ignore start */ versions.size === 0) {
-        throw new InternalAppmapError("unexpected source without version");
-      } /* c8 ignore stop */ else if (versions.size === 1) {
-        const {
-          value: { source },
-        } = versions.values().next();
-        return completeClosure(
-          source,
-          toStaticSpecifier(url, base),
-          shallow,
-          position,
-        );
-      } else {
+    if (/* c8 ignore start */ versions.size === 0) {
+      throw new InternalAppmapError("unexpected source without version");
+    } /* c8 ignore stop */ else if (versions.size === 1) {
+      const {
+        value: { source },
+      } = versions.values().next();
+      return completeClosure(
+        source,
+        toStaticSpecifier(url, base),
+        shallow,
+        position,
+      );
+    } else {
+      if (hash === null) {
         logWarning(
           "Ignoring closure at %j because its source has multiple versions",
           location,
         );
         return null;
+      } else {
+        if (versions.has(hash)) {
+          const { source, version } = versions.get(hash);
+          return completeClosure(
+            source,
+            toDynamicSpecifier(url, base, version),
+            shallow,
+            position,
+          );
+        } else {
+          logWarning(
+            "Ignoring closure at %j because of source content mismatch",
+            location,
+          );
+          return null;
+        }
       }
-    } else if (versions.has(hash)) {
-      const { source, version } = versions.get(hash);
-      return completeClosure(
-        source,
-        toDynamicSpecifier(url, base, version),
-        shallow,
-        position,
-      );
-    } else {
-      logWarning(
-        "Ignoring closure at %j because of source content mismatch",
-        location,
-      );
-      return null;
     }
   } else {
     logWarningWhen(
