@@ -21,3 +21,5 @@ hooks:
   mysql: false
   pg: false
   sqlite3: false
+validate:
+  appmap: true
