@@ -1,3 +1,10 @@
+## [13.9.1](https://github.com/getappmap/appmap-agent-js/compare/v13.9.0...v13.9.1) (2023-07-28)
+
+
+### Bug Fixes
+
+* use static path in function path ([84e5fbb](https://github.com/getappmap/appmap-agent-js/commit/84e5fbb3aa0056c0cc19cbe431568d47a91896aa))
+
 # [13.9.0](https://github.com/getappmap/appmap-agent-js/compare/v13.8.0...v13.9.0) (2023-05-15)
 
 
