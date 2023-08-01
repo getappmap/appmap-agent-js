@@ -1,0 +1,8 @@
+metadata:
+  test_failure:
+    message: |
+      AssertionError: Expected values to be strictly equal:
+
+      'a' !== 'b'
+
+    location: main.test.mjs:19

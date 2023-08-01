@@ -1,6 +1,9 @@
 import process from "node:process";
 import { hooks } from "../../../lib/node/mocha-hook.mjs";
-import { ExternalAppmapError } from "../../error/index.mjs";
+import {
+  ExternalAppmapError,
+  parseExceptionStack,
+} from "../../error/index.mjs";
 import { logInfo, logErrorWhen } from "../../log/index.mjs";
 import { getUuid } from "../../uuid/index.mjs";
 import { extendConfiguration } from "../../configuration/index.mjs";
@@ -26,8 +29,24 @@ import {
   closeSocket,
   addSocketListener,
 } from "../../socket/index.mjs";
+import { stringifyLocation } from "../../location/index.mjs";
 
-const { undefined, parseInt, Promise } = globalThis;
+const { undefined, parseInt, Boolean, Promise } = globalThis;
+
+const buildTestFailure = (error) => {
+  if (!error?.name) {
+    return undefined;
+  }
+  const message = [error.name, error.message].filter(Boolean).join(": ");
+  const frame = parseExceptionStack(error)?.at(0);
+  if (!frame) {
+    return { message };
+  }
+  return {
+    message,
+    location: stringifyLocation({ position: frame, url: frame.fileName }),
+  };
+};
 
 // Accessing mocha version via the prototype is not documented but it seems stable enough.
 // Added in https://github.com/mochajs/mocha/pull/3535
@@ -140,9 +159,11 @@ export const recordAsync = (configuration) => {
       "No running mocha test case",
       ExternalAppmapError,
     );
+    const passed = context.currentTest.state === "passed";
     recordStopTrack(frontend, running.track, {
       type: "test",
-      passed: context.currentTest.state === "passed",
+      passed,
+      failure: passed ? undefined : buildTestFailure(context.currentTest.err),
     });
     flush();
     running = null;

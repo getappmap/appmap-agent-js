@@ -1,7 +1,7 @@
 import { strict as Assert } from "node:assert";
 import { describe, it } from "mocha";
 import { main, mainAsync } from "./main.mjs";
-const { setTimeout } = globalThis;
+const { Error, setTimeout } = globalThis;
 const { equal: assertEqual } = Assert;
 describe("suite", function () {
   it("main", function () {
@@ -13,4 +13,8 @@ describe("suite", function () {
   it("mainAsync", async function () {
     assertEqual(await mainAsync(), "main");
   });
+  it("errors", () => {
+    throw new Error("test error");
+  });
+  it("fails", () => assertEqual("a", "b"));
 });
