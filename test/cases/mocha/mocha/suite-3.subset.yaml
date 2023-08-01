@@ -1,0 +1,4 @@
+metadata:
+  test_failure:
+    message: "Error: test error"
+    location: main.test.mjs:17

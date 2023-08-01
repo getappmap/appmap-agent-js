@@ -9,6 +9,7 @@ import {
   logInfo,
   logInfoWhen,
 } from "../../log/index.mjs";
+import { toRelativeUrl } from "../../url/index.mjs";
 import { validateAppmap } from "../../validate-appmap/index.mjs";
 import { parseLocation } from "../../location/index.mjs";
 import {
@@ -22,11 +23,13 @@ import { orderEventArray } from "./ordering/index.mjs";
 import { getOutputUrl } from "./output.mjs";
 
 const {
+  Boolean,
   Map,
   Array: { from: toArray },
   String,
   Math: { round },
   RangeError,
+  URL,
 } = globalThis;
 
 const VERSION = "1.8.0";
@@ -181,6 +184,18 @@ const printApplyEventDistribution = (events, codebase) => {
     .join("");
 };
 
+const makeFailure = ({ message, location }, { base }) => {
+  if (!location) {
+    return { message };
+  }
+  const {
+    url,
+    position: { line },
+  } = parseLocation(location);
+  const relative = toRelativeUrl(new URL(url, base), base);
+  return { message, location: [relative, line].filter(Boolean).join(":") };
+};
+
 export const compileTrace = (configuration, files, messages, termination) => {
   logDebug("Trace: %j", { configuration, files, messages, termination });
   const errors = [];
@@ -290,12 +305,18 @@ export const compileTrace = (configuration, files, messages, termination) => {
     }
   }
   /* c8 ignore stop */
+
   const appmap = {
     version: VERSION,
     metadata: compileMetadata(configuration, errors, termination),
     classMap: exportClassmap(codebase),
     events: digested_events,
   };
+
+  if (termination.failure) {
+    appmap.metadata.test_failure = makeFailure(termination.failure, codebase);
+  }
+
   if (configuration.validate.appmap) {
     validateAppmap(appmap);
   }

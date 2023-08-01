@@ -1,0 +1,1 @@
+commands: ["node $1 || cd ."] # the test suite is expected to fail
