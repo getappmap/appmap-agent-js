@@ -1,3 +1,23 @@
+# [14.0.0](https://github.com/getappmap/appmap-agent-js/compare/v13.9.1...v14.0.0) (2023-08-04)
+
+
+### Bug Fixes
+
+* Expand short paths on Windows ([7e41bc2](https://github.com/getappmap/appmap-agent-js/commit/7e41bc2f1b33bfea6c41091865e118aa84c4d9eb))
+* Tolerate UNKNOWN errors on Windows ([4f178f6](https://github.com/getappmap/appmap-agent-js/commit/4f178f631856eb555f0d67bdc77b07e4434ef205))
+* Wait a bit longer while spawning subcommands ([9d6ff47](https://github.com/getappmap/appmap-agent-js/commit/9d6ff4705b48d8133d4bb3dab3c41be894dfe290))
+
+
+### chore
+
+* Remove support for Node 14 ([66739e6](https://github.com/getappmap/appmap-agent-js/commit/66739e650fa2bff547dcd2da1fad5bc9234f347c))
+
+
+### BREAKING CHANGES
+
+* Support for Node 14 has been removed.
+Official support ended more than two months ago.
+
 ## [13.9.1](https://github.com/getappmap/appmap-agent-js/compare/v13.9.0...v13.9.1) (2023-07-28)
 
 
