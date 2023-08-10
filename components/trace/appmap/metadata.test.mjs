@@ -39,7 +39,7 @@ const default_meta_data = {
     version: "1.2.3",
     url: "http://host/homepage",
   },
-  recorder: { name: "process" },
+  recorder: { name: "process", type: "process" },
   recording: undefined,
   git: undefined,
   test_status: undefined,
@@ -67,7 +67,7 @@ assertEqual(
 // recorder //
 assertDeepEqual(test({ recorder: "process" }, "protocol://host/base/"), {
   ...default_meta_data,
-  recorder: { name: "process" },
+  recorder: { name: "process", type: "process" },
 });
 
 // exception //

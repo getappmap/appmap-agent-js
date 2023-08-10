@@ -1,3 +1,4 @@
+# NOTE: when changing this, make sure to adjust the type map in components/trace/appmap/metadata
 enum:
   - process
   - mocha

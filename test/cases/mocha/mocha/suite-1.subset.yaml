@@ -1,1 +1,4 @@
-{}
+metadata:
+  recorder:
+    name: mocha
+    type: tests

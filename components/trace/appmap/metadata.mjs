@@ -76,13 +76,22 @@ const makeTestStatus = (termination) => {
   }
 };
 
+// NOTE: this relies on the fact that schema/definitions/recorder.yaml is an enum
+const RECORDER_TYPES = {
+  process: "process",
+  mocha: "tests",
+  jest: "tests",
+  manual: "process",
+  remote: "remote",
+};
+
 const makeRecorder = (recorder) => {
   assert(
     recorder !== null,
     "recorder should have been resolved earlier",
     InternalAppmapError,
   );
-  return { name: recorder };
+  return { name: recorder, type: RECORDER_TYPES[recorder] };
 };
 
 const makeException = (serials) => {

@@ -173,7 +173,7 @@ assertDeepEqual(
           url: "https://github.com/applandinc/appmap-agent-js",
           version: "1.2.3",
         },
-        recorder: { name: "process" },
+        recorder: { name: "process", type: "process" },
         recording: undefined,
         git: undefined,
         test_status: undefined,
