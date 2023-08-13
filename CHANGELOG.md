@@ -1,3 +1,10 @@
+# [14.1.0](https://github.com/getappmap/appmap-agent-js/compare/v14.0.0...v14.1.0) (2023-08-13)
+
+
+### Features
+
+* Add recorder type to appmap metadata ([f7fa84b](https://github.com/getappmap/appmap-agent-js/commit/f7fa84bab63063590febb1169f66af1667f5f072)), closes [#235](https://github.com/getappmap/appmap-agent-js/issues/235)
+
 # [14.0.0](https://github.com/getappmap/appmap-agent-js/compare/v13.9.1...v14.0.0) (2023-08-04)
 
 
