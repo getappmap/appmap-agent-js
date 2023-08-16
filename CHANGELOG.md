@@ -1,3 +1,10 @@
+# [14.2.0](https://github.com/getappmap/appmap-agent-js/compare/v14.1.0...v14.2.0) (2023-08-16)
+
+
+### Features
+
+* Record test failure details in mocha ([1052eb9](https://github.com/getappmap/appmap-agent-js/commit/1052eb9e51a52f47f8e688a13fc03b108f4d587e)), closes [#231](https://github.com/getappmap/appmap-agent-js/issues/231)
+
 # [14.1.0](https://github.com/getappmap/appmap-agent-js/compare/v14.0.0...v14.1.0) (2023-08-13)
 
 
