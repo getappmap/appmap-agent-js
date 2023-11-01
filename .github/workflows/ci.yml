@@ -8,8 +8,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-        with:
-          ref: ${{ github.event.pull_request.head.ref }}
       - uses: actions/setup-node@v3
         with: { cache: npm }
       - run: npm ci
@@ -24,8 +22,6 @@ jobs:
     runs-on: ${{matrix.os}}-latest
     steps:
       - uses: actions/checkout@v3
-        with:
-          ref: ${{ github.event.pull_request.head.ref }}
       - uses: actions/setup-node@v3
         with:
           cache: npm
@@ -44,6 +40,13 @@ jobs:
       - run: npm run test:unit
         if: matrix.node-version != 18 || matrix.os != 'ubuntu'
       - run: npm run test:system
+      # Begin AppMap bootstrap archive step
+      - name: Archive AppMaps
+        id: appmap-bootstrap-archive-appmaps
+        uses: getappmap/archive-action@v1
+        with:
+          revision: ${{ github.event.pull_request.base.sha }}
+      # End AppMap bootstrap archive step
 
   deploy:
     permissions:
@@ -58,7 +61,6 @@ jobs:
         with:
           fetch-depth: 0
           token: ${{ secrets.SEMANTIC_RELEASE_BOT_GITHUB_TOKEN }}
-          ref: ${{ github.event.pull_request.head.ref }}
       - uses: actions/setup-node@v3
         with: { cache: npm }
       - run: npm ci
