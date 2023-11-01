@@ -1,0 +1,12 @@
+name: appmap-agent-js
+packages:
+  - path: bin
+  - path: component
+  - path: components
+  - path: dist
+  - path: doc
+  - path: lib/node
+  - path: schema
+  - path: test
+language: javascript
+appmap_dir: tmp/appmap
